@@ -8,8 +8,16 @@ const router = createRouter({
       path: '/sign-up',
       name: 'signUp',
       component: SignUpView,
+      meta: {
+        title: 'Signup',
+        description: 'Register your account',
+      },
     },
   ],
+})
+
+router.beforeEach((to, from) => {
+  document.title = to.meta?.title ?? 'Default Title'
 })
 
 export default router
