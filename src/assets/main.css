@@ -2,6 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import 'primeicons/primeicons.css';
 @import '@vuepic/vue-datepicker/dist/main.css';
+@import 'vue-select/dist/vue-select.css';
+@import 'vue3-flag-icons/styles';
 
 @layer theme {
     @theme {
@@ -20,6 +22,14 @@
 .dp__input {
     @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none;
 }
+
+.vs__dropdown-toggle {
+    @apply px-3 pb-2 pt-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none;
+}
+.vs__selected-options {
+    @apply text-sm;
+}
+
 
 :root {
     /*General*/
@@ -56,4 +66,73 @@
     --dp-animation-duration: 0.1s; /*Transition duration*/
     --dp-menu-appear-transition-timing: cubic-bezier(.4, 0, 1, 1); /*Timing on menu appear animation*/
     --dp-transition-timing: ease-out; /*Timing on slide animations*/
+}
+
+:root,
+:host {
+    --vs-colors--lightest: rgba(60, 60, 60, 0.26);
+    --vs-colors--light: theme('colors.gray.400');
+    --vs-colors--dark: #333;
+    --vs-colors--darkest: rgba(0, 0, 0, 0.15);
+
+    /* Search Input */
+    --vs-search-input-color: inherit;
+    --vs-search-input-bg: theme('colors.white');
+    --vs-search-input-placeholder-color: theme('colors.gray.400');
+
+    /* Font */
+    --vs-font-size: var(--text-sm);
+    --vs-line-height: var(--text-sm--line-height);
+
+    /* Disabled State */
+    --vs-state-disabled-bg: rgb(248, 248, 248);
+    --vs-state-disabled-color: var(--vs-colors--light);
+    --vs-state-disabled-controls-color: var(--vs-colors--light);
+    --vs-state-disabled-cursor: not-allowed;
+
+    /* Borders */
+    --vs-border-color: var(--vs-colors--lightest);
+    --vs-border-width: 1px;
+    --vs-border-style: solid;
+    --vs-border-radius: 4px;
+
+    /* Actions: house the component controls */
+    --vs-actions-padding: 4px 6px 0 3px;
+
+    /* Component Controls: Clear, Open Indicator */
+    --vs-controls-color: theme('colors.gray.400');
+    --vs-controls-size: 1;
+    --vs-controls--deselect-text-shadow: 0 1px 0 #fff;
+
+    /* Selected */
+    --vs-selected-bg: #f0f0f0;
+    --vs-selected-color: var(--vs-colors--dark);
+    --vs-selected-border-color: var(--vs-border-color);
+    --vs-selected-border-style: var(--vs-border-style);
+    --vs-selected-border-width: var(--vs-border-width);
+
+    /* Dropdown */
+    --vs-dropdown-bg: #fff;
+    --vs-dropdown-color: inherit;
+    --vs-dropdown-z-index: 1000;
+    --vs-dropdown-min-width: 160px;
+    --vs-dropdown-max-height: 350px;
+    --vs-dropdown-box-shadow: theme('shadow.sm');
+
+    /* Options */
+    --vs-dropdown-option-bg: theme('colors.white');
+    --vs-dropdown-option-color: var(--vs-dropdown-color);
+    --vs-dropdown-option-padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+
+    /* Active State */
+    --vs-dropdown-option--active-bg: theme('colors.purple.700');
+    --vs-dropdown-option--active-color: theme('colors.white');
+
+    /* Deselect State */
+    --vs-dropdown-option--deselect-bg: #fb5858;
+    --vs-dropdown-option--deselect-color: theme('colors.gray.400');
+
+    /* Transitions */
+    --vs-transition-timing-function: cubic-bezier(1, -0.115, 0.975, 0.855);
+    --vs-transition-duration: 150ms;
 }
