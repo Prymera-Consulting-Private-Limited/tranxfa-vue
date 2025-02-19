@@ -2,7 +2,10 @@ import Account from "@/models/account.js";
 import Session from "@/models/session.js";
 import Country from "@/models/country.js";
 import Customer from "@/models/customer.js";
-export function useCustomerModel() {
+import CustomerAddress from "@/models/customer_address.js";
+import CustomerAttribute from "@/models/customer_attribute.js";
+
+export function useCustomerUtils() {
     const customer = new Customer()
     function getObject(data) {
         customer.id = data.id;
@@ -81,6 +84,35 @@ export function useCustomerModel() {
             nationality.endonym = data.nationality.endonym;
             nationality.demonym = data.nationality.demonym;
             customer.nationality = nationality;
+        }
+        if (data.address) {
+            const address = new CustomerAddress();
+            address.addressLine1 = data.address.address_line_1;
+            address.addressLine2 = data.address.address_line_2;
+            address.city = data.address.city;
+            address.postcode = data.address.postcode;
+            address.region = data.address.region;
+            address.createdAt = data.address.created_at;
+            address.updatedAt = data.address.updated_at;
+            customer.address = address;
+        }
+        if (data.attributes && data.attributes.length > 0) {
+            let attributes = [];
+            for (const attribute of data.attributes) {
+                const attr = new CustomerAttribute();
+                attr.attribute = attribute.attribute;
+                attr.category = attribute.category;
+                attr.regularExpression = attribute.regular_expression;
+                attr.mask = attribute.mask;
+                attr.expressionErrorMessage = attribute.expression_error_message;
+                attr.label = attribute.label;
+                attr.infoText = attribute.info_text;
+                attr.isRequired = attribute.is_required;
+                attr.value = attribute.value;
+                attributes.push(attr);
+            }
+
+            customer.attributes = attributes;
         }
     }
 
