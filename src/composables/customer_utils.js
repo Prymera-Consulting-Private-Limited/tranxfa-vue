@@ -146,7 +146,7 @@ export function useCustomerUtils() {
         }).then((response) => {
             getObject(response.data);
             customerStore.customer = customer;
-            customerStore.isLoaded = true;
+            customerStore.isLoaded.value = true;
         }).catch((e) => {
             throw e;
         })
