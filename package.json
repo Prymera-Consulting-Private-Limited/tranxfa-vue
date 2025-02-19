@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
+    "@vuepic/vue-datepicker": "^11.0.1",
     "axios": "^1.7.9",
     "pinia": "^3.0.1",
     "primeicons": "^7.0.0",
