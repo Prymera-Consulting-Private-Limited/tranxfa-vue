@@ -34,3 +34,5 @@ class CustomerAddress {
      */
     updatedAt = null;
 }
+
+export default CustomerAddress;
