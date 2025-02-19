@@ -121,6 +121,35 @@ export function useCustomerUtils() {
         }
     }
 
+    async function register(email, password, confirmPassword) {
+        await $axios.post('/client/v1/signup', {
+            email: email,
+            password: password,
+            confirm_password: confirmPassword,
+        }).then((response) => {
+            getObject(response.data);
+            customerStore.customer = customer;
+            customerStore.isLoaded = true;
+            localStorage.setItem('customerSessionToken', customer?.session?.sessionToken);
+        }).catch((e) => {
+            throw e;
+        })
+    }
+
+    async function login(email, password) {
+        await $axios.post('/client/v1/login', {
+            email: email,
+            password: password,
+        }).then((response) => {
+            getObject(response.data);
+            customerStore.customer = customer;
+            customerStore.isLoaded = true;
+            localStorage.setItem('customerSessionToken', customer?.session?.sessionToken);
+        }).catch((e) => {
+            throw e;
+        })
+    }
+
     async function refresh() {
         $axios.get('/client/v1/profile', {
             headers: {
@@ -130,8 +159,8 @@ export function useCustomerUtils() {
             getObject(response.data);
             customerStore.customer = customer;
             customerStore.isLoaded = true;
-        }).catch(() => {
-
+        }).catch((e) => {
+            throw e;
         })
     }
 
@@ -179,6 +208,8 @@ export function useCustomerUtils() {
     return {
         customer,
         getObject,
+        register,
+        login,
         refresh,
         verifyEmail,
         updateProfileIdentity,
