@@ -85,7 +85,7 @@ export class Customer {
     birthDetail = null;
 
     /**
-     * @type {Array<object>}
+     * @type {Array<CustomerAttribute>}
      */
     attributes = [];
 }
