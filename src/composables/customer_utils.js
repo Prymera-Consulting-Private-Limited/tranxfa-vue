@@ -4,9 +4,14 @@ import Country from "@/models/country.js";
 import Customer from "@/models/customer.js";
 import CustomerAddress from "@/models/customer_address.js";
 import CustomerAttribute from "@/models/customer_attribute.js";
+import {inject} from "vue";
+import {useCustomerStore} from "@/stores/customer.js";
 
 export function useCustomerUtils() {
     const customer = new Customer()
+    const $axios = inject('axios')
+    const customerStore = useCustomerStore();
+
     function getObject(data) {
         customer.id = data.id;
         customer.crn = data.crn;
@@ -116,9 +121,23 @@ export function useCustomerUtils() {
         }
     }
 
+    async function refresh() {
+        await $axios.get('/client/v1/profile', {
+            headers: {
+                'X-Customer-Token': localStorage.getItem('customerSessionToken'),
+            }
+        }).then((response) => {
+            getObject(response.data);
+            customerStore.customer = customer;
+            customerStore.isLoaded = true;
+        }).catch(() => {
+
+        })
+    }
 
     return {
         customer,
         getObject,
+        refresh,
     }
 }
