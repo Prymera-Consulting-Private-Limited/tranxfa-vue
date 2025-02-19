@@ -4,8 +4,9 @@ import Country from "@/models/country.js";
 import Customer from "@/models/customer.js";
 import CustomerAddress from "@/models/customer_address.js";
 import CustomerAttribute from "@/models/customer_attribute.js";
-import {inject} from "vue";
+import {inject, reactive} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
+import router from "@/router/index.js";
 
 export function useCustomerUtils() {
     const customer = new Customer()
@@ -122,7 +123,7 @@ export function useCustomerUtils() {
     }
 
     async function refresh() {
-        await $axios.get('/client/v1/profile', {
+        $axios.get('/client/v1/profile', {
             headers: {
                 'X-Customer-Token': localStorage.getItem('customerSessionToken'),
             }
@@ -135,9 +136,52 @@ export function useCustomerUtils() {
         })
     }
 
+    async function verifyEmail(otp) {
+        await $axios.post('/client/v1/verify-email-address', {
+            otp: otp,
+        }, {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        }).then((response) => {
+            getObject(response.data);
+            customerStore.customer = customer;
+            customerStore.isLoaded = true;
+        }).catch((e) => {
+            throw e;
+        })
+    }
+
+    async function updateProfileIdentity(attributes) {
+        const data = {};
+        for (const attr of attributes.value) {
+            const parsedAttr = attr.attribute.split('.');
+            if (parsedAttr.length === 1) {
+                data[attr.attribute] = attr.value;
+            } else {
+                data[parsedAttr[0]] = {};
+                data[parsedAttr[0]][parsedAttr[1]] = attr.value;
+            }
+        }
+
+        await $axios.post('/client/v1/update?category=identity', data, {
+            headers: {
+                'X-Customer-Token': localStorage.getItem('customerSessionToken'),
+            }
+        }).then((response) => {
+            getObject(response.data);
+            customerStore.customer = customer;
+            customerStore.isLoaded = true;
+        }).catch((e) => {
+            throw e;
+        })
+    }
+
     return {
         customer,
         getObject,
         refresh,
+        verifyEmail,
+        updateProfileIdentity,
     }
 }
