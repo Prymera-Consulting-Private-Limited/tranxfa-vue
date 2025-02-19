@@ -4,9 +4,8 @@ import Country from "@/models/country.js";
 import Customer from "@/models/customer.js";
 import CustomerAddress from "@/models/customer_address.js";
 import CustomerAttribute from "@/models/customer_attribute.js";
-import {inject, reactive} from "vue";
+import {inject} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
-import router from "@/router/index.js";
 
 export function useCustomerUtils() {
     const customer = new Customer()
@@ -146,7 +145,7 @@ export function useCustomerUtils() {
         }).then((response) => {
             getObject(response.data);
             customerStore.customer = customer;
-            customerStore.isLoaded.value = true;
+            customerStore.isLoaded = true;
         }).catch((e) => {
             throw e;
         })
