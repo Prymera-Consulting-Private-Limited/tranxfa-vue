@@ -17,6 +17,7 @@ axios.interceptors.request.use((config) => {
     config.headers['Accept'] = 'application/json'
     config.headers['X-App-User'] = import.meta.env.VITE_APP_USERNAME
     config.headers['X-App-Password'] = import.meta.env.VITE_APP_PASSWORD
+    config.headers['ngrok-skip-browser-warning'] = 'yes'
 
     return config;
 })
