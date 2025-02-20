@@ -3,6 +3,7 @@ import SignUpView from "@/views/SignUpView.vue";
 import SignInView from "@/views/SignInView.vue";
 import EmailVerificationView from "@/views/EmailVerificationView.vue";
 import EditIdentifyInfoView from "@/views/EditIdentifyInfoView.vue";
+import DashboardView from "@/views/DashboardView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,7 +43,7 @@ const router = createRouter({
     }, {
       path: '/dashboard',
       name: 'dashboard',
-      component: EditIdentifyInfoView,
+      component: DashboardView,
       meta: {
         title: 'Dashboard',
         description: '',
