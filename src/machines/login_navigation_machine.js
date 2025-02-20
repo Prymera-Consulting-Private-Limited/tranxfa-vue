@@ -20,7 +20,6 @@ export const loginNavigationMachine = createMachine({
                             return event.isEmailVerified || context.isEmailVerified;
                         },
                         identityInfoProvided: ({context, event}) => {
-                            console.log(event.identityInfoProvided || context.identityInfoProvided);
                             return event.identityInfoProvided || context.identityInfoProvided;
                         }
                     })
