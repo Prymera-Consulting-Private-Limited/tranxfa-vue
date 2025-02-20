@@ -78,7 +78,7 @@ async function verifyEmailAddress() {
                 </div>
               </div>
               <v-otp-input
-                  class="flex flex-row items-center justify-between w-full max-w-sm space-x-3 mx-auto"
+                  class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"
                   input-classes="w-16 h-16 flex flex-col items-center justify-center text-center px-5 border-b border border-gray-300 rounded-lg text-lg otp-input"
                   separator=""
                   inputType="number"
@@ -89,8 +89,7 @@ async function verifyEmailAddress() {
                   :placeholder="['*', '*', '*', '*', '*', '*']"
                   @on-complete="verifyEmailAddress"
               />
-              <div class="mt-6 grid grid-cols-2 gap-4">
-                <router-link :to="'/identity'" class="block w-full bg-white text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:ring-transparent text-center py-3  rounded-[10px] font-medium transition cursor-pointer">Skip</router-link>
+              <div class="mt-6 max-w-md mx-auto">
                 <button type="submit" class="block w-full bg-purple-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-purple-800 transition cursor-pointer">Verify Email</button>
               </div>
             </form>
