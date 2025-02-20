@@ -1,5 +1,5 @@
 <template>
-  <aside class="hidden md:block w-1/4 py-6   shadow-[18px 0 12px -16px rgba(0,0,0,0.1)]">
+  <aside class="hidden md:block md:w-1/4 lg:w-1/5 xl:w-1/6 py-6 tracking-wider">
     <ul class="space-y-6">
       <li>
         <a href="javascript:" class="flex items-center text-purple-700 font-medium hover:text-purple-700">

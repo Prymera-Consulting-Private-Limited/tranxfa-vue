@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-white  p-4">
+  <header class="bg-white p-4 tracking-wider">
     <div class="container mx-auto flex items-center justify-between overflow-x-auto">
       <!-- Logo -->
       <div class="flex items-center space-x-2">
