@@ -2,24 +2,41 @@
 import {reactive, ref} from "vue";
 import router from "@/router/index.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {useOnboardingUtils} from "@/composables/onboarding_utils.js";
-
+import {useNavigationUtils} from "@/composables/navigation_utils.js";
+import {useMachine} from "@xstate/vue";
+import {loginNavigationMachine} from "@/machines/login_navigation_machine.js"
+const { snapshot, send } = useMachine(loginNavigationMachine, {
+  provideActor: true
+});
 const showPassword = ref(false);
 const customerUtils = useCustomerUtils();
-const onboardingUtils = useOnboardingUtils();
+const navUtils = useNavigationUtils(snapshot)
 const form = reactive({
   email: '',
   password: '',
 });
 const isLoading = ref(false);
 const loginError = ref(null);
+
 async function login() {
   isLoading.value = true;
   loginError.value = null;
   await customerUtils.login(form.email, form.password).then(() => {
-    router.push(onboardingUtils.nextOnboardingRoute.value);
+    send({
+      type: "SET_CONTEXT",
+      isEmailVerified: customerUtils.customer.account.isEmailVerified
+    });
+    send({
+      type: "SET_CONTEXT",
+      identityInfoProvided: !customerUtils.customer.identityInformationRequired(),
+    });
+    send({ type: "PROCEED" })
+    if (navUtils.nextRoute.value) {
+      router.push(navUtils.nextRoute.value);
+    }
   }).catch((e) => {
-    loginError.value = e.response.data.message;
+    loginError.value = e.response?.data?.message;
+    console.error(e);
   }).finally(() => {
     isLoading.value = false;
   })
