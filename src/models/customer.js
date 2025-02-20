@@ -88,6 +88,10 @@ export class Customer {
      * @type {Array<CustomerAttribute>}
      */
     attributes = [];
+
+    identityInformationRequired () {
+        return Boolean(this.attributes.find((o) => o.category === 'identity' && o.isRequired && !o.value))
+    }
 }
 
 export default Customer;
