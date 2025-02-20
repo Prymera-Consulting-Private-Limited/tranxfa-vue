@@ -45,14 +45,6 @@ async function verifyEmailAddress() {
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
-              <i class="pi pi-times"></i>
-            </a>
-          </div>
-          <div class="hidden md:block  absolute top-4 right-4">
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
-              <i class="pi pi-times"></i>
-            </a>
           </div>
         </div>
 
