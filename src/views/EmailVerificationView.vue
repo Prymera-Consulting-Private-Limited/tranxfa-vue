@@ -4,20 +4,13 @@ import {useCustomerStore} from "@/stores/customer.js";
 import VOtpInput from "vue3-otp-input";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
+import pTimeout from 'p-timeout';
 
 const emailVerificationCode = ref('');
 const isLoading = ref(false);
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const otpError = ref('');
-
-onMounted(async () => {
-  if (! customerStore.isLoaded) {
-    isLoading.value = true;
-    await customerUtils.refresh();
-    isLoading.value = false;
-  }
-});
 
 async function verifyEmailAddress() {
   isLoading.value = true;
@@ -34,6 +27,53 @@ async function verifyEmailAddress() {
     isLoading.value = false;
   });
 }
+
+const showResendButton = ref(false);
+const countdown = ref(10);
+
+async function startResendOtpTimer() {
+  showResendButton.value = false;
+  countdown.value = 10;
+
+  try {
+    const timer = new Promise((resolve) => {
+      const interval = setInterval(() => {
+        countdown.value -= 1;
+        if (countdown.value === 0) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 1000);
+    });
+
+    await pTimeout(timer, { milliseconds: 10000 });
+    showResendButton.value = true;
+  } catch (error) {
+    console.log("Timeout error:", error);
+  }
+}
+
+async function resend() {
+  isLoading.value = true;
+  customerUtils.resendEmailVerification().catch((e) => {
+    if (e.status === 403) {
+
+    }
+  }).finally(() => {
+    isLoading.value = false;
+  });
+
+  await startResendOtpTimer();
+}
+
+onMounted(async () => {
+  if (! customerStore.isLoaded) {
+    isLoading.value = true;
+    await customerUtils.refresh();
+    isLoading.value = false;
+  }
+  await startResendOtpTimer();
+});
 </script>
 <template>
   <main>
@@ -81,8 +121,10 @@ async function verifyEmailAddress() {
                   :placeholder="['*', '*', '*', '*', '*', '*']"
                   @on-complete="verifyEmailAddress"
               />
-              <div class="mt-6 max-w-md mx-auto">
+              <div class="mt-6 max-w-md flex justify-between mx-auto">
                 <button type="submit" class="block w-full bg-purple-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-purple-800 transition cursor-pointer">Verify Email</button>
+              </div>
+              <div class="text-sm text-gray-500 text-center">Didn't receive verification code? <a @click="resend" class="text-purple-600 hover:text-purple-800 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
               </div>
             </form>
           </div>
