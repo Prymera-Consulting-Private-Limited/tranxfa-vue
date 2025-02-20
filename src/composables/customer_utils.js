@@ -164,6 +164,16 @@ export function useCustomerUtils() {
         })
     }
 
+    async function resendEmailVerification() {
+        await $axios.post('/client/v1/resend-email-verification', {}, {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        }).catch((e) => {
+            throw e;
+        })
+    }
+
     async function verifyEmail(otp) {
         await $axios.post('/client/v1/verify-email-address', {
             otp: otp,
@@ -211,6 +221,7 @@ export function useCustomerUtils() {
         register,
         login,
         refresh,
+        resendEmailVerification,
         verifyEmail,
         updateProfileIdentity,
     }
