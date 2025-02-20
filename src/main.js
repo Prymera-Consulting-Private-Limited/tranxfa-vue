@@ -21,6 +21,14 @@ axios.interceptors.request.use((config) => {
 
     return config;
 })
+
+axios.interceptors.response.use(null, function (e) {
+    if (e.status === 401) {
+        router.push('/');
+    }
+    throw e;
+})
+
 app.provide('axios', axios)
 
 app.mount('#app')
