@@ -39,6 +39,14 @@ const router = createRouter({
         title: 'Personal Details',
         description: '',
       },
+    }, {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: EditIdentifyInfoView,
+      meta: {
+        title: 'Dashboard',
+        description: '',
+      },
     },
   ],
 })
