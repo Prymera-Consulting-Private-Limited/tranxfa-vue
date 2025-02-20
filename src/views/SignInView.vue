@@ -1,6 +1,5 @@
 <script setup>
 import {reactive, ref} from "vue";
-import router from "@/router/index.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useNavigationUtils} from "@/composables/navigation_utils.js";
 import {useMachine} from "@xstate/vue";
@@ -10,7 +9,7 @@ const { snapshot, send } = useMachine(loginNavigationMachine, {
 });
 const showPassword = ref(false);
 const customerUtils = useCustomerUtils();
-const navUtils = useNavigationUtils(snapshot)
+const navUtils = useNavigationUtils(snapshot, send)
 const form = reactive({
   email: '',
   password: '',
@@ -22,18 +21,7 @@ async function login() {
   isLoading.value = true;
   loginError.value = null;
   await customerUtils.login(form.email, form.password).then(() => {
-    send({
-      type: "SET_CONTEXT",
-      isEmailVerified: customerUtils.customer.account.isEmailVerified
-    });
-    send({
-      type: "SET_CONTEXT",
-      identityInfoProvided: !customerUtils.customer.identityInformationRequired(),
-    });
-    send({ type: "PROCEED" })
-    if (navUtils.nextRoute.value) {
-      router.push(navUtils.nextRoute.value);
-    }
+    navUtils.redirectOnboarding(customerUtils.customer);
   }).catch((e) => {
     loginError.value = e.response?.data?.message;
     console.error(e);

@@ -3,7 +3,9 @@ import {onMounted, ref} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import VOtpInput from "vue3-otp-input";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import router from "@/router/index.js";
+import {useNavigationUtils} from "@/composables/navigation_utils.js";
+import {useMachine} from "@xstate/vue";
+import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_machine.js";
 import pTimeout from 'p-timeout';
 
 const emailVerificationCode = ref('');
@@ -11,17 +13,18 @@ const isLoading = ref(false);
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const otpError = ref('');
+const { snapshot, send } = useMachine(onboardingNavigationMachine, {
+  provideActor: true
+});
+const navUtils = useNavigationUtils(snapshot, send)
 
 async function verifyEmailAddress() {
   isLoading.value = true;
   await customerUtils.verifyEmail(emailVerificationCode.value).then(() => {
-    router.replace('/identity')
+    navUtils.redirectOnboarding(customerUtils.customer);
   }).catch((e) => {
     if (e.status === 422) {
       otpError.value = e.response.data.message;
-    } else if (e.status === 401) {
-      otpError.value = e.response.data.message;
-      router.push('/');
     }
   }).finally(() => {
     isLoading.value = false;
@@ -55,9 +58,10 @@ async function startResendOtpTimer() {
 
 async function resend() {
   isLoading.value = true;
-  customerUtils.resendEmailVerification().catch((e) => {
+  customerUtils.resendEmailVerification().catch(async (e) => {
     if (e.status === 403) {
-
+      await customerUtils.refresh();
+      await navUtils.redirectOnboarding(customerUtils.customer);
     }
   }).finally(() => {
     isLoading.value = false;
