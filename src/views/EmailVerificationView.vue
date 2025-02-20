@@ -13,30 +13,29 @@ const isLoading = ref(false);
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const otpError = ref('');
-const { snapshot, send } = useMachine(onboardingNavigationMachine, {
-  provideActor: true
-});
+const { snapshot, send } = useMachine(onboardingNavigationMachine);
 const navUtils = useNavigationUtils(snapshot, send)
 
 async function verifyEmailAddress() {
   isLoading.value = true;
-  await customerUtils.verifyEmail(emailVerificationCode.value).then(() => {
-    navUtils.redirectOnboarding(customerUtils.customer);
-  }).catch((e) => {
+  await customerUtils.verifyEmail(emailVerificationCode.value).catch((e) => {
     if (e.status === 422) {
       otpError.value = e.response.data.message;
+    } else if (e.status === 403) {
+      customerUtils.refresh();
     }
   }).finally(() => {
+    navUtils.redirectOnboarding(customerUtils.customer);
     isLoading.value = false;
   });
 }
 
 const showResendButton = ref(false);
-const countdown = ref(10);
+const countdown = ref(30);
 
 async function startResendOtpTimer() {
   showResendButton.value = false;
-  countdown.value = 10;
+  countdown.value = 30;
 
   try {
     const timer = new Promise((resolve) => {
@@ -49,7 +48,7 @@ async function startResendOtpTimer() {
       }, 1000);
     });
 
-    await pTimeout(timer, { milliseconds: 10000 });
+    await pTimeout(timer, { milliseconds: 30000 });
     showResendButton.value = true;
   } catch (error) {
     console.log("Timeout error:", error);
@@ -101,7 +100,7 @@ onMounted(async () => {
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-semibold text-black mb-4 text-center">Verify your Email!</h2>
-            <p class="text-md text-[#B7A3C1] mb-8 text-center">We have sent an email verification code to your email {{ customerStore.customer.account?.email }}</p>
+            <p class="text-md text-[#B7A3C1] mb-8 text-center">We have sent an email verification code to your email {{ customerStore.customer?.account?.email }}</p>
             <!-- Form -->
             <form @submit.prevent="verifyEmailAddress" class="space-y-10">
               <div v-if="otpError" class="rounded-md bg-red-50 p-4">
@@ -138,7 +137,6 @@ onMounted(async () => {
   </main>
 </template>
 <style scoped>
-
 .otp-input::-webkit-inner-spin-button,
 .otp-input::-webkit-outer-spin-button {
   -webkit-appearance: none;
