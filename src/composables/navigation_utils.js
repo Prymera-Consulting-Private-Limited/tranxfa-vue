@@ -4,6 +4,7 @@ import router from "@/router/index.js";
 export function useNavigationUtils(snapshot, send) {
     const routeMap = {
         emailVerification: '/email-verification',
+        editAccountCountry: '/onboarding/country',
         updateIdentityInformation: '/identity',
         dashboard: '/dashboard'
     };
@@ -27,11 +28,15 @@ export function useNavigationUtils(snapshot, send) {
         });
         send({
             type: "SET_CONTEXT",
+            accountCountry: customer.country?.id
+        });
+        send({
+            type: "SET_CONTEXT",
             identityInfoProvided: !customer.identityInformationRequired(),
         });
         send({ type: "PROCEED" })
         if (nextRoute.value) {
-            await router.replace(nextRoute.value);
+            await router.push(nextRoute.value);
         }
     }
 

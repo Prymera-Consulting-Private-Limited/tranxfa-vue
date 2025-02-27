@@ -4,6 +4,7 @@ import SignInView from "@/views/SignInView.vue";
 import EmailVerificationView from "@/views/EmailVerificationView.vue";
 import EditIdentifyInfoView from "@/views/EditIdentifyInfoView.vue";
 import DashboardView from "@/views/DashboardView.vue";
+import EditAccountCountryView from "@/views/EditAccountCountryView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,14 @@ const router = createRouter({
       meta: {
         title: 'Verify Email',
         description: 'Verify your email',
+      },
+    }, {
+      path: '/onboarding/country',
+      name: 'editAccountCountry',
+      component: EditAccountCountryView,
+      meta: {
+        title: 'Country of Residence',
+        description: '',
       },
     }, {
       path: '/identity',

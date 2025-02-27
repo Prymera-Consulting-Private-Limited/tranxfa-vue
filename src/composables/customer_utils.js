@@ -190,6 +190,22 @@ export function useCustomerUtils() {
         })
     }
 
+    async function updateCountry(country) {
+        await $axios.post('/client/v1/update-country', {
+            country_id: country.id,
+        }, {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        }).then((response) => {
+            getObject(response.data);
+            customerStore.customer = customer;
+            customerStore.isLoaded = true;
+        }).catch((e) => {
+            throw e;
+        })
+    }
+
     async function updateProfileIdentity(attributes) {
         const data = {};
         for (const attr of attributes.value) {
@@ -223,6 +239,7 @@ export function useCustomerUtils() {
         refresh,
         resendEmailVerification,
         verifyEmail,
+        updateCountry,
         updateProfileIdentity,
     }
 }

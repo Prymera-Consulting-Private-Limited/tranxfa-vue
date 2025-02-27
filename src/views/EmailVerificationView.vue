@@ -24,6 +24,7 @@ async function verifyEmailAddress() {
     } else if (e.status === 403) {
       customerUtils.refresh();
     }
+    console.error(e);
   }).finally(() => {
     navUtils.redirectOnboarding(customerUtils.customer);
     isLoading.value = false;
