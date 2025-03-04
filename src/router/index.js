@@ -1,10 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import SignUpView from "@/views/SignUpView.vue";
 import SignInView from "@/views/SignInView.vue";
-import EmailVerificationView from "@/views/EmailVerificationView.vue";
-import EditIdentifyInfoView from "@/views/EditIdentifyInfoView.vue";
-import DashboardView from "@/views/DashboardView.vue";
-import EditAccountCountryView from "@/views/EditAccountCountryView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,7 +24,7 @@ const router = createRouter({
     }, {
       path: '/email-verification',
       name: 'emailVerification',
-      component: EmailVerificationView,
+      component: () => import('@/views/EmailVerificationView.vue'),
       meta: {
         title: 'Verify Email',
         description: 'Verify your email',
@@ -36,7 +32,7 @@ const router = createRouter({
     }, {
       path: '/onboarding/country',
       name: 'editAccountCountry',
-      component: EditAccountCountryView,
+      component: () => import('@/views/EditAccountCountryView.vue'),
       meta: {
         title: 'Country of Residence',
         description: '',
@@ -44,7 +40,7 @@ const router = createRouter({
     }, {
       path: '/identity',
       name: 'updateIdentityInformation',
-      component: EditIdentifyInfoView,
+      component: () => import('@/views/EditIdentifyInfoView.vue'),
       meta: {
         title: 'Personal Details',
         description: '',
@@ -52,7 +48,7 @@ const router = createRouter({
     }, {
       path: '/dashboard',
       name: 'dashboard',
-      component: DashboardView,
+      component: () => import('@/views/DashboardView.vue'),
       meta: {
         title: 'Dashboard',
         description: '',
