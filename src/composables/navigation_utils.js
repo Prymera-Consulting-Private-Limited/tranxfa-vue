@@ -6,6 +6,7 @@ export function useNavigationUtils(snapshot, send) {
         emailVerification: '/email-verification',
         editAccountCountry: '/onboarding/country',
         updateIdentityInformation: '/identity',
+        mobileNumberInput: '/mobile-number',
         dashboard: '/dashboard'
     };
 
@@ -33,6 +34,10 @@ export function useNavigationUtils(snapshot, send) {
         send({
             type: "SET_CONTEXT",
             identityInfoProvided: !customer.identityInformationRequired(),
+        });
+        send({
+            type: "SET_CONTEXT",
+            mobileNumber: customer.mobileNumber,
         });
         send({ type: "PROCEED" })
         if (nextRoute.value) {
