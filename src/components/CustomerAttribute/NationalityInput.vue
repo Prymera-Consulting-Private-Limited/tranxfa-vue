@@ -15,11 +15,7 @@ const nationality = computed({
     return countries.value.find((o) => o.id === props.attr.value)
   },
   set(nationality) {
-    if (nationality) {
-      props.attr.value = nationality.id;
-    } else {
-      props.attr.value = null;
-    }
+    props.attr.value = nationality.id || null;
   }
 })
 
