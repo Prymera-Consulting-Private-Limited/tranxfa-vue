@@ -3,8 +3,9 @@ import {reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useNavigationUtils} from "@/composables/navigation_utils.js";
 import {useMachine} from "@xstate/vue";
-import {loginNavigationMachine} from "@/machines/login_navigation_machine.js"
-const { snapshot, send } = useMachine(loginNavigationMachine, {
+import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_machine.js";
+
+const { snapshot, send } = useMachine(onboardingNavigationMachine, {
   provideActor: true
 });
 const showPassword = ref(false);
