@@ -12,7 +12,7 @@ defineProps({
 </script>
 
 <template>
-  <label  :class="[attr.errors?.length > 0 ? 'text-red-700' : 'text-purple-700']" class="block text-sm font-medium mb-0">{{ attr.label }}</label>
+  <label :for="attr.attribute" :class="[attr.errors?.length > 0 ? 'text-red-700' : 'text-purple-700']" class="block text-sm font-medium mb-0">{{ attr.label }}</label>
   <p class="mt-2 mb-3 text-gray-400 text-sm">{{ attr.infoText }}</p>
   <FirstNameInput v-bind:attr="attr" v-if="attr.attribute === 'first_name'" />
   <MiddleNameInput v-bind:attr="attr" v-if="attr.attribute === 'middle_name'" />
