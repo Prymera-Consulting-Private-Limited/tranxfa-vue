@@ -1,14 +1,19 @@
 <script setup>
 import {useCustomerStore} from "@/stores/customer.js";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import FormGroup from "@/components/CustomerAttribute/FormGroup.vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountriesStore} from "@/stores/countries.js";
+import {useMachine} from "@xstate/vue";
+import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_machine.js";
+import {useNavigationUtils} from "@/composables/navigation_utils.js";
 
 const isLoading = ref(false)
 const customerStore = useCustomerStore()
 const countriesStore = useCountriesStore();
 const customerUtils = useCustomerUtils()
+const { snapshot, send } = useMachine(onboardingNavigationMachine);
+const navUtils = useNavigationUtils(snapshot, send)
 const formErrors = ref({});
 const identityAttributes = computed(() => {
   const identityAttributes = [];
@@ -30,15 +35,17 @@ onMounted( () => {
 });
 async function update() {
   isLoading.value = true;
-  try {
-    await customerUtils.updateProfileIdentity(identityAttributes);
-  } catch (e) {
+  await customerUtils.updateProfileIdentity(identityAttributes).then(() => {
+    navUtils.redirectOnboarding(customerUtils.customer);
+  }).catch((e) => {
     if (e.status === 422) {
       formErrors.value = e.response.data.errors;
+    } else {
+      console.error(e);
     }
-  } finally {
+  }).finally(() => {
     isLoading.value = false;
-  }
+  });
 }
 
 const showLoading = computed(() => {
@@ -69,7 +76,6 @@ const showLoading = computed(() => {
             <h2 class="text-2xl font-semibold text-black mb-4 mt-8">Personal Details</h2>
             <p class="text-md text-[#B7A3C1] mb-8">Complete your profile by providing some details about you</p>
             <!-- Form -->
-
             <form @submit.prevent="update" class="space-y-6 mt-12">
               <div v-for="attr in identityAttributes">
                 <FormGroup v-bind:attr="attr" />
