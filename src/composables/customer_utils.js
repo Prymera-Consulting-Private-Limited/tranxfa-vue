@@ -151,7 +151,7 @@ export function useCustomerUtils() {
     }
 
     async function refresh() {
-        $axios.get('/client/v1/profile', {
+        return $axios.get('/client/v1/profile', {
             headers: {
                 'X-Customer-Token': localStorage.getItem('customerSessionToken'),
             }
