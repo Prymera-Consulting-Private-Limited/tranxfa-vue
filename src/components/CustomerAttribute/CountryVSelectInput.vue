@@ -7,7 +7,7 @@ import FlagIcon from 'vue3-flag-icons'
 const props = defineProps({
   attr: CustomerAttribute,
   countries: Array,
-  labelGenerator: String,
+  labelGenerator: [String, Function],
   model: Object,
 })
 
@@ -29,6 +29,12 @@ watch(() => selectedCountry.value, (value) => {
   emit('update:modelValue', value);
 });
 
+function getLabel(option) {
+  if (typeof props.labelGenerator === 'function') {
+    return props.labelGenerator(option);
+  }
+  return option[props.labelGenerator];
+}
 </script>
 
 <template>
@@ -42,7 +48,7 @@ watch(() => selectedCountry.value, (value) => {
         <div class="flex items-center w-auto">
           <div class="text-sm flex items-center w-full gap-x-2">
             <FlagIcon :code="option.iso2Alpha.toLowerCase()" circle  />
-            <span class="lg:max-w-sm xl:max-w-md truncate">{{ option[props.labelGenerator] }}</span>
+            <span class="lg:max-w-sm xl:max-w-md truncate">{{ getLabel(option) }}</span>
           </div>
         </div>
       </div>
@@ -50,7 +56,7 @@ watch(() => selectedCountry.value, (value) => {
     <template #option="option">
       <div class="text-sm flex items-center w-full gap-x-3 truncate">
         <FlagIcon :code="option.iso2Alpha.toLowerCase()" circle  />
-        <span class="truncate">{{ option[props.labelGenerator] }}</span>
+        <span class="truncate">{{ getLabel(option) }}</span>
       </div>
     </template>
   </v-select>
