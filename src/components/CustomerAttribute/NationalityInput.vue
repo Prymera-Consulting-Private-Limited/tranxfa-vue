@@ -29,7 +29,5 @@ function updateNationality(updated) {
 </script>
 
 <template>
-  <CountryVSelectInput v-bind:countries="countries" v-bind:model="nationality" v-bind:labelGenerator="`demonym`" v-on:update:modelValue="updateNationality" :attr="attr">
-
-  </CountryVSelectInput>
+  <CountryVSelectInput v-bind:countries="countries" v-bind:model="nationality" v-bind:labelGenerator="`demonym`" v-on:update:modelValue="updateNationality" />
 </template>
