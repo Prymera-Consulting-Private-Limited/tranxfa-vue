@@ -1,14 +1,12 @@
 <script setup>
+import Footer from "@/components/Footer.vue";
 import Header from "@/components/Header.vue";
-import Sidebar from "@/components/Sidebar.vue";
 </script>
 
 <template>
-  <Header />
-  <main class="bg-gray-50 tracking-wider">
-    <div class="container mx-auto flex">
-      <Sidebar />
-      <slot />
-    </div>
-  </main>
+  <div class="min-h-full">
+    <Header />
+    <slot />
+    <Footer />
+  </div>
 </template>
