@@ -48,6 +48,22 @@ class Country {
      * @type {string|null}
      */
     demonym = null;
+
+    static getInstance(data) {
+        const country = new Country();
+        country.id = data.id;
+        country.iso2Alpha = data.iso2_alpha;
+        country.iso3Alpha = data.iso3_alpha;
+        country.isoNumeric = data.iso_numeric;
+        country.fipsCode = data.fips_code;
+        country.slug = data.slug;
+        country.callingCode = data.calling_code;
+        country.commonName = data.common_name;
+        country.officialName = data.official_name;
+        country.endonym = data.endonym;
+        country.demonym = data.demonym;
+        return country;
+    }
 }
 
 export default Country;
