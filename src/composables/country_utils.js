@@ -7,28 +7,11 @@ export function useCountryUtils() {
     const countriesStore = useCountriesStore();
     const sources = ref([]);
 
-    function getObject(data) {
-        const country = new Country();
-        country.id = data.id;
-        country.iso2Alpha = data.iso2_alpha;
-        country.iso3Alpha = data.iso3_alpha;
-        country.isoNumeric = data.iso_numeric;
-        country.fipsCode = data.fips_code;
-        country.slug = data.slug;
-        country.callingCode = data.calling_code;
-        country.commonName = data.common_name;
-        country.officialName = data.official_name;
-        country.endonym = data.endonym;
-        country.demonym = data.demonym;
-
-        return country;
-    }
-
     async function getCountries() {
         if (! countriesStore.isLoaded) {
             $axios.get('/client/v1/countries').then((response) => {
                 for (const data of response.data.data) {
-                    countriesStore.add(getObject(data));
+                    countriesStore.add(Country.getInstance(data));
                 }
                 countriesStore.isLoaded = true;
             })
@@ -40,13 +23,12 @@ export function useCountryUtils() {
     async function getSources() {
         $axios.get('/client/v1/countries/source').then((response) => {
             for (const data of response.data.data) {
-                sources.value.push(getObject(data));
+                sources.value.push(Country.getInstance(data));
             }
         })
     }
 
     return {
-        getObject,
         getCountries,
         getSources,
         sources,
