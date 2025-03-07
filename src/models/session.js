@@ -43,6 +43,20 @@ class Session {
      * @type {string|null}
      */
     updatedAt = null;
+
+    static getInstance(data) {
+        const session = new Session();
+        session.id = data.id;
+        session.isMfaCompleted = data.is_mfa_completed;
+        session.sessionToken = data.session_token;
+        session.mfaMethod = data.mfa_method;
+        session.clientVersion = data.client_version;
+        session.osVersion = data.os_version;
+        session.touchedAt = data.touched_at;
+        session.createdAt = data.created_at;
+        session.updatedAt = data.updated_at;
+        return session;
+    }
 }
 
 export default Session;
