@@ -38,7 +38,7 @@ onMounted(async () => {
 <template>
   <main>
     <div class="flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
-      <i v-if="isLoading || countryUtils.sources.value.length === 0" class="pi pi-spin pi-spinner text-5xl text-purple-700"></i>
+      <i v-if="isLoading || countryUtils.sources.value.length === 0" class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">

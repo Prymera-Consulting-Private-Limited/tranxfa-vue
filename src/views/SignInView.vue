@@ -34,7 +34,7 @@ async function login() {
 <template>
   <main>
     <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
-      <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-purple-700 bg-white/10"></i>
+      <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
@@ -76,7 +76,7 @@ async function login() {
               </div>
 
               <div>
-                <label for="email" class="block text-purple-700 mb-3">Email</label>
+                <label for="email" class="block text-brand-700 mb-3">Email</label>
                 <div class="relative">
                   <input type="email" id="email" v-model="form.email" placeholder="example@email.com" class="w-full px-4 py-2 border-b border border-gray-300 rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1 flex items-center px-3">
@@ -87,7 +87,7 @@ async function login() {
 
               <!-- Password Field -->
               <div>
-                <label for="password" class="block text-purple-700 mb-3">Password</label>
+                <label for="password" class="block text-brand-700 mb-3">Password</label>
                 <div class="relative">
                   <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
@@ -100,17 +100,17 @@ async function login() {
               <!-- Remember Me & Forgot Password -->
               <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center">
-                  <input id="remember-me" type="checkbox" class="w-4 h-4 text-purple-700 border-gray-300 rounded focus:ring-purple-700 focus:ring-0 outline-none accent-purple-700">
+                  <input id="remember-me" type="checkbox" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700">
                   <label for="remember-me" class="ml-2 text-sm text-gray-600">Remember me</label>
                 </div>
-                <a href="javascript:" class="text-sm text-purple-600 hover:text-purple-800 hover:underline">Forgot password?</a>
+                <a href="javascript:" class="text-sm text-brand-600 hover:text-brand-800 hover:underline">Forgot password?</a>
               </div>
 
               <!-- Submit Button -->
-              <button type="submit" class="block w-full bg-purple-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-purple-800 transition cursor-pointer">Continue</button>
+              <button type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
-                Don’t have an account? <router-link :to="'/sign-up'" class="text-purple-600 hover:text-purple-800 hover:underline">Sign up instead</router-link>
+                Don’t have an account? <router-link :to="'/sign-up'" class="text-brand-600 hover:text-brand-800 hover:underline">Sign up instead</router-link>
               </p>
             </form>
           </div>

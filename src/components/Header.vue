@@ -22,37 +22,37 @@
     <nav class="fixed inset-y-0 left-0 bg-gray-100 w-64 transform -translate-x-full transition-transform duration-300 ease-in-out z-20 md:hidden min-h-screen">
       <ul class="p-6 space-y-4">
         <li>
-          <a href="javascript:" class="flex items-center text-purple-secondary font-medium hover:text-purple-secondary">
+          <a href="javascript:" class="flex items-center text-brand-700 font-medium hover:text-brand-700">
             <i class="pi pi-home text-base mr-2"></i>
             Dashboard
           </a>
         </li>
         <li>
-          <a href="javascript:" class="flex items-center text-gray-700 font-medium hover:text-purple-secondary">
+          <a href="javascript:" class="flex items-center text-gray-700 font-medium hover:text-brand-700">
             <i class="pi pi-send text-base mr-2"></i>
             Send Money
           </a>
         </li>
         <li>
-          <a href="javascript:" class="flex items-center text-gray-700 hover:text-purple-secondary">
+          <a href="javascript:" class="flex items-center text-gray-700 hover:text-brand-700">
             <i class="pi pi-list-check text-base mr-2"></i>
             Your Transfers
           </a>
         </li>
         <li>
-          <a href="javascript:" class="flex items-center text-gray-700 hover:text-purple-secondary">
+          <a href="javascript:" class="flex items-center text-gray-700 hover:text-brand-700">
             <i class="pi pi-users text-base mr-2"></i>
             Your Recipients
           </a>
         </li>
         <li>
-          <a href="javascript:" class="flex items-center text-gray-700 hover:text-purple-secondary">
+          <a href="javascript:" class="flex items-center text-gray-700 hover:text-brand-700">
             <i class="pi pi-shield text-base mr-2"></i>
             Account Verification
           </a>
         </li>
         <li>
-          <a href="javascript:" class="flex items-center text-gray-700 hover:text-purple-secondary">
+          <a href="javascript:" class="flex items-center text-gray-700 hover:text-brand-700">
             <i class="pi pi-cog text-base mr-2"></i>
             Account Settings
           </a>

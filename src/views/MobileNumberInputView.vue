@@ -44,7 +44,7 @@ async function updateMobileNumber() {
 <template>
   <main>
     <div class="flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
-      <i v-show="isLoading" class="pi pi-spin pi-spinner text-5xl text-purple-700"></i>
+      <i v-show="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
       <div v-show="! isLoading" class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
@@ -62,7 +62,7 @@ async function updateMobileNumber() {
             <!-- Form -->
             <form @submit.prevent="updateMobileNumber" class="space-y-6 mt-12">
               <MobileNumberInput v-bind:mobile="mobile" v-bind:errors="errors" v-on:update:mobileNumberUpdated="mobileNumberUpdated" />
-              <button type="submit" class="block w-full bg-purple-700 text-white text-center py-3 rounded-[10px] font-medium hover:bg-purple-800 transition cursor-pointer">Continue</button>
+              <button type="submit" class="block w-full bg-brand-700 text-white text-center py-3 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
             </form>
           </div>
         </div>

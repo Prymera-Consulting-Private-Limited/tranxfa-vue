@@ -88,7 +88,7 @@ async function register() {
 <template>
   <main>
     <div class="flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
-      <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-purple-700"></i>
+      <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
@@ -128,7 +128,7 @@ async function register() {
             <form @submit.prevent="register" class="space-y-6">
               <!-- Email Field -->
               <div>
-                <label :class="[formErrors.email.length > 0 ? 'text-red-700' : 'text-purple-700']" for="email" class="block mb-3 text-base">Email</label>
+                <label :class="[formErrors.email.length > 0 ? 'text-red-700' : 'text-brand-700']" for="email" class="block mb-3 text-base">Email</label>
                 <div class="relative ">
                   <input type="email" id="email" v-model="form.email" :class="[formErrors.email.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="enter your email" class="w-full px-4 py-2 border rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1 flex items-center px-3">
@@ -140,7 +140,7 @@ async function register() {
 
               <!-- Password Field -->
               <div>
-                <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-purple-700']" for="password" class="block mb-3 text-base">Password</label>
+                <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Password</label>
                 <div class="mb-3">
                   <div class="relative">
                     <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" :class="[formErrors.password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
@@ -190,7 +190,7 @@ async function register() {
               </ul>
               <!-- Confirm Password -->
               <div>
-                <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-purple-700']" for="confirm_password" class="block mb-3 text-base">Confirm Password</label>
+                <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirm Password</label>
                 <div class="relative">
                   <input :type="showConfirmPassword ? 'text' : 'password'" id="confirm_password" v-model="form.confirm_password" :class="[formErrors.confirm_password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
@@ -203,16 +203,16 @@ async function register() {
 
               <!-- Checkbox -->
               <div class="flex items-center space-x-2">
-                <input type="checkbox" id="terms" v-model="termsAccepted" class="w-4 h-4 text-purple-700 border-gray-300 rounded focus:ring-purple-700 focus:ring-0 outline-none accent-purple-700" />
-                <label for="terms" class="text-sm text-gray-700">I agree to <a href="#" class="text-purple-700 hover:text-purple-800 hover:underline">privacy policy & terms of service.</a></label>
+                <input type="checkbox" id="terms" v-model="termsAccepted" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
+                <label for="terms" class="text-sm text-gray-700">I agree to <a href="#" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy & terms of service.</a></label>
               </div>
 
               <!-- Submit Button -->
-              <button :disabled="!termsAccepted" :class="[termsAccepted ? 'hover:bg-purple-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-purple-700 text-center py-3 font-medium text-white rounded-[10px]">Continue</button>
+              <button :disabled="!termsAccepted" :class="[termsAccepted ? 'hover:bg-brand-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-brand-700 text-center py-3 font-medium text-white rounded-[10px]">Continue</button>
             </form>
 
             <p class="text-sm text-gray-500 mt-10 text-center">
-              Already have an account? <router-link class="text-purple-700 hover:text-purple-800 hover:underline" :to="'/'">Sign in instead</router-link>
+              Already have an account? <router-link class="text-brand-700 hover:text-brand-800 hover:underline" :to="'/'">Sign in instead</router-link>
             </p>
           </div>
         </div>

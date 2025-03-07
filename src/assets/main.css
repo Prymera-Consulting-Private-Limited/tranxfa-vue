@@ -8,6 +8,7 @@
 @layer theme {
     @theme {
         --default-font-family: 'Inter', sans-serif;
+        --color-brand-700: theme('colors.purple.700');
     }
 }
 

@@ -55,7 +55,7 @@ const showLoading = computed(() => {
 <template>
   <main>
     <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
-      <i v-show="showLoading" class="pi pi-spin pi-spinner text-5xl text-purple-700 bg-white/10"></i>
+      <i v-show="showLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-show="! showLoading" class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
@@ -80,7 +80,7 @@ const showLoading = computed(() => {
               <div v-for="attr in identityAttributes">
                 <FormGroup v-bind:attr="attr" />
               </div>
-              <button type="submit" class="block w-full bg-purple-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-purple-800 transition cursor-pointer">Continue</button>
+              <button type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
             </form>
           </div>
         </div>
