@@ -150,6 +150,20 @@ export function useCustomerUtils() {
         })
     }
 
+    async function logout() {
+        await $axios.post('/client/v1/logout', {}, {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        }).then(() => {
+            customerStore.customer = null;
+            customerStore.isLoaded = false;
+            localStorage.removeItem('customerSessionToken');
+        }).catch((e) => {
+            throw e;
+        })
+    }
+
     async function refresh() {
         return $axios.get('/client/v1/profile', {
             headers: {
@@ -259,5 +273,6 @@ export function useCustomerUtils() {
         updateCountry,
         updateProfileIdentity,
         updateMobileNumber,
+        logout,
     }
 }
