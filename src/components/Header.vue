@@ -1,5 +1,5 @@
 <script setup>
-import {Bars3Icon, BellIcon, XMarkIcon} from "@heroicons/vue/24/outline/index.js";
+import {Bars3Icon, XMarkIcon} from "@heroicons/vue/24/outline/index.js";
 import {
   Menu,
   MenuButton,
@@ -11,13 +11,13 @@ import {
   TransitionRoot
 } from "@headlessui/vue";
 import {MagnifyingGlassIcon} from "@heroicons/vue/20/solid/index.js";
+import {useCustomerStore} from "@/stores/customer.js";
+import {useCustomerUtils} from "@/composables/customer_utils.js";
+import {onMounted} from "vue";
+import router from "@/router/index.js";
 
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-}
+const customerStore = useCustomerStore();
+const customerUtils = useCustomerUtils();
 const navigation = [
   { name: 'Dashboard', href: '#', current: true },
   { name: 'Transactions', href: '#', current: false },
@@ -25,11 +25,24 @@ const navigation = [
   { name: 'Account Verification', href: '#', current: false },
   { name: 'Settings', href: '#', current: false },
 ]
+
+async function logout() {
+  await customerUtils.logout().finally(() => {
+    router.push({ name: 'signIn' });
+  });
+}
+
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your Profile', action: () => {} },
+  { name: 'Settings', action: () => {} },
+  { name: 'Sign out', action: logout },
 ]
+
+onMounted(async () => {
+  if (! customerStore.isLoaded) {
+    await customerUtils.refresh();
+  }
+});
 </script>
 <template>
   <Popover as="header" class="bg-brand-700 pb-24" v-slot="{ open }">
@@ -45,11 +58,6 @@ const userNavigation = [
 
         <!-- Right section on desktop -->
         <div class="hidden lg:ml-4 lg:flex lg:items-center lg:pr-0.5">
-          <button type="button" class="relative shrink-0 rounded-full p-1 text-indigo-200 hover:bg-white/10 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden">
-            <span class="absolute -inset-1.5" />
-            <span class="sr-only">View notifications</span>
-            <BellIcon class="size-6" aria-hidden="true" />
-          </button>
 
           <!-- Profile dropdown -->
           <Menu as="div" class="relative ml-4 shrink-0">
@@ -57,13 +65,15 @@ const userNavigation = [
               <MenuButton class="relative flex rounded-full bg-white text-sm ring-2 ring-white/20 focus:ring-white focus:outline-hidden">
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full" :src="user.imageUrl" alt="" />
+                <div class="bg-gray-200 text-gray-500 size-8 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
+                  {{ customerStore.customer?.firstName?.slice(0, 1).toUpperCase() + customerStore.customer?.lastName?.slice(0, 1).toUpperCase() }}
+                </div>
               </MenuButton>
             </div>
             <transition leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-              <MenuItems class="absolute -right-2 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden">
+              <MenuItems class="absolute -right-2 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden tracking-wider">
                 <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                  <a :href="item.href" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</a>
+                  <a href="javascript:" @click="item.action" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</a>
                 </MenuItem>
               </MenuItems>
             </transition>
@@ -93,7 +103,7 @@ const userNavigation = [
         <div class="grid grid-cols-3 items-center gap-8">
           <div class="col-span-2">
             <nav class="flex space-x-4">
-              <a v-for="item in navigation" :key="item.name" :href="item.href" :class="[item.current ? 'text-white' : 'text-indigo-100', 'rounded-md px-3 py-2 text-sm font-medium hover:bg-white/10']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
+              <a v-for="item in navigation" :key="item.name" :href="item.href" :class="[item.current ? 'text-white' : 'text-indigo-100', 'rounded-md px-3 py-2 text-sm font-medium hover:bg-white/10 tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
             </nav>
           </div>
           <div class="mx-auto grid w-full max-w-md grid-cols-1">
@@ -116,10 +126,10 @@ const userNavigation = [
               <div class="pt-3 pb-2">
                 <div class="flex items-center justify-between px-4">
                   <div>
-                    <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" />
+                    <img class="h-8 w-auto" src="/images/logo.png" alt="Tranxfa Inc" />
                   </div>
                   <div class="-mr-2">
-                    <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden focus:ring-inset">
+                    <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:ring-2 focus:ring-brand-700 focus:outline-hidden focus:ring-inset">
                       <span class="absolute -inset-0.5" />
                       <span class="sr-only">Close menu</span>
                       <XMarkIcon class="size-6" aria-hidden="true" />
@@ -127,30 +137,23 @@ const userNavigation = [
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                  <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800">Dashboard</a>
-                  <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800">Transactions</a>
-                  <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800">Recipients</a>
-                  <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800">Account Verification</a>
-                  <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800">Settings</a>
+                  <a v-for="item in navigation" :key="item.name" href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</a>
                 </div>
               </div>
               <div class="pt-4 pb-2">
                 <div class="flex items-center px-5">
                   <div class="shrink-0">
-                    <img class="size-10 rounded-full" :src="user.imageUrl" alt="" />
+                    <div class="bg-gray-200 text-gray-500 size-12 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
+                      {{ customerStore.customer?.firstName?.slice(0, 1).toUpperCase() + customerStore.customer?.lastName?.slice(0, 1).toUpperCase() }}
+                    </div>
                   </div>
                   <div class="ml-3 min-w-0 flex-1">
-                    <div class="truncate text-base font-medium text-gray-800">{{ user.name }}</div>
-                    <div class="truncate text-sm font-medium text-gray-500">{{ user.email }}</div>
+                    <div class="truncate text-base font-medium text-gray-800 tracking-wider">{{ customerStore.customer?.fullName }}</div>
+                    <div class="truncate text-sm font-medium text-gray-500 tracking-wider">{{ customerStore.customer?.account?.email }}</div>
                   </div>
-                  <button type="button" class="relative ml-auto shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden">
-                    <span class="absolute -inset-1.5" />
-                    <span class="sr-only">View notifications</span>
-                    <BellIcon class="size-6" aria-hidden="true" />
-                  </button>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                  <a v-for="item in userNavigation" :key="item.name" :href="item.href" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800">{{ item.name }}</a>
+                  <a v-for="item in userNavigation" :key="item.name" href="javascript:" @click="item.action" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</a>
                 </div>
               </div>
             </div>
