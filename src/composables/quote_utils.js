@@ -10,7 +10,7 @@ export function useQuoteUtils() {
     const customerStore = useCustomerStore();
 
     const getQuote = async () => {
-        $axios.get('/client/v1/quote', {
+        await $axios.get('/client/v1/quote', {
             headers: {
                 'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
             }
