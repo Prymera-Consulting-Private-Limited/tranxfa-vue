@@ -231,6 +231,23 @@ export function useCustomerUtils() {
         })
     }
 
+    async function updateMobileNumber(country, number) {
+        await $axios.post('/client/v1/update-mobile-number', {
+            mobile_number_country_id: country,
+            mobile_number: number,
+        }, {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        }).then((response) => {
+            getObject(response.data);
+            customerStore.customer = customer;
+            customerStore.isLoaded = true;
+        }).catch((e) => {
+            throw e;
+        })
+    }
+
     return {
         customer,
         getObject,
@@ -241,5 +258,6 @@ export function useCustomerUtils() {
         verifyEmail,
         updateCountry,
         updateProfileIdentity,
+        updateMobileNumber,
     }
 }
