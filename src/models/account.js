@@ -23,6 +23,16 @@ class Account {
      * @type {string|null}
      */
     updatedAt = null;
+
+    static getInstance(data) {
+        const account = new Account();
+        account.email = data.email;
+        account.isEmailVerified = data.is_email_verified;
+        account.passwordChangedAt = data.password_changed_at;
+        account.createdAt = data.created_at;
+        account.updatedAt = data.updated_at;
+        return account;
+    }
 }
 
 export default Account;
