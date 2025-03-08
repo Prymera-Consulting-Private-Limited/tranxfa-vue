@@ -10,7 +10,8 @@ import {
   UsersIcon,
   PaperAirplaneIcon,
   HomeIcon,
-  DevicePhoneMobileIcon
+  DevicePhoneMobileIcon,
+  DocumentTextIcon,
 } from '@heroicons/vue/24/outline'
 
 const customerStore = useCustomerStore();
@@ -26,6 +27,7 @@ const items = [
     icon: EnvelopeIcon,
     background: 'bg-pink-500',
     completed: false,
+    href: 'emailVerification',
   },
   {
     id: 'contactNumberProvided',
@@ -36,6 +38,7 @@ const items = [
     icon: DevicePhoneMobileIcon,
     background: 'bg-indigo-500',
     completed: false,
+    href: 'mobileNumberInput',
   },
   {
     id: 'identityVerified',
@@ -46,6 +49,7 @@ const items = [
     icon: IdentificationIcon,
     background: 'bg-yellow-500',
     completed: false,
+    href: 'documentTypeSelectionForUpload',
   },
   {
     id: 'addressDetailsProvided',
@@ -56,16 +60,18 @@ const items = [
     icon: HomeIcon,
     background: 'bg-green-500',
     completed: false,
+    href: 'updateAddressInformation',
   },
   {
     id: 'recipientCreated',
     title: 'Create a Recipient',
     completedTitle: 'Recipient Added',
-    description: 'Add the details of the person you want to send money to, including their name and payment information.',
+    description: 'Add the details and payment information of the person you want to send money to.',
     completedDescription: 'Recipient added. You are ready to send money.',
     icon: UsersIcon,
     background: 'bg-blue-500',
     completed: false,
+    href: 'addRecipient',
   },
   {
     id: 'transactionSent',
@@ -76,6 +82,7 @@ const items = [
     icon: PaperAirplaneIcon,
     background: 'bg-purple-500',
     completed: false,
+    href: 'sendMoney',
   },
 ]
 
@@ -118,20 +125,46 @@ onMounted(async () => {
                 <p class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
                 <ul v-if="tasks.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 border-t border-b border-gray-200 py-6 sm:grid-cols-2">
                   <li v-for="task in tasks" :key="task.id" :class="[isLoading ? 'pulse' : '']" class="flow-root">
-                    <div :class="{'opacity-60': task.completed}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 hover:bg-gray-50">
-                      <div :class="[task.background, 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
-                        <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
+                    <div v-if="isLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
+                      <div :class="['bg-gray-300', 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
+                        <DocumentTextIcon class="size-6 text-white" aria-hidden="true" />
                       </div>
                       <div>
                         <h3 class="text-sm font-medium text-gray-900">
                           <a href="#" class="focus:outline-hidden">
                             <span class="absolute inset-0" aria-hidden="true" />
-                            <span v-if="task.completed">{{ task.completedTitle }}</span>
-                            <span v-else>{{ task.title }}</span>
-                            <span aria-hidden="true"> &rarr;</span>
+                            <div class="h-3 block pulse rounded-md bg-gray-300 w-full"></div>
                           </a>
                         </h3>
-                        <p class="mt-1 text-sm text-gray-500">{{ task.completed ? task.completedDescription : task.description }}</p>
+                        <p class="flex flex-col mt-1 text-sm text-gray-500 space-y-1">
+                          <span class="h-2 block pulse rounded-md bg-gray-300 w-32"></span>
+                          <span class="h-2 block pulse rounded-md bg-gray-300 w-24"></span>
+                        </p>
+                      </div>
+                    </div>
+                    <div v-else :class="{'opacity-60': task.completed}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 hover:bg-gray-50">
+                      <div :class="[task.background, 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
+                        <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
+                      </div>
+                      <div v-if="task.completed">
+                        <div class="text-sm font-medium text-gray-900">
+                          <div class="focus:outline-hidden">
+                            <span class="absolute inset-0" aria-hidden="true" />
+                            <span>{{ task.completedTitle }}</span>
+                            <span aria-hidden="true"> &rarr;</span>
+                          </div>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">{{ task.completedDescription }}</p>
+                      </div>
+                      <div v-else class="cursor-pointer">
+                        <div class="text-sm font-medium text-gray-900">
+                          <div class="focus:outline-hidden">
+                            <span class="absolute inset-0" aria-hidden="true" />
+                            <span>{{ task.title }}</span>
+                            <span aria-hidden="true"> &rarr;</span>
+                          </div>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
                       </div>
                     </div>
                   </li>
