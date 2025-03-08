@@ -19,7 +19,8 @@ const props = defineProps({
   options: Array(Object({
     country: Country,
     currency: Currency
-  }))
+  })),
+  inputId: String,
 })
 
 const emit = defineEmits([
@@ -58,7 +59,7 @@ function amountUpdated() {
 <template>
   <div class="flex items-center rounded-md bg-white pl-3 outline-2 -outline-offset-1 outline-brand-700 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-brand-700">
     <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6">{{ currency.iconUnicode }}</div>
-    <input @change="amountUpdated" v-maska="maskaOptions" @maska="onMaska" type="text" v-model="amountModel" class="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" placeholder="0.00" />
+    <input :id="inputId" @change="amountUpdated" v-maska="maskaOptions" @maska="onMaska" type="text" v-model="amountModel" class="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" placeholder="0.00" />
     <div class="grid shrink-0 grid-cols-1 focus-within:relative bg-white">
       <Menu as="div" class="relative inline-block text-left">
         <div>
@@ -69,11 +70,11 @@ function amountUpdated() {
           </MenuButton>
         </div>
         <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
-          <MenuItems class="absolute right-0 mt-2 w-86 origin-top-right divide-y divide-purple-700/40 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-99">
+          <MenuItems class="absolute right-0 mt-2 w-86 origin-top-right divide-y divide-gray-300 rounded-md bg-gray-50 shadow-lg ring-1 ring-black/5 focus:outline-none z-99">
             <MenuItem v-for="(option, index) in options" v-slot="{ active }">
               <button @click="selectOption(option)" :class="[
-                active ? 'bg-purple-700/50 text-purple-900' : 'text-gray-900',
-                'group flex w-full items-center px-4 py-4 text-sm tracking-wider gap-x-2 cursor-pointer bg-purple-700/30',
+                active ? 'text-purple-900' : 'text-gray-900',
+                'group flex w-full items-center px-4 py-4 text-sm tracking-wider gap-x-2 cursor-pointer',
                 index === 0 ? 'rounded-t-md' : '',
                 index === options.length - 1 ? 'rounded-b-md' : ''
               ]">
