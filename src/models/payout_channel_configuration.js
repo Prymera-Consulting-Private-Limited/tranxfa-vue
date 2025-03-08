@@ -1,5 +1,3 @@
-import RecipientType from "@/enums/recipient_type.js";
-
 class PayoutChannelConfiguration {
     /**
      * @type {RecipientType|null}
