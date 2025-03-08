@@ -3,6 +3,8 @@ import Session from "@/models/session.js";
 import Country from "@/models/country.js";
 import CustomerAddress from "@/models/customer_address.js";
 import CustomerAttribute from "@/models/customer_attribute.js";
+import CustomerDocument from "@/models/customer_document.js";
+import DocumentCategory from "@/models/document_category.js";
 
 export class Customer {
     /**
@@ -95,6 +97,16 @@ export class Customer {
      */
     attributes = [];
 
+    /**
+     * @type {Array<CustomerDocument>}
+     */
+    documents = [];
+
+    /**
+     * @type {DocumentCategory[]}
+     */
+    pendingDocuments = [];
+
     identityInformationRequired () {
         return Boolean(this.attributes.find((o) => o.category === 'identity' && o.isRequired && !o.value))
     }
@@ -130,12 +142,13 @@ export class Customer {
             customer.address = CustomerAddress.getInstance(data.address);
         }
         if (data.attributes && data.attributes.length > 0) {
-            let attributes = [];
-            for (const attribute of data.attributes) {
-                attributes.push(CustomerAttribute.getInstance(attribute));
-            }
-
-            customer.attributes = attributes;
+            customer.attributes = data.attributes.map((attribute) => CustomerAttribute.getInstance(attribute));
+        }
+        if (data.documents && data.documents.length > 0) {
+            customer.documents = data.documents.map((document) => CustomerDocument.getInstance(document));
+        }
+        if (data.pending_documents && data.pending_documents.length > 0) {
+            customer.pendingDocuments = data.pending_documents.map((category) => DocumentCategory.getInstance(category));
         }
         return customer;
     }
