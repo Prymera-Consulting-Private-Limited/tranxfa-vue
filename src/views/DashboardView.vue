@@ -27,7 +27,7 @@ const items = [
     icon: EnvelopeIcon,
     background: 'bg-pink-500',
     completed: false,
-    href: 'emailVerification',
+    href: {name: 'emailVerification'},
   },
   {
     id: 'contactNumberProvided',
@@ -38,7 +38,7 @@ const items = [
     icon: DevicePhoneMobileIcon,
     background: 'bg-indigo-500',
     completed: false,
-    href: 'mobileNumberInput',
+    href: {name: 'mobileNumberInput'},
   },
   {
     id: 'identityVerified',
@@ -49,7 +49,7 @@ const items = [
     icon: IdentificationIcon,
     background: 'bg-yellow-500',
     completed: false,
-    href: 'documentTypeSelectionForUpload',
+    href: null,
   },
   {
     id: 'addressDetailsProvided',
@@ -60,7 +60,7 @@ const items = [
     icon: HomeIcon,
     background: 'bg-green-500',
     completed: false,
-    href: 'updateAddressInformation',
+    href: null,
   },
   {
     id: 'recipientCreated',
@@ -71,7 +71,7 @@ const items = [
     icon: UsersIcon,
     background: 'bg-blue-500',
     completed: false,
-    href: 'addRecipient',
+    href: null,
   },
   {
     id: 'transactionSent',
@@ -82,7 +82,7 @@ const items = [
     icon: PaperAirplaneIcon,
     background: 'bg-purple-500',
     completed: false,
-    href: 'sendMoney',
+    href: null,
   },
 ]
 
@@ -92,6 +92,15 @@ const tasks = computed(() => {
       item.completed = customerStore.customer?.account?.isEmailVerified ?? false;
     } else if (item.id === 'contactNumberProvided') {
       item.completed = customerStore.customer?.mobileNumber ?? false;
+    } else if (item.id === 'identityVerified') {
+      const pendingPoi = customerStore.customer?.pendingDocuments?.find(cat => cat.code === 'POI');
+      item.completed = ! (Boolean(pendingPoi) ?? true);
+      item.href = pendingPoi?.id ? {
+        name: 'documentTypeSelectionForUpload',
+        params: {
+          category: pendingPoi.id
+        },
+      } : null;
     }
 
     return item;
@@ -130,15 +139,16 @@ onMounted(async () => {
                         <DocumentTextIcon class="size-6 text-white" aria-hidden="true" />
                       </div>
                       <div>
-                        <h3 class="text-sm font-medium text-gray-900">
+                        <h3 class="text-sm font-medium text-gray-900 mb-3">
                           <a href="#" class="focus:outline-hidden">
                             <span class="absolute inset-0" aria-hidden="true" />
-                            <div class="h-3 block pulse rounded-md bg-gray-300 w-full"></div>
+                            <div class="h-3 block pulse bg-gray-300 w-full w-64"></div>
                           </a>
                         </h3>
                         <p class="flex flex-col mt-1 text-sm text-gray-500 space-y-1">
-                          <span class="h-2 block pulse rounded-md bg-gray-300 w-32"></span>
-                          <span class="h-2 block pulse rounded-md bg-gray-300 w-24"></span>
+                          <span class="h-2 block pulse bg-gray-300 w-48"></span>
+                          <span class="h-2 block pulse bg-gray-300 w-32"></span>
+                          <span class="h-2 block pulse bg-gray-300 w-24"></span>
                         </p>
                       </div>
                     </div>
@@ -156,16 +166,28 @@ onMounted(async () => {
                         </div>
                         <p class="mt-1 text-sm text-gray-500">{{ task.completedDescription }}</p>
                       </div>
-                      <div v-else class="cursor-pointer">
-                        <div class="text-sm font-medium text-gray-900">
-                          <div class="focus:outline-hidden">
-                            <span class="absolute inset-0" aria-hidden="true" />
-                            <span>{{ task.title }}</span>
-                            <span aria-hidden="true"> &rarr;</span>
+                      <template v-else>
+                        <router-link v-if="task.href" :to="task.href" class="cursor-pointer">
+                          <div class="text-sm font-medium text-gray-900">
+                            <div class="focus:outline-hidden">
+                              <span class="absolute inset-0" aria-hidden="true" />
+                              <span>{{ task.title }}</span>
+                              <span aria-hidden="true"> &rarr;</span>
+                            </div>
                           </div>
+                          <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
+                        </router-link>
+                        <div v-else class="cursor-pointer">
+                          <div class="text-sm font-medium text-gray-900">
+                            <div class="focus:outline-hidden">
+                              <span class="absolute inset-0" aria-hidden="true" />
+                              <span>{{ task.title }}</span>
+                              <span aria-hidden="true"> &rarr;</span>
+                            </div>
+                          </div>
+                          <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
                         </div>
-                        <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
-                      </div>
+                      </template>
                     </div>
                   </li>
                 </ul>
