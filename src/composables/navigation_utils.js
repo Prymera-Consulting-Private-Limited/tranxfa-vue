@@ -2,19 +2,11 @@ import {computed} from "vue";
 import router from "@/router/index.js";
 
 export function useNavigationUtils(snapshot, send) {
-    const routeMap = {
-        emailVerification: '/email-verification',
-        editAccountCountry: '/onboarding/country',
-        updateIdentityInformation: '/identity',
-        mobileNumberInput: '/mobile-number',
-        dashboard: '/dashboard'
-    };
-
     const nextRoute = computed(() => {
         /**
          * @type {string|null}
          */
-        const targetRoute = routeMap[snapshot?.value?.value] || null;
+        const targetRoute = snapshot?.value?.value;
         if (targetRoute && router.currentRoute.value.path !== targetRoute) {
             return targetRoute;
         }
@@ -41,7 +33,9 @@ export function useNavigationUtils(snapshot, send) {
         });
         send({ type: "PROCEED" })
         if (nextRoute.value) {
-            await router.push(nextRoute.value);
+            await router.push({
+                name: nextRoute.value,
+            });
         }
     }
 
