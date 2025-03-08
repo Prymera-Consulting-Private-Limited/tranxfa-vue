@@ -9,8 +9,19 @@ export function useQuoteUtils() {
     });
     const customerStore = useCustomerStore();
 
-    const getQuote = async () => {
+    const getQuote = async (query = null) => {
+        const params = {
+            amount_type: query?.amountType,
+            amount: query?.amount,
+            payment_country_id: query?.paymentCountry?.id,
+            payment_currency_id: query?.paymentCurrency?.id,
+            payout_country_id: query?.payoutCountry?.id,
+            payout_currency_id: query?.payoutCurrency?.id,
+            payout_method_id: query?.payoutMethod?.id,
+            payout_company_id: query?.payoutCompany?.id,
+        };
         await $axios.get('/client/v1/quote', {
+            params: params,
             headers: {
                 'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
             }
