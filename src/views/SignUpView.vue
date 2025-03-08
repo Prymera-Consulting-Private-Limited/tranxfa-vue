@@ -64,7 +64,7 @@ async function register() {
   formErrors.password = [];
   formErrors.confirm_password = [];
   await customerUtils.register(form.email, form.password, form.confirm_password).then(() => {
-    router.push('/email-verification');
+    router.push({name: 'emailVerification'});
   }).catch((e) => {
     if (e.status === 422) {
       const errors = e.response.data.errors;
