@@ -27,9 +27,6 @@ const navigation = [
   { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },
 ]
 
-console.log(navigation);
-console.log(router.currentRoute.value.name);
-
 async function logout() {
   await customerUtils.logout().finally(() => {
     router.push({ name: 'signIn' });
