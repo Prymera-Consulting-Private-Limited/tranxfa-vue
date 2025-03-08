@@ -122,6 +122,14 @@ export function useCustomerUtils() {
         })
     }
 
+    async function getIdentityVerificationToken() {
+        return $axios.get('/client/v1/customer/identity-verification-token', {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        });
+    }
+
     return {
         register,
         login,
@@ -132,5 +140,6 @@ export function useCustomerUtils() {
         updateProfileIdentity,
         updateMobileNumber,
         logout,
+        getIdentityVerificationToken,
     }
 }
