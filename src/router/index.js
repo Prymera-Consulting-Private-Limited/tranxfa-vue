@@ -80,7 +80,15 @@ const router = createRouter({
     }, {
       path: '/account-verification',
       name: 'accountVerification',
-      component: () => import('@/views/AccountVerification.vue'),
+      component: () => import('@/views/AccountVerificationView.vue'),
+      meta: {
+        title: 'Account Verification',
+        description: '',
+      },
+    }, {
+      path: '/account-verification/upload/:category',
+      name: 'documentTypeSelectionForUpload',
+      component: () => import('@/views/Kyc/DocumentTypeSelectionView.vue'),
       meta: {
         title: 'Account Verification',
         description: '',
@@ -88,7 +96,7 @@ const router = createRouter({
     }, {
       path: '/settings',
       name: 'settings',
-      component: () => import('@/views/Settings.vue'),
+      component: () => import('@/views/SettingsView.vue'),
       meta: {
         title: 'Settings',
         description: '',
