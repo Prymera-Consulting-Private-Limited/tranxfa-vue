@@ -18,13 +18,17 @@ import router from "@/router/index.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
+
 const navigation = [
-  { name: 'Dashboard', href: 'dashboard', current: true },
-  { name: 'Transactions', href: 'transactions', current: false },
-  { name: 'Recipients', href: 'recipients', current: false },
-  { name: 'Account Verification', href: 'accountVerification', current: false },
-  { name: 'Settings', href: 'settings', current: false },
+  { name: 'Dashboard', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
+  { name: 'Transactions', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
+  { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
+  { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
+  { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },
 ]
+
+console.log(navigation);
+console.log(router.currentRoute.value.name);
 
 async function logout() {
   await customerUtils.logout().finally(() => {
@@ -103,7 +107,7 @@ onMounted(async () => {
         <div class="grid grid-cols-3 items-center gap-8">
           <div class="col-span-2">
             <nav class="flex space-x-4">
-              <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white' : 'text-indigo-100', 'rounded-md px-3 py-2 text-sm font-medium hover:bg-white/10 tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
+              <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-indigo-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
             </nav>
           </div>
           <div class="mx-auto grid w-full max-w-md grid-cols-1">
@@ -137,7 +141,7 @@ onMounted(async () => {
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                  <a v-for="item in navigation" :key="item.name" href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</a>
+                  <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</router-link>
                 </div>
               </div>
               <div class="pt-4 pb-2">
