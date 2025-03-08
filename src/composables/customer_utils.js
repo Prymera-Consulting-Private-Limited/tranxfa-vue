@@ -14,10 +14,8 @@ export function useCustomerUtils() {
         }).then((response) => {
             customerStore.customer = Customer.getInstance(response.data);
             customerStore.isLoaded = true;
-            localStorage.setItem('customerSessionToken', customer?.session?.sessionToken);
-        }).catch((e) => {
-            throw e;
-        })
+            localStorage.setItem('customerSessionToken', customerStore.customer?.session?.sessionToken);
+        });
     }
 
     async function login(email, password) {
@@ -27,9 +25,7 @@ export function useCustomerUtils() {
         }).then((response) => {
             customerStore.customer = Customer.getInstance(response.data);
             customerStore.isLoaded = true;
-            localStorage.setItem('customerSessionToken', customer?.session?.sessionToken);
-        }).catch((e) => {
-            throw e;
+            localStorage.setItem('customerSessionToken', customerStore.customer?.session?.sessionToken);
         })
     }
 
@@ -42,8 +38,6 @@ export function useCustomerUtils() {
             customerStore.customer = null;
             customerStore.isLoaded = false;
             localStorage.removeItem('customerSessionToken');
-        }).catch((e) => {
-            throw e;
         })
     }
 
@@ -55,8 +49,6 @@ export function useCustomerUtils() {
         }).then((response) => {
             customerStore.customer = Customer.getInstance(response.data);
             customerStore.isLoaded = true;
-        }).catch((e) => {
-            throw e;
         })
     }
 
@@ -65,8 +57,6 @@ export function useCustomerUtils() {
             headers: {
                 'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
             }
-        }).catch((e) => {
-            throw e;
         })
     }
 
@@ -80,8 +70,6 @@ export function useCustomerUtils() {
         }).then((response) => {
             customerStore.customer = Customer.getInstance(response.data);
             customerStore.isLoaded = true;
-        }).catch((e) => {
-            throw e;
         })
     }
 
@@ -95,8 +83,6 @@ export function useCustomerUtils() {
         }).then((response) => {
             customerStore.customer = Customer.getInstance(response.data);
             customerStore.isLoaded = true;
-        }).catch((e) => {
-            throw e;
         })
     }
 
@@ -119,8 +105,6 @@ export function useCustomerUtils() {
         }).then((response) => {
             customerStore.customer = Customer.getInstance(response.data);
             customerStore.isLoaded = true;
-        }).catch((e) => {
-            throw e;
         })
     }
 
@@ -135,8 +119,6 @@ export function useCustomerUtils() {
         }).then((response) => {
             customerStore.customer = Customer.getInstance(response.data);
             customerStore.isLoaded = true;
-        }).catch((e) => {
-            throw e;
         })
     }
 
