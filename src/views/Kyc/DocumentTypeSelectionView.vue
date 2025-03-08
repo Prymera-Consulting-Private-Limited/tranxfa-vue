@@ -1,10 +1,12 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
-import {onMounted, reactive} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
 import {IdentificationIcon} from "@heroicons/vue/24/outline";
+import snsWebSdk from '@sumsub/websdk';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -21,7 +23,54 @@ onMounted(async () => {
   } else {
     selectedCategory.data = customerStore.customer?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
   }
-})
+});
+
+const openSumsub = ref(false)
+
+/**
+ * @param accessToken - access token that you generated on the backend
+ * @param customI18nMessages - customized locale messages for current session (not required)
+ */
+async function launchWebSdk(accessToken, customI18nMessages) {
+  let snsWebSdkInstance = snsWebSdk
+      .init(
+          accessToken,
+          () => getNewAccessToken()
+      )
+      .withConf({
+        lang: "en", //language of WebSDK texts and comments (ISO 639-1 format)
+        theme: "dark" | "light",
+      })
+      .withOptions({ addViewportTag: false, adaptIframeHeight: true })
+      // see below what kind of messages WebSDK generates
+      .on("idCheck.onStepCompleted", (payload) => {
+        console.log("onStepCompleted", payload);
+      })
+      .on("idCheck.onError", (error) => {
+        console.log("onError", error);
+      })
+      .build();
+
+  snsWebSdkInstance.launch("#sumsub-websdk-container");
+}
+
+async function getNewAccessToken() {
+  let accessToken = null;
+  await customerUtils.getIdentityVerificationToken().then((response) => {
+    console.log(response);
+    accessToken = response.data.token;
+  });
+
+  return accessToken;
+}
+
+async function startSumsubVerification () {
+  openSumsub.value = true;
+  customerUtils.getIdentityVerificationToken().then((response) => {
+    launchWebSdk(response.data.token);
+  });
+
+}
 </script>
 
 <template>
@@ -51,7 +100,7 @@ onMounted(async () => {
                           </dd>
                           <dt class="sr-only">Start Verification</dt>
                           <dd class="mt-3 text-sm text-gray-500">
-                            <a href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
+                            <a @click="startSumsubVerification" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
                           </dd>
                         </dl>
                       </div>
@@ -64,31 +113,26 @@ onMounted(async () => {
 
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4">
-            <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">What is Identity Verification?</h2>
-              <div class="rounded-lg bg-white shadow-lg p-5 pb-16">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Identity Verification</h2>
-                <p class="text-gray-700 mb-4 text-sm text-justify">
-                  Identity verification is the process of ensuring that a person is who they claim to be. This is typically done by checking government-issued identification documents, such as a passport or driver's license, and comparing them to the individual's personal information.
-                </p>
-                <h3 class="text-base font-semibold text-gray-900 mb-2">Why is it needed for processing transactions?</h3>
-                <p class="text-gray-700 mb-4 text-sm text-justify">
-                  Identity verification is crucial for processing transactions for several reasons:
-                </p>
-                <ul class="list-disc list-inside text-gray-700 mb-4 text-sm">
-                  <li>Prevents fraud and ensures that transactions are legitimate.</li>
-                  <li>Protects both the business and the customer from identity theft.</li>
-                  <li>Complies with legal and regulatory requirements.</li>
-                  <li>Enhances trust and security in financial transactions.</li>
-                </ul>
-                <p class="text-gray-700 text-sm text-justify">
-                  By verifying the identity of individuals, businesses can ensure that they are dealing with genuine customers, thereby reducing the risk of fraudulent activities and maintaining the integrity of their financial operations.
-                </p>
-              </div>
-            </section>
+
           </div>
         </div>
       </div>
     </main>
   </CustomerLayout>
+  <TransitionRoot as="template" :show="openSumsub">
+    <Dialog class="relative z-10" @close="openSumsub = false">
+      <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+        <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+      </TransitionChild>
+      <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+            <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm lg:max-w-md">
+              <div id="sumsub-websdk-container"></div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
 </template>
