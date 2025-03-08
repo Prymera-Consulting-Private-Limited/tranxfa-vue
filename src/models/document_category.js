@@ -1,3 +1,5 @@
+import DocumentType from "@/models/document_type.js";
+
 class DocumentCategory {
     /**
      * @type {String|null}
