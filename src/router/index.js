@@ -61,6 +61,38 @@ const router = createRouter({
         title: 'Dashboard',
         description: '',
       },
+    }, {
+      path: '/transactions',
+      name: 'transactions',
+      component: () => import('@/views/TransactionListingView.vue'),
+      meta: {
+        title: 'Transactions',
+        description: '',
+      },
+    }, {
+      path: '/recipients',
+      name: 'recipients',
+      component: () => import('@/views/RecipientListingView.vue'),
+      meta: {
+        title: 'Recipients',
+        description: '',
+      },
+    }, {
+      path: '/account-verification',
+      name: 'accountVerification',
+      component: () => import('@/views/AccountVerification.vue'),
+      meta: {
+        title: 'Account Verification',
+        description: '',
+      },
+    }, {
+      path: '/settings',
+      name: 'settings',
+      component: () => import('@/views/Settings.vue'),
+      meta: {
+        title: 'Settings',
+        description: '',
+      },
     },
   ],
 })
