@@ -52,7 +52,6 @@ function selectOption(option) {
 }
 
 function amountUpdated() {
-  console.log(unmaskedValue.value);
   emit('update:amount', Number.parseInt(unmaskedValue.value) / Math.pow(10, props.currency.decimalPlaces));
 }
 </script>
@@ -63,21 +62,23 @@ function amountUpdated() {
     <div class="grid shrink-0 grid-cols-1 focus-within:relative bg-white">
       <Menu as="div" class="relative inline-block text-left">
         <div>
-          <MenuButton class="inline-flex w-full items-center justify-center rounded-r-md bg-brand-700 px-4 py-4 text-sm font-medium text-white hover:bg-brand-700/90 focus:outline-none focus-visible:ring-0 focus-visible:ring-brand/75 gap-x-3 cursor-pointer">
+          <MenuButton class="inline-flex w-full items-center justify-center rounded-r-md bg-brand-700 px-4 py-4 text-sm font-medium text-white hover:bg-brand-700/90 focus:outline-none focus-visible:ring-0 outline-none ring-0 focus-visible:ring-brand/75 cursor-pointer">
             <FlagIcon :class="['ring-2 ring-white']" :code="country.iso2Alpha.toLowerCase()" circle />
-            <strong class="text-sm tracking-wider">{{ currency.code }}</strong>
+            <strong class="text-sm tracking-wider ml-2">{{ currency.code }}</strong>
             <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5 text-violet-200 hover:text-violet-100" aria-hidden="true"/>
           </MenuButton>
         </div>
         <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
-          <MenuItems class="absolute right-0 mt-2 w-86 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-9999">
-            <MenuItem v-for="option in options" v-slot="{ active }">
+          <MenuItems class="absolute right-0 mt-2 w-86 origin-top-right divide-y divide-purple-700/40 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-99">
+            <MenuItem v-for="(option, index) in options" v-slot="{ active }">
               <button @click="selectOption(option)" :class="[
-                active ? 'bg-brand-700 text-white' : 'text-gray-900',
-                'group flex w-full items-center px-4 py-4 text-sm tracking-wider gap-x-2 cursor-pointer',
+                active ? 'bg-purple-700/50 text-purple-900' : 'text-gray-900',
+                'group flex w-full items-center px-4 py-4 text-sm tracking-wider gap-x-2 cursor-pointer bg-purple-700/30',
+                index === 0 ? 'rounded-t-md' : '',
+                index === options.length - 1 ? 'rounded-b-md' : ''
               ]">
                 <FlagIcon :class="['ring-2 ring-white']" :code="option.country.iso2Alpha.toLowerCase()" circle />
-                <strong class="text-xs">{{ option.currency.code }}</strong>
+                <strong class="text-sm">{{ option.currency.code }}</strong>
                 <span class="text-sm">{{ option.country.commonName }}</span>
               </button>
             </MenuItem>
