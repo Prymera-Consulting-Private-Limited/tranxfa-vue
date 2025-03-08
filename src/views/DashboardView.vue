@@ -1,138 +1,110 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import { ArrowRightIcon, PaperAirplaneIcon } from '@heroicons/vue/20/solid'
+import {useCustomerStore} from "@/stores/customer.js";
+import {useCustomerUtils} from "@/composables/customer_utils.js";
+import {onMounted} from "vue";
+import Calculator from "@/components/Calculator.vue";
 
-const people = [
+const customerStore = useCustomerStore();
+const customerUtils = useCustomerUtils();
+
+import {
+  EnvelopeIcon,
+  IdentificationIcon,
+  UsersIcon,
+  PaperAirplaneIcon,
+  HomeIcon,
+} from '@heroicons/vue/24/outline'
+
+const items = [
   {
-    name: 'Leslie Alexander',
-    email: 'leslie.alexander@example.com',
-    role: 'Co-Founder / CEO',
-    imageUrl:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    lastSeen: '3h ago',
-    lastSeenDateTime: '2023-01-23T13:23Z',
+    title: 'Verify Email Address',
+    description: 'Confirm your email to start sending money securely.',
+    icon: EnvelopeIcon,
+    background: 'bg-pink-500',
   },
   {
-    name: 'Michael Foster',
-    email: 'michael.foster@example.com',
-    role: 'Co-Founder / CTO',
-    imageUrl:
-        'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    lastSeen: '3h ago',
-    lastSeenDateTime: '2023-01-23T13:23Z',
+    title: 'Verify Your Identity',
+    description: 'Upload your ID to comply with financial regulations.',
+    icon: IdentificationIcon,
+    background: 'bg-yellow-500',
   },
   {
-    name: 'Dries Vincent',
-    email: 'dries.vincent@example.com',
-    role: 'Business Relations',
-    imageUrl:
-        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    lastSeen: null,
+    title: 'Add Address Details',
+    description: 'Provide your address to ensure smooth transactions.',
+    icon: HomeIcon,
+    background: 'bg-green-500',
   },
   {
-    name: 'Lindsay Walton',
-    email: 'lindsay.walton@example.com',
-    role: 'Front-end Developer',
-    imageUrl:
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    lastSeen: '3h ago',
-    lastSeenDateTime: '2023-01-23T13:23Z',
+    title: 'Create a Recipient',
+    description: 'Add the details of the person you want to send money to.',
+    icon: UsersIcon,
+    background: 'bg-blue-500',
   },
   {
-    name: 'Courtney Henry',
-    email: 'courtney.henry@example.com',
-    role: 'Designer',
-    imageUrl:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    lastSeen: '3h ago',
-    lastSeenDateTime: '2023-01-23T13:23Z',
-  },
-  {
-    name: 'Tom Cook',
-    email: 'tom.cook@example.com',
-    role: 'Director of Product',
-    imageUrl:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    lastSeen: null,
+    title: 'Send a Transaction',
+    description: 'Initiate a secure transfer to your recipient.',
+    icon: PaperAirplaneIcon,
+    background: 'bg-purple-500',
   },
 ]
+
+
+onMounted(async () => {
+  if (! customerStore.isLoaded) {
+    await customerUtils.refresh();
+  }
+});
 </script>
 <template>
   <CustomerLayout>
-    <main class="-mt-24 pb-8">
+    <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Dashboard</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
-            <section aria-labelledby="section-1-title">
-              <h2 class="sr-only" id="section-1-title">Section title</h2>
-              <div class="overflow-hidden rounded-lg bg-white shadow-sm">
-                <div class="p-6">
-                  <h3 class="text-lg font-semibold text-gray-900">Welcome Dhruv!</h3>
-                  <p class="mt-2 text-sm text-gray-500">Here’s what’s happening with your business today.</p>
-                </div>
-              </div>
-            </section>
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Section title</h2>
-              <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-                <li v-for="person in people" :key="person.email" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm">
-                  <div class="flex flex-1 flex-col p-8">
-                    <img class="mx-auto size-32 shrink-0 rounded-full" :src="person.imageUrl" alt="" />
-                    <h3 class="mt-6 text-sm font-medium text-gray-900">{{ person.name }}</h3>
-                    <dl class="mt-1 flex grow flex-col justify-between">
-                      <dt class="sr-only">Title</dt>
-                      <dd class="text-sm text-gray-500">{{ person.title }}</dd>
-                      <dt class="sr-only">Role</dt>
-                      <dd class="mt-3">
-                        <span class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">{{ person.role }}</span>
-                      </dd>
-                    </dl>
-                  </div>
-                  <div>
-                    <div class="-mt-px flex divide-x divide-gray-200">
-                      <div class="flex w-0 flex-1">
-                        <a :href="`mailto:${person.email}`" class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-700 hover:text-brand-700">
-                          <ArrowRightIcon class="size-5" aria-hidden="true" />
-                          View
-                        </a>
+              <div>
+                <h2 class="text-base font-semibold text-gray-900">Welcome {{ customerStore.customer.firstName }}</h2>
+                <p class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
+                <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-t border-b border-gray-200 py-6 sm:grid-cols-2">
+                  <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
+                    <div class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 hover:bg-gray-50">
+                      <div :class="[item.background, 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
+                        <component :is="item.icon" class="size-6 text-white" aria-hidden="true" />
                       </div>
-                      <div class="-ml-px flex w-0 flex-1">
-                        <a :href="`tel:${person.telephone}`" class="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-700 hover:text-brand-700">
-                          <PaperAirplaneIcon class="size-5" aria-hidden="true" />
-                          Repeat
-                        </a>
+                      <div>
+                        <h3 class="text-sm font-medium text-gray-900">
+                          <a href="#" class="focus:outline-hidden">
+                            <span class="absolute inset-0" aria-hidden="true" />
+                            <span>{{ item.title }}</span>
+                            <span aria-hidden="true"> &rarr;</span>
+                          </a>
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
                       </div>
                     </div>
-                  </div>
-                </li>
-              </ul>
+                  </li>
+                </ul>
+                <div class="mt-4 flex">
+                  <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    Or complete these steps later
+                    <span aria-hidden="true"> &rarr;</span>
+                  </a>
+                </div>
+              </div>
             </section>
           </div>
 
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Section title</h2>
-              <div class="overflow-hidden rounded-lg bg-white shadow-sm">
-                <ul role="list" class="divide-y divide-gray-100">
-                  <li v-for="person in people" :key="person.email" class="flex justify-between gap-x-6 py-5 px-6">
-                    <div class="flex min-w-0 gap-x-4">
-                      <img class="size-10 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />
-                      <div class="min-w-0 flex-auto">
-                        <p class="text-sm/6 font-semibold text-gray-900">{{ person.name }}</p>
-                        <p class="mt-0 truncate text-xs/5 text-gray-500">{{ person.email }}</p>
-                      </div>
-                    </div>
-                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                      <p v-if="person.lastSeen" class="mt-1 text-xs/5 text-gray-500">
-                        Sent <time :datetime="person.lastSeenDateTime">{{ person.lastSeen }}</time>
-                      </p>
-                    </div>
-                  </li>
-                </ul>
+              <h2 class="sr-only" id="section-2-title">Send Money</h2>
+              <div class="rounded-lg bg-white shadow-lg p-5 pb-16">
+                <Calculator />
               </div>
             </section>
           </div>
