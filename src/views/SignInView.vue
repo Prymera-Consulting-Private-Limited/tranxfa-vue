@@ -1,5 +1,6 @@
 <script setup>
 import {reactive, ref} from "vue";
+import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useNavigationUtils} from "@/composables/navigation_utils.js";
 import {useMachine} from "@xstate/vue";
@@ -9,6 +10,7 @@ const { snapshot, send } = useMachine(onboardingNavigationMachine, {
   provideActor: true
 });
 const showPassword = ref(false);
+const customerStore = useCustomerStore()
 const customerUtils = useCustomerUtils();
 const navUtils = useNavigationUtils(snapshot, send)
 const form = reactive({
@@ -22,7 +24,7 @@ async function login() {
   isLoading.value = true;
   loginError.value = null;
   await customerUtils.login(form.email, form.password).then(() => {
-    navUtils.redirectOnboarding(customerUtils.customer);
+    navUtils.redirectOnboarding(customerStore.customer);
   }).catch((e) => {
     loginError.value = e.response?.data?.message;
     console.error(e);

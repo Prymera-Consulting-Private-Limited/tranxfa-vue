@@ -36,7 +36,7 @@ onMounted( () => {
 async function update() {
   isLoading.value = true;
   await customerUtils.updateProfileIdentity(identityAttributes).then(() => {
-    navUtils.redirectOnboarding(customerUtils.customer);
+    navUtils.redirectOnboarding(customerStore.customer);
   }).catch((e) => {
     if (e.status === 422) {
       formErrors.value = e.response.data.errors;

@@ -1,11 +1,13 @@
 <script setup>
 import {onMounted, reactive, ref} from "vue";
+import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useNavigationUtils} from "@/composables/navigation_utils.js";
 import {useMachine} from "@xstate/vue";
 import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_machine.js";
 import MobileNumberInput from "@/components/CustomerAttribute/MobileNumberInput.vue";
 
+const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const { snapshot, send } = useMachine(onboardingNavigationMachine);
 const navUtils = useNavigationUtils(snapshot, send)
@@ -35,7 +37,7 @@ async function updateMobileNumber() {
       console.error(e);
     }
   }).finally(() => {
-    navUtils.redirectOnboarding(customerUtils.customer)
+    navUtils.redirectOnboarding(customerStore.customer)
     isLoading.value = false;
   });
 }

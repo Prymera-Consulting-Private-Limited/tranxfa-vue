@@ -26,7 +26,7 @@ async function verifyEmailAddress() {
     }
     console.error(e);
   }).finally(() => {
-    navUtils.redirectOnboarding(customerUtils.customer);
+    navUtils.redirectOnboarding(customerStore.customer);
     isLoading.value = false;
   });
 }
@@ -61,7 +61,7 @@ async function resend() {
   customerUtils.resendEmailVerification().catch(async (e) => {
     if (e.status === 403) {
       await customerUtils.refresh();
-      await navUtils.redirectOnboarding(customerUtils.customer);
+      await navUtils.redirectOnboarding(customerStore.customer);
     }
   }).finally(() => {
     isLoading.value = false;

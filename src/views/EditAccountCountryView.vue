@@ -19,7 +19,7 @@ async function updateCountry(country) {
   isLoading.value = true;
   await customerUtils.updateCountry(country).finally(() => {
     isLoading.value = false;
-    navUtils.redirectOnboarding(customerUtils.customer);
+    navUtils.redirectOnboarding(customerStore.customer);
   });
 }
 onMounted(async () => {
