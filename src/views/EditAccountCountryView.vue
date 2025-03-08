@@ -17,9 +17,10 @@ const navUtils = useNavigationUtils(snapshot, send)
 const isLoading = ref(true);
 async function updateCountry(country) {
   isLoading.value = true;
-  await customerUtils.updateCountry(country).finally(() => {
-    isLoading.value = false;
+  await customerUtils.updateCountry(country).then(() => {
     navUtils.redirectOnboarding(customerStore.customer);
+  }).finally(() => {
+    isLoading.value = false;
   });
 }
 onMounted(async () => {
