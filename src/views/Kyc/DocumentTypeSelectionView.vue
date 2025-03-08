@@ -1,8 +1,94 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
+import {useCustomerStore} from "@/stores/customer.js";
+import {onMounted, reactive} from "vue";
+import {useCustomerUtils} from "@/composables/customer_utils.js";
+import router from "@/router/index.js";
+import {IdentificationIcon} from "@heroicons/vue/24/outline";
+
+const customerStore = useCustomerStore();
+const customerUtils = useCustomerUtils();
+
+const selectedCategory = reactive({
+  data: null,
+})
+
+onMounted(async () => {
+  if (! customerStore.isLoaded) {
+    customerUtils.refresh().then(() => {
+      selectedCategory.data = customerStore.customer?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
+    });
+  } else {
+    selectedCategory.data = customerStore.customer?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
+  }
+})
 </script>
 
 <template>
   <CustomerLayout>
+    <main class="-mt-24 py-8 bg-gray-50">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+        <h1 class="sr-only">Select document type for your Proof of Identity</h1>
+        <!-- Main 3 column grid -->
+        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
+          <!-- Left column -->
+          <div class="grid grid-cols-1 gap-4 lg:col-span-2">
+            <section aria-labelledby="section-2-title">
+              <h2 class="sr-only" id="section-2-title">{{ selectedCategory.data?.title }}</h2>
+              <div>
+                <h2 class="text-base font-semibold text-gray-900">{{ selectedCategory.data?.title }}</h2>
+                <p class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
+                <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
+                  <ul v-if="selectedCategory.data?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <li v-for="documentType in selectedCategory.data.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm">
+                      <div class="flex flex-1 flex-col p-8">
+                        <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-purple-700" />
+                        <h3 class="mt-6 text-sm font-medium text-gray-900">{{ documentType.title }}</h3>
+                        <dl v-if="documentType.description" class="mt-1 flex grow flex-col justify-between">
+                          <dt class="sr-only">Information</dt>
+                          <dd class="mt-3 text-sm text-gray-500">
+                            <p>{{ documentType.description }}</p>
+                          </dd>
+                          <dt class="sr-only">Start Verification</dt>
+                          <dd class="mt-3 text-sm text-gray-500">
+                            <a href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
+                          </dd>
+                        </dl>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Right column -->
+          <div class="grid grid-cols-1 gap-4">
+            <section aria-labelledby="section-2-title">
+              <h2 class="sr-only" id="section-2-title">What is Identity Verification?</h2>
+              <div class="rounded-lg bg-white shadow-lg p-5 pb-16">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Identity Verification</h2>
+                <p class="text-gray-700 mb-4 text-sm text-justify">
+                  Identity verification is the process of ensuring that a person is who they claim to be. This is typically done by checking government-issued identification documents, such as a passport or driver's license, and comparing them to the individual's personal information.
+                </p>
+                <h3 class="text-base font-semibold text-gray-900 mb-2">Why is it needed for processing transactions?</h3>
+                <p class="text-gray-700 mb-4 text-sm text-justify">
+                  Identity verification is crucial for processing transactions for several reasons:
+                </p>
+                <ul class="list-disc list-inside text-gray-700 mb-4 text-sm">
+                  <li>Prevents fraud and ensures that transactions are legitimate.</li>
+                  <li>Protects both the business and the customer from identity theft.</li>
+                  <li>Complies with legal and regulatory requirements.</li>
+                  <li>Enhances trust and security in financial transactions.</li>
+                </ul>
+                <p class="text-gray-700 text-sm text-justify">
+                  By verifying the identity of individuals, businesses can ensure that they are dealing with genuine customers, thereby reducing the risk of fraudulent activities and maintaining the integrity of their financial operations.
+                </p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
   </CustomerLayout>
 </template>
