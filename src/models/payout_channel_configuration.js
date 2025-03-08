@@ -1,3 +1,5 @@
+import RecipientType from "@/enums/recipient_type.js";
+
 class PayoutChannelConfiguration {
     /**
      * @type {RecipientType|null}
@@ -11,7 +13,7 @@ class PayoutChannelConfiguration {
 
     static getInstance(data) {
         const payoutChannelConfiguration = new PayoutChannelConfiguration();
-        payoutChannelConfiguration.recipientType = data.recipient_type;
+        payoutChannelConfiguration.recipientType = RecipientType[data.recipient_type];
         payoutChannelConfiguration.askForMiddleName = data.ask_for_middle_name;
         return payoutChannelConfiguration;
     }

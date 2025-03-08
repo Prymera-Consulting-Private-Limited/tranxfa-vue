@@ -1,3 +1,5 @@
+import RecipientDataType from "@/enums/recipient_data_type.js";
+
 class PayoutChannelAttribute {
     /**
      * @type {RecipientDataType|null}
@@ -91,7 +93,7 @@ class PayoutChannelAttribute {
 
     static getInstance(data) {
         const payoutChannelAttribute = new PayoutChannelAttribute();
-        payoutChannelAttribute.type = data.type;
+        payoutChannelAttribute.type = RecipientDataType[data.type];
         payoutChannelAttribute.context = data.context;
         payoutChannelAttribute.isRequired = data.is_required;
         payoutChannelAttribute.label = data.label;
