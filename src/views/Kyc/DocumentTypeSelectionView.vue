@@ -64,9 +64,9 @@ async function getNewAccessToken() {
   return accessToken;
 }
 
-async function startSumsubVerification () {
+async function startSumsubVerification (documentType) {
   openSumsub.value = true;
-  customerUtils.getIdentityVerificationToken().then((response) => {
+  customerUtils.getIdentityVerificationToken(documentType).then((response) => {
     launchWebSdk(response.data.token);
   });
 
@@ -100,7 +100,7 @@ async function startSumsubVerification () {
                           </dd>
                           <dt class="sr-only">Start Verification</dt>
                           <dd class="mt-3 text-sm text-gray-500">
-                            <a @click="startSumsubVerification" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
+                            <a @click="startSumsubVerification(documentType)" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
                           </dd>
                         </dl>
                       </div>

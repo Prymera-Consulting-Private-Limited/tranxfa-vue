@@ -122,8 +122,11 @@ export function useCustomerUtils() {
         })
     }
 
-    async function getIdentityVerificationToken() {
+    async function getIdentityVerificationToken(documentType) {
         return $axios.get('/client/v1/customer/identity-verification-token', {
+            params: {
+                document_type_id: documentType.id,
+            },
             headers: {
                 'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
             }
