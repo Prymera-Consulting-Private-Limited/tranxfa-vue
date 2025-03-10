@@ -88,13 +88,14 @@ const items = [
 
 const tasks = computed(() => {
   return items.map((item) => {
+    console.log(item.id);
     if (item.id === 'emailVerification') {
       item.completed = customerStore.customer?.account?.isEmailVerified ?? false;
     } else if (item.id === 'contactNumberProvided') {
       item.completed = customerStore.customer?.mobileNumber ?? false;
     } else if (item.id === 'identityVerified') {
       const pendingPoi = customerStore.customer?.pendingDocuments?.find(cat => cat.code === 'POI');
-      item.completed = ! (Boolean(pendingPoi) ?? true);
+      item.completed = Boolean(pendingPoi) === false;
       item.href = pendingPoi?.id ? {
         name: 'documentTypeSelectionForUpload',
         params: {
@@ -102,6 +103,7 @@ const tasks = computed(() => {
         },
       } : null;
     }
+    console.log(item.completed);
 
     return item;
   });
