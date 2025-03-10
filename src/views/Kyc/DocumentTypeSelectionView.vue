@@ -6,7 +6,8 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
 import {IdentificationIcon} from "@heroicons/vue/24/outline";
 import snsWebSdk from '@sumsub/websdk';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import Spinner from "@/components/Spinner.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -26,19 +27,19 @@ onMounted(async () => {
 });
 
 const openSumsub = ref(false)
+const isSumsubInitialized = ref(false)
 
 /**
  * @param accessToken - access token that you generated on the backend
- * @param customI18nMessages - customized locale messages for current session (not required)
  */
-async function launchWebSdk(accessToken, customI18nMessages) {
+async function launchSumsubWebSdk(accessToken) {
   let snsWebSdkInstance = snsWebSdk
       .init(
           accessToken,
           () => getNewAccessToken()
       )
       .withConf({
-        lang: "en", //language of WebSDK texts and comments (ISO 639-1 format)
+        lang: "en",
         theme: "dark" | "light",
       })
       .withOptions({ addViewportTag: false, adaptIframeHeight: true })
@@ -49,6 +50,22 @@ async function launchWebSdk(accessToken, customI18nMessages) {
       .on("idCheck.onError", (error) => {
         console.log("onError", error);
       })
+      .on("idCheck.onInitialized", () => {
+        isSumsubInitialized.value = true;
+      })
+      .on("idCheck.onApplicantStatusChanged", (payload) => {
+        if (payload.reviewStatus === 'completed') {
+          if (payload.reviewResult.reviewAnswer === 'GREEN') {
+            if (router.currentRoute.value.query?._utm === 'dashboard-todos') {
+              router.push({name: 'dashboard'});
+            }
+          }
+        } else if (payload.reviewStatus === 'onHold') {
+            if (router.currentRoute.value.query?._utm === 'dashboard-todos') {
+              router.push({name: 'dashboard'});
+            }
+        }
+      })
       .build();
 
   snsWebSdkInstance.launch("#sumsub-websdk-container");
@@ -57,7 +74,6 @@ async function launchWebSdk(accessToken, customI18nMessages) {
 async function getNewAccessToken() {
   let accessToken = null;
   await customerUtils.getIdentityVerificationToken().then((response) => {
-    console.log(response);
     accessToken = response.data.token;
   });
 
@@ -66,10 +82,10 @@ async function getNewAccessToken() {
 
 async function startSumsubVerification (documentType) {
   openSumsub.value = true;
+  isSumsubInitialized.value = false;
   customerUtils.getIdentityVerificationToken(documentType).then((response) => {
-    launchWebSdk(response.data.token);
+    launchSumsubWebSdk(response.data.token);
   });
-
 }
 </script>
 
@@ -100,7 +116,7 @@ async function startSumsubVerification (documentType) {
                           </dd>
                           <dt class="sr-only">Start Verification</dt>
                           <dd class="mt-3 text-sm text-gray-500">
-                            <a @click="startSumsubVerification(documentType)" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
+                            <a v-if="documentType.api === 'SUMSUB'" @click="startSumsubVerification(documentType)" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
                           </dd>
                         </dl>
                       </div>
@@ -128,7 +144,11 @@ async function startSumsubVerification (documentType) {
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
           <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
             <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm lg:max-w-md">
-              <div id="sumsub-websdk-container"></div>
+              <div v-show="! isSumsubInitialized" role="status" class="p-10">
+                <Spinner class="size-16 mx-auto" />
+                <span class="sr-only">Loading...</span>
+              </div>
+              <div v-show="isSumsubInitialized" id="sumsub-websdk-container"></div>
             </DialogPanel>
           </TransitionChild>
         </div>
