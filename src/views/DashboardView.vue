@@ -100,6 +100,7 @@ const tasks = computed(() => {
         params: {
           category: pendingPoi.id
         },
+        query: {_utm: 'dashboard-todos'}
       } : null;
     }
 
