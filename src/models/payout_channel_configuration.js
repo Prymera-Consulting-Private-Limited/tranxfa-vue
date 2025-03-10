@@ -13,7 +13,7 @@ class PayoutChannelConfiguration {
 
     static getInstance(data) {
         const payoutChannelConfiguration = new PayoutChannelConfiguration();
-        payoutChannelConfiguration.recipientType = RecipientType[data.recipient_type];
+        payoutChannelConfiguration.recipientType = RecipientType[data.recipient_type] ?? null;
         payoutChannelConfiguration.askForMiddleName = data.ask_for_middle_name;
         return payoutChannelConfiguration;
     }
