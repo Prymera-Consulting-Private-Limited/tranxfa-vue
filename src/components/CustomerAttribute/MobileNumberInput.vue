@@ -13,7 +13,6 @@ const mobileNumber = reactive({
 })
 
 function updateIsdCode(updated) {
-  console.log(updated);
   mobileNumber.country = updated?.id;
 }
 
