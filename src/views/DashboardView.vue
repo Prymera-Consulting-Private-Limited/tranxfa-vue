@@ -88,7 +88,6 @@ const items = [
 
 const tasks = computed(() => {
   return items.map((item) => {
-    console.log(item.id);
     if (item.id === 'emailVerification') {
       item.completed = customerStore.customer?.account?.isEmailVerified ?? false;
     } else if (item.id === 'contactNumberProvided') {
@@ -103,7 +102,6 @@ const tasks = computed(() => {
         },
       } : null;
     }
-    console.log(item.completed);
 
     return item;
   });
