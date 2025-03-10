@@ -18,15 +18,20 @@ const navUtils = useNavigationUtils(snapshot, send)
 
 async function verifyEmailAddress() {
   isLoading.value = true;
-  await customerUtils.verifyEmail(emailVerificationCode.value).catch((e) => {
+  await customerUtils.verifyEmail(emailVerificationCode.value).then(() => {
+    navUtils.redirectOnboarding(customerStore.customer);
+  }).catch((e) => {
     if (e.status === 422) {
       otpError.value = e.response.data.message;
     } else if (e.status === 403) {
-      customerUtils.refresh();
+      customerUtils.refresh().then(() => {
+        navUtils.redirectOnboarding(customerStore.customer);
+      });
+    } else {
+      console.error(e);
+      throw e;
     }
-    console.error(e);
   }).finally(() => {
-    navUtils.redirectOnboarding(customerStore.customer);
     isLoading.value = false;
   });
 }
