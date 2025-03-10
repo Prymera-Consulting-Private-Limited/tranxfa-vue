@@ -1,5 +1,6 @@
 import KycDocumentStatus from "@/enums/kyc_document_status.js";
 import DocumentCategory from "@/models/document_category.js";
+import DocumentType from "@/models/document_type.js";
 
 class CustomerDocument {
     /**
