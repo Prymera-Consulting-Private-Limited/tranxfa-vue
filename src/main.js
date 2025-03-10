@@ -54,6 +54,7 @@ if (isLocal) {
     window.Echo = new Echo({
         broadcaster: 'pusher',
         key: import.meta.env.VITE_PUSHER_APP_KEY,
+        host: import.meta.env.VITE_PUSHER_HOST,
         cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
         forceTLS: true,
     });
