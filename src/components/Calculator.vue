@@ -53,7 +53,7 @@ async function getQuote() {
 }
 
 async function sentAmountUpdated(amount) {
-  query.amountType = AmountType.send;
+  query.amountType = AmountType.SEND;
   query.amount = amount;
   await getQuote();
 }
@@ -65,7 +65,7 @@ async function sourceUpdated(option) {
 }
 
 async function receiveAmountUpdated(amount) {
-  query.amountType = AmountType.receive;
+  query.amountType = AmountType.RECEIVE;
   query.amount = amount;
   await getQuote();
 }

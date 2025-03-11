@@ -3,7 +3,6 @@ import Currency from "@/models/currency.js";
 import PayoutMethod from "@/models/payout_method.js";
 import QuoteSource from "@/models/quote_source.js";
 import QuoteTarget from "@/models/quote_target.js";
-import AmountType from "@/enums/amount_type.js";
 import Company from "@/models/company.js";
 
 class Quote {
@@ -85,7 +84,7 @@ class Quote {
     amount = null;
 
     /**
-     * @type {AmountType|null}
+     * @type {string|null}
      */
     amountType = null;
 
@@ -141,7 +140,7 @@ class Quote {
         quote.exchangeRateDate = data.exchange_rate_date;
         quote.exchangeRateFormatted = data.exchange_rate_formatted;
         quote.amount = data.amount;
-        quote.amountType = AmountType[data.amount_type];
+        quote.amountType = data.amount_type;
         quote.baseFees = data.base_fees;
         quote.baseFeesCurrencyPrefixed = data.base_fees_currency_prefixed;
         quote.baseFeesFormatted = data.base_fees_formatted;
