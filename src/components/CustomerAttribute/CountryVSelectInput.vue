@@ -7,7 +7,14 @@ import FlagIcon from 'vue3-flag-icons'
 const props = defineProps({
   attr: CustomerAttribute,
   countries: Array,
-  labelGenerator: [String, Function],
+  optionLabelGenerator: {
+    type: [String, Function],
+    required: true,
+  },
+  itemLabelGenerator: {
+    type: [String, Function],
+    required: true,
+  },
   model: Object,
 })
 
@@ -29,16 +36,23 @@ watch(() => selectedCountry.value, (value) => {
   emit('update:modelValue', value);
 });
 
-function getLabel(option) {
-  if (typeof props.labelGenerator === 'function') {
-    return props.labelGenerator(option);
+function getOptionLabel(option) {
+  if (typeof props.optionLabelGenerator === 'function') {
+    return props.optionLabelGenerator(option);
   }
-  return option[props.labelGenerator];
+  return option[props.optionLabelGenerator];
+}
+
+function getItemLabel(option) {
+  if (typeof props.itemLabelGenerator === 'function') {
+    return props.itemLabelGenerator(option);
+  }
+  return option[props.itemLabelGenerator];
 }
 </script>
 
 <template>
-  <v-select v-model="selectedCountry" :options="countries" :placeholder="`Please select`" key-by="id" label="demonym">
+  <v-select v-model="selectedCountry" append-to-body :options="countries" :placeholder="`Please select`" key-by="id" label="demonym">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
       <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
@@ -48,7 +62,7 @@ function getLabel(option) {
         <div class="flex items-center w-auto">
           <div class="text-sm flex items-center w-full gap-x-2">
             <FlagIcon :code="option.iso2Alpha.toLowerCase()" circle  />
-            <span class="lg:max-w-sm xl:max-w-md truncate">{{ getLabel(option) }}</span>
+            <span class="lg:max-w-sm xl:max-w-md truncate">{{ getItemLabel(option) }}</span>
           </div>
         </div>
       </div>
@@ -56,7 +70,7 @@ function getLabel(option) {
     <template #option="option">
       <div class="text-sm flex items-center w-full gap-x-3 truncate">
         <FlagIcon :code="option.iso2Alpha.toLowerCase()" circle  />
-        <span class="truncate">{{ getLabel(option) }}</span>
+        <span class="truncate">{{ getOptionLabel(option) }}</span>
       </div>
     </template>
   </v-select>

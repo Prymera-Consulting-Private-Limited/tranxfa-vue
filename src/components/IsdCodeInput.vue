@@ -6,6 +6,14 @@ const countryUtils = useCountryUtils();
 const countries = ref([]);
 const props = defineProps({
   modelValue: String,
+  optionLabelGenerator: {
+    type: Function,
+    default: null,
+  },
+  itemLabelGenerator: {
+    type: Function,
+    default: null,
+  },
 });
 const emit = defineEmits(['update:modelValue']);
 const selectedIsdCode = ref(props.modelValue);
@@ -27,11 +35,15 @@ function updateIsdCode(updated) {
   emit('update:modelValue', updated);
 }
 
-function optionLabelGenerator(country) {
+function defaultOptionLabelGenerator(country) {
   return country.commonName + ' (+' + country.callingCode + ')';
+}
+
+function defaultItemLabelGenerator(country) {
+  return defaultOptionLabelGenerator(country);
 }
 </script>
 
 <template>
-  <CountryVSelectInput v-bind:countries="countries" v-bind:model="isdCode" v-bind:labelGenerator="optionLabelGenerator" v-on:update:modelValue="updateIsdCode"></CountryVSelectInput>
+  <CountryVSelectInput v-bind:itemLabelGenerator="itemLabelGenerator || defaultItemLabelGenerator" v-bind:optionLabelGenerator="optionLabelGenerator || defaultOptionLabelGenerator" v-bind:countries="countries" v-bind:model="isdCode" v-bind:labelGenerator="optionLabelGenerator" v-on:update:modelValue="updateIsdCode"></CountryVSelectInput>
 </template>
