@@ -1,5 +1,5 @@
 import PayoutChannelConfiguration from "@/models/payout_channel_configuration.js";
-import PayoutChannelAttribute from "@/models/payout_channel_attributes.js";
+import PayoutChannelAttribute from "@/models/payout_channel_attribute.js";
 
 class PayoutChannel {
     /**
