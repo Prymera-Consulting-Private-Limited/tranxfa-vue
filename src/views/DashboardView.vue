@@ -13,9 +13,15 @@ import {
   DevicePhoneMobileIcon,
   DocumentTextIcon,
 } from '@heroicons/vue/24/outline'
+import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import AddRecipientWizard from "@/components/Recipient/AddRecipientWizard.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
+const isCreateRecipientModalOpen = ref(false);
+const createRecipient = () => {
+  isCreateRecipientModalOpen.value = true;
+};
 
 const items = [
   {
@@ -72,6 +78,7 @@ const items = [
     background: 'bg-blue-500',
     completed: false,
     href: null,
+    action: createRecipient,
   },
   {
     id: 'transactionSent',
@@ -178,6 +185,16 @@ onMounted(async () => {
                           </div>
                           <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
                         </router-link>
+                        <div v-else-if="task.action || null" @click="task.action" class="cursor-pointer">
+                          <div class="text-sm font-medium text-gray-900">
+                            <div class="focus:outline-hidden">
+                              <span class="absolute inset-0" aria-hidden="true" />
+                              <span>{{ task.title }}</span>
+                              <span aria-hidden="true"> &rarr;</span>
+                            </div>
+                          </div>
+                          <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
+                        </div>
                         <div v-else class="cursor-pointer">
                           <div class="text-sm font-medium text-gray-900">
                             <div class="focus:outline-hidden">
@@ -214,7 +231,22 @@ onMounted(async () => {
         </div>
       </div>
     </main>
-
+    <TransitionRoot as="template" :show="isCreateRecipientModalOpen">
+      <Dialog class="relative z-10" @close="isCreateRecipientModalOpen = false">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+        </TransitionChild>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+                <AddRecipientWizard />
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </CustomerLayout>
 </template>
 
