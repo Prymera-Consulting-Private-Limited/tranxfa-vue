@@ -55,7 +55,7 @@ async function launchSumsubWebSdk(accessToken) {
       })
       .on("idCheck.onApplicantStatusChanged", (payload) => {
         if (payload.reviewStatus === 'completed') {
-          if (payload.reviewResult.reviewAnswer === 'GREEN') {
+          if (payload.reviewResult.reviewAnswer === ReviewAnswer.GREEN) {
             if (router.currentRoute.value.query?._utm === 'dashboard-todos') {
               router.push({name: 'dashboard'});
             }
