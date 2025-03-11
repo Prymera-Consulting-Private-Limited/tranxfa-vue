@@ -1,3 +1,5 @@
+import DeliveryOption from "@/models/delivery_option.js";
+
 class PayoutChannelAttribute {
     /**
      * @type {String|null}
@@ -89,6 +91,11 @@ class PayoutChannelAttribute {
      */
     viewOrder = null;
 
+    /**
+     * @type {DeliveryOption[]}
+     */
+    options = [];
+
     static getInstance(data) {
         const payoutChannelAttribute = new PayoutChannelAttribute();
         payoutChannelAttribute.type = data.type;
@@ -109,6 +116,9 @@ class PayoutChannelAttribute {
         payoutChannelAttribute.maxValue = data.max_value;
         payoutChannelAttribute.exactValue = data.exact_value;
         payoutChannelAttribute.viewOrder = data.view_order;
+        if (data.options?.length > 0) {
+            payoutChannelAttribute.options = data.options.map(option => DeliveryOption.getInstance(option));
+        }
         return payoutChannelAttribute;
     }
 }
