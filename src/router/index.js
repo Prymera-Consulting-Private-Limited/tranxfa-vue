@@ -80,7 +80,7 @@ const router = createRouter({
     }, {
       path: '/account-verification',
       name: 'accountVerification',
-      component: () => import('@/views/AccountVerificationView.vue'),
+      component: () => import('@/views/Kyc/AccountVerificationView.vue'),
       meta: {
         title: 'Account Verification',
         description: '',
