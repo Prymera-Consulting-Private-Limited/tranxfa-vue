@@ -72,7 +72,7 @@ const router = createRouter({
     }, {
       path: '/recipients',
       name: 'recipients',
-      component: () => import('@/views/RecipientListingView.vue'),
+      component: () => import('@/views/Recipient/Index.vue'),
       meta: {
         title: 'Recipients',
         description: '',
