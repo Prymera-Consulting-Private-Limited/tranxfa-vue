@@ -15,9 +15,11 @@ import {
 } from '@heroicons/vue/24/outline'
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import AddRecipientWizard from "@/components/Recipient/AddRecipientWizard.vue";
+import {useRecipientUtils} from "@/composables/recipient_utils.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
+const recipientUtils = useRecipientUtils();
 const isCreateRecipientModalOpen = ref(false);
 const createRecipient = () => {
   isCreateRecipientModalOpen.value = true;
@@ -109,6 +111,8 @@ const tasks = computed(() => {
         },
         query: {_utm: 'dashboard-todos'}
       } : null;
+    } else if (item.id === 'recipientCreated') {
+      item.completed = hasRecipients.value;
     }
 
     return item;
@@ -116,14 +120,17 @@ const tasks = computed(() => {
 });
 
 const isLoading = ref(false);
+const hasRecipients = ref(false);
 
 onMounted(async () => {
   if (! customerStore.isLoaded) {
     isLoading.value = true;
-    await customerUtils.refresh().finally(() => {
-      isLoading.value = false;
-    });
+    await customerUtils.refresh();
+    isLoading.value = false;
   }
+  recipientUtils.whisper().then(() => {
+    hasRecipients.value = true;
+  });
 });
 </script>
 <template>
