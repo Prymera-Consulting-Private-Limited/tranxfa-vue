@@ -71,8 +71,8 @@ async function receiveAmountUpdated(amount) {
 }
 
 async function targetUpdated(option) {
-  quoteUtil.quote.data.payoutCountry = option.country;
-  quoteUtil.quote.data.payoutCurrency = option.currency;
+  query.payoutCountry = option.country;
+  query.payoutCurrency = option.currency;
   await getQuote();
 }
 
