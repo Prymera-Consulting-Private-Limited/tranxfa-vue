@@ -20,7 +20,7 @@ const props = defineProps({
 
 const deliveryOption = ref(null);
 
-const emit = defineEmits(['update:deliveryOption']);
+const emit = defineEmits(['recipient:input:updated']);
 
 const optionSelected = (option) => {
   emit('recipient:input:updated', option, props.attribute);
