@@ -130,6 +130,12 @@ onMounted(async () => {
   }
   recipientUtils.whisper().then(() => {
     hasRecipients.value = true;
+  }).catch((e) => {
+    if (e.response.status === 404) {
+      hasRecipients.value = false;
+    } else {
+      console.error(e);
+    }
   });
 });
 </script>

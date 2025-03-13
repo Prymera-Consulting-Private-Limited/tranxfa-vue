@@ -19,6 +19,8 @@ import {reactive, ref} from "vue";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import Relationship from "@/models/relationship.js";
 import RelationshipInput from "@/components/Recipient/Attribute/RelationshipInput.vue";
+import Spinner from "@/components/Spinner.vue";
+import {useRecipientUtils} from "@/composables/recipient_utils.js";
 
 const props = defineProps({
   country: {
@@ -41,12 +43,20 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  errors: Object,
   relationships: {
     type: Array({type: Relationship}),
     required: true,
   },
 })
+
+const errors = reactive({
+  entity_name: [],
+  first_name: [],
+  middle_name: [],
+  last_name: [],
+  recipient_type: [],
+  relationship_id: [],
+});
 
 const componentMap = {
   'default': TextInput,
@@ -85,13 +95,20 @@ if (props.type === RecipientType.BUSINESS) {
 const confirmAccountNumberInput = ref(null);
 
 for (const attribute of props.payoutChannel.attributes) {
-  if (attribute.type === RecipientDataType.ACCOUNT_NUMBER) {
-    input.data[attribute.attribute] = null;
-    input.data[`confirm_${attribute.attribute}`] = confirmAccountNumberInput;
+  input.data[attribute.attribute] = null;
+  if (attribute.type === RecipientDataType.MOBILE_NUMBER) {
+    errors[`${attribute.attribute}.number`] = [];
+    errors[`${attribute.attribute}.country`] = [];
+  } else if (attribute.type === RecipientDataType.PHONE_NUMBER) {
+    errors[`${attribute.attribute}.number`] = [];
+    errors[`${attribute.attribute}.country`] = [];
   } else {
-    input.data[attribute.attribute] = null;
+    errors[attribute.attribute] = [];
   }
-
+  if (attribute.type === RecipientDataType.ACCOUNT_NUMBER) {
+    input.data[`confirm_${attribute.attribute}`] = confirmAccountNumberInput;
+    errors[`confirm_${attribute.attribute}`] = [];
+  }
 }
 
 async function updateRecipientFirstName(updated) {
@@ -122,17 +139,43 @@ async function updateRecipientInput(updated, attribute) {
   input.data[attribute.attribute] = updated;
 }
 
+const isSaving = ref(false);
+
+const recipientUtils = useRecipientUtils();
+
+const emit = defineEmits(['recipient:added']);
+
+async function addRecipient() {
+  isSaving.value = true;
+  Object.entries(errors).forEach(([key]) => {
+    errors[key] = [];
+  });
+  recipientUtils.add(props.payoutChannel, input.data).then((recipient) => {
+    emit('recipient:added', recipient);
+  }).catch((e) => {
+    if (e.response.status === 422) {
+      for (const [key, value] of Object.entries(e.response.data.errors)) {
+        errors[key] = value;
+      }
+    } else {
+      console.error(e)
+      throw e;
+    }
+  }).finally(() => {
+    isSaving.value = false;
+  });
+}
 </script>
 
 <template>
-  <form class="space-y-6 mt-12">
+  <form @submit.prevent="addRecipient" class="space-y-6 mt-12">
     <div v-if="type === RecipientType.BUSINESS">
       <div >
         <div>
-          <label for="entity-name" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Entity Name</label>
+          <label for="entity-name" :class="[errors?.entity_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Entity Name</label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the entity name as it appears of their incorporation certificate or similar documents.</p>
           <EntityNameInput v-on:recipient:input:updated="updateRecipientEntityName" :id="`entity-name`" />
-          <p class="mt-2 mb-3 text-gray-400 text-sm"></p>
+          <p v-if="errors?.entity_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.entity_name[0] }}</p>
         </div>
       </div>
     </div>
@@ -141,22 +184,22 @@ async function updateRecipientInput(updated, attribute) {
           payoutChannel.configuration.askForMiddleName ? 'lg:grid-cols-3' :  'lg:grid-cols-2'
       ]" class="grid grid-cols-1 gap-6">
         <div>
-          <label for="first-name" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">First Name</label>
+          <label for="first-name" :class="[errors?.first_name?.length ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">First Name</label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the first name of the recipient as it appears of their identity document.</p>
           <FirstNameInput v-on:recipient:input:updated="updateRecipientFirstName" :id="`first-name`" />
-          <p class="mt-2 mb-3 text-gray-400 text-sm"></p>
+          <p v-if="errors?.first_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.first_name[0] }}</p>
         </div>
         <div v-if="payoutChannel.configuration.askForMiddleName">
-          <label for="middle-name" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Middle Name</label>
+          <label for="middle-name" :class="[errors?.middle_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Middle Name</label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the middle name of the recipient as it appears of their identity document.</p>
           <MiddleNameInput v-on:recipient:input:updated="updateRecipientMiddleName" :id="`middle-name`" />
-          <p class="mt-2 mb-3 text-gray-400 text-sm"></p>
+          <p v-if="errors?.middle_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.middle_name[0] }}</p>
         </div>
         <div>
-          <label for="last-name" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Last Name</label>
+          <label for="last-name" :class="[errors?.last_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Last Name</label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the last name of the recipient as it appears of their identity document.</p>
           <LastNameInput v-on:recipient:input:updated="updateRecipientLastName" :id="`last-name`" />
-          <p class="mt-2 mb-3 text-gray-400 text-sm"></p>
+          <p v-if="errors?.last_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.last_name[0] }}</p>
         </div>
       </div>
     </div>
@@ -166,29 +209,47 @@ async function updateRecipientInput(updated, attribute) {
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
           <div class="space-y-6">
             <div>
-              <label :for="attribute.attribute" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attribute.label }}</label>
+              <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attribute.label }}</label>
               <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
               <TextInput v-on:recipient:input:updated="updateRecipientInput" v-bind:attribute="attribute" :id="attribute.attribute" />
+              <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[attribute.attribute][0] }}</p>
             </div>
             <div>
-              <label :for="`confirm-input-${attribute.attribute}`" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Confirm {{ attribute.label }}</label>
+              <label :for="`confirm-input-${attribute.attribute}`" :class="[errors[`confirm_${attribute.attribute}`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Confirm {{ attribute.label }}</label>
               <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
               <TextInput v-on:recipient:input:updated="updateRecipientAccountNumberConfirmation" :id="`confirm-input-${attribute.attribute}`" />
+              <p v-if="errors[`confirm_${attribute.attribute}`]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[`confirm_${attribute.attribute}`][0] }}</p>
             </div>
           </div>
         </AccountNumberInput>
       </template>
       <template v-else>
-        <label :for="attribute.attribute" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attribute.label }}</label>
-        <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
-        <component v-on:recipient:input:updated="updateRecipientInput" :is="componentMap[attribute.type] || componentMap['default']" v-bind:attribute="attribute" :id="attribute.attribute" />
+        <template v-if="(componentMap[attribute.type] || componentMap['default']) === MobileNumberInput || (componentMap[attribute.type] || componentMap['default']) === PhoneNumberInput">
+          <label :for="attribute.attribute" :class="[errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attribute.label }}</label>
+          <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
+          <component v-on:recipient:input:updated="updateRecipientInput" :is="componentMap[attribute.type] || componentMap['default']" v-bind:attribute="attribute" :id="attribute.attribute" />
+          <p v-if="errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[`${attribute.attribute}.country`][0] || errors[`${attribute.attribute}.number`][0] }}</p>
+        </template>
+        <template v-else>
+          <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attribute.label }}</label>
+          <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
+          <component v-on:recipient:input:updated="updateRecipientInput" :is="componentMap[attribute.type] || componentMap['default']" v-bind:attribute="attribute" :id="attribute.attribute" />
+          <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[attribute.attribute][0] }}</p>
+        </template>
       </template>
     </div>
     <div>
-      <label for="relationship" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Relation</label>
+      <label for="relationship" :class="[errors?.relationship_id?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Relation</label>
       <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please select your relation with the recipient.</p>
       <RelationshipInput v-bind:relationships="relationships" v-on:recipient:relationship:updated="updateRelationship" />
+      <p v-if="errors?.relationship_id?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.relationship_id[0] }}</p>
     </div>
-    <button type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
+    <button :class="{'opacity-60' : isSaving}" :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
+      <span v-if="isSaving" class="flex justify-center items-center">
+        <Spinner :class="'w-5 h-5 mr-3'"/>
+        <span>Saving...</span>
+      </span>
+      <span v-else>Save Recipient</span>
+    </button>
   </form>
 </template>

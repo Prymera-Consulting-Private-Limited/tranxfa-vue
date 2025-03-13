@@ -105,6 +105,12 @@ onMounted(async () => {
     isLoading.value = false;
   });
 })
+
+defineEmits(['recipient:added']);
+
+const recipientAdded = (recipient) => {
+  emit('recipient:added', recipient);
+}
 </script>
 
 <template>
@@ -121,6 +127,7 @@ onMounted(async () => {
           v-bind:payoutChannel="recipient.payoutChannel"
           v-bind:type="recipient.type"
           v-bind:relationships="relationships"
+          v-on:recipient:added="recipientAdded"
       />
     </template>
     <template v-else-if="snapshot?.value === 'recipientTypeSelection'">
