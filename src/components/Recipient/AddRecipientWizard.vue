@@ -10,10 +10,13 @@ import PayoutMethodSelection from "@/components/Recipient/PayoutMethodSelection.
 import AttributeCollection from "@/components/Recipient/AttributeCollection.vue";
 import {usePayoutChannelUtils} from "@/composables/payout_channel_utils.js";
 import RecipientType from "@/enums/recipient_type.js";
+import {useResourceUtils} from "@/composables/resource_utils.js";
+import Relationship from "@/models/relationship.js";
 
 const isLoading = ref(true);
 const quoteUtils = useQuoteUtils();
 const payoutChannelUtils = usePayoutChannelUtils();
+const resourceUtils = useResourceUtils();
 const { snapshot, send } = useMachine(addRecipientNavigationMachine);
 
 const recipient = reactive({
@@ -27,6 +30,7 @@ const recipient = reactive({
 
 const targets = ref([]);
 const payoutMethods = ref([]);
+const relationships = ref([]);
 
 async function updateRecipientTarget(target) {
   recipient.country = target.country;
@@ -43,12 +47,7 @@ async function updateRecipientTarget(target) {
   });
   payoutMethods.value = quoteUtils.quote.data.payoutMethods;
   if (payoutMethods.value.length === 1) {
-    send({
-      type: "SET_CONTEXT",
-      payoutMethod: payoutMethods.value[0]
-    });
     await updatePayoutMethod(payoutMethods.value[0]);
-    send({ type: "PROCEED" })
   }
   isLoading.value = false;
 }
@@ -88,6 +87,13 @@ async function updateRecipientType(type) {
     recipientType: type
   });
   send({ type: "PROCEED" })
+  isLoading.value = true;
+  await resourceUtils.relationships().then((response) => {
+    relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship))
+  }).finally(() => {
+    isLoading.value = false;
+  });
+
 }
 
 onMounted(async () => {
@@ -114,6 +120,7 @@ onMounted(async () => {
           v-bind:payoutMethod="recipient.payoutMethod"
           v-bind:payoutChannel="recipient.payoutChannel"
           v-bind:type="recipient.type"
+          v-bind:relationships="relationships"
       />
     </template>
     <template v-else-if="snapshot?.value === 'recipientTypeSelection'">

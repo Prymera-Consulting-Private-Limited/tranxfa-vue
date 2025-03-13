@@ -17,14 +17,35 @@ import AccountNumberInput from "@/components/Recipient/Attribute/AccountNumberIn
 import PhoneNumberInput from "@/components/Recipient/Attribute/PhoneNumberInput.vue";
 import {reactive, ref} from "vue";
 import RecipientDataType from "@/enums/recipient_data_type.js";
+import Relationship from "@/models/relationship.js";
+import RelationshipInput from "@/components/Recipient/Attribute/RelationshipInput.vue";
 
 const props = defineProps({
-  country: Country,
-  currency: Currency,
-  payoutMethod: PayoutMethod,
-  payoutChannel: PayoutChannel,
-  type: String,
+  country: {
+    type: Country,
+    required: true,
+  },
+  currency: {
+    type: Currency,
+    required: true,
+  },
+  payoutMethod: {
+    type: PayoutMethod,
+    required: true,
+  },
+  payoutChannel: {
+    type: PayoutChannel,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+  },
   errors: Object,
+  relationships: {
+    type: Array({type: Relationship}),
+    required: true,
+  },
 })
 
 const componentMap = {
@@ -89,6 +110,9 @@ async function updateRecipientEntityName(updated) {
 async function updateRecipientAccountNumberConfirmation(updated) {
   confirmAccountNumberInput.value = updated;
 }
+async function updateRelationship(relationship) {
+  input.data.relationship_id = relationship.id;
+}
 
 async function updateRecipientInput(updated, attribute) {
   if (attribute.type === RecipientDataType.DELIVERY_OPTION) {
@@ -97,11 +121,11 @@ async function updateRecipientInput(updated, attribute) {
   }
   input.data[attribute.attribute] = updated;
 }
+
 </script>
 
 <template>
   <form class="space-y-6 mt-12">
-    <pre>{{ input.data }}</pre>
     <div v-if="type === RecipientType.BUSINESS">
       <div >
         <div>
@@ -159,6 +183,11 @@ async function updateRecipientInput(updated, attribute) {
         <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
         <component v-on:recipient:input:updated="updateRecipientInput" :is="componentMap[attribute.type] || componentMap['default']" v-bind:attribute="attribute" :id="attribute.attribute" />
       </template>
+    </div>
+    <div>
+      <label for="relationship" :class="[false ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Relation</label>
+      <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please select your relation with the recipient.</p>
+      <RelationshipInput v-bind:relationships="relationships" v-on:recipient:relationship:updated="updateRelationship" />
     </div>
     <button type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
   </form>
