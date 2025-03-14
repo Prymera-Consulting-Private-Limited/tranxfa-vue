@@ -78,6 +78,14 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/recipient/:id',
+      name: 'viewRecipient',
+      component: () => import('@/views/Recipient/View.vue'),
+      meta: {
+        title: 'Recipients',
+        description: '',
+      },
+    }, {
       path: '/account-verification',
       name: 'accountVerification',
       component: () => import('@/views/Kyc/AccountVerificationView.vue'),

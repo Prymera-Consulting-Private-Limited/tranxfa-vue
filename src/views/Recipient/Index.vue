@@ -73,8 +73,10 @@ const createRecipient = () => {
               </template>
               <template v-else>
                 <ul v-if="recipients.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 border-t border-gray-200 py-6">
-                  <li v-for="(recipient, index) in recipients" :key="recipient.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm">
-                    <RecipientCard v-bind:cardColor="colors[index%6]" v-bind:recipient="recipient" />
+                  <li v-for="(recipient, index) in recipients" :key="recipient.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center transition-transform transform hover:scale-105 shadow-sm hover:shadow-md">
+                    <router-link :to="{ name: 'viewRecipient', params: { id: recipient.id } }" class="cursor-pointer">
+                      <RecipientCard v-bind:cardColor="colors[index%6]" v-bind:recipient="recipient" />
+                    </router-link>
                   </li>
                 </ul>
                 <template v-else>
