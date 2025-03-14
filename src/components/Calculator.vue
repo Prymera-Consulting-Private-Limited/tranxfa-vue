@@ -26,7 +26,8 @@ import Recipient from "@/models/recipient.js";
 const props = defineProps({
   recipient: {
     type: Recipient,
-    required: true,
+    required: false,
+    default: null,
   }
 })
 
