@@ -28,7 +28,7 @@ export const transactionNavigationMachine = createMachine({
             always: [
                 {
                     target: 'addRecipient',
-                    cond: (context) => context.recipients.length === 0,
+                    guard: (context) => context.recipients.length === 0,
                 },
                 {
                     target: 'selectRecipient',
