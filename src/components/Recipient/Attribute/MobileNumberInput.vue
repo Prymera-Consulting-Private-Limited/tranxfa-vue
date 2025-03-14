@@ -13,7 +13,7 @@ const props = defineProps({
     required: true,
   },
 });
-const emit = defineEmits(['update:mobileNumberUpdated']);
+const emit = defineEmits(['recipient:input:updated']);
 const mobileNumber = reactive({
   country: props.mobile?.country || null,
   number: props.mobile?.number || null,

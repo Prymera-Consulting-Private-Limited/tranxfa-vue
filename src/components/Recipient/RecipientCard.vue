@@ -20,13 +20,11 @@ defineProps({
     </div>
     <h3 class="mt-6 text-sm font-medium text-gray-900">{{ recipient.fullName }}</h3>
     <dl class="mt-1 flex grow flex-col justify-between">
-      <dt class="sr-only">Payout Method</dt>
-      <dd class="text-gray-500 text-sm">{{ recipient.channel.payoutMethod.title }}</dd>
       <dt class="sr-only">In Country</dt>
       <dd class="text-gray-500 text-sm leading-5">{{ recipient.channel.country.commonName }}</dd>
-      <dt class="sr-only">Relation</dt>
+      <dt class="sr-only">Payout Method</dt>
       <dd class="mt-3">
-        <span class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">{{ recipient.relationship.title }}</span>
+        <span class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">{{ recipient.channel.payoutMethod.title }}</span>
       </dd>
     </dl>
   </div>

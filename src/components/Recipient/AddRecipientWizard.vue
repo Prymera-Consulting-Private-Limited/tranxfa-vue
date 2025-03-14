@@ -106,7 +106,7 @@ onMounted(async () => {
   });
 })
 
-defineEmits(['recipient:added']);
+const emit = defineEmits(['recipient:added']);
 
 const recipientAdded = (recipient) => {
   emit('recipient:added', recipient);
