@@ -35,9 +35,18 @@ export function useRecipientUtils() {
         });
     }
 
+    const getRecipient = async (id) => {
+        return $axios.get(`/client/v1/recipient/${id}`, {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        });
+    }
+
     return {
         whisper,
         add,
         get,
+        getRecipient,
     };
 }

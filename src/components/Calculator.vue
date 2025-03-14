@@ -21,6 +21,14 @@ import { useQuoteUtils } from "@/composables/quote_utils.js";
 import MoneyInput from "@/components/MoneyInput.vue";
 import MoneyInputShimmer from "@/components/MoneyInputShimmer.vue";
 import AmountType from "@/enums/amount_type.js";
+import Recipient from "@/models/recipient.js";
+
+const props = defineProps({
+  recipient: {
+    type: Recipient,
+    required: true,
+  }
+})
 
 const isFetchingQuote = ref(true);
 
@@ -31,9 +39,9 @@ const query = reactive({
   amount: quoteUtil.quote.data?.amount,
   paymentCountry: quoteUtil.quote.data?.paymentCountry,
   paymentCurrency: quoteUtil.quote.data?.paymentCurrency,
-  payoutCountry: quoteUtil.quote.data?.payoutCountry,
-  payoutCurrency: quoteUtil.quote.data?.payoutCurrency,
-  payoutMethod: quoteUtil.quote.data?.payoutMethod,
+  payoutCountry: props.recipient?.channel?.country || quoteUtil.quote.data?.payoutCountry,
+  payoutCurrency: props.recipient?.channel?.currency || quoteUtil.quote.data?.payoutCurrency,
+  payoutMethod: props.recipient?.channel?.payoutMethod || quoteUtil.quote.data?.payoutMethod,
   payoutCompany: quoteUtil.quote.data?.payoutCompany,
 });
 
@@ -85,6 +93,7 @@ const selectedPayoutMethod = computed({
 })
 
 onMounted(getQuote)
+
 </script>
 <template>
   <div class="flow-root">
@@ -174,7 +183,7 @@ onMounted(getQuote)
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <UserIcon class="size-4 text-white"/>
                     </span>
-                    <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">Recipient Gets</label>
+                    <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.fullName || 'Recipient Gets' }}</label>
                   </div>
                   <div class="mt-4">
                     <MoneyInput
@@ -183,6 +192,7 @@ onMounted(getQuote)
                         v-bind:currency="quoteUtil.quote.data.payoutCurrency"
                         v-bind:options="quoteUtil.quote.data.targets"
                         v-bind:amount="quoteUtil.quote.data.foreignAmount"
+                        v-bind:disableTargetSelection="true"
                         v-bind:inputId="`receive-money-input`"
                         v-on:update:amount="receiveAmountUpdated"
                         v-on:option:updated="targetUpdated"
@@ -213,19 +223,19 @@ onMounted(getQuote)
                       <ListboxLabel class="sr-only">Select or Change Delivery Method</ListboxLabel>
                       <div class="relative">
                         <div  class="flex divide-x divide-brand-700 rounded-md outline-2 outline-brand-700 bg-white w-full">
-                          <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-3 bg-white w-full">
+                          <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-3 bg-white w-full">
                             <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
                             <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
                           </div>
                           <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 mt-1 outline-hidden outline-0 w-full']">
-                            <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0" >
+                            <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
                               <span class="sr-only">Select or Change Delivery Method</span>
                               <ChevronDownIcon class="size-5 text-brand-700 forced-colors:text-[Highlight]" aria-hidden="true" />
                             </template>
                           </ListboxButton>
                         </div>
 
-                        <transition v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0" leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                        <transition v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
                           <ListboxOptions class="absolute right-0 z-10 mt-2 w-72 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden">
                             <ListboxOption as="template" v-for="payoutMethod in quoteUtil.quote?.data?.payoutMethods" :key="payoutMethod.id" :value="payoutMethod" v-slot="{ active, selectedPayoutMethod }">
                               <li :class="[active ? 'bg-brand-700 text-white' : 'text-gray-900', 'cursor-default p-4 text-sm select-none']">
