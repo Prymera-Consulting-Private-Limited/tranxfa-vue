@@ -202,7 +202,7 @@ function saveQuote() {
                         v-bind:currency="quoteUtil.quote.data.payoutCurrency"
                         v-bind:options="quoteUtil.quote.data.targets"
                         v-bind:amount="quoteUtil.quote.data.foreignAmount"
-                        v-bind:disableTargetSelection="true"
+                        v-bind:disableTargetSelection="!!recipient"
                         v-bind:inputId="`receive-money-input`"
                         v-on:update:amount="receiveAmountUpdated"
                         v-on:option:updated="targetUpdated"
