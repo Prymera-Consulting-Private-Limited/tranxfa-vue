@@ -55,7 +55,7 @@ onMounted(async () => {
                     <div class="py-6 sm:flex">
                       <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Name</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                        <div class="text-gray-900">{{ recipient.fullName }}</div>
+                        <div class="text-gray-900">{{ recipient?.fullName }}</div>
                       </dd>
                     </div>
                     <div class="py-6 sm:flex">
