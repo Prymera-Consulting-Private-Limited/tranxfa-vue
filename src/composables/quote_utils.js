@@ -57,10 +57,21 @@ export function useQuoteUtils() {
         });
     }
 
+    const setRecipient = async (quoteId, recipient) => {
+        return $axios.post(`/client/v1/quote/recipient/${quoteId}`, {
+            recipient_id: recipient.id,
+        }, {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        });
+    }
+
     return {
         quote,
         getQuote,
         saveQuote,
         getTransferQuote,
+        setRecipient,
     }
 }
