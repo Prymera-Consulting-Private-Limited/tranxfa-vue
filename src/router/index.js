@@ -64,6 +64,7 @@ const router = createRouter({
     }, {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
+      props: route => ({ id: route.params.quoteId }),
       component: () => import('@/views/Transfer/Index.vue'),
       meta: {
         title: 'Dashboard',
