@@ -1,5 +1,6 @@
 import Relationship from "@/models/relationship.js";
 import PayoutChannel from "@/models/payout_channel.js";
+import RecipientAttribute from "@/models/recipient_attribute.js";
 
 class Recipient {
 
@@ -48,6 +49,11 @@ class Recipient {
      */
     channel = null;
 
+    /**
+     * @type {RecipientAttribute[]}
+     */
+    attributes = [];
+
     static getInstance(data) {
         let recipient = new Recipient();
         recipient.id = data.id;
@@ -59,6 +65,9 @@ class Recipient {
         recipient.fullName = data.full_name;
         recipient.relationship = Relationship.getInstance(data.relationship);
         recipient.channel = PayoutChannel.getInstance(data.channel);
+        if (data.attributes?.length > 0) {
+            recipient.attributes = data.attributes.map(attribute => RecipientAttribute.getInstance(attribute));
+        }
         return recipient;
     }
 }
