@@ -125,9 +125,11 @@ const hasRecipients = ref(false);
 onMounted(async () => {
   if (! customerStore.isLoaded) {
     isLoading.value = true;
-    await customerUtils.refresh();
-    isLoading.value = false;
+    customerUtils.refresh().finally(() => {
+      isLoading.value = false;
+    });
   }
+  isLoading.value = true;
   recipientUtils.whisper().then(() => {
     hasRecipients.value = true;
   }).catch((e) => {
@@ -136,6 +138,8 @@ onMounted(async () => {
     } else {
       console.error(e);
     }
+  }).finally(() => {
+    isLoading.value = false;
   });
 });
 </script>
