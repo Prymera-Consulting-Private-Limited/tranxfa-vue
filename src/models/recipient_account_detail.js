@@ -18,8 +18,8 @@ class RecipientAccountDetail {
 
     static getInstance(data) {
         const recipientAccountDetail = new RecipientAccountDetail();
-        recipientAccountDetail.accountNumber = data.accountNumber;
-        recipientAccountDetail.accountHolderName = data.accountHolderName;
+        recipientAccountDetail.accountNumber = data.account_number;
+        recipientAccountDetail.accountHolderName = data.account_holder_name;
         if (data.institution) {
             recipientAccountDetail.institution = DeliveryOption.getInstance(data.institution);
         }
