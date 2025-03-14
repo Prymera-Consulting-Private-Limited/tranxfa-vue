@@ -21,6 +21,7 @@ import Relationship from "@/models/relationship.js";
 import RelationshipInput from "@/components/Recipient/Attribute/RelationshipInput.vue";
 import Spinner from "@/components/Spinner.vue";
 import {useRecipientUtils} from "@/composables/recipient_utils.js";
+import Recipient from "@/models/recipient.js";
 
 const props = defineProps({
   country: {
@@ -150,7 +151,8 @@ async function addRecipient() {
   Object.entries(errors).forEach(([key]) => {
     errors[key] = [];
   });
-  await recipientUtils.add(props.payoutChannel, input.data).then((recipient) => {
+  await recipientUtils.add(props.payoutChannel, input.data).then((data) => {
+    const recipient = Recipient.getInstance(data);
     emit('recipient:added', recipient);
   }).catch((e) => {
     if (e.status === 422) {
