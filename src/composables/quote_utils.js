@@ -30,8 +30,27 @@ export function useQuoteUtils() {
         });
     }
 
+    const saveQuote = async (quote) => {
+        const data = {
+            amount_type: quote?.amountType,
+            amount: quote?.amount,
+            payment_country_id: quote?.paymentCountry?.id,
+            payment_currency_id: quote?.paymentCurrency?.id,
+            payout_country_id: quote?.payoutCountry?.id,
+            payout_currency_id: quote?.payoutCurrency?.id,
+            payout_method_id: quote?.payoutMethod?.id,
+            payout_company_id: quote?.payoutCompany?.id,
+        };
+        return $axios.post('/client/v1/quote', data, {
+            headers: {
+                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+            }
+        });
+    }
+
     return {
         quote,
-        getQuote
+        getQuote,
+        saveQuote,
     }
 }

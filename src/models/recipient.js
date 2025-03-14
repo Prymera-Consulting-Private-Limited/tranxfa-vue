@@ -64,7 +64,10 @@ class Recipient {
         recipient.entityName = data.entity_name;
         recipient.fullName = data.full_name;
         recipient.relationship = Relationship.getInstance(data.relationship);
-        recipient.channel = PayoutChannel.getInstance(data.channel);
+        if (data.channel) {
+            recipient.channel = PayoutChannel.getInstance(data.channel);
+        }
+
         if (data.attributes?.length > 0) {
             recipient.attributes = data.attributes.map(attribute => RecipientAttribute.getInstance(attribute));
         }

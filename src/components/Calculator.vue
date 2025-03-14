@@ -23,6 +23,8 @@ import MoneyInputShimmer from "@/components/MoneyInputShimmer.vue";
 import AmountType from "@/enums/amount_type.js";
 import Recipient from "@/models/recipient.js";
 import Spinner from "@/components/Spinner.vue";
+import router from "@/router/index.js";
+import TransactionQuote from "@/models/transaction_quote.js";
 
 const props = defineProps({
   recipient: {
@@ -99,9 +101,12 @@ onMounted(getQuote)
 
 function saveQuote() {
   isSavingQuote.value = true;
-  setTimeout(() => {
+  quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
+    const quote = TransactionQuote.getInstance(response.data);
+    router.push({name: 'transferWizard', params: {quoteId: quote.id}});
+  }).finally(() => {
     isSavingQuote.value = false;
-  }, 2000);
+  });
 }
 
 </script>
