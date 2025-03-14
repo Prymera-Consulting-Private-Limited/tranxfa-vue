@@ -62,6 +62,14 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/transfer/:quoteId',
+      name: 'transferWizard',
+      component: () => import('@/views/Transfer/Index.vue'),
+      meta: {
+        title: 'Dashboard',
+        description: '',
+      },
+    }, {
       path: '/transactions',
       name: 'transactions',
       component: () => import('@/views/TransactionListingView.vue'),
