@@ -22,6 +22,7 @@ import MoneyInput from "@/components/MoneyInput.vue";
 import MoneyInputShimmer from "@/components/MoneyInputShimmer.vue";
 import AmountType from "@/enums/amount_type.js";
 import Recipient from "@/models/recipient.js";
+import Spinner from "@/components/Spinner.vue";
 
 const props = defineProps({
   recipient: {
@@ -32,6 +33,7 @@ const props = defineProps({
 })
 
 const isFetchingQuote = ref(true);
+const isSavingQuote = ref(false);
 
 const quoteUtil = useQuoteUtils();
 
@@ -95,9 +97,16 @@ const selectedPayoutMethod = computed({
 
 onMounted(getQuote)
 
+function saveQuote() {
+  isSavingQuote.value = true;
+  setTimeout(() => {
+    isSavingQuote.value = false;
+  }, 2000);
+}
+
 </script>
 <template>
-  <div class="flow-root">
+  <form @submit.prevent="saveQuote" class="flow-root">
     <ul role="list" class="-mb-8">
       <li>
         <div class="relative pb-4">
@@ -281,11 +290,17 @@ onMounted(getQuote)
         </div>
       </li>
     </ul>
-    <button  :class="[! isFetchingQuote ? '' : 'opacity-75']" type="button" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
-      Send Money
-      <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
+    <button :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
+      <template v-if="isSavingQuote">
+        <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
+        Saving ...
+      </template>
+      <template v-else>
+        Send Money
+        <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
+      </template>
     </button>
-  </div>
+  </form>
 </template>
 
 <style scoped>
