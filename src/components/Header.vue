@@ -13,11 +13,15 @@ import {
 import {MagnifyingGlassIcon} from "@heroicons/vue/20/solid/index.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {onMounted} from "vue";
+import {onMounted, ref} from "vue";
 import router from "@/router/index.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
+/**
+ * @type {Customer|null}
+ */
+const customer = customerStore.customer.data;
 
 const navigation = [
   { name: 'Dashboard', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
@@ -39,9 +43,13 @@ const userNavigation = [
   { name: 'Sign out', action: logout },
 ]
 
+const isLoading = ref(false);
+
 onMounted(async () => {
   if (! customerStore.isLoaded) {
+    isLoading.value = true;
     await customerUtils.refresh();
+    isLoading.value = false;
   }
 });
 </script>
@@ -67,7 +75,12 @@ onMounted(async () => {
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
                 <div class="bg-gray-200 text-gray-500 size-8 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
-                  {{ customerStore.customer?.firstName?.slice(0, 1).toUpperCase() + customerStore.customer?.lastName?.slice(0, 1).toUpperCase() }}
+                  <template v-if="customer">{{ customer?.firstName?.slice(0, 1).toUpperCase() + customer?.lastName?.slice(0, 1).toUpperCase() }}</template>
+                  <template v-else>
+                    <svg class="size-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                  </template>
                 </div>
               </MenuButton>
             </div>
