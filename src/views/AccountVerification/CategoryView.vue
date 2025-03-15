@@ -76,21 +76,27 @@ async function launchSumsubWebSdk(accessToken) {
   snsWebSdkInstance.launch("#sumsub-container");
 }
 
-async function getNewAccessToken() {
+async function getNewAccessToken(documentCategory, documentType) {
   let accessToken = null;
-  await customerUtils.getIdentityVerificationToken().then((response) => {
+  await customerUtils.getAccountVerificationToken(documentCategory, documentType).then((response) => {
     accessToken = response.data.token;
+  }).catch((e) => {
+    console.error(e);
   });
 
   return accessToken;
 }
 
+async function startSystemVerification(documentType) {
+  const accessToken = await getNewAccessToken(selectedCategory.data, documentType);
+  console.log(accessToken);
+}
+
 async function startSumsubVerification (documentType) {
   openSumsub.value = true;
   isSumsubInitialized.value = false;
-  customerUtils.getIdentityVerificationToken(documentType).then((response) => {
-    launchSumsubWebSdk(response.data.token);
-  });
+  const accessToken = await getNewAccessToken(selectedCategory.data, documentType);
+  await launchSumsubWebSdk(accessToken);
 }
 </script>
 
@@ -122,6 +128,7 @@ async function startSumsubVerification (documentType) {
                           <dt class="sr-only">Start Verification</dt>
                           <dd class="mt-3 text-sm text-gray-500">
                             <a v-if="documentType.api === 'SUMSUB'" @click="startSumsubVerification(documentType)" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
+                            <a v-else-if="documentType.api === 'SYSTEM'" @click="startSystemVerification(documentType)" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
                           </dd>
                         </dl>
                       </div>
