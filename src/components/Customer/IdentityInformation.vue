@@ -1,6 +1,6 @@
 <script setup>
 import {useCustomerStore} from "@/stores/customer.js";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import FormGroup from "@/components/CustomerAttribute/FormGroup.vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountriesStore} from "@/stores/countries.js";
@@ -10,8 +10,10 @@ const isLoading = ref(false)
 const customerStore = useCustomerStore()
 const countriesStore = useCountriesStore();
 const customerUtils = useCustomerUtils()
-const formData = ref({})
-const formErrors = ref({});
+const form = reactive({
+  errors: null,
+  data: null,
+})
 
 /**
  * @type {{data: Customer | null}}
@@ -22,8 +24,8 @@ const identityAttributes = computed(() => {
   const identityAttributes = [];
   for (const attribute of customer.data?.attributes) {
     if (attribute.category === 'identity') {
-      if (typeof formErrors.value[attribute.attribute] !== 'undefined') {
-        attribute['errors'] = formErrors.value[attribute.attribute];
+      if (form.errors && typeof form.errors[attribute.attribute] !== 'undefined') {
+        attribute['errors'] = form.errors[attribute.attribute];
       }
       identityAttributes.push(attribute);
     }
@@ -35,8 +37,9 @@ onMounted( async () => {
   if (! customerStore.isLoaded) {
     await customerUtils.refresh();
   }
+  form.data = {};
   for (const attribute of identityAttributes.value) {
-    formData.value[attribute.attribute] = attribute.value;
+    form.data[attribute.attribute] = attribute.value;
   }
 });
 
@@ -44,10 +47,10 @@ const isSaving = ref(false);
 
 async function update() {
   isSaving.value = true;
-  formErrors.value = {};
-  customerUtils.updateProfileIdentity(formData.value).catch((e) => {
+  form.errors = null;
+  customerUtils.updateProfileIdentity(form.data).catch((e) => {
     if (e.status === 422) {
-      formErrors.value = e.response.data.errors;
+      form.errors = e.response.data.errors;
     } else {
       console.error(e);
     }
@@ -61,7 +64,7 @@ const showLoading = computed(() => {
 })
 
 const updateFormData = (attr, value) => {
-  formData.value[attr.attribute] = value;
+  form.data[attr.attribute] = value;
 }
 </script>
 <template>
