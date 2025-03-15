@@ -60,6 +60,8 @@ class Recipient {
      */
     accountDetail = null;
 
+    accountDetailHashMap = [];
+
     static getInstance(data) {
         let recipient = new Recipient();
         recipient.id = data.id;
@@ -75,6 +77,9 @@ class Recipient {
         }
         if (data.account_detail) {
             recipient.accountDetail = RecipientAccountDetail.getInstance(data.account_detail);
+        }
+        if (data.account_detail_hashmap) {
+            recipient.accountDetailHashMap = data.account_detail_hashmap || [];
         }
 
         if (data.attributes?.length > 0) {
