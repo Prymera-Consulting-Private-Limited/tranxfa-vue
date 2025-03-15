@@ -43,8 +43,8 @@ onMounted( async () => {
 const isSaving = ref(false);
 
 async function update() {
-  isLoading.value = true;
   isSaving.value = true;
+  formErrors.value = {};
   customerUtils.updateProfileIdentity(formData.value).catch((e) => {
     if (e.status === 422) {
       formErrors.value = e.response.data.errors;
@@ -52,7 +52,6 @@ async function update() {
       console.error(e);
     }
   }).finally(() => {
-    isLoading.value = false;
     isSaving.value = false;
   });
 }
