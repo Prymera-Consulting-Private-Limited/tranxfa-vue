@@ -1,100 +1,33 @@
 import {assign, createMachine} from 'xstate';
+import {useCustomerStore} from "@/stores/customer.js";
+
+const customerStore = useCustomerStore();
+
 export const onboardingNavigationMachine = createMachine({
     id: 'onboardingNavigation',
     initial: 'emailVerification',
     context: {
-        isEmailVerified: false,
-        accountCountry: null,
-        identityInfoProvided: false,
-        mobileNumber: null,
+
     },
     states: {
         emailVerification: {
-            on: {
-                PROCEED: [
-                    { target: "editAccountCountry", guard: "countryIsMissing" },
-                    { target: "updateIdentityInformation", guard: "identityInformationRequired" },
-                    { target: "mobileNumberInput", guard: "mobileNumberRequired" },
-                    { target: "dashboard", guard: "onboardingOk" },
-                ],
-                SET_CONTEXT: {
-                    actions: assign({
-                        accountCountry: ({context, event}) => {
-                            return event.accountCountry || context.accountCountry;
-                        },
-                        isEmailVerified: ({context, event}) => {
-                            return event.isEmailVerified || context.isEmailVerified;
-                        },
-                        identityInfoProvided: ({context, event}) => {
-                            return event.identityInfoProvided || context.identityInfoProvided;
-                        },
-                        mobileNumber: ({context, event}) => {
-                            return event.mobileNumber || context.mobileNumber;
-                        }
-                    })
-                }
-            },
+            always: [
+                {
+                    target: 'sourceCountrySelection',
+                    guard: () => customerStore.isLoaded && customerStore?.customer?.account?.isEmailVerified === true,
+                },
+            ],
         },
-        editAccountCountry: {
-            on: {
-                PROCEED: [
-                    { target: "emailVerification", guard: "isEmailVerified" },
-                    { target: "updateIdentityInformation", guard: "identityInformationRequired" },
-                    { target: "mobileNumberInput", guard: "mobileNumberRequired" },
-                    { target: "dashboard", guard: "onboardingOk" },
-                ],
-                SET_CONTEXT: {
-                    actions: assign({
-                        accountCountry: ({context, event}) => {
-                            return event.accountCountry || context.accountCountry;
-                        },
-                        isEmailVerified: ({context, event}) => {
-                            return event.isEmailVerified || context.isEmailVerified;
-                        },
-                        identityInfoProvided: ({context, event}) => {
-                            return event.identityInfoProvided || context.identityInfoProvided;
-                        },
-                        mobileNumber: ({context, event}) => {
-                            return event.mobileNumber || context.mobileNumber;
-                        }
-                    })
-                }
-            },
+        sourceCountrySelection: {
+            always: [
+                {
+                    target: 'identityInformation',
+                    guard: () => customerStore.isLoaded && customerStore?.customer?.country === null,
+                },
+            ],
         },
-        updateIdentityInformation: {
-            on: {
-                PROCEED: [
-                    { target: "emailVerification", guard: "isEmailVerified" },
-                    { target: "editAccountCountry", guard: "countryIsMissing" },
-                    { target: "mobileNumberInput", guard: "mobileNumberRequired" },
-                    { target: "dashboard", guard: "onboardingOk" },
-                ],
-                SET_CONTEXT: {
-                    actions: assign({
-                        accountCountry: ({context, event}) => {
-                            return event.accountCountry || context.accountCountry;
-                        },
-                        isEmailVerified: ({context, event}) => {
-                            return event.isEmailVerified || context.isEmailVerified;
-                        },
-                        identityInfoProvided: ({context, event}) => {
-                            return event.identityInfoProvided || context.identityInfoProvided;
-                        },
-                        mobileNumber: ({context, event}) => {
-                            return event.mobileNumber || context.mobileNumber;
-                        }
-                    })
-                }
-            },
-        },
-        mobileNumberInput: {},
-        dashboard: {},
-    }
-}, {
-    guards: {
-        countryIsMissing: ({context}) => context.isEmailVerified && ! context.accountCountry,
-        identityInformationRequired: ({context}) => ! context.identityInfoProvided && context.accountCountry && context.isEmailVerified,
-        mobileNumberRequired: ({context}) => context.identityInfoProvided && context.isEmailVerified && context.accountCountry && ! context.mobileNumber,
-        onboardingOk: ({context}) => context.accountCountry && context.identityInfoProvided && context.isEmailVerified && context.mobileNumber
+        identityInformation: {
+            final: true,
+        }
     }
 });
