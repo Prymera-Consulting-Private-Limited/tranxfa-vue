@@ -63,11 +63,15 @@ async function launchSumsubWebSdk(accessToken) {
           if (payload.reviewResult.reviewAnswer === ReviewAnswer.GREEN) {
             if (router.currentRoute.value.query?._utm === 'dashboard-todos') {
               router.push({name: 'dashboard'});
+            } else {
+              router.push({name: 'accountVerification'});
             }
           }
         } else if (payload.reviewStatus === 'onHold') {
           if (router.currentRoute.value.query?._utm === 'dashboard-todos') {
             router.push({name: 'dashboard'});
+          } else {
+            router.push({name: 'accountVerification'});
           }
         }
       })
