@@ -10,6 +10,7 @@ const isLoading = ref(false)
 const customerStore = useCustomerStore()
 const countriesStore = useCountriesStore();
 const customerUtils = useCustomerUtils()
+const formData = ref({})
 const formErrors = ref({});
 
 /**
@@ -34,6 +35,9 @@ onMounted( async () => {
   if (! customerStore.isLoaded) {
     await customerUtils.refresh();
   }
+  for (const attribute of identityAttributes.value) {
+    formData.value[attribute.attribute] = attribute.value;
+  }
 });
 
 const isSaving = ref(false);
@@ -41,7 +45,7 @@ const isSaving = ref(false);
 async function update() {
   isLoading.value = true;
   isSaving.value = true;
-  customerUtils.updateProfileIdentity(identityAttributes).catch((e) => {
+  customerUtils.updateProfileIdentity(formData.value).catch((e) => {
     if (e.status === 422) {
       formErrors.value = e.response.data.errors;
     } else {
@@ -56,6 +60,10 @@ async function update() {
 const showLoading = computed(() => {
   return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
 })
+
+const updateFormData = (attr, value) => {
+  formData.value[attr.attribute] = value;
+}
 </script>
 <template>
   <div v-show="! showLoading" class="flex-1 flex items-center justify-center p-4 md:p-8">
@@ -70,7 +78,7 @@ const showLoading = computed(() => {
       <!-- Form -->
       <form @submit.prevent="update" class="space-y-6 mt-12">
         <div v-for="attr in identityAttributes">
-          <FormGroup v-bind:attr="attr" />
+          <FormGroup v-on:customer:attribute:updated="updateFormData" v-bind:attr="attr" />
         </div>
         <button :disabled="showLoading || isSaving" :class="[{'opacity-70': isLoading || isSaving}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
           <template v-if="isSaving">

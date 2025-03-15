@@ -96,19 +96,19 @@ export function useCustomerUtils() {
         })
     }
 
-    async function updateProfileIdentity(attributes) {
-        const data = {};
-        for (const attr of attributes.value) {
-            const parsedAttr = attr.attribute.split('.');
-            if (parsedAttr.length === 1) {
-                data[attr.attribute] = attr.value;
+    async function updateProfileIdentity(data) {
+        const requestData = {};
+        for (const attr of Object.keys(data)) {
+            const unzipped = attr.split('.');
+            if (unzipped.length === 1) {
+                requestData[attr] = data[attr];
             } else {
-                data[parsedAttr[0]] = {};
-                data[parsedAttr[0]][parsedAttr[1]] = attr.value;
+                requestData[unzipped[0]] = {};
+                requestData[unzipped[0]][unzipped[1]] = data[attr];
             }
         }
 
-        await $axios.post('/client/v1/update?category=identity', data, {
+        await $axios.post('/client/v1/update?category=identity', requestData, {
             headers: {
                 'X-Customer-Token': getAuthToken(),
             }
