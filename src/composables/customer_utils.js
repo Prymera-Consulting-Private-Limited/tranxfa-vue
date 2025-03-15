@@ -130,8 +130,8 @@ export function useCustomerUtils() {
         })
     }
 
-    async function getIdentityVerificationToken(documentType) {
-        return $axios.get('/client/v1/customer/identity-verification-token', {
+    async function getAccountVerificationToken(documentCategory, documentType) {
+        return $axios.get(`/client/v1/account-verification/token/${documentCategory.id}/${documentType.id}`, {
             params: {
                 document_type_id: documentType.id,
             },
@@ -152,6 +152,6 @@ export function useCustomerUtils() {
         updateProfileIdentity,
         updateMobileNumber,
         logout,
-        getIdentityVerificationToken,
+        getAccountVerificationToken,
     }
 }
