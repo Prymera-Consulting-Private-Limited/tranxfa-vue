@@ -162,7 +162,7 @@ async function save() {
         <div v-if="file.status === 'uploading'" class="absolute bottom-0 left-0 h-1 bg-brand-700 transition-all" :style="{ width: file.progress + '%' }"></div>
       </div>
     </div>
-    <form>
+    <form @submit.prevent="save">
       <button :disabled="isUploading || isSaving || !files.length" :class="[{'opacity-70': isUploading || isSaving || !files.length}, (isUploading || isSaving || !files.length) ? 'cursor-not-allowed' : 'cursor-pointer' ]" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3 rounded-[10px] font-medium hover:bg-brand-800 transition">
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
