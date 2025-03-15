@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref, watch, watchEffect} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useMachine} from "@xstate/vue";
@@ -57,7 +57,6 @@ watch(customer, () => {
         <OriginCountrySelection v-else-if="snapshot?.value === 'sourceCountrySelection'" />
         <IdentityInformation v-else-if="snapshot?.value === 'identityInformation'" />
         <MobileNumberInput v-else-if="snapshot?.value === 'mobileNumberInput'" />
-        <template v-else><pre>{{ snapshot }}</pre></template>
       </div>
     </div>
   </main>
