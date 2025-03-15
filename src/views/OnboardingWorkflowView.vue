@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch, watchEffect} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useMachine} from "@xstate/vue";
@@ -9,8 +9,11 @@ import OriginCountrySelection from "@/components/Customer/OriginCountrySelection
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
-const {snapshot, send} = useMachine(onboardingNavigationMachine);
 
+/**
+ * @type {{data: Customer | null}}
+ */
+const customer = customerStore.customer;
 const isLoading = ref(false);
 
 onMounted(async () => {
@@ -22,8 +25,9 @@ onMounted(async () => {
   }
 });
 
-watch(customerStore.customer, () => {
-  console.log(customerStore.customer)
+const {snapshot, send} = useMachine(onboardingNavigationMachine);
+
+watch(customer, () => {
   send({type: 'CUSTOMER_UPDATED'});
 });
 </script>

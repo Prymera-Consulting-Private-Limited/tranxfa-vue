@@ -14,9 +14,9 @@ const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
 
 /**
- * @type {Customer|null}
+ * @type {{data: Customer | null}}
  */
-const customer = customerStore.customer.data;
+const customer = customerStore.customer;
 
 async function verifyEmailAddress() {
   isLoading.value = true;
@@ -88,7 +88,7 @@ onMounted(async () => {
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 text-center">Verify your Email!</h2>
-      <p class="text-md text-[#B7A3C1] mb-8 text-center">We have sent an email verification code to your email {{ customer?.account?.email }}</p>
+      <p class="text-md text-[#B7A3C1] mb-8 text-center">We have sent an email verification code to your email {{ customer.data?.account?.email }}</p>
       <!-- Form -->
       <form @submit.prevent="verifyEmailAddress" class="space-y-10">
         <div v-if="otpError" class="rounded-md bg-red-50 p-4">

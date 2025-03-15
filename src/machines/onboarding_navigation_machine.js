@@ -4,9 +4,9 @@ import {useCustomerStore} from "@/stores/customer.js";
 const customerStore = useCustomerStore();
 
 /**
- * @type {Customer|null}
+ * @type {{data: Customer | null}}
  */
-const customer = customerStore.customer.data;
+const customer = customerStore.customer;
 
 export const onboardingNavigationMachine = createMachine({
     id: 'onboardingNavigation',
@@ -19,7 +19,7 @@ export const onboardingNavigationMachine = createMachine({
             always: [
                 {
                     target: 'sourceCountrySelection',
-                    guard: () => customerStore.isLoaded && customer?.account?.isEmailVerified === true,
+                    guard: () => customerStore.isLoaded && customer.data?.account?.isEmailVerified === true,
                 },
             ],
         },
@@ -27,7 +27,7 @@ export const onboardingNavigationMachine = createMachine({
             always: [
                 {
                     target: 'identityInformation',
-                    guard: () => customerStore.isLoaded && customer?.country === null,
+                    guard: () => customerStore.isLoaded && customer.data?.country,
                 },
             ],
         },

@@ -11,11 +11,16 @@ import { XMarkIcon } from '@heroicons/vue/20/solid'
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 
+/**
+ * @type {{data: Customer | null}}
+ */
+const customer = customerStore.customer;
+
 onMounted(async () => {
   if (customerStore.isLoaded === false) {
     await customerUtils.refresh();
   }
-  Echo.private(`customer.${customerStore.customer.id}`)
+  Echo.private(`customer.${customer.data?.id}`)
       .listen('CustomerDocumentProcessing', (e) => {
         console.log(e);
         const category = 'Source of Funds';

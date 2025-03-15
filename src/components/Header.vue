@@ -19,9 +19,9 @@ import router from "@/router/index.js";
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 /**
- * @type {Customer|null}
+ * @type {{data: Customer | null}}
  */
-const customer = customerStore.customer.data;
+const customer = customerStore.customer;
 
 const navigation = [
   { name: 'Dashboard', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
@@ -75,7 +75,7 @@ onMounted(async () => {
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
                 <div class="bg-gray-200 text-gray-500 size-8 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
-                  <template v-if="customer">{{ customer?.firstName?.slice(0, 1).toUpperCase() + customer?.lastName?.slice(0, 1).toUpperCase() }}</template>
+                  <template v-if="customer.data">{{ customer.data.firstName?.slice(0, 1).toUpperCase() + customer.data.lastName?.slice(0, 1).toUpperCase() }}</template>
                   <template v-else>
                     <svg class="size-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -155,15 +155,15 @@ onMounted(async () => {
                 </div>
               </div>
               <div class="pt-4 pb-2">
-                <div class="flex items-center px-5">
+                <div class="flex items-center px-5" v-if="! isLoading">
                   <div class="shrink-0">
                     <div class="bg-gray-200 text-gray-500 size-12 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
-                      {{ customerStore.customer?.firstName?.slice(0, 1).toUpperCase() + customerStore.customer?.lastName?.slice(0, 1).toUpperCase() }}
+                      {{ customer.data?.firstName?.slice(0, 1).toUpperCase() + customer.data?.lastName?.slice(0, 1).toUpperCase() }}
                     </div>
                   </div>
                   <div class="ml-3 min-w-0 flex-1">
-                    <div class="truncate text-base font-medium text-gray-800 tracking-wider">{{ customerStore.customer?.fullName }}</div>
-                    <div class="truncate text-sm font-medium text-gray-500 tracking-wider">{{ customerStore.customer?.account?.email }}</div>
+                    <div class="truncate text-base font-medium text-gray-800 tracking-wider">{{ customer.data?.fullName }}</div>
+                    <div class="truncate text-sm font-medium text-gray-500 tracking-wider">{{ customer.data?.account?.email }}</div>
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
