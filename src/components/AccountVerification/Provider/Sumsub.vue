@@ -59,21 +59,7 @@ async function launchSumsubWebSdk(accessToken) {
         emit('sdkInitialized');
       })
       .on("idCheck.onApplicantStatusChanged", (payload) => {
-        if (payload.reviewStatus === 'completed') {
-          if (payload.reviewResult.reviewAnswer === ReviewAnswer.GREEN) {
-            if (router.currentRoute.value.query?._utm === 'dashboard-todos') {
-              router.push({name: 'dashboard'});
-            } else {
-              router.push({name: 'accountVerification'});
-            }
-          }
-        } else if (payload.reviewStatus === 'onHold') {
-          if (router.currentRoute.value.query?._utm === 'dashboard-todos') {
-            router.push({name: 'dashboard'});
-          } else {
-            router.push({name: 'accountVerification'});
-          }
-        }
+        emit('sdkApplicantStatusChanged', payload);
       })
       .build();
 
