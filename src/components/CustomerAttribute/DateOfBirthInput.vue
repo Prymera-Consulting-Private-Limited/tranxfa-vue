@@ -22,7 +22,7 @@ const maxDate = computed(() => {
       v-model="attr.value"
       :always-clearable="false"
       :format="textInputOptions.format"
-      class="rounded-md shadow-sm focus:outline-none"
+      :class="['rounded-md shadow-sm focus:outline-none']"
       :enable-time-picker="false"
       :preview-format="textInputOptions.format"
       :max-date="maxDate.format('yyyy-MM-DD')"

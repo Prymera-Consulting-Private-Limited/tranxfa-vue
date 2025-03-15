@@ -1,14 +1,18 @@
 <script setup>
 import CustomerAttribute from "@/models/customer_attribute.js";
+import {ref, watch} from "vue";
 
-defineProps({
+const props = defineProps({
   attr: {
     type: CustomerAttribute,
     required: true
   },
+  class: {
+    default: ''
+  }
 });
 </script>
 
 <template>
-  <input :id="attr.attribute" :name="attr.attribute" type="text" v-model="attr.value" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
+  <input :id="attr.attribute" :name="attr.attribute" type="text" v-model="attr.value" :class="props.class" />
 </template>
