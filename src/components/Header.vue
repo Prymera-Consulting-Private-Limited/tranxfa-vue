@@ -71,7 +71,7 @@ onMounted(async () => {
           <!-- Profile dropdown -->
           <Menu as="div" class="relative ml-4 shrink-0">
             <div>
-              <MenuButton class="relative flex rounded-full bg-white text-sm ring-2 ring-white/20 focus:ring-white focus:outline-hidden">
+              <MenuButton class="relative flex rounded-full bg-white text-sm ring-2 ring-white/20 focus:ring-white focus:outline-hidden cursor-pointer">
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
                 <div class="bg-gray-200 text-gray-500 size-8 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
