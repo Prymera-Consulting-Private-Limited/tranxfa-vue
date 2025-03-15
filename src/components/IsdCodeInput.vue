@@ -45,5 +45,10 @@ function defaultItemLabelGenerator(country) {
 </script>
 
 <template>
-  <CountryVSelectInput v-bind:itemLabelGenerator="itemLabelGenerator || defaultItemLabelGenerator" v-bind:optionLabelGenerator="optionLabelGenerator || defaultOptionLabelGenerator" v-bind:countries="countries" v-bind:model="isdCode" v-bind:labelGenerator="optionLabelGenerator" v-on:update:modelValue="updateIsdCode"></CountryVSelectInput>
+  <CountryVSelectInput
+      v-bind:itemLabelGenerator="itemLabelGenerator || defaultItemLabelGenerator"
+      v-bind:optionLabelGenerator="optionLabelGenerator || defaultOptionLabelGenerator"
+      v-bind:countries="countries"
+      v-bind:model="isdCode"
+      v-on:update:modelValue="updateIsdCode" />
 </template>
