@@ -32,6 +32,14 @@ export const onboardingNavigationMachine = createMachine({
             ],
         },
         identityInformation: {
+            always: [
+                {
+                    target: 'mobileNumberInput',
+                    guard: () => customerStore.isLoaded && customer.data?.identityInformationRequired() === false,
+                },
+            ],
+        },
+        mobileNumberEntry: {
             final: true,
         }
     }
