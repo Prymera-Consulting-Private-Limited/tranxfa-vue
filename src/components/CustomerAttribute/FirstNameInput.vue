@@ -3,8 +3,11 @@ import CustomerAttribute from "@/models/customer_attribute.js";
 import TextInput from "@/components/CustomerAttribute/TextInput.vue";
 
 defineProps({
-  attr: CustomerAttribute,
-})
+  attr: {
+    type: CustomerAttribute,
+    required: true
+  },
+});
 </script>
 
 <template>

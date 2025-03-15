@@ -2,8 +2,11 @@
 import CustomerAttribute from "@/models/customer_attribute.js";
 
 defineProps({
-  attr: CustomerAttribute,
-})
+  attr: {
+    type: CustomerAttribute,
+    required: true
+  },
+});
 </script>
 
 <template>

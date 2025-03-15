@@ -6,6 +6,7 @@ import {useMachine} from "@xstate/vue";
 import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_machine.js";
 import EmailVerification from "@/components/Customer/EmailVerification.vue";
 import OriginCountrySelection from "@/components/Customer/OriginCountrySelection.vue";
+import IdentityInformation from "@/components/Customer/IdentityInformation.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -46,6 +47,7 @@ watch(customer, () => {
         </div>
         <EmailVerification v-if="snapshot?.value === 'emailVerification'" />
         <OriginCountrySelection v-else-if="snapshot?.value === 'sourceCountrySelection'" />
+        <IdentityInformation v-else-if="snapshot?.value === 'identityInformation'" />
         <span v-else>{{ snapshot?.value }}</span>
       </div>
     </div>
