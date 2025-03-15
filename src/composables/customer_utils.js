@@ -7,20 +7,20 @@ export function useCustomerUtils() {
     const customerStore = useCustomerStore();
 
     /**
-     * @type {Customer|null}
+     * @type {{data: Customer|null}}
      */
-    const customer = customerStore.customer.data;
+    const customer = customerStore.customer;
 
     function updateStore(data, storeLocally = false) {
         customerStore.customer.data = Customer.getInstance(data);
         customerStore.isLoaded = true;
         if (storeLocally) {
-            localStorage.setItem('customerSessionToken', customer?.session?.sessionToken);
+            localStorage.setItem('customerSessionToken', customer.data?.session?.sessionToken);
         }
     }
 
     function getAuthToken() {
-        return customer?.session?.sessionToken || localStorage.getItem('customerSessionToken');
+        return customer.data?.session?.sessionToken || localStorage.getItem('customerSessionToken');
     }
 
     async function register(email, password, confirmPassword) {
@@ -48,7 +48,7 @@ export function useCustomerUtils() {
                 'X-Customer-Token': getAuthToken(),
             }
         }).then(() => {
-            customerStore.customer = null;
+            customerStore.customer.data = null;
             customerStore.isLoaded = false;
             localStorage.removeItem('customerSessionToken');
         })
