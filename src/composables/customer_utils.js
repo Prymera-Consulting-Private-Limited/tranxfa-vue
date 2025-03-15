@@ -142,6 +142,21 @@ export function useCustomerUtils() {
         });
     }
 
+    async function uploadDocument(documentCategory, documentType, pages = []) {
+        const data = {
+            pages: pages,
+        }
+        return $axios.post(`/client/v1/document/upload`, data, {
+            params: {
+                document_category_id: documentCategory.id,
+                document_type_id: documentType.id,
+            },
+            headers: {
+                'X-Customer-Token': getAuthToken(),
+            }
+        });
+    }
+
     return {
         getAuthToken,
         register,
@@ -154,5 +169,6 @@ export function useCustomerUtils() {
         updateMobileNumber,
         logout,
         getAccountVerificationToken,
+        uploadDocument,
     }
 }
