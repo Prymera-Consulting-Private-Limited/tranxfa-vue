@@ -27,7 +27,7 @@ axios.interceptors.request.use((config) => {
 
 axios.interceptors.response.use(null, function (e) {
     if (e.status === 401) {
-        router.push('/');
+        router.push({ name: 'signIn' });
     }
     throw e;
 })
