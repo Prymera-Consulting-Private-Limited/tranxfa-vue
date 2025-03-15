@@ -39,8 +39,16 @@ export const onboardingNavigationMachine = createMachine({
                 },
             ],
         },
-        mobileNumberEntry: {
+        mobileNumberInput: {
+            always: [
+                {
+                    target: 'onboardingComplete',
+                    guard: () => customerStore.isLoaded && customer.data?.mobileNumber,
+                },
+            ],
+        },
+        onboardingComplete: {
             final: true,
-        }
+        },
     }
 });
