@@ -6,15 +6,30 @@ export function useCustomerUtils() {
     const $axios = inject('axios')
     const customerStore = useCustomerStore();
 
+    /**
+     * @type {Customer|null}
+     */
+    const customer = customerStore.customer.data;
+
+    function updateStore(data, storeLocally = false) {
+        customerStore.customer.data = Customer.getInstance(data);
+        customerStore.isLoaded = true;
+        if (storeLocally) {
+            localStorage.setItem('customerSessionToken', customer?.session?.sessionToken);
+        }
+    }
+
+    function getAuthToken() {
+        return customer?.session?.sessionToken || localStorage.getItem('customerSessionToken');
+    }
+
     async function register(email, password, confirmPassword) {
         await $axios.post('/client/v1/signup', {
             email: email,
             password: password,
             confirm_password: confirmPassword,
         }).then((response) => {
-            customerStore.customer = Customer.getInstance(response.data);
-            customerStore.isLoaded = true;
-            localStorage.setItem('customerSessionToken', customerStore.customer?.session?.sessionToken);
+            updateStore(response.data, true);
         });
     }
 
@@ -23,16 +38,14 @@ export function useCustomerUtils() {
             email: email,
             password: password,
         }).then((response) => {
-            customerStore.customer = Customer.getInstance(response.data);
-            customerStore.isLoaded = true;
-            localStorage.setItem('customerSessionToken', customerStore.customer?.session?.sessionToken);
+            updateStore(response.data, true);
         })
     }
 
     async function logout() {
         await $axios.post('/client/v1/logout', {}, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': getAuthToken(),
             }
         }).then(() => {
             customerStore.customer = null;
@@ -44,18 +57,17 @@ export function useCustomerUtils() {
     async function refresh() {
         return $axios.get('/client/v1/profile', {
             headers: {
-                'X-Customer-Token': localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': getAuthToken(),
             }
         }).then((response) => {
-            customerStore.customer = Customer.getInstance(response.data);
-            customerStore.isLoaded = true;
+            updateStore(response.data);
         })
     }
 
     async function resendEmailVerification() {
         await $axios.post('/client/v1/resend-email-verification', {}, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': getAuthToken(),
             }
         })
     }
@@ -65,11 +77,10 @@ export function useCustomerUtils() {
             otp: otp,
         }, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': getAuthToken(),
             }
         }).then((response) => {
-            customerStore.customer = Customer.getInstance(response.data);
-            customerStore.isLoaded = true;
+            updateStore(response.data);
         })
     }
 
@@ -78,11 +89,10 @@ export function useCustomerUtils() {
             country_id: country.id,
         }, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': getAuthToken(),
             }
         }).then((response) => {
-            customerStore.customer = Customer.getInstance(response.data);
-            customerStore.isLoaded = true;
+            updateStore(response.data);
         })
     }
 
@@ -100,11 +110,10 @@ export function useCustomerUtils() {
 
         await $axios.post('/client/v1/update?category=identity', data, {
             headers: {
-                'X-Customer-Token': localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': getAuthToken(),
             }
         }).then((response) => {
-            customerStore.customer = Customer.getInstance(response.data);
-            customerStore.isLoaded = true;
+            updateStore(response.data);
         })
     }
 
@@ -114,11 +123,10 @@ export function useCustomerUtils() {
             mobile_number: number,
         }, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': getAuthToken(),
             }
         }).then((response) => {
-            customerStore.customer = Customer.getInstance(response.data);
-            customerStore.isLoaded = true;
+            updateStore(response.data);
         })
     }
 
@@ -128,12 +136,13 @@ export function useCustomerUtils() {
                 document_type_id: documentType.id,
             },
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': getAuthToken(),
             }
         });
     }
 
     return {
+        getAuthToken,
         register,
         login,
         refresh,

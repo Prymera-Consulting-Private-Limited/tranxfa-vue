@@ -1,16 +1,18 @@
 import {inject} from "vue";
-import {useCustomerStore} from "@/stores/customer.js";
+import {useCustomerUtils} from "@/composables/customer_utils.js";
+
+const customerUtils = useCustomerUtils();
 
 export function useRecipientUtils() {
 
     const $axios = inject('axios')
-    const customerStore = useCustomerStore();
+    const customerUtils = useCustomerUtils();
 
     const whisper = async (query = null) => {
         return $axios.get('/client/v1/recipients/whisper', {
             params: query,
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': customerUtils.getAuthToken(),
             }
         });
     }
@@ -21,7 +23,7 @@ export function useRecipientUtils() {
                 payout_channel_id: payoutChannel.id,
             },
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': customerUtils.getAuthToken(),
             }
         });
     }
@@ -30,7 +32,7 @@ export function useRecipientUtils() {
         return $axios.get('/client/v1/recipients', {
             params: query,
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': customerUtils.getAuthToken(),
             }
         });
     }
@@ -38,7 +40,7 @@ export function useRecipientUtils() {
     const getRecipient = async (id) => {
         return $axios.get(`/client/v1/recipient/${id}`, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': customerUtils.getAuthToken(),
             }
         });
     }

@@ -1,13 +1,13 @@
 import {inject, reactive} from "vue";
 import Quote from "@/models/quote.js";
-import {useCustomerStore} from "@/stores/customer.js";
+import {useCustomerUtils} from "@/composables/customer_utils.js";
 
 export function useQuoteUtils() {
     const $axios = inject('axios')
     const quote = reactive({
         data: new Quote(),
     });
-    const customerStore = useCustomerStore();
+    const customerUtils = useCustomerUtils();
 
     const getQuote = async (query = null) => {
         const params = {
@@ -24,7 +24,7 @@ export function useQuoteUtils() {
         await $axios.get('/client/v1/quote', {
             params: params,
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': customerUtils.getAuthToken(),
             }
         }).then((response) => {
             quote.data = Quote.getInstance(response.data);
@@ -44,7 +44,7 @@ export function useQuoteUtils() {
         };
         return $axios.post('/client/v1/quote', data, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': customerUtils.getAuthToken(),
             }
         });
     }
@@ -52,7 +52,7 @@ export function useQuoteUtils() {
     const getTransferQuote = async (id) => {
         return $axios.get(`/client/v1/quote/${id}`, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': customerUtils.getAuthToken(),
             }
         });
     }
@@ -62,7 +62,7 @@ export function useQuoteUtils() {
             recipient_id: recipient.id,
         }, {
             headers: {
-                'X-Customer-Token': customerStore.customer?.session?.sessionToken || localStorage.getItem('customerSessionToken'),
+                'X-Customer-Token': customerUtils.getAuthToken(),
             }
         });
     }
