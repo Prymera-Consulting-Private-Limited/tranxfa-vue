@@ -8,8 +8,14 @@ defineProps({
     required: true
   },
 });
+
+const emit = defineEmits(['customer:attribute:updated']);
+
+const notifyFirstNameUpdated = (attr, value) => {
+  emit('customer:attribute:updated', attr, value);
+}
 </script>
 
 <template>
-  <TextInput v-bind:attr="attr" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
+  <TextInput v-on:customer:attribute:updated="notifyFirstNameUpdated" v-bind:attr="attr" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
 </template>

@@ -11,8 +11,15 @@ const props = defineProps({
     default: ''
   }
 });
+
+const input = ref(null);
+const emit  = defineEmits(['customer:attribute:updated']);
+
+watch(input, () => {
+  emit('customer:attribute:updated', props.attr, input.value);
+});
 </script>
 
 <template>
-  <input :id="attr.attribute" :name="attr.attribute" type="text" v-model="attr.value" :class="props.class" />
+  <input :id="attr.attribute" :name="attr.attribute" type="text" v-model="input" :class="props.class" />
 </template>

@@ -5,7 +5,10 @@ import {computed, onMounted, ref} from "vue";
 import CountryVSelectInput from "@/components/CustomerAttribute/CountryVSelectInput.vue";
 
 const props = defineProps({
-  attr: CustomerAttribute,
+  attr: {
+    type: CustomerAttribute,
+    required: true
+  },
 })
 
 const countryUtils = useCountryUtils();
@@ -23,9 +26,12 @@ onMounted(async () => {
   countries.value = await countryUtils.getCountries();
 })
 
-function updateNationality(updated) {
-  nationality.value = updated;
+const emit = defineEmits(['customer:attribute:updated']);
+
+const notifyNationalityUpdated = (value) => {
+  emit('customer:attribute:updated', props.attr, value?.id);
 }
+
 </script>
 
 <template>
@@ -34,6 +40,6 @@ function updateNationality(updated) {
       v-bind:optionLabelGenerator="'demonym'"
       v-bind:countries="countries"
       v-bind:model="nationality"
-      v-on:update:modelValue="updateNationality"
+      v-on:update:modelValue="notifyNationalityUpdated"
   />
 </template>
