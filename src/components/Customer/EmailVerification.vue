@@ -75,6 +75,9 @@ async function resend() {
 }
 
 onMounted(async () => {
+  if (! customerStore.isLoaded) {
+    await customerUtils.refresh();
+  }
   await startResendOtpTimer();
 });
 </script>
