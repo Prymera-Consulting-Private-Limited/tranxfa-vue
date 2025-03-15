@@ -26,6 +26,11 @@ const createRecipient = () => {
   isCreateRecipientModalOpen.value = true;
 };
 
+/**
+ * @type {{data: Customer|null}}
+ */
+const customer = customerStore.customer;
+
 const items = [
   {
     id: 'emailVerification',
@@ -36,7 +41,7 @@ const items = [
     icon: EnvelopeIcon,
     background: 'bg-pink-500',
     completed: false,
-    href: {name: 'emailVerification'},
+    href: {name: 'onboardingWorkflow'},
   },
   {
     id: 'contactNumberProvided',
@@ -47,7 +52,7 @@ const items = [
     icon: DevicePhoneMobileIcon,
     background: 'bg-indigo-500',
     completed: false,
-    href: {name: 'mobileNumberInput'},
+    href: {name: 'onboardingWorkflow'},
   },
   {
     id: 'identityVerified',
@@ -99,11 +104,11 @@ const items = [
 const tasks = computed(() => {
   return items.map((item) => {
     if (item.id === 'emailVerification') {
-      item.completed = customerStore.customer?.account?.isEmailVerified ?? false;
+      item.completed = customer.data?.account?.isEmailVerified ?? false;
     } else if (item.id === 'contactNumberProvided') {
-      item.completed = customerStore.customer?.mobileNumber ?? false;
+      item.completed = customer.data?.mobileNumber ?? false;
     } else if (item.id === 'identityVerified') {
-      const pendingPoi = customerStore.customer?.pendingDocuments?.find(cat => cat.code === 'POI');
+      const pendingPoi = customer.data?.pendingDocuments?.find(cat => cat.code === 'POI');
       item.completed = Boolean(pendingPoi) === false;
       item.href = pendingPoi?.id ? {
         name: 'documentTypeSelectionForUpload',
