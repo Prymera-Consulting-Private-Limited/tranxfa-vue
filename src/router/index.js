@@ -30,14 +30,6 @@ const router = createRouter({
         description: 'Complete your profile with us.',
       },
     }, {
-      path: '/mobile-number',
-      name: 'mobileNumberInput',
-      component: () => import('@/views/MobileNumberInputView.vue'),
-      meta: {
-        title: 'Mobile Number',
-        description: '',
-      },
-    }, {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),
