@@ -73,15 +73,15 @@ const router = createRouter({
     }, {
       path: '/account-verification',
       name: 'accountVerification',
-      component: () => import('@/views/Kyc/AccountVerificationView.vue'),
+      component: () => import('@/views/AccountVerification/IndexView.vue'),
       meta: {
         title: 'Account Verification',
         description: '',
       },
     }, {
       path: '/account-verification/upload/:category',
-      name: 'documentTypeSelectionForUpload',
-      component: () => import('@/views/Kyc/DocumentTypeSelectionView.vue'),
+      name: 'categoryView',
+      component: () => import('@/views/AccountVerification/CategoryView.vue'),
       meta: {
         title: 'Account Verification',
         description: '',

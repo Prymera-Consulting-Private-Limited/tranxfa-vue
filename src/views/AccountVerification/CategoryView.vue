@@ -12,6 +12,11 @@ import Spinner from "@/components/Spinner.vue";
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 
+/**
+ * @type {{data: Customer|null}}
+ */
+const customer = customerStore.customer;
+
 const selectedCategory = reactive({
   data: null,
 })
@@ -19,10 +24,10 @@ const selectedCategory = reactive({
 onMounted(async () => {
   if (! customerStore.isLoaded) {
     customerUtils.refresh().then(() => {
-      selectedCategory.data = customerStore.customer?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
+      selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
     });
   } else {
-    selectedCategory.data = customerStore.customer?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
+    selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
   }
 });
 
@@ -68,7 +73,7 @@ async function launchSumsubWebSdk(accessToken) {
       })
       .build();
 
-  snsWebSdkInstance.launch("#sumsub-websdk-container");
+  snsWebSdkInstance.launch("#sumsub-container");
 }
 
 async function getNewAccessToken() {
@@ -148,7 +153,7 @@ async function startSumsubVerification (documentType) {
                 <Spinner class="size-16 mx-auto" />
                 <span class="sr-only">Loading...</span>
               </div>
-              <div v-show="isSumsubInitialized" id="sumsub-websdk-container"></div>
+              <div v-show="isSumsubInitialized" id="sumsub-container"></div>
             </DialogPanel>
           </TransitionChild>
         </div>

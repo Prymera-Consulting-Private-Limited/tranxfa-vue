@@ -111,7 +111,7 @@ const tasks = computed(() => {
       const pendingPoi = customer.data?.pendingDocuments?.find(cat => cat.code === 'POI');
       item.completed = Boolean(pendingPoi) === false;
       item.href = pendingPoi?.id ? {
-        name: 'documentTypeSelectionForUpload',
+        name: 'categoryView',
         params: {
           category: pendingPoi.id
         },
