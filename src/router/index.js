@@ -30,14 +30,6 @@ const router = createRouter({
         description: 'Complete your profile with us.',
       },
     }, {
-      path: '/identity',
-      name: 'updateIdentityInformation',
-      component: () => import('@/views/EditIdentifyInfoView.vue'),
-      meta: {
-        title: 'Personal Details',
-        description: '',
-      },
-    }, {
       path: '/mobile-number',
       name: 'mobileNumberInput',
       component: () => import('@/views/MobileNumberInputView.vue'),
