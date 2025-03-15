@@ -4,6 +4,7 @@ import {computed, onMounted, ref} from "vue";
 import FormGroup from "@/components/CustomerAttribute/FormGroup.vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountriesStore} from "@/stores/countries.js";
+import Spinner from "@/components/Spinner.vue";
 
 const isLoading = ref(false)
 const customerStore = useCustomerStore()
@@ -29,14 +30,18 @@ const identityAttributes = computed(() => {
   return identityAttributes;
 })
 
-onMounted( () => {
+onMounted( async () => {
   if (! customerStore.isLoaded) {
-    customerUtils.refresh();
+    await customerUtils.refresh();
   }
 });
+
+const isSaving = ref(false);
+
 async function update() {
   isLoading.value = true;
-  await customerUtils.updateProfileIdentity(identityAttributes).catch((e) => {
+  isSaving.value = true;
+  customerUtils.updateProfileIdentity(identityAttributes).catch((e) => {
     if (e.status === 422) {
       formErrors.value = e.response.data.errors;
     } else {
@@ -44,6 +49,7 @@ async function update() {
     }
   }).finally(() => {
     isLoading.value = false;
+    isSaving.value = false;
   });
 }
 
@@ -66,7 +72,15 @@ const showLoading = computed(() => {
         <div v-for="attr in identityAttributes">
           <FormGroup v-bind:attr="attr" />
         </div>
-        <button type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
+        <button :disabled="showLoading || isSaving" :class="[{'opacity-70': isLoading || isSaving}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
+          <template v-if="isSaving">
+              <span class="flex items-center justify-center whitespace-nowrap">
+                <Spinner :class="'size-4 mr-2'" />
+                Saving ...
+              </span>
+          </template>
+          <template v-else>Continue</template>
+        </button>
       </form>
     </div>
   </div>
