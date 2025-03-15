@@ -75,7 +75,7 @@ onMounted(async () => {
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
                 <div class="bg-gray-200 text-gray-500 size-8 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
-                  <template v-if="customer.data">{{ customer.data.firstName?.slice(0, 1).toUpperCase() + customer.data.lastName?.slice(0, 1).toUpperCase() }}</template>
+                  <template v-if="customer.data">{{ customer.data?.firstName?.slice(0, 1).toUpperCase() + customer.data?.lastName?.slice(0, 1).toUpperCase() }}</template>
                   <template v-else>
                     <svg class="size-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -86,7 +86,7 @@ onMounted(async () => {
             </div>
             <transition leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
               <MenuItems class="absolute -right-2 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden tracking-wider">
-                <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
+                <MenuItem as="div" v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
                   <a href="javascript:" @click="item.action" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</a>
                 </MenuItem>
               </MenuItems>
