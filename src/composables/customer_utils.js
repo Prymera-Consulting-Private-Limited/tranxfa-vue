@@ -130,10 +130,11 @@ export function useCustomerUtils() {
         })
     }
 
-    async function getAccountVerificationToken(documentCategory, documentType) {
+    async function getAccountVerificationToken(documentCategory, documentType, file = null) {
         return $axios.get(`/client/v1/account-verification/token/${documentCategory.id}/${documentType.id}`, {
             params: {
-                document_type_id: documentType.id,
+                file_name: file.name,
+                content_type: file.type,
             },
             headers: {
                 'X-Customer-Token': getAuthToken(),
