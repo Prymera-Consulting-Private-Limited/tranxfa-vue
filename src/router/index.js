@@ -22,20 +22,12 @@ const router = createRouter({
         description: 'Register your account',
       },
     }, {
-      path: '/email-verification',
-      name: 'emailVerification',
-      component: () => import('@/views/EmailVerificationView.vue'),
+      path: '/workflow/onboarding',
+      name: 'onboardingWorkflow',
+      component: () => import('@/views/OnboardingWorkflowView.vue'),
       meta: {
-        title: 'Verify Email',
-        description: 'Verify your email',
-      },
-    }, {
-      path: '/onboarding/country',
-      name: 'editAccountCountry',
-      component: () => import('@/views/EditAccountCountryView.vue'),
-      meta: {
-        title: 'Country of Residence',
-        description: '',
+        title: 'Complete Signup',
+        description: 'Complete your profile with us.',
       },
     }, {
       path: '/identity',
