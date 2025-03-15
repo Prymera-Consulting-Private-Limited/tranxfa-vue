@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch, watchEffect} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useMachine} from "@xstate/vue";
@@ -7,6 +7,8 @@ import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_mach
 import EmailVerification from "@/components/Customer/EmailVerification.vue";
 import OriginCountrySelection from "@/components/Customer/OriginCountrySelection.vue";
 import IdentityInformation from "@/components/Customer/IdentityInformation.vue";
+import MobileNumberInput from "@/components/Customer/MobileNumberInput.vue";
+import router from "@/router/index.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -28,6 +30,12 @@ onMounted(async () => {
 
 const {snapshot, send} = useMachine(onboardingNavigationMachine);
 
+watch(() => snapshot.value, (newSnapshot) => {
+  if (newSnapshot?.value === 'onboardingComplete') {
+    router.push({name: 'dashboard'});
+  }
+}, { deep: true });
+
 watch(customer, () => {
   send({type: 'CUSTOMER_UPDATED'});
 });
@@ -48,7 +56,8 @@ watch(customer, () => {
         <EmailVerification v-if="snapshot?.value === 'emailVerification'" />
         <OriginCountrySelection v-else-if="snapshot?.value === 'sourceCountrySelection'" />
         <IdentityInformation v-else-if="snapshot?.value === 'identityInformation'" />
-        <span v-else>{{ snapshot?.value }}</span>
+        <MobileNumberInput v-else-if="snapshot?.value === 'mobileNumberInput'" />
+        <template v-else><pre>{{ snapshot }}</pre></template>
       </div>
     </div>
   </main>
