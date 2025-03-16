@@ -66,16 +66,18 @@ const handleDrop = (event) => {
 
 const uploadFiles = async () => {
   for (let fileObj of pendingFiles.value) {
-    fileObj.status = 'pending';
-    try {
-      fileObj.status = 'preparing';
-      const preSignedUrl = await getPreSignedUrl(fileObj.file);
+    fileObj.status = 'preparing';
+    getPreSignedUrl(fileObj.file).then((preSignedUrl) => {
       fileObj.status = 'uploading';
-      await uploadToS3(preSignedUrl, fileObj);
-      fileObj.status = 'completed';
-    } catch (error) {
+      uploadToS3(preSignedUrl, fileObj).then(() => {
+        fileObj.path = new URL(preSignedUrl).pathname.split('/').slice(2).join('/');
+        fileObj.status = 'completed';
+      }).catch(() => {
+        fileObj.status = 'failed';
+      });
+    }).catch(() => {
       fileObj.status = 'failed';
-    }
+    });
   }
 };
 
