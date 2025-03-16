@@ -10,18 +10,16 @@ export function useAwsS3Utils () {
      */
     const uploadToPreSignedS3Url = async (url, fileObj, progressCb = null) => {
 
-        await axios.put(url, fileObj.file, {
+        return axios.put(url, fileObj, {
             headers: {
-                "Content-Type": fileObj.file.type,
+                "Content-Type": fileObj.type,
             },
             onUploadProgress: (progressEvent) => {
                 if (progressCb) {
                     progressCb(Math.round((progressEvent.loaded * 100) / progressEvent.total));
                 }
             },
-        }).then(() => {
-            return new URL(url).pathname.split('/').slice(2).join('/');
-        });
+        })
     };
 
     return {
