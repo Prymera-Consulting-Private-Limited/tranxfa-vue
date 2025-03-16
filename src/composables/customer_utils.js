@@ -1,9 +1,8 @@
 import Customer from "@/models/customer.js";
-import {inject} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
+import axios from "axios";
 
 export function useCustomerUtils() {
-    const $axios = inject('axios')
     const customerStore = useCustomerStore();
 
     /**
@@ -24,7 +23,7 @@ export function useCustomerUtils() {
     }
 
     async function register(email, password, confirmPassword) {
-        await $axios.post('/client/v1/signup', {
+        await axios.post('/client/v1/signup', {
             email: email,
             password: password,
             confirm_password: confirmPassword,
@@ -34,7 +33,7 @@ export function useCustomerUtils() {
     }
 
     async function login(email, password) {
-        await $axios.post('/client/v1/login', {
+        await axios.post('/client/v1/login', {
             email: email,
             password: password,
         }).then((response) => {
@@ -43,7 +42,7 @@ export function useCustomerUtils() {
     }
 
     async function logout() {
-        await $axios.post('/client/v1/logout', {}, {
+        await axios.post('/client/v1/logout', {}, {
             headers: {
                 'X-Customer-Token': getAuthToken(),
             }
@@ -55,7 +54,7 @@ export function useCustomerUtils() {
     }
 
     async function refresh() {
-        return $axios.get('/client/v1/profile', {
+        return axios.get('/client/v1/profile', {
             headers: {
                 'X-Customer-Token': getAuthToken(),
             }
@@ -65,7 +64,7 @@ export function useCustomerUtils() {
     }
 
     async function resendEmailVerification() {
-        await $axios.post('/client/v1/resend-email-verification', {}, {
+        await axios.post('/client/v1/resend-email-verification', {}, {
             headers: {
                 'X-Customer-Token': getAuthToken(),
             }
@@ -73,7 +72,7 @@ export function useCustomerUtils() {
     }
 
     async function verifyEmail(otp) {
-        await $axios.post('/client/v1/verify-email-address', {
+        await axios.post('/client/v1/verify-email-address', {
             otp: otp,
         }, {
             headers: {
@@ -85,7 +84,7 @@ export function useCustomerUtils() {
     }
 
     async function updateCountry(country) {
-        await $axios.post('/client/v1/update-country', {
+        await axios.post('/client/v1/update-country', {
             country_id: country.id,
         }, {
             headers: {
@@ -108,7 +107,7 @@ export function useCustomerUtils() {
             }
         }
 
-        await $axios.post('/client/v1/update?category=identity', requestData, {
+        await axios.post('/client/v1/update?category=identity', requestData, {
             headers: {
                 'X-Customer-Token': getAuthToken(),
             }
@@ -118,7 +117,7 @@ export function useCustomerUtils() {
     }
 
     async function updateMobileNumber(country, number) {
-        await $axios.post('/client/v1/update-mobile-number', {
+        await axios.post('/client/v1/update-mobile-number', {
             mobile_number_country_id: country,
             mobile_number: number,
         }, {
@@ -131,10 +130,21 @@ export function useCustomerUtils() {
     }
 
     async function getAccountVerificationToken(documentCategory, documentType, file = null) {
-        return $axios.get(`/client/v1/account-verification/token/${documentCategory.id}/${documentType.id}`, {
+        return axios.get(`/client/v1/account-verification/token/${documentCategory.id}/${documentType.id}`, {
             params: {
                 file_name: file.name,
-                content_type: file.type,
+                file_type: file.type,
+            },
+            headers: {
+                'X-Customer-Token': getAuthToken(),
+            }
+        });
+    }
+
+    async function getLivelinessToken(api) {
+        return axios.get(`/client/v1/account-verification/liveliness-token`, {
+            params: {
+                api: api,
             },
             headers: {
                 'X-Customer-Token': getAuthToken(),
@@ -146,7 +156,7 @@ export function useCustomerUtils() {
         const data = {
             pages: pages,
         }
-        return $axios.post(`/client/v1/document/upload`, data, {
+        return axios.post(`/client/v1/document/upload`, data, {
             params: {
                 document_category_id: documentCategory.id,
                 document_type_id: documentType.id,
@@ -169,6 +179,7 @@ export function useCustomerUtils() {
         updateMobileNumber,
         logout,
         getAccountVerificationToken,
+        getLivelinessToken,
         uploadDocument,
     }
 }
