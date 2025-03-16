@@ -3,9 +3,11 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
 import {computed, onMounted, ref} from "vue";
-import {ArrowUpTrayIcon, TrashIcon, CheckCircleIcon, XCircleIcon, ArrowPathIcon} from "@heroicons/vue/24/outline";
+import {ArrowPathIcon, ArrowUpTrayIcon, CheckCircleIcon, TrashIcon, XCircleIcon} from "@heroicons/vue/24/outline";
 import Spinner from "@/components/Spinner.vue";
-import axios from "axios";
+import {useAwsS3Utils} from "@/composables/aws_s3_utils.js";
+
+const awsS3Utils = useAwsS3Utils();
 
 const customerUtils = useCustomerUtils();
 const MAX_FILE_SIZE_MB = 5;
@@ -22,6 +24,12 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['sdkInitialized', 'sdkError', 'sdkStepCompleted', 'sdkApplicantStatusChanged']);
+
+const uploadToS3 = async (url, fileObject) => {
+  fileObject.path = await awsS3Utils.uploadToPreSignedS3Url(url, fileObject.file, (progress) => {
+    fileObject.progress = progress;
+  });
+}
 
 onMounted(async () => {
   emit('sdkInitialized');
@@ -83,22 +91,7 @@ const getPreSignedUrl = async (file) => {
   return accessToken;
 };
 
-const uploadToS3 = async (url, fileObj) => {
 
-  await axios.put(url, fileObj.file, {
-    headers: {
-      "Content-Type": fileObj.file.type,
-    },
-    onUploadProgress: (progressEvent) => {
-      fileObj.progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-    },
-  }).then(() => {
-    fileObj.path = new URL(url).pathname.split('/').slice(2).join('/');
-  }).catch((e) => {
-    console.error(e);
-    throw e;
-  });
-};
 
 const removeFile = (index) => {
   files.value.splice(index, 1);
