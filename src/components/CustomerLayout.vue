@@ -20,7 +20,7 @@ onMounted(async () => {
   if (customerStore.isLoaded === false) {
     await customerUtils.refresh();
   }
-  Echo.private(`customer.${customer.data?.id}`)
+  Echo.channel(`client-customer.${customer.data?.id}`)
       .listen('CustomerDocumentProcessing', (e) => {
         console.log(e);
         const category = 'Source of Funds';
