@@ -4,7 +4,7 @@ export function useAwsS3Utils () {
     /**
      *
      * @param {string} url
-     * @param {File} fileObj
+     * @param {File|Blob} fileObj - The file or blob to upload. Must include a valid `type` property.
      * @param {Function|null} progressCb
      * @returns
      */
