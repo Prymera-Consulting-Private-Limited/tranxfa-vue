@@ -14,10 +14,7 @@ const isSaving = ref(false);
 async function updateCountry(country) {
   isLoading.value = true;
   isSaving.value = true;
-  await customerUtils.updateCountry(country).finally(() => {
-    isLoading.value = false;
-    isSaving.value = false;
-  });
+  await customerUtils.updateCountry(country);
 }
 onMounted(async () => {
   if (! customerStore.isLoaded) {
