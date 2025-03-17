@@ -131,10 +131,10 @@ export function useCustomerUtils() {
 
     async function getAccountVerificationToken(documentCategory, documentType, file = null) {
         return axios.get(`/client/v1/account-verification/token/${documentCategory.id}/${documentType.id}`, {
-            params: {
+            params: file ? {
                 file_name: file.name,
                 file_type: file.type,
-            },
+            } : null,
             headers: {
                 'X-Customer-Token': getAuthToken(),
             }
