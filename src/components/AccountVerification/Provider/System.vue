@@ -2,7 +2,7 @@
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
 import MultiFileUpload from "@/components/AccountVerification/MultiFileUpload.vue";
-import PoiFileUpload from "@/components/AccountVerification/Provider/PoiFileUpload.vue";
+import PoiFileUpload from "@/components/AccountVerification/PoiFileUpload.vue";
 
 const emit = defineEmits([
   'sdkInitialized',
