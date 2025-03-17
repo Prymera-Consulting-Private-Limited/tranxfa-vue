@@ -9,6 +9,7 @@ import Spinner from "@/components/Spinner.vue";
 const emailVerificationCode = ref('');
 const isLoading = ref(false);
 const isVerifying = ref(false);
+const isResendingToken = ref(false);
 const otpError = ref('');
 const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
@@ -62,13 +63,13 @@ async function startResendOtpTimer() {
 }
 
 async function resend() {
-  isLoading.value = true;
+  isResendingToken.value = true;
   customerUtils.resendEmailVerification().catch(async (e) => {
     if (e.status === 403) {
       await customerUtils.refresh();
     }
   }).finally(() => {
-    isLoading.value = false;
+    isResendingToken.value = false;
   });
 
   await startResendOtpTimer();
@@ -76,15 +77,20 @@ async function resend() {
 
 onMounted(async () => {
   if (! customerStore.isLoaded) {
+    isLoading.value = true;
     await customerUtils.refresh();
+    isLoading.value = false;
   }
   await startResendOtpTimer();
 });
 </script>
 <template>
   <!-- Form Section -->
-  <div class="flex-1 flex items-center justify-center p-4 md:p-8">
-    <div class="w-full max-w-xl">
+  <div class="relative flex-1 flex items-center justify-center p-4 md:p-8">
+    <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center bg-white/75 z-10">
+      <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
+    </div>
+    <div v-show="! isLoading || isVerifying" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
@@ -126,8 +132,11 @@ onMounted(async () => {
             <template v-else>Verify Email</template>
           </button>
         </div>
-        <div v-if="! isLoading" class="text-sm text-gray-500 text-center">Didn't receive verification code? <a @click="resend" class="text-brand-600 hover:text-brand-800 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
-        </div>
+        <template v-if="! isLoading && ! isVerifying">
+          <div v-if="! isResendingToken" class="text-sm text-gray-500 text-center">Didn't receive verification code? <a @click="resend" class="text-brand-600 hover:text-brand-800 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
+          </div>
+          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending verification code to your email {{ customer.data?.account?.email }} ...</div>
+        </template>
       </form>
     </div>
   </div>
