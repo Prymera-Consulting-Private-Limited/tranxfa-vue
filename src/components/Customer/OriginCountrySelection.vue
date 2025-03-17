@@ -10,19 +10,19 @@ const countryUtils = useCountryUtils();
 const customerUtils = useCustomerUtils();
 
 const isLoading = ref(true);
+const isSaving = ref(false);
 async function updateCountry(country) {
   isLoading.value = true;
+  isSaving.value = true;
   await customerUtils.updateCountry(country).finally(() => {
     isLoading.value = false;
+    isSaving.value = false;
   });
 }
 onMounted(async () => {
   if (! customerStore.isLoaded) {
-    isLoading.value = true;
     await customerUtils.refresh();
-    isLoading.value = false;
   }
-  isLoading.value = true;
   await countryUtils.getSources().finally(() => {
     isLoading.value = false;
   });
@@ -30,8 +30,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex-1 flex items-center justify-center p-4 md:p-8">
-    <div class="w-full max-w-xl">
+  <div class="relative flex-1 flex items-center justify-center p-4 md:p-8">
+    <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center bg-white/75 z-10">
+      <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
+    </div>
+    <div v-show="! isLoading || isSaving" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
