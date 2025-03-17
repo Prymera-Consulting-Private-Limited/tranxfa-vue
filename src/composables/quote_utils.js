@@ -1,9 +1,9 @@
-import {inject, reactive} from "vue";
+import {reactive} from "vue";
 import Quote from "@/models/quote.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
+import axios from "axios";
 
 export function useQuoteUtils() {
-    const $axios = inject('axios')
     const quote = reactive({
         data: new Quote(),
     });
@@ -21,7 +21,7 @@ export function useQuoteUtils() {
             payout_company_id: query?.payoutCompany?.id,
         };
 
-        await $axios.get('/client/v1/quote', {
+        await axios.get('/client/v1/quote', {
             params: params,
             headers: {
                 'X-Customer-Token': customerUtils.getAuthToken(),
@@ -42,7 +42,7 @@ export function useQuoteUtils() {
             payout_method_id: quote?.payoutMethod?.id,
             payout_company_id: quote?.payoutCompany?.id,
         };
-        return $axios.post('/client/v1/quote', data, {
+        return axios.post('/client/v1/quote', data, {
             headers: {
                 'X-Customer-Token': customerUtils.getAuthToken(),
             }
@@ -50,7 +50,7 @@ export function useQuoteUtils() {
     }
 
     const getTransferQuote = async (id) => {
-        return $axios.get(`/client/v1/quote/${id}`, {
+        return axios.get(`/client/v1/quote/${id}`, {
             headers: {
                 'X-Customer-Token': customerUtils.getAuthToken(),
             }
@@ -58,7 +58,7 @@ export function useQuoteUtils() {
     }
 
     const setRecipient = async (quoteId, recipient) => {
-        return $axios.post(`/client/v1/quote/recipient/${quoteId}`, {
+        return axios.post(`/client/v1/quote/recipient/${quoteId}`, {
             recipient_id: recipient.id,
         }, {
             headers: {
