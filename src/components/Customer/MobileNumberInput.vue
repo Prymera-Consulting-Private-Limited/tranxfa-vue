@@ -41,7 +41,6 @@ async function updateMobileNumber() {
     } else {
       console.error(e);
     }
-  }).finally(() => {
     isSaving.value = false;
   });
 }
