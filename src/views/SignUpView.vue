@@ -79,8 +79,8 @@ async function register() {
       }
     }
     console.error(e);
-  }).finally(() => {
     isLoading.value = false;
+  }).finally(() => {
   })
 }
 </script>
