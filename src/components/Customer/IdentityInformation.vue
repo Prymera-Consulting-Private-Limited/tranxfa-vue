@@ -54,9 +54,8 @@ async function update() {
     } else {
       console.error(e);
     }
-  }).finally(() => {
     isSaving.value = false;
-  });
+  })
 }
 
 const showLoading = computed(() => {
