@@ -8,7 +8,6 @@ import {useAwsS3Utils} from "@/composables/aws_s3_utils.js";
 import * as faceDetection from "@tensorflow-models/face-detection";
 import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
-import { RekognitionClient, GetFaceLivenessSessionResultsCommand } from "@aws-sdk/client-rekognition";
 import { StartFaceLivenessSessionCommand, RekognitionStreamingClient } from "@aws-sdk/client-rekognitionstreaming";
 
 const props = defineProps({
@@ -46,57 +45,6 @@ let faceDetectionInterval = null;
 const isInitialized = ref(false);
 const isProcessing = ref(false);
 
-const rekognitionClient = new RekognitionClient({
-  region: "us-east-1",
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
-    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
-  },
-});
-
-const rekognitionStreamingClient = new RekognitionStreamingClient({
-  region: "us-east-1",
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
-    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
-  },
-});
-
-const getFaceLivelinessSessionResults = async (sessionId) => {
-  try {
-    const command = new GetFaceLivenessSessionResultsCommand({ SessionId: sessionId });
-    const response = await rekognitionClient.send(command);
-
-    console.log("Liveliness Session Result:", response);
-    if (response.Status === "SUCCEEDED") {
-      liveCheckSuccess.value = "Liveliness test completed successfully.";
-      liveCheckMessage.value = "";
-      liveCheckError.value = "";
-      liveCheckWarning.value = "";
-      isProcessing.value = false;
-      emit('sdkStepCompleted');
-    } else if (response.Status === "FAILED") {
-      liveCheckError.value = "Liveliness test failed. Please try again.";
-      liveCheckMessage.value = "";
-      liveCheckSuccess.value = "";
-      liveCheckWarning.value = "";
-      isProcessing.value = false;
-    } else if (response.Status === "IN_PROGRESS") {
-      liveCheckWarning.value = "Liveliness test in progress...";
-      liveCheckMessage.value = "";
-      liveCheckSuccess.value = "";
-      liveCheckError.value = "";
-    } else {
-      setTimeout(() => getFaceLivelinessSessionResults(sessionId), 5000);
-    }
-
-    return response;
-  } catch (error) {
-    console.error("Error getting Liveliness session results:", error);
-    throw error;
-  }
-};
-
 const emit = defineEmits(['sdkInitialized', 'sdkError', 'sdkStepCompleted', 'sdkApplicantStatusChanged']);
 
 const setupTensorFlowBackend = async () => {
@@ -125,11 +73,9 @@ const startFaceDetection = async () => {
           isProcessing.value = true;
           const {
             session_id,
-            artifact
+            aws_access_token
           } = await getLivelinessToken();
-          console.log(session_id);
-          console.log(artifact);
-          await beginTest(session_id, artifact);
+          await beginTest(session_id, aws_access_token);
         }
       }
     } catch (error) {
@@ -138,7 +84,7 @@ const startFaceDetection = async () => {
   }, 1000);
 };
 
-async function startLivelinessStream(sessionId) {
+async function startLivelinessStream(sessionId, aws_access_token) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { width: 640, height: 480 },
@@ -180,6 +126,15 @@ async function startLivelinessStream(sessionId) {
       return;
     }
 
+    const client = new RekognitionStreamingClient({
+      region: "us-east-1",
+      credentials: {
+        accessKeyId: aws_access_token.AccessKeyId,
+        secretAccessKey: aws_access_token.SecretAccessKey,
+        sessionToken: aws_access_token.SessionToken,
+      },
+    });
+
     const params = {
       SessionId: sessionId,
       ChallengeVersions: "FaceMovementAndLight_1.0.0",
@@ -189,7 +144,7 @@ async function startLivelinessStream(sessionId) {
     };
 
     const command = new StartFaceLivenessSessionCommand(params);
-    const response = await rekognitionStreamingClient.send(command);
+    const response = await client.send(command);
 
     console.log("Liveliness stream started: ", response);
   } catch (error) {
@@ -197,8 +152,8 @@ async function startLivelinessStream(sessionId) {
   }
 }
 
-const beginTest = async (sessionId, artifact) => {
-  await startLivelinessStream(sessionId);
+const beginTest = async (sessionId, aws_access_token) => {
+  await startLivelinessStream(sessionId, aws_access_token);
   // awsS3Utils.uploadToPreSignedS3Url(artifact, recordedBlob.value);
   // await getFaceLivelinessSessionResults(sessionId);
 };
