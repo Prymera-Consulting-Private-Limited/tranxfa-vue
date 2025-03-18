@@ -5,15 +5,11 @@ import DocumentType from "@/models/document_type.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useAwsS3Utils} from "@/composables/aws_s3_utils.js";
-
-const customerStore = useCustomerStore();
-const customerUtils = useCustomerUtils();
-const awsS3Utils = useAwsS3Utils();
-
-/**
- * @type {{data: Customer | null}}
- */
-const customer = customerStore.customer;
+import * as faceDetection from "@tensorflow-models/face-detection";
+import * as tf from "@tensorflow/tfjs-core";
+import "@tensorflow/tfjs-backend-webgl";
+import { RekognitionClient, GetFaceLivenessSessionResultsCommand } from "@aws-sdk/client-rekognition";
+import { StartFaceLivenessSessionCommand, RekognitionStreamingClient } from "@aws-sdk/client-rekognitionstreaming";
 
 const props = defineProps({
   documentCategory: {
@@ -26,90 +22,230 @@ const props = defineProps({
   }
 })
 
-const video = ref(null);
+const customerStore = useCustomerStore();
+const customerUtils = useCustomerUtils();
+const awsS3Utils = useAwsS3Utils();
+
+/**
+ * @type {{data: Customer | null}}
+ */
+const customer = customerStore.customer;
+
 const cameraAccess = ref(false);
+const video = ref(null);
 
 const liveCheckMessage = ref("");
 const liveCheckSuccess = ref("");
 const liveCheckError = ref("");
 const liveCheckWarning = ref("");
 
-const isInitialized = ref(false);
-
-const emit = defineEmits(['sdkInitialized', 'sdkError', 'sdkStepCompleted', 'sdkApplicantStatusChanged']);
-
-const isRecording = ref(false);
-const recordedChunks = ref([]);
-const mediaRecorder = ref(null);
-const videoUrl = ref("");
 let stream = null;
+let faceDetector = null;
+let faceDetectionInterval = null;
 
-const startCamera = async () => {
-  stream = await navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-    cameraAccess.value = true;
+const isInitialized = ref(false);
+const isProcessing = ref(false);
 
-    return stream;
-  }).catch((err) => {
-    console.error(err);
-    cameraAccess.value = false;
-  });
-  if (cameraAccess.value === true) {
-    video.value.srcObject = stream;
+const rekognitionClient = new RekognitionClient({
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const rekognitionStreamingClient = new RekognitionStreamingClient({
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const getFaceLivelinessSessionResults = async (sessionId) => {
+  try {
+    const command = new GetFaceLivenessSessionResultsCommand({ SessionId: sessionId });
+    const response = await rekognitionClient.send(command);
+
+    console.log("Liveliness Session Result:", response);
+    if (response.Status === "SUCCEEDED") {
+      liveCheckSuccess.value = "Liveliness test completed successfully.";
+      liveCheckMessage.value = "";
+      liveCheckError.value = "";
+      liveCheckWarning.value = "";
+      isProcessing.value = false;
+      emit('sdkStepCompleted');
+    } else if (response.Status === "FAILED") {
+      liveCheckError.value = "Liveliness test failed. Please try again.";
+      liveCheckMessage.value = "";
+      liveCheckSuccess.value = "";
+      liveCheckWarning.value = "";
+      isProcessing.value = false;
+    } else if (response.Status === "IN_PROGRESS") {
+      liveCheckWarning.value = "Liveliness test in progress...";
+      liveCheckMessage.value = "";
+      liveCheckSuccess.value = "";
+      liveCheckError.value = "";
+    } else {
+      setTimeout(() => getFaceLivelinessSessionResults(sessionId), 5000);
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Error getting Liveliness session results:", error);
+    throw error;
   }
 };
 
-const startRecording = () => {
-  recordedChunks.value = [];
-  const options = { mimeType: "video/webm" };
-  mediaRecorder.value = new MediaRecorder(stream, options);
+const emit = defineEmits(['sdkInitialized', 'sdkError', 'sdkStepCompleted', 'sdkApplicantStatusChanged']);
 
-  mediaRecorder.value.ondataavailable = (event) => {
-    if (event.data.size > 0) {
-      recordedChunks.value.push(event.data);
-    }
-  };
-
-  mediaRecorder.value.onstop = async () => {
-    const videoBlob = new Blob(recordedChunks.value, { type: "video/webm" });
-    videoUrl.value = URL.createObjectURL(videoBlob); // Preview Video
-    await uploadToS3(videoBlob);
-  };
-
-  mediaRecorder.value.start();
-  isRecording.value = true;
+const setupTensorFlowBackend = async () => {
+  await tf.setBackend("webgl");
 };
 
-const getPreSignedUrl = async () => {
+const startFaceDetection = async () => {
+  if (!faceDetector) {
+    console.error("Face detector not initialized");
+    return;
+  }
+
+  faceDetectionInterval = setInterval(async () => {
+    try {
+      const faceCount = await detectFaceInFrame();
+      if (faceCount === 0) {
+        liveCheckMessage.value = "";
+        liveCheckError.value = "No face detected. Please ensure your face is clearly visible.";
+      } else if (faceCount > 1) {
+        liveCheckMessage.value = "";
+        liveCheckError.value = "Multiple faces detected. Please be alone in the frame.";
+      } else {
+        liveCheckMessage.value = "Hold still while we verify your identity...";
+        liveCheckError.value = "";
+        if (!isProcessing.value) {
+          isProcessing.value = true;
+          const {
+            session_id,
+            artifact
+          } = await getLivelinessToken();
+          console.log(session_id);
+          console.log(artifact);
+          await beginTest(session_id, artifact);
+        }
+      }
+    } catch (error) {
+      console.error("Face detection error:", error);
+    }
+  }, 1000);
+};
+
+async function startLivelinessStream(sessionId) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: 640, height: 480 },
+    });
+
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: "video/webm",
+    });
+
+    let controllerRef;
+
+    const requestEventStream = new ReadableStream({
+      start(controller) {
+        controllerRef = controller;
+
+        mediaRecorder.ondataavailable = async (event) => {
+          if (event.data.size > 0) {
+            const arrayBuffer = await event.data.arrayBuffer();
+            const videoChunk = new Uint8Array(arrayBuffer);
+            controller.enqueue({
+              VideoEvent: {
+                TimestampMillis: Date.now(),
+                VideoChunk: videoChunk,
+              },
+            });
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          controller.close();
+        };
+
+        mediaRecorder.start(100);
+      },
+    });
+
+    if (!(requestEventStream instanceof ReadableStream)) {
+      console.error("requestEventStream is not a ReadableStream", requestEventStream);
+      return;
+    }
+
+    const params = {
+      SessionId: sessionId,
+      ChallengeVersions: "FaceMovementAndLight_1.0.0",
+      VideoWidth: "640",
+      VideoHeight: "480",
+      LivenessRequestStream: requestEventStream,
+    };
+
+    const command = new StartFaceLivenessSessionCommand(params);
+    const response = await rekognitionStreamingClient.send(command);
+
+    console.log("Liveliness stream started: ", response);
+  } catch (error) {
+    console.error("Error starting liveliness stream: ", error);
+  }
+}
+
+const beginTest = async (sessionId, artifact) => {
+  await startLivelinessStream(sessionId);
+  // awsS3Utils.uploadToPreSignedS3Url(artifact, recordedBlob.value);
+  // await getFaceLivelinessSessionResults(sessionId);
+};
+
+const detectFaceInFrame = async () => {
+  if (!faceDetector) {
+    console.error("Face detector is not ready yet");
+    return 0;
+  }
+
+  if (!video.value || !video.value.videoWidth) {
+    console.error("Video element not ready");
+    return 0;
+  }
+
+  const faces = await faceDetector.estimateFaces(video.value);
+  return faces.length;
+};
+
+const startCamera = async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    cameraAccess.value = true;
+    video.value.srcObject = stream;
+    video.value.play();
+    faceDetector = await faceDetection.createDetector(faceDetection.SupportedModels.MediaPipeFaceDetector, {
+      runtime: "tfjs",
+      modelType: "full",
+      maxFaces: 5,
+    });
+    await startFaceDetection();
+  } catch (err) {
+    console.error("Camera Access Error:", err);
+    liveCheckError.value = "Camera access denied. Please grant permission.";
+  }
+};
+
+const getLivelinessToken = async () => {
   let accessToken = null;
   await customerUtils.getLivelinessToken('system').then((response) => {
-    accessToken = response.data.token;
+    accessToken = JSON.parse(atob(response.data.token));
   }).catch((e) => {
     console.error(e);
     throw e;
   });
 
   return accessToken;
-};
-
-const uploadToS3 = async (videoBlob) => {
-  const fileBuffer = await videoBlob.arrayBuffer();
-  const fileObj = new Blob([fileBuffer], { type: videoBlob.type });
-  const url = await getPreSignedUrl();
-
-  awsS3Utils.uploadToPreSignedS3Url(url, fileObj, (progress) => {
-    console.log(progress);
-  }).then(() => {
-    liveCheckSuccess.value = "Liveliness check completed successfully.";
-    emit('sdkStepCompleted');
-  }).catch((e) => {
-    console.error(e);
-    liveCheckError.value = "An error occurred while processing the video. Please try again.";
-  });
-}
-
-const stopRecording = () => {
-  mediaRecorder.value.stop();
-  isRecording.value = false;
 };
 
 const stopCamera = () => {
@@ -119,13 +255,23 @@ const stopCamera = () => {
 };
 
 onMounted(async () => {
+  await setupTensorFlowBackend();
   await startCamera();
   isInitialized.value = true;
   emit('sdkInitialized');
 })
 
 onUnmounted(() => {
+  video?.value?.stop();
   stopCamera();
+  liveCheckMessage.value = "";
+  liveCheckSuccess.value = "";
+  liveCheckError.value = "";
+  liveCheckWarning.value = "";
+  if (faceDetectionInterval) {
+    clearInterval(faceDetectionInterval);
+    faceDetectionInterval = null;
+  }
 });
 </script>
 
@@ -146,15 +292,6 @@ onUnmounted(() => {
       <p v-if="liveCheckWarning" class="leading-6 text-yellow-500 mb-3 text-center">{{ liveCheckWarning }}</p>
       <div class="relative h-72 w-72 bg-black rounded-full overflow-hidden border-6 p-4 border-gray-300">
         <video ref="video" autoplay playsinline class="w-full h-full transform scale-160"></video>
-      </div>
-
-      <div class="mt-4">
-        <button v-if="!isRecording" @click="startRecording" class="bg-green-600 text-white px-6 py-2 rounded-lg shadow-lg">
-          Start Recording
-        </button>
-        <button v-if="isRecording" @click="stopRecording" class="bg-red-600 text-white px-6 py-2 rounded-lg shadow-lg">
-          Stop Recording
-        </button>
       </div>
       <p class="leading-6 text-gray-400 text-xs mt-3 text-center">All data is processed in accordance with our privacy policy.</p>
     </div>
