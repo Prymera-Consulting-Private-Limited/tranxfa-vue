@@ -4,11 +4,9 @@ import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {useAwsS3Utils} from "@/composables/aws_s3_utils.js";
 import * as faceDetection from "@tensorflow-models/face-detection";
 import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
-import { StartFaceLivenessSessionCommand, RekognitionStreamingClient } from "@aws-sdk/client-rekognitionstreaming";
 
 const props = defineProps({
   documentCategory: {
@@ -23,7 +21,6 @@ const props = defineProps({
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
-const awsS3Utils = useAwsS3Utils();
 
 /**
  * @type {{data: Customer | null}}
@@ -46,6 +43,7 @@ const isInitialized = ref(false);
 const isProcessing = ref(false);
 
 const emit = defineEmits(['sdkInitialized', 'sdkError', 'sdkStepCompleted', 'sdkApplicantStatusChanged']);
+
 
 const setupTensorFlowBackend = async () => {
   await tf.setBackend("webgl");
@@ -71,91 +69,14 @@ const startFaceDetection = async () => {
         liveCheckError.value = "";
         if (!isProcessing.value) {
           isProcessing.value = true;
-          const {
-            session_id,
-            aws_access_token
-          } = await getLivelinessToken();
-          await beginTest(session_id, aws_access_token);
+          //const accessToken = await getLivelinessToken();
+          //await beginTest(accessToken);
         }
       }
     } catch (error) {
       console.error("Face detection error:", error);
     }
   }, 1000);
-};
-
-async function startLivelinessStream(sessionId, aws_access_token) {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 640, height: 480 },
-    });
-
-    const mediaRecorder = new MediaRecorder(stream, {
-      mimeType: "video/webm",
-    });
-
-    let controllerRef;
-
-    const requestEventStream = new ReadableStream({
-      start(controller) {
-        controllerRef = controller;
-
-        mediaRecorder.ondataavailable = async (event) => {
-          if (event.data.size > 0) {
-            const arrayBuffer = await event.data.arrayBuffer();
-            const videoChunk = new Uint8Array(arrayBuffer);
-            controller.enqueue({
-              VideoEvent: {
-                TimestampMillis: Date.now(),
-                VideoChunk: videoChunk,
-              },
-            });
-          }
-        };
-
-        mediaRecorder.onstop = () => {
-          controller.close();
-        };
-
-        mediaRecorder.start(100);
-      },
-    });
-
-    if (!(requestEventStream instanceof ReadableStream)) {
-      console.error("requestEventStream is not a ReadableStream", requestEventStream);
-      return;
-    }
-
-    const client = new RekognitionStreamingClient({
-      region: "us-east-1",
-      credentials: {
-        accessKeyId: aws_access_token.AccessKeyId,
-        secretAccessKey: aws_access_token.SecretAccessKey,
-        sessionToken: aws_access_token.SessionToken,
-      },
-    });
-
-    const params = {
-      SessionId: sessionId,
-      ChallengeVersions: "FaceMovementAndLight_1.0.0",
-      VideoWidth: "640",
-      VideoHeight: "480",
-      LivenessRequestStream: requestEventStream,
-    };
-
-    const command = new StartFaceLivenessSessionCommand(params);
-    const response = await client.send(command);
-
-    console.log("Liveliness stream started: ", response);
-  } catch (error) {
-    console.error("Error starting liveliness stream: ", error);
-  }
-}
-
-const beginTest = async (sessionId, aws_access_token) => {
-  await startLivelinessStream(sessionId, aws_access_token);
-  // awsS3Utils.uploadToPreSignedS3Url(artifact, recordedBlob.value);
-  // await getFaceLivelinessSessionResults(sessionId);
 };
 
 const detectFaceInFrame = async () => {
