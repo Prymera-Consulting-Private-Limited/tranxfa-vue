@@ -14,11 +14,15 @@ export function useRecipientUtils() {
         });
     }
 
-    const add = async (payoutChannel, data) => {
+    const add = async (payoutChannel, data, quote = null) => {
+        const params = {
+            payout_channel_id: payoutChannel.id,
+        };
+        if (quote) {
+            params.quote_id = quote.id;
+        }
         return axios.post('/client/v1/recipients/add', data, {
-            params: {
-                payout_channel_id: payoutChannel.id,
-            },
+            params: params,
             headers: {
                 'X-Customer-Token': customerUtils.getAuthToken(),
             }
