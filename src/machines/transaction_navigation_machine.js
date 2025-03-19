@@ -10,45 +10,45 @@ export const transactionNavigationMachine = createMachine({
         checkRecipients: {
             always: [
                 {
-                    target: 'confirm',
-                    guard: (context) => context?.quote?.recipients?.length === 0,
+                    target: 'selectRecipient',
+                    guard: ({context}) => context.quote?.recipients?.length > 0,
                 },
                 {
-                    target: 'selectRecipient',
+                    target: 'addRecipient',
                 },
             ],
-        },
-        selectRecipient: {
-            on: {
-                SELECT_EXISTING_RECIPIENT: 'confirm',
-                ADD_NEW_RECIPIENT: 'confirm',
+            SET_CONTEXT: {
+                actions: assign({
+                    quote: ({context, event}) => event.quote || context.quote
+                })
             },
         },
-        // addRecipient: {
-        //     invoke: {
-        //         src: 'addRecipientWizard',
-        //         onDone: {
-        //             target: 'updateQuoteWithRecipient'
-        //         },
-        //         onError: {
-        //             target: 'error',
-        //         },
-        //     },
-        // },
-        // updateQuoteWithRecipient: {
-        //     invoke: {
-        //         src: 'updateQuoteRecipient',
-        //         onDone: {
-        //             target: 'confirm',
-        //             actions: assign({
-        //                 quote: (context, event) => event.data,
-        //             }),
-        //         },
-        //         onError: {
-        //             target: 'error',
-        //         },
-        //     },
-        // },
+        addRecipient: {
+            PROCEED: [
+                {
+                    target: 'confirm',
+                    guard: ({context}) => context.quote?.recipient !== null,
+                },
+            ],
+            SET_CONTEXT: {
+                actions: assign({
+                    quote: ({context, event}) => event.quote || context.quote
+                })
+            },
+        },
+        selectRecipient: {
+            PROCEED: [
+                {
+                    target: 'confirm',
+                    guard: ({context}) => context.quote?.recipient !== null,
+                },
+            ],
+            SET_CONTEXT: {
+                actions: assign({
+                    quote: ({context, event}) => event.quote || context.quote
+                })
+            },
+        },
         confirm: {
             type: 'final',
             entry: (context, event) => {
