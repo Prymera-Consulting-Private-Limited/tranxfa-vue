@@ -43,7 +43,7 @@ const router = createRouter({
       props: route => ({ id: route.params.quoteId }),
       component: () => import('@/views/Transfer/Index.vue'),
       meta: {
-        title: 'Dashboard',
+        title: 'Send Money',
         description: '',
       },
     }, {
