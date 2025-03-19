@@ -59,6 +59,20 @@ export const transactionNavigationMachine = createMachine({
             }
         },
         confirm: {
+            on: {
+                CONFIRMED: [
+                    {
+                        target: 'confirmed',
+                    },
+                ],
+                SET_CONTEXT: {
+                    actions: assign({
+                        quote: ({context, event}) => event.quote || context.quote
+                    })
+                },
+            }
+        },
+        confirmed: {
             type: 'final',
             entry: (context, event) => {
                 console.error('Final state reached:', event?.data);
