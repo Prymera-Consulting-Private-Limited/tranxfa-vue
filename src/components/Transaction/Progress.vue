@@ -1,18 +1,31 @@
 <script setup>
 import {CheckIcon} from "@heroicons/vue/20/solid";
+import {computed} from "vue";
+import TransactionQuote from "@/models/transaction_quote.js";
+
+const props = defineProps({
+  currentStep: {
+    type: String,
+    required: true
+  },
+  quote: {
+    type: Object(TransactionQuote),
+    required: false
+  }
+})
 
 const steps = [
   {
     name: 'Prepare Your Transfer',
     description: 'Get started by entering the amount and selecting your transfer method for a smooth transaction.',
     href: '#',
-    status: 'complete'
+    action: ['prepare']
   },
   {
     name: 'Add Recipient Details',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
     href: '#',
-    status: 'current'
+    action: ['addRecipient', 'selectRecipient']
   },
   // {
   //   name: 'Provide Your Address',
@@ -30,20 +43,37 @@ const steps = [
     name: 'Review & Confirm',
     description: 'Double-check all details before finalizing your transfer.',
     href: '#',
-    status: 'upcoming'
+    action: ['confirm']
   },
-  {
-    name: 'Make Payment',
-    description: 'Complete your transfer by choosing a payment method and sending the funds.',
-    href: '#',
-    status: 'upcoming'
-  }
+  // {
+  //   name: 'Make Payment',
+  //   description: 'Complete your transfer by choosing a payment method and sending the funds.',
+  //   href: '#',
+  // }
 ];
+
+const progress = computed(() => {
+  for (let i = 0; i < steps.length; i++) {
+    const cursor = steps.findIndex((step) => step.action.includes(props.currentStep));
+    if (steps[i].action.includes('selectRecipient')) {
+      steps[i].name = props.quote?.recipients?.length > 0 ? 'Select Recipient Details' : 'Add Recipient Details';
+    }
+    if (i < cursor) {
+      steps[i].status = 'complete';
+    } else if (i === cursor) {
+      steps[i].status = 'current';
+    } else {
+      steps[i].status = 'upcoming';
+    }
+  }
+
+  return steps;
+})
 </script>
 <template>
   <nav aria-label="Progress">
     <ol role="list" class="overflow-hidden">
-      <li v-for="(step, stepIdx) in steps" :key="step.name" :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
+      <li v-for="(step, stepIdx) in progress" :key="step.name" :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
         <template v-if="step.status === 'complete'">
           <div v-if="stepIdx !== steps.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-purple-600" aria-hidden="true" />
           <a :href="step.href" class="group relative flex items-start">
