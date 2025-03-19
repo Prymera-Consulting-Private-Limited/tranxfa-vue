@@ -155,7 +155,7 @@ const saveRecipientFailed = (error) => {
           v-bind:type="recipient.type"
           v-bind:relationships="relationships"
           v-bind:isSubmitted = "externalSaveTrigger"
-          v-bind:submitControlOutsourced="!!props.quote?.id"
+          v-bind:quote="props.quote"
           v-on:recipient:added="recipientAdded"
           v-on:recipient:add:failed="saveRecipientFailed"
       />
