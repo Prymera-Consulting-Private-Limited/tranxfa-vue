@@ -81,8 +81,11 @@ const canContinue = computed(() => {
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">
               <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                <Progress v-bind:step="snapshot.value" />
-                <div class="xl:col-span-2">
+                <Progress
+                    v-bind:currentStep="snapshot.value"
+                    v-bind:quote="quote.data"
+                />
+                <div class="xl:col-span-2 px-3">
                   <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center min-w-96 mx-auto min-h-96">
                     <Spinner class="size-16 mx-auto" />
                     <span class="sr-only">Loading...</span>
@@ -124,7 +127,7 @@ const canContinue = computed(() => {
           <div class="grid grid-cols-1 gap-4">
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Transaction Summary</h2>
-              <template v-if="quote.data !== null">
+              <template v-if="quote.data !== null && snapshot.value !== 'confirm'">
                 <QuoteDisplay v-bind:quote="quote.data" />
               </template>
               <button @click="isStepProcessing = true" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-6 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
