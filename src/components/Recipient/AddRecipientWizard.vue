@@ -12,6 +12,7 @@ import {usePayoutChannelUtils} from "@/composables/payout_channel_utils.js";
 import RecipientType from "@/enums/recipient_type.js";
 import {useResourceUtils} from "@/composables/resource_utils.js";
 import Relationship from "@/models/relationship.js";
+import TransactionQuote from "@/models/transaction_quote.js";
 
 const isLoading = ref(true);
 const quoteUtils = useQuoteUtils();
@@ -19,10 +20,17 @@ const payoutChannelUtils = usePayoutChannelUtils();
 const resourceUtils = useResourceUtils();
 const { snapshot, send } = useMachine(addRecipientNavigationMachine);
 
+const props = defineProps({
+  quote: {
+    type: Object(TransactionQuote),
+    required: false
+  }
+})
+
 const recipient = reactive({
-  country: null,
-  currency: null,
-  payoutMethod: null,
+  country: props.quote?.payoutCountry,
+  currency: props.quote?.payoutCurrency,
+  payoutMethod: props.quote?.payoutMethod,
   attributes: null,
   type: null,
   payoutChannel: null,
@@ -91,13 +99,26 @@ async function updateRecipientType(type) {
 }
 
 onMounted(async () => {
-  await quoteUtils.getQuote().then(() => {
-    targets.value = quoteUtils.quote.data.targets;
-    if (targets.value.length === 1) {
-      updateRecipientTarget(targets.value[0]);
-    }
-    isLoading.value = false;
-  });
+  if (props.quote) {
+    send({
+      type: "SET_CONTEXT",
+      target: {
+        country: props.quote.payoutCountry,
+        currency: props.quote.payoutCurrency
+      }
+    });
+    send({ type: "PROCEED" })
+    await updatePayoutMethod(props.quote.payoutMethod);
+  } else {
+    await quoteUtils.getQuote().then(() => {
+      targets.value = quoteUtils.quote.data.targets;
+      if (targets.value.length === 1) {
+        updateRecipientTarget(targets.value[0]);
+      }
+      isLoading.value = false;
+    });
+  }
+  isLoading.value = false;
 })
 
 const emit = defineEmits(['recipient:added']);
@@ -108,7 +129,7 @@ const recipientAdded = (recipient) => {
 </script>
 
 <template>
-  <div class="p-6 sm:px-8">
+  <div>
     <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center min-w-96 mx-auto min-h-96">
       <Spinner class="size-16 mx-auto" />
       <span class="sr-only">Loading...</span>
