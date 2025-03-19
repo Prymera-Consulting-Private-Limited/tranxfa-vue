@@ -1,6 +1,6 @@
 <script setup>
 import {CheckIcon, PaperAirplaneIcon, XMarkIcon, UserIcon} from "@heroicons/vue/24/outline";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import TransactionQuote from "@/models/transaction_quote.js";
 import FlagIcon from "vue3-flag-icons";
 
@@ -20,68 +20,70 @@ const steps = [
     id: 'checkRecipients',
     name: 'Prepare your transfer',
     description: 'Get started by entering the amount and selecting your transfer method for a smooth transaction.',
+    show: true,
   },
   {
     id: 'addRecipient',
     name: 'Add Recipient Details',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
+    show: true,
   },
   {
     id: 'selectRecipient',
     name: 'Choose your recipient',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
+    show: true,
   },
   {
     id: 'provideAddress',
     name: 'Provide Your Address',
     description: 'For security and compliance, we need your address details before proceeding.',
+    show: false,
   },
   {
     id: 'verifyIdentity',
     name: 'Verify Your Identity',
     description: 'A quick identity check ensures your transfer is safe and secure.',
+    show: false,
   },
   {
     id: 'confirm',
     name: 'Review & Confirm',
     description: 'Double-check all details before finalizing your transfer.',
+    show: true,
   },
   {
     id: 'makePayment',
     name: 'Make Payment',
     description: 'Complete your transfer by choosing a payment method and sending the funds.',
+    show: true,
   }
 ];
 
-const progress = computed(() => {
-  const progress = [];
-  for (let i = 0; i < steps.length; i++) {
-    const step = steps[i];
-    if (step.id === 'checkRecipients' && props.quote) {
-      step.name = `Transfer to ${props.quote?.payoutCountry?.commonName}`;
-
-    }
-    const cursor = steps.findIndex((step) => props.currentStep === step.id);
-    if (i < cursor) {
-      step.status = 'complete';
-    } else if (i === cursor) {
-      step.status = 'current';
-    } else {
-      step.status = 'upcoming';
-    }
-    progress.push(step);
+const progress = computed(() => steps.filter((step) => step.show).map((step) => {
+  if (step.id === 'checkRecipients' && props.quote) {
+    step.name = `Transfer to ${props.quote?.payoutCountry?.commonName}`;
   }
-
-  return steps;
-})
+  const currentStepIndex = steps.findIndex((o) => o.id === step.id);
+  const cursor = steps.findIndex((o) => o.id === props.currentStep);
+  if (currentStepIndex === cursor) {
+    step.status = 'current';
+  } else if (currentStepIndex < cursor) {
+    step.status = 'complete';
+  } else {
+    step.status = 'upcoming';
+  }
+  return step;
+}));
 </script>
 <template>
   <nav aria-label="Progress">
     <ol role="list" class="overflow-hidden">
-      <template v-for="(step, stepIdx) in progress" :key="step.name">
-        <li v-if="step.status !== 'completed' && step.id !== 'addRecipient'" :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
+      <template v-for="(step, stepIdx) in progress" :key="step.id">
+        <template v-if="(step.id === 'selectRecipient' && step.status === 'upcoming') || (step.id === 'addRecipient' && step.status === 'complete')"></template>
+        <li v-else :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
           <template v-if="step.status === 'complete'">
-            <div v-if="stepIdx !== steps.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-purple-600" aria-hidden="true" />
+            <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-purple-600" aria-hidden="true" />
             <div class="group relative flex items-start">
               <div class="flex h-9 items-center">
                 <div :class="{'bg-purple-600 group-hover:bg-purple-800' : stepIdx !== 0 || !quote}" class="relative z-10 flex size-8 items-center justify-center rounded-full">
@@ -96,7 +98,7 @@ const progress = computed(() => {
             </div>
           </template>
           <template v-else-if="step.status === 'current'">
-            <div v-if="stepIdx !== steps.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true" />
+            <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true" />
             <div class="group relative flex items-start" aria-current="step">
               <div class="flex h-9 items-center" aria-hidden="true">
                 <div class="relative z-10 flex size-8 items-center justify-center rounded-full border-2 border-purple-600 bg-white">
@@ -110,7 +112,7 @@ const progress = computed(() => {
             </div>
           </template>
           <template v-else>
-            <div v-if="stepIdx !== steps.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true" />
+            <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true" />
             <div class="group relative flex items-start">
               <div class="flex h-9 items-center" aria-hidden="true">
                 <div class="relative z-10 flex size-8 items-center justify-center rounded-full border-2 border-gray-300 bg-white group-hover:border-gray-400">
