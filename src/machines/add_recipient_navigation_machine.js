@@ -7,15 +7,13 @@ export const addRecipientNavigationMachine = createMachine({
         target: null,
         payoutMethod: null,
         recipientType: null,
-        canAddIndividual: false,
-        canAddBusiness: false,
     },
     states: {
         targetSelection: {
             on: {
                 PROCEED: {
                     target: 'payoutMethodSelection',
-                    guard: 'targetProvided'
+                    guard: ({context}) => context.target !== null
                 },
                 SET_CONTEXT: {
                     actions: assign({
@@ -28,7 +26,7 @@ export const addRecipientNavigationMachine = createMachine({
             on: {
                 PROCEED: {
                     target: 'recipientTypeSelection',
-                    guard: 'payoutMethodProvided'
+                    guard: ({context}) => context.payoutMethod !== null
                 },
                 SET_CONTEXT: {
                     actions: assign({
@@ -40,7 +38,10 @@ export const addRecipientNavigationMachine = createMachine({
         recipientTypeSelection: {
             on: {
                 PROCEED: [
-                    { target: 'addRecipientForm', guard: 'recipientTypeProvided' }
+                    {
+                        target: 'addRecipientForm',
+                        guard: ({context}) => context.recipientType !== null
+                    }
                 ],
                 SET_CONTEXT: {
                     actions: assign({
@@ -50,12 +51,5 @@ export const addRecipientNavigationMachine = createMachine({
             }
         },
         addRecipientForm: {}
-    }
-}, {
-    guards: {
-        targetProvided: ({context}) => context.target !== null,
-        payoutMethodProvided: ({context}) => context.payoutMethod !== null,
-        multipleContextsAvailable: ({context}) => context.canAddIndividual && context.canAddBusiness,
-        recipientTypeProvided: ({context}) => context.recipientType !== null
     }
 });
