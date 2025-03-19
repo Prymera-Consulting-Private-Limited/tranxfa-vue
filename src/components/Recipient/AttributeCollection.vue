@@ -164,7 +164,7 @@ async function addRecipient() {
   Object.entries(errors).forEach(([key]) => {
     errors[key] = [];
   });
-  await recipientUtils.add(props.payoutChannel, input.data).then((response) => {
+  await recipientUtils.add(props.payoutChannel, input.data, props.quote).then((response) => {
     const recipient = Recipient.getInstance(response.data);
     emit('recipient:added', recipient);
   }).catch((e) => {
