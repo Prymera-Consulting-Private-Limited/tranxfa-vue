@@ -48,6 +48,16 @@ const props = defineProps({
     type: Array({type: Relationship}),
     required: true,
   },
+  isSubmitted: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  submitControlOutsourced: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 })
 
 const errors = reactive({
@@ -246,7 +256,7 @@ async function addRecipient() {
       <RelationshipInput v-bind:relationships="relationships" v-on:recipient:relationship:updated="updateRelationship" />
       <p v-if="errors?.relationship_id?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.relationship_id[0] }}</p>
     </div>
-    <button :class="{'opacity-60' : isSaving}" :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-white text-center py-2.5  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
+    <button v-if="! submitControlOutsourced" :class="{'opacity-60' : isSaving}" :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-white text-center py-2.5  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
       <span v-if="isSaving" class="flex justify-center items-center">
         <Spinner :class="'w-5 h-5 mr-3'"/>
         <span>Saving...</span>

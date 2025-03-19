@@ -126,6 +126,8 @@ const emit = defineEmits(['recipient:added']);
 const recipientAdded = (recipient) => {
   emit('recipient:added', recipient);
 }
+
+const isSubmitted = ref(false);
 </script>
 
 <template>
@@ -142,6 +144,8 @@ const recipientAdded = (recipient) => {
           v-bind:payoutChannel="recipient.payoutChannel"
           v-bind:type="recipient.type"
           v-bind:relationships="relationships"
+          v-bind:isSubmitted = "isSubmitted.value"
+          v-bind:submitControlOutsourced="!!props.quote?.id"
           v-on:recipient:added="recipientAdded"
       />
     </template>
