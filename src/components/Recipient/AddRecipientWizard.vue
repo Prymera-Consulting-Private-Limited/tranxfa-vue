@@ -24,6 +24,11 @@ const props = defineProps({
   quote: {
     type: Object(TransactionQuote),
     required: false
+  },
+  externalSaveTrigger: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 
@@ -121,13 +126,18 @@ onMounted(async () => {
   isLoading.value = false;
 })
 
-const emit = defineEmits(['recipient:added']);
+const emit = defineEmits([
+    'recipient:added',
+    'recipient:add:failed',
+]);
 
 const recipientAdded = (recipient) => {
   emit('recipient:added', recipient);
 }
 
-const isSubmitted = ref(false);
+const saveRecipientFailed = (error) => {
+  emit('recipient:add:failed', error);
+}
 </script>
 
 <template>
@@ -144,9 +154,10 @@ const isSubmitted = ref(false);
           v-bind:payoutChannel="recipient.payoutChannel"
           v-bind:type="recipient.type"
           v-bind:relationships="relationships"
-          v-bind:isSubmitted = "isSubmitted.value"
+          v-bind:isSubmitted = "externalSaveTrigger"
           v-bind:submitControlOutsourced="!!props.quote?.id"
           v-on:recipient:added="recipientAdded"
+          v-on:recipient:add:failed="saveRecipientFailed"
       />
     </template>
     <template v-else-if="snapshot?.value === 'recipientTypeSelection'">

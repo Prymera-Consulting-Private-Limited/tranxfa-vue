@@ -15,7 +15,7 @@ import MobileNumberInput from "@/components/Recipient/Attribute/MobileNumberInpu
 import EmailInput from "@/components/Recipient/Attribute/EmailInput.vue";
 import AccountNumberInput from "@/components/Recipient/Attribute/AccountNumberInput.vue";
 import PhoneNumberInput from "@/components/Recipient/Attribute/PhoneNumberInput.vue";
-import {reactive, ref} from "vue";
+import {reactive, ref, watchEffect} from "vue";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import Relationship from "@/models/relationship.js";
 import RelationshipInput from "@/components/Recipient/Attribute/RelationshipInput.vue";
@@ -154,7 +154,10 @@ const isSaving = ref(false);
 
 const recipientUtils = useRecipientUtils();
 
-const emit = defineEmits(['recipient:added']);
+const emit = defineEmits([
+    'recipient:added',
+    'recipient:add:failed',
+]);
 
 async function addRecipient() {
   isSaving.value = true;
@@ -173,10 +176,17 @@ async function addRecipient() {
       console.error(e)
       throw e;
     }
+    emit('recipient:add:failed');
   }).finally(() => {
     isSaving.value = false;
   });
 }
+
+watchEffect(() => {
+  if (props.isSubmitted && props.submitControlOutsourced && !isSaving.value) {
+    addRecipient();
+  }
+});
 </script>
 
 <template>
