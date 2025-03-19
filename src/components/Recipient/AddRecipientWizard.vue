@@ -48,8 +48,9 @@ async function updateRecipientTarget(target) {
   payoutMethods.value = quoteUtils.quote.data.payoutMethods;
   if (payoutMethods.value.length === 1) {
     await updatePayoutMethod(payoutMethods.value[0]);
+  } else {
+    isLoading.value = false;
   }
-  isLoading.value = false;
 }
 async function updatePayoutMethod(payoutMethod) {
   recipient.payoutMethod = payoutMethod;
@@ -68,20 +69,13 @@ async function updatePayoutMethod(payoutMethod) {
     await updateRecipientType(RecipientType.INDIVIDUAL);
   } else if (recipient.payoutChannel.configuration.recipientType === RecipientType.BUSINESS) {
     await updateRecipientType(RecipientType.BUSINESS);
+  } else {
+    isLoading.value = false;
   }
-  isLoading.value = false;
 }
 
 async function updateRecipientType(type) {
   recipient.type = type;
-  send({
-    type: "SET_CONTEXT",
-    canAddIndividual: recipient.payoutChannel.configuration.recipientType === null || recipient.payoutChannel.configuration.recipientType === RecipientType.INDIVIDUAL,
-  });
-  send({
-    type: "SET_CONTEXT",
-    canAddBusiness: recipient.payoutChannel.configuration.recipientType === null || recipient.payoutChannel.configuration.recipientType === RecipientType.BUSINESS,
-  });
   send({
     type: "SET_CONTEXT",
     recipientType: type
@@ -115,7 +109,7 @@ const recipientAdded = (recipient) => {
 
 <template>
   <div class="p-6 sm:px-8">
-    <div v-if="isLoading" role="status" class="p-10">
+    <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center min-w-96 mx-auto min-h-96">
       <Spinner class="size-16 mx-auto" />
       <span class="sr-only">Loading...</span>
     </div>
