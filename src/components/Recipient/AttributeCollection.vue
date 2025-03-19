@@ -170,7 +170,7 @@ async function addRecipient() {
 </script>
 
 <template>
-  <form @submit.prevent="addRecipient" class="space-y-6 mt-12">
+  <form @submit.prevent="addRecipient" class="space-y-6">
     <div v-if="type === RecipientType.BUSINESS">
       <div >
         <div>
