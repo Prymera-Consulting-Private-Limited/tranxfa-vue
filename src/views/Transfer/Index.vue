@@ -88,7 +88,6 @@ const canContinue = computed(() => {
                     <span class="sr-only">Loading...</span>
                   </div>
                   <template v-else>
-                    {{ snapshot.value }}
                     <AddRecipientWizard
                         v-if="snapshot.value === 'addRecipient'"
                         v-bind:externalSaveTrigger="isStepProcessing"
