@@ -8,16 +8,16 @@ export const transactionNavigationMachine = createMachine({
     },
     states: {
         checkRecipients: {
-            always: [
-                {
-                    target: 'addRecipient',
-                    guard: ({context}) => context.quote?.recipients?.length === 0,
-                },
-                {
-                    target: 'selectRecipient',
-                },
-            ],
             on: {
+                PROCEED: [
+                    {
+                        target: 'addRecipient',
+                        guard: ({context}) => context.quote?.recipients?.length === 0,
+                    },
+                    {
+                        target: 'selectRecipient',
+                    },
+                ],
                 SET_CONTEXT: {
                     actions: assign({
                         quote: ({context, event}) => event.quote || context.quote
