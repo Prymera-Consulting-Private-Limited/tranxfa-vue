@@ -104,7 +104,7 @@ function saveQuote() {
   quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
     const quote = TransactionQuote.getInstance(response.data);
     router.push({name: 'transferWizard', params: {quoteId: quote.id}});
-  }).finally(() => {
+  }).catch(() => {
     isSavingQuote.value = false;
   });
 }
