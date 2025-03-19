@@ -22,6 +22,7 @@ import RelationshipInput from "@/components/Recipient/Attribute/RelationshipInpu
 import Spinner from "@/components/Spinner.vue";
 import {useRecipientUtils} from "@/composables/recipient_utils.js";
 import Recipient from "@/models/recipient.js";
+import TransactionQuote from "@/models/transaction_quote.js";
 
 const props = defineProps({
   country: {
@@ -53,10 +54,9 @@ const props = defineProps({
     required: false,
     default: false,
   },
-  submitControlOutsourced: {
-    type: Boolean,
+  quote: {
+    type: Object(TransactionQuote),
     required: false,
-    default: false,
   },
 })
 
@@ -183,7 +183,7 @@ async function addRecipient() {
 }
 
 watchEffect(() => {
-  if (props.isSubmitted && props.submitControlOutsourced && !isSaving.value) {
+  if (props.isSubmitted && props.quote && !isSaving.value) {
     addRecipient();
   }
 });
