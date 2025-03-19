@@ -37,7 +37,7 @@ const createRecipientClicked = () => {
 
 <template v-if="quote.recipients.length > 0" >
   <ul role="list" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
-    <li @click="createRecipientClicked" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center border border-dashed border-gray-200 transition-transform transform hover:scale-105 shadow-sm hover:shadow-md cursor-pointer">
+    <li @click="createRecipientClicked" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center border border-gray-200 transition-transform transform hover:scale-105 shadow-sm hover:shadow-md cursor-pointer">
       <AddRecipientCard />
     </li>
     <li v-for="(recipient, index) in quote.recipients" :key="recipient.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center border border-gray-200 transition-transform transform hover:scale-105 shadow-sm hover:shadow-md">
