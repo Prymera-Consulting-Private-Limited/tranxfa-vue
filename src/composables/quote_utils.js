@@ -67,11 +67,22 @@ export function useQuoteUtils() {
         });
     }
 
+    const confirmQuote = async (quote, purpose) => {
+        return axios.post(`/client/v1/quote/confirm/${quote.id}`, {
+            purpose_id: purpose.id,
+        }, {
+            headers: {
+                'X-Customer-Token': customerUtils.getAuthToken(),
+            }
+        });
+    }
+
     return {
         quote,
         getQuote,
         saveQuote,
         getTransferQuote,
         setRecipient,
+        confirmQuote,
     }
 }
