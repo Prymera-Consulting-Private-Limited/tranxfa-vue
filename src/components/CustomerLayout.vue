@@ -2,7 +2,7 @@
 import Footer from "@/components/Footer.vue";
 import Header from "@/components/Header.vue";
 import {useCustomerStore} from "@/stores/customer.js";
-import {onMounted} from "vue";
+import {onMounted, onUnmounted} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {NotificationGroup, Notification, notify} from 'notiwind';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
@@ -20,56 +20,62 @@ onMounted(async () => {
   if (customerStore.isLoaded === false) {
     await customerUtils.refresh();
   }
-  Echo.channel(`client-customer.${customer.data?.id}`)
-      .listen('CustomerDocumentProcessing', (e) => {
-        console.log(e);
-        const category = 'Source of Funds';
-        const document = 'Bank Statement';
-        notify(
-            {
-              group: 'customer',
-              title: `${category} - Received`,
-              text: `We have received your ${document}.`,
-              type: 'info',
-            },
-            -1,
-        )
-      })
-      .listen('CustomerDocumentApproved', (e) => {
-        console.log(e)
-        const category = 'Proof of Identity';
-        const document = 'Passport'.toLowerCase();
-        notify(
-            {
-              group: 'customer',
-              title: `${category} - Accepted`,
-              text: `Your ${document} has been accepted by our compliance team.`,
-              type: 'success',
-            },
-            -1,
-        )
-      })
-      .listen('CustomerDocumentRejected', (e) => {
-        console.log(e)
-        const category = 'Proof of Address';
-        const document = 'Utility Bill'.toLowerCase();
-        notify(
-            {
-              group: 'customer',
-              title: `${category} - Rejected`,
-              text: `We were unable to verify your ${document}.`,
-              type: 'danger',
-            },
-            -1,
-        )
-      });
+  if (customer.data?.id) {
+    Echo.channel(`client-customer.${customer.data?.id}`)
+        .listen('CustomerDocumentProcessing', (e) => {
+          customerUtils.refresh();
+          notify(
+              {
+                group: 'customer',
+                title: `${category} - Received`,
+                text: `We have received your ${document}.`,
+                type: 'info',
+              },
+              -1,
+          )
+        })
+        .listen('CustomerDocumentApproved', (e) => {
+          customerUtils.refresh();
+          const category = 'Proof of Identity';
+          const document = 'Passport'.toLowerCase();
+          notify(
+              {
+                group: 'customer',
+                title: `${category} - Accepted`,
+                text: `Your ${document} has been accepted by our compliance team.`,
+                type: 'success',
+              },
+              -1,
+          )
+        })
+        .listen('CustomerDocumentRejected', (e) => {
+          customerUtils.refresh();
+          const category = 'Proof of Address';
+          const document = 'Utility Bill'.toLowerCase();
+          notify(
+              {
+                group: 'customer',
+                title: `${category} - Rejected`,
+                text: `We were unable to verify your ${document}.`,
+                type: 'danger',
+              },
+              -1,
+          )
+        });
+  }
+})
+
+onUnmounted(async () => {
+  if (customer.data?.id) {
+    Echo.leaveChannel(`client-customer.${customer.data?.id}`);
+  }
 })
 </script>
 
 <template>
   <div class="min-h-full">
     <Header />
-    <slot />
+      <slot />
     <Footer />
     <NotificationGroup position="top" group="customer">
       <div class="fixed inset-0 flex items-start justify-end p-6 px-4 py-6 pointer-events-none">
