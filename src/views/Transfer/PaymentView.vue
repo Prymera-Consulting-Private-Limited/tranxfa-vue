@@ -3,6 +3,7 @@ import CustomerLayout from "@/components/CustomerLayout.vue";
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 import { useTransactionUtils } from "@/composables/transaction_utils.js";
 import {onMounted, ref} from "vue";
+import {notify} from "notiwind";
 
 const transactionUtils = useTransactionUtils();
 
@@ -17,6 +18,13 @@ const isRedirected = ref(false);
 
 onMounted(async () => {
   transactionUtils.getTransaction(props.id).then((response) => {
+    Echo.channel(`client-payment.${response.data?.payment?.id}`)
+        .listen('PaymentTransactionStateUpdated', (e) => {
+          if (e.state.code === 'PENDING') {
+            isRedirected.value = true;
+            window.open('https://gateway-web.fit.interac.ca/acceptPaymentRequest.do?rID=' + response.data.payment.shared_reference, '_blank', 'noopener,noreferrer')
+          }
+        });
     if (response.data.payment.state.code === 'PENDING') {
       isRedirected.value = true;
       window.open('https://gateway-web.fit.interac.ca/acceptPaymentRequest.do?rID=' + response.data.payment.shared_reference, '_blank', 'noopener,noreferrer')
