@@ -71,7 +71,9 @@ class Recipient {
         recipient.lastName = data.last_name;
         recipient.entityName = data.entity_name;
         recipient.fullName = data.full_name;
-        recipient.relationship = Relationship.getInstance(data.relationship);
+        if (data.relationship) {
+            recipient.relationship = Relationship.getInstance(data.relationship);
+        }
         if (data.channel) {
             recipient.channel = PayoutChannel.getInstance(data.channel);
         }
