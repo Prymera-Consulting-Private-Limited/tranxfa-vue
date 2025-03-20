@@ -12,6 +12,8 @@ import AddRecipientWizard from "@/components/Recipient/AddRecipientWizard.vue";
 import QuoteDisplay from "@/components/QuoteDisplay.vue";
 import Progress from "@/components/Transaction/Progress.vue";
 import RecipientCardShimmer from "@/components/Recipient/RecipientCardShimmer.vue";
+import vSelect from 'vue-select';
+import router from "@/router/index.js";
 
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
@@ -66,15 +68,35 @@ async function recipientAddedOnQuote(recipient) {
 const isStepProcessing = ref(false);
 
 const canContinue = computed(() => {
+  if (snapshot.value?.value === 'confirm') {
+    return !!purpose.value && !isStepProcessing.value && !isLoading.value;
+  }
   return !isStepProcessing.value && !isLoading.value;
 });
+
+const purpose = ref(null);
+
+const submitAndContinue = async () => {
+  isStepProcessing.value = true
+  if (snapshot.value?.value === 'confirm') {
+    try {
+      const response = await quoteUtils.confirmQuote(quote.data, purpose.value);
+      const transaction = response.data;
+      await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
+    } catch (error) {
+      console.log(error);
+    } finally {
+      isStepProcessing.value = false
+    }
+  }
+}
 </script>
 
 <template>
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Your Recipients</h1>
+        <h1 class="sr-only">Review & Confirm</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 shadow-lg">
           <!-- Left column -->
@@ -127,10 +149,34 @@ const canContinue = computed(() => {
           <div class="grid grid-cols-1 gap-4">
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Transaction Summary</h2>
-              <template v-if="quote.data !== null && snapshot.value !== 'confirm'">
-                <QuoteDisplay v-bind:quote="quote.data" />
+              <template v-if="quote.data">
+                <QuoteDisplay v-if="snapshot.value !== 'confirm'" v-bind:quote="quote.data" />
+                <template v-else>
+                  <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose</label>
+                  <p class="my-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
+                  <v-select v-model="purpose" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="purpose">
+                    <template v-slot:no-options="{ search, searching }">
+                      <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
+                      <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
+                    </template>
+                    <template #selected-option-container="{ option, deselect, multiple, disabled }">
+                      <div class="vs__selected">
+                        <div class="flex items-center w-auto">
+                          <div class="text-sm flex items-center w-full gap-x-2">
+                            <span class="lg:max-w-sm xl:max-w-md truncate">{{ option.title }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <template #option="option">
+                      <div class="text-sm flex items-center w-full gap-x-3 truncate">
+                        <span class="truncate">{{ option.title }}</span>
+                      </div>
+                    </template>
+                  </v-select>
+                </template>
               </template>
-              <button @click="isStepProcessing = true" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-6 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+              <button v-if="snapshot.value?.value !== 'selectRecipient'" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-6 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
                 <span v-if="isStepProcessing" class="flex justify-center items-center">
                   <Spinner :class="'w-5 h-5 mr-3'"/>
                   <span>Saving...</span>

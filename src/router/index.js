@@ -41,7 +41,7 @@ const router = createRouter({
       path: '/transfer/:quoteId',
       name: 'transferWizard',
       props: route => ({ id: route.params.quoteId }),
-      component: () => import('@/views/Transfer/Index.vue'),
+      component: () => import('@/views/Transfer/IndexView.vue'),
       meta: {
         title: 'Send Money',
         description: '',
@@ -50,7 +50,7 @@ const router = createRouter({
       path: '/pay/:transactionId',
       name: 'makePayment',
       props: route => ({ id: route.params.transactionId }),
-      component: () => import('@/views/Transfer/Payment.vue'),
+      component: () => import('@/views/Transfer/PaymentView.vue'),
       meta: {
         title: 'Make Payment',
         description: '',
@@ -66,7 +66,7 @@ const router = createRouter({
     }, {
       path: '/recipients',
       name: 'recipients',
-      component: () => import('@/views/Recipient/Index.vue'),
+      component: () => import('@/views/Recipient/IndexView.vue'),
       meta: {
         title: 'Recipients',
         description: '',
@@ -74,7 +74,7 @@ const router = createRouter({
     }, {
       path: '/recipient/:id',
       name: 'viewRecipient',
-      component: () => import('@/views/Recipient/View.vue'),
+      component: () => import('@/views/Recipient/ItemView.vue'),
       meta: {
         title: 'Recipients',
         description: '',
