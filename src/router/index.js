@@ -47,6 +47,15 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/pay/:transactionId',
+      name: 'makePayment',
+      props: route => ({ id: route.params.transactionId }),
+      component: () => import('@/views/Transfer/Payment.vue'),
+      meta: {
+        title: 'Make Payment',
+        description: '',
+      },
+    }, {
       path: '/transactions',
       name: 'transactions',
       component: () => import('@/views/TransactionListingView.vue'),
