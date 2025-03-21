@@ -12,7 +12,12 @@ const props = defineProps({
   quote: {
     type: Object(TransactionQuote),
     required: false
-  }
+  },
+  addressRequired: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
 })
 
 const steps = [
@@ -60,9 +65,13 @@ const steps = [
   }
 ];
 
-const progress = computed(() => steps.filter((step) => step.show).map((step) => {
+const progress = computed(() => steps.map((step) => {
   if (step.id === 'checkRecipients' && props.quote) {
     step.name = `Transfer to ${props.quote?.payoutCountry?.commonName}`;
+  }
+  if (step.id === 'provideAddress') {
+    step.show = props.addressRequired;
+    console.log(step);
   }
   const currentStepIndex = steps.findIndex((o) => o.id === step.id);
   const cursor = steps.findIndex((o) => o.id === props.currentStep);
@@ -74,7 +83,7 @@ const progress = computed(() => steps.filter((step) => step.show).map((step) => 
     step.status = 'upcoming';
   }
   return step;
-}));
+}).filter((step) => step.show));
 </script>
 <template>
   <nav aria-label="Progress">

@@ -75,6 +75,7 @@ const canContinue = computed(() => {
 });
 
 const purpose = ref(null);
+const isAddressRequired = ref(false);
 
 const submitAndContinue = async () => {
   isStepProcessing.value = true
@@ -84,7 +85,11 @@ const submitAndContinue = async () => {
       const transaction = response.data;
       await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
     } catch (error) {
-      console.log(error);
+      if (error.response.status === 412) {
+        if (error.response.data.type === "incomplete_customer_address") {
+          isAddressRequired.value = true;
+        }
+      }
     } finally {
       isStepProcessing.value = false
     }
@@ -106,6 +111,7 @@ const submitAndContinue = async () => {
                 <Progress
                     v-bind:currentStep="snapshot.value"
                     v-bind:quote="quote.data"
+                    v-bind:addressRequired="isAddressRequired"
                 />
                 <div class="xl:col-span-2 px-3">
                   <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center min-w-96 mx-auto min-h-96">
