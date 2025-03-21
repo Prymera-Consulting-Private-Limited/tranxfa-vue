@@ -1,6 +1,5 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import Calculator from "@/components/Calculator.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useRecipientUtils} from "@/composables/recipient_utils.js";
@@ -58,7 +57,7 @@ const recipientCreated = (recipient) => {
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
-          <div class="grid grid-cols-1 gap-4 lg:col-span-2">
+          <div class="grid grid-cols-1 gap-4 lg:col-span-3">
             <section aria-labelledby="section-2-title">
               <div class="flex justify-between items-center">
                 <div>
@@ -78,7 +77,7 @@ const recipientCreated = (recipient) => {
                 </ul>
               </template>
               <template v-else>
-                <ul v-if="recipients.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 border-t border-gray-200 py-6">
+                <ul v-if="recipients.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-gray-200 py-6">
                   <li v-for="(recipient, index) in recipients" :key="recipient.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center transition-transform transform hover:scale-105 shadow-sm hover:shadow-md">
                     <router-link :to="{ name: 'viewRecipient', params: { id: recipient.id } }" class="cursor-pointer">
                       <RecipientCard v-bind:cardColor="colors[index%6]" v-bind:recipient="recipient" />
@@ -100,16 +99,6 @@ const recipientCreated = (recipient) => {
                   </div>
                 </template>
               </template>
-            </section>
-          </div>
-
-          <!-- Right column -->
-          <div class="grid grid-cols-1 gap-4">
-            <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Send Money</h2>
-              <div class="rounded-lg bg-white shadow-lg p-5 pb-16">
-                <Calculator />
-              </div>
             </section>
           </div>
         </div>
