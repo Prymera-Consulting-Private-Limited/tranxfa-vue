@@ -19,8 +19,9 @@ onMounted(async () => {
       .listen('PaymentTransactionStateUpdated', (e) => {
         props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
       });
-
-  props.transaction.payment.state.code = PaymentState.REDIRECTED;
+  if (props.transaction.payment.state.code === PaymentState.PENDING) {
+    props.transaction.payment.state.code = PaymentState.REDIRECTED;
+  }
 })
 
 onUnmounted(async () => {
