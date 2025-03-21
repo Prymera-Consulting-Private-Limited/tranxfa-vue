@@ -1,5 +1,5 @@
 <script setup>
-import {CheckIcon, PaperAirplaneIcon, XMarkIcon, UserIcon} from "@heroicons/vue/24/outline";
+import {CheckIcon} from "@heroicons/vue/24/outline";
 import {computed, ref} from "vue";
 import TransactionQuote from "@/models/transaction_quote.js";
 import FlagIcon from "vue3-flag-icons";
@@ -28,6 +28,12 @@ const steps = [
     show: true,
   },
   {
+    id: 'verifyIdentity',
+    name: 'Verify Your Identity',
+    description: 'For security and compliance, please verify your identity before proceeding with the transaction.',
+    show: false,
+  },
+  {
     id: 'addRecipient',
     name: 'Add Recipient Details',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
@@ -43,12 +49,6 @@ const steps = [
     id: 'provideAddress',
     name: 'Provide Your Address',
     description: 'For security and compliance, we need your address details before proceeding.',
-    show: false,
-  },
-  {
-    id: 'verifyIdentity',
-    name: 'Verify Your Identity',
-    description: 'A quick identity check ensures your transfer is safe and secure.',
     show: false,
   },
   {
@@ -71,7 +71,6 @@ const progress = computed(() => steps.map((step) => {
   }
   if (step.id === 'provideAddress') {
     step.show = props.addressRequired;
-    console.log(step);
   }
   const currentStepIndex = steps.findIndex((o) => o.id === step.id);
   const cursor = steps.findIndex((o) => o.id === props.currentStep);
