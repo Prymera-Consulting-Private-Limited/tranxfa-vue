@@ -1,6 +1,7 @@
 <script setup>
 import Recipient from "@/models/recipient.js";
 import FlagIcon from "vue3-flag-icons";
+import {useTimeUtils} from "@/composables/time_utils.js";
 
 defineProps({
   recipient: {
@@ -12,10 +13,12 @@ defineProps({
     required: true,
   }
 })
+
+const timeUtils = useTimeUtils();
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col p-8">
+  <div class="flex flex-1 flex-col px-4 py-5">
     <div :class="[`bg-${cardColor}-500`]" class="flex items-center justify-center mx-auto size-10 shrink-0 rounded-full text-white tracking-wider text-sm">
       {{ recipient.firstName.charAt(0) + recipient.lastName.charAt(0) }}
     </div>
@@ -35,6 +38,20 @@ defineProps({
         </dd>
       </template>
       <slot />
+      <template v-if="recipient.transactionSummary">
+        <dt class="sr-only">Last transaction sent on</dt>
+        <dd class="text-gray-500 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
+          <p>Last transaction</p>
+          <p class="text-purple-700">{{ timeUtils.getNiceTime(recipient.transactionSummary.recentTransactionAt) }}</p>
+        </dd>
+      </template>
+      <template v-else>
+        <dt class="sr-only">You've never sent money to {{ recipient.fullName }}</dt>
+        <dd class="text-gray-400 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
+          <p>You've never sent money to</p>
+          <p>{{ recipient.fullName }}</p>
+        </dd>
+      </template>
     </dl>
   </div>
 </template>
