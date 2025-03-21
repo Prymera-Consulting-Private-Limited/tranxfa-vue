@@ -2,6 +2,7 @@ import Relationship from "@/models/relationship.js";
 import PayoutChannel from "@/models/payout_channel.js";
 import RecipientAttribute from "@/models/recipient_attribute.js";
 import RecipientAccountDetail from "@/models/recipient_account_detail.js";
+import RecipientTransactionSummary from "@/models/recipient_transaction_summary.js";
 
 class Recipient {
 
@@ -62,6 +63,11 @@ class Recipient {
 
     accountDetailHashMap = [];
 
+    /**
+     * @type {RecipientTransactionSummary|null}
+     */
+    transactionSummary = null;
+
     static getInstance(data) {
         let recipient = new Recipient();
         recipient.id = data.id;
@@ -82,6 +88,10 @@ class Recipient {
         }
         if (data.account_detail_hashmap) {
             recipient.accountDetailHashMap = data.account_detail_hashmap || [];
+        }
+        if (data.transaction_summary) {
+            recipient.transactionSummary = RecipientTransactionSummary.getInstance(data.transaction_summary);
+
         }
 
         if (data.attributes?.length > 0) {
