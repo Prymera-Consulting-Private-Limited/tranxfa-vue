@@ -2,8 +2,9 @@
 import Recipient from "@/models/recipient.js";
 import FlagIcon from "vue3-flag-icons";
 import {useTimeUtils} from "@/composables/time_utils.js";
+import {onMounted, ref} from "vue";
 
-defineProps({
+const props = defineProps({
   recipient: {
     type: Recipient,
     required: true,
@@ -15,6 +16,19 @@ defineProps({
 })
 
 const timeUtils = useTimeUtils();
+
+const lastSentOn = ref(null)
+
+const updateTimestamp = () => {
+  lastSentOn.value = props.recipient.transactionSummary?.recentTransactionAt ? timeUtils.getNiceTime(props.recipient.transactionSummary.recentTransactionAt) : null;
+}
+
+let intervalId;
+
+onMounted(() => {
+  updateTimestamp();
+  intervalId = setInterval(updateTimestamp, 5000);
+})
 </script>
 
 <template>
@@ -38,11 +52,11 @@ const timeUtils = useTimeUtils();
         </dd>
       </template>
       <slot />
-      <template v-if="recipient.transactionSummary">
+      <template v-if="lastSentOn">
         <dt class="sr-only">Last transaction sent on</dt>
         <dd class="text-gray-500 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
           <p>Last transaction</p>
-          <p class="text-purple-700">{{ timeUtils.getNiceTime(recipient.transactionSummary.recentTransactionAt) }}</p>
+          <p class="text-purple-700">{{ lastSentOn }}</p>
         </dd>
       </template>
       <template v-else>
