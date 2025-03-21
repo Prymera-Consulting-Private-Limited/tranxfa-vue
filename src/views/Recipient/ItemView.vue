@@ -45,7 +45,7 @@ onMounted(async () => {
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Your Recipients</h1>
         <!-- Main 3 column grid -->
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-t-lg p-5">
+        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-t-lg p-5 shadow-lg">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">
@@ -124,7 +124,7 @@ onMounted(async () => {
           <div class="grid grid-cols-1 gap-4" v-if="!isLoading">
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Send Money</h2>
-              <div class="rounded-lg bg-white shadow-lg p-5 pb-16">
+              <div class="rounded-lg bg-white p-5 pb-8 border border-dashed border-gray-300 border-1">
                 <Calculator v-bind:recipient="recipient" />
               </div>
             </section>
