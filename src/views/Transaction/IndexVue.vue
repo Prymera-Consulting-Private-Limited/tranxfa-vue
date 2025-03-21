@@ -18,7 +18,7 @@ import Calculator from "@/components/Calculator.vue";
           <div class="grid grid-cols-1 gap-4">
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Send Money</h2>
-              <div class="rounded-lg bg-white shadow-lg p-5 pb-16">
+              <div class="rounded-lg bg-white shadow-lg p-5 pb-8">
                 <Calculator />
               </div>
             </section>
