@@ -37,20 +37,20 @@ onUnmounted(async () => {
 
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.REDIRECTED">
-    <PendingReceived />
-    <h2 class="text-2xl font-semibold text-gray-900 mb-5 mt-5">Payment in Progress</h2>
-    <p class="text-base text-gray-600 mb-6">Please make a bank transfer of {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }} to our following bank account.</p>
+    <PendingReceived class="-mt-10" />
+    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">Payment in Progress</h2>
+    <p class="text-base text-gray-600">Please make a bank transfer of {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }} to our following bank account.</p>
   </template>
 
   <template v-else-if="transaction.payment.state.code === PaymentState.AUTHORIZED || transaction.payment.state.code === PaymentState.CAPTURED">
-    <PaymentCompleted />
-    <h2 class="text-2xl font-semibold text-green-700 mb-5 mt-5">Payment Successful</h2>
-    <p class="text-base text-gray-600 mb-6">Your payment has been successfully received.</p>
+    <PaymentCompleted class="-mt-10" />
+    <h2 class="text-2xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
+    <p class="text-base text-gray-600">Your payment has been successfully received.</p>
   </template>
 
   <template v-else>
-    <AwaitingPending />
-    <h2 class="text-2xl font-semibold text-gray-900 mb-5 mt-5">Please wait...</h2>
-    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
+    <AwaitingPending class="-mt-10" />
+    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">Please wait...</h2>
+    <p class="text-base text-gray-600">Please wait while we are setting up the payment.</p>
   </template>
 </template>

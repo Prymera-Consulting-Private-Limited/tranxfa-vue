@@ -33,27 +33,27 @@ const redirected = async () => {
 <template>
 
   <template v-if="transaction.payment.state.code === PaymentState.REDIRECTED">
-    <PendingReceived />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 mt-5">Awaiting Payment Updated</h2>
+    <PendingReceived class="-mt-10" />
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Updated</h2>
     <p class="text-base text-gray-600 mb-6">We have opened a new browser window for you to complete the payment.</p>
   </template>
 
   <template v-else-if="transaction.payment.state.code === PaymentState.AUTHORIZED || transaction.payment.state.code === PaymentState.CAPTURED">
-    <PaymentCompleted />
-    <h2 class="text-xl font-semibold text-green-700 mb-5 mt-5">Payment Successful</h2>
+    <PaymentCompleted class="-mt-10" />
+    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
     <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
   </template>
 
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
-    <AwaitingPending />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 mt-5">Complete Your Payment</h2>
+    <AwaitingPending class="-mt-10" />
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Complete Your Payment</h2>
     <p class="text-base text-gray-600 mb-6">Your transaction is pending. To proceed, please click the button below and complete the payment.</p>
     <a @click="redirected" :href="`https://gateway-web.fit.interac.ca/acceptPaymentRequest.do?rID=${transaction.payment.sharedReference}`" class="mt-6 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm" target="_blank">Proceed to Payment</a>
   </template>
 
   <template v-else>
-    <AwaitingPending />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 mt-5">Please wait...</h2>
+    <AwaitingPending class="-mt-10" />
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait...</h2>
     <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
   </template>
 </template>
