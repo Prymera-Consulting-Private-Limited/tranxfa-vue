@@ -1,0 +1,15 @@
+const PaymentState = Object.freeze({
+    CREATED: 'CREATED',
+    INITIALIZED: 'INITIALIZED',
+    PENDING: 'PENDING',
+    REDIRECTED: 'REDIRECTED',
+    AUTHORIZED: 'AUTHORIZED',
+    CAPTURED: 'CAPTURED',
+    FAILED: 'FAILED',
+    TIMED_OUT: 'TIMED_OUT',
+    PART_REFUNDED: 'PART_REFUNDED',
+    REFUNDED: 'REFUNDED',
+    CANCELLED: 'CANCELLED',
+});
+
+export default PaymentState;
