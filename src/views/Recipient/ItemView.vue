@@ -9,11 +9,24 @@ import Recipient from "@/models/recipient.js";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import PageHeadingShimmer from "@/components/PageHeadingShimmer.vue";
 import ItemDescriptionShimmer from "@/components/ItemDescriptionShimmer.vue";
+import {useTimeUtils} from "@/composables/time_utils.js";
 
 const recipientUtils = useRecipientUtils();
 const isLoading = ref(true);
 const id = router.currentRoute.value.params.id;
 const recipient = ref(null);
+
+
+
+const timeUtils = useTimeUtils();
+
+const lastSentOn = ref(null)
+
+const updateTimestamp = () => {
+  lastSentOn.value = recipient.value?.transactionSummary?.recentTransactionAt ? timeUtils.getNiceTime(recipient.value.transactionSummary.recentTransactionAt) : null;
+}
+
+let intervalId;
 
 onMounted(async () => {
   await recipientUtils.getRecipient(id).then((response) => {
@@ -21,6 +34,8 @@ onMounted(async () => {
   }).finally(() => {
     isLoading.value = false;
   })
+  updateTimestamp();
+  intervalId = setInterval(updateTimestamp, 30000);
 });
 </script>
 
@@ -68,6 +83,12 @@ onMounted(async () => {
                       <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Email</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                         <div class="text-gray-900">{{ recipient.email }}</div>
+                      </dd>
+                    </div>
+                    <div class="py-6 sm:flex">
+                      <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Recent Transaction</dt>
+                      <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+                        <div class="text-gray-900">{{ lastSentOn || 'You have not sent any transaction yet.' }}</div>
                       </dd>
                     </div>
                   </dl>

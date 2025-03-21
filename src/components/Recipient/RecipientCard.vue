@@ -27,7 +27,7 @@ let intervalId;
 
 onMounted(() => {
   updateTimestamp();
-  intervalId = setInterval(updateTimestamp, 5000);
+  intervalId = setInterval(updateTimestamp, 30000);
 })
 </script>
 
