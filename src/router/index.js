@@ -58,7 +58,16 @@ const router = createRouter({
     }, {
       path: '/transactions',
       name: 'transactions',
-      component: () => import('@/views/TransactionListingView.vue'),
+      component: () => import('@/views/Transaction/IndexVue.vue'),
+      meta: {
+        title: 'Transactions',
+        description: '',
+      },
+    }, {
+      path: '/transaction/:transactionId',
+      name: 'viewTransaction',
+      props: route => ({ id: route.params.transactionId }),
+      component: () => import('@/views/Transaction/IndexVue.vue'),
       meta: {
         title: 'Transactions',
         description: '',
@@ -74,6 +83,7 @@ const router = createRouter({
     }, {
       path: '/recipient/:id',
       name: 'viewRecipient',
+      props: route => ({ id: route.params.id }),
       component: () => import('@/views/Recipient/ItemView.vue'),
       meta: {
         title: 'Recipients',
