@@ -198,7 +198,7 @@ function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <UserIcon class="size-4 text-white"/>
                     </span>
-                    <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.fullName || 'Recipient Gets' }}</label>
+                    <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.fullName || 'Recipient' }} Gets</label>
                   </div>
                   <div class="mt-4">
                     <MoneyInput
