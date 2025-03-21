@@ -58,11 +58,25 @@ export const transactionNavigationMachine = createMachine({
                 },
             }
         },
+        provideAddress: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'confirm',
+                    },
+                ],
+            }
+        },
         confirm: {
             on: {
                 CONFIRMED: [
                     {
                         target: 'confirmed',
+                    },
+                ],
+                ADDRESS_REQUIRED: [
+                    {
+                        target: 'provideAddress',
                     },
                 ],
                 SET_CONTEXT: {
