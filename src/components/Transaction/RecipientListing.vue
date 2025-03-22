@@ -1,8 +1,6 @@
 <script setup>
 import RecipientCard from "@/components/Recipient/RecipientCard.vue";
-import Calculator from "@/components/Calculator.vue";
 import TransactionQuote from "@/models/transaction_quote.js";
-import QuoteDisplay from "@/components/QuoteDisplay.vue";
 import AddRecipientCard from "@/components/Recipient/AddRecipientCard.vue";
 
 defineProps({
