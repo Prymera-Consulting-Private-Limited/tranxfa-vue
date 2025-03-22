@@ -14,7 +14,8 @@ import Progress from "@/components/Transaction/Progress.vue";
 import RecipientCardShimmer from "@/components/Recipient/RecipientCardShimmer.vue";
 import vSelect from 'vue-select';
 import router from "@/router/index.js";
-
+import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
+import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const props = defineProps({
@@ -88,12 +89,18 @@ const submitAndContinue = async () => {
       if (error.response.status === 412) {
         if (error.response.data.type === "incomplete_customer_address") {
           isAddressRequired.value = true;
+          send({ type: 'ADDRESS_REQUIRED' });
         }
       }
     } finally {
       isStepProcessing.value = false
     }
   }
+}
+
+const customerAttributeCategoryUpdated = () => {
+  isStepProcessing.value = false;
+  send({ type: 'PROCEED' });
 }
 </script>
 
@@ -140,7 +147,16 @@ const submitAndContinue = async () => {
                         </div>
                       </template>
                     </template>
-
+                    <template v-if="snapshot.value === 'provideAddress'">
+                      <p class="text-gray-500 text-sm mb-4">For security and compliance, we need your address details before proceeding.</p>
+                      <CustomerAttributeForm
+                          v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
+                          v-bind:updateOutsourced="true"
+                          v-bind:updateCommandReceived="isStepProcessing"
+                          v-on:customer:attribute_category:updated="customerAttributeCategoryUpdated"
+                          v-on:customer:attribute_category:update_failed="isStepProcessing = false"
+                      />
+                    </template>
                     <Confirm
                         v-else-if="snapshot.value === 'confirm'"
                         v-bind:quote="quote.data"
