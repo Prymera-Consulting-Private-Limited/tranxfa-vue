@@ -105,14 +105,16 @@ const submitAndContinue = async () => {
       if (error.response.status === 412) {
         if (error.response.data.type === "incomplete_customer_address") {
           isAddressRequired.value = true;
-          send({ type: 'ADDRESS_REQUIRED' });
           isStepProcessing.value = false;
+          await send({ type: 'ADDRESS_REQUIRED' });
+          return ;
         }
       }
     }
+  } else if (snapshot.value?.value !== 'provideAddress') {
+    send({ type: 'SET_CONTEXT', quote: quote.data });
+    send({ type: 'PROCEED' });
   }
-  send({ type: 'SET_CONTEXT', quote: quote.data });
-  send({ type: 'PROCEED' });
 }
 
 const customerAttributeCategoryUpdated = () => {
@@ -180,7 +182,7 @@ const showContinueButton = computed(() => {
                       <CustomerAttributeForm
                           v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
                           v-bind:updateOutsourced="true"
-                          v-bind:updateCommandReceived="isStepProcessing"
+                          v-bind:externalSaveTrigger="isStepProcessing"
                           v-on:customer:attribute_category:updated="customerAttributeCategoryUpdated"
                           v-on:customer:attribute_category:update_failed="isStepProcessing = false"
                       />
