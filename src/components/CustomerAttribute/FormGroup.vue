@@ -5,7 +5,7 @@ import MiddleNameInput from "@/components/CustomerAttribute/MiddleNameInput.vue"
 import LastNameInput from "@/components/CustomerAttribute/LastNameInput.vue";
 import DateOfBirthInput from "@/components/CustomerAttribute/DateOfBirthInput.vue";
 import NationalityInput from "@/components/CustomerAttribute/NationalityInput.vue";
-import TextInput from "@/components/Recipient/Attribute/TextInput.vue";
+import TextInput from "@/components/CustomerAttribute/TextInput.vue";
 
 defineProps({
   attr: {
@@ -29,6 +29,6 @@ const notifyAttributeUpdated = (attr, value) => {
   <LastNameInput v-else-if="attr.attribute === 'last_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
   <DateOfBirthInput v-else-if="attr.attribute === 'birth_detail.birth_date'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
   <NationalityInput v-else-if="attr.attribute === 'nationality_id'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
-  <TextInput v-else v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" :id="attr.attribute" />
+  <TextInput v-else v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" :id="attr.attribute" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
   <p v-if="attr.errors?.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ attr.errors[0] }}</p>
 </template>
