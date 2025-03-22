@@ -95,19 +95,19 @@ export function useCustomerUtils() {
         })
     }
 
-    async function updateProfileIdentity(data) {
+    async function updateProfileAttribute(data, categories) {
         const requestData = {};
         for (const attr of Object.keys(data)) {
             const unzipped = attr.split('.');
             if (unzipped.length === 1) {
                 requestData[attr] = data[attr];
             } else {
-                requestData[unzipped[0]] = {};
+                requestData[unzipped[0]] = requestData[unzipped[0]] || {};
                 requestData[unzipped[0]][unzipped[1]] = data[attr];
             }
         }
 
-        await axios.post('/client/v1/update?category=identity', requestData, {
+        await axios.post(`/client/v1/update?category=${categories}`, requestData, {
             headers: {
                 'X-Customer-Token': getAuthToken(),
             }
@@ -175,7 +175,7 @@ export function useCustomerUtils() {
         resendEmailVerification,
         verifyEmail,
         updateCountry,
-        updateProfileIdentity,
+        updateProfileAttribute,
         updateMobileNumber,
         logout,
         getAccountVerificationToken,
