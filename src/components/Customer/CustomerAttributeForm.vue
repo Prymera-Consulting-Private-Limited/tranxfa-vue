@@ -1,7 +1,7 @@
 <script setup>
 import FormGroup from "@/components/CustomerAttribute/FormGroup.vue";
 import Spinner from "@/components/Spinner.vue";
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, onMounted, reactive, ref, watchEffect} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 
@@ -23,7 +23,7 @@ const props = defineProps({
     required: false,
     default: false,
   },
-  updateCommandReceived: {
+  externalSaveTrigger: {
     type: Boolean,
     required: false,
     default: false,
@@ -81,8 +81,9 @@ onMounted(() => {
   }
 })
 
-watch(() => props.updateCommandReceived, (value) => {
-  if (value) {
+watchEffect(() => {
+  console.log(props.updateOutsourced, props.externalSaveTrigger);
+  if (props.updateOutsourced && props.externalSaveTrigger) {
     update();
   }
 })
