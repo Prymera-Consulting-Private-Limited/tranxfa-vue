@@ -111,7 +111,7 @@ const submitAndContinue = async () => {
     }
   }
   send({ type: 'PROCEED' });
-  isStepProcessing.value = true
+  isStepProcessing.value = false;
 }
 
 const customerAttributeCategoryUpdated = () => {
