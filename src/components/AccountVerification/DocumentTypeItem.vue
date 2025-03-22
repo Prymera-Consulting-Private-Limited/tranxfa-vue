@@ -7,6 +7,9 @@ import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/
 import Sumsub from "@/components/AccountVerification/Provider/Sumsub.vue";
 import Spinner from "@/components/Spinner.vue";
 import DocumentCategory from "@/models/document_category.js";
+import {useCustomerUtils} from "@/composables/customer_utils.js";
+
+const customerUtils = useCustomerUtils();
 
 const props = defineProps({
   documentCategory: {
