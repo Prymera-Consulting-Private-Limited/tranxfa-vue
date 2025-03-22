@@ -21,7 +21,9 @@ export const transactionNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'verifyIdentity',
-                        guard: ({context}) => customerStore.isLoaded && customer.data?.pendingDocuments?.find(category => category.code === 'POI') !== null,
+                        guard: ({context}) => {
+                            return customerStore.isLoaded && (customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null) !== null
+                        },
                     }, {
                         target: 'addRecipient',
                         guard: ({context}) => context.quote?.recipients?.length === 0,
