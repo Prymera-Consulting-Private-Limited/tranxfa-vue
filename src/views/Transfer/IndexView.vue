@@ -95,6 +95,7 @@ const purpose = ref(null);
 const isAddressRequired = ref(false);
 
 const submitAndContinue = async () => {
+  console.log(snapshot.value?.value);
   isStepProcessing.value = true
   if (snapshot.value?.value === 'confirm') {
     try {
@@ -111,6 +112,11 @@ const submitAndContinue = async () => {
         }
       }
     }
+  } else if (snapshot.value?.value === 'verifyIdentity') {
+    console.log('Here we are');
+    await customerUtils.refresh();
+    await send({ type: 'SET_CONTEXT', quote: quote.data });
+    await send({ type: 'PROCEED' });
   } else if (snapshot.value?.value !== 'provideAddress') {
     await send({ type: 'SET_CONTEXT', quote: quote.data });
     await send({ type: 'PROCEED' });
@@ -118,6 +124,11 @@ const submitAndContinue = async () => {
 }
 
 const customerAttributeCategoryUpdated = () => {
+  isStepProcessing.value = false;
+  send({ type: 'PROCEED' });
+}
+
+const sdkFinalStateReached = async () => {
   isStepProcessing.value = false;
   send({ type: 'PROCEED' });
 }
@@ -195,11 +206,10 @@ const showContinueButton = computed(() => {
                           <DocumentTypeItem
                               v-bind:documentType="documentType"
                               v-bind:documentCategory="identityDocumentCategory"
-                              v-on:sdkFinalStateReached="submitAndContinue"
+                              v-on:sdkFinalStateReached="sdkFinalStateReached"
                           />
                         </li>
                       </ul>
-
                     </template>
                     <Confirm
                         v-else-if="snapshot.value === 'confirm'"
