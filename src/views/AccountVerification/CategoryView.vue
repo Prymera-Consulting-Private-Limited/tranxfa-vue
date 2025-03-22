@@ -53,7 +53,7 @@ const finalStateReached = async () => {
                       <DocumentTypeItem
                           v-bind:documentType="documentType"
                           v-bind:documentCategory="selectedCategory.data"
-                          v-on:sdkFinalStateReached=""
+                          v-on:sdkFinalStateReached="finalStateReached"
                       />
                     </li>
                   </ul>
