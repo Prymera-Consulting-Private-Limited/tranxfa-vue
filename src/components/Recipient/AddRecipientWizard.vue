@@ -154,7 +154,7 @@ const saveRecipientFailed = (error) => {
           v-bind:payoutChannel="recipient.payoutChannel"
           v-bind:type="recipient.type"
           v-bind:relationships="relationships"
-          v-bind:isSubmitted = "externalSaveTrigger"
+          v-bind:isSubmitted="externalSaveTrigger"
           v-bind:quote="props.quote"
           v-on:recipient:added="recipientAdded"
           v-on:recipient:add:failed="saveRecipientFailed"
