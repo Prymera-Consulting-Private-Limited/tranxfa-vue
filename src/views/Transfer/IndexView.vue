@@ -100,6 +100,7 @@ const submitAndContinue = async () => {
     try {
       const response = await quoteUtils.confirmQuote(quote.data, purpose.value);
       const transaction = response.data;
+      isStepProcessing.value = false;
       await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
     } catch (error) {
       if (error.response.status === 412) {
@@ -107,13 +108,12 @@ const submitAndContinue = async () => {
           isAddressRequired.value = true;
           isStepProcessing.value = false;
           await send({ type: 'ADDRESS_REQUIRED' });
-          return ;
         }
       }
     }
   } else if (snapshot.value?.value !== 'provideAddress') {
-    send({ type: 'SET_CONTEXT', quote: quote.data });
-    send({ type: 'PROCEED' });
+    await send({ type: 'SET_CONTEXT', quote: quote.data });
+    await send({ type: 'PROCEED' });
   }
 }
 
