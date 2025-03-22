@@ -106,12 +106,13 @@ const submitAndContinue = async () => {
         if (error.response.data.type === "incomplete_customer_address") {
           isAddressRequired.value = true;
           send({ type: 'ADDRESS_REQUIRED' });
+          isStepProcessing.value = false;
         }
       }
     }
   }
+  send({ type: 'SET_CONTEXT', quote: quote.data });
   send({ type: 'PROCEED' });
-  isStepProcessing.value = false;
 }
 
 const customerAttributeCategoryUpdated = () => {
