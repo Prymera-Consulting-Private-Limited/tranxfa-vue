@@ -36,11 +36,11 @@ onMounted(() => {
     <div :class="[`bg-${cardColor}-500`]" class="flex items-center justify-center mx-auto size-10 shrink-0 rounded-full text-white tracking-wider text-sm">
       {{ recipient.firstName.charAt(0) + recipient.lastName.charAt(0) }}
     </div>
-    <h3 class="mt-6 text-sm font-medium text-gray-900">{{ recipient.fullName }}</h3>
+    <h3 class="mt-6 text-sm font-medium text-gray-900 break-words">{{ recipient.fullName }}</h3>
     <dl class="mt-1 flex grow flex-col justify-between">
       <template v-if="recipient?.channel?.country">
         <dt class="sr-only">In Country</dt>
-        <dd class="text-gray-500 text-sm leading-5 flex items-center mx-auto gap-x-2">
+        <dd class="text-gray-500 text-sm leading-5 flex items-center mx-auto gap-x-2 truncate">
           <FlagIcon :code="recipient.channel.country.iso2Alpha.toLowerCase()" circle  />
           {{ recipient.channel.country.commonName }}
         </dd>
