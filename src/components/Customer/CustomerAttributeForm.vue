@@ -66,7 +66,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <form @submit.prevent="update" class="space-y-6 mt-12">
+  <form @submit.prevent="update" class="space-y-6">
     <div v-for="attribute in attributes" :key="attribute.attribute">
       <FormGroup v-on:customer:attribute:updated="updateFormData" v-bind:attr="attribute" />
     </div>
