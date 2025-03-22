@@ -1,7 +1,7 @@
 <script setup>
 import FormGroup from "@/components/CustomerAttribute/FormGroup.vue";
 import Spinner from "@/components/Spinner.vue";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 
@@ -17,6 +17,16 @@ const props = defineProps({
   categories: {
     type: String,
     required: true,
+  },
+  updateOutsourced: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  updateCommandReceived: {
+    type: Boolean,
+    required: false,
+    default: false,
   }
 })
 
@@ -32,17 +42,24 @@ const form = reactive({
 
 const isSaving = ref(false);
 
+const emit = defineEmits([
+  'customer:attribute_category:updated',
+  'customer:attribute_category:update_failed',
+])
+
 async function update() {
   isSaving.value = true;
   form.errors = null;
-  customerUtils.updateProfileIdentity(form.data).catch((e) => {
+  customerUtils.updateProfileAttribute(form.data, props.categories).catch((e) => {
+    emit('customer:attribute_category:update_failed', e);
     if (e.status === 422) {
       form.errors = e.response.data.errors;
     } else {
       console.error(e);
     }
-    isSaving.value = false;
-  })
+  }).then(() => {
+    emit('customer:attribute_category:updated');
+  });
 }
 
 const attributes = computed(() => {
@@ -63,6 +80,12 @@ onMounted(() => {
     form.data[attribute.attribute] = attribute.value;
   }
 })
+
+watch(() => props.updateCommandReceived, (value) => {
+  if (value) {
+    update();
+  }
+})
 </script>
 
 <template>
@@ -70,7 +93,7 @@ onMounted(() => {
     <div v-for="attribute in attributes" :key="attribute.attribute">
       <FormGroup v-on:customer:attribute:updated="updateFormData" v-bind:attr="attribute" />
     </div>
-    <button :disabled="showLoading || isSaving" :class="[{'opacity-70': showLoading || isSaving}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition cursor-pointer">
+    <button v-if="! updateOutsourced" :disabled="showLoading || isSaving" :class="[{'opacity-70': showLoading || isSaving}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition cursor-pointer">
       <template v-if="isSaving">
         <span class="flex items-center justify-center whitespace-nowrap">
           <Spinner :class="'size-4 mr-2'" />
