@@ -34,7 +34,7 @@ const showLoading = computed(() => {
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 mt-8">Personal Details</h2>
-      <p class="text-md text-[#B7A3C1] mb-8">Complete your profile by providing some details about you</p>
+      <p class="text-md text-[#B7A3C1] mb-12">Complete your profile by providing some details about you</p>
       <!-- Form -->
       <CustomerAttributeForm v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`" v-bind:showLoading="showLoading" />
     </div>
