@@ -120,7 +120,7 @@ const customerAttributeCategoryUpdated = () => {
 }
 
 const isIdentityDocumentRequired = computed(() => {
-  return customer.data?.pendingDocuments?.find(category => category.code === 'POI') !== null;
+  return (customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null) !== null;
 });
 
 const identityDocumentCategory = computed(() => customer.data?.pendingDocuments?.find(category => category.code === 'POI'));
