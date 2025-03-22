@@ -1,5 +1,14 @@
 import { assign, createMachine } from 'xstate';
 
+import {useCustomerStore} from "@/stores/customer.js";
+
+const customerStore = useCustomerStore();
+
+/**
+ * @type {{data: Customer | null}}
+ */
+const customer = customerStore.customer;
+
 export const transactionNavigationMachine = createMachine({
     id: 'moneyTransfer',
     initial: 'checkRecipients',
@@ -8,6 +17,27 @@ export const transactionNavigationMachine = createMachine({
     },
     states: {
         checkRecipients: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'verifyIdentity',
+                        guard: ({context}) => customerStore.isLoaded && customer.data?.pendingDocuments?.find(category => category.code === 'POI') !== null,
+                    }, {
+                        target: 'addRecipient',
+                        guard: ({context}) => context.quote?.recipients?.length === 0,
+                    },
+                    {
+                        target: 'selectRecipient',
+                    },
+                ],
+                SET_CONTEXT: {
+                    actions: assign({
+                        quote: ({context, event}) => event.quote || context.quote
+                    })
+                },
+            }
+        },
+        verifyIdentity: {
             on: {
                 PROCEED: [
                     {
@@ -23,7 +53,7 @@ export const transactionNavigationMachine = createMachine({
                         quote: ({context, event}) => event.quote || context.quote
                     })
                 },
-            },
+            }
         },
         addRecipient: {
             on: {

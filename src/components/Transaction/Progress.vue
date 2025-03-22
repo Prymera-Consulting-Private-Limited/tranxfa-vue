@@ -1,6 +1,6 @@
 <script setup>
 import {CheckIcon} from "@heroicons/vue/24/outline";
-import {computed, ref} from "vue";
+import {computed} from "vue";
 import TransactionQuote from "@/models/transaction_quote.js";
 import FlagIcon from "vue3-flag-icons";
 
@@ -14,6 +14,11 @@ const props = defineProps({
     required: false
   },
   addressRequired: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  identityDocumentRequired: {
     type: Boolean,
     required: false,
     default: false
@@ -71,6 +76,9 @@ const progress = computed(() => steps.map((step) => {
   }
   if (step.id === 'provideAddress') {
     step.show = props.addressRequired;
+  }
+  if (step.id === 'verifyIdentity') {
+    step.show = props.identityDocumentRequired;
   }
   const currentStepIndex = steps.findIndex((o) => o.id === step.id);
   const cursor = steps.findIndex((o) => o.id === props.currentStep);

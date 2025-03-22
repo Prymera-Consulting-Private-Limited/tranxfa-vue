@@ -16,8 +16,20 @@ import vSelect from 'vue-select';
 import router from "@/router/index.js";
 import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
+import {useCustomerStore} from "@/stores/customer.js";
+import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.vue";
+import {useCustomerUtils} from "@/composables/customer_utils.js";
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
+
+const customerStore = useCustomerStore();
+const customerUtils = useCustomerUtils();
+
+/**
+ * @type {{data: Customer|null}}
+ */
+const customer = customerStore.customer;
+
 const props = defineProps({
   id: {
     type: String,
@@ -33,6 +45,10 @@ const quote = reactive({
 const isLoading = ref(false);
 
 onMounted(async () => {
+  if (customerStore.isLoaded === false) {
+    isLoading.value = true;
+    await customerUtils.refresh()
+  }
   if (! quote.data) {
     isLoading.value = true;
     await quoteUtils.getTransferQuote(props.id).then((response) => {
@@ -92,16 +108,26 @@ const submitAndContinue = async () => {
           send({ type: 'ADDRESS_REQUIRED' });
         }
       }
-    } finally {
-      isStepProcessing.value = false
     }
   }
+  send({ type: 'PROCEED' });
+  isStepProcessing.value = true
 }
 
 const customerAttributeCategoryUpdated = () => {
   isStepProcessing.value = false;
   send({ type: 'PROCEED' });
 }
+
+const isIdentityDocumentRequired = computed(() => {
+  return customer.data?.pendingDocuments?.find(category => category.code === 'POI') !== null;
+});
+
+const identityDocumentCategory = computed(() => customer.data?.pendingDocuments?.find(category => category.code === 'POI'));
+
+const showContinueButton = computed(() => {
+  return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'verifyIdentity');
+});
 </script>
 
 <template>
@@ -119,6 +145,7 @@ const customerAttributeCategoryUpdated = () => {
                     v-bind:currentStep="snapshot.value"
                     v-bind:quote="quote.data"
                     v-bind:addressRequired="isAddressRequired"
+                    v-bind:identityDocumentRequired="isIdentityDocumentRequired"
                 />
                 <div class="xl:col-span-2 px-3">
                   <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center min-w-96 mx-auto min-h-96">
@@ -156,6 +183,20 @@ const customerAttributeCategoryUpdated = () => {
                           v-on:customer:attribute_category:updated="customerAttributeCategoryUpdated"
                           v-on:customer:attribute_category:update_failed="isStepProcessing = false"
                       />
+                    </template>
+                    <template v-if="snapshot.value === 'verifyIdentity'">
+                      <h3 class="text-gray-900 mb-4 font-semibold">Verify your identity</h3>
+                      <p class="text-gray-500 text-sm mb-6">To ensure the security of your transactions and compliance with financial regulations, we need to verify your identity. Please provide a valid government-issued ID. The details on your document should match the information we have on record.</p>
+                      <ul v-if="identityDocumentCategory?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                        <li v-for="documentType in identityDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
+                          <DocumentTypeItem
+                              v-bind:documentType="documentType"
+                              v-bind:documentCategory="identityDocumentCategory"
+                              v-on:sdkFinalStateReached="submitAndContinue"
+                          />
+                        </li>
+                      </ul>
+
                     </template>
                     <Confirm
                         v-else-if="snapshot.value === 'confirm'"
@@ -198,7 +239,7 @@ const customerAttributeCategoryUpdated = () => {
                   </v-select>
                 </template>
               </template>
-              <button v-if="snapshot.value?.value !== 'selectRecipient'" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-6 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+              <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-6 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
                 <span v-if="isStepProcessing" class="flex justify-center items-center">
                   <Spinner :class="'w-5 h-5 mr-3'"/>
                   <span>Saving...</span>
