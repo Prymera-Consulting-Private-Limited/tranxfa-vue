@@ -100,6 +100,7 @@ const router = createRouter({
     }, {
       path: '/account-verification/upload/:category',
       name: 'categoryView',
+      props: route => ({ id: route.params.category }),
       component: () => import('@/views/AccountVerification/CategoryView.vue'),
       meta: {
         title: 'Account Verification',
