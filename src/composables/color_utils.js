@@ -33,15 +33,15 @@ export function useColorUtils () {
         return getClass('text', color, variable);
     }
 
-    const getBgClassOpacity = (color, variable, opacity) => {
+    const getBgClassWithOpacity = (color, variable, opacity) => {
         return getClassWithOpacity('bg', color, variable, opacity);
     }
 
-    const getBorderClassOpacity = (color, variable, opacity) => {
+    const getBorderClassWithOpacity = (color, variable, opacity) => {
         return getClassWithOpacity('border', color, variable, opacity);
     }
 
-    const getTextClassOpacity = (color, variable, opacity) => {
+    const getTextClassWithOpacity = (color, variable, opacity) => {
         return getClassWithOpacity('text', color, variable, opacity);
     }
 
@@ -51,8 +51,8 @@ export function useColorUtils () {
         getBgClass,
         getBorderClass,
         getTextClass,
-        getBgClassOpacity,
-        getBorderClassOpacity,
-        getTextClassOpacity,
+        getBgClassWithOpacity,
+        getBorderClassWithOpacity,
+        getTextClassWithOpacity,
     };
 }
