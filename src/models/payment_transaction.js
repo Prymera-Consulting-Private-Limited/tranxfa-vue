@@ -1,4 +1,7 @@
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
+import PaymentMethod from "@/models/payment_method.js";
+import PaymentProvider from "@/models/payment_provider.js";
+import PaymentAccount from "@/models/payment_account.js";
 
 class PaymentTransaction {
     /**
@@ -59,9 +62,12 @@ class PaymentTransaction {
     static getInstance(data) {
         const paymentTransaction = new PaymentTransaction();
         paymentTransaction.id = data.id;
-        paymentTransaction.paymentAccount = data.payment_account;
-        paymentTransaction.paymentMethod = data.payment_method;
-        paymentTransaction.paymentProvider = data.payment_provider;
+        if (data.payment_account) {
+            paymentTransaction.paymentAccount = PaymentAccount.getInstance(data.payment_account);
+        }
+
+        paymentTransaction.paymentMethod = PaymentMethod.getInstance(data.payment_method);
+        paymentTransaction.paymentProvider = PaymentProvider.getInstance(data.payment_provider);
         paymentTransaction.sharedReference = data.shared_reference;
         paymentTransaction.totalPaymentAmount = data.total_payment_amount;
         paymentTransaction.totalPaymentAmountFormatted = data.total_payment_amount_formatted;
