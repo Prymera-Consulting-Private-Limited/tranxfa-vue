@@ -47,6 +47,7 @@ class Transaction extends BaseTransaction {
         const transaction = new Transaction();
         transaction.createdAt = data.created_at;
         transaction.updatedAt = data.updated_at;
+        transaction.transactionNumber = data.transaction_number;
         if (data.recipient) {
             transaction.recipient = Recipient.getInstance(data.recipient);
         }
