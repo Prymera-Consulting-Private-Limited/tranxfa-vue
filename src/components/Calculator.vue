@@ -25,6 +25,7 @@ import Recipient from "@/models/recipient.js";
 import Spinner from "@/components/Spinner.vue";
 import router from "@/router/index.js";
 import TransactionQuote from "@/models/transaction_quote.js";
+import {useRecipientUtils} from "@/composables/recipient_utils.js";
 
 const props = defineProps({
   recipient: {
@@ -38,6 +39,7 @@ const isFetchingQuote = ref(true);
 const isSavingQuote = ref(false);
 
 const quoteUtil = useQuoteUtils();
+const recipientUtil = useRecipientUtils();
 
 const query = reactive({
   amountType: quoteUtil.quote.data?.amountType,
@@ -101,12 +103,22 @@ onMounted(getQuote)
 
 function saveQuote() {
   isSavingQuote.value = true;
-  quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
-    const quote = TransactionQuote.getInstance(response.data);
-    router.push({name: 'transferWizard', params: {quoteId: quote.id}});
-  }).catch(() => {
-    isSavingQuote.value = false;
-  });
+  if (props.recipient) {
+    recipientUtil.getQuote(props.recipient, quoteUtil.quote.data).then((response) => {
+      const quote = TransactionQuote.getInstance(response.data);
+      router.push({name: 'transferWizard', params: {quoteId: quote.id}});
+    }).catch(() => {
+      isSavingQuote.value = false;
+    });
+  } else {
+    quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
+      const quote = TransactionQuote.getInstance(response.data);
+      router.push({name: 'transferWizard', params: {quoteId: quote.id}});
+    }).catch(() => {
+      isSavingQuote.value = false;
+    });
+  }
+
 }
 
 </script>
