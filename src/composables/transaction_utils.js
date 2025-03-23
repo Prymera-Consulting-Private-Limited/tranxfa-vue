@@ -12,7 +12,16 @@ export function useTransactionUtils() {
         });
     }
 
+    const get = async () => {
+        return axios.get(`/client/v1/transactions`, {
+            headers: {
+                'X-Customer-Token': customerUtils.getAuthToken(),
+            }
+        });
+    }
+
     return {
+        get,
         getTransaction,
     }
 }
