@@ -46,10 +46,19 @@ export function useRecipientUtils() {
         });
     }
 
+    const getQuote = async (recipient, data) => {
+        return axios.post(`/client/v1/recipient/send-money/${recipient.id}`, data, {
+            headers: {
+                'X-Customer-Token': customerUtils.getAuthToken(),
+            }
+        });
+    }
+
     return {
         whisper,
         add,
         get,
         getRecipient,
+        getQuote,
     };
 }
