@@ -1,11 +1,12 @@
 <script setup>
 import Transaction from "@/models/transaction.js";
-import {onMounted, onUnmounted, watch} from "vue";
+import {onMounted, onUnmounted, watch, watchEffect} from "vue";
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentState from "@/enums/payment_state.js";
 import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import PendingReceived from "@/components/Payment/State/PendingReceived.vue";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
+import router from "@/router/index.js";
 
 const props = defineProps({
   transaction: {
@@ -21,18 +22,24 @@ onMounted(async () => {
       });
   if (props.transaction.payment.state.code === PaymentState.PENDING) {
     props.transaction.payment.state.code = PaymentState.REDIRECTED;
+  } else if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
+    await router.push({name: 'viewTransaction', params: {transactionId: props.transaction.id}});
   }
 })
 
-watch(() => props.transaction.payment.state.code, (newValue) => {
-  if (newValue === PaymentState.PENDING) {
+watchEffect(() => {
+  if (props.transaction.payment.state.code === PaymentState.PENDING) {
     props.transaction.payment.state.code = PaymentState.REDIRECTED;
+  }
+  if (props.transaction.payment.state.code === PaymentState.AUTHORIZED ||  props.transaction.payment.state.code === PaymentState.CAPTURED) {
+    router.push({name: 'viewTransaction', params: {transactionId: props.transaction.id}});
   }
 })
 
 onUnmounted(async () => {
   Echo.leaveChannel(`client-payment.${props.transaction.payment.id}`);
 })
+
 </script>
 
 <template>
