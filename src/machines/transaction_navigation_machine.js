@@ -30,7 +30,11 @@ export const transactionNavigationMachine = createMachine({
                     },
                     {
                         target: 'selectRecipient',
+                        guard: ({context}) => (context.quote?.recipient || null) === null,
                     },
+                    {
+                        target: 'confirm',
+                    }
                 ],
                 SET_CONTEXT: {
                     actions: assign({
