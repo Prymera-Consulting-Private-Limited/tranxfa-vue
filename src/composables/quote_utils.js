@@ -67,9 +67,16 @@ export function useQuoteUtils() {
         });
     }
 
-    const confirmQuote = async (quote, purpose) => {
+    /**
+     * @param {TransactionQuote} quote
+     * @param {Object} purpose
+     * @param {PaymentMethod} paymentMethod
+     * @returns {Promise<axios.AxiosResponse<any>>}
+     */
+    const confirmQuote = async (quote, purpose, paymentMethod) => {
         return axios.post(`/client/v1/quote/confirm/${quote.id}`, {
             purpose_id: purpose.id,
+            payment_method_id: paymentMethod.id,
         }, {
             headers: {
                 'X-Customer-Token': customerUtils.getAuthToken(),
