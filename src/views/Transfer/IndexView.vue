@@ -19,6 +19,8 @@ import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
+import { RadioGroup, RadioGroupOption } from '@headlessui/vue'
+import { CheckCircleIcon } from '@heroicons/vue/20/solid'
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 
@@ -86,12 +88,13 @@ const isStepProcessing = ref(false);
 
 const canContinue = computed(() => {
   if (snapshot.value?.value === 'confirm') {
-    return !!purpose.value && !isStepProcessing.value && !isLoading.value;
+    return !!purpose.value && !!paymentMethod.value && !isStepProcessing.value && !isLoading.value;
   }
   return !isStepProcessing.value && !isLoading.value;
 });
 
 const purpose = ref(null);
+const paymentMethod = ref(null);
 const isAddressRequired = ref(false);
 
 const submitAndContinue = async () => {
@@ -99,7 +102,7 @@ const submitAndContinue = async () => {
   isStepProcessing.value = true
   if (snapshot.value?.value === 'confirm') {
     try {
-      const response = await quoteUtils.confirmQuote(quote.data, purpose.value);
+      const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value);
       const transaction = response.data;
       isStepProcessing.value = false;
       await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
@@ -229,7 +232,7 @@ const showContinueButton = computed(() => {
                 <QuoteDisplay v-if="snapshot.value !== 'confirm'" v-bind:quote="quote.data" />
                 <template v-else>
                   <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose</label>
-                  <p class="my-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
+                  <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
                   <v-select v-model="purpose" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="purpose">
                     <template v-slot:no-options="{ search, searching }">
                       <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
@@ -250,6 +253,24 @@ const showContinueButton = computed(() => {
                       </div>
                     </template>
                   </v-select>
+
+                  <fieldset aria-label="Server size" class="mt-6">
+                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Payment Method</label>
+                    <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
+                      <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
+                        <div :class="[(active || checked) ? 'border-purple-600 ring-2 ring-purple-600 bg-purple-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border p-4 shadow-xs focus:outline-hidden']">
+                          <span class="flex flex-1">
+                            <span class="flex flex-col">
+                              <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
+                              <span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>
+                            </span>
+                          </span>
+                          <CheckCircleIcon :class="[!checked ? 'invisible' : '', 'size-5 text-purple-600']" aria-hidden="true" />
+                          <span :class="[active ? 'border' : 'border-1', checked ? 'border-purple-600' : 'border-transparent', 'pointer-events-none absolute -inset-px rounded-lg']" aria-hidden="true" />
+                        </div>
+                      </RadioGroupOption>
+                    </RadioGroup>
+                  </fieldset>
                 </template>
               </template>
               <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-6 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
