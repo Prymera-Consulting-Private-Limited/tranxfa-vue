@@ -1,5 +1,6 @@
 import BaseQuote from "@/models/base_quote.js";
 import Recipient from "@/models/recipient.js";
+import PaymentMethod from "@/models/payment_method.js";
 
 class TransactionQuote extends BaseQuote {
     /**
@@ -7,9 +8,17 @@ class TransactionQuote extends BaseQuote {
      */
     recipients = [];
 
+    /**
+     * @type {Recipient|null}
+     */
     recipient = null;
 
     purposes = [];
+
+    /**
+     * @type {PaymentMethod[]}
+     */
+    paymentMethods = [];
 
     static getInstance(data) {
         const quote = new TransactionQuote();
@@ -25,6 +34,11 @@ class TransactionQuote extends BaseQuote {
         if (data.purposes?.length > 0) {
             quote.purposes = data.purposes.map((data) => {
                 return data;
+            });
+        }
+        if (data.payment_methods?.length > 0) {
+            quote.paymentMethods = data.payment_methods.map((data) => {
+                return PaymentMethod.getInstance(data);
             });
         }
         return quote;
