@@ -67,7 +67,7 @@ const router = createRouter({
       path: '/transaction/:transactionId',
       name: 'viewTransaction',
       props: route => ({ id: route.params.transactionId }),
-      component: () => import('@/views/Transaction/IndexView.vue'),
+      component: () => import('@/views/Transaction/ItemView.vue'),
       meta: {
         title: 'Transactions',
         description: '',
