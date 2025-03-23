@@ -23,6 +23,8 @@ onMounted(async () => {
   if (customer.data?.id) {
     Echo.channel(`client-customer.${customer.data?.id}`)
         .listen('CustomerDocumentProcessing', (e) => {
+          const category = e.category;
+          const document = e.document_type.toLowerCase();
           customerUtils.refresh();
           notify(
               {
@@ -36,8 +38,8 @@ onMounted(async () => {
         })
         .listen('CustomerDocumentApproved', (e) => {
           customerUtils.refresh();
-          const category = 'Proof of Identity';
-          const document = 'Passport'.toLowerCase();
+          const category = e.category;
+          const document = e.document_type.toLowerCase();
           notify(
               {
                 group: 'customer',
@@ -50,8 +52,8 @@ onMounted(async () => {
         })
         .listen('CustomerDocumentRejected', (e) => {
           customerUtils.refresh();
-          const category = 'Proof of Address';
-          const document = 'Utility Bill'.toLowerCase();
+          const category = e.category;
+          const document = e.document_type.toLowerCase();
           notify(
               {
                 group: 'customer',
