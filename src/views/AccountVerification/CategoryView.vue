@@ -9,6 +9,13 @@ import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  }
+})
+
 /**
  * @type {{data: Customer|null}}
  */
@@ -21,15 +28,16 @@ const selectedCategory = reactive({
 onMounted(async () => {
   if (! customerStore.isLoaded) {
     customerUtils.refresh().then(() => {
-      selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
+      selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === props.id);
     });
   } else {
-    selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === router.currentRoute.value.params.category);
+    selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === props.id);
   }
 });
 
 const finalStateReached = async () => {
-  await router.push({name: 'accountVerification'});
+  await customerUtils.refresh();
+  await router.replace({name: 'accountVerification'});
 }
 </script>
 
