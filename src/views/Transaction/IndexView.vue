@@ -9,6 +9,7 @@ import {useColorUtils} from "@/composables/color_utils.js";
 import TransactionStateIcon from "@/enums/transaction_state_icon.js";
 import TransactionState from "@/enums/transaction_state.js";
 import moment from "moment";
+import {BanknotesIcon} from "@heroicons/vue/24/outline";
 
 const transactionUtils = useTransactionUtils();
 const timeUtils = useTimeUtils();
@@ -39,7 +40,7 @@ const transactions = computed(() => {
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 grid grid-cols-3 gap-8">
         <h1 class="sr-only">Transactions</h1>
-        <div class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
+        <div v-if="transactions?.value?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
           <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <ul role="list" class="divide-y divide-gray-100">
@@ -89,6 +90,18 @@ const transactions = computed(() => {
             </div>
           </div>
         </div>
+        <template v-else>
+          <div class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white col-span-2 shadow-lg">
+            <div class="animate-pulse">
+              <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
+              <span class="mt-4 block text-lg font-semibold text-gray-900">No Transactions Yet</span>
+              <p class="mt-2 text-sm text-gray-600 max-w-sm">
+                Ready to send money? Your first transfer is just a few clicks away! Start now and experience fast, secure, and hassle-free transactions.
+              </p>
+            </div>
+          </div>
+
+        </template>
         <div class="grid grid-cols-1 gap-4">
           <section aria-labelledby="section-2-title">
             <h2 class="sr-only" id="section-2-title">Send Money</h2>
