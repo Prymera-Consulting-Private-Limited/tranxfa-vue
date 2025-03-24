@@ -167,6 +167,14 @@ export function useCustomerUtils() {
         });
     }
 
+    async function tasks() {
+        return axios.get('/client/v1/tasks', {
+            headers: {
+                'X-Customer-Token': getAuthToken(),
+            }
+        });
+    }
+
     return {
         getAuthToken,
         register,
@@ -181,5 +189,6 @@ export function useCustomerUtils() {
         getAccountVerificationToken,
         getLivelinessToken,
         uploadDocument,
+        tasks,
     }
 }

@@ -15,12 +15,13 @@ import {
 } from '@heroicons/vue/24/outline'
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import AddRecipientWizard from "@/components/Recipient/AddRecipientWizard.vue";
-import {useRecipientUtils} from "@/composables/recipient_utils.js";
 import router from "@/router/index.js";
+import CustomerTask from "@/enums/customer_task.js";
+import {CustomerTask as CustomerTaskModal} from "@/models/customer_task.js";
+import CustomerTaskStatus from "@/enums/customer_task_status.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
-const recipientUtils = useRecipientUtils();
 const isCreateRecipientModalOpen = ref(false);
 const createRecipient = () => {
   isCreateRecipientModalOpen.value = true;
@@ -31,57 +32,51 @@ const createRecipient = () => {
  */
 const customer = customerStore.customer;
 
-const items = [
+const taskItems = [
   {
-    id: 'emailVerification',
-    title: 'Verify Email Address',
-    completedTitle: 'Email Verified',
-    description: 'Confirm your email address to activate your account and start sending money securely.',
-    completedDescription: 'Email address successfully verified. Your account is now ready for transactions.',
+    id: CustomerTask.EMAIL_VERIFICATION,
+    title: '',
+    description: '',
+    status: '',
     icon: EnvelopeIcon,
     background: 'bg-pink-500',
-    completed: false,
     href: {name: 'onboardingWorkflow'},
   },
   {
-    id: 'contactNumberProvided',
-    title: 'Provide Contact Number',
-    completedTitle: 'Contact Number Verified',
-    description: 'Provide your mobile number to receive important notifications and secure your account.',
-    completedDescription: 'Contact number verified. You will receive important updates on your phone.',
+    id: CustomerTask.HAS_CONTACT_NUMBER,
+    title: '',
+    description: '',
+    status: '',
     icon: DevicePhoneMobileIcon,
     background: 'bg-indigo-500',
     completed: false,
     href: {name: 'onboardingWorkflow'},
   },
   {
-    id: 'identityVerified',
-    title: 'Verify Your Identity',
-    completedTitle: 'Identity Verified',
-    description: 'Upload a government-issued ID to comply with financial regulations and protect your transactions.',
-    completedDescription: 'Identity successfully verified. You are now compliant with financial regulations.',
+    id: CustomerTask.HAS_IDENTITY_DOCUMENT,
+    title: '',
+    description: '',
+    status: '',
     icon: IdentificationIcon,
     background: 'bg-yellow-500',
     completed: false,
     href: null,
   },
   {
-    id: 'addressDetailsProvided',
-    title: 'Add Address Details',
-    completedTitle: 'Address Details Added',
-    description: 'Provide your residential address to complete your profile and enable secure transfers.',
-    completedDescription: 'Address details added. Your profile is now more secure.',
+    id: CustomerTask.HAS_ADDRESS,
+    title: '',
+    description: '',
+    status: '',
     icon: HomeIcon,
     background: 'bg-green-500',
     completed: false,
     href: null,
   },
   {
-    id: 'recipientCreated',
-    title: 'Create a Recipient',
-    completedTitle: 'Recipient Added',
-    description: 'Add the details and payment information of the person you want to send money to.',
-    completedDescription: 'Recipient added. You are ready to send money.',
+    id: CustomerTask.RECIPIENT_CREATED,
+    title: '',
+    description: '',
+    status: '',
     icon: UsersIcon,
     background: 'bg-blue-500',
     completed: false,
@@ -89,11 +84,10 @@ const items = [
     action: createRecipient,
   },
   {
-    id: 'transactionSent',
-    title: 'Send a Transaction',
-    completedTitle: 'Transaction Sent',
-    description: 'Initiate a secure money transfer to your recipient and track its progress.',
-    completedDescription: 'Transaction sent successfully. You can track your transfer in your account.',
+    id: CustomerTask.TRANSACTION_SENT,
+    title: '',
+    description: '',
+    status: '',
     icon: PaperAirplaneIcon,
     background: 'bg-purple-500',
     completed: false,
@@ -102,33 +96,37 @@ const items = [
 ]
 
 const tasks = computed(() => {
-  return items.map((item) => {
-    if (item.id === 'emailVerification') {
-      item.completed = customer.data?.account?.isEmailVerified ?? false;
-    } else if (item.id === 'contactNumberProvided') {
-      item.completed = customer.data?.mobileNumber ?? false;
-    } else if (item.id === 'identityVerified') {
+  return taskItems.filter((taskItem) => serverTasks.value.find((serverTask) => serverTask.id === taskItem.id)).map((taskItem) => {
+    const serverTask = serverTasks.value.find((serverTask) => serverTask.id === taskItem.id);
+    taskItem.title = serverTask?.title;
+    taskItem.description = serverTask?.description;
+    taskItem.status = serverTask?.status;
+    if (taskItem.id === CustomerTask.HAS_IDENTITY_DOCUMENT) {
       const pendingPoi = customer.data?.pendingDocuments?.find(cat => cat.code === 'POI');
-      item.completed = Boolean(pendingPoi) === false;
-      item.href = pendingPoi?.id ? {
+      taskItem.href = serverTask?.status === CustomerTaskStatus.PENDING ? {
         name: 'categoryView',
         params: {
           category: pendingPoi.id
         },
         query: {_utm: 'dashboard-todos'}
       } : null;
-    } else if (item.id === 'recipientCreated') {
-      item.completed = hasRecipients.value;
-    } else if (item.id === 'addressDetailsProvided') {
-      item.completed = !!customer.data?.addressInformationRequired;
     }
 
-    return item;
+    return taskItem;
   });
 });
 
 const isLoading = ref(false);
-const hasRecipients = ref(false);
+const serverTasks = ref([]);
+
+const getTasks = async () => {
+  isLoading.value = true;
+  customerUtils.tasks().then((response) => {
+    serverTasks.value = response.data.map((task) => CustomerTaskModal.getInstance(task));
+  }).finally(() => {
+    isLoading.value = false;
+  });
+}
 
 onMounted(async () => {
   if (! customerStore.isLoaded) {
@@ -137,22 +135,10 @@ onMounted(async () => {
       isLoading.value = false;
     });
   }
-  isLoading.value = true;
-  recipientUtils.whisper().then(() => {
-    hasRecipients.value = true;
-  }).catch((e) => {
-    if (e.response.status === 404) {
-      hasRecipients.value = false;
-    } else {
-      console.error(e);
-    }
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  await getTasks();
 });
 
 const recipientCreated = (recipient) => {
-  hasRecipients.value = true;
   isCreateRecipientModalOpen.value = false;
   router.push({name: 'viewRecipient', params: {id: recipient.id}});
 };
@@ -171,8 +157,8 @@ const recipientCreated = (recipient) => {
               <div>
                 <h2 class="text-base font-semibold text-gray-900">Welcome {{ customer.data?.firstName }}</h2>
                 <p class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
-                <ul v-if="tasks.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 border-t border-b border-gray-200 py-6 sm:grid-cols-2">
-                  <li v-for="task in tasks" :key="task.id" :class="[isLoading ? 'pulse' : '']" class="flow-root">
+                <ul v-if="tasks.length === 0 && isLoading" role="list" class="mt-6 grid grid-cols-1 gap-6 border-t border-b border-gray-200 py-6 sm:grid-cols-2">
+                  <li v-for="i of 6" :key="i" class="flow-root pulse">
                     <div v-if="isLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
                       <div :class="['bg-gray-300', 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
                         <DocumentTextIcon class="size-6 text-white" aria-hidden="true" />
@@ -191,19 +177,23 @@ const recipientCreated = (recipient) => {
                         </p>
                       </div>
                     </div>
-                    <div v-else :class="{'opacity-60': task.completed}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 hover:bg-gray-50">
+                  </li>
+                </ul>
+                <ul v-if="tasks.length > 0 && !isLoading" role="list" class="mt-6 grid grid-cols-1 gap-6 border-t border-b border-gray-200 py-6 sm:grid-cols-2">
+                  <li v-for="task in tasks" :key="task.id" class="flow-root">
+                    <div :class="{'opacity-60': task.status !== CustomerTaskStatus.PENDING}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 hover:bg-gray-50">
                       <div :class="[task.background, 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
                         <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
                       </div>
-                      <div v-if="task.completed">
+                      <div v-if="task.status !== CustomerTaskStatus.PENDING">
                         <div class="text-sm font-medium text-gray-900">
                           <div class="focus:outline-hidden">
                             <span class="absolute inset-0" aria-hidden="true" />
-                            <span>{{ task.completedTitle }}</span>
+                            <span>{{ task.title }}</span>
                             <span aria-hidden="true"> &rarr;</span>
                           </div>
                         </div>
-                        <p class="mt-1 text-sm text-gray-500">{{ task.completedDescription }}</p>
+                        <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
                       </div>
                       <template v-else>
                         <router-link v-if="task.href" :to="task.href" class="cursor-pointer">
@@ -271,7 +261,7 @@ const recipientCreated = (recipient) => {
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
-                <AddRecipientWizard class="p-6 sm:px-8" v:on:recipient:added="recipientCreated" />
+                <AddRecipientWizard class="p-6 sm:px-8" v-on:recipient:added="recipientCreated" />
               </DialogPanel>
             </TransitionChild>
           </div>
