@@ -18,6 +18,8 @@ const mobile = reactive({
   country: null,
 });
 
+const emit = defineEmits(['mobileNumberUpdated', 'editPersonalInformationRequested']);
+
 const errors = ref({});
 
 onMounted( async () => {
@@ -43,11 +45,16 @@ async function updateMobileNumber() {
     }
     isSaving.value = false;
   });
+  emit('mobileNumberUpdated');
 }
 
 const showLoading = computed(() => {
   return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
 })
+
+const editPersonalInformation = () => {
+  emit('editPersonalInformationRequested');
+}
 </script>
 
 <template>
@@ -60,7 +67,7 @@ const showLoading = computed(() => {
         <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
       </div>
       <h2 class="text-2xl font-semibold text-black mb-4 text-left">Enter Your Mobile Number</h2>
-      <p class="text-md text-[#B7A3C1] mb-8 text-left">Please provide your mobile number along with the ISD code to continue.</p>
+      <p class="text-md text-gray-900 mb-8 text-left">Please provide your mobile number to continue.</p>
       <!-- Form -->
       <form @submit.prevent="updateMobileNumber" class="space-y-6 mt-12">
         <MobileNumberInput v-bind:mobile="mobile" v-bind:errors="errors" v-on:update:mobileNumberUpdated="mobileNumberUpdated" />
@@ -74,6 +81,9 @@ const showLoading = computed(() => {
           <template v-else>Continue</template>
         </button>
       </form>
+      <div class="text-center mt-12">
+        <a @click="editPersonalInformation" class="text-purple-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
+      </div>
     </div>
   </div>
 </template>

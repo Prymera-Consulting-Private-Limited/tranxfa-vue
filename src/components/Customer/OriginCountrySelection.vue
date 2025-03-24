@@ -11,10 +11,13 @@ const customerUtils = useCustomerUtils();
 
 const isLoading = ref(true);
 const isSaving = ref(false);
+const emit = defineEmits(['countryUpdated']);
+
 async function updateCountry(country) {
   isLoading.value = true;
   isSaving.value = true;
   await customerUtils.updateCountry(country);
+  emit('countryUpdated');
 }
 onMounted(async () => {
   if (! customerStore.isLoaded) {
@@ -42,7 +45,9 @@ onMounted(async () => {
       <ul role="list" class="mt-3 grid grid-cols-1 gap-5 xl:grid-cols-2 sm:gap-6">
         <template v-for="country in countryUtils.sources.value" :key="country.id">
           <li @click="updateCountry(country)" class="col-span-1 flex rounded-md shadow-xs cursor-pointer">
-            <div class="flex px-5 font- shrink-0 items-center justify-center rounded-l-md border-t border-l border-b border-gray-200 bg-white"><FlagIcon :class="['text-2xl']" :code="country.iso2Alpha.toLowerCase()" circle  /></div>
+            <div class="flex px-5 font- shrink-0 items-center justify-center rounded-l-md border-t border-l border-b border-gray-200 bg-white">
+              <FlagIcon :class="['text-2xl']" :code="country.iso2Alpha.toLowerCase()" circle  />
+            </div>
             <div class="flex flex-1 items-center justify-between truncate rounded-r-md border-t border-r border-b border-gray-200 bg-white">
               <div class="flex-1 truncate px-5 pl-0 py-2 text-sm">
                 <p class="font-medium text-gray-900 truncate">{{ country.commonName }}</p>

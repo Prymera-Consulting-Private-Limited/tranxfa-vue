@@ -12,7 +12,6 @@ export const onboardingNavigationMachine = createMachine({
     id: 'onboardingNavigation',
     initial: 'emailVerification',
     context: {
-
     },
     states: {
         emailVerification: {
@@ -24,28 +23,40 @@ export const onboardingNavigationMachine = createMachine({
             ],
         },
         sourceCountrySelection: {
-            always: [
-                {
-                    target: 'identityInformation',
-                    guard: () => customerStore.isLoaded && customer.data?.country,
-                },
-            ],
+            on: {
+                PROCEED: [
+                    {
+                        target: 'identityInformation',
+                        guard: ({context}) => (customerStore.isLoaded && customer.data?.country || null) !== null,
+                    },
+                ],
+            },
         },
         identityInformation: {
-            always: [
-                {
-                    target: 'mobileNumberInput',
-                    guard: () => customerStore.isLoaded && customer.data?.identityInformationRequired() === false,
-                },
-            ],
+            on: {
+                PROCEED: [
+                    {
+                        target: 'mobileNumberInput',
+                        guard: () => customerStore.isLoaded && customer.data?.identityInformationRequired() === false,
+                    },
+                ],
+                CHANGE_COUNTRY: {
+                    target: 'sourceCountrySelection',
+                }
+            },
         },
         mobileNumberInput: {
-            always: [
-                {
-                    target: 'onboardingComplete',
-                    guard: () => customerStore.isLoaded && customer.data?.mobileNumber,
-                },
-            ],
+            on: {
+                PROCEED: [
+                    {
+                        target: 'onboardingComplete',
+                        guard: () => customerStore.isLoaded && customer.data?.mobileNumber,
+                    },
+                ],
+                EDIT_PERSONAL_INFORMATION: {
+                    target: 'identityInformation',
+                }
+            },
         },
         onboardingComplete: {
             final: true,

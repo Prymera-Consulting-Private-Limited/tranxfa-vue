@@ -23,7 +23,7 @@ onMounted(async () => {
   if (! customerStore.isLoaded) {
     isLoading.value = true;
     await customerUtils.refresh();
-    send({type: 'CUSTOMER_UPDATED'});
+    proceed();
     isLoading.value = false;
   }
 });
@@ -36,9 +36,15 @@ watch(() => snapshot.value, (newSnapshot) => {
   }
 }, { deep: true });
 
-watch(customer, () => {
-  send({type: 'CUSTOMER_UPDATED'});
-});
+const changeCountry = () => {
+  send({type: 'CHANGE_COUNTRY'});
+}
+const proceed = () => {
+  send({type: 'PROCEED'});
+}
+const editPersonalInformation = () => {
+  send({type: 'EDIT_PERSONAL_INFORMATION'});
+}
 </script>
 
 <template>
@@ -54,9 +60,18 @@ watch(customer, () => {
           </div>
         </div>
         <EmailVerification v-if="snapshot?.value === 'emailVerification'" />
-        <OriginCountrySelection v-else-if="snapshot?.value === 'sourceCountrySelection'" />
-        <IdentityInformation v-else-if="snapshot?.value === 'identityInformation'" />
-        <MobileNumberInput v-else-if="snapshot?.value === 'mobileNumberInput'" />
+        <OriginCountrySelection
+            v-else-if="snapshot?.value === 'sourceCountrySelection'"
+            v-on:countryUpdated="proceed" />
+        <IdentityInformation
+            v-else-if="snapshot?.value === 'identityInformation'"
+            v-on:identityUpdated="proceed"
+            v-on:changeCountry="changeCountry" />
+        <MobileNumberInput
+            v-else-if="snapshot?.value === 'mobileNumberInput'"
+            v-on:mobileNumberUpdated="proceed"
+            v-on:editPersonalInformationRequested="editPersonalInformation"
+        />
       </div>
     </div>
   </main>

@@ -1,15 +1,18 @@
 <script setup>
 import {useCustomerStore} from "@/stores/customer.js";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountriesStore} from "@/stores/countries.js";
 import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
+import FlagIcon from "vue3-flag-icons";
 
 const isLoading = ref(false)
 const customerStore = useCustomerStore()
 const countriesStore = useCountriesStore();
 const customerUtils = useCustomerUtils()
+
+const customer = customerStore.customer;
 
 onMounted( async () => {
   if (! customerStore.isLoaded) {
@@ -21,6 +24,15 @@ const showLoading = computed(() => {
   return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
 })
 
+const emit = defineEmits(['changeCountry', 'identityUpdated'])
+
+const changeCountry = () => {
+  emit('changeCountry')
+}
+
+const identityUpdated = () => {
+  emit('identityUpdated')
+}
 </script>
 <template>
   <div class="relative flex-1 flex items-center justify-center p-4 md:p-8">
@@ -34,9 +46,16 @@ const showLoading = computed(() => {
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 mt-8">Personal Details</h2>
-      <p class="text-md text-[#B7A3C1] mb-12">Complete your profile by providing some details about you</p>
+      <p class="text-md text-gray-900 mb-3">Complete your profile by providing some details about you</p>
+      <div class="text-sm text-gray-900 mb-12 flex items-center justify-start gap-x-1">
+        You've signed up from <FlagIcon v-if="customer?.data?.country" :class="['text-xl border border-gray-100']" :code="customer?.data?.country?.iso2Alpha.toLowerCase()" circle  /> <span class="font-semibold">{{ customer?.data?.country?.commonName }}.</span>
+        <a class="text-purple-700 hover:underline" @click="changeCountry" href="javascript:">Change</a></div>
       <!-- Form -->
-      <CustomerAttributeForm v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`" v-bind:showLoading="showLoading" />
+      <CustomerAttributeForm
+          v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`"
+          v-bind:showLoading="showLoading"
+          v-on:customer:attribute_category:updated="identityUpdated"
+      />
     </div>
   </div>
 </template>
