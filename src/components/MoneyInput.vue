@@ -42,11 +42,11 @@ const maskaOptions = reactive({
 const unmaskedValue = ref(null);
 
 const onMaska = (event) => {
-  unmaskedValue.value = event.detail.unmasked < 100 ? event.detail.unmasked * 100 : event.detail.unmasked;
+  unmaskedValue.value = event.detail.unmasked < Math.pow(10, props.currency.decimalPlaces) ? event.detail.unmasked * Math.pow(10, props.currency.decimalPlaces) : event.detail.unmasked;
 }
 
 const amountModel = computed({
-  get: () => Math.ceil(props.amount * Math.pow(10, props.currency.decimalPlaces)),
+  get: () => props.amount.toFixed(props.currency.decimalPlaces),
   set: () => {}
 })
 
