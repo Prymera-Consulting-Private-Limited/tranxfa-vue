@@ -5,6 +5,7 @@ import CustomerAddress from "@/models/customer_address.js";
 import CustomerAttribute from "@/models/customer_attribute.js";
 import CustomerDocument from "@/models/customer_document.js";
 import DocumentCategory from "@/models/document_category.js";
+import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 
 export class Customer {
     /**
@@ -108,7 +109,11 @@ export class Customer {
     pendingDocuments = [];
 
     identityInformationRequired () {
-        return Boolean(this.attributes.find((o) => o.category === 'identity' && o.isRequired && !o.value))
+        return Boolean(this.attributes.find((o) => o.category === CustomerAttributeCategory.IDENTITY && o.isRequired && !o.value))
+    }
+
+    addressInformationRequired () {
+        return Boolean(this.attributes.find((o) => o.category === CustomerAttributeCategory.ADDRESS && o.isRequired && !o.value))
     }
 
     static getInstance(data) {

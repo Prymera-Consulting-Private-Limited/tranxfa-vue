@@ -119,6 +119,8 @@ const tasks = computed(() => {
       } : null;
     } else if (item.id === 'recipientCreated') {
       item.completed = hasRecipients.value;
+    } else if (item.id === 'addressDetailsProvided') {
+      item.completed = !!customer.data?.addressInformationRequired;
     }
 
     return item;
