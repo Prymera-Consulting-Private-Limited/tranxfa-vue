@@ -1,6 +1,43 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import { UserIcon, HomeIcon, PhoneIcon, LockClosedIcon, DevicePhoneMobileIcon } from '@heroicons/vue/24/outline';
+import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import {computed, onMounted, ref} from "vue";
+import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
+import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
+import {useCustomerStore} from "@/stores/customer.js";
+import {useCountriesStore} from "@/stores/countries.js";
+import {useCustomerUtils} from "@/composables/customer_utils.js";
+
+const isPersonalDetailsModalOpen = ref(false);
+const isAddressModalOpen = ref(false);
+
+const isLoading = ref(false)
+const customerStore = useCustomerStore()
+const countriesStore = useCountriesStore();
+const customerUtils = useCustomerUtils()
+
+const customer = customerStore.customer;
+
+onMounted( async () => {
+  if (! customerStore.isLoaded) {
+    await customerUtils.refresh();
+  }
+});
+
+const showLoading = computed(() => {
+  return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
+})
+
+const emit = defineEmits(['identityUpdated', 'addressUpdated'])
+
+const identityUpdated = () => {
+  emit('identityUpdated')
+}
+
+const addressUpdated = () => {
+  emit('addressUpdated')
+}
 </script>
 
 <template>
@@ -19,13 +56,13 @@ import { UserIcon, HomeIcon, PhoneIcon, LockClosedIcon, DevicePhoneMobileIcon } 
                 <UserIcon class="h-6 w-6 text-purple-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Personal Details</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">View and update your name, email address, and other personal information.</p>
-                <a href="#" class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500">Modify &rarr;</a>
+                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500">Modify &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <HomeIcon class="h-6 w-6 text-purple-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Address</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Ensure your billing and shipping address details are up-to-date.</p>
-                <a href="#" class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500">Modify &rarr;</a>
+                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500">Modify &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <PhoneIcon class="h-6 w-6 text-purple-600 mb-2" />
@@ -50,5 +87,51 @@ import { UserIcon, HomeIcon, PhoneIcon, LockClosedIcon, DevicePhoneMobileIcon } 
         </div>
       </div>
     </main>
+    <TransitionRoot as="div" :show="isPersonalDetailsModalOpen">
+      <Dialog class="relative z-10" @close="isPersonalDetailsModalOpen = false">
+        <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+        </TransitionChild>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+                <div class="px-6 py-5">
+                  <CustomerAttributeForm
+                      v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`"
+                      v-bind:showLoading="showLoading"
+                      v-bind:saveBtnText="'Save Changes'"
+                      v-on:customer:attribute_category:updated="identityUpdated"
+                  />
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
+    <TransitionRoot as="div" :show="isAddressModalOpen">
+      <Dialog class="relative z-10" @close="isAddressModalOpen = false">
+        <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+        </TransitionChild>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl min-w-sm">
+                <div class="px-6 py-5">
+                  <CustomerAttributeForm
+                      v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
+                      v-bind:showLoading="showLoading"
+                      v-bind:saveBtnText="'Save Changes'"
+                      v-on:customer:attribute_category:updated="addressUpdated"
+                  />
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </CustomerLayout>
 </template>
