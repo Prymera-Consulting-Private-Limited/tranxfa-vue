@@ -42,7 +42,7 @@ const maskaOptions = reactive({
 const unmaskedValue = ref(null);
 
 const onMaska = (event) => {
-  unmaskedValue.value = event.detail.unmasked;
+  unmaskedValue.value = event.detail.unmasked < 100 ? event.detail.unmasked * 100 : event.detail.unmasked;
 }
 
 const amountModel = computed({
