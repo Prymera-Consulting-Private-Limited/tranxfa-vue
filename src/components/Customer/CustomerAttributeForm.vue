@@ -27,7 +27,12 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false,
-  }
+  },
+  saveBtnText: {
+    type: String,
+    required: false,
+    default: 'Continue',
+  },
 })
 
 /**
@@ -101,7 +106,7 @@ watchEffect(() => {
           Saving ...
         </span>
       </template>
-      <template v-else>Continue</template>
+      <template v-else>{{ saveBtnText }}</template>
     </button>
   </form>
 </template>
