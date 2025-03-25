@@ -59,6 +59,9 @@ onMounted(async () => {
       send({ type: 'PROCEED' });
     });
   }
+  if (quote.data.paymentMethods.length === 1) {
+    paymentMethod.value = quote.data.paymentMethods[0];
+  }
   isLoading.value = false;
 });
 
@@ -115,7 +118,6 @@ const submitAndContinue = async () => {
       }
     }
   } else if (snapshot.value?.value === 'verifyIdentity') {
-    console.log('Here we are');
     await customerUtils.refresh();
     await send({ type: 'SET_CONTEXT', quote: quote.data });
     await send({ type: 'PROCEED' });
@@ -256,6 +258,7 @@ const showContinueButton = computed(() => {
 
                   <fieldset aria-label="Server size" class="mt-6">
                     <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Payment Method</label>
+                    <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
                     <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                       <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
                         <div :class="[(active || checked) ? 'border-purple-600 ring-2 ring-purple-600 bg-purple-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border p-4 shadow-xs focus:outline-hidden']">
