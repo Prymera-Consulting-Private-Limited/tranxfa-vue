@@ -95,14 +95,6 @@ onMounted(async () => {
           </Menu>
         </div>
 
-        <!-- Search -->
-        <div class="min-w-0 flex-1 px-12 lg:hidden">
-          <div class="mx-auto grid w-full max-w-xs grid-cols-1">
-            <input type="search" name="search" aria-label="Search" class="peer col-start-1 row-start-1 block w-full rounded-md bg-white/20 py-1.5 pr-3 pl-10 text-base text-white outline-hidden placeholder:text-white focus:bg-white focus:text-gray-900 focus:outline-2 focus:outline-offset-2 focus:outline-white/40 focus:placeholder:text-gray-400 sm:text-sm/6" placeholder="Search" />
-            <MagnifyingGlassIcon class="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-white peer-focus:text-gray-400" aria-hidden="true" />
-          </div>
-        </div>
-
         <!-- Menu button -->
         <div class="absolute right-0 shrink-0 lg:hidden">
           <!-- Mobile menu button -->
@@ -120,10 +112,6 @@ onMounted(async () => {
             <nav class="flex space-x-4">
               <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-indigo-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
             </nav>
-          </div>
-          <div class="mx-auto grid w-full max-w-md grid-cols-1">
-            <input type="search" name="search" aria-label="Search" class="peer col-start-1 row-start-1 block w-full rounded-md bg-white/20 py-1.5 pr-3 pl-10 text-sm/6 text-white outline-hidden placeholder:text-white focus:bg-white focus:text-gray-900 focus:outline-2 focus:outline-offset-2 focus:outline-white/40 focus:placeholder:text-gray-400" placeholder="Search" />
-            <MagnifyingGlassIcon class="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-white peer-focus:text-gray-400" aria-hidden="true" />
           </div>
         </div>
       </div>
