@@ -38,8 +38,8 @@ async function logout() {
 }
 
 const userNavigation = [
-  { name: 'Your Profile', action: () => {} },
-  { name: 'Settings', action: () => {} },
+  { name: 'Account Verification', href: 'accountVerification' },
+  { name: 'Settings', href: 'settings' },
   { name: 'Sign out', action: logout },
 ]
 
@@ -87,7 +87,8 @@ onMounted(async () => {
             <transition leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
               <MenuItems class="absolute -right-2 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden tracking-wider">
                 <MenuItem as="div" v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                  <a href="javascript:" @click="item.action" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</a>
+                  <a v-if="item.action" href="javascript:" @click="item.action" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</a>
+                  <router-link v-else :to="{name: item.href}" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</router-link>
                 </MenuItem>
               </MenuItems>
             </transition>
@@ -167,7 +168,11 @@ onMounted(async () => {
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                  <a v-for="item in userNavigation" :key="item.name" href="javascript:" @click="item.action" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</a>
+                  <template v-for="item in userNavigation" :key="item.name">
+                    <a v-if="item.action" href="javascript:" @click="item.action" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</a>
+                    <router-link v-else :to="{name: item.href}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</router-link>
+                  </template>
+
                 </div>
               </div>
             </div>
