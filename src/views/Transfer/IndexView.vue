@@ -98,7 +98,6 @@ const paymentMethod = ref(null);
 const isAddressRequired = ref(false);
 
 const submitAndContinue = async () => {
-  console.log(snapshot.value?.value);
   isStepProcessing.value = true
   if (snapshot.value?.value === 'confirm') {
     try {
