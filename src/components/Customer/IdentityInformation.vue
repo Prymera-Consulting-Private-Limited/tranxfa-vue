@@ -6,17 +6,22 @@ import {useCountriesStore} from "@/stores/countries.js";
 import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import FlagIcon from "vue3-flag-icons";
+import {useCountryUtils} from "@/composables/country_utils.js";
 
 const isLoading = ref(false)
 const customerStore = useCustomerStore()
 const countriesStore = useCountriesStore();
 const customerUtils = useCustomerUtils()
+const countryUtils = useCountryUtils();
 
 const customer = customerStore.customer;
 
 onMounted( async () => {
   if (! customerStore.isLoaded) {
     await customerUtils.refresh();
+  }
+  if (! countriesStore.isLoaded) {
+    await countryUtils.getCountries();
   }
 });
 

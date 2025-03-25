@@ -16,7 +16,6 @@ import {
 import moment from "moment";
 import TransactionStateIcon from "@/enums/transaction_state_icon.js";
 import RecipientDataType from "@/enums/recipient_data_type.js";
-import TransasctionState from "@/models/transaction_state.js";
 
 const transactionUtils = useTransactionUtils();
 const timeUtils = useTimeUtils();
