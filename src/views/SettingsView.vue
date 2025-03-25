@@ -34,15 +34,11 @@ const showLoading = computed(() => {
   return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
 })
 
-const emit = defineEmits(['identityUpdated', 'addressUpdated'])
-
 const identityUpdated = () => {
-  emit('identityUpdated')
   isPersonalDetailsModalOpen.value = false;
 }
 
 const addressUpdated = () => {
-  emit('addressUpdated')
   isAddressModalOpen.value = false;
 }
 </script>
