@@ -196,6 +196,7 @@ const showContinueButton = computed(() => {
                           v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
                           v-bind:updateOutsourced="true"
                           v-bind:externalSaveTrigger="isStepProcessing"
+                          v-bind:showLoading="false"
                           v-on:customer:attribute_category:updated="customerAttributeCategoryUpdated"
                           v-on:customer:attribute_category:update_failed="isStepProcessing = false"
                       />
