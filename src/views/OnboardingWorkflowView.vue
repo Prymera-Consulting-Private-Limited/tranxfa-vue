@@ -23,9 +23,9 @@ onMounted(async () => {
   if (! customerStore.isLoaded) {
     isLoading.value = true;
     await customerUtils.refresh();
-    proceed();
     isLoading.value = false;
   }
+  proceed();
 });
 
 const {snapshot, send} = useMachine(onboardingNavigationMachine);
@@ -40,7 +40,9 @@ const changeCountry = () => {
   send({type: 'CHANGE_COUNTRY'});
 }
 const proceed = () => {
+  console.log(snapshot.value);
   send({type: 'PROCEED'});
+  console.log(snapshot.value);
 }
 const editPersonalInformation = () => {
   send({type: 'EDIT_PERSONAL_INFORMATION'});
