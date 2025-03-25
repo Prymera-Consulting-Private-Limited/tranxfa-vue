@@ -25,7 +25,7 @@ defineProps({
 <template>
   <section class="">
     <div class="divide-y divide-dashed divide-gray-200 border-dashed border-gray-200 border-1 rounded-md text-sm/6">
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <UserCircleIcon class="h-6 w-6 text-gray-600" />
@@ -36,7 +36,7 @@ defineProps({
           <div class="text-gray-900">{{ quote.recipient.fullName }}</div>
         </dd>
       </div>
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <FlagIcon class="h-6 w-6 text-gray-600" />
@@ -47,7 +47,7 @@ defineProps({
           <div class="text-gray-900">{{ quote.payoutCountry.commonName }}</div>
         </dd>
       </div>
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <TruckIcon class="h-6 w-6 text-gray-600" />
@@ -58,7 +58,7 @@ defineProps({
           <div class="text-gray-900">{{ quote.payoutMethod.title }}</div>
         </dd>
       </div>
-      <div v-for="accountDetailHashmap in quote.recipient.accountDetailHashMap" class="py-6 px-5 sm:flex">
+      <div v-for="accountDetailHashmap in quote.recipient.accountDetailHashMap" class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <UserCircleIcon v-if="accountDetailHashmap.type === RecipientDataType.ACCOUNT_HOLDER_NAME" class="h-6 w-6 text-gray-600" />
@@ -71,7 +71,7 @@ defineProps({
           <div class="text-gray-900">{{ accountDetailHashmap.value }}</div>
         </dd>
       </div>
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <PaperAirplaneIcon class="h-6 w-6 text-gray-600" />
@@ -82,7 +82,7 @@ defineProps({
           <div class="text-gray-900">{{ quote.localAmountCurrencyPrefixed }}</div>
         </dd>
       </div>
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <BanknotesIcon class="h-6 w-6 text-gray-600" />
@@ -93,7 +93,7 @@ defineProps({
           <div class="text-gray-900">{{ quote.exchangeRateFormatted }}</div>
         </dd>
       </div>
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <BuildingLibraryIcon class="h-6 w-6 text-gray-600" />
@@ -104,7 +104,7 @@ defineProps({
           <div class="text-gray-900">{{ quote.foreignAmountCurrencyPrefixed }}</div>
         </dd>
       </div>
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <PlusIcon class="h-6 w-6 text-gray-600" />
@@ -115,7 +115,7 @@ defineProps({
           <div class="text-gray-900">{{ quote.baseFeesFormatted }}</div>
         </dd>
       </div>
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <CalculatorIcon class="h-6 w-6 text-gray-600" />
@@ -126,7 +126,7 @@ defineProps({
           <div class="text-gray-900">{{ quote.localAmountCurrencyPrefixed }}</div>
         </dd>
       </div>
-      <div class="py-6 px-5 sm:flex">
+      <div class="py-4.5 px-5 sm:flex">
         <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
           <div class="flex items-start gap-4">
             <WalletIcon class="h-6 w-6 text-gray-600" />

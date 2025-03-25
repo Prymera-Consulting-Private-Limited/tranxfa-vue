@@ -265,8 +265,7 @@ const showContinueButton = computed(() => {
                               <span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>
                             </span>
                           </span>
-                          <CheckCircleIcon :class="[!checked ? 'invisible' : '', 'size-5 text-purple-600']" aria-hidden="true" />
-                          <span :class="[active ? 'border' : 'border-1', checked ? 'border-purple-600' : 'border-transparent', 'pointer-events-none absolute -inset-px rounded-lg']" aria-hidden="true" />
+                          <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-purple-600', 'size-5']" aria-hidden="true" />
                         </div>
                       </RadioGroupOption>
                     </RadioGroup>
