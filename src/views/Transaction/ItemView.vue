@@ -156,7 +156,7 @@ onUnmounted(async () => {
                   <dd class="text-sm/6 text-gray-500">Paid with {{ transaction.data.payment.paymentAccount?.institution }} {{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
                 </div>
               </dl>
-              <div class="mt-6 border-t border-gray-900/5 px-6 py-6">
+              <div v-if="false" class="mt-6 border-t border-gray-900/5 px-6 py-6">
                 <a href="#" class="text-sm/6 font-semibold text-gray-900">Download receipt <span aria-hidden="true">&rarr;</span></a>
               </div>
             </div>
