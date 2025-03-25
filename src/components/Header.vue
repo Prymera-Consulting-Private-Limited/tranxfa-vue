@@ -132,7 +132,7 @@ onMounted(async () => {
                     <img class="h-8 w-auto" src="/images/logo.png" alt="Tranxfa Inc" />
                   </div>
                   <div class="-mr-2">
-                    <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:ring-2 focus:ring-brand-700 focus:outline-hidden focus:ring-inset">
+                    <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 outline-none focus:ring-0 focus:ring-brand-700 focus:outline-hidden focus:ring-inset">
                       <span class="absolute -inset-0.5" />
                       <span class="sr-only">Close menu</span>
                       <XMarkIcon class="size-6" aria-hidden="true" />
