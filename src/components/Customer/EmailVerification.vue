@@ -136,7 +136,7 @@ onMounted(async () => {
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
-          <div v-if="! isResendingToken" class="text-sm text-gray-500 text-center">Didn't receive verification code? <a @click="resend" class="text-brand-600 hover:text-brand-800 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
+          <div v-if="! isResendingToken" class="text-sm text-gray-500 text-center">Didn't receive verification code? <a @click="resend" class="text-brand-700 hover:text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
           </div>
           <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending verification code to your email {{ customer.data?.account?.email }} ...</div>
         </template>
