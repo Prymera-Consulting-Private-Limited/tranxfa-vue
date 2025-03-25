@@ -114,7 +114,7 @@ onMounted(async () => {
         </div>
         <v-otp-input
             class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"
-            input-classes="w-16 h-16 flex flex-col items-center justify-center text-center px-5 border-b border border-gray-300 rounded-lg text-lg otp-input"
+            input-classes="w-12 h-12 lg:w-16 lg:h-16 flex flex-col items-center justify-center text-center px-3 lg:px-5 border-b border border-gray-300 rounded-lg text-lg otp-input"
             separator=""
             inputType="number"
             :num-inputs="6"
