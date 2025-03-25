@@ -89,6 +89,12 @@ const progress = computed(() => steps.map((step) => {
   } else {
     step.status = 'upcoming';
   }
+  // if ((step.id === 'selectRecipient' && step.status === 'upcoming')) {
+  //   step.show = false;
+  // }
+  if ((step.id === 'addRecipient' && step.status === 'complete')) {
+    step.show = false;
+  }
   return step;
 }).filter((step) => step.show));
 </script>
@@ -96,8 +102,7 @@ const progress = computed(() => steps.map((step) => {
   <nav aria-label="Progress">
     <ol role="list" class="overflow-hidden">
       <template v-for="(step, stepIdx) in progress" :key="step.id">
-        <template v-if="(step.id === 'selectRecipient' && step.status === 'upcoming') || (step.id === 'addRecipient' && step.status === 'complete')"></template>
-        <li v-else :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
+        <li :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
           <template v-if="step.status === 'complete'">
             <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-purple-600" aria-hidden="true" />
             <div class="group relative flex items-start">
@@ -108,8 +113,8 @@ const progress = computed(() => steps.map((step) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium">{{ step.name }}</div>
-                <p class="mt-1 text-sm text-gray-500">{{ step.description }}</p>
+                <div class="text-sm font-medium mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="mt-1 text-sm text-gray-500"></p>
               </div>
             </div>
           </template>
@@ -122,8 +127,8 @@ const progress = computed(() => steps.map((step) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium text-purple-600">{{ step.name }}</div>
-                <p class="text-sm text-gray-500">{{ step.description }}</p>
+                <div class="text-sm font-medium text-purple-600 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="text-sm text-gray-500"></p>
               </div>
             </div>
           </template>
@@ -135,9 +140,9 @@ const progress = computed(() => steps.map((step) => {
                   <div class="size-2.5 rounded-full bg-transparent group-hover:bg-gray-300" />
                 </div>
               </div>
-              <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium text-gray-500">{{ step.name }}</div>
-                <p class="text-sm text-gray-500">{{ step.description }}</p>
+              <div class="ml-4 flex min-w-0 flex-col mt-2">
+                <div class="text-sm font-medium text-gray-500">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="text-sm text-gray-500"></p>
               </div>
             </div>
           </template>
