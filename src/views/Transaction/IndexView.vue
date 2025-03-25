@@ -40,7 +40,7 @@ const transactions = computed(() => {
 <template>
   <CustomerLayout>
     <main class="-mt-24 py-8">
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 grid grid-cols-3 gap-8">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 grid xl:grid-cols-3 gap-8">
         <h1 class="sr-only">Transactions</h1>
         <template v-if="isLoading">
           <div class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
@@ -119,7 +119,7 @@ const transactions = computed(() => {
           </div>
           <template v-else>
             <div class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white col-span-2 shadow-lg">
-              <div class="animate-pulse">
+              <div>
                 <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
                 <span class="mt-4 block text-lg font-semibold text-gray-900">No Transactions Yet</span>
                 <p class="mt-2 text-sm text-gray-600 max-w-sm">
@@ -129,13 +129,8 @@ const transactions = computed(() => {
             </div>
           </template>
         </template>
-        <div class="grid grid-cols-1 gap-4">
-          <section aria-labelledby="section-2-title">
-            <h2 class="sr-only" id="section-2-title">Send Money</h2>
-            <div class="rounded-lg bg-white p-5 pb-8 border border-solid border-gray-300 border-1 shadow-lg">
-              <Calculator />
-            </div>
-          </section>
+        <div class="flex items-center justify-center rounded-lg bg-white p-5 pb-8 border border-solid border-gray-300 border-1 shadow-lg w-full">
+          <Calculator />
         </div>
       </div>
     </main>
