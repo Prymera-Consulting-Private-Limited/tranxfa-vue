@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, onUnmounted, reactive, ref} from "vue";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import Transaction from "@/models/transaction.js";
 import {useTimeUtils} from "@/composables/time_utils.js";
@@ -16,6 +16,7 @@ import {
 import moment from "moment";
 import TransactionStateIcon from "@/enums/transaction_state_icon.js";
 import RecipientDataType from "@/enums/recipient_data_type.js";
+import TransasctionState from "@/models/transaction_state.js";
 
 const transactionUtils = useTransactionUtils();
 const timeUtils = useTimeUtils();
@@ -28,15 +29,31 @@ const props = defineProps({
   }
 });
 
+const isLoading = ref(false);
+
 const transaction = reactive({
   data: null
 });
 
-onMounted(async () => {
+const getTransaction = async () => {
+  isLoading.value = true;
   await transactionUtils.getTransaction(props.id).then((response) => {
     transaction.data = Transaction.getInstance(response.data);
   })
+  isLoading.value = false;
+}
+
+onMounted(async () => {
+  await getTransaction()
+  Echo.channel(`client-transaction.${transaction.data.id}`)
+      .listen('TransactionStateUpdated', (e) => {
+        getTransaction();
+      });
 });
+
+onUnmounted(async () => {
+  Echo.leaveChannel(`client-transaction.${transaction.data.id}`);
+})
 
 </script>
 
@@ -97,12 +114,12 @@ onMounted(async () => {
                     <time datetime="2023-01-31">January 31, 2023</time>
                   </dd>
                 </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
+                <div class="mt-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data.payment.paymentAccount">
                   <dt class="flex-none">
                     <span class="sr-only">Status</span>
                     <CreditCardIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-500">Paid with {{ transaction.data.payment.paymentAccount.institution }} {{ transaction.data.payment.paymentAccount.accountNumber }}</dd>
+                  <dd class="text-sm/6 text-gray-500">Paid with {{ transaction.data.payment.paymentAccount?.institution }} {{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
                 </div>
               </dl>
               <div class="mt-6 border-t border-gray-900/5 px-6 py-6">
