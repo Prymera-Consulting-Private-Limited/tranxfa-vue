@@ -15,12 +15,26 @@ export const onboardingNavigationMachine = createMachine({
     },
     states: {
         emailVerification: {
-            always: [
-                {
-                    target: 'sourceCountrySelection',
-                    guard: () => customerStore.isLoaded && customer.data?.account?.isEmailVerified === true,
-                },
-            ],
+            on: {
+                PROCEED: [
+                    {
+                        target: 'onboardingComplete',
+                        guard: () => customerStore.isLoaded && customer.data?.mobileNumber,
+                    },
+                    {
+                        target: 'mobileNumberInput',
+                        guard: () => customerStore.isLoaded && customer.data?.identityInformationRequired() === false,
+                    },
+                    {
+                        target: 'identityInformation',
+                        guard: () => (customerStore.isLoaded && customer.data?.country || null) !== null,
+                    },
+                    {
+                        target: 'sourceCountrySelection',
+                        guard: () => customerStore.isLoaded && customer.data?.account?.isEmailVerified === true,
+                    }
+                ],
+            },
         },
         sourceCountrySelection: {
             on: {
