@@ -66,7 +66,7 @@ const editPersonalInformation = () => {
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
       </div>
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left">Enter Your Mobile Number</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Enter Your Mobile Number</h2>
       <p class="text-md text-gray-900 mb-8 text-left">Please provide your mobile number to continue.</p>
       <!-- Form -->
       <form @submit.prevent="updateMobileNumber" class="space-y-6 mt-12">

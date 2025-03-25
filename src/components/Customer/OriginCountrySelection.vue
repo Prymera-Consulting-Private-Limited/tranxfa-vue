@@ -40,7 +40,7 @@ onMounted(async () => {
         <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left">Where Do You Live?</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left  mt-14 sm:mt-8">Where Do You Live?</h2>
       <p class="text-md text-[#B7A3C1] mb-8 text-left">To provide you with the best service, we need to know your country of residence. Please select your country to continue.</p>
       <ul role="list" class="mt-3 grid grid-cols-1 gap-5 xl:grid-cols-2 sm:gap-6">
         <template v-for="country in countryUtils.sources.value" :key="country.id">

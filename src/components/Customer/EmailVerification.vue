@@ -99,7 +99,7 @@ onMounted(async () => {
         <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center">Verify your Email!</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">Verify your Email!</h2>
       <p class="text-md text-[#B7A3C1] mb-8 text-center">We have sent an email verification code to your email {{ customer.data?.account?.email }}</p>
       <!-- Form -->
       <form @submit.prevent="verifyEmailAddress" class="space-y-10">

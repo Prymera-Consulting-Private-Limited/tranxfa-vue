@@ -45,7 +45,7 @@ const identityUpdated = () => {
         <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 mt-8">Personal Details</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">Personal Details</h2>
       <p class="text-md text-gray-900 mb-3">Complete your profile by providing some details about you</p>
       <div class="text-sm text-gray-900 mb-12 flex items-center justify-start gap-x-1">
         You've signed up from <FlagIcon v-if="customer?.data?.country" :class="['text-xl border border-gray-100']" :code="customer?.data?.country?.iso2Alpha.toLowerCase()" circle  /> <span class="font-semibold">{{ customer?.data?.country?.commonName }}.</span>
