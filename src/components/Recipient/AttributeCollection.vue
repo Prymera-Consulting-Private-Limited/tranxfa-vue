@@ -194,7 +194,10 @@ watchEffect(() => {
     <div v-if="type === RecipientType.BUSINESS">
       <div >
         <div>
-          <label for="entity-name" :class="[errors?.entity_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Entity Name</label>
+          <label for="entity-name" :class="[errors?.entity_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+            Entity Name
+            <span class="ml-0.5 text-red-500">*</span>
+          </label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the entity name as it appears of their incorporation certificate or similar documents.</p>
           <EntityNameInput v-on:recipient:input:updated="updateRecipientEntityName" :id="`entity-name`" />
           <p v-if="errors?.entity_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.entity_name[0] }}</p>
@@ -206,7 +209,10 @@ watchEffect(() => {
           payoutChannel.configuration.askForMiddleName ? 'lg:grid-cols-3' :  'lg:grid-cols-2'
       ]" class="grid grid-cols-1 gap-6">
         <div>
-          <label for="first-name" :class="[errors?.first_name?.length ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">First Name</label>
+          <label for="first-name" :class="[errors?.first_name?.length ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+            First Name
+            <span class="ml-0.5 text-red-500">*</span>
+          </label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the first name of the recipient as it appears of their identity document.</p>
           <FirstNameInput v-on:recipient:input:updated="updateRecipientFirstName" :id="`first-name`" />
           <p v-if="errors?.first_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.first_name[0] }}</p>
@@ -218,7 +224,10 @@ watchEffect(() => {
           <p v-if="errors?.middle_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.middle_name[0] }}</p>
         </div>
         <div>
-          <label for="last-name" :class="[errors?.last_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Last Name</label>
+          <label for="last-name" :class="[errors?.last_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+            Last Name
+            <span class="ml-0.5 text-red-500">*</span>
+          </label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the last name of the recipient as it appears of their identity document.</p>
           <LastNameInput v-on:recipient:input:updated="updateRecipientLastName" :id="`last-name`" />
           <p v-if="errors?.last_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.last_name[0] }}</p>
@@ -231,13 +240,19 @@ watchEffect(() => {
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
           <div class="space-y-6">
             <div>
-              <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attribute.label }}</label>
+              <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+                {{ attribute.label }}
+                <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
+              </label>
               <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
               <TextInput v-on:recipient:input:updated="updateRecipientInput" v-bind:attribute="attribute" :id="attribute.attribute" />
               <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[attribute.attribute][0] }}</p>
             </div>
             <div>
-              <label :for="`confirm-input-${attribute.attribute}`" :class="[errors[`confirm_${attribute.attribute}`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Confirm {{ attribute.label }}</label>
+              <label :for="`confirm-input-${attribute.attribute}`" :class="[errors[`confirm_${attribute.attribute}`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+                Confirm {{ attribute.label }}
+                <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
+              </label>
               <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
               <TextInput v-on:recipient:input:updated="updateRecipientAccountNumberConfirmation" :id="`confirm-input-${attribute.attribute}`" />
               <p v-if="errors[`confirm_${attribute.attribute}`]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[`confirm_${attribute.attribute}`][0] }}</p>
@@ -247,13 +262,19 @@ watchEffect(() => {
       </template>
       <template v-else>
         <template v-if="(componentMap[attribute.type] || componentMap['default']) === MobileNumberInput || (componentMap[attribute.type] || componentMap['default']) === PhoneNumberInput">
-          <label :for="attribute.attribute" :class="[errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attribute.label }}</label>
+          <label :for="attribute.attribute" :class="[errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+            {{ attribute.label }}
+            <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
+          </label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
           <component v-on:recipient:input:updated="updateRecipientInput" :is="componentMap[attribute.type] || componentMap['default']" v-bind:attribute="attribute" :id="attribute.attribute" />
           <p v-if="errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[`${attribute.attribute}.country`][0] || errors[`${attribute.attribute}.number`][0] }}</p>
         </template>
         <template v-else>
-          <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attribute.label }}</label>
+          <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+            {{ attribute.label }}
+            <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
+          </label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
           <component v-on:recipient:input:updated="updateRecipientInput" :is="componentMap[attribute.type] || componentMap['default']" v-bind:attribute="attribute" :id="attribute.attribute" />
           <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[attribute.attribute][0] }}</p>
@@ -261,7 +282,10 @@ watchEffect(() => {
       </template>
     </div>
     <div>
-      <label for="relationship" :class="[errors?.relationship_id?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Relation</label>
+      <label for="relationship" :class="[errors?.relationship_id?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+        Relation
+        <span class="ml-0.5 text-red-500">*</span>
+      </label>
       <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please select your relation with the recipient.</p>
       <RelationshipInput v-bind:relationships="relationships" v-on:recipient:relationship:updated="updateRelationship" />
       <p v-if="errors?.relationship_id?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.relationship_id[0] }}</p>
