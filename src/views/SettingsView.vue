@@ -41,6 +41,14 @@ const identityUpdated = () => {
 const addressUpdated = () => {
   isAddressModalOpen.value = false;
 }
+
+const identityUpdateFailed = () => {
+  isPersonalDetailsModalOpen.value = true;
+}
+
+const addressUpdateFailed = () => {
+  isAddressModalOpen.value = true;
+}
 </script>
 
 <template>
@@ -102,7 +110,7 @@ const addressUpdated = () => {
                 <div class="rounded-t-md bg-purple-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
-                      <p class="text-sm text-purple-700">Updating verified personal details may require re-verification of your identity to ensure accuracy and compliance. Please review changes carefully before proceeding.</p>
+                      <p class="text-xs text-purple-700 max-w-sm">Updating verified personal details may require re-verification of your identity to ensure accuracy and compliance. Please review changes carefully before proceeding.</p>
                     </div>
                   </div>
                 </div>
@@ -112,6 +120,7 @@ const addressUpdated = () => {
                       v-bind:showLoading="showLoading"
                       v-bind:saveBtnText="'Save Changes'"
                       v-on:customer:attribute_category:updated="identityUpdated"
+                      v-on:customer:attribute_category:update_failed="identityUpdateFailed"
                   />
                 </div>
               </DialogPanel>
@@ -132,7 +141,7 @@ const addressUpdated = () => {
                 <div class="rounded-t-md bg-purple-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
-                      <p class="text-sm text-purple-700">Updating your address may require re-verification of your address to ensure accuracy and compliance. Please review your changes carefully before proceeding.</p>
+                      <p class="text-xs text-purple-700 max-w-sm">Updating your address may require re-verification of your address to ensure accuracy and compliance. Please review your changes carefully before proceeding.</p>
                     </div>
                   </div>
                 </div>
@@ -142,6 +151,7 @@ const addressUpdated = () => {
                       v-bind:showLoading="showLoading"
                       v-bind:saveBtnText="'Save Changes'"
                       v-on:customer:attribute_category:updated="addressUpdated"
+                      v-on:customer:attribute_category:update_failed="addressUpdateFailed"
                   />
                 </div>
               </DialogPanel>

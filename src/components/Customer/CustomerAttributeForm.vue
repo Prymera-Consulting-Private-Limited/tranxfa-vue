@@ -55,16 +55,17 @@ const emit = defineEmits([
 async function update() {
   isSaving.value = true;
   form.errors = null;
-  customerUtils.updateProfileAttribute(form.data, props.categories).catch((e) => {
+  customerUtils.updateProfileAttribute(form.data, props.categories).then(() => {
+    emit('customer:attribute_category:updated');
+  }).catch((e) => {
     if (e.response.status === 422) {
       form.errors = e.response.data.errors;
     } else {
       console.error(e);
     }
     emit('customer:attribute_category:update_failed', e);
+  }).finally(() => {
     isSaving.value = false;
-  }).then(() => {
-    emit('customer:attribute_category:updated');
   });
 }
 
