@@ -57,7 +57,7 @@ onMounted(async () => {
               <div>
                 <div class="mt-3 text-center sm:mt-5">
                   <div v-if="transaction" class="text-center">
-                    <Apaylo v-if="transaction.payment.paymentProvider.code === 'INTERAC'" v-bind:transaction="transaction"  />
+                    <Apaylo v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  />
                     <Paga v-if="transaction.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction"  />
                   </div>
                 </div>
