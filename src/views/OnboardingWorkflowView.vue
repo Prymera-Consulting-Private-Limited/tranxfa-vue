@@ -61,7 +61,7 @@ const editPersonalInformation = () => {
             <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
           </div>
         </div>
-        <EmailVerification v-if="snapshot?.value === 'emailVerification'" />
+        <EmailVerification v-if="snapshot?.value === 'emailVerification'" v-on:emailVerified="proceed" />
         <OriginCountrySelection
             v-else-if="snapshot?.value === 'sourceCountrySelection'"
             v-on:countryUpdated="proceed" />

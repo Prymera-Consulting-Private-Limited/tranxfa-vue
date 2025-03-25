@@ -19,11 +19,11 @@ export const onboardingNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'onboardingComplete',
-                        guard: () => customerStore.isLoaded && customer.data?.mobileNumber,
+                        guard: () => customerStore.isLoaded && (customer.data?.mobileNumber || null) !== null,
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: () => customerStore.isLoaded && customer.data?.identityInformationRequired() === false,
+                        guard: () => customerStore.isLoaded && (customer.data?.identityInformationRequired() || true) === false,
                     },
                     {
                         target: 'identityInformation',
@@ -31,7 +31,7 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'sourceCountrySelection',
-                        guard: () => customerStore.isLoaded && customer.data?.account?.isEmailVerified === true,
+                        guard: () => customerStore.isLoaded && (customer.data?.account?.isEmailVerified || false) === true,
                     }
                 ],
             },

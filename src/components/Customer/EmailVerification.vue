@@ -13,6 +13,7 @@ const isResendingToken = ref(false);
 const otpError = ref('');
 const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
+const emit = defineEmits(['emailVerified']);
 
 /**
  * @type {{data: Customer | null}}
@@ -27,6 +28,7 @@ async function verifyEmailAddress() {
       otpError.value = e.response.data.message;
     } else if (e.status === 403) {
       customerUtils.refresh();
+      emit('emailVerified');
     } else {
       console.error(e);
       throw e;
@@ -35,6 +37,7 @@ async function verifyEmailAddress() {
     isLoading.value = false;
     isVerifying.value = false;
   });
+  emit('emailVerified');
 }
 
 const showResendButton = ref(false);
