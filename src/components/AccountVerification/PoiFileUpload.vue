@@ -81,7 +81,7 @@ const canSave = computed(() => {
       <h1 class="text-lg font-bold">Upload {{ documentType.title }}</h1>
       <p class="text-sm text-gray-600">Ensure all details on the document are clear and readable</p>
     </div>
-    <div class="flex items-center justify-center gap-5">
+    <div class="grid sm:grid-cols-2 items-center justify-center gap-5">
       <SingleFileUpload
           v-bind:page="'photo'"
           v-bind:documentCategory="documentCategory"
