@@ -24,6 +24,10 @@ const props = defineProps({
   disableSelection: {
     type: Boolean,
     default: false
+  },
+  errors: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -46,7 +50,7 @@ const onMaska = (event) => {
 }
 
 const amountModel = computed({
-  get: () => props.amount.toFixed(props.currency.decimalPlaces),
+  get: () => props.amount?.toFixed(props.currency.decimalPlaces),
   set: () => {}
 })
 
@@ -92,4 +96,5 @@ function amountUpdated() {
       </Menu>
     </div>
   </div>
+  <p v-if="errors.length > 0" class="mt-3 ml-6 text-xs text-red-600">{{ errors[0] }}</p>
 </template>

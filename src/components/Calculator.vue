@@ -52,8 +52,15 @@ const query = reactive({
   payoutCompany: quoteUtil.quote.data?.payoutCompany,
 });
 
+const quoteErrors = reactive({
+  payment: [],
+  payout: [],
+});
+
 async function getQuote() {
   isFetchingQuote.value = true;
+  quoteErrors.payment = [];
+  quoteErrors.payout = [];
   await quoteUtil.getQuote(query).then(() => {
     query.amountType = quoteUtil.quote.data?.amountType;
     query.amount = quoteUtil.quote.data?.amount;
@@ -63,8 +70,26 @@ async function getQuote() {
     query.payoutCurrency = quoteUtil.quote.data?.payoutCurrency;
     query.payoutMethod = quoteUtil.quote.data?.payoutMethod;
     query.payoutCompany = quoteUtil.quote.data?.payoutCompany;
+  }).catch((e) => {
+    if (e.response.status === 422) {
+      const errors = e.response.data.errors;
+      if (errors?.amount?.length > 0) {
+        if ((query?.amountType || AmountType.SEND) === AmountType.SEND) {
+          for (const error of errors.amount) {
+            quoteErrors.payment.push(error);
+          }
+        } else {
+          for (const error of errors.amount) {
+            quoteErrors.payout.push(error);
+          }
+        }
+      }
+    } else {
+      console.error(e);
+    }
+  }).finally(() => {
+    isFetchingQuote.value = false;
   });
-  isFetchingQuote.value = false;
 }
 
 async function sentAmountUpdated(amount) {
@@ -146,6 +171,7 @@ function saveQuote() {
                         v-bind:options="quoteUtil.quote.data.sources"
                         v-bind:amount="quoteUtil.quote.data.localAmount"
                         v-bind:inputId="`send-money-input`"
+                        v-bind:errors="quoteErrors.payment"
                         v-on:update:amount="sentAmountUpdated"
                         v-on:option:updated="sourceUpdated"
                     />
@@ -221,6 +247,7 @@ function saveQuote() {
                         v-bind:amount="quoteUtil.quote.data.foreignAmount"
                         v-bind:disableSelection="!!recipient"
                         v-bind:inputId="`receive-money-input`"
+                        v-bind:errors="quoteErrors.payout"
                         v-on:update:amount="receiveAmountUpdated"
                         v-on:option:updated="targetUpdated"
                     />
