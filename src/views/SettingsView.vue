@@ -80,7 +80,7 @@ const addressUpdated = () => {
                 <DevicePhoneMobileIcon class="h-6 w-6 text-purple-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Devices</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Manage devices that have access to your account.</p>
-                <a href="#" class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500">Manage Devices &rarr;</a>
+                <router-link class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500 cursor-pointer" :to="{name: 'devices'}">Manage Devices &rarr;</router-link>
               </div>
             </div>
           </section>
