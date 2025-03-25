@@ -56,12 +56,13 @@ async function update() {
   isSaving.value = true;
   form.errors = null;
   customerUtils.updateProfileAttribute(form.data, props.categories).catch((e) => {
-    emit('customer:attribute_category:update_failed', e);
-    if (e.status === 422) {
+    if (e.response.status === 422) {
       form.errors = e.response.data.errors;
     } else {
       console.error(e);
     }
+    emit('customer:attribute_category:update_failed', e);
+    isSaving.value = false;
   }).then(() => {
     emit('customer:attribute_category:updated');
   });
@@ -72,7 +73,10 @@ const attributes = computed(() => {
     return [];
   }
   const categories = props.categories.split(',');
-  return customer.data.attributes.filter((attr) => categories.includes(attr.category));
+  return customer.data.attributes.map((attr) => {
+    attr.errors = form.errors?.[attr.attribute] ?? [];
+    return attr;
+  }).filter((attr) => categories.includes(attr.category));
 })
 
 const updateFormData = (attr, value) => {

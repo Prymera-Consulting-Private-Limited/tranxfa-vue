@@ -22,8 +22,11 @@ const notifyAttributeUpdated = (attr, value) => {
 </script>
 
 <template>
-  <label :for="attr.attribute" :class="[attr.errors?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">{{ attr.label }}</label>
-  <p class="mt-2 mb-3 text-gray-400 text-sm">{{ attr.infoText }}</p>
+  <label :for="attr.attribute" :class="[attr.errors?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+    <span>{{ attr.label }}</span>
+    <span v-if="attr.isRequired === true" class="ml-0.5 text-red-500">*</span>
+  </label>
+  <p class="mt-2 mb-3 text-gray-400 text-xs">{{ attr.infoText }}</p>
   <FirstNameInput v-if="attr.attribute === 'first_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
   <MiddleNameInput v-else-if="attr.attribute === 'middle_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
   <LastNameInput v-else-if="attr.attribute === 'last_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
