@@ -46,7 +46,17 @@ export function useRecipientUtils() {
         });
     }
 
-    const getQuote = async (recipient, data) => {
+    const getQuote = async (recipient, quote) => {
+        const data = {
+            amount_type: quote?.amountType,
+            amount: quote?.amount,
+            payment_country_id: quote?.paymentCountry?.id,
+            payment_currency_id: quote?.paymentCurrency?.id,
+            payout_country_id: quote?.payoutCountry?.id,
+            payout_currency_id: quote?.payoutCurrency?.id,
+            payout_method_id: quote?.payoutMethod?.id,
+            payout_company_id: quote?.payoutCompany?.id,
+        };
         return axios.post(`/client/v1/recipient/send-money/${recipient.id}`, data, {
             headers: {
                 'X-Customer-Token': customerUtils.getAuthToken(),
