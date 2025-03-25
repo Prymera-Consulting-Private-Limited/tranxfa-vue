@@ -87,7 +87,6 @@ onMounted(() => {
 })
 
 watchEffect(() => {
-  console.log(props.updateOutsourced, props.externalSaveTrigger);
   if (props.updateOutsourced && props.externalSaveTrigger) {
     update();
   }
@@ -95,7 +94,12 @@ watchEffect(() => {
 </script>
 
 <template>
-  <form @submit.prevent="update" class="space-y-6">
+  <template v-if="showLoading && !isSaving">
+    <div class="h-24 w-full flex items-center justify-center">
+      <Spinner :class="'size-12'" />
+    </div>
+  </template>
+  <form v-else @submit.prevent="update" class="space-y-6">
     <div v-for="attribute in attributes" :key="attribute.attribute">
       <FormGroup v-on:customer:attribute:updated="updateFormData" v-bind:attr="attribute" />
     </div>

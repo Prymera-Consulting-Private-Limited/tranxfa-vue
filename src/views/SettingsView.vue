@@ -8,6 +8,7 @@ import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.v
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCountriesStore} from "@/stores/countries.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
+import {useCountryUtils} from "@/composables/country_utils.js";
 
 const isPersonalDetailsModalOpen = ref(false);
 const isAddressModalOpen = ref(false);
@@ -15,6 +16,7 @@ const isAddressModalOpen = ref(false);
 const isLoading = ref(false)
 const customerStore = useCustomerStore()
 const countriesStore = useCountriesStore();
+const countryUtils = useCountryUtils();
 const customerUtils = useCustomerUtils()
 
 const customer = customerStore.customer;
@@ -22,6 +24,9 @@ const customer = customerStore.customer;
 onMounted( async () => {
   if (! customerStore.isLoaded) {
     await customerUtils.refresh();
+  }
+  if (! countriesStore.isLoaded) {
+    await countryUtils.getCountries();
   }
 });
 
@@ -33,10 +38,12 @@ const emit = defineEmits(['identityUpdated', 'addressUpdated'])
 
 const identityUpdated = () => {
   emit('identityUpdated')
+  isPersonalDetailsModalOpen.value = false;
 }
 
 const addressUpdated = () => {
   emit('addressUpdated')
+  isAddressModalOpen.value = false;
 }
 </script>
 
