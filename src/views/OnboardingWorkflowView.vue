@@ -40,9 +40,7 @@ const changeCountry = () => {
   send({type: 'CHANGE_COUNTRY'});
 }
 const proceed = () => {
-  console.log(snapshot.value);
   send({type: 'PROCEED'});
-  console.log(snapshot.value);
 }
 const editPersonalInformation = () => {
   send({type: 'EDIT_PERSONAL_INFORMATION'});
