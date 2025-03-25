@@ -212,7 +212,7 @@ async function register() {
             </form>
 
             <p class="text-sm text-gray-500 mt-10 text-center">
-              Already have an account? <router-link class="text-brand-700 hover:text-brand-800 hover:underline" :to="{name: 'signIn'}">Sign in instead</router-link>
+              Already have an account? <router-link class="text-brand-700 hover:text-brand-700 hover:underline" :to="{name: 'signIn'}">Sign in instead</router-link>
             </p>
           </div>
         </div>
