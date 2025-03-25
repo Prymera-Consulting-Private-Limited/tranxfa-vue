@@ -125,36 +125,36 @@ onUnmounted(async () => {
                     {{ transaction.data.baseFeesCurrencyPrefixed }}
                   </dd>
                 </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
-                  <dt class="flex-none">
-                    <span class="sr-only">Status</span>
-                    <CalculatorIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />
-                  </dt>
-                  <dd class="text-sm/6 text-gray-500">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
-                </div>
-                <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
-                  <dt class="flex-none">
-                    <span class="sr-only">Account Holder Name</span>
-                    <UserCircleIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />
-                  </dt>
-                  <dd class="text-sm/6 font-medium text-gray-900">{{ transaction.data.payment.paymentAccount.accountHolderName }}</dd>
-                </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
-                  <dt class="flex-none">
-                    <span class="sr-only">Due date</span>
-                    <CalendarDaysIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />
-                  </dt>
-                  <dd class="text-sm/6 text-gray-500">
-                    <time datetime="2023-01-31">January 31, 2023</time>
-                  </dd>
-                </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data.payment.paymentAccount">
-                  <dt class="flex-none">
-                    <span class="sr-only">Status</span>
-                    <CreditCardIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />
-                  </dt>
-                  <dd class="text-sm/6 text-gray-500">Paid with {{ transaction.data.payment.paymentAccount?.institution }} {{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
-                </div>
+<!--                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">-->
+<!--                  <dt class="flex-none">-->
+<!--                    <span class="sr-only">Status</span>-->
+<!--                    <CalculatorIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />-->
+<!--                  </dt>-->
+<!--                  <dd class="text-sm/6 text-gray-500">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>-->
+<!--                </div>-->
+<!--                <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">-->
+<!--                  <dt class="flex-none">-->
+<!--                    <span class="sr-only">Account Holder Name</span>-->
+<!--                    <UserCircleIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />-->
+<!--                  </dt>-->
+<!--                  <dd class="text-sm/6 font-medium text-gray-900">{{ transaction.data.payment.paymentAccount.accountHolderName }}</dd>-->
+<!--                </div>-->
+<!--                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">-->
+<!--                  <dt class="flex-none">-->
+<!--                    <span class="sr-only">Due date</span>-->
+<!--                    <CalendarDaysIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />-->
+<!--                  </dt>-->
+<!--                  <dd class="text-sm/6 text-gray-500">-->
+<!--                    <time datetime="2023-01-31">January 31, 2023</time>-->
+<!--                  </dd>-->
+<!--                </div>-->
+<!--                <div class="mt-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">-->
+<!--                  <dt class="flex-none">-->
+<!--                    <span class="sr-only">Status</span>-->
+<!--                    <CreditCardIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />-->
+<!--                  </dt>-->
+<!--                  <dd class="text-sm/6 text-gray-500">Paid with {{ transaction.data.payment.paymentAccount?.institution }} {{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>-->
+<!--                </div>-->
               </dl>
               <div v-if="false" class="mt-6 border-t border-gray-900/5 px-6 py-6">
                 <a href="#" class="text-sm/6 font-semibold text-gray-900">Download receipt <span aria-hidden="true">&rarr;</span></a>
