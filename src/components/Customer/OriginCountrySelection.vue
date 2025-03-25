@@ -42,7 +42,7 @@ onMounted(async () => {
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 text-left  mt-14 sm:mt-8">Where Do You Live?</h2>
       <p class="text-md text-[#B7A3C1] mb-8 text-left">To provide you with the best service, we need to know your country of residence. Please select your country to continue.</p>
-      <ul role="list" class="mt-3 grid grid-cols-1 gap-5 xl:grid-cols-2 sm:gap-6">
+      <ul v-if="countryUtils.sources.value?.length > 0" role="list" class="mt-3 grid grid-cols-1 gap-5 xl:grid-cols-2 sm:gap-6">
         <template v-for="country in countryUtils.sources.value" :key="country.id">
           <li @click="updateCountry(country)" class="col-span-1 flex rounded-md shadow-xs cursor-pointer">
             <div class="flex px-5 font- shrink-0 items-center justify-center rounded-l-md border-t border-l border-b border-gray-200 bg-white">
@@ -52,6 +52,21 @@ onMounted(async () => {
               <div class="flex-1 truncate px-5 pl-0 py-2 text-sm">
                 <p class="font-medium text-gray-900 truncate">{{ country.commonName }}</p>
                 <p class="text-gray-500 truncate">{{ country.endonym ?? country.officialName }}</p>
+              </div>
+            </div>
+          </li>
+        </template>
+      </ul>
+      <ul v-else role="list" class="mt-3 grid grid-cols-1 gap-5 xl:grid-cols-2 sm:gap-6">
+        <template v-for="i in 4" :key="i">
+          <li class="col-span-1 flex rounded-md">
+            <div class="flex px-5 py-3 font- shrink-0 items-center justify-center rounded-l-md border-t border-l border-b border-gray-200 bg-white">
+              <span class="size-10 bg-gray-200 animate-pulse rounded-full"></span>
+            </div>
+            <div class="flex flex-1 items-center justify-between truncate rounded-r-md border-t border-r border-b border-gray-200 bg-white">
+              <div class="flex-1 truncate px-5 pl-0 py-2 text-sm">
+                <div class="w-24 h-4 bg-gray-200 animate-pulse"></div>
+                <div class="w-16 h-2 mt-2 bg-gray-200 animate-pulse"></div>
               </div>
             </div>
           </li>
