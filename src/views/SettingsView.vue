@@ -51,7 +51,7 @@ const addressUpdated = () => {
               <h2 class="text-base font-semibold text-gray-900">Account Settings</h2>
               <p class="mt-1 text-sm text-gray-500">Manage your personal details, security settings, and connected devices all in one place.</p>
             </div>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 max-w-4xl">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 lg:gap-8 max-w-2xl">
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <UserIcon class="h-6 w-6 text-purple-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Personal Details</h3>
@@ -64,7 +64,7 @@ const addressUpdated = () => {
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Ensure your billing and shipping address details are up-to-date.</p>
                 <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500">Modify &rarr;</a>
               </div>
-              <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
+              <div v-if="false" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <PhoneIcon class="h-6 w-6 text-purple-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Mobile Number</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Update your phone number for account recovery and notifications.</p>
@@ -96,6 +96,13 @@ const addressUpdated = () => {
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+                <div class="rounded-t-md bg-purple-50 p-4">
+                  <div class="flex">
+                    <div class="ml-3 flex-1 md:flex md:justify-between">
+                      <p class="text-sm text-purple-700">Updating verified personal details may require re-verification of your identity to ensure accuracy and compliance. Please review changes carefully before proceeding.</p>
+                    </div>
+                  </div>
+                </div>
                 <div class="px-6 py-5">
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`"
@@ -119,6 +126,13 @@ const addressUpdated = () => {
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl min-w-sm">
+                <div class="rounded-t-md bg-purple-50 p-4">
+                  <div class="flex">
+                    <div class="ml-3 flex-1 md:flex md:justify-between">
+                      <p class="text-sm text-purple-700">Updating your address may require re-verification of your address to ensure accuracy and compliance. Please review your changes carefully before proceeding.</p>
+                    </div>
+                  </div>
+                </div>
                 <div class="px-6 py-5">
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
