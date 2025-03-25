@@ -56,14 +56,29 @@ const finalStateReached = async () => {
                 <h2 class="text-base font-semibold text-gray-900">{{ selectedCategory.data?.title }}</h2>
                 <p class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
                 <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
-                  <ul v-if="selectedCategory.data?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    <li v-for="documentType in selectedCategory.data.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm">
-                      <DocumentTypeItem
-                          v-bind:documentType="documentType"
-                          v-bind:documentCategory="selectedCategory.data"
-                          v-on:sdkFinalStateReached="finalStateReached"
-                      />
-                    </li>
+                  <template v-if="customerStore.isLoaded">
+                    <ul v-if="selectedCategory.data?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      <li v-for="documentType in selectedCategory.data.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm">
+                        <DocumentTypeItem
+                            v-bind:documentType="documentType"
+                            v-bind:documentCategory="selectedCategory.data"
+                            v-on:sdkFinalStateReached="finalStateReached"
+                        />
+                      </li>
+                    </ul>
+                  </template>
+                  <ul v-else role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <template v-for="i in 3" :key="i">
+                      <li class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm animate-pulse">
+                        <div class="flex flex-1 flex-col p-8">
+                          <div class="mx-auto size-16 shrink-0 rounded-full bg-gray-200"></div>
+                          <div class="mt-6 h-4 w-3/4 bg-gray-200 rounded mx-auto"></div>
+                          <div class="mt-3 h-3 w-1/2 bg-gray-200 rounded mx-auto"></div>
+                          <div class="mt-3 h-3 w-2/3 bg-gray-200 rounded mx-auto"></div>
+                          <div class="mt-4 h-5 w-1/2 bg-gray-300 rounded mx-auto"></div>
+                        </div>
+                      </li>
+                    </template>
                   </ul>
                 </div>
               </div>
