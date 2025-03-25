@@ -1,7 +1,7 @@
 <script setup>
 import CustomerAttribute from "@/models/customer_attribute.js";
 import vSelect from 'vue-select';
-import {h, ref, watch} from "vue";
+import {h, onMounted, ref, watch} from "vue";
 import FlagIcon from 'vue3-flag-icons'
 
 const props = defineProps({
@@ -21,7 +21,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 
 const selectedCountry = ref(null);
-selectedCountry.value = props.model;
 
 vSelect.props.components.default = () => ({
   Deselect: {
@@ -49,6 +48,18 @@ function getItemLabel(option) {
   }
   return option[props.itemLabelGenerator];
 }
+
+watch(props, () => {
+  if (props.model) {
+    selectedCountry.value = props.model;
+  }
+});
+
+onMounted(() => {
+  if (props.model) {
+    selectedCountry.value = props.model;
+  }
+});
 </script>
 
 <template>

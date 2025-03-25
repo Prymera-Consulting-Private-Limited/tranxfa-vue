@@ -11,8 +11,7 @@ const props = defineProps({
     default: ''
   }
 });
-
-const input = ref(null);
+const input = ref(props.attr.value);
 const emit  = defineEmits(['customer:attribute:updated']);
 
 watch(input, () => {
