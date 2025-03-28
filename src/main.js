@@ -19,6 +19,7 @@ app.use(router)
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_URL
 axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 axios.interceptors.request.use((config) => {
     config.headers['Accept'] = 'application/json'
     config.headers['ngrok-skip-browser-warning'] = 'yes'
