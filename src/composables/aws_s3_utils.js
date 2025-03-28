@@ -11,6 +11,8 @@ export function useAwsS3Utils () {
     const uploadToPreSignedS3Url = async (url, fileObj, progressCb = null) => {
 
         return axios.put(url, fileObj, {
+            withXSRFToken: false,
+            withCredentials: false,
             headers: {
                 "Content-Type": fileObj.type,
             },
