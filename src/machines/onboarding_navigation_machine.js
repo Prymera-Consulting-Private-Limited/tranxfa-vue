@@ -27,7 +27,7 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'identityInformation',
-                        guard: () => (customerStore.isLoaded && customer.data?.country || null) !== null,
+                        guard: () => (customerStore.isLoaded && customer.data?.country || null) !== null && (customer.data?.account?.isEmailVerified || false) === true,
                     },
                     {
                         target: 'sourceCountrySelection',
