@@ -10,16 +10,9 @@ export function useCustomerUtils() {
      */
     const customer = customerStore.customer;
 
-    function updateStore(data, storeLocally = false) {
+    function updateStore(data) {
         customerStore.customer.data = Customer.getInstance(data);
         customerStore.isLoaded = true;
-        if (storeLocally) {
-            localStorage.setItem('customerSessionToken', customer.data?.session?.sessionToken);
-        }
-    }
-
-    function getAuthToken() {
-        return customer.data?.session?.sessionToken || localStorage.getItem('customerSessionToken');
     }
 
     async function register(email, password, confirmPassword) {
@@ -28,7 +21,7 @@ export function useCustomerUtils() {
             password: password,
             confirm_password: confirmPassword,
         }).then((response) => {
-            updateStore(response.data, true);
+            updateStore(response.data);
         });
     }
 
@@ -37,47 +30,30 @@ export function useCustomerUtils() {
             email: email,
             password: password,
         }).then((response) => {
-            updateStore(response.data, true);
+            updateStore(response.data);
         })
     }
 
     async function logout() {
-        await axios.post('/client/v1/logout', {}, {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
-        }).then(() => {
+        await axios.post('/client/v1/logout', {}).then(() => {
             customerStore.customer.data = null;
             customerStore.isLoaded = false;
-            localStorage.removeItem('customerSessionToken');
         })
     }
 
     async function refresh() {
-        return axios.get('/client/v1/profile', {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
-        }).then((response) => {
+        return axios.get('/client/v1/profile').then((response) => {
             updateStore(response.data);
         })
     }
 
     async function resendEmailVerification() {
-        await axios.post('/client/v1/resend-email-verification', {}, {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
-        })
+        await axios.post('/client/v1/resend-email-verification', {})
     }
 
     async function verifyEmail(otp) {
         await axios.post('/client/v1/verify-email-address', {
             otp: otp,
-        }, {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
         }).then((response) => {
             updateStore(response.data);
         })
@@ -86,10 +62,6 @@ export function useCustomerUtils() {
     async function updateCountry(country) {
         await axios.post('/client/v1/update-country', {
             country_id: country.id,
-        }, {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
         }).then((response) => {
             updateStore(response.data);
         })
@@ -107,11 +79,7 @@ export function useCustomerUtils() {
             }
         }
 
-        await axios.post(`/client/v1/update?category=${categories}`, requestData, {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
-        }).then((response) => {
+        await axios.post(`/client/v1/update?category=${categories}`, requestData).then((response) => {
             updateStore(response.data);
         })
     }
@@ -120,10 +88,6 @@ export function useCustomerUtils() {
         await axios.post('/client/v1/update-mobile-number', {
             mobile_number_country_id: country,
             mobile_number: number,
-        }, {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
         }).then((response) => {
             updateStore(response.data);
         })
@@ -134,10 +98,7 @@ export function useCustomerUtils() {
             params: file ? {
                 file_name: file.name,
                 file_type: file.type,
-            } : null,
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
+            } : null
         });
     }
 
@@ -146,9 +107,6 @@ export function useCustomerUtils() {
             params: {
                 api: api,
             },
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
         });
     }
 
@@ -161,30 +119,18 @@ export function useCustomerUtils() {
                 document_category_id: documentCategory.id,
                 document_type_id: documentType.id,
             },
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
         });
     }
 
     async function tasks() {
-        return axios.get('/client/v1/tasks', {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
-        });
+        return axios.get('/client/v1/tasks');
     }
 
     async function devices() {
-        return axios.get('/client/v1/devices', {
-            headers: {
-                'X-Customer-Token': getAuthToken(),
-            }
-        });
+        return axios.get('/client/v1/devices');
     }
 
     return {
-        getAuthToken,
         register,
         login,
         refresh,
