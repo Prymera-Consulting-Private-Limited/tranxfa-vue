@@ -1,13 +1,11 @@
 import {reactive} from "vue";
 import Quote from "@/models/quote.js";
-import {useCustomerUtils} from "@/composables/customer_utils.js";
 import axios from "axios";
 
 export function useQuoteUtils() {
     const quote = reactive({
         data: new Quote(),
     });
-    const customerUtils = useCustomerUtils();
 
     const getQuote = async (query = null) => {
         const params = {
@@ -23,9 +21,6 @@ export function useQuoteUtils() {
 
         await axios.get('/client/v1/quote', {
             params: params,
-            headers: {
-                'X-Customer-Token': customerUtils.getAuthToken(),
-            }
         }).then((response) => {
             quote.data = Quote.getInstance(response.data);
         });
@@ -42,28 +37,16 @@ export function useQuoteUtils() {
             payout_method_id: quote?.payoutMethod?.id,
             payout_company_id: quote?.payoutCompany?.id,
         };
-        return axios.post('/client/v1/quote', data, {
-            headers: {
-                'X-Customer-Token': customerUtils.getAuthToken(),
-            }
-        });
+        return axios.post('/client/v1/quote', data);
     }
 
     const getTransferQuote = async (id) => {
-        return axios.get(`/client/v1/quote/${id}`, {
-            headers: {
-                'X-Customer-Token': customerUtils.getAuthToken(),
-            }
-        });
+        return axios.get(`/client/v1/quote/${id}`);
     }
 
     const setRecipient = async (quoteId, recipient) => {
         return axios.post(`/client/v1/quote/recipient/${quoteId}`, {
             recipient_id: recipient.id,
-        }, {
-            headers: {
-                'X-Customer-Token': customerUtils.getAuthToken(),
-            }
         });
     }
 
@@ -77,10 +60,6 @@ export function useQuoteUtils() {
         return axios.post(`/client/v1/quote/confirm/${quote.id}`, {
             purpose_id: purpose.id,
             payment_method_id: paymentMethod.id,
-        }, {
-            headers: {
-                'X-Customer-Token': customerUtils.getAuthToken(),
-            }
         });
     }
 
