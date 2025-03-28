@@ -4,7 +4,6 @@ import router from "@/router/index.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {usePasswordPolicyUtils} from "@/composables/password_policy_utils.js";
-import axios from "axios";
 
 const isLoading = ref(false);
 const showPassword = ref(false);
@@ -64,28 +63,26 @@ async function register() {
   formErrors.email = [];
   formErrors.password = [];
   formErrors.confirm_password = [];
-  await axios.get('/sanctum/csrf-cookie').then(() => {
-    customerUtils.register(form.email, form.password, form.confirm_password).then(() => {
-      router.push({name: 'onboardingWorkflow'});
-    }).catch((e) => {
-      if (e.status === 422) {
-        const errors = e.response.data.errors;
-        if (typeof errors.email !== 'undefined') {
-          formErrors.email = errors.email;
-        }
-        if (typeof errors.password !== 'undefined') {
-          formErrors.password = errors.password;
-        }
-        if (typeof errors.confirm_password !== 'undefined') {
-          formErrors.confirm_password = errors.confirm_password;
-        }
-      } else {
-        console.error(e);
+  customerUtils.register(form.email, form.password, form.confirm_password).then(() => {
+    router.push({name: 'onboardingWorkflow'});
+  }).catch((e) => {
+    if (e.status === 422) {
+      const errors = e.response.data.errors;
+      if (typeof errors.email !== 'undefined') {
+        formErrors.email = errors.email;
       }
-    }).finally(() => {
-      isLoading.value = false;
-    })
-  });
+      if (typeof errors.password !== 'undefined') {
+        formErrors.password = errors.password;
+      }
+      if (typeof errors.confirm_password !== 'undefined') {
+        formErrors.confirm_password = errors.confirm_password;
+      }
+    } else {
+      console.error(e);
+    }
+  }).finally(() => {
+    isLoading.value = false;
+  })
 }
 </script>
 
