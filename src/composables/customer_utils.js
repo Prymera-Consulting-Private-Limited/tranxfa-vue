@@ -5,11 +5,6 @@ import axios from "axios";
 export function useCustomerUtils() {
     const customerStore = useCustomerStore();
 
-    /**
-     * @type {{data: Customer|null}}
-     */
-    const customer = customerStore.customer;
-
     function updateStore(data) {
         customerStore.customer.data = Customer.getInstance(data);
         customerStore.isLoaded = true;
