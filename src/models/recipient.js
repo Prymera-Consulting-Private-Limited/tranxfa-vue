@@ -19,27 +19,22 @@ class Recipient {
     /**
      * @type {String|null}
      */
-    firstName = null;
+    name = null;
 
     /**
      * @type {String|null}
      */
-    middleName = null;
+    secondName = null;
 
     /**
      * @type {String|null}
      */
-    lastName = null;
+    thirdName = null;
 
     /**
      * @type {String|null}
      */
-    entityName = null;
-
-    /**
-     * @type {String|null}
-     */
-    fullName = null;
+    wholeName = null;
 
     /**
      * @type {Relationship|null}
@@ -72,11 +67,10 @@ class Recipient {
         let recipient = new Recipient();
         recipient.id = data.id;
         recipient.recipientType = data.recipient_type;
-        recipient.firstName = data.first_name;
-        recipient.middleName = data.middle_name;
-        recipient.lastName = data.last_name;
-        recipient.entityName = data.entity_name;
-        recipient.fullName = data.full_name;
+        recipient.name = data.name;
+        recipient.secondName = data.second_name;
+        recipient.thirdName = data.third_name;
+        recipient.wholeName = data.whole_name;
         if (data.relationship) {
             recipient.relationship = Relationship.getInstance(data.relationship);
         }
@@ -91,7 +85,6 @@ class Recipient {
         }
         if (data.transaction_summary) {
             recipient.transactionSummary = RecipientTransactionSummary.getInstance(data.transaction_summary);
-
         }
 
         if (data.attributes?.length > 0) {
