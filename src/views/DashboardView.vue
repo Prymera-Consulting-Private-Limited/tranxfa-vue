@@ -155,7 +155,7 @@ const recipientCreated = (recipient) => {
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Section title</h2>
               <div>
-                <h2 class="text-base font-semibold text-gray-900">Welcome {{ customer.data?.firstName }}</h2>
+                <h2 class="text-base font-semibold text-gray-900">Welcome {{ customer.data?.name }}</h2>
                 <p class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
                 <ul v-if="tasks.length === 0 && isLoading" role="list" class="mt-6 grid grid-cols-1 gap-6 border-t border-b border-gray-200 py-6 sm:grid-cols-2">
                   <li v-for="i of 6" :key="i" class="flow-root pulse">

@@ -21,22 +21,22 @@ export class Customer {
     /**
      * @type {string|null}
      */
-    firstName = null;
+    name = null;
 
     /**
      * @type {string|null}
      */
-    middleName = null;
+    secondName = null;
 
     /**
      * @type {string|null}
      */
-    lastName = null;
+    thirdName = null;
 
     /**
      * @type {string|null}
      */
-    fullName = null;
+    wholeName = null;
 
     /**
      * @type {string|null}
@@ -120,10 +120,10 @@ export class Customer {
         const customer = new Customer();
         customer.id = data.id;
         customer.crn = data.crn;
-        customer.firstName = data.first_name;
-        customer.middleName = data.middle_name;
-        customer.lastName = data.last_name;
-        customer.fullName = data.full_name;
+        customer.name = data.name;
+        customer.secondName = data.second_name;
+        customer.thirdName = data.third_name;
+        customer.wholeName = data.whole_name;
         customer.uniqueIdentityNumber = data.unique_identity_number;
         customer.mobileNumber = data.mobile_number;
         customer.createdAt = data.created_at;
