@@ -7,11 +7,6 @@ class RecipientAccountDetail {
     accountNumber = null;
 
     /**
-     * @type {String|null}
-     */
-    accountHolderName = null;
-
-    /**
      * @type {DeliveryOption|null}
      */
     institution = null;
@@ -19,7 +14,6 @@ class RecipientAccountDetail {
     static getInstance(data) {
         const recipientAccountDetail = new RecipientAccountDetail();
         recipientAccountDetail.accountNumber = data.account_number;
-        recipientAccountDetail.accountHolderName = data.account_holder_name;
         if (data.institution) {
             recipientAccountDetail.institution = DeliveryOption.getInstance(data.institution);
         }
