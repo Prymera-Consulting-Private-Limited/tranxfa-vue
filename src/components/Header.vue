@@ -10,7 +10,6 @@ import {
   TransitionChild,
   TransitionRoot
 } from "@headlessui/vue";
-import {MagnifyingGlassIcon} from "@heroicons/vue/20/solid/index.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {onMounted, ref} from "vue";
