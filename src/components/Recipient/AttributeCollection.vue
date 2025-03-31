@@ -3,12 +3,6 @@ import Country from "@/models/country.js";
 import Currency from "@/models/currency.js";
 import PayoutMethod from "@/models/payout_method.js";
 import PayoutChannel from "@/models/payout_channel.js";
-import RecipientType from "@/enums/recipient_type.js";
-import FirstNameInput from "@/components/Recipient/Attribute/FirstNameInput.vue";
-import MiddleNameInput from "@/components/Recipient/Attribute/MiddleNameInput.vue";
-import LastNameInput from "@/components/Recipient/Attribute/LastNameInput.vue";
-import EntityNameInput from "@/components/Recipient/Attribute/EntityNameInput.vue";
-import AccountHolderNameInput from "@/components/Recipient/Attribute/AccountHolderNameInput.vue";
 import TextInput from "@/components/Recipient/Attribute/TextInput.vue";
 import DeliveryOptionInput from "@/components/Recipient/Attribute/DeliveryOptionInput.vue";
 import MobileNumberInput from "@/components/Recipient/Attribute/MobileNumberInput.vue";
@@ -23,6 +17,9 @@ import Spinner from "@/components/Spinner.vue";
 import {useRecipientUtils} from "@/composables/recipient_utils.js";
 import Recipient from "@/models/recipient.js";
 import TransactionQuote from "@/models/transaction_quote.js";
+import NameInput from "@/components/Recipient/Attribute/NameInput.vue";
+import SecondNameInput from "@/components/Recipient/Attribute/SecondNameInput.vue";
+import ThirdNameInput from "@/components/Recipient/Attribute/ThirdNameInput.vue";
 
 const props = defineProps({
   country: {
@@ -70,6 +67,9 @@ const errors = reactive({
 });
 
 const componentMap = {
+  'name': NameInput,
+  'second_name': SecondNameInput,
+  'third_name': ThirdNameInput,
   'default': TextInput,
   'select': null,
   'radio': null,
@@ -84,7 +84,6 @@ const componentMap = {
   'address_city': null,
   'address_region': null,
   'address_postcode': null,
-  'account_holder_name': AccountHolderNameInput,
 }
 
 const input = reactive({
@@ -93,15 +92,6 @@ const input = reactive({
     'relationship_id': null,
   },
 });
-if (props.type === RecipientType.BUSINESS) {
-  input.data['entity_name'] = null;
-} else {
-  input.data['first_name'] = null;
-  if (props.payoutChannel.configuration.askForMiddleName) {
-    input.data['middle_name'] = null;
-  }
-  input.data['last_name'] = null;
-}
 
 const confirmAccountNumberInput = ref(null);
 
@@ -122,19 +112,6 @@ for (const attribute of props.payoutChannel.attributes) {
   }
 }
 
-async function updateRecipientFirstName(updated) {
-  input.data.first_name = updated;
-}
-
-async function updateRecipientMiddleName(updated) {
-  input.data.middle_name = updated;
-}
-async function updateRecipientLastName(updated) {
-  input.data.last_name = updated;
-}
-async function updateRecipientEntityName(updated) {
-  input.data.entity_name = updated;
-}
 async function updateRecipientAccountNumberConfirmation(updated) {
   confirmAccountNumberInput.value = updated;
 }
@@ -174,6 +151,7 @@ async function addRecipient() {
       }
     } else {
       console.error(e)
+      isSaving.value = false;
       throw e;
     }
     emit('recipient:add:failed');
@@ -191,50 +169,6 @@ watchEffect(() => {
 
 <template>
   <form @submit.prevent="addRecipient" class="space-y-6">
-    <div v-if="type === RecipientType.BUSINESS">
-      <div >
-        <div>
-          <label for="entity-name" :class="[errors?.entity_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
-            Entity Name
-            <span class="ml-0.5 text-red-500">*</span>
-          </label>
-          <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the entity name as it appears of their incorporation certificate or similar documents.</p>
-          <EntityNameInput v-on:recipient:input:updated="updateRecipientEntityName" :id="`entity-name`" />
-          <p v-if="errors?.entity_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.entity_name[0] }}</p>
-        </div>
-      </div>
-    </div>
-    <div v-else>
-      <div :class="[
-          payoutChannel.configuration.askForMiddleName ? 'lg:grid-cols-3' :  'lg:grid-cols-2'
-      ]" class="grid grid-cols-1 gap-6">
-        <div>
-          <label for="first-name" :class="[errors?.first_name?.length ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
-            First Name
-            <span class="ml-0.5 text-red-500">*</span>
-          </label>
-          <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the first name of the recipient as it appears of their identity document.</p>
-          <FirstNameInput v-on:recipient:input:updated="updateRecipientFirstName" :id="`first-name`" />
-          <p v-if="errors?.first_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.first_name[0] }}</p>
-        </div>
-        <div v-if="payoutChannel.configuration.askForMiddleName">
-          <label for="middle-name" :class="[errors?.middle_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Middle Name</label>
-          <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the middle name of the recipient as it appears of their identity document.</p>
-          <MiddleNameInput v-on:recipient:input:updated="updateRecipientMiddleName" :id="`middle-name`" />
-          <p v-if="errors?.middle_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.middle_name[0] }}</p>
-        </div>
-        <div>
-          <label for="last-name" :class="[errors?.last_name?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
-            Last Name
-            <span class="ml-0.5 text-red-500">*</span>
-          </label>
-          <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please enter the last name of the recipient as it appears of their identity document.</p>
-          <LastNameInput v-on:recipient:input:updated="updateRecipientLastName" :id="`last-name`" />
-          <p v-if="errors?.last_name?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.last_name[0] }}</p>
-        </div>
-      </div>
-    </div>
-
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
