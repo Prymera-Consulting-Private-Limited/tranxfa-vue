@@ -54,7 +54,7 @@ onMounted(async () => {
                   <PageHeadingShimmer />
                 </div>
                 <div v-else>
-                  <h2 class="text-base font-semibold text-gray-900">{{ recipient?.fullName }}</h2>
+                  <h2 class="text-base font-semibold text-gray-900">{{ recipient?.wholeName }}</h2>
                   <p class="mt-1 text-sm text-gray-500">
                     {{ recipient?.channel.payoutMethod.title }} in
                     {{ recipient?.channel.country.commonName }} for receiving {{ recipient?.channel.currency.isoAlpha }}
@@ -70,7 +70,7 @@ onMounted(async () => {
                     <div class="py-6 sm:flex">
                       <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Name</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                        <div class="text-gray-900">{{ recipient?.fullName }}</div>
+                        <div class="text-gray-900">{{ recipient?.wholeName }}</div>
                       </dd>
                     </div>
                     <div class="py-6 sm:flex">

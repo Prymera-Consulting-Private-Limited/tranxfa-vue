@@ -207,7 +207,7 @@ onUnmounted(async () => {
               <div class="mt-8 sm:mt-6 sm:border-t sm:border-gray-900/5 sm:pt-6 sm:pl-4">
                 <dt class="font-semibold text-gray-900">Payout in {{ transaction.data.payoutCountry.commonName }}</dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
-                  <span class="font-medium text-gray-900">{{ transaction.data.recipient.fullName }}</span>
+                  <span class="font-medium text-gray-900">{{ transaction.data.recipient.wholeName }}</span>
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
                   <span class="">{{ transaction.data.payoutMethod.title }}</span>
                 </dd>
@@ -220,8 +220,8 @@ onUnmounted(async () => {
                 <div class="">
                   <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                     <div class="sm:col-span-1">
-                      <dt class="text-sm font-medium text-gray-500">Full Name</dt>
-                      <dd class="mt-1 text-sm text-gray-900">{{ transaction.data.recipient.fullName }}</dd>
+                      <dt class="text-sm font-medium text-gray-500">Name</dt>
+                      <dd class="mt-1 text-sm text-gray-900">{{ transaction.data.recipient.wholeName }}</dd>
                     </div>
                     <div v-for="attribute in transaction.data.recipient.attributes" class="sm:col-span-1">
                       <dt class="text-sm font-medium text-gray-500">{{ attribute.label }}</dt>

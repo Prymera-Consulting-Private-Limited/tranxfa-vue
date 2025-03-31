@@ -34,9 +34,9 @@ onMounted(() => {
 <template>
   <div class="flex flex-1 flex-col px-4 py-5">
     <div :class="[`bg-${cardColor}-500`]" class="flex items-center justify-center mx-auto size-10 shrink-0 rounded-full text-white tracking-wider text-sm">
-      {{ recipient.firstName.charAt(0) + recipient.lastName.charAt(0) }}
+      {{ recipient.name.charAt(0) }}
     </div>
-    <h3 class="mt-6 text-sm font-medium text-gray-900 break-words">{{ recipient.fullName }}</h3>
+    <h3 class="mt-6 text-sm font-medium text-gray-900 break-words">{{ recipient.wholeName }}</h3>
     <dl class="mt-1 flex grow flex-col justify-between">
       <template v-if="recipient?.channel?.country">
         <dt class="sr-only">In Country</dt>
@@ -60,10 +60,10 @@ onMounted(() => {
         </dd>
       </template>
       <template v-else>
-        <dt class="sr-only">You've never sent money to {{ recipient.fullName }}</dt>
+        <dt class="sr-only">You've never sent money to {{ recipient.wholeName }}</dt>
         <dd class="text-gray-400 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
           <p>You've never sent money to</p>
-          <p>{{ recipient.fullName }}</p>
+          <p>{{ recipient.wholeName }}</p>
         </dd>
       </template>
     </dl>

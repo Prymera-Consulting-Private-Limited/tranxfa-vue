@@ -83,7 +83,7 @@ const transactions = computed(() => {
                        }" :is="TransactionStateIcon[transaction.data.state.code]" class="size-6" />
                     </span>
                         <div class="min-w-0 flex-auto">
-                          <div class="text-sm/6 font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }} to <span class="text-purple-700">{{ transaction.data.recipient.fullName }}</span></div>
+                          <div class="text-sm/6 font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }} to <span class="text-purple-700">{{ transaction.data.recipient.wholeName }}</span></div>
                           <div class="text-xs/5 text-gray-800 flex justify-center items-center gap-x-1.5">
                             Sent {{ transaction.data.foreignAmountCurrencyPrefixed }} via {{ transaction.data.payoutMethod.title }}
                             <span class="flex justify-center items-center text-xs/5 text-gray-500">

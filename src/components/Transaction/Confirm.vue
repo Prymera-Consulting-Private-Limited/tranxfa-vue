@@ -33,7 +33,7 @@ defineProps({
           </div>
         </dt>
         <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-          <div class="text-gray-900">{{ quote.recipient.fullName }}</div>
+          <div class="text-gray-900">{{ quote.recipient.wholeName }}</div>
         </dd>
       </div>
       <div class="py-4.5 px-5 sm:flex">

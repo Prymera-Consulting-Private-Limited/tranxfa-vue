@@ -28,7 +28,7 @@ const props = defineProps({
       <p class="text-gray-700 text-sm">{{ quote.exchangeRateFormatted }}</p>
     </li>
     <li class="px-4 py-4 sm:px-6 flex justify-between items-center gap-4 border-b border-dashed border-gray-300">
-      <div class="text-gray-700 font-semibold text-sm">{{ quote.recipient?.fullName || 'Recipient' }} Gets</div>
+      <div class="text-gray-700 font-semibold text-sm">{{ quote.recipient?.wholeName || 'Recipient' }} Gets</div>
       <p class="text-gray-700 text-sm">{{ quote.foreignAmountCurrencyPrefixed }}</p>
     </li>
     <li class="px-4 py-4 sm:px-6 flex justify-between items-center gap-4 border-b border-dashed border-gray-300 bg-gray-50">
