@@ -1,8 +1,8 @@
 <script setup>
 import CustomerAttribute from "@/models/customer_attribute.js";
-import FirstNameInput from "@/components/CustomerAttribute/FirstNameInput.vue";
-import MiddleNameInput from "@/components/CustomerAttribute/MiddleNameInput.vue";
-import LastNameInput from "@/components/CustomerAttribute/LastNameInput.vue";
+import NameInput from "@/components/CustomerAttribute/NameInput.vue";
+import SecondNameInput from "@/components/CustomerAttribute/SecondNameInput.vue";
+import ThirdNameInput from "@/components/CustomerAttribute/ThirdNameInput.vue";
 import DateOfBirthInput from "@/components/CustomerAttribute/DateOfBirthInput.vue";
 import NationalityInput from "@/components/CustomerAttribute/NationalityInput.vue";
 import TextInput from "@/components/CustomerAttribute/TextInput.vue";
@@ -27,9 +27,9 @@ const notifyAttributeUpdated = (attr, value) => {
     <span v-if="attr.isRequired === true" class="ml-0.5 text-red-500">*</span>
   </label>
   <p class="mt-2 mb-3 text-gray-400 text-xs">{{ attr.infoText }}</p>
-  <FirstNameInput v-if="attr.attribute === 'first_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
-  <MiddleNameInput v-else-if="attr.attribute === 'middle_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
-  <LastNameInput v-else-if="attr.attribute === 'last_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
+  <NameInput v-if="attr.attribute === 'name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
+  <SecondNameInput v-else-if="attr.attribute === 'second_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
+  <ThirdNameInput v-else-if="attr.attribute === 'third_name'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
   <DateOfBirthInput v-else-if="attr.attribute === 'birth_detail.birth_date'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
   <NationalityInput v-else-if="attr.attribute === 'nationality_id'" v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" />
   <TextInput v-else v-bind:attr="attr" v-on:customer:attribute:updated="notifyAttributeUpdated" :id="attr.attribute" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
