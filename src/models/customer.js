@@ -46,22 +46,12 @@ export class Customer {
     /**
      * @type {string|null}
      */
-    mobileNumber = null;
-
-    /**
-     * @type {string|null}
-     */
     createdAt = null;
 
     /**
      * @type {string|null}
      */
     updatedAt = null;
-
-    /**
-     * @type {Country|null}
-     */
-    mobileNumberCountry = null;
 
     /**
      * @type {Account|null}
@@ -125,7 +115,6 @@ export class Customer {
         customer.thirdName = data.third_name;
         customer.wholeName = data.whole_name;
         customer.uniqueIdentityNumber = data.unique_identity_number;
-        customer.mobileNumber = data.mobile_number;
         customer.createdAt = data.created_at;
         customer.updatedAt = data.updated_at;
         if (data.account) {
@@ -133,9 +122,6 @@ export class Customer {
         }
         if (data.session) {
             customer.session = Session.getInstance(data.session);
-        }
-        if (data.mobile_number_country) {
-            customer.mobileNumberCountry = Country.getInstance(data.mobile_number_country);
         }
         if (data.country) {
             customer.country = Country.getInstance(data.country);

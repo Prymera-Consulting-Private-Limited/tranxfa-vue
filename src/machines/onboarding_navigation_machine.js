@@ -19,7 +19,7 @@ export const onboardingNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'onboardingComplete',
-                        guard: () => customerStore.isLoaded && (customer.data?.mobileNumber || null) !== null,
+                        guard: () => customerStore.isLoaded && (customer.data?.account?.mobileNumber || null) !== null,
                     },
                     {
                         target: 'mobileNumberInput',
@@ -64,7 +64,7 @@ export const onboardingNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'onboardingComplete',
-                        guard: () => customerStore.isLoaded && customer.data?.mobileNumber,
+                        guard: () => customerStore.isLoaded && customer.data?.account?.mobileNumber,
                     },
                 ],
                 EDIT_PERSONAL_INFORMATION: {

@@ -1,3 +1,5 @@
+import Country from "@/models/country.js";
+
 class Account {
     /**
      * @type {string|null}
@@ -17,6 +19,16 @@ class Account {
     /**
      * @type {string|null}
      */
+    mobileNumber = null;
+
+    /**
+     * @type {Country|null}
+     */
+    mobileNumberCountry = null;
+
+    /**
+     * @type {string|null}
+     */
     createdAt = null;
 
     /**
@@ -29,6 +41,10 @@ class Account {
         account.email = data.email;
         account.isEmailVerified = data.is_email_verified;
         account.passwordChangedAt = data.password_changed_at;
+        account.mobileNumber = data.mobile_number;
+        if (data.mobile_number_country) {
+            account.mobileNumberCountry = Country.getInstance(data.mobile_number_country);
+        }
         account.createdAt = data.created_at;
         account.updatedAt = data.updated_at;
         return account;
