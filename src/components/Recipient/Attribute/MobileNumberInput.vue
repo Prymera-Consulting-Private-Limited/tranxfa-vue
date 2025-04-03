@@ -2,10 +2,15 @@
 import IsdCodeInput from "@/components/IsdCodeInput.vue";
 import {reactive, watch} from "vue";
 import PayoutChannelAttribute from "@/models/payout_channel_attribute.js";
+import Country from "@/models/country.js";
 
 const props = defineProps({
   attribute: {
     type: PayoutChannelAttribute,
+    required: true,
+  },
+  country: {
+    type: Country,
     required: true,
   },
   id: {
@@ -15,7 +20,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['recipient:input:updated']);
 const mobileNumber = reactive({
-  country: props.mobile?.country || null,
+  country: props.country?.id || null,
   number: props.mobile?.number || null,
 })
 
@@ -34,7 +39,7 @@ watch(mobileNumber, () => {
 
 <template>
   <div class="input-group flex items-center">
-    <IsdCodeInput :class="['min-w-40']" v-bind:itemLabelGenerator="itemLabelGenerator" v-on:update:modelValue="updateIsdCode" />
+    <IsdCodeInput :class="['min-w-40']" v-bind:modelValue="mobileNumber.country" v-bind:itemLabelGenerator="itemLabelGenerator" v-on:update:modelValue="updateIsdCode" />
     <input :id="id" type="tel" v-model="mobileNumber.number" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none ml-2" />
   </div>
 </template>
