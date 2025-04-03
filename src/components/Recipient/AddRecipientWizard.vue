@@ -115,15 +115,14 @@ onMounted(async () => {
     send({ type: "PROCEED" })
     await updatePayoutMethod(props.quote.payoutMethod);
   } else {
-    await quoteUtils.getQuote().then(() => {
-      targets.value = quoteUtils.quote.data.targets;
-      if (targets.value.length === 1) {
-        updateRecipientTarget(targets.value[0]);
-      }
+    await quoteUtils.getQuote();
+    targets.value = quoteUtils.quote.data.targets;
+    if (targets.value.length === 1) {
+      await updateRecipientTarget(targets.value[0]);
+    } else {
       isLoading.value = false;
-    });
+    }
   }
-  isLoading.value = false;
 })
 
 const emit = defineEmits([
@@ -138,6 +137,7 @@ const recipientAdded = (recipient) => {
 const saveRecipientFailed = (error) => {
   emit('recipient:add:failed', error);
 }
+
 </script>
 
 <template>
