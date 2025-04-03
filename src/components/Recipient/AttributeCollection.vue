@@ -107,8 +107,10 @@ for (const attribute of props.payoutChannel.attributes) {
     errors[attribute.attribute] = [];
   }
   if (attribute.type === RecipientDataType.ACCOUNT_NUMBER) {
-    input.data[`confirm_${attribute.attribute}`] = confirmAccountNumberInput;
-    errors[`confirm_${attribute.attribute}`] = [];
+    if (props.payoutChannel.configuration.confirmAccountNumber) {
+      input.data[`confirm_${attribute.attribute}`] = confirmAccountNumberInput;
+      errors[`confirm_${attribute.attribute}`] = [];
+    }
   }
 }
 
@@ -182,7 +184,7 @@ watchEffect(() => {
               <TextInput v-on:recipient:input:updated="updateRecipientInput" v-bind:attribute="attribute" :id="attribute.attribute" />
               <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[attribute.attribute][0] }}</p>
             </div>
-            <div>
+            <div v-if="props.payoutChannel.configuration.confirmAccountNumber">
               <label :for="`confirm-input-${attribute.attribute}`" :class="[errors[`confirm_${attribute.attribute}`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
                 Confirm {{ attribute.label }}
                 <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
