@@ -2,9 +2,11 @@
 import {reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
+import {useCustomerStore} from "@/stores/customer.js";
 
 const showPassword = ref(false);
 const customerUtils = useCustomerUtils();
+const customerStore = useCustomerStore();
 const form = reactive({
   email: '',
   password: '',
@@ -16,7 +18,12 @@ async function login() {
   isLoading.value = true;
   loginError.value = null;
   await customerUtils.login(form.email, form.password).then(() => {
-    router.push({name: 'onboardingWorkflow'});
+    if (customerStore.customer.data?.account?.isEmailVerified && customerStore.customer.data?.session?.mfaMethod !== null) {
+      router.push({name: 'multiFactorAuth'});
+    } else {
+      router.push({name: 'onboardingWorkflow'});
+    }
+
   }).catch((e) => {
     loginError.value = e.response?.data?.message;
     console.error(e);
