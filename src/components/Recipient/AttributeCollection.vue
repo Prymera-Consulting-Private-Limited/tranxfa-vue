@@ -201,7 +201,7 @@ watchEffect(() => {
             <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
           </label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
-          <component v-on:recipient:input:updated="updateRecipientInput" :is="componentMap[attribute.type] || componentMap['default']" v-bind:attribute="attribute" :id="attribute.attribute" />
+          <component v-bind:country="props.country" v-on:recipient:input:updated="updateRecipientInput" :is="componentMap[attribute.type] || componentMap['default']" v-bind:attribute="attribute" :id="attribute.attribute" />
           <p v-if="errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[`${attribute.attribute}.country`][0] || errors[`${attribute.attribute}.number`][0] }}</p>
         </template>
         <template v-else>
