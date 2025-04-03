@@ -29,6 +29,18 @@ export function useCustomerUtils() {
         })
     }
 
+    async function mfa(otp) {
+        await axios.post('/client/v1/mfa', {
+            otp: otp,
+        }).then((response) => {
+            updateStore(response.data);
+        })
+    }
+
+    async function resendMfaOtp () {
+        await axios.post('/client/v1/resend-mfa-otp', {})
+    }
+
     async function logout() {
         await axios.post('/client/v1/logout', {}).then(() => {
             customerStore.customer.data = null;
@@ -128,6 +140,8 @@ export function useCustomerUtils() {
     return {
         register,
         login,
+        mfa,
+        resendMfaOtp,
         refresh,
         resendEmailVerification,
         verifyEmail,
