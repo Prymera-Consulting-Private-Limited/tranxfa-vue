@@ -188,7 +188,7 @@ watchEffect(() => {
                 <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
               </label>
               <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
-              <TextInput v-on:recipient:input:updated="updateRecipientAccountNumberConfirmation" :id="`confirm-input-${attribute.attribute}`" />
+              <TextInput v-on:recipient:input:updated="updateRecipientAccountNumberConfirmation" v-bind:attribute="attribute" :id="`confirm-input-${attribute.attribute}`" />
               <p v-if="errors[`confirm_${attribute.attribute}`]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[`confirm_${attribute.attribute}`][0] }}</p>
             </div>
           </div>
