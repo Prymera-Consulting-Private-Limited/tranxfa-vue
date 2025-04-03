@@ -9,7 +9,7 @@ class PayoutChannelAttribute {
     /**
      * @type {String|null}
      */
-    accountNumberType = null;
+    inputMode = null;
 
     /**
      * @type {string|null}
@@ -105,6 +105,7 @@ class PayoutChannelAttribute {
         const payoutChannelAttribute = new PayoutChannelAttribute();
         payoutChannelAttribute.type = data.type;
         payoutChannelAttribute.context = data.context;
+        payoutChannelAttribute.inputMode = data.input_mode;
         payoutChannelAttribute.isRequired = data.is_required;
         payoutChannelAttribute.label = data.label;
         payoutChannelAttribute.attribute = data.attribute;
