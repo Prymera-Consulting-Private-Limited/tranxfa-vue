@@ -23,5 +23,5 @@ watch(model, (value) => {
 </script>
 
 <template>
-  <input :id="id" :minlength="attribute?.exactLength || attribute?.minLength" :maxlength="attribute?.exactLength || attribute?.maxLength" v-model="model" :type="attribute?.accountNumberType || 'text'" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
+  <input :inputmode="attribute?.inputMode || 'text'" :id="id" :minlength="attribute?.exactLength || attribute?.minLength" :maxlength="attribute?.exactLength || attribute?.maxLength" v-model="model" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
 </template>
