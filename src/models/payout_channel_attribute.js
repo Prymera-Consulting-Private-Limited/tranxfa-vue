@@ -7,6 +7,11 @@ class PayoutChannelAttribute {
     type = null;
 
     /**
+     * @type {String|null}
+     */
+    accountNumberType = null;
+
+    /**
      * @type {string|null}
      */
     context = null;
