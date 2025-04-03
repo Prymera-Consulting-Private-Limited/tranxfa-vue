@@ -117,6 +117,7 @@ onMounted(async () => {
             input-classes="w-12 h-12 lg:w-16 lg:h-16 flex flex-col items-center justify-center text-center px-3 lg:px-5 border-b border border-gray-300 rounded-lg text-lg otp-input"
             separator=""
             inputType="number"
+            inputmode="numeric"
             :num-inputs="6"
             v-model:value="emailVerificationCode"
             :should-auto-focus="true"
