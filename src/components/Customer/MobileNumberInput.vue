@@ -28,6 +28,7 @@ onMounted( async () => {
     await customerUtils.refresh();
     isLoading.value = false;
   }
+  mobile.country = customerStore.customer.data?.country?.id || null;
 });
 
 function mobileNumberUpdated(updated) {
