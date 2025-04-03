@@ -14,6 +14,14 @@ const router = createRouter({
         description: 'Login into your account',
       },
     }, {
+      path: '/mfa',
+      name: 'multiFactorAuth',
+      component: () => import('@/views/MultifactorAuthenticationView.vue'),
+      meta: {
+        title: 'More authentication required',
+        description: 'More authentication required',
+      },
+    }, {
       path: '/sign-up',
       name: 'signUp',
       component: SignUpView,
