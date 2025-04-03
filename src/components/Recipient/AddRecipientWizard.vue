@@ -146,42 +146,46 @@ const saveRecipientFailed = (error) => {
       <Spinner class="size-16 mx-auto" />
       <span class="sr-only">Loading...</span>
     </div>
-    <template v-else-if="snapshot?.value === 'addRecipientForm'">
-      <AttributeCollection
-          v-bind:country="recipient.country"
-          v-bind:currency="recipient.currency"
-          v-bind:payoutMethod="recipient.payoutMethod"
-          v-bind:payoutChannel="recipient.payoutChannel"
-          v-bind:type="recipient.type"
-          v-bind:relationships="relationships"
-          v-bind:isSubmitted="externalSaveTrigger"
-          v-bind:quote="props.quote"
-          v-on:recipient:added="recipientAdded"
-          v-on:recipient:add:failed="saveRecipientFailed"
-      />
-    </template>
-    <template v-else-if="snapshot?.value === 'recipientTypeSelection'">
-      <RecipientTypeSelection
-          v-on:recipient:typeSelected="updateRecipientType"
-          v-bind:country="recipient.country"
-          v-bind:currency="recipient.currency"
-          v-bind:payoutMethod="recipient.payoutMethod"
-          v-bind:payoutChannel="recipient.payoutChannel"
-      />
-    </template>
-    <template v-else-if="snapshot?.value === 'payoutMethodSelection'">
-      <PayoutMethodSelection
-          v-on:recipient:payoutMethodSelected="updatePayoutMethod"
-          v-bind:country="recipient.country"
-          v-bind:currency="recipient.currency"
-          v-bind:payoutMethods="payoutMethods"
-      />
-    </template>
     <template v-else>
-      <TargetSelection
-          v-on:recipient:targetSelected="updateRecipientTarget"
-          v-bind:targets="targets"
-      />
+      <template v-if="snapshot?.value === 'addRecipientForm'">
+        <h4 class="text-base text-gray-800 font-semibold">Recipient Details</h4>
+        <p class="mt-1 text-sm text-gray-700 mb-5">For receiving <span class="text-purple-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span> in <span class="text-purple-700 font-semibold">{{ recipient.country?.commonName }}</span> using <span class="text-purple-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></p>
+        <AttributeCollection
+            v-bind:country="recipient.country"
+            v-bind:currency="recipient.currency"
+            v-bind:payoutMethod="recipient.payoutMethod"
+            v-bind:payoutChannel="recipient.payoutChannel"
+            v-bind:type="recipient.type"
+            v-bind:relationships="relationships"
+            v-bind:isSubmitted="externalSaveTrigger"
+            v-bind:quote="props.quote"
+            v-on:recipient:added="recipientAdded"
+            v-on:recipient:add:failed="saveRecipientFailed"
+        />
+      </template>
+      <template v-else-if="snapshot?.value === 'recipientTypeSelection'">
+        <RecipientTypeSelection
+            v-on:recipient:typeSelected="updateRecipientType"
+            v-bind:country="recipient.country"
+            v-bind:currency="recipient.currency"
+            v-bind:payoutMethod="recipient.payoutMethod"
+            v-bind:payoutChannel="recipient.payoutChannel"
+        />
+      </template>
+      <template v-else-if="snapshot?.value === 'payoutMethodSelection'">
+        <PayoutMethodSelection
+            v-on:recipient:payoutMethodSelected="updatePayoutMethod"
+            v-bind:country="recipient.country"
+            v-bind:currency="recipient.currency"
+            v-bind:payoutMethods="payoutMethods"
+        />
+      </template>
+      <template v-else>
+        <TargetSelection
+            v-on:recipient:targetSelected="updateRecipientTarget"
+            v-bind:targets="targets"
+        />
+      </template>
     </template>
   </div>
 </template>
