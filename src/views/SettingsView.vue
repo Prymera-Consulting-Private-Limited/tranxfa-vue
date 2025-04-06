@@ -9,6 +9,7 @@ import {useCustomerStore} from "@/stores/customer.js";
 import {useCountriesStore} from "@/stores/countries.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountryUtils} from "@/composables/country_utils.js";
+import {notify} from 'notiwind';
 
 const isPersonalDetailsModalOpen = ref(false);
 const isAddressModalOpen = ref(false);
@@ -36,10 +37,28 @@ const showLoading = computed(() => {
 
 const identityUpdated = () => {
   isPersonalDetailsModalOpen.value = false;
+  notify(
+      {
+        group: 'customer',
+        title: 'Personal Details Updated',
+        text: 'Your personal information has been successfully updated.',
+        type: 'success',
+      },
+      -1,
+  )
 }
 
 const addressUpdated = () => {
   isAddressModalOpen.value = false;
+  notify(
+      {
+        group: 'customer',
+        title: 'Address Updated',
+        text: 'Your address details have been successfully updated.',
+        type: 'success',
+      },
+      -1,
+  )
 }
 
 const identityUpdateFailed = () => {
