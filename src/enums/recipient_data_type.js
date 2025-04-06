@@ -13,7 +13,9 @@ const RecipientDataType = Object.freeze({
     ADDRESS_CITY: 'address_city',
     ADDRESS_REGION: 'address_region',
     ADDRESS_POSTCODE: 'address_postcode',
-    ACCOUNT_HOLDER_NAME: 'account_holder_name',
+    NAME: 'name',
+    SECOND_NAME: 'second_name',
+    THIRD_NAME: 'third_name',
 })
 
 export default RecipientDataType
