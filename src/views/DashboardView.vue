@@ -19,6 +19,7 @@ import router from "@/router/index.js";
 import CustomerTask from "@/enums/customer_task.js";
 import {CustomerTask as CustomerTaskModal} from "@/models/customer_task.js";
 import CustomerTaskStatus from "@/enums/customer_task_status.js";
+import Task from "@/components/Customer/Task.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -156,8 +157,8 @@ const recipientCreated = (recipient) => {
               <h2 class="sr-only" id="section-2-title">Section title</h2>
               <div>
                 <h2 class="text-base font-semibold text-gray-900">Welcome {{ customer.data?.name }}</h2>
-                <p class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
-                <ul v-if="tasks.length === 0 && isLoading" role="list" class="mt-6 grid grid-cols-1 gap-6 border-t border-b border-gray-200 py-6 sm:grid-cols-2">
+                <p class="mt-1 text-sm text-gray-500 hidden lg:block">Get started by completing the following steps.</p>
+                <ul v-if="tasks.length === 0 && isLoading" role="list" class="mt-6 grid-cols-1 gap-6 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 sm:grid-cols-2 hidden lg:grid">
                   <li v-for="i of 6" :key="i" class="flow-root pulse">
                     <div v-if="isLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
                       <div :class="['bg-gray-300', 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
@@ -179,63 +180,32 @@ const recipientCreated = (recipient) => {
                     </div>
                   </li>
                 </ul>
-                <ul v-if="tasks.length > 0 && !isLoading" role="list" class="mt-6 grid grid-cols-1 gap-6 border-t border-b border-gray-200 py-6 sm:grid-cols-2">
-                  <li v-for="task in tasks" :key="task.id" class="flow-root">
-                    <div :class="{'opacity-60': task.status !== CustomerTaskStatus.PENDING}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 hover:bg-gray-50">
-                      <div :class="[task.background, 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
+                <ul v-if="tasks.length > 0 && !isLoading" role="list" class="mt-6 grid-cols-1 xl:grid-cols-3 gap-10 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 hidden lg:grid">
+                  <li v-for="(task, index) in tasks" :key="task.id" class="flow-root xl:flex-grow">
+                    <div :class="{'opacity-60': task.status !== CustomerTaskStatus.PENDING}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 xl:hover:bg-purple-50 xl:hover:border-purple-200 xl:flex-col xl:space-y-5 xl:text-center xl:border xl:border-dashed xl:border-gray-200 xl:px-5 xl:py-8 xl:bg-white h-full xl:shadow-xs">
+                      <div :class="[task.background, 'flex xl:mx-auto size-16 shrink-0 items-center justify-center rounded-lg xl:hidden']">
+                        <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
+                      </div>
+                      <div :class="['xl:mx-auto size-16 shrink-0 items-center bg-purple-700 justify-center rounded-full hidden xl:flex']">
                         <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
                       </div>
                       <div v-if="task.status !== CustomerTaskStatus.PENDING">
-                        <div class="text-sm font-medium text-gray-900">
-                          <div class="focus:outline-hidden">
-                            <span class="absolute inset-0" aria-hidden="true" />
-                            <span>{{ task.title }}</span>
-                            <span aria-hidden="true"> &rarr;</span>
-                          </div>
-                        </div>
-                        <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
+                        <Task :task="task" :index="index" />
                       </div>
                       <template v-else>
                         <router-link v-if="task.href" :to="task.href" class="cursor-pointer">
-                          <div class="text-sm font-medium text-gray-900">
-                            <div class="focus:outline-hidden">
-                              <span class="absolute inset-0" aria-hidden="true" />
-                              <span>{{ task.title }}</span>
-                              <span aria-hidden="true"> &rarr;</span>
-                            </div>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
+                          <Task :task="task" :index="index" />
                         </router-link>
                         <div v-else-if="task.action || null" @click="task.action" class="cursor-pointer">
-                          <div class="text-sm font-medium text-gray-900">
-                            <div class="focus:outline-hidden">
-                              <span class="absolute inset-0" aria-hidden="true" />
-                              <span>{{ task.title }}</span>
-                              <span aria-hidden="true"> &rarr;</span>
-                            </div>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
+                          <Task :task="task" :index="index" />
                         </div>
-                        <div v-else class="cursor-pointer">
-                          <div class="text-sm font-medium text-gray-900">
-                            <div class="focus:outline-hidden">
-                              <span class="absolute inset-0" aria-hidden="true" />
-                              <span>{{ task.title }}</span>
-                              <span aria-hidden="true"> &rarr;</span>
-                            </div>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">{{ task.description }}</p>
+                        <div v-else>
+                          <Task :task="task" :index="index" />
                         </div>
                       </template>
                     </div>
                   </li>
                 </ul>
-                <div class="mt-4 flex">
-                  <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                    Or complete these steps later
-                    <span aria-hidden="true"> &rarr;</span>
-                  </a>
-                </div>
               </div>
             </section>
           </div>
