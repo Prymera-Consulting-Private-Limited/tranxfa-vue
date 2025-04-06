@@ -179,16 +179,19 @@ async function addRecipient() {
 const doLookup = debounce(() => {
   if (nameLookup.value.isValid) {
     const query = {};
+    const nameAttribute = props.payoutChannel.attributes.find((attribute) => {
+      return attribute.type === RecipientDataType.NAME;
+    });
+    errors[nameAttribute.attribute] = [];
+    input.data[nameAttribute.attribute] = 'Looking up for name with the bank ...';
     for (const attribute of nameLookup.value.attributes) {
       query[attribute.attribute] = input.data[attribute.attribute];
     }
     recipientUtils.lookup(props.payoutChannel, query).then((response) => {
-      const nameAttribute = props.payoutChannel.attributes.find((attribute) => {
-        return attribute.type === RecipientDataType.NAME;
-      });
       input.data[nameAttribute.attribute] = response.data.name;
     }).catch((e) => {
-      console.error(e)
+      input.data[nameAttribute.attribute] = 'Lookup Failed';
+      errors[nameAttribute.attribute] = [e.response.data.message];
     });
   }
 }, 1000)
@@ -204,7 +207,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <form @submit.prevent="addRecipient" class="space-y-6">
+  <form @submit.prevent="addRecipient" class="space-y-6 max-w-md min-w-md">
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
@@ -254,6 +257,7 @@ watchEffect(() => {
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
           <component
               v-bind:disableNameInput="payoutChannel.configuration?.nameLookupRequirements?.length > 0"
+              v-bind:input="input.data"
               v-on:recipient:input:updated="updateRecipientInput"
               :is="componentMap[attribute.type] || componentMap['default']"
               v-bind:attribute="attribute"
