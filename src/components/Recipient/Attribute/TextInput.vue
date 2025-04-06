@@ -11,6 +11,11 @@ const props = defineProps({
     type: PayoutChannelAttribute,
     required: false,
   },
+  nameLookupPath: {
+    type: String,
+    required: false,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['recipient:input:updated']);
@@ -23,5 +28,17 @@ watch(model, (value) => {
 </script>
 
 <template>
-  <input :inputmode="attribute?.inputMode || 'text'" :id="id" :minlength="attribute?.exactLength || attribute?.minLength" :maxlength="attribute?.exactLength || attribute?.maxLength" v-model="model" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
+  <input
+      :class="[
+          nameLookupPath?.length > 0 ? 'bg-gray-50' : 'shadow-sm',
+      ]"
+      :readonly="nameLookupPath?.length > 0"
+      :inputmode="attribute?.inputMode || 'text'"
+      :id="id"
+      :minlength="attribute?.exactLength || attribute?.minLength"
+      :maxlength="attribute?.exactLength || attribute?.maxLength"
+      v-model="model"
+      type="text"
+      class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+  />
 </template>

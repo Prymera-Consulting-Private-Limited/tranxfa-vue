@@ -10,6 +10,11 @@ const props = defineProps({
     type: PayoutChannelAttribute,
     required: true,
   },
+  nameLookupPath: {
+    type: String,
+    required: false,
+    default: null,
+  },
 })
 
 const secondNameUpdated = (value) => {
@@ -18,5 +23,5 @@ const secondNameUpdated = (value) => {
 </script>
 
 <template>
-  <TextInput v-on:recipient:input:updated="secondNameUpdated" :id="id" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
+  <TextInput v-bind:nameLookupPath="nameLookupPath" v-on:recipient:input:updated="secondNameUpdated" :id="id" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
 </template>
