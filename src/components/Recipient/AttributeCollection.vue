@@ -9,7 +9,7 @@ import MobileNumberInput from "@/components/Recipient/Attribute/MobileNumberInpu
 import EmailInput from "@/components/Recipient/Attribute/EmailInput.vue";
 import AccountNumberInput from "@/components/Recipient/Attribute/AccountNumberInput.vue";
 import PhoneNumberInput from "@/components/Recipient/Attribute/PhoneNumberInput.vue";
-import {reactive, ref, watchEffect} from "vue";
+import {computed, reactive, ref, watchEffect} from "vue";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import Relationship from "@/models/relationship.js";
 import RelationshipInput from "@/components/Recipient/Attribute/RelationshipInput.vue";
@@ -20,6 +20,7 @@ import TransactionQuote from "@/models/transaction_quote.js";
 import NameInput from "@/components/Recipient/Attribute/NameInput.vue";
 import SecondNameInput from "@/components/Recipient/Attribute/SecondNameInput.vue";
 import ThirdNameInput from "@/components/Recipient/Attribute/ThirdNameInput.vue";
+import { debounce } from 'lodash'
 
 const props = defineProps({
   country: {
@@ -58,10 +59,6 @@ const props = defineProps({
 })
 
 const errors = reactive({
-  entity_name: [],
-  first_name: [],
-  middle_name: [],
-  last_name: [],
   recipient_type: [],
   relationship_id: [],
 });
@@ -121,12 +118,29 @@ async function updateRelationship(relationship) {
   input.data.relationship_id = relationship.id;
 }
 
+const nameLookup = computed(() => {
+  if (props.payoutChannel.configuration?.nameLookupRequirements?.length > 0) {
+    return {
+      attributes: props.payoutChannel.configuration.nameLookupRequirements.map((attribute => {
+        return {
+          attribute: attribute,
+          isValid: input.data[attribute] !== null && input.data[attribute] !== undefined && input.data[attribute].length > 0
+        }
+      })),
+      isValid: props.payoutChannel.configuration.nameLookupRequirements.every((attribute) => {
+        return input.data[attribute] !== null && input.data[attribute] !== undefined && input.data[attribute].length > 0
+      }),
+    };
+  }
+  return [];
+});
+
 async function updateRecipientInput(updated, attribute) {
   if (attribute.type === RecipientDataType.DELIVERY_OPTION) {
     input.data[attribute.attribute] = updated.id;
-    return;
+  } else {
+    input.data[attribute.attribute] = updated;
   }
-  input.data[attribute.attribute] = updated;
 }
 
 const isSaving = ref(false);
@@ -162,9 +176,29 @@ async function addRecipient() {
   });
 }
 
+const doLookup = debounce(() => {
+  if (nameLookup.value.isValid) {
+    const query = {};
+    for (const attribute of nameLookup.value.attributes) {
+      query[attribute.attribute] = input.data[attribute.attribute];
+    }
+    recipientUtils.lookup(props.payoutChannel, query).then((response) => {
+      const nameAttribute = props.payoutChannel.attributes.find((attribute) => {
+        return attribute.type === RecipientDataType.NAME;
+      });
+      input.data[nameAttribute.attribute] = response.data.name;
+    }).catch((e) => {
+      console.error(e)
+    });
+  }
+}, 1000)
+
 watchEffect(() => {
   if (props.isSubmitted && props.quote && !isSaving.value) {
     addRecipient();
+  }
+  if (nameLookup.value.isValid) {
+    doLookup();
   }
 });
 </script>
@@ -219,7 +253,7 @@ watchEffect(() => {
           </label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
           <component
-              v-bind:nameLookupPath="payoutChannel.configuration.nameLookupPath"
+              v-bind:disableNameInput="payoutChannel.configuration?.nameLookupRequirements?.length > 0"
               v-on:recipient:input:updated="updateRecipientInput"
               :is="componentMap[attribute.type] || componentMap['default']"
               v-bind:attribute="attribute"
