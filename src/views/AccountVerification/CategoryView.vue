@@ -37,7 +37,7 @@ onMounted(async () => {
 
 const finalStateReached = async () => {
   await customerUtils.refresh();
-  await router.replace({name: 'accountVerification'});
+  await router.push({name: 'accountVerification'});
 }
 </script>
 
