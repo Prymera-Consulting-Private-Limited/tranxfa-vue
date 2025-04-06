@@ -122,7 +122,7 @@ async function save() {
 </script>
 
 <template>
-  <div class="max-w-xl mx-auto p-6 bg-white shadow-xl rounded-2xl">
+  <div class="max-w-xl mx-auto p-6 bg-white">
     <h2 class="text-lg font-semibold text-gray-900 mb-2">Upload {{ documentType.title }}</h2>
     <p class="text-sm text-gray-500 mb-4">Please upload clear images of your <span class="text-brand-700">{{ documentType.title }}</span>.</p>
 
