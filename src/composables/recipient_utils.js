@@ -43,11 +43,18 @@ export function useRecipientUtils() {
         return axios.post(`/client/v1/recipient/send-money/${recipient.id}`, data);
     }
 
+    const lookup = async (payoutChannel, query = []) => {
+        return axios.get(`/client/v1/recipient/name-lookup/${payoutChannel.id}`, {
+            params: query,
+        });
+    }
+
     return {
         whisper,
         add,
         get,
         getRecipient,
         getQuote,
+        lookup,
     };
 }
