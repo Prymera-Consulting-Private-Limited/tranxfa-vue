@@ -11,10 +11,10 @@ const props = defineProps({
     type: PayoutChannelAttribute,
     required: false,
   },
-  nameLookupPath: {
-    type: String,
+  disableInput: {
+    type: Boolean,
     required: false,
-    default: null,
+    default: false,
   },
 })
 
@@ -30,9 +30,9 @@ watch(model, (value) => {
 <template>
   <input
       :class="[
-          nameLookupPath?.length > 0 ? 'bg-gray-50' : 'shadow-sm',
+          disableInput ? 'bg-gray-50' : 'shadow-sm',
       ]"
-      :readonly="nameLookupPath?.length > 0"
+      :readonly="disableInput"
       :inputmode="attribute?.inputMode || 'text'"
       :id="id"
       :minlength="attribute?.exactLength || attribute?.minLength"
