@@ -10,10 +10,22 @@ class PayoutChannelConfiguration {
      */
     confirmAccountNumber = false;
 
+    /**
+     * @type {String|null}
+     */
+    nameLookupPath = null;
+
+    /**
+     * @type {Array}
+     */
+    nameLookupRequirements = [];
+
     static getInstance(data) {
         const payoutChannelConfiguration = new PayoutChannelConfiguration();
         payoutChannelConfiguration.recipientType = data.recipient_type ?? null;
         payoutChannelConfiguration.confirmAccountNumber = data.confirm_account_number ?? false;
+        payoutChannelConfiguration.nameLookupPath = data.name_lookup_path ?? null;
+        payoutChannelConfiguration.nameLookupRequirements = data.name_lookup_requirements ?? [];
         return payoutChannelConfiguration;
     }
 }
