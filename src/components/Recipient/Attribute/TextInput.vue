@@ -11,11 +11,6 @@ const props = defineProps({
     type: PayoutChannelAttribute,
     required: false,
   },
-  disableInput: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
 })
 
 const emit = defineEmits(['recipient:input:updated']);
@@ -29,16 +24,12 @@ watch(model, (value) => {
 
 <template>
   <input
-      :class="[
-          disableInput ? 'bg-gray-50' : 'shadow-sm',
-      ]"
-      :readonly="disableInput"
       :inputmode="attribute?.inputMode || 'text'"
       :id="id"
       :minlength="attribute?.exactLength || attribute?.minLength"
       :maxlength="attribute?.exactLength || attribute?.maxLength"
       v-model="model"
       type="text"
-      class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+      class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none shadow-sm"
   />
 </template>
