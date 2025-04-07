@@ -59,7 +59,6 @@ function selectOption(option) {
     emit('option:updated', option);
   }
 }
-
 function amountUpdated() {
   emit('update:amount', Number.parseInt(unmaskedValue.value) / Math.pow(10, props.currency.decimalPlaces));
 }
@@ -67,7 +66,7 @@ function amountUpdated() {
 <template>
   <div class="flex items-center rounded-md bg-white pl-3 outline-2 -outline-offset-1 outline-brand-700 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-brand-700">
     <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6">{{ currency.iconUnicode }}</div>
-    <input :id="inputId" @change="amountUpdated" v-maska="maskaOptions" @maska="onMaska" type="text" v-model="amountModel" class="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" placeholder="0.00" />
+    <input inputmode="decimal" :id="inputId" @change="amountUpdated" v-maska="maskaOptions" @maska="onMaska" type="text" v-model="amountModel" class="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" placeholder="0.00" />
     <div class="grid shrink-0 grid-cols-1 focus-within:relative bg-white">
       <Menu as="div" class="relative inline-block text-left">
         <div>
