@@ -1,6 +1,6 @@
 <script setup>
 import Transaction from "@/models/transaction.js";
-import {onMounted, onUnmounted, watch, watchEffect} from "vue";
+import {onMounted, onUnmounted, watchEffect} from "vue";
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentState from "@/enums/payment_state.js";
 import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
@@ -29,7 +29,7 @@ onMounted(async () => {
 })
 
 const paymentDone = async function () {
-  axios.post(`${import.meta.env.VITE_APP_BASE_URL}?paymentId=${props.transaction.payment.id}`, {
+  axios.post(`${import.meta.env.VITE_PAGA_WEBHOOK_LISTENER}?paymentId=${props.transaction.payment.id}`, {
     "event": "PAYMENT_COMPLETE",
     "notificationId": "a12ef82b-14d0-4a67-a08c-162b95154f59",
     "statusCode": "0",
