@@ -3,14 +3,11 @@ import CustomerLayout from "@/components/CustomerLayout.vue";
 import {onMounted, onUnmounted, reactive, ref} from "vue";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import Transaction from "@/models/transaction.js";
-import {useTimeUtils} from "@/composables/time_utils.js";
 import {useColorUtils} from "@/composables/color_utils.js";
 import {
   RocketLaunchIcon,
-  CalendarDaysIcon,
   CreditCardIcon,
   PlusCircleIcon,
-  UserCircleIcon,
   CalculatorIcon,
 } from '@heroicons/vue/24/outline'
 import moment from "moment";
@@ -19,7 +16,6 @@ import RecipientDataType from "@/enums/recipient_data_type.js";
 import PaymentState from "@/enums/payment_state.js";
 
 const transactionUtils = useTransactionUtils();
-const timeUtils = useTimeUtils();
 const colorUtils = useColorUtils();
 
 const props = defineProps({
@@ -182,7 +178,7 @@ onUnmounted(async () => {
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4">
                 <dt class="font-semibold text-gray-900">Sending from <span class="text-purple-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
-                  <span class="font-medium text-gray-900">Dhruv Patel</span>
+                  <span class="font-medium text-gray-900">You sent</span>
                   <span class="text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</span>
                   <span class="">{{ transaction.data.payment.paymentMethod.title }}</span>
                 </dd>
