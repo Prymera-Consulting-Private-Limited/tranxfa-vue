@@ -128,7 +128,26 @@ const nameLookup = computed(() => {
         }
       })),
       isValid: props.payoutChannel.configuration.nameLookupRequirements.every((attribute) => {
-        return input.data[attribute] !== null && input.data[attribute] !== undefined && input.data[attribute].length > 0
+        if (input.data[attribute] === null || input.data[attribute] === undefined) {
+          return false;
+        }
+        const payoutChannelAttribute = props.payoutChannel.attributes.find((payoutChannelAttribute) => {
+          return payoutChannelAttribute.attribute === attribute;
+        });
+        if (payoutChannelAttribute?.minLength && input.data[attribute].length < payoutChannelAttribute.minLength) {
+          return false;
+        }
+        if (payoutChannelAttribute?.maxLength && input.data[attribute].length > payoutChannelAttribute.maxLength) {
+          return false;
+        }
+        if (payoutChannelAttribute?.exactLength && input.data[attribute].length !== payoutChannelAttribute.exactLength) {
+          return false;
+        }
+        if(payoutChannelAttribute.regexPattern && !new RegExp(payoutChannelAttribute.regexPattern).test(input.data[attribute])) {
+          return false;
+        }
+
+        return input.data[attribute].length > 0;
       }),
     };
   }
@@ -208,6 +227,7 @@ watchEffect(() => {
 
 <template>
   <form @submit.prevent="addRecipient" class="space-y-6 min-w-md">
+    {{ nameLookup }}
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
