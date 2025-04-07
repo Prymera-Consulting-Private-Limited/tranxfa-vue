@@ -193,7 +193,7 @@ const showContinueButton = computed(() => {
                       </template>
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
-                      <p class="text-gray-500 text-sm mb-4">For security and compliance, we need your address details before proceeding.</p>
+                      <h3 class="text-gray-900 mb-4 font-semibold">Provide Your Address</h3>
                       <CustomerAttributeForm
                           v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
                           v-bind:updateOutsourced="true"
@@ -205,7 +205,7 @@ const showContinueButton = computed(() => {
                     </template>
                     <template v-if="snapshot.value === 'verifyIdentity'">
                       <h3 class="text-gray-900 mb-4 font-semibold">Verify your identity</h3>
-                      <p class="text-gray-500 text-sm mb-6">To ensure the security of your transactions and compliance with financial regulations, we need to verify your identity. Please provide a valid government-issued ID. The details on your document should match the information we have on record.</p>
+                      <p class="text-gray-500 text-sm mb-6">For security and compliance, please upload a valid government-issued ID. Ensure the details match those in your profile.</p>
                       <ul v-if="identityDocumentCategory?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <li v-for="documentType in identityDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
                           <DocumentTypeItem
