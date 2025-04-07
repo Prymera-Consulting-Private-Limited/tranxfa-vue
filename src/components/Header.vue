@@ -23,7 +23,7 @@ const customerUtils = useCustomerUtils();
 const customer = customerStore.customer;
 
 const navigation = [
-  { name: 'Dashboard', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
+  { name: 'Home', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
   { name: 'Transactions', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
   { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
   { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
