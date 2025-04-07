@@ -179,14 +179,15 @@ const recipientCreated = (recipient) => {
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Dashboard</h1>
         <!-- Main 3 column grid -->
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
+        <h2 class="text-base font-semibold text-gray-900 mb-5">Welcome {{ customer.data?.name }}</h2>
+        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 lg:flex-row-reverse">
+
           <!-- Left column -->
-          <div class="grid grid-cols-1 gap-4 lg:col-span-2">
+          <div class="grid grid-cols-1 gap-4 lg:col-span-2 order-last lg:order-first">
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Section title</h2>
               <div>
-                <h2 class="text-base font-semibold text-gray-900">Welcome {{ customer.data?.name }}</h2>
-                <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100 mt-6">
+                <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
                   <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                       <ul role="list" class="divide-y divide-gray-100 shadow-md">
