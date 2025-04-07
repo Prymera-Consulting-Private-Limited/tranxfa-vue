@@ -73,7 +73,6 @@ onUnmounted(async () => {
 </script>
 
 <template>
-  <pre>{{ transaction.payment.state }}</pre>
   <template v-if="transaction.payment.state.code === PaymentState.REDIRECTED">
     <PendingReceived class="-mt-10" />
     <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">Payment in Progress</h2>
