@@ -16,6 +16,7 @@ import {
 import moment from "moment";
 import TransactionStateIcon from "@/enums/transaction_state_icon.js";
 import RecipientDataType from "@/enums/recipient_data_type.js";
+import PaymentState from "@/enums/payment_state.js";
 
 const transactionUtils = useTransactionUtils();
 const timeUtils = useTimeUtils();
@@ -95,7 +96,6 @@ onUnmounted(async () => {
           </div>
         </template>
         <div v-else class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3" v-if="transaction.data">
-          <!-- Invoice summary -->
           <div class="lg:col-start-3 lg:row-end-1">
             <h2 class="sr-only">Summary</h2>
             <div class="rounded-lg bg-white ring-1 shadow-xs ring-gray-900/5">
@@ -106,57 +106,40 @@ onUnmounted(async () => {
                 </div>
                 <div class="flex-none self-end px-6 pt-4">
                   <dt class="sr-only">Status</dt>
-                  <dd class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
+                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
+                  <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
                 </div>
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">
                     <span class="sr-only">Client</span>
-                    <RocketLaunchIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />
+                    <RocketLaunchIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 font-medium text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Due date</span>
-                    <PlusCircleIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />
+                    <PlusCircleIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-500">
-                    {{ transaction.data.baseFeesCurrencyPrefixed }}
-                  </dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
                 </div>
-<!--                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">-->
-<!--                  <dt class="flex-none">-->
-<!--                    <span class="sr-only">Status</span>-->
-<!--                    <CalculatorIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />-->
-<!--                  </dt>-->
-<!--                  <dd class="text-sm/6 text-gray-500">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>-->
-<!--                </div>-->
-<!--                <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">-->
-<!--                  <dt class="flex-none">-->
-<!--                    <span class="sr-only">Account Holder Name</span>-->
-<!--                    <UserCircleIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />-->
-<!--                  </dt>-->
-<!--                  <dd class="text-sm/6 font-medium text-gray-900">{{ transaction.data.payment.paymentAccount.accountHolderName }}</dd>-->
-<!--                </div>-->
-<!--                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">-->
-<!--                  <dt class="flex-none">-->
-<!--                    <span class="sr-only">Due date</span>-->
-<!--                    <CalendarDaysIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />-->
-<!--                  </dt>-->
-<!--                  <dd class="text-sm/6 text-gray-500">-->
-<!--                    <time datetime="2023-01-31">January 31, 2023</time>-->
-<!--                  </dd>-->
-<!--                </div>-->
-<!--                <div class="mt-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">-->
-<!--                  <dt class="flex-none">-->
-<!--                    <span class="sr-only">Status</span>-->
-<!--                    <CreditCardIcon class="h-6 w-5 text-gray-400" aria-hidden="true" />-->
-<!--                  </dt>-->
-<!--                  <dd class="text-sm/6 text-gray-500">Paid with {{ transaction.data.payment.paymentAccount?.institution }} {{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>-->
-<!--                </div>-->
+                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
+                  <dt class="flex-none">
+                    <span class="sr-only">Status</span>
+                    <CalculatorIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                </div>
+                <div class="mt-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
+                  <dt class="flex-none">
+                    <span class="sr-only">Status</span>
+                    <CreditCardIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
+                </div>
               </dl>
-              <div v-if="false" class="mt-6 border-t border-gray-900/5 px-6 py-6">
-                <a href="#" class="text-sm/6 font-semibold text-gray-900">Download receipt <span aria-hidden="true">&rarr;</span></a>
+              <div class="mt-6 border-t border-gray-900/5 px-6 py-6">
+                <a href="javascript:window.print()" class="text-sm/6 font-semibold text-gray-900">Print receipt <span aria-hidden="true">&rarr;</span></a>
               </div>
             </div>
           </div>
@@ -223,11 +206,17 @@ onUnmounted(async () => {
                       <dt class="text-sm font-medium text-gray-500">Name</dt>
                       <dd class="mt-1 text-sm text-gray-900">{{ transaction.data.recipient.wholeName }}</dd>
                     </div>
-                    <div v-for="attribute in transaction.data.recipient.attributes" class="sm:col-span-1">
-                      <dt class="text-sm font-medium text-gray-500">{{ attribute.label }}</dt>
-                      <dd v-if="attribute.type === RecipientDataType.MOBILE_NUMBER" class="mt-1 text-sm text-gray-900">+{{ attribute.value?.country?.callingCode }} {{  attribute.value?.number }}</dd>
-                      <dd v-else class="mt-1 text-sm text-gray-900">{{ attribute.value }}</dd>
+                    <div class="sm:col-span-1">
+                      <dt class="text-sm font-medium text-gray-500">Relation</dt>
+                      <dd class="mt-1 text-sm text-gray-900">{{ transaction.data.recipient.relationship.title }}</dd>
                     </div>
+                    <template v-for="attribute in transaction.data.recipient.attributes">
+                      <div class="sm:col-span-1" v-if="[RecipientDataType.NAME, RecipientDataType.SECOND_NAME, RecipientDataType.THIRD_NAME].includes(attribute.type) === false">
+                        <dt class="text-sm font-medium text-gray-500">{{ attribute.label }}</dt>
+                        <dd v-if="attribute.type === RecipientDataType.MOBILE_NUMBER" class="mt-1 text-sm text-gray-900">+{{ attribute.value?.country?.callingCode }} {{  attribute.value?.number }}</dd>
+                        <dd v-else class="mt-1 text-sm text-gray-900">{{ attribute.value }}</dd>
+                      </div>
+                    </template>
                   </dl>
                 </div>
               </div>
