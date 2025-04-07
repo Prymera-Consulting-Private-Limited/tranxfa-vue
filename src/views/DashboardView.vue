@@ -153,7 +153,9 @@ onMounted(async () => {
     transactionsData.value = response.data;
     isLoading.value = false;
   })
-  await getTasks();
+  if (transactionsData.value.data.length === 0) {
+    await getTasks();
+  }
 });
 
 const transactions = computed(() => {
@@ -187,9 +189,9 @@ const recipientCreated = (recipient) => {
                 <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100 mt-6">
                   <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                      <ul role="list" class="divide-y divide-gray-100">
+                      <ul role="list" class="divide-y divide-gray-100 shadow-md">
                         <template v-for="(transaction, i) in transactions" :key="transaction.data.id">
-                          <router-link :class="{'rounded-t-lg': i === 0}" as="li" :to="{name: 'viewTransaction', params: {transactionId: transaction.data.id}}" class="flex justify-between gap-x-6 py-5 px-6 sm:px-8 cursor-pointer hover:bg-purple-50">
+                          <router-link :class="{'rounded-t-lg': i === 0}" as="li" :to="{name: 'viewTransaction', params: {transactionId: transaction.data.id}}" class="flex justify-between gap-x-6 py-5 px-6 sm:px-8 cursor-pointer hover:bg-gray-50">
                             <div :class="{'opacity-75': transaction.data.state.code === TransactionState.CANCELLED}" class="flex min-w-0 gap-x-4">
                               <span class="inline-flex size-11 items-center justify-center border border-1 rounded-full" :style="{
                                  backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
