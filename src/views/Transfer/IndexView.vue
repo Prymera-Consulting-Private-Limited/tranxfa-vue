@@ -238,7 +238,7 @@ const showContinueButton = computed(() => {
               <template v-if="quote.data">
                 <QuoteDisplay v-if="snapshot.value !== 'confirm'" v-bind:quote="quote.data" />
                 <template v-else>
-                  <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose</label>
+                  <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose <span class="text-red-500">*</span></label>
                   <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
                   <v-select v-model="purpose" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="purpose">
                     <template v-slot:no-options="{ search, searching }">
@@ -262,7 +262,7 @@ const showContinueButton = computed(() => {
                   </v-select>
 
                   <fieldset aria-label="Server size" class="mt-6">
-                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Payment Method</label>
+                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-red-500">*</span></label>
                     <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
                     <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                       <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
@@ -270,7 +270,7 @@ const showContinueButton = computed(() => {
                           <span class="flex flex-1">
                             <span class="flex flex-col">
                               <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
-                              <span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>
+<!--                              <span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
                           <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-purple-600', 'size-5']" aria-hidden="true" />
