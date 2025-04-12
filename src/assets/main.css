@@ -4,6 +4,7 @@
 @import '@vuepic/vue-datepicker/dist/main.css';
 @import 'vue-select/dist/vue-select.css';
 @import 'vue3-flag-icons/styles';
+@import 'nprogress/nprogress.css';
 
 @layer theme {
     @theme {
@@ -136,4 +137,11 @@
     /* Transitions */
     --vs-transition-timing-function: cubic-bezier(1, -0.115, 0.975, 0.855);
     --vs-transition-duration: 150ms;
+}
+
+#nprogress .bar {
+    background: #A855F7 !important;
+}
+#nprogress .peg {
+    box-shadow: 0 0 10px theme('colors.purple.500'), 0 0 5px theme('colors.purple.500') !important;
 }

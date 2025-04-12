@@ -11,6 +11,7 @@ import axios from "axios";
 
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import NProgress from "nprogress";
 
 const app = createApp(App)
 
@@ -21,13 +22,19 @@ axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_URL
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 axios.interceptors.request.use((config) => {
+    NProgress.start()
     config.headers['Accept'] = 'application/json'
     config.headers['ngrok-skip-browser-warning'] = 'yes'
 
     return config;
 })
 
-axios.interceptors.response.use(null, function (e) {
+axios.interceptors.response.use((response) => {
+    NProgress.done()
+
+    return response;
+}, function (e) {
+    NProgress.done()
     if (e.status === 401) {
         router.push({ name: 'signIn' });
     }
