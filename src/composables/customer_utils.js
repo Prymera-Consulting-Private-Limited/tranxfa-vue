@@ -2,9 +2,9 @@ import Customer from "@/models/customer.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import axios from "axios";
 
+let refreshPromise = null;
 export function useCustomerUtils() {
     const customerStore = useCustomerStore();
-
     function updateStore(data) {
         customerStore.customer.data = Customer.getInstance(data);
         customerStore.isLoaded = true;
@@ -49,9 +49,16 @@ export function useCustomerUtils() {
     }
 
     async function refresh() {
-        return axios.get('/client/v1/profile').then((response) => {
-            updateStore(response.data);
-        })
+        if (refreshPromise) return refreshPromise;
+        refreshPromise = axios.get('/client/v1/profile')
+            .then((response) => {
+                updateStore(response.data);
+            })
+            .finally(() => {
+                refreshPromise = null;
+            });
+
+        return refreshPromise;
     }
 
     async function resendEmailVerification() {
