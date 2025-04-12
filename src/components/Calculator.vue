@@ -6,7 +6,7 @@ import {
   PaperAirplaneIcon,
   PlusIcon,
   TruckIcon,
-  UserIcon, XMarkIcon, DivideIcon
+  UserIcon, XMarkIcon, DivideIcon, BanknotesIcon
 } from "@heroicons/vue/20/solid/index.js";
 import {
   Listbox,
@@ -191,9 +191,7 @@ function saveQuote() {
               <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                   <DivideIcon v-if="! isFetchingQuote && quoteUtil.quote.data?.exchangeRateIsInverse" class="size-5 text-white"/>
                   <XMarkIcon v-else-if="! isFetchingQuote && !quoteUtil.quote.data?.exchangeRateIsInverse" class="size-4 text-white"/>
-                  <span v-else class="size-5 text-white">
-                    <Spinner class="animate-spin" />
-                  </span>
+                  <BanknotesIcon v-else class="size-4 text-white" />
               </span>
             </div>
             <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
