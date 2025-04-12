@@ -100,23 +100,27 @@ const purpose = ref(null);
 const paymentMethod = ref(null);
 const isAddressRequired = ref(false);
 
+const confirm = async () => {
+  try {
+    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value);
+    const transaction = response.data;
+    isStepProcessing.value = false;
+    await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
+  } catch (error) {
+    if (error.response.status === 412) {
+      if (error.response.data.type === "incomplete_customer_address") {
+        isAddressRequired.value = true;
+        isStepProcessing.value = false;
+        await send({ type: 'ADDRESS_REQUIRED' });
+      }
+    }
+  }
+}
+
 const submitAndContinue = async () => {
   isStepProcessing.value = true
   if (snapshot.value?.value === 'confirm') {
-    try {
-      const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value);
-      const transaction = response.data;
-      isStepProcessing.value = false;
-      await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
-    } catch (error) {
-      if (error.response.status === 412) {
-        if (error.response.data.type === "incomplete_customer_address") {
-          isAddressRequired.value = true;
-          isStepProcessing.value = false;
-          await send({ type: 'ADDRESS_REQUIRED' });
-        }
-      }
-    }
+    await confirm();
   } else if (snapshot.value?.value === 'verifyIdentity') {
     await customerUtils.refresh();
     await send({ type: 'SET_CONTEXT', quote: quote.data });
@@ -127,14 +131,15 @@ const submitAndContinue = async () => {
   }
 }
 
-const customerAttributeCategoryUpdated = () => {
+const customerAttributeCategoryUpdated = async () => {
+  await send({ type: 'PROCEED' });
+  await confirm();
   isStepProcessing.value = false;
-  send({ type: 'PROCEED' });
 }
 
 const sdkFinalStateReached = async () => {
   isStepProcessing.value = false;
-  send({ type: 'PROCEED' });
+  await send({ type: 'PROCEED' });
 }
 
 const isIdentityDocumentRequired = computed(() => {
@@ -165,7 +170,7 @@ const showContinueButton = computed(() => {
                     v-bind:addressRequired="isAddressRequired"
                     v-bind:identityDocumentRequired="isIdentityDocumentRequired"
                 />
-                <div class="xl:col-span-2 px-3">
+                <div :class="{'animate-pulse': isStepProcessing}" class="xl:col-span-2 px-3">
                   <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center min-w-96 mx-auto min-h-96">
                     <Spinner class="size-16 mx-auto" />
                     <span class="sr-only">Loading...</span>
