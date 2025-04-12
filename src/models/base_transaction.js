@@ -95,6 +95,11 @@ class BaseTransaction {
     exchangeRateFormatted = null;
 
     /**
+     * @type {boolean}
+     */
+    exchangeRateIsInverse = false;
+
+    /**
      * @param {Quote|TransactionQuote|Transaction} obj
      * @param {object} data
      * @return {Quote|TransactionQuote|Transaction}
@@ -103,6 +108,7 @@ class BaseTransaction {
         obj.id = data?.id;
         obj.exchangeRate = data.exchange_rate;
         obj.exchangeRateFormatted = data.exchange_rate_formatted;
+        obj.exchangeRateIsInverse = data.exchange_rate_is_inverse;
         obj.baseFees = data.base_fees;
         obj.baseFeesCurrencyPrefixed = data.base_fees_currency_prefixed;
         obj.baseFeesFormatted = data.base_fees_formatted;
