@@ -24,6 +24,7 @@ import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import {useTimeUtils} from "@/composables/time_utils.js";
 import Transaction from "@/models/transaction.js";
 import ListItem from "@/components/Transaction/ListItem.vue";
+import ListShimmer from "@/components/Transaction/ListShimmer.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -122,36 +123,32 @@ const tasks = computed(() => {
   });
 });
 
-const isLoading = ref(false);
+
+const isTransactionLoading = ref(true);
+const isTaskLoading = ref(true);
 const serverTasks = ref([]);
 
 const getTasks = async () => {
-  isLoading.value = true;
   customerUtils.tasks().then((response) => {
     serverTasks.value = response.data.map((task) => CustomerTaskModal.getInstance(task));
   }).finally(() => {
-    isLoading.value = false;
+    isTaskLoading.value = false;
   });
 }
 
 const timeUtils = useTimeUtils();
-
 const transactionsData = ref(null);
 
 onMounted(async () => {
   if (! customerStore.isLoaded) {
-    isLoading.value = true;
-    customerUtils.refresh().finally(() => {
-      isLoading.value = false;
-    });
+    customerUtils.refresh().catch();
   }
-  await transactionUtils.get().then((response) => {
+  transactionUtils.get().then((response) => {
     transactionsData.value = response.data;
-    isLoading.value = false;
-  })
-  if (transactionsData.value.data.length === 0) {
-    await getTasks();
-  }
+  }).finally(() => {
+    isTransactionLoading.value = false;
+  });
+  getTasks().catch();
 });
 
 const transactions = computed(() => {
@@ -183,69 +180,74 @@ const recipientCreated = (recipient) => {
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Section title</h2>
               <div>
-                <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
-                  <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                      <ul role="list" class="divide-y divide-gray-100 shadow-md">
-                        <template v-for="(transaction, i) in transactions" :key="transaction.data.id">
-                          <router-link :class="{'rounded-t-lg': i === 0}" as="li" :to="{name: 'viewTransaction', params: {transactionId: transaction.data.id}}" class="flex justify-between gap-x-6 py-5 px-6 sm:px-8 cursor-pointer hover:bg-gray-50">
+                <template v-if="isTransactionLoading">
+                  <ListShimmer />
+                </template>
+                <template v-else>
+                  <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
+                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                        <ul role="list" class="divide-y divide-gray-100 shadow-md">
+                          <template v-for="(transaction, i) in transactions" :key="transaction.data.id">
+                            <router-link :class="{'rounded-t-lg': i === 0}" as="li" :to="{name: 'viewTransaction', params: {transactionId: transaction.data.id}}" class="flex justify-between gap-x-6 py-5 px-6 sm:px-8 cursor-pointer hover:bg-gray-50">
                               <ListItem v-bind:niceTime="transaction.niceTime" v-bind:transaction="transaction.data" />
-                          </router-link>
-                        </template>
-                      </ul>
+                            </router-link>
+                          </template>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <template v-else>
-                  <p class="mt-1 text-sm text-gray-500 hidden lg:block">Get started by completing the following steps.</p>
-                  <ul v-if="tasks.length === 0 && isLoading" role="list" class="mt-6 grid-cols-1 gap-6 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 sm:grid-cols-2 hidden lg:grid">
-                    <li v-for="i of 6" :key="i" class="flow-root pulse">
-                      <div v-if="isLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
-                        <div :class="['bg-gray-300', 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
-                          <DocumentTextIcon class="size-6 text-white" aria-hidden="true" />
+                  <template v-else>
+                    <p class="mt-1 text-sm text-gray-500 hidden lg:block">Get started by completing the following steps.</p>
+                    <ul v-if="tasks.length === 0 && isTaskLoading" role="list" class="mt-6 grid-cols-1 gap-6 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 sm:grid-cols-2 hidden lg:grid">
+                      <li v-for="i of 6" :key="i" class="flow-root pulse">
+                        <div v-if="isTaskLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
+                          <div :class="['bg-gray-300', 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
+                            <DocumentTextIcon class="size-6 text-white" aria-hidden="true" />
+                          </div>
+                          <div>
+                            <h3 class="text-sm font-medium text-gray-900 mb-3">
+                              <a href="#" class="focus:outline-hidden">
+                                <span class="absolute inset-0" aria-hidden="true" />
+                                <div class="h-3 block pulse bg-gray-300 w-full w-64"></div>
+                              </a>
+                            </h3>
+                            <p class="flex flex-col mt-1 text-sm text-gray-500 space-y-1">
+                              <span class="h-2 block pulse bg-gray-300 w-48"></span>
+                              <span class="h-2 block pulse bg-gray-300 w-32"></span>
+                              <span class="h-2 block pulse bg-gray-300 w-24"></span>
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 class="text-sm font-medium text-gray-900 mb-3">
-                            <a href="#" class="focus:outline-hidden">
-                              <span class="absolute inset-0" aria-hidden="true" />
-                              <div class="h-3 block pulse bg-gray-300 w-full w-64"></div>
-                            </a>
-                          </h3>
-                          <p class="flex flex-col mt-1 text-sm text-gray-500 space-y-1">
-                            <span class="h-2 block pulse bg-gray-300 w-48"></span>
-                            <span class="h-2 block pulse bg-gray-300 w-32"></span>
-                            <span class="h-2 block pulse bg-gray-300 w-24"></span>
-                          </p>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                  <ul v-if="tasks.length > 0 && !isLoading" role="list" class="mt-6 grid-cols-1 xl:grid-cols-3 gap-10 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 hidden lg:grid">
-                    <li v-for="(task, index) in tasks" :key="task.id" class="flow-root xl:flex-grow">
-                      <div :class="{'opacity-60': task.status !== CustomerTaskStatus.PENDING}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 xl:hover:bg-purple-50 xl:hover:border-purple-200 xl:flex-col xl:space-y-5 xl:text-center xl:border xl:border-dashed xl:border-gray-200 xl:px-5 xl:py-8 xl:bg-white h-full xl:shadow-xs">
-                        <div :class="[task.background, 'flex xl:mx-auto size-16 shrink-0 items-center justify-center rounded-lg xl:hidden']">
-                          <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
-                        </div>
-                        <div :class="['xl:mx-auto size-16 shrink-0 items-center bg-purple-700 justify-center rounded-full hidden xl:flex']">
-                          <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
-                        </div>
-                        <div v-if="task.status !== CustomerTaskStatus.PENDING">
-                          <Task :task="task" :index="index" />
-                        </div>
-                        <template v-else>
-                          <router-link v-if="task.href" :to="task.href" class="cursor-pointer">
-                            <Task :task="task" :index="index" />
-                          </router-link>
-                          <div v-else-if="task.action || null" @click="task.action" class="cursor-pointer">
+                      </li>
+                    </ul>
+                    <ul v-if="tasks.length > 0 && !isTaskLoading" role="list" class="mt-6 grid-cols-1 xl:grid-cols-3 gap-10 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 hidden lg:grid">
+                      <li v-for="(task, index) in tasks" :key="task.id" class="flow-root xl:flex-grow">
+                        <div :class="{'opacity-60': task.status !== CustomerTaskStatus.PENDING}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 xl:hover:bg-purple-50 xl:hover:border-purple-200 xl:flex-col xl:space-y-5 xl:text-center xl:border xl:border-dashed xl:border-gray-200 xl:px-5 xl:py-8 xl:bg-white h-full xl:shadow-xs">
+                          <div :class="[task.background, 'flex xl:mx-auto size-16 shrink-0 items-center justify-center rounded-lg xl:hidden']">
+                            <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
+                          </div>
+                          <div :class="['xl:mx-auto size-16 shrink-0 items-center bg-purple-700 justify-center rounded-full hidden xl:flex']">
+                            <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
+                          </div>
+                          <div v-if="task.status !== CustomerTaskStatus.PENDING">
                             <Task :task="task" :index="index" />
                           </div>
-                          <div v-else>
-                            <Task :task="task" :index="index" />
-                          </div>
-                        </template>
-                      </div>
-                    </li>
-                  </ul>
+                          <template v-else>
+                            <router-link v-if="task.href" :to="task.href" class="cursor-pointer">
+                              <Task :task="task" :index="index" />
+                            </router-link>
+                            <div v-else-if="task.action || null" @click="task.action" class="cursor-pointer">
+                              <Task :task="task" :index="index" />
+                            </div>
+                            <div v-else>
+                              <Task :task="task" :index="index" />
+                            </div>
+                          </template>
+                        </div>
+                      </li>
+                    </ul>
+                  </template>
                 </template>
               </div>
             </section>
