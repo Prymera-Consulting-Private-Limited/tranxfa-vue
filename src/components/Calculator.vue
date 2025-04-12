@@ -6,7 +6,7 @@ import {
   PaperAirplaneIcon,
   PlusIcon,
   TruckIcon,
-  UserIcon, XMarkIcon
+  UserIcon, XMarkIcon, DivideIcon
 } from "@heroicons/vue/20/solid/index.js";
 import {
   Listbox,
@@ -189,12 +189,16 @@ function saveQuote() {
           <div class="relative flex space-x-3">
             <div>
               <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
-                  <XMarkIcon class="size-5 text-white"/>
+                  <DivideIcon v-if="! isFetchingQuote && quoteUtil.quote.data?.exchangeRateIsInverse" class="size-5 text-white"/>
+                  <XMarkIcon v-else-if="! isFetchingQuote && !quoteUtil.quote.data?.exchangeRateIsInverse" class="size-4 text-white"/>
+                  <span v-else class="size-5 text-white">
+                    <Spinner class="animate-spin" />
+                  </span>
               </span>
             </div>
             <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
               <div>
-                <p v-if="! isFetchingQuote" class="text-sm text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRate }}</p>
+                <p v-if="! isFetchingQuote" class="text-sm text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRateFormatted }}</p>
                 <p v-else class="text-sm bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
               </div>
               <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
