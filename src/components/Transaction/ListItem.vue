@@ -30,7 +30,7 @@ const props = defineProps({
     </span>
     <div class="min-w-0 flex-auto">
       <div class="text-sm/6 font-semibold text-gray-900">{{ transaction.localAmountCurrencyPrefixed }} to <span class="text-purple-700">{{ transaction.recipient.wholeName }}</span></div>
-      <div class="text-xs/5 text-gray-800 flex justify-center items-center gap-x-1.5">
+      <div class="text-xs/5 text-gray-800 flex justify-start items-center gap-x-1.5">
         Sent {{ transaction.foreignAmountCurrencyPrefixed }} via {{ transaction.payoutMethod.title }}
         <span class="flex justify-center items-center text-xs/5 text-gray-500">
           <abbr :title="moment(transaction.createdAt)">{{ niceTime }}</abbr>
