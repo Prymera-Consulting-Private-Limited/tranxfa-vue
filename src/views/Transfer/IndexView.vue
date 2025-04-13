@@ -230,6 +230,7 @@ const showContinueButton = computed(() => {
                         v-bind:quote="quote.data"
                     />
                   </template>
+                  <div class="py-6 block sm:hidden"></div>
                 </div>
               </div>
 
@@ -240,57 +241,61 @@ const showContinueButton = computed(() => {
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Transaction Summary</h2>
               <template v-if="quote.data">
-                <QuoteDisplay v-if="snapshot.value !== 'confirm'" v-bind:quote="quote.data" />
+                <div v-if="snapshot.value !== 'confirm'" class="hidden sm:grid"><QuoteDisplay v-bind:quote="quote.data" /></div>
                 <template v-else>
-                  <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose <span class="text-red-500">*</span></label>
-                  <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
-                  <v-select v-model="purpose" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="purpose">
-                    <template v-slot:no-options="{ search, searching }">
-                      <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
-                      <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
-                    </template>
-                    <template #selected-option-container="{ option, deselect, multiple, disabled }">
-                      <div class="vs__selected">
-                        <div class="flex items-center w-auto">
-                          <div class="text-sm flex items-center w-full gap-x-2">
-                            <span class="lg:max-w-sm xl:max-w-md truncate">{{ option.title }}</span>
+                  <div class="px-3">
+                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose <span class="text-red-500">*</span></label>
+                    <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
+                    <v-select v-model="purpose" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="purpose">
+                      <template v-slot:no-options="{ search, searching }">
+                        <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
+                        <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
+                      </template>
+                      <template #selected-option-container="{ option, deselect, multiple, disabled }">
+                        <div class="vs__selected">
+                          <div class="flex items-center w-auto">
+                            <div class="text-sm flex items-center w-full gap-x-2">
+                              <span class="lg:max-w-sm xl:max-w-md truncate">{{ option.title }}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </template>
-                    <template #option="option">
-                      <div class="text-sm flex items-center w-full gap-x-3 truncate">
-                        <span class="truncate">{{ option.title }}</span>
-                      </div>
-                    </template>
-                  </v-select>
+                      </template>
+                      <template #option="option">
+                        <div class="text-sm flex items-center w-full gap-x-3 truncate">
+                          <span class="truncate">{{ option.title }}</span>
+                        </div>
+                      </template>
+                    </v-select>
 
-                  <fieldset aria-label="Server size" class="mt-6">
-                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-red-500">*</span></label>
-                    <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
-                    <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
-                      <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
-                        <div :class="[(active || checked) ? 'border-purple-600 ring-2 ring-purple-600 bg-purple-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border p-4 shadow-xs focus:outline-hidden']">
+                    <fieldset aria-label="Server size" class="mt-6">
+                      <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-red-500">*</span></label>
+                      <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
+                      <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
+                        <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
+                          <div :class="[(active || checked) ? 'border-purple-600 ring-2 ring-purple-600 bg-purple-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border p-4 shadow-xs focus:outline-hidden']">
                           <span class="flex flex-1">
                             <span class="flex flex-col">
                               <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
-<!--                              <span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
+                              <!--                              <span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
-                          <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-purple-600', 'size-5']" aria-hidden="true" />
-                        </div>
-                      </RadioGroupOption>
-                    </RadioGroup>
-                  </fieldset>
+                            <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-purple-600', 'size-5']" aria-hidden="true" />
+                          </div>
+                        </RadioGroupOption>
+                      </RadioGroup>
+                    </fieldset>
+                  </div>
                 </template>
               </template>
-              <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-6 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
-                <span v-if="isStepProcessing" class="flex justify-center items-center">
-                  <Spinner :class="'w-5 h-5 mr-3'"/>
-                  <span>Saving...</span>
-                </span>
-                <span v-else>Continue</span>
-              </button>
+              <div class="py-8 px-3">
+                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+                  <span v-if="isStepProcessing" class="flex justify-center items-center">
+                    <Spinner :class="'w-5 h-5 mr-3'"/>
+                    <span>Saving...</span>
+                  </span>
+                  <span v-else>Continue</span>
+                </button>
+              </div>
             </section>
           </div>
         </div>
