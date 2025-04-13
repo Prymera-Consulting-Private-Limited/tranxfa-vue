@@ -27,12 +27,6 @@ const props = defineProps({
 
 const steps = [
   {
-    id: 'checkRecipients',
-    name: 'Prepare your transfer',
-    description: 'Get started by entering the amount and selecting your transfer method for a smooth transaction.',
-    show: true,
-  },
-  {
     id: 'verifyIdentity',
     name: 'Verify Your Identity',
     description: 'For security and compliance, please verify your identity before proceeding with the transaction.',
@@ -103,7 +97,27 @@ const progress = computed(() => steps.map((step) => {
 }).filter((step) => step.show));
 </script>
 <template>
-  <nav aria-label="Progress">
+  <nav class="flex items-center justify-between space-x-8 sm:hidden py-3 px-4" aria-label="Progress">
+    <p class="text-sm font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
+    <ol role="list" class="flex items-center space-x-5">
+      <li v-for="step in progress" :key="step.name">
+        <a v-if="step.status === 'complete'"  class="block size-2.5 rounded-full bg-purple-600 hover:bg-purple-900">
+          <span class="sr-only">{{ step.name }}</span>
+        </a>
+        <a v-else-if="step.status === 'current'" class="relative flex items-center justify-center" aria-current="step">
+          <span class="absolute flex size-5 p-px" aria-hidden="true">
+            <span class="size-full rounded-full bg-purple-200" />
+          </span>
+          <span class="relative block size-2.5 rounded-full bg-purple-600" aria-hidden="true" />
+          <span class="sr-only">{{ step.name }}</span>
+        </a>
+        <a v-else class="block size-2.5 rounded-full bg-gray-200 hover:bg-gray-400">
+          <span class="sr-only">{{ step.name }}</span>
+        </a>
+      </li>
+    </ol>
+  </nav>
+  <nav aria-label="Progress" class="hidden sm:block">
     <ol role="list" class="overflow-hidden">
       <template v-for="(step, stepIdx) in progress" :key="step.id">
         <li :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
