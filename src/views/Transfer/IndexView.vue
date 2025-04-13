@@ -100,7 +100,7 @@ const purpose = ref(null);
 const paymentMethod = ref(null);
 const isAddressRequired = ref(false);
 
-const confirm = async () => {
+const confirmQuote = async () => {
   try {
     const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value);
     const transaction = response.data;
@@ -120,7 +120,7 @@ const confirm = async () => {
 const submitAndContinue = async () => {
   isStepProcessing.value = true
   if (snapshot.value?.value === 'confirm') {
-    await confirm();
+    await confirmQuote();
   } else if (snapshot.value?.value === 'verifyIdentity') {
     await customerUtils.refresh();
     await send({ type: 'SET_CONTEXT', quote: quote.data });
@@ -133,7 +133,7 @@ const submitAndContinue = async () => {
 
 const customerAttributeCategoryUpdated = async () => {
   await send({ type: 'PROCEED' });
-  await confirm();
+  await confirmQuote();
   isStepProcessing.value = false;
 }
 
