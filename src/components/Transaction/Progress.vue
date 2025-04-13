@@ -22,7 +22,7 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
-  },
+  }
 })
 
 const steps = [
@@ -39,14 +39,14 @@ const steps = [
     show: false,
   },
   {
-    id: 'addRecipient',
-    name: 'Add Recipient Details',
+    id: 'selectRecipient',
+    name: 'Choose your recipient',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
     show: true,
   },
   {
-    id: 'selectRecipient',
-    name: 'Choose your recipient',
+    id: 'addRecipient',
+    name: 'Add Recipient Details',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
     show: true,
   },
@@ -89,11 +89,15 @@ const progress = computed(() => steps.map((step) => {
   } else {
     step.status = 'upcoming';
   }
-  // if ((step.id === 'selectRecipient' && step.status === 'upcoming')) {
-  //   step.show = false;
-  // }
-  if ((step.id === 'addRecipient' && step.status === 'complete')) {
-    step.show = false;
+  if (step.id === 'selectRecipient') {
+    step.show = props.quote?.recipients?.length > 0;
+  }
+  if (step.id === 'addRecipient') {
+    if (step.status === 'current') {
+      step.show = true;
+      return step;
+    }
+    step.show = !(step.status === 'complete' || props.quote?.recipients?.length > 0);
   }
   return step;
 }).filter((step) => step.show));

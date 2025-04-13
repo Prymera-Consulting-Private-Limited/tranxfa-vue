@@ -226,7 +226,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <form @submit.prevent="addRecipient" class="space-y-6 min-w-md">
+  <form @submit.prevent="addRecipient" class="space-y-6 sm:min-w-md">
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">

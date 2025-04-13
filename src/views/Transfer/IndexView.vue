@@ -40,6 +40,10 @@ const props = defineProps({
 });
 
 const quoteUtils = useQuoteUtils();
+
+/**
+ * @type {Reactive<{data: null|TransactionQuote}>}
+ */
 const quote = reactive({
   data: null
 });
