@@ -63,7 +63,7 @@ const transactions = computed(() => {
             </div>
           </div>
           <template v-else>
-            <div class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white col-span-2 shadow-lg">
+            <div class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white lg:col-span-2 shadow-lg">
               <div>
                 <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
                 <span class="mt-4 block text-lg font-semibold text-gray-900">No Transactions Yet</span>
@@ -74,7 +74,7 @@ const transactions = computed(() => {
             </div>
           </template>
         </template>
-        <div class="flex items-center justify-center rounded-lg bg-white p-5 pb-8 border border-solid border-gray-300 border-1 shadow-lg w-full">
+        <div class="flex items-center justify-center rounded-lg bg-white p-5 pb-8 border border-solid border-gray-300 border-1 shadow-lg min-w-sm">
           <Calculator />
         </div>
       </div>
