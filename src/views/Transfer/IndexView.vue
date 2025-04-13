@@ -230,7 +230,6 @@ const showContinueButton = computed(() => {
                         v-bind:quote="quote.data"
                     />
                   </template>
-                  <div class="py-6 block sm:hidden"></div>
                 </div>
               </div>
 
@@ -272,7 +271,7 @@ const showContinueButton = computed(() => {
                       <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
-                          <div :class="[(active || checked) ? 'border-purple-600 ring-2 ring-purple-600 bg-purple-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border p-4 shadow-xs focus:outline-hidden']">
+                          <div :class="[(active || checked) ? 'border-purple-600 ring-1 ring-purple-600 bg-purple-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
                           <span class="flex flex-1">
                             <span class="flex flex-col">
                               <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
@@ -287,8 +286,8 @@ const showContinueButton = computed(() => {
                   </div>
                 </template>
               </template>
-              <div class="py-8 px-3">
-                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+              <div class="py-4 px-3">
+                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-4 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
                   <span v-if="isStepProcessing" class="flex justify-center items-center">
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>Saving...</span>
