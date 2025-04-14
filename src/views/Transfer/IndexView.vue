@@ -44,6 +44,7 @@ const quote = reactive({
 });
 const isLoading = ref(false);
 const isStepProcessing = ref(false);
+const isSubComponentLoading = ref(false);
 const purpose = ref(null);
 const paymentMethod = ref(null);
 const isAddressRequired = ref(false);
@@ -71,7 +72,7 @@ const canContinue = computed(() => {
   if (snapshot.value?.value === 'confirm') {
     return !!purpose.value && !!paymentMethod.value && !isStepProcessing.value && !isLoading.value;
   }
-  return !isStepProcessing.value && !isLoading.value;
+  return !isStepProcessing.value && !isLoading.value && !isSubComponentLoading.value;
 });
 
 const isIdentityDocumentRequired = computed(() => {
@@ -86,6 +87,7 @@ const showContinueButton = computed(() => {
 
 const createRecipient = async () => {
   send({ type: 'ADD_RECIPIENT' });
+  isSubComponentLoading.value = true;
 };
 
 const setRecipient =  async (recipient) => {
@@ -158,10 +160,16 @@ const sdkFinalStateReached = async () => {
   await send({ type: 'PROCEED' });
 }
 
-const gotoSelectRecipient = () => {
-  send({ type: 'SELECT_RECIPIENT' });
+const stepCommandExecuted = (e) => {
+  if (e) {
+    send({ type: e });
+  }
 }
 
+const addRecipientLoadingStateUpdated = (e) => {
+  console.log(e);
+  isSubComponentLoading.value = e;
+}
 </script>
 
 <template>
@@ -180,7 +188,7 @@ const gotoSelectRecipient = () => {
                     v-bind:quote="quote.data"
                     v-bind:addressRequired="isAddressRequired"
                     v-bind:identityDocumentRequired="isIdentityDocumentRequired"
-                    v-on:gotoSelectRecipient="gotoSelectRecipient"
+                    v-on:stepCommandExecuted="stepCommandExecuted"
                 />
                 <div :class="{'animate-pulse': isStepProcessing}" class="xl:col-span-2 px-3">
                   <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center w-64 lg:min-w-96 mx-auto min-h-96">
@@ -195,6 +203,7 @@ const gotoSelectRecipient = () => {
                         v-on:recipient:add:failed="isStepProcessing = false"
                         v-on:recipient:added="recipientAddedOnQuote"
                         class="w-full max-w-2xl"
+                        v-on:recipient:add:loadingStateUpdated="addRecipientLoadingStateUpdated"
                     />
                     <template v-if="snapshot.value === 'selectRecipient'">
                       <RecipientListing
