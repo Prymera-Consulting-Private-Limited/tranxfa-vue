@@ -23,9 +23,7 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   transactionUtils.getTransaction(props.id).then((response) => {
-    transaction.payment = PaymentTransaction.getInstance(response.data);
-  }).catch((e) => {
-    console.error(e);
+    transaction.value = Transaction.getInstance(response.data);
   }).finally(() => {
     isLoading.value = false;
   });
@@ -37,7 +35,9 @@ const retryPayment = async () => {
   paymentAttempt.value++;
   isLoading.value = true;
   transactionUtils.retryPayment(props.id).then((response) => {
-    transaction.value = Transaction.getInstance(response.data);
+    transaction.value.payment = PaymentTransaction.getInstance(response.data);
+  }).catch((e) => {
+    console.error(e);
   }).finally(() => {
     isLoading.value = false;
   });
