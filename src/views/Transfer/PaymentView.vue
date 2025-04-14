@@ -6,6 +6,7 @@ import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessu
 import Transaction from "@/models/transaction.js";
 import Apaylo from "@/components/Payment/Apaylo.vue";
 import Paga from "@/components/Payment/Paga.vue";
+import PaymentTransaction from "@/models/payment_transaction.js";
 
 const transactionUtils = useTransactionUtils();
 
@@ -22,12 +23,25 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   transactionUtils.getTransaction(props.id).then((response) => {
-    transaction.value = Transaction.getInstance(response.data);
+    transaction.payment = PaymentTransaction.getInstance(response.data);
+  }).catch((e) => {
+    console.error(e);
   }).finally(() => {
     isLoading.value = false;
   });
 })
 
+
+const paymentAttempt = ref(1);
+const retryPayment = async () => {
+  paymentAttempt.value++;
+  isLoading.value = true;
+  transactionUtils.retryPayment(props.id).then((response) => {
+    transaction.value = Transaction.getInstance(response.data);
+  }).finally(() => {
+    isLoading.value = false;
+  });
+}
 </script>
 
 <template>
@@ -57,8 +71,8 @@ onMounted(async () => {
               <div class="p-8 sm:pb-6">
                 <div class="mt-3 text-center sm:mt-5">
                   <div v-if="transaction" class="text-center">
-                    <Apaylo v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  />
-                    <Paga v-if="transaction.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction"  />
+                    <Apaylo v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  />
+                    <Paga v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction"  />
                   </div>
                 </div>
               </div>
