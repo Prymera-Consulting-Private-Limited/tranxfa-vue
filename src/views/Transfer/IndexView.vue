@@ -23,32 +23,30 @@ import { RadioGroup, RadioGroupOption } from '@headlessui/vue'
 import { CheckCircleIcon } from '@heroicons/vue/20/solid'
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
-
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
-
 /**
  * @type {{data: Customer|null}}
  */
 const customer = customerStore.customer;
-
 const props = defineProps({
   id: {
     type: String,
     required: true
   },
 });
-
 const quoteUtils = useQuoteUtils();
-
 /**
  * @type {Reactive<{data: null|TransactionQuote}>}
  */
 const quote = reactive({
   data: null
 });
-
 const isLoading = ref(false);
+const isStepProcessing = ref(false);
+const purpose = ref(null);
+const paymentMethod = ref(null);
+const isAddressRequired = ref(false);
 
 onMounted(async () => {
   if (customerStore.isLoaded === false) {
@@ -69,11 +67,28 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
-async function createRecipient() {
-  send({ type: 'ADD_RECIPIENT' });
-}
+const canContinue = computed(() => {
+  if (snapshot.value?.value === 'confirm') {
+    return !!purpose.value && !!paymentMethod.value && !isStepProcessing.value && !isLoading.value;
+  }
+  return !isStepProcessing.value && !isLoading.value;
+});
 
-async function setRecipient(recipient) {
+const isIdentityDocumentRequired = computed(() => {
+  return (customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null) !== null;
+});
+
+const identityDocumentCategory = computed(() => customer.data?.pendingDocuments?.find(category => category.code === 'POI'));
+
+const showContinueButton = computed(() => {
+  return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'verifyIdentity');
+});
+
+const createRecipient = async () => {
+  send({ type: 'ADD_RECIPIENT' });
+};
+
+const setRecipient =  async (recipient) => {
   isLoading.value = true;
   await quoteUtils.setRecipient(props.id, recipient).then((response) => {
     quote.data = TransactionQuote.getInstance(response.data);
@@ -83,26 +98,13 @@ async function setRecipient(recipient) {
   isLoading.value = false;
 }
 
-async function recipientAddedOnQuote(recipient) {
+const recipientAddedOnQuote = async (recipient)  => {
   isStepProcessing.value = false;
   quote.data.recipients.push(recipient);
   quote.data.recipient = recipient;
   send({ type: 'SET_CONTEXT', quote: quote.data });
   send({ type: 'PROCEED' });
 }
-
-const isStepProcessing = ref(false);
-
-const canContinue = computed(() => {
-  if (snapshot.value?.value === 'confirm') {
-    return !!purpose.value && !!paymentMethod.value && !isStepProcessing.value && !isLoading.value;
-  }
-  return !isStepProcessing.value && !isLoading.value;
-});
-
-const purpose = ref(null);
-const paymentMethod = ref(null);
-const isAddressRequired = ref(false);
 
 const confirmQuote = async () => {
   try {
@@ -135,6 +137,8 @@ const submitAndContinue = async () => {
     if (purpose) {
       await confirmQuote();
     }
+  } else if (snapshot.value?.value === 'addRecipient') {
+    isStepProcessing.value = true;
   } else if (snapshot.value?.value !== 'provideAddress') {
     await send({ type: 'SET_CONTEXT', quote: quote.data });
     await send({ type: 'PROCEED' });
@@ -154,18 +158,8 @@ const sdkFinalStateReached = async () => {
   await send({ type: 'PROCEED' });
 }
 
-const isIdentityDocumentRequired = computed(() => {
-  return (customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null) !== null;
-});
-
-const identityDocumentCategory = computed(() => customer.data?.pendingDocuments?.find(category => category.code === 'POI'));
-
-const showContinueButton = computed(() => {
-  return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'verifyIdentity');
-});
-
-const gotoSelectRecipient = async () => {
-  await send({ type: 'SELECT_RECIPIENT' });
+const gotoSelectRecipient = () => {
+  send({ type: 'SELECT_RECIPIENT' });
 }
 
 </script>
@@ -173,10 +167,10 @@ const gotoSelectRecipient = async () => {
 <template>
   <CustomerLayout>
     <main class="-mt-24 py-8">
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-5">
         <h1 class="sr-only">Review & Confirm</h1>
         <!-- Main 3 column grid -->
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 shadow-lg">
+        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-lg p-4 md:px-6 md:py-10 shadow-lg">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">
@@ -289,7 +283,7 @@ const gotoSelectRecipient = async () => {
                           <span class="flex flex-1">
                             <span class="flex flex-col">
                               <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
-                              <!--                              <span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
+                              <!--<span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
                             <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-purple-600', 'size-5']" aria-hidden="true" />
