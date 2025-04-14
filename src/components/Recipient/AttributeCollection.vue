@@ -195,25 +195,30 @@ async function addRecipient() {
   });
 }
 
-const doLookup = debounce(() => {
+const isLookingUp = ref(false);
+
+const doLookup = () => {
   if (nameLookup.value.isValid) {
+    isLookingUp.value = true;
     const query = {};
     const nameAttribute = props.payoutChannel.attributes.find((attribute) => {
       return attribute.type === RecipientDataType.NAME;
     });
     errors[nameAttribute.attribute] = [];
-    input.data[nameAttribute.attribute] = 'Looking up for name with the bank ...';
+    input.data[nameAttribute.attribute] = null;
     for (const attribute of nameLookup.value.attributes) {
       query[attribute.attribute] = input.data[attribute.attribute];
     }
     recipientUtils.lookup(props.payoutChannel, query).then((response) => {
       input.data[nameAttribute.attribute] = response.data.name;
     }).catch((e) => {
-      input.data[nameAttribute.attribute] = 'Lookup Failed';
+      input.data[nameAttribute.attribute] = null;
       errors[nameAttribute.attribute] = [e.response.data.message];
+    }).finally(() => {
+      isLookingUp.value = false;
     });
   }
-}, 1000)
+}
 
 watchEffect(() => {
   if (props.isSubmitted && props.quote && !isSaving.value) {
@@ -276,6 +281,7 @@ watchEffect(() => {
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
           <component
               v-bind:disableNameInput="payoutChannel.configuration?.nameLookupRequirements?.length > 0"
+              v-bind:isLookingUp="isLookingUp"
               v-bind:input="input.data"
               v-on:recipient:input:updated="updateRecipientInput"
               :is="componentMap[attribute.type] || componentMap['default']"
