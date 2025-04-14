@@ -1,6 +1,6 @@
 <script setup>
 import TargetSelection from "@/components/Recipient/TargetSelection.vue";
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import Spinner from "@/components/Spinner.vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
 import {addRecipientNavigationMachine} from "@/machines/add_recipient_navigation_machine.js";
@@ -128,6 +128,7 @@ onMounted(async () => {
 const emit = defineEmits([
     'recipient:added',
     'recipient:add:failed',
+    'recipient:add:loadingStateUpdated',
 ]);
 
 const recipientAdded = (recipient) => {
@@ -137,6 +138,10 @@ const recipientAdded = (recipient) => {
 const saveRecipientFailed = (error) => {
   emit('recipient:add:failed', error);
 }
+
+watch(isLoading, (newValue) => {
+  emit('recipient:add:loadingStateUpdated', newValue);
+});
 
 </script>
 
