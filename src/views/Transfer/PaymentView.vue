@@ -1,12 +1,13 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import { useTransactionUtils } from "@/composables/transaction_utils.js";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import Transaction from "@/models/transaction.js";
 import Apaylo from "@/components/Payment/Apaylo.vue";
 import Paga from "@/components/Payment/Paga.vue";
 import PaymentTransaction from "@/models/payment_transaction.js";
+import router from "@/router/index.js";
 
 const transactionUtils = useTransactionUtils();
 
@@ -31,8 +32,16 @@ onMounted(async () => {
 
 
 const paymentAttempt = ref(1);
+
+const canAttemptPayment = computed(() => {
+  return paymentAttempt.value <= 3
+});
+
 const retryPayment = async () => {
   paymentAttempt.value++;
+  if (canAttemptPayment === false) {
+    return;
+  }
   isLoading.value = true;
   transactionUtils.retryPayment(props.id).then((response) => {
     transaction.value.payment = PaymentTransaction.getInstance(response.data);
@@ -42,6 +51,12 @@ const retryPayment = async () => {
     isLoading.value = false;
   });
 }
+
+watch(canAttemptPayment, async () => {
+  if (! canAttemptPayment.value) {
+    await router.push({name: 'viewTransaction', params: {transactionId: props.id}});
+  }
+});
 </script>
 
 <template>
