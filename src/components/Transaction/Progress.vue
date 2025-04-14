@@ -27,12 +27,6 @@ const props = defineProps({
 
 const steps = [
   {
-    id: 'verifyIdentity',
-    name: 'Verify Your Identity',
-    description: 'For security and compliance, please verify your identity before proceeding with the transaction.',
-    show: false,
-  },
-  {
     id: 'selectRecipient',
     name: 'Choose your recipient',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
@@ -48,6 +42,12 @@ const steps = [
     id: 'provideAddress',
     name: 'Provide Your Address',
     description: 'For security and compliance, we need your address details before proceeding.',
+    show: false,
+  },
+  {
+    id: 'verifyIdentity',
+    name: 'Verify Your Identity',
+    description: 'For security and compliance, please verify your identity before proceeding with the transaction.',
     show: false,
   },
   {
@@ -95,6 +95,13 @@ const progress = computed(() => steps.map((step) => {
   }
   return step;
 }).filter((step) => step.show));
+
+const emit = defineEmits(['gotoSelectRecipient']);
+
+function gotoSelectRecipient () {
+  emit('gotoSelectRecipient');
+}
+
 </script>
 <template>
   <nav class="flex items-center justify-between space-x-8 sm:hidden py-3 px-4" aria-label="Progress">
@@ -123,7 +130,7 @@ const progress = computed(() => steps.map((step) => {
         <li :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
           <template v-if="step.status === 'complete'">
             <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-purple-600" aria-hidden="true" />
-            <div class="group relative flex items-start">
+            <div @click="gotoSelectRecipient()" class="group relative flex items-start cursor-pointer">
               <div class="flex h-9 items-center">
                 <div :class="{'bg-purple-600 group-hover:bg-purple-800' : stepIdx !== 0 || !quote}" class="relative z-10 flex size-8 items-center justify-center rounded-full">
                   <FlagIcon v-if="stepIdx === 0 && quote" :code="quote.payoutCountry.iso2Alpha.toLowerCase()" circle size="30"  />

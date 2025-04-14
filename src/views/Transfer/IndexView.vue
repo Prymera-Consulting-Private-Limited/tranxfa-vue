@@ -116,6 +116,9 @@ const confirmQuote = async () => {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
         await send({ type: 'ADDRESS_REQUIRED' });
+      } else if (error.response.data.type === "poi_required") {
+        isStepProcessing.value = false;
+        await send({ type: 'POI_REQUIRED' });
       }
     }
   }
@@ -129,9 +132,13 @@ const submitAndContinue = async () => {
     await customerUtils.refresh();
     await send({ type: 'SET_CONTEXT', quote: quote.data });
     await send({ type: 'PROCEED' });
+    if (purpose) {
+      await confirmQuote();
+    }
   } else if (snapshot.value?.value !== 'provideAddress') {
     await send({ type: 'SET_CONTEXT', quote: quote.data });
     await send({ type: 'PROCEED' });
+    isStepProcessing.value = false;
   }
 }
 
@@ -156,6 +163,11 @@ const identityDocumentCategory = computed(() => customer.data?.pendingDocuments?
 const showContinueButton = computed(() => {
   return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'verifyIdentity');
 });
+
+const gotoSelectRecipient = async () => {
+  await send({ type: 'SELECT_RECIPIENT' });
+}
+
 </script>
 
 <template>
@@ -174,6 +186,7 @@ const showContinueButton = computed(() => {
                     v-bind:quote="quote.data"
                     v-bind:addressRequired="isAddressRequired"
                     v-bind:identityDocumentRequired="isIdentityDocumentRequired"
+                    v-on:gotoSelectRecipient="gotoSelectRecipient"
                 />
                 <div :class="{'animate-pulse': isStepProcessing}" class="xl:col-span-2 px-3">
                   <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center w-64 lg:min-w-96 mx-auto min-h-96">

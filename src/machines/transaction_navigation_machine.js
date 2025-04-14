@@ -20,17 +20,20 @@ export const transactionNavigationMachine = createMachine({
             on: {
                 PROCEED: [
                     {
-                        target: 'verifyIdentity',
-                        guard: ({context}) => {
-                            return customerStore.isLoaded && (customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null) !== null
-                        },
-                    }, {
                         target: 'addRecipient',
                         guard: ({context}) => context.quote?.recipients?.length === 0,
                     },
                     {
                         target: 'selectRecipient',
                         guard: ({context}) => (context.quote?.recipient || null) === null,
+                    },
+                    {
+                        target: 'verifyIdentity',
+                        guard: ({context}) => {
+                            return customerStore.isLoaded && (
+                                customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null
+                            ) !== null && (context.quote?.recipient || null) !== null
+                        },
                     },
                     {
                         target: 'confirm',
@@ -43,32 +46,25 @@ export const transactionNavigationMachine = createMachine({
                 },
             }
         },
-        verifyIdentity: {
-            on: {
-                PROCEED: [
-                    {
-                        target: 'addRecipient',
-                        guard: ({context}) => context.quote?.recipients?.length === 0,
-                    },
-                    {
-                        target: 'selectRecipient',
-                    },
-                ],
-                SET_CONTEXT: {
-                    actions: assign({
-                        quote: ({context, event}) => event.quote || context.quote
-                    })
-                },
-            }
-        },
         addRecipient: {
             on: {
                 PROCEED: [
+                    {
+                        target: 'verifyIdentity',
+                        guard: ({context}) => {
+                            return customerStore.isLoaded && (
+                                customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null
+                            ) !== null && (context.quote?.recipient || null) !== null
+                        },
+                    },
                     {
                         target: 'confirm',
                         guard: ({context}) => context.quote?.recipient !== null,
                     },
                 ],
+                SELECT_RECIPIENT: {
+                    target: 'selectRecipient'
+                },
                 SET_CONTEXT: {
                     actions: assign({
                         quote: ({context, event}) => event.quote || context.quote
@@ -79,6 +75,14 @@ export const transactionNavigationMachine = createMachine({
         selectRecipient: {
             on: {
                 PROCEED: [
+                    {
+                        target: 'verifyIdentity',
+                        guard: ({context}) => {
+                            return customerStore.isLoaded && (
+                                customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null
+                            ) !== null && (context.quote?.recipient || null) !== null
+                        },
+                    },
                     {
                         target: 'confirm',
                         guard: ({context}) => context.quote?.recipient !== null,
@@ -94,6 +98,23 @@ export const transactionNavigationMachine = createMachine({
                 },
             }
         },
+        verifyIdentity: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'confirm',
+                    },
+                ],
+                SELECT_RECIPIENT: {
+                    target: 'selectRecipient'
+                },
+                SET_CONTEXT: {
+                    actions: assign({
+                        quote: ({context, event}) => event.quote || context.quote
+                    })
+                },
+            }
+        },
         provideAddress: {
             on: {
                 PROCEED: [
@@ -101,6 +122,9 @@ export const transactionNavigationMachine = createMachine({
                         target: 'confirm',
                     },
                 ],
+                SELECT_RECIPIENT: {
+                    target: 'selectRecipient'
+                },
             }
         },
         confirm: {
@@ -115,6 +139,14 @@ export const transactionNavigationMachine = createMachine({
                         target: 'provideAddress',
                     },
                 ],
+                POI_REQUIRED: [
+                    {
+                        target: 'verifyIdentity',
+                    },
+                ],
+                SELECT_RECIPIENT: {
+                    target: 'selectRecipient'
+                },
                 SET_CONTEXT: {
                     actions: assign({
                         quote: ({context, event}) => event.quote || context.quote
