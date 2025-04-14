@@ -1,6 +1,6 @@
 <script setup>
 import Transaction from "@/models/transaction.js";
-import {computed, onMounted, onUnmounted, ref, watchEffect} from "vue";
+import {computed, onMounted, onUnmounted, watchEffect} from "vue";
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentState from "@/enums/payment_state.js";
 import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
@@ -52,8 +52,6 @@ const paymentDone = async function () {
   });
 }
 
-const paymentAttempt = ref(1);
-
 watchEffect(() => {
   if (props.transaction.payment.state.code === PaymentState.PENDING) {
     props.transaction.payment.state.code = PaymentState.REDIRECTED;
@@ -88,6 +86,13 @@ const status = computed(() => {
     return 'failed';
   }
 })
+
+const emits = defineEmits(['retryPayment']);
+
+const retryPayment = async () => {
+  emits('retryPayment');
+}
+
 </script>
 
 <template>
@@ -116,6 +121,7 @@ const status = computed(() => {
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
     <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-purple-600 text-white text-center py-3 rounded-md font-medium hover:bg-purple-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
   </template>
 
 
