@@ -142,7 +142,7 @@ const saveRecipientFailed = (error) => {
 
 <template>
   <div>
-    <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center min-w-96 mx-auto min-h-96">
+    <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center w-64 lg:min-w-96 mx-auto min-h-96">
       <Spinner class="size-16 mx-auto" />
       <span class="sr-only">Loading...</span>
     </div>

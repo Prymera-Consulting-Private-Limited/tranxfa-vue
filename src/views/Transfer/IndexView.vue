@@ -175,7 +175,7 @@ const showContinueButton = computed(() => {
                     v-bind:identityDocumentRequired="isIdentityDocumentRequired"
                 />
                 <div :class="{'animate-pulse': isStepProcessing}" class="xl:col-span-2 px-3">
-                  <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center min-w-96 mx-auto min-h-96">
+                  <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center w-64 lg:min-w-96 mx-auto min-h-96">
                     <Spinner class="size-16 mx-auto" />
                     <span class="sr-only">Loading...</span>
                   </div>
@@ -286,8 +286,8 @@ const showContinueButton = computed(() => {
                   </div>
                 </template>
               </template>
-              <div class="py-4 px-3">
-                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="mt-4 block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+              <div class="py-4 px-3 sm:px-0">
+                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
                   <span v-if="isStepProcessing" class="flex justify-center items-center">
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>Saving...</span>
