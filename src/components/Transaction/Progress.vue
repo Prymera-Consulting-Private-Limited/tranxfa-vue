@@ -31,36 +31,48 @@ const steps = [
     name: 'Choose your recipient',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
     show: true,
+    stepCommand: 'SELECT_RECIPIENT',
+    isMain: true,
   },
   {
     id: 'addRecipient',
     name: 'Add Recipient Details',
     description: 'Tell us who you’re sending money to by providing their name and transfer information.',
     show: true,
+    stepCommand: 'ADD_RECIPIENT',
+    isMain: false,
   },
   {
     id: 'provideAddress',
     name: 'Provide Your Address',
     description: 'For security and compliance, we need your address details before proceeding.',
     show: false,
+    stepCommand: null,
+    isMain: false,
   },
   {
     id: 'verifyIdentity',
     name: 'Verify Your Identity',
     description: 'For security and compliance, please verify your identity before proceeding with the transaction.',
     show: false,
+    stepCommand: null,
+    isMain: false,
   },
   {
     id: 'confirm',
     name: 'Review & Confirm',
     description: 'Double-check all details before finalizing your transfer.',
     show: true,
+    stepCommand: null,
+    isMain: true,
   },
   {
     id: 'makePayment',
     name: 'Make Payment',
     description: 'Complete your transfer by choosing a payment method and sending the funds.',
     show: true,
+    stepCommand: null,
+    isMain: true,
   }
 ];
 
@@ -96,10 +108,10 @@ const progress = computed(() => steps.map((step) => {
   return step;
 }).filter((step) => step.show));
 
-const emit = defineEmits(['gotoSelectRecipient']);
+const emit = defineEmits(['stepCommandExecuted']);
 
-function gotoSelectRecipient () {
-  emit('gotoSelectRecipient');
+const stepCommandExecuted = async (e) => {
+  emit('stepCommandExecuted', e);
 }
 
 </script>
@@ -108,7 +120,7 @@ function gotoSelectRecipient () {
     <p class="text-sm font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
     <ol role="list" class="flex items-center space-x-5">
       <li v-for="step in progress" :key="step.name">
-        <a v-if="step.status === 'complete'"  class="block size-2.5 rounded-full bg-purple-600 hover:bg-purple-900">
+        <a v-if="step.status === 'complete'" @click="stepCommandExecuted(step.stepCommand)" class="block size-2.5 rounded-full bg-purple-600 hover:bg-purple-900">
           <span class="sr-only">{{ step.name }}</span>
         </a>
         <a v-else-if="step.status === 'current'" class="relative flex items-center justify-center" aria-current="step">
@@ -130,7 +142,7 @@ function gotoSelectRecipient () {
         <li :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
           <template v-if="step.status === 'complete'">
             <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-purple-600" aria-hidden="true" />
-            <div @click="gotoSelectRecipient()" class="group relative flex items-start cursor-pointer">
+            <div @click="stepCommandExecuted(step.stepCommand)" class="group relative flex items-start cursor-pointer">
               <div class="flex h-9 items-center">
                 <div :class="{'bg-purple-600 group-hover:bg-purple-800' : stepIdx !== 0 || !quote}" class="relative z-10 flex size-8 items-center justify-center rounded-full">
                   <FlagIcon v-if="stepIdx === 0 && quote" :code="quote.payoutCountry.iso2Alpha.toLowerCase()" circle size="30"  />
