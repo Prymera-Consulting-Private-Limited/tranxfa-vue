@@ -29,7 +29,7 @@ const steps = [
   {
     id: 'selectRecipient',
     name: 'Choose your recipient',
-    description: 'Tell us who you’re sending money to by providing their name and transfer information.',
+    description: 'Tell us who you are sending money to by providing their name and transfer information.',
     show: true,
     stepCommand: 'SELECT_RECIPIENT',
     isMain: true,
@@ -37,8 +37,8 @@ const steps = [
   {
     id: 'addRecipient',
     name: 'Add Recipient Details',
-    description: 'Tell us who you’re sending money to by providing their name and transfer information.',
-    show: true,
+    description: 'Tell us who you are sending money to by providing their name and transfer information.',
+    show: false,
     stepCommand: 'ADD_RECIPIENT',
     isMain: false,
   },
@@ -76,37 +76,55 @@ const steps = [
   }
 ];
 
-const progress = computed(() => steps.map((step) => {
-  if (step.id === 'checkRecipients' && props.quote) {
-    step.name = `Transfer to ${props.quote?.payoutCountry?.commonName}`;
+const getStepStatus = (stepId, currentStep) => {
+  const currentStepIndex = steps.findIndex(step => step.id === stepId);
+  const cursor = steps.findIndex(step => step.id === currentStep);
+  
+  if (currentStepIndex === cursor) return 'current';
+  if (currentStepIndex < cursor) return 'complete';
+  return 'upcoming';
+};
+
+const shouldShowStep = (step, status) => {
+  if (step.isMain) return true;
+  if (step.id === 'provideAddress') return props.addressRequired;
+  if (step.id === 'verifyIdentity') return props.identityDocumentRequired;
+
+  // Handle mutually exclusive recipient steps
+  if (step.id === 'selectRecipient' || step.id === 'addRecipient') {
+    const hasRecipients = props.quote?.recipients?.length > 0;
+    
+    // If we're on the current step, show it regardless
+    if (status === 'current') return true;
+    
+    // For completed steps, show based on recipient state
+    if (status === 'complete') return step.id !== 'addRecipient';
+    
+    // For upcoming steps, show selectRecipient if recipients, addRecipient if there are no recipients
+    return step.id === 'selectRecipient' ? hasRecipients : !hasRecipients;
   }
-  if (step.id === 'provideAddress') {
-    step.show = props.addressRequired;
-  }
-  if (step.id === 'verifyIdentity') {
-    step.show = props.identityDocumentRequired;
-  }
-  const currentStepIndex = steps.findIndex((o) => o.id === step.id);
-  const cursor = steps.findIndex((o) => o.id === props.currentStep);
-  if (currentStepIndex === cursor) {
-    step.status = 'current';
-  } else if (currentStepIndex < cursor) {
-    step.status = 'complete';
-  } else {
-    step.status = 'upcoming';
-  }
-  if (step.id === 'selectRecipient') {
-    step.show = props.quote?.recipients?.length > 0;
-  }
-  if (step.id === 'addRecipient') {
-    if (step.status === 'current') {
-      step.show = true;
-      return step;
-    }
-    step.show = !(step.status === 'complete' || props.quote?.recipients?.length > 0);
-  }
-  return step;
-}).filter((step) => step.show));
+
+  return step.show;
+};
+
+const progress = computed(() => {
+  return steps.map(step => {
+    const status = getStepStatus(step.id, props.currentStep);
+    const show = shouldShowStep(step, status);
+    
+    // Update step name if needed
+    const name = step.id === 'checkRecipients' && props.quote 
+      ? `Transfer to ${props.quote?.payoutCountry?.commonName}`
+      : step.name;
+    
+    return {
+      ...step,
+      name,
+      status,
+      show
+    };
+  }).filter(step => step.show);
+});
 
 const emit = defineEmits(['stepCommandExecuted']);
 
