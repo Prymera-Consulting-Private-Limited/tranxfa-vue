@@ -10,17 +10,18 @@ import {useCountriesStore} from "@/stores/countries.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountryUtils} from "@/composables/country_utils.js";
 import {notify} from 'notiwind';
+import ChangePassword from "@/components/ChangePassword.vue";
+import router from "@/router/index.js";
 
 const isPersonalDetailsModalOpen = ref(false);
 const isAddressModalOpen = ref(false);
+const isChangePasswordModalOpen = ref(false);
 
 const isLoading = ref(false)
 const customerStore = useCustomerStore()
 const countriesStore = useCountriesStore();
 const countryUtils = useCountryUtils();
 const customerUtils = useCustomerUtils()
-
-const customer = customerStore.customer;
 
 onMounted( async () => {
   if (! customerStore.isLoaded) {
@@ -68,6 +69,23 @@ const identityUpdateFailed = () => {
 const addressUpdateFailed = () => {
   isAddressModalOpen.value = true;
 }
+
+const passwordChanged = async () => {
+  isChangePasswordModalOpen.value = false;
+  notify(
+      {
+        group: 'customer',
+        title: 'Password Changed',
+        text: 'Your password has been successfully changed. Please login again with your new password',
+        type: 'success',
+      },
+      -1,
+  )
+  await setTimeout(() => {
+    router.push({name: 'signIn'});
+  }, 2000);
+}
+
 </script>
 
 <template>
@@ -104,7 +122,7 @@ const addressUpdateFailed = () => {
                 <LockClosedIcon class="h-6 w-6 text-purple-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Password</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Change your password to keep your account secure.</p>
-                <a href="#" class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500">Change Password &rarr;</a>
+                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-purple-600 hover:text-purple-500">Change Password &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <DevicePhoneMobileIcon class="h-6 w-6 text-purple-600 mb-2" />
@@ -117,6 +135,24 @@ const addressUpdateFailed = () => {
         </div>
       </div>
     </main>
+    <TransitionRoot as="div" :show="isChangePasswordModalOpen">
+      <Dialog class="relative z-10" @close="isChangePasswordModalOpen = false">
+        <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+        </TransitionChild>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full min-w-sm md:min-w-md sm:max-w-2xl px-5 sm:px-6 lg:px-8 py-8">
+                <ChangePassword
+                    v-on:account:password:changed="passwordChanged"
+                />
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
     <TransitionRoot as="div" :show="isPersonalDetailsModalOpen">
       <Dialog class="relative z-10" @close="isPersonalDetailsModalOpen = false">
         <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">

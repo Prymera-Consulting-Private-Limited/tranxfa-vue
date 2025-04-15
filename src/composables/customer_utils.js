@@ -148,6 +148,14 @@ export function useCustomerUtils() {
         return axios.delete(`/client/v1/device/${deviceId}`);
     }
 
+    async function changePassword(currentPassword, newPassword, confirmNewPassword) {
+        return axios.post(`/client/v1/change-password`, {
+            current_password: currentPassword,
+            password: newPassword,
+            confirm_password: confirmNewPassword,
+        });
+    }
+
     return {
         register,
         login,
@@ -166,5 +174,6 @@ export function useCustomerUtils() {
         tasks,
         devices,
         deleteDevice,
+        changePassword,
     }
 }
