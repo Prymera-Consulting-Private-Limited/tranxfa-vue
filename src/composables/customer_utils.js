@@ -144,6 +144,10 @@ export function useCustomerUtils() {
         return axios.get('/client/v1/devices');
     }
 
+    async function deleteDevice(deviceId) {
+        return axios.delete(`/client/v1/device/${deviceId}`);
+    }
+
     return {
         register,
         login,
@@ -161,5 +165,6 @@ export function useCustomerUtils() {
         uploadDocument,
         tasks,
         devices,
+        deleteDevice,
     }
 }
