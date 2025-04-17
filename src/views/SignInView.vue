@@ -75,6 +75,18 @@ async function login() {
                   </div>
                 </div>
               </div>
+              <div v-if="router.currentRoute.value.query?.referer" class="rounded-md bg-blue-50 p-4">
+                <div class="flex">
+                  <div class="">
+                    <div v-if="router.currentRoute.value.query.referer === 'change-password'" class="text-sm text-blue-700">
+                      Your password has been successfully changed. Please log in using your new password.
+                    </div>
+                    <div v-if="router.currentRoute.value.query.referer === 'reset-password'" class="text-sm text-blue-700">
+                      Your password has been successfully reset. Please log in using your new password.
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <label for="email" class="block text-brand-700 mb-3">Email</label>
