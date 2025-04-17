@@ -10,16 +10,21 @@ import RecipientDataType from "@/enums/recipient_data_type.js";
 import PageHeadingShimmer from "@/components/PageHeadingShimmer.vue";
 import ItemDescriptionShimmer from "@/components/ItemDescriptionShimmer.vue";
 import {useTimeUtils} from "@/composables/time_utils.js";
+import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 
 const recipientUtils = useRecipientUtils();
 const isLoading = ref(true);
-const id = router.currentRoute.value.params.id;
+const props = defineProps({
+  id: String,
+})
 const recipient = ref(null);
 
-
+const isConfirmDeleteModalOpen = ref(false);
+const isDeleting = ref(false);
+const isDeleted = ref(false);
 
 const timeUtils = useTimeUtils();
-
 const lastSentOn = ref(null)
 
 const updateTimestamp = () => {
@@ -29,7 +34,7 @@ const updateTimestamp = () => {
 let intervalId;
 
 onMounted(async () => {
-  await recipientUtils.getRecipient(id).then((response) => {
+  await recipientUtils.getRecipient(props.id).then((response) => {
     recipient.value = Recipient.getInstance(response.data);
   }).finally(() => {
     isLoading.value = false;
@@ -37,6 +42,18 @@ onMounted(async () => {
   updateTimestamp();
   intervalId = setInterval(updateTimestamp, 30000);
 });
+
+const handleDelete = async () => {
+  try {
+    isDeleting.value = true;
+    await recipientUtils.deleteRecipient(props.id);
+    isDeleted.value = true;
+    await router.replace({name: 'recipients'});
+  } catch (error) {
+    console.error('Failed to delete recipient:', error);
+    isDeleting.value = false;
+  }
+};
 </script>
 
 <template>
@@ -53,12 +70,18 @@ onMounted(async () => {
                 <div v-if="isLoading">
                   <PageHeadingShimmer />
                 </div>
-                <div v-else>
-                  <h2 class="text-base font-semibold text-gray-900">{{ recipient?.wholeName }}</h2>
-                  <p class="mt-1 text-sm text-gray-500">
-                    {{ recipient?.channel.payoutMethod.title }} in
-                    {{ recipient?.channel.country.commonName }} for receiving {{ recipient?.channel.currency.isoAlpha }}
-                  </p>
+                <div v-else class="flex items-center justify-between w-full">
+                  <div class="flex-1">
+                    <h2 class="text-base font-semibold text-gray-900">{{ recipient?.wholeName }}</h2>
+                    <p class="mt-1 text-sm text-gray-500">
+                      {{ recipient?.channel.payoutMethod.title }} in
+                      {{ recipient?.channel.country.commonName }} for receiving {{ recipient?.channel.currency.isoAlpha }}
+                    </p>
+                  </div>
+                  <div class="flex-none mt-3">
+                    <button type="button" class="rounded-sm bg-white px-5 py-2 font-medium text-sm text-gray-800 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 cursor-pointer">Edit</button>
+                    <button @click="isConfirmDeleteModalOpen = true" type="button" class="ml-3 rounded-sm px-5 py-2 font-medium text-sm text-white shadow-xs ring-1 ring-red-600 ring-inset bg-red-600 hover:bg-red-500 cursor-pointer">Delete</button>
+                  </div>
                 </div>
               </div>
               <div class="mx-auto max-w-2xl space-y-10 lg:mx-0 lg:max-w-none">
@@ -132,5 +155,51 @@ onMounted(async () => {
         </div>
       </div>
     </main>
+    <TransitionRoot as="template" :show="isConfirmDeleteModalOpen">
+      <Dialog as="div" class="relative z-10">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+        </TransitionChild>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <div class="sm:flex sm:items-start">
+                  <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <ExclamationTriangleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
+                  </div>
+                  <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Delete Recipient?</DialogTitle>
+                    <div class="mt-2">
+                      <DialogDescription class="text-sm text-gray-500">
+                        Are you sure, you want to delete this recipient?
+                      </DialogDescription>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
+                  <button
+                      type="button"
+                      class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:mr-3 sm:w-auto cursor-pointer"
+                      @click="handleDelete"
+                      :disabled="isDeleting"
+                  >
+                    {{ isDeleting ? 'Deleting...' : 'Delete' }}
+                  </button>
+                  <button
+                      type="button"
+                      class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer"
+                      @click="isConfirmDeleteModalOpen = false"
+                      :disabled="isDeleting"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </CustomerLayout>
 </template>
