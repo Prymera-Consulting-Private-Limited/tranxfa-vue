@@ -72,18 +72,7 @@ const addressUpdateFailed = () => {
 
 const passwordChanged = async () => {
   isChangePasswordModalOpen.value = false;
-  notify(
-      {
-        group: 'customer',
-        title: 'Password Changed',
-        text: 'Your password has been successfully changed. Please login again with your new password',
-        type: 'success',
-      },
-      -1,
-  )
-  await setTimeout(() => {
-    router.push({name: 'signIn'});
-  }, 2000);
+  await router.push({name: 'signIn', params: {referer: "change-password"}});
 }
 
 </script>
