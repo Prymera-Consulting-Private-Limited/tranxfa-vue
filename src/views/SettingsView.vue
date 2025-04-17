@@ -72,7 +72,7 @@ const addressUpdateFailed = () => {
 
 const passwordChanged = async () => {
   isChangePasswordModalOpen.value = false;
-  await router.push({name: 'signIn', params: {referer: "change-password"}});
+  await router.push({name: 'signIn', query: {referer: "change-password"}});
 }
 
 </script>

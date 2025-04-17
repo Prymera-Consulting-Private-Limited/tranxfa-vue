@@ -67,7 +67,7 @@ async function resetPassword() {
   formErrors.confirm_password = [];
   resetPasswordFailureMessage.value = '';
   customerUtils.resetPassword(props.token, form.password, form.confirm_password).then(() => {
-    router.push({name: 'signIn', params: {referer: "reset-password"}});
+    router.push({name: 'signIn', query: {referer: "reset-password"}});
   }).catch((e) => {
     if (e.status === 422) {
       const errors = e.response.data.errors;
