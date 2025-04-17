@@ -49,6 +49,10 @@ export function useRecipientUtils() {
         });
     }
 
+    const deleteRecipient = async (id) => {
+        return axios.delete(`/client/v1/recipient/${id}`);
+    }
+
     return {
         whisper,
         add,
@@ -56,5 +60,6 @@ export function useRecipientUtils() {
         getRecipient,
         getQuote,
         lookup,
+        deleteRecipient,
     };
 }
