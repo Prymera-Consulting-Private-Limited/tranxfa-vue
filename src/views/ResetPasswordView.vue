@@ -21,7 +21,7 @@ const formErrors = reactive({
   password: [],
   confirm_password: [],
 });
-const tokenErrorMessage = ref('');
+const resetPasswordFailureMessage = ref('');
 const passwordPolicyStore = usePasswordPolicyStore();
 const customerUtils = useCustomerUtils();
 const passwordPolicyUtils = usePasswordPolicyUtils();
@@ -65,7 +65,7 @@ async function resetPassword() {
   isLoading.value = true;
   formErrors.password = [];
   formErrors.confirm_password = [];
-  tokenErrorMessage.value = '';
+  resetPasswordFailureMessage.value = '';
   customerUtils.resetPassword(props.token, form.password, form.confirm_password).then(() => {
     router.push({name: 'signIn'});
   }).catch((e) => {
@@ -78,10 +78,10 @@ async function resetPassword() {
         formErrors.confirm_password = errors.confirm_password;
       }
       if (typeof errors.token !== 'undefined') {
-        tokenErrorMessage.value = errors.token[0];
+        resetPasswordFailureMessage.value = errors.token[0];
       }
     } else {
-      console.error(e);
+      resetPasswordFailureMessage.value = e.response.data?.message;
     }
   }).finally(() => {
     isLoading.value = false;
@@ -126,10 +126,10 @@ async function resetPassword() {
 
             <!-- Form -->
             <form @submit.prevent="resetPassword" class="space-y-6">
-              <div v-if="tokenErrorMessage" class="rounded-md bg-red-50 border-red-100 border p-4">
+              <div v-if="resetPasswordFailureMessage" class="rounded-md bg-red-50 border-red-100 border p-4">
                 <div class="flex">
                   <div class="text-sm text-red-700">
-                    {{ tokenErrorMessage }}
+                    {{ resetPasswordFailureMessage }}
                   </div>
                 </div>
               </div>
