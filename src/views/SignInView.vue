@@ -108,7 +108,7 @@ async function login() {
               </div>
 
               <!-- Submit Button -->
-              <button type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
+              <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
                 Don’t have an account? <router-link :to="{name: 'signUp'}" class="text-purple-700 hover:text-purple-700 hover:underline">Sign up instead</router-link>

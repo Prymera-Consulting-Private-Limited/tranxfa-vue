@@ -209,7 +209,7 @@ async function register() {
               </div>
 
               <!-- Submit Button -->
-              <button :disabled="!termsAccepted" :class="[termsAccepted ? 'hover:bg-brand-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-brand-700 text-center py-3 font-medium text-white rounded-[10px]">Continue</button>
+              <button :disabled="!termsAccepted || isLoading" :class="[termsAccepted && !isLoading ? 'hover:bg-brand-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-brand-700 text-center py-3 font-medium text-white rounded-[10px]">Continue</button>
             </form>
 
             <p class="text-sm text-gray-500 mt-10 text-center">
