@@ -16,6 +16,7 @@ async function requestResetPassword() {
   forgotPasswordMessage.value = null;
   await customerUtils.forgotPassword(form.email).then((response) => {
     forgotPasswordMessage.value = response?.data?.message;
+    form.email = '';
   }).catch((e) => {
     forgotPasswordMessage.value = e.response?.data?.message;
     console.error(e);
