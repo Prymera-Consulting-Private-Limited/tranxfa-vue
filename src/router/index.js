@@ -31,6 +31,15 @@ const router = createRouter({
         description: 'Forgot Password',
       },
     }, {
+      path: '/reset-password/:token',
+      props: route => ({ token: route.params.token }),
+      name: 'resetPassword',
+      component: () => import('@/views/ResetPasswordView.vue'),
+      meta: {
+        title: 'Reset Password',
+        description: 'Reset Password',
+      },
+    }, {
       path: '/sign-up',
       name: 'signUp',
       component: SignUpView,
