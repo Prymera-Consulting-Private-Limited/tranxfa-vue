@@ -156,6 +156,12 @@ export function useCustomerUtils() {
         });
     }
 
+    async function forgotPassword(email) {
+        return axios.post(`/client/v1/forgot-password`, {
+            email: email
+        });
+    }
+
     return {
         register,
         login,
@@ -175,5 +181,6 @@ export function useCustomerUtils() {
         devices,
         deleteDevice,
         changePassword,
+        forgotPassword,
     }
 }
