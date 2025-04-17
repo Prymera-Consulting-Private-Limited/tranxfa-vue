@@ -23,6 +23,14 @@ const router = createRouter({
         description: 'More authentication required',
       },
     }, {
+      path: '/forgot-password',
+      name: 'forgotPassword',
+      component: () => import('@/views/ForgotPasswordView.vue'),
+      meta: {
+        title: 'Forgot Password',
+        description: 'Forgot Password',
+      },
+    }, {
       path: '/sign-up',
       name: 'signUp',
       component: SignUpView,
