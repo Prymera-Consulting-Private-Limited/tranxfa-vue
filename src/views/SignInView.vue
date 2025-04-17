@@ -104,14 +104,14 @@ async function login() {
                   <input id="remember-me" type="checkbox" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700">
                   <label for="remember-me" class="ml-2 text-sm text-gray-600">Remember me</label>
                 </div>
-                <a href="javascript:" class="text-sm text-brand-600 hover:text-brand-800 hover:underline">Forgot password?</a>
+                <router-link :to="{name: 'forgotPassword'}" class="text-sm text-brand-600 hover:text-brand-700 underline">Forgot password?</router-link>
               </div>
 
               <!-- Submit Button -->
               <button type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
-                Don’t have an account? <router-link :to="'/sign-up'" class="text-purple-700 hover:text-purple-700 hover:underline">Sign up instead</router-link>
+                Don’t have an account? <router-link :to="{name: 'signUp'}" class="text-purple-700 hover:text-purple-700 hover:underline">Sign up instead</router-link>
               </p>
             </form>
           </div>
