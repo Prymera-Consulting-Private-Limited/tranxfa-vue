@@ -162,6 +162,14 @@ export function useCustomerUtils() {
         });
     }
 
+    async function resetPassword(token, newPassword, confirmNewPassword) {
+        return axios.post(`/client/v1/reset-password`, {
+            token: atob(token),
+            password: newPassword,
+            confirm_password: confirmNewPassword,
+        });
+    }
+
     return {
         register,
         login,
@@ -182,5 +190,6 @@ export function useCustomerUtils() {
         deleteDevice,
         changePassword,
         forgotPassword,
+        resetPassword,
     }
 }
