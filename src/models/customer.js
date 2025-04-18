@@ -99,10 +99,18 @@ export class Customer {
     pendingDocuments = [];
 
     identityInformationRequired () {
+        if (this.country === null) {
+            return true;
+        }
+
         return Boolean(this.attributes.find((o) => o.category === CustomerAttributeCategory.IDENTITY && o.isRequired && !o.value))
     }
 
     addressInformationRequired () {
+        if (this.country === null) {
+            return true;
+        }
+
         return Boolean(this.attributes.find((o) => o.category === CustomerAttributeCategory.ADDRESS && o.isRequired && !o.value))
     }
 
