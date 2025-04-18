@@ -114,17 +114,17 @@ onUnmounted(async () => {
               </div>
             </div>
             <dl class="mt-6 grid grid-cols-1 text-sm/6 lg:grid-cols-2">
-              <div class="sm:pr-4">
+              <div class="sm:pr-4 col-span-2 sm:col-span-1">
                 <dt class="inline text-gray-500">Date</dt>
                 {{  }}
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.createdAt">{{ moment(transaction.data.createdAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
-              <div class="mt-2 sm:mt-0 sm:pl-4">
+              <div class="mt-2 sm:mt-0 sm:pl-4 col-span-2 sm:col-span-1">
                 <dt class="inline text-gray-500">Updated on</dt>
                 {{ ' ' }}
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
-              <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4">
+              <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
                 <dt class="font-semibold text-gray-900">Sending from <span class="text-purple-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">You sent</span>
@@ -132,7 +132,7 @@ onUnmounted(async () => {
                   <span class="">{{ transaction.data.payment.paymentMethod.title }}</span>
                 </dd>
               </div>
-              <div class="mt-8 sm:mt-6 sm:border-t sm:border-gray-900/5 sm:pt-6 sm:pl-4">
+              <div class="mt-8 sm:mt-6 sm:border-t sm:border-gray-900/5 sm:pt-6 sm:pl-4 col-span-2 sm:col-span-1">
                 <dt class="font-semibold text-gray-900">Payout in {{ transaction.data.payoutCountry.commonName }}</dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">{{ transaction.data.recipient.wholeName }}</span>
