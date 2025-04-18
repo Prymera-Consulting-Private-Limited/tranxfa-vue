@@ -65,7 +65,7 @@ onMounted(async () => {
         </div>
 
         <!-- Right section on desktop -->
-        <div class="hidden lg:ml-4 lg:flex lg:items-center lg:pr-0.5">
+        <div class="hidden lg:ml-4 lg:flex lg:items-center lg:pr-0.5 print:hidden">
 
           <!-- Profile dropdown -->
           <Menu as="div" class="relative ml-4 shrink-0">
@@ -95,7 +95,7 @@ onMounted(async () => {
         </div>
 
         <!-- Menu button -->
-        <div class="absolute right-0 shrink-0 lg:hidden">
+        <div class="absolute right-0 shrink-0 lg:hidden  print:hidden">
           <!-- Mobile menu button -->
           <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-transparent p-2 text-indigo-200 hover:bg-white/10 hover:text-white outline-none focus:ring-0 focus:ring-white focus:outline-hidden">
             <span class="absolute -inset-0.5" />
@@ -105,7 +105,7 @@ onMounted(async () => {
           </PopoverButton>
         </div>
       </div>
-      <div class="hidden border-t border-purple-100/20 py-5 lg:block">
+      <div class="hidden border-t border-purple-100/20 py-5 lg:block  print:hidden">
         <div class="grid grid-cols-3 items-center gap-8">
           <div class="col-span-2">
             <nav class="flex space-x-4">
