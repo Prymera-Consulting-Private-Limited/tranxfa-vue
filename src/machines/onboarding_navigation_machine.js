@@ -19,19 +19,19 @@ export const onboardingNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'onboardingComplete',
-                        guard: () => customerStore.isLoaded && (customer.data?.account?.mobileNumber || null) !== null,
+                        guard: 'mobileNumberProvided',
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: () => customerStore.isLoaded && (customer.data?.identityInformationRequired() || true) === false,
+                        guard: 'identityInformationProvided',
                     },
                     {
                         target: 'identityInformation',
-                        guard: () => (customerStore.isLoaded && customer.data?.country || null) !== null && (customer.data?.account?.isEmailVerified || false) === true,
+                        guard: 'countryProvided',
                     },
                     {
                         target: 'sourceCountrySelection',
-                        guard: () => customerStore.isLoaded && (customer.data?.account?.isEmailVerified || false) === true,
+                        guard: 'emailVerified',
                     }
                 ],
             },
@@ -41,7 +41,7 @@ export const onboardingNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'identityInformation',
-                        guard: ({context}) => (customerStore.isLoaded && customer.data?.country || null) !== null,
+                        guard: 'countryProvided',
                     },
                 ],
             },
@@ -51,7 +51,7 @@ export const onboardingNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'mobileNumberInput',
-                        guard: () => customerStore.isLoaded && customer.data?.identityInformationRequired() === false,
+                        guard: 'identityInformationProvided',
                     },
                 ],
                 CHANGE_COUNTRY: {
@@ -64,7 +64,7 @@ export const onboardingNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'onboardingComplete',
-                        guard: () => customerStore.isLoaded && customer.data?.account?.mobileNumber,
+                        guard: 'mobileNumberProvided',
                     },
                 ],
                 EDIT_PERSONAL_INFORMATION: {
@@ -75,5 +75,12 @@ export const onboardingNavigationMachine = createMachine({
         onboardingComplete: {
             final: true,
         },
+    }
+}, {
+    guards: {
+        emailVerified: () => customerStore.isLoaded && (customer.data?.account?.isEmailVerified || false) === true,
+        countryProvided: () =>  customerStore.isLoaded && ((customer.data?.country || null) !== null),
+        identityInformationProvided: () =>  customerStore.isLoaded && (customer.data?.identityInformationRequired?.() === false),
+        mobileNumberProvided: () =>  customerStore.isLoaded && (customer.data?.account?.mobileNumber || null) !== null,
     }
 });
