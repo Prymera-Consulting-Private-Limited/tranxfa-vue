@@ -78,9 +78,9 @@ export const onboardingNavigationMachine = createMachine({
     }
 }, {
     guards: {
-        emailVerified: () => customerStore.isLoaded && (customer.data?.account?.isEmailVerified || false) === true,
-        countryProvided: () =>  customerStore.isLoaded && ((customer.data?.country || null) !== null),
-        identityInformationProvided: () =>  customerStore.isLoaded && (customer.data?.identityInformationRequired?.() === false),
-        mobileNumberProvided: () =>  customerStore.isLoaded && (customer.data?.account?.mobileNumber || null) !== null,
+        emailVerified: () => customerStore.isLoaded && (customer.data?.account?.isEmailVerified ?? false) === true,
+        countryProvided: () => customerStore.isLoaded && ((customer.data?.country || null) !== null),
+        identityInformationProvided: () => customerStore.isLoaded && ((customer.data?.identityInformationRequired?.() ?? false) === false),
+        mobileNumberProvided: () => customerStore.isLoaded && (customer.data?.account?.mobileNumber || null) !== null,
     }
 });
