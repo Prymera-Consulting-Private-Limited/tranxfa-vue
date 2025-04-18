@@ -12,9 +12,16 @@ const props = defineProps({
     type: String,
     default: 'Please Select',
   },
+  defaultValue: {
+    type: Object(Relationship),
+    required: false,
+    default: null,
+  },
 })
 
 const relationship = ref(null);
+
+relationship.value = props.defaultValue;
 
 const emit = defineEmits(['recipient:relationship:updated']);
 
