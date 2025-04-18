@@ -53,6 +53,10 @@ export function useRecipientUtils() {
         return axios.delete(`/client/v1/recipient/${id}`);
     }
 
+    const update = async (id, data) => {
+        return axios.post(`/client/v1/recipient/edit/${id}`, data);
+    }
+
     return {
         whisper,
         add,
@@ -61,5 +65,6 @@ export function useRecipientUtils() {
         getQuote,
         lookup,
         deleteRecipient,
+        update,
     };
 }
