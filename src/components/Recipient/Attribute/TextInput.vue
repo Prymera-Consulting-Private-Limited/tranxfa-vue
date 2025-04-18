@@ -11,11 +11,18 @@ const props = defineProps({
     type: PayoutChannelAttribute,
     required: false,
   },
+  defaultValue: {
+    type: String,
+    required: false,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['recipient:input:updated']);
 
 const model = ref(null);
+
+model.value = props.defaultValue;
 
 watch(model, (value) => {
   emit('recipient:input:updated', value, props.attribute);
