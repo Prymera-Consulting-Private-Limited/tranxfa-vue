@@ -19,8 +19,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <div :class="{'opacity-75': transaction.state.code === TransactionState.CANCELLED}" class="flex min-w-0 gap-x-4">
-    <span class="inline-flex size-11 items-center justify-center border border-1 rounded-full" :style="{
+  <div :class="{'opacity-75': transaction.state.code === TransactionState.CANCELLED}" class="flex min-w-0 gap-x-4 px-4 md:px-0">
+    <span class="size-11 items-center justify-center border border-1 rounded-full hidden md:inline-flex" :style="{
        backgroundColor: colorUtils.getStyleValue(transaction.state.colorScheme, 50),
        borderColor: colorUtils.getStyleValue(transaction.state.colorScheme, 600),
      }">
