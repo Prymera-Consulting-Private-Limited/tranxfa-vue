@@ -114,6 +114,14 @@ export class Customer {
         return Boolean(this.attributes.find((o) => o.category === CustomerAttributeCategory.ADDRESS && o.isRequired && !o.value))
     }
 
+    employmentInformationRequired () {
+        if (this.country === null) {
+            return true;
+        }
+
+        return Boolean(this.attributes.find((o) => o.category === CustomerAttributeCategory.EMPLOYMENT && o.isRequired && !o.value))
+    }
+
     static getInstance(data) {
         const customer = new Customer();
         customer.id = data.id;
