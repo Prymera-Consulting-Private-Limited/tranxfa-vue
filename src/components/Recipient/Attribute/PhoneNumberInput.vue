@@ -19,7 +19,7 @@ const props = defineProps({
   },
   defaultValue: {
     type: Object({
-      country: Object,
+      country: String,
       number: String,
     }),
     required: false,
@@ -28,7 +28,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['recipient:input:updated']);
 const phoneNumber = reactive({
-  country: props.defaultValue?.country?.id || props.country?.id || null,
+  country: props.defaultValue?.country || props.country?.id || null,
   number: props.defaultValue?.number || null,
 })
 
