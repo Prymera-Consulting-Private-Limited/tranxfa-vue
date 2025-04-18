@@ -2,6 +2,8 @@
 import vSelect from 'vue-select';
 import PayoutChannelAttribute from "@/models/payout_channel_attribute.js";
 import {ref} from "vue";
+import Relationship from "@/models/relationship.js";
+import Delivery_option from "@/models/delivery_option.js";
 
 const props = defineProps({
   placeholder: {
@@ -16,9 +18,16 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  defaultValue: {
+    type: Object(Delivery_option),
+    required: false,
+    default: null,
+  },
 })
 
 const deliveryOption = ref(null);
+
+deliveryOption.value = props.defaultValue;
 
 const emit = defineEmits(['recipient:input:updated']);
 
