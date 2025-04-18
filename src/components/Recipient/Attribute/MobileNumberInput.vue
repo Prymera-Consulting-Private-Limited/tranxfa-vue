@@ -17,11 +17,19 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  defaultValue: {
+    type: Object({
+      country: Object,
+      number: String,
+    }),
+    required: false,
+    default: '',
+  },
 });
 const emit = defineEmits(['recipient:input:updated']);
 const mobileNumber = reactive({
-  country: props.country?.id || null,
-  number: props.mobile?.number || null,
+  country: props.defaultValue?.country?.id || props.country?.id || null,
+  number: props.defaultValue?.number || null,
 })
 
 const itemLabelGenerator = (country) => {
