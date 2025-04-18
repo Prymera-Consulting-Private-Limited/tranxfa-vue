@@ -59,7 +59,18 @@ onUnmounted(async () => {
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <template v-if="isLoading">
           <div class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-            <!-- Invoice summary -->
+            <div class="-mx-4 px-4 py-8 ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20 ">
+              <h2 class="text-base font-semibold text-gray-900 animate-pulse">Transaction #</h2>
+              <div class="col-span-2">
+                <div class="border-l-4 border-1 border-gray-300 rounded-md mt-4 p-4 bg-gray-200 h-10 animate-pulse"></div>
+              </div>
+              <dl class="mt-6 grid grid-cols-1 text-sm/6 sm:grid-cols-2 animate-pulse">
+                <div class="sm:pr-4 h-4 bg-gray-300 w-32"></div>
+                <div class="mt-2 sm:mt-0 sm:pl-4 h-4 bg-gray-300 w-32"></div>
+                <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 h-4 bg-gray-300 w-48"></div>
+                <div class="mt-8 sm:mt-6 sm:border-t sm:border-gray-900/5 sm:pt-6 sm:pl-4 h-4 bg-gray-300 w-48"></div>
+              </dl>
+            </div>
             <div class="lg:col-start-3 lg:row-end-1">
               <h2 class="sr-only">Summary</h2>
               <div class="rounded-lg bg-white ring-1 shadow-xs ring-gray-900/5">
@@ -75,71 +86,9 @@ onUnmounted(async () => {
                 </dl>
               </div>
             </div>
-
-            <!-- Invoice -->
-            <div class="-mx-4 px-4 py-8 ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20 ">
-              <h2 class="text-base font-semibold text-gray-900 animate-pulse">Transaction #</h2>
-              <div class="col-span-2">
-                <div class="border-l-4 border-1 border-gray-300 rounded-md mt-4 p-4 bg-gray-200 h-10 animate-pulse"></div>
-              </div>
-              <dl class="mt-6 grid grid-cols-1 text-sm/6 sm:grid-cols-2 animate-pulse">
-                <div class="sm:pr-4 h-4 bg-gray-300 w-32"></div>
-                <div class="mt-2 sm:mt-0 sm:pl-4 h-4 bg-gray-300 w-32"></div>
-                <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 h-4 bg-gray-300 w-48"></div>
-                <div class="mt-8 sm:mt-6 sm:border-t sm:border-gray-900/5 sm:pt-6 sm:pl-4 h-4 bg-gray-300 w-48"></div>
-              </dl>
-            </div>
           </div>
         </template>
         <div v-else class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3" v-if="transaction.data">
-          <div class="lg:col-start-3 lg:row-end-1 print:hidden">
-            <h2 class="sr-only">Summary</h2>
-            <div class="rounded-lg bg-white ring-1 shadow-xs ring-gray-900/5">
-              <dl class="flex items-center flex-wrap">
-                <div class="flex-auto pt-6 pl-6">
-                  <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
-                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
-                </div>
-                <div class="flex-none px-6">
-                  <dt class="sr-only">Status</dt>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
-                  <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
-                </div>
-                <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
-                  <dt class="flex-none">
-                    <span class="sr-only">Client</span>
-                    <RocketLaunchIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
-                  </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
-                </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
-                  <dt class="flex-none">
-                    <span class="sr-only">Fees</span>
-                    <PlusCircleIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
-                  </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
-                </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
-                  <dt class="flex-none">
-                    <span class="sr-only">Total</span>
-                    <CalculatorIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
-                  </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
-                </div>
-                <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
-                  <dt class="flex-none">
-                    <span class="sr-only">Status</span>
-                    <CreditCardIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
-                  </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
-                </div>
-              </dl>
-              <div class="mt-6 border-t border-gray-900/5 px-6 py-6 print:hidden">
-                <a href="javascript:window.print()" class="text-sm/6 font-semibold text-gray-900">Print receipt <span aria-hidden="true">&rarr;</span></a>
-              </div>
-            </div>
-          </div>
           <!-- Invoice -->
           <div class="-mx-4 px-4 py-8 print:px-0 print:py-4 print:ring-0 print:shadow-none ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20">
             <h2 class="text-base font-semibold text-gray-900">Transaction #{{ transaction.data.transactionNumber }}</h2>
@@ -164,7 +113,7 @@ onUnmounted(async () => {
                 </div>
               </div>
             </div>
-            <dl class="mt-6 grid grid-cols-1 text-sm/6 sm:grid-cols-2">
+            <dl class="mt-6 grid grid-cols-1 text-sm/6 lg:grid-cols-2">
               <div class="sm:pr-4">
                 <dt class="inline text-gray-500">Date</dt>
                 {{  }}
@@ -240,6 +189,54 @@ onUnmounted(async () => {
                 </div>
               </div>
             </dl>
+          </div>
+          <div class="lg:col-start-3 lg:row-end-1 print:hidden">
+            <h2 class="sr-only">Summary</h2>
+            <div class="rounded-lg bg-white ring-1 shadow-xs ring-gray-900/5">
+              <dl class="flex items-center flex-wrap">
+                <div class="flex-auto pt-6 pl-6">
+                  <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
+                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                </div>
+                <div class="flex-none px-6">
+                  <dt class="sr-only">Status</dt>
+                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
+                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
+                  <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
+                </div>
+                <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
+                  <dt class="flex-none">
+                    <span class="sr-only">Client</span>
+                    <RocketLaunchIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                </div>
+                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
+                  <dt class="flex-none">
+                    <span class="sr-only">Fees</span>
+                    <PlusCircleIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
+                </div>
+                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
+                  <dt class="flex-none">
+                    <span class="sr-only">Total</span>
+                    <CalculatorIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                </div>
+                <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
+                  <dt class="flex-none">
+                    <span class="sr-only">Status</span>
+                    <CreditCardIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
+                </div>
+              </dl>
+              <div class="mt-6 border-t border-gray-900/5 px-6 py-6 print:hidden">
+                <a href="javascript:window.print()" class="text-sm/6 font-semibold text-gray-900">Print receipt <span aria-hidden="true">&rarr;</span></a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
