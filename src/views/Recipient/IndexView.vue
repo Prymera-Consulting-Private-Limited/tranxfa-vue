@@ -59,12 +59,12 @@ const recipientCreated = (recipient) => {
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-3">
             <section aria-labelledby="section-2-title">
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center gap-3">
                 <div>
                   <h2 class="text-base font-semibold text-gray-900">Your Recipients</h2>
                   <p class="mt-1 text-sm text-gray-500">Here you can manage all your recipients and perform various actions such as adding, editing, or deleting recipients.</p>
                 </div>
-                <button @click="createRecipient" type="button" class="inline-flex w-auto whitespace-nowrap items-center rounded-md bg-brand-700 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-brand-700/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer">
+                <button @click="createRecipient" type="button" class="inline-flex w-auto whitespace-nowrap items-center rounded-md bg-brand-700 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-brand-700/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer ml-3">
                   <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />
                   Add Recipient
                 </button>
