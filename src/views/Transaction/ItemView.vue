@@ -55,7 +55,7 @@ onUnmounted(async () => {
 
 <template>
   <CustomerLayout>
-    <main class="-mt-24 py-8">
+    <main class="-mt-24 py-8 print:py-0">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <template v-if="isLoading">
           <div class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
@@ -115,14 +115,14 @@ onUnmounted(async () => {
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
-                    <span class="sr-only">Due date</span>
+                    <span class="sr-only">Fees</span>
                     <PlusCircleIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
-                    <span class="sr-only">Status</span>
+                    <span class="sr-only">Total</span>
                     <CalculatorIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
@@ -215,6 +215,28 @@ onUnmounted(async () => {
                       </div>
                     </template>
                   </dl>
+                </div>
+              </div>
+              <div class="col-span-2 print:grid grid-cols-2 mt-8 sm:mt-6 border-t border-gray-900/5 hidden py-3">
+                <div class="py-3">
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Sent Amount</h2>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
+                </div>
+                <div class="py-3">
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Fee</h2>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
+                </div>
+                <div class="py-3">
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Total Amount</h2>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
+                </div>
+                <div class="py-3">
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
+                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
+                    <span v-else class="text-sm font-medium">Paid</span>
+                  </p>
                 </div>
               </div>
             </dl>
