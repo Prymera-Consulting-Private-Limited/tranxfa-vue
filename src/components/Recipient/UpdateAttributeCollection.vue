@@ -81,6 +81,7 @@ for (const attribute of props.recipient.attributes) {
   }
   if (attribute.type === RecipientDataType.ACCOUNT_NUMBER) {
     if (props.recipient.channel.configuration.confirmAccountNumber) {
+      confirmAccountNumberInput.value = attribute.value;
       input.data[`confirm_${attribute.attribute}`] = confirmAccountNumberInput;
       errors[`confirm_${attribute.attribute}`] = [];
     }
