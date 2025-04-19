@@ -1,6 +1,6 @@
 <script setup>
 import {useCustomerStore} from "@/stores/customer.js";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountriesStore} from "@/stores/countries.js";
 import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
@@ -8,8 +8,11 @@ import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import {useCountryUtils} from "@/composables/country_utils.js";
 import {useResourceUtils} from "@/composables/resource_utils.js";
 import Occupation from "@/models/occupation.js";
+import Currency from "@/models/currency.js";
+import SalaryRange from "@/models/salary_range.js";
 
-const isLoading = ref(false)
+const isOccupationsLoading = ref(false)
+const isSalaryRangesLoading = ref(false)
 const customerStore = useCustomerStore()
 const countriesStore = useCountriesStore();
 const customerUtils = useCustomerUtils()
@@ -20,23 +23,42 @@ const customer = customerStore.customer;
 
 const occupations = ref([]);
 
+const currencySalaryRange = reactive({
+  currency: null,
+  ranges: [],
+});
+
 onMounted( async () => {
-  isLoading.value = true;
   if (! customerStore.isLoaded) {
     customerUtils.refresh().finally();
   }
+
   if (! countriesStore.isLoaded) {
     countryUtils.getCountries().finally();
   }
+
+  isOccupationsLoading.value = true;
   resourceUtils.occupations().then((response) => {
     occupations.value = response.data.map((o) => Occupation.getInstance(o));
   }).finally(() => {
-    isLoading.value = false;
+    isOccupationsLoading.value = false;
+  });
+
+  isSalaryRangesLoading.value = true;
+  resourceUtils.currencySalaryRanges().then((response) => {
+    if (response?.data?.currency) {
+      currencySalaryRange.currency = Currency.getInstance(response.data.currency);
+    }
+    if (response?.data?.salary_ranges) {
+      currencySalaryRange.ranges = response.data.salary_ranges.map((o) => SalaryRange.getInstance(o));
+    }
+  }).finally(() => {
+    isSalaryRangesLoading.value = false;
   })
 });
 
 const showLoading = computed(() => {
-  return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
+  return isOccupationsLoading.value || isSalaryRangesLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
 })
 
 const emit = defineEmits(['employmentUpdated', 'editPersonalInformationRequested'])
