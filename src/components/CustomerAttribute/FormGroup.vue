@@ -7,6 +7,7 @@ import DateOfBirthInput from "@/components/CustomerAttribute/DateOfBirthInput.vu
 import NationalityInput from "@/components/CustomerAttribute/NationalityInput.vue";
 import TextInput from "@/components/CustomerAttribute/TextInput.vue";
 import OccupationInput from "@/components/CustomerAttribute/OccupationInput.vue";
+import EarningInput from "@/components/CustomerAttribute/EarningInput.vue";
 
 defineProps({
   attr: {
@@ -27,13 +28,16 @@ defineProps({
   },
 });
 
-const emit = defineEmits(['customer:attribute:updated', 'customer:occupation:updated']);
+const emit = defineEmits(['customer:attribute:updated', 'customer:occupation:updated', 'customer:earning:updated']);
 
 const notifyAttributeUpdated = (attr, value) => {
   emit('customer:attribute:updated', attr, value);
 }
 const notifyOccupationUpdated = (attr, value) => {
   emit('customer:occupation:updated', attr, value);
+}
+const notifyEarningUpdated = (attr, value) => {
+  emit('customer:earning:updated', attr, value);
 }
 </script>
 
@@ -74,6 +78,13 @@ const notifyOccupationUpdated = (attr, value) => {
       v-bind:occupations="occupations"
       v-bind:formErrors="formErrors"
       v-on:customer:attribute:updated="notifyOccupationUpdated"
+  />
+  <EarningInput
+      v-else-if="attr.attribute === 'employment.earning'"
+      v-bind:attr="attr"
+      v-bind:currencySalaryRange="currencySalaryRange"
+      v-bind:formErrors="formErrors"
+      v-on:customer:attribute:updated="notifyEarningUpdated"
   />
   <TextInput
       v-else v-bind:attr="attr"
