@@ -92,14 +92,12 @@ const updateFormData = (attr, value) => {
   form.data[attr.attribute] = value;
 }
 const updateFormDataOccupation = (attr, value) => {
+  if (form.data === null) {
+    form.data = {};
+  }
   form.data[attr.attribute] = value?.id;
   const namespace = attr.attribute.split('.').shift();
   form.data[`${namespace}.other_occupation`] = value?.other;
-}
-const updateFormDataEarning = (attr, value) => {
-  form.data[attr.attribute] = value?.earning;
-  const namespace = attr.attribute.split('.').shift();
-  form.data[`${namespace}.earning_range_id`] = value?.earning_range_id;
 }
 
 onMounted(() => {
@@ -128,7 +126,6 @@ watchEffect(() => {
       <FormGroup
           v-on:customer:attribute:updated="updateFormData"
           v-on:customer:occupation:updated="updateFormDataOccupation"
-          v-on:customer:earning:updated="updateFormDataEarning"
           v-bind:attr="attribute"
           v-bind:occupations="occupations"
           v-bind:currencySalaryRange="currencySalaryRange"
