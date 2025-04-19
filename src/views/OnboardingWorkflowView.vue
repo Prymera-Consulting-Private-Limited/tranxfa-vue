@@ -9,6 +9,7 @@ import OriginCountrySelection from "@/components/Customer/OriginCountrySelection
 import IdentityInformation from "@/components/Customer/IdentityInformation.vue";
 import MobileNumberInput from "@/components/Customer/MobileNumberInput.vue";
 import router from "@/router/index.js";
+import EmploymentInformation from "@/components/Customer/EmploymentInformation.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -67,6 +68,10 @@ const editPersonalInformation = () => {
             v-else-if="snapshot?.value === 'identityInformation'"
             v-on:identityUpdated="proceed"
             v-on:changeCountry="changeCountry" />
+        <EmploymentInformation
+            v-else-if="snapshot?.value === 'employmentInformation'"
+            v-on:employmentUpdated="proceed"
+            v-on:editPersonalInformationRequested="editPersonalInformation" />
         <MobileNumberInput
             v-else-if="snapshot?.value === 'mobileNumberInput'"
             v-on:mobileNumberUpdated="proceed"
