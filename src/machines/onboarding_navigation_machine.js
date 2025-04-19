@@ -23,7 +23,11 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: 'identityInformationProvided',
+                        guard: 'employmentInformationProvided',
+                    },
+                    {
+                        target: 'employmentInformation',
+                        guard: 'employmentInformationRequired',
                     },
                     {
                         target: 'identityInformation',
@@ -50,12 +54,28 @@ export const onboardingNavigationMachine = createMachine({
             on: {
                 PROCEED: [
                     {
+                        target: 'employmentInformation',
+                        guard: 'employmentInformationRequired',
+                    }, {
                         target: 'mobileNumberInput',
-                        guard: 'identityInformationProvided',
+                        guard: 'employmentInformationProvided',
                     },
                 ],
                 CHANGE_COUNTRY: {
                     target: 'sourceCountrySelection',
+                }
+            },
+        },
+        employmentInformation: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'mobileNumberInput',
+                        guard: 'employmentInformationProvided',
+                    },
+                ],
+                EDIT_PERSONAL_INFORMATION: {
+                    target: 'identityInformation',
                 }
             },
         },
@@ -78,9 +98,30 @@ export const onboardingNavigationMachine = createMachine({
     }
 }, {
     guards: {
-        emailVerified: () => customerStore.isLoaded && (customer.data?.account?.isEmailVerified ?? false) === true,
-        countryProvided: () => customerStore.isLoaded && ((customer.data?.country || null) !== null),
-        identityInformationProvided: () => customerStore.isLoaded && ((customer.data?.identityInformationRequired?.() ?? false) === false),
-        mobileNumberProvided: () => customerStore.isLoaded && (customer.data?.account?.mobileNumber || null) !== null,
+        emailVerified: () => customerStore.isLoaded &&
+            (customer.data?.account?.isEmailVerified ?? false) === true,
+        countryProvided: () => customerStore.isLoaded &&
+            (customer.data?.account?.isEmailVerified ?? false) === true &&
+            ((customer.data?.country || null) !== null),
+        identityInformationProvided: () => customerStore.isLoaded &&
+            (customer.data?.account?.isEmailVerified ?? false) === true &&
+            ((customer.data?.country || null) !== null) &&
+            ((customer.data?.identityInformationRequired?.() ?? false) === false),
+        employmentInformationRequired: () => customerStore.isLoaded &&
+            (customer.data?.account?.isEmailVerified ?? false) === true &&
+            ((customer.data?.country || null) !== null) &&
+            ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
+            ((customer.data?.employmentInformationRequired?.() ?? false) === true),
+        employmentInformationProvided: () => customerStore.isLoaded &&
+            (customer.data?.account?.isEmailVerified ?? false) === true &&
+            ((customer.data?.country || null) !== null) &&
+            ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
+            ((customer.data?.employmentInformationRequired?.() ?? false) === false),
+        mobileNumberProvided: () => customerStore.isLoaded &&
+            (customer.data?.account?.isEmailVerified ?? false) === true &&
+            ((customer.data?.country || null) !== null) &&
+            ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
+            ((customer.data?.employmentInformationRequired?.() ?? false) === false) &&
+            (customer.data?.account?.mobileNumber || null) !== null,
     }
 });
