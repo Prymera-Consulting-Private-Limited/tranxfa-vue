@@ -18,6 +18,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  occupations: {
+    type: Array,
+    required: false,
+  },
   updateOutsourced: {
     type: Boolean,
     required: false,
@@ -83,6 +87,10 @@ const attributes = computed(() => {
 const updateFormData = (attr, value) => {
   form.data[attr.attribute] = value;
 }
+const updateFormDataOccupation = (attr, value) => {
+  form.data[attr.attribute] = value?.id;
+  console.log(attr, value);
+}
 
 onMounted(() => {
   form.data = {};
@@ -106,9 +114,17 @@ watchEffect(() => {
   </template>
   <form v-else @submit.prevent="update" class="space-y-6">
     <div v-for="attribute in attributes" :key="attribute.attribute">
-      <FormGroup v-on:customer:attribute:updated="updateFormData" v-bind:attr="attribute" />
+      <FormGroup
+          v-on:customer:attribute:updated="updateFormData"
+          v-on:customer:occupation:updated="updateFormDataOccupation"
+          v-bind:attr="attribute"
+          v-bind:occupations="occupations"
+      />
     </div>
-    <button v-if="! updateOutsourced" :disabled="showLoading || isSaving" :class="[{'opacity-70': showLoading || isSaving}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition cursor-pointer">
+    <button
+      v-if="! updateOutsourced" :disabled="showLoading || isSaving" :class="[{'opacity-70': showLoading || isSaving}]"
+      type="submit"
+      class="block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition cursor-pointer">
       <template v-if="isSaving">
         <span class="flex items-center justify-center whitespace-nowrap">
           <Spinner :class="'size-4 mr-2'" />
