@@ -5,7 +5,12 @@ export function useResourceUtils () {
         return axios.get('/client/v1/resources/relationships');
     }
 
+    const occupations =  async () => {
+        return axios.get('/client/v1/resources/occupations');
+    }
+
     return {
         relationships,
+        occupations,
     }
 }
