@@ -121,7 +121,6 @@ watchEffect(() => {
     </div>
   </template>
   <form v-else @submit.prevent="update" class="space-y-6">
-    <pre>{{ form.data }}</pre>
     <div v-for="attribute in attributes" :key="attribute.attribute">
       <FormGroup
           v-on:customer:attribute:updated="updateFormData"
