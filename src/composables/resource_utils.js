@@ -9,8 +9,13 @@ export function useResourceUtils () {
         return axios.get('/client/v1/resources/occupations');
     }
 
+    const currencySalaryRanges =  async () => {
+        return axios.get('/client/v1/resources/currency-salary-ranges');
+    }
+
     return {
         relationships,
         occupations,
+        currencySalaryRanges,
     }
 }
