@@ -13,6 +13,7 @@ class SalaryRange {
         const salaryRange = new SalaryRange();
         salaryRange.id = data.id;
         salaryRange.title = data.title;
+        return salaryRange;
     }
 }
 
