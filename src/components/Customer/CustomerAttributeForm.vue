@@ -89,7 +89,8 @@ const updateFormData = (attr, value) => {
 }
 const updateFormDataOccupation = (attr, value) => {
   form.data[attr.attribute] = value?.id;
-  console.log(attr, value);
+  const namespace = attr.attribute.split('.').shift();
+  form.data[`${namespace}.other_occupation`] = value?.other;
 }
 
 onMounted(() => {
@@ -119,6 +120,7 @@ watchEffect(() => {
           v-on:customer:occupation:updated="updateFormDataOccupation"
           v-bind:attr="attribute"
           v-bind:occupations="occupations"
+          v-bind:formErrors="form.errors"
       />
     </div>
     <button

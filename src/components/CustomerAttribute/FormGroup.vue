@@ -17,6 +17,10 @@ defineProps({
     type: Array,
     required: false,
   },
+  formErrors: {
+    type: Object,
+    required: false,
+  },
 });
 
 const emit = defineEmits(['customer:attribute:updated', 'customer:occupation:updated']);
@@ -64,6 +68,7 @@ const notifyOccupationUpdated = (attr, value) => {
       v-else-if="attr.attribute === 'employment.occupation_id'"
       v-bind:attr="attr"
       v-bind:occupations="occupations"
+      v-bind:formErrors="formErrors"
       v-on:customer:attribute:updated="notifyOccupationUpdated"
   />
   <TextInput
