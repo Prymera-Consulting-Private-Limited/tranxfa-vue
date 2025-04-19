@@ -96,6 +96,11 @@ const updateFormDataOccupation = (attr, value) => {
   const namespace = attr.attribute.split('.').shift();
   form.data[`${namespace}.other_occupation`] = value?.other;
 }
+const updateFormDataEarning = (attr, value) => {
+  form.data[attr.attribute] = value?.earning;
+  const namespace = attr.attribute.split('.').shift();
+  form.data[`${namespace}.earning_range_id`] = value?.earning_range_id;
+}
 
 onMounted(() => {
   form.data = {};
@@ -118,10 +123,12 @@ watchEffect(() => {
     </div>
   </template>
   <form v-else @submit.prevent="update" class="space-y-6">
+    <pre>{{ form.data }}</pre>
     <div v-for="attribute in attributes" :key="attribute.attribute">
       <FormGroup
           v-on:customer:attribute:updated="updateFormData"
           v-on:customer:occupation:updated="updateFormDataOccupation"
+          v-on:customer:earning:updated="updateFormDataEarning"
           v-bind:attr="attribute"
           v-bind:occupations="occupations"
           v-bind:currencySalaryRange="currencySalaryRange"
