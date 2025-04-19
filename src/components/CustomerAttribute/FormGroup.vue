@@ -17,6 +17,10 @@ defineProps({
     type: Array,
     required: false,
   },
+  currencySalaryRange: {
+    type: Object,
+    required: false,
+  },
   formErrors: {
     type: Object,
     required: false,

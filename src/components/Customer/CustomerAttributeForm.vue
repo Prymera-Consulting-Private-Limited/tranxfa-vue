@@ -22,6 +22,10 @@ const props = defineProps({
     type: Array,
     required: false,
   },
+  currencySalaryRange: {
+    type: Object,
+    required: false,
+  },
   updateOutsourced: {
     type: Boolean,
     required: false,
@@ -120,6 +124,7 @@ watchEffect(() => {
           v-on:customer:occupation:updated="updateFormDataOccupation"
           v-bind:attr="attribute"
           v-bind:occupations="occupations"
+          v-bind:currencySalaryRange="currencySalaryRange"
           v-bind:formErrors="form.errors"
       />
     </div>

@@ -89,6 +89,7 @@ const editPersonalInformation = () => {
           v-bind:categories="`${CustomerAttributeCategory.EMPLOYMENT}`"
           v-bind:showLoading="showLoading"
           v-bind:occupations="occupations"
+          v-bind:currencySalaryRange="currencySalaryRange"
           v-on:customer:attribute_category:updated="employmentUpdated"
       />
       <div class="text-center mt-12">
