@@ -34,7 +34,7 @@ async function requestResetPassword() {
           <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
+            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-sm"></a>
             <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
@@ -51,7 +51,7 @@ async function requestResetPassword() {
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
+              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-sm"></a>
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-2">Forgot Password</h2>
@@ -78,7 +78,7 @@ async function requestResetPassword() {
               <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Send Reset Link</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
-                Changed mind? <router-link :to="{name: 'signIn'}" class="text-purple-700 hover:text-purple-700 hover:underline">Sign in instead</router-link>
+                Changed mind? <router-link :to="{name: 'signIn'}" class="text-blue-700 hover:text-blue-700 hover:underline">Sign in instead</router-link>
               </p>
             </form>
           </div>

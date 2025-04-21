@@ -57,7 +57,7 @@ const retryPayment = async () => {
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Complete Your Payment</h2>
     <p class="text-base text-gray-600 mb-6">Your transaction is pending. To proceed, please click the button below and complete the payment.</p>
     <div class="mt-6 mb-10">
-      <a @click="redirected" :href="`https://gateway-web.fit.interac.ca/acceptPaymentRequest.do?rID=${transaction.payment.sharedReference}`" class="px-4 md:px-6 lg:px-8 bg-purple-600 text-white text-center py-3 rounded-md font-medium hover:bg-purple-700 transition cursor-pointer text-sm outline-none ring-0" target="_blank">Proceed to Payment</a>
+      <a @click="redirected" :href="`https://gateway-web.fit.interac.ca/acceptPaymentRequest.do?rID=${transaction.payment.sharedReference}`" class="px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0" target="_blank">Proceed to Payment</a>
     </div>
   </template>
 
@@ -72,7 +72,7 @@ const retryPayment = async () => {
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
     <p class="text-base text-gray-600 mb-6">We have opened a new browser window for you to complete the payment.</p>
     <div class="mt-6 mb-10">
-      <a @click="redirected" :href="`https://gateway-web.fit.interac.ca/acceptPaymentRequest.do?rID=${transaction.payment.sharedReference}`" class="px-4 md:px-6 lg:px-8 bg-purple-600 text-white text-center py-3 rounded-md font-medium hover:bg-purple-700 transition cursor-pointer text-sm outline-none ring-0" target="_blank">Open again</a>
+      <a @click="redirected" :href="`https://gateway-web.fit.interac.ca/acceptPaymentRequest.do?rID=${transaction.payment.sharedReference}`" class="px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0" target="_blank">Open again</a>
     </div>
   </template>
 
@@ -86,7 +86,7 @@ const retryPayment = async () => {
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
     <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-purple-600 text-white text-center py-3 rounded-md font-medium hover:bg-purple-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
   </template>
 
 </template>

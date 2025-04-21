@@ -97,17 +97,7 @@ async function register() {
           <img src="/images/backgrounds/signup.png" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa" class="w-auto max-w-sm"></a>
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
-              <i class="pi pi-times"></i>
-            </a>
-          </div>
-          <!-- Logo at Top Left (Desktop) -->
-          <!-- Cross Mark at Form Right Corner (Desktop) -->
-          <div class="hidden md:block  absolute top-4 right-4">
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 ">
-              <i class="pi pi-times"></i>
-            </a>
+            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-48 mb-4"></a>
           </div>
         </div>
 
@@ -116,7 +106,7 @@ async function register() {
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa" class="w-auto max-w-sm"></a>
+              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-48 mb-4"></a>
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-2">

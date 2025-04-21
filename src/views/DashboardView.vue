@@ -96,7 +96,7 @@ const taskItems = [
     description: '',
     status: '',
     icon: PaperAirplaneIcon,
-    background: 'bg-purple-500',
+    background: 'bg-blue-500',
     completed: false,
     href: null,
   },
@@ -223,11 +223,11 @@ const recipientCreated = (recipient) => {
                     </ul>
                     <ul v-if="tasks.length > 0 && !isTaskLoading" role="list" class="mt-6 grid-cols-1 xl:grid-cols-3 gap-10 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 hidden lg:grid">
                       <li v-for="(task, index) in tasks" :key="task.id" class="flow-root xl:flex-grow">
-                        <div :class="{'opacity-60': task.status !== CustomerTaskStatus.PENDING}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 xl:hover:bg-purple-50 xl:hover:border-purple-200 xl:flex-col xl:space-y-5 xl:text-center xl:border xl:border-dashed xl:border-gray-200 xl:px-5 xl:py-8 xl:bg-white h-full xl:shadow-xs">
+                        <div :class="{'opacity-60': task.status !== CustomerTaskStatus.PENDING}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 xl:hover:bg-blue-50 xl:hover:border-blue-200 xl:flex-col xl:space-y-5 xl:text-center xl:border xl:border-dashed xl:border-gray-200 xl:px-5 xl:py-8 xl:bg-white h-full xl:shadow-xs">
                           <div :class="[task.background, 'flex xl:mx-auto size-16 shrink-0 items-center justify-center rounded-lg xl:hidden']">
                             <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
                           </div>
-                          <div :class="['xl:mx-auto size-16 shrink-0 items-center bg-purple-700 justify-center rounded-full hidden xl:flex']">
+                          <div :class="['xl:mx-auto size-16 shrink-0 items-center bg-blue-700 justify-center rounded-full hidden xl:flex']">
                             <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
                           </div>
                           <div v-if="task.status !== CustomerTaskStatus.PENDING">

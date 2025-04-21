@@ -23,7 +23,7 @@ const colors = [
   "yellow",
   "green",
   "blue",
-  "purple",
+  "blue",
 ]
 
 onMounted(async () => {

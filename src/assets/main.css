@@ -9,7 +9,7 @@
 @layer theme {
     @theme {
         --default-font-family: 'Inter', sans-serif;
-        --color-brand-700: theme('colors.purple.700');
+        --color-brand-700: theme('colors.blue.700');
     }
 }
 
@@ -17,7 +17,7 @@
     --dp-background-color: theme('colors.white'); /* Background */
     --dp-text-color: theme('colors.gray.800'); /* Text */
     --dp-hover-color: theme('colors.gray.200'); /* Hover */
-    --dp-primary-color: theme('colors.purple.700'); /* Selected Date */
+    --dp-primary-color: theme('colors.blue.700'); /* Selected Date */
     --dp-primary-text-color: theme('colors.white'); /* Selected Text */
 }
 
@@ -127,7 +127,7 @@
     --vs-dropdown-option-padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
 
     /* Active State */
-    --vs-dropdown-option--active-bg: theme('colors.purple.700');
+    --vs-dropdown-option--active-bg: theme('colors.blue.700');
     --vs-dropdown-option--active-color: theme('colors.white');
 
     /* Deselect State */
@@ -143,5 +143,5 @@
     background: #A855F7 !important;
 }
 #nprogress .peg {
-    box-shadow: 0 0 10px theme('colors.purple.500'), 0 0 5px theme('colors.purple.500') !important;
+    box-shadow: 0 0 10px theme('colors.blue.500'), 0 0 5px theme('colors.blue.500') !important;
 }

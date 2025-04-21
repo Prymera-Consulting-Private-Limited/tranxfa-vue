@@ -78,8 +78,8 @@ const editPersonalInformation = () => {
     </div>
     <div v-show="! showLoading" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
-      <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="w-auto max-w-sm"></a>
+      <div class="hidden md:block">
+        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-48 mb-4"></a>
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">Employment Details</h2>
@@ -93,7 +93,7 @@ const editPersonalInformation = () => {
           v-on:customer:attribute_category:updated="employmentUpdated"
       />
       <div class="text-center mt-12">
-        <a @click="editPersonalInformation" class="text-purple-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
+        <a @click="editPersonalInformation" class="text-blue-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
       </div>
     </div>
   </div>

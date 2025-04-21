@@ -154,7 +154,7 @@ watch(isLoading, (newValue) => {
     <template v-else>
       <template v-if="snapshot?.value === 'addRecipientForm'">
         <h4 class="text-base text-gray-800 font-semibold">Recipient Details</h4>
-        <p class="mt-1 text-sm text-gray-700 mb-5">For receiving <span class="text-purple-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span> in <span class="text-purple-700 font-semibold">{{ recipient.country?.commonName }}</span> using <span class="text-purple-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></p>
+        <p class="mt-1 text-sm text-gray-700 mb-5">For receiving <span class="text-blue-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span> in <span class="text-blue-700 font-semibold">{{ recipient.country?.commonName }}</span> using <span class="text-blue-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></p>
         <AttributeCollection
             v-bind:country="recipient.country"
             v-bind:currency="recipient.currency"

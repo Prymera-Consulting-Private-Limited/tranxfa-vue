@@ -288,14 +288,14 @@ const addRecipientLoadingStateUpdated = (e) => {
                       <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
-                          <div :class="[(active || checked) ? 'border-purple-600 ring-1 ring-purple-600 bg-purple-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
+                          <div :class="[(active || checked) ? 'border-blue-600 ring-1 ring-blue-600 bg-blue-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
                           <span class="flex flex-1">
                             <span class="flex flex-col">
                               <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
                               <!--<span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
-                            <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-purple-600', 'size-5']" aria-hidden="true" />
+                            <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-blue-600', 'size-5']" aria-hidden="true" />
                           </div>
                         </RadioGroupOption>
                       </RadioGroup>

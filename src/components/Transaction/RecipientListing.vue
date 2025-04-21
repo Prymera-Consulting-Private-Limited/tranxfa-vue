@@ -16,7 +16,7 @@ const colors = [
   "yellow",
   "green",
   "blue",
-  "purple",
+  "blue",
 ]
 
 const emit = defineEmits([
