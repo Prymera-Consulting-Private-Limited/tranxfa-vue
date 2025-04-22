@@ -25,7 +25,7 @@ const transaction = ref(null);
 const isLoading = ref(true);
 
 onMounted(async () => {
-  transactionUtils.getTransaction(props.id).then((response) => {
+  await transactionUtils.getTransaction(props.id).then((response) => {
     transaction.value = Transaction.getInstance(response.data);
     if (transaction.value.payment.state.code === PaymentState.AUTHORIZED || transaction.value.payment.state.code === PaymentState.CAPTURED) {
       setTimeout(async () => {
