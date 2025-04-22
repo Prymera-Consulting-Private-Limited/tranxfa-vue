@@ -201,7 +201,7 @@ onUnmounted(async () => {
                 <div class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
                   <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
+                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
                   <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
                 </div>
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
