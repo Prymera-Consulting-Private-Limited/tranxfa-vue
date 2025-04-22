@@ -1,10 +1,9 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import { useTransactionUtils } from "@/composables/transaction_utils.js";
-import {computed, onMounted, onUnmounted, ref, watch, watchEffect} from "vue";
+import {computed, onMounted, onUnmounted, ref, watchEffect} from "vue";
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import Transaction from "@/models/transaction.js";
-import PaymentTransaction from "@/models/payment_transaction.js";
 import PaymentState from "@/enums/payment_state.js";
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import Failed from "@/components/Payment/State/Failed.vue";
@@ -29,7 +28,9 @@ onMounted(async () => {
   transactionUtils.getTransaction(props.id).then((response) => {
     transaction.value = Transaction.getInstance(response.data);
     if (transaction.value.payment.state.code === PaymentState.AUTHORIZED || transaction.value.payment.state.code === PaymentState.CAPTURED) {
-
+      setTimeout(async () => {
+        await router.push({ name: 'viewTransaction', params: { transactionId: transaction.value.id } });
+      }, 1500);
     }
   }).finally(() => {
     isLoading.value = false;
@@ -43,13 +44,15 @@ onMounted(async () => {
 })
 
 watchEffect(() => {
-  if (transaction.value.payment.state.code === PaymentState.FAILED) {
-    transaction.value.payment.state.code = PaymentState.FAILED;
-  }
-  if (transaction.value.payment.state.code === PaymentState.AUTHORIZED ||  transaction.value.payment.state.code === PaymentState.CAPTURED) {
-    setTimeout(async () => {
-      await router.push({ name: 'viewTransaction', params: { transactionId: transaction.value.id } });
-    }, 1500);
+  if (transaction.value) {
+    if (transaction.value.payment.state.code === PaymentState.FAILED) {
+      transaction.value.payment.state.code = PaymentState.FAILED;
+    }
+    if (transaction.value.payment.state.code === PaymentState.AUTHORIZED ||  transaction.value.payment.state.code === PaymentState.CAPTURED) {
+      setTimeout(async () => {
+        await router.push({ name: 'viewTransaction', params: { transactionId: transaction.value.id } });
+      }, 1500);
+    }
   }
 })
 
@@ -107,7 +110,7 @@ const retryPayment = async () => {
               <button class="sr-only"></button>
               <div class="p-8 sm:pb-6">
                 <div class="mt-3 text-center sm:mt-5">
-                  <template v-else-if="status === 'pending' || status === 'processing'">
+                  <template v-if="status === 'pending' || status === 'processing'">
                     <Processing class="-mt-10" />
                     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
                     <p class="text-base text-gray-600 mb-6">We have opened a new browser window for you to complete the payment.</p>
