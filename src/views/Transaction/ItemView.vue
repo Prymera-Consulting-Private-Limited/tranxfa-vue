@@ -183,7 +183,7 @@ onUnmounted(async () => {
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">
                     <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
-                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
+                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
                     <span v-else class="text-sm font-medium">Paid</span>
                   </p>
                 </div>
