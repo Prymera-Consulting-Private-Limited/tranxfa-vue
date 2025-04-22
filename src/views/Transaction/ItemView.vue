@@ -9,11 +9,14 @@ import {
   CreditCardIcon,
   PlusCircleIcon,
   CalculatorIcon,
+  ArrowUpTrayIcon
 } from '@heroicons/vue/24/outline'
 import moment from "moment";
 import TransactionStateIcon from "@/enums/transaction_state_icon.js";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import PaymentState from "@/enums/payment_state.js";
+import TransactionState from "@/enums/transaction_state.js";
+import router from "@/router/index.js";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
@@ -50,6 +53,20 @@ onMounted(async () => {
 onUnmounted(async () => {
   Echo.leaveChannel(`client-transaction.${transaction.data.id}`);
 })
+
+const pendingDocuments = [
+  {
+    "id": "9ebcf98f-0c40-4918-8109-10e536522dde",
+    "document_category": {
+      "id": "2b40b5e1-e512-41a6-b061-9e7f71534b55",
+      "code": "POA",
+      "title": "Proof of Address",
+      "description": "Documents that confirm the customer\u2019s residential address, such as utility bills, bank statements, or rental agreements."
+    },
+    "created_at": "2025-04-22T17:59:39.000000Z",
+    "updated_at": "2025-04-22T17:59:39.000000Z"
+  }
+];
 
 </script>
 
@@ -112,6 +129,23 @@ onUnmounted(async () => {
                   </div>
                 </div>
               </div>
+            </div>
+            <div v-if="transaction.data.pendingDocuments.length > 0 && (transaction.data.state.code === TransactionState['DOCUMENT-REQUIRED'] || transaction.data.state.code === TransactionState['ADDITIONAL-DOCUMENT-REQUIRED'])">
+              <ul role="list" class="mt-4 grid grid-cols-1 gap-5">
+                <template v-for="document in transaction.data.pendingDocuments" :key="document.id">
+                  <li @click="router.push({name: 'categoryView', params: {category: document.documentCategory.id}, query: {'_rtr': 'viewTransaction', '_rti': transaction.data.id}})" class="col-span-1 flex rounded-md shadow-xs cursor-pointer">
+                    <div class="flex flex-1 items-center justify-between rounded-l-md rounded-r-md border border-yellow-200 bg-yellow-50">
+                      <div class="flex-1 px-4 py-2 text-sm">
+                        <p class="font-medium text-yellow-700">{{ document.documentCategory.title }}</p>
+                        <p class="text-yellow-600 leading-6">Upload your {{ document.documentCategory.title.toLowerCase() }} to process the transaction</p>
+                      </div>
+                      <div class="shrink-0 px-3 text-yellow-700">
+                        <ArrowUpTrayIcon class="size-5" aria-hidden="true" />
+                      </div>
+                    </div>
+                  </li>
+                </template>
+              </ul>
             </div>
             <dl class="mt-6 grid grid-cols-1 text-sm/6 lg:grid-cols-2">
               <div class="sm:pr-4 col-span-2 sm:col-span-1">
