@@ -130,6 +130,10 @@ const pendingDocuments = [
                 </div>
               </div>
             </div>
+            <pre>{{ transaction.data.pendingDocuments }}</pre>
+            <pre>{{ transaction.data.state.code }}</pre>
+            <pre>{{ TransactionState['DOCUMENT-REQUIRED'] }}</pre>
+            <pre>{{ TransactionState['ADDITIONAL-DOCUMENT-REQUIRED'] }}</pre>
             <div v-if="transaction.data.pendingDocuments.length > 0 && (transaction.data.state.code === TransactionState['DOCUMENT-REQUIRED'] || transaction.data.state.code === TransactionState['ADDITIONAL-DOCUMENT-REQUIRED'])">
               <ul role="list" class="mt-4 grid grid-cols-1 gap-5">
                 <template v-for="document in transaction.data.pendingDocuments" :key="document.id">
