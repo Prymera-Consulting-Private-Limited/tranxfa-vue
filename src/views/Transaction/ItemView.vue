@@ -30,6 +30,9 @@ const props = defineProps({
 
 const isLoading = ref(false);
 
+/**
+ * @type {Reactive<{data: Transaction|null}>}
+ */
 const transaction = reactive({
   data: null
 });
