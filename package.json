@@ -16,6 +16,8 @@
     "@tailwindcss/vite": "^4.0.6",
     "@tensorflow-models/face-detection": "^1.0.3",
     "@vuepic/vue-datepicker": "^11.0.1",
+    "@vueuse/components": "^13.1.0",
+    "@vueuse/core": "^13.1.0",
     "@xstate/vue": "^4.0.2",
     "axios": "^1.7.9",
     "lodash": "^4.17.21",
