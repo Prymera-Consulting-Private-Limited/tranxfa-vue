@@ -9,11 +9,14 @@ import {
   CreditCardIcon,
   PlusCircleIcon,
   CalculatorIcon,
+  ArrowUpTrayIcon
 } from '@heroicons/vue/24/outline'
 import moment from "moment";
 import TransactionStateIcon from "@/enums/transaction_state_icon.js";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import PaymentState from "@/enums/payment_state.js";
+import TransactionState from "@/enums/transaction_state.js";
+import router from "@/router/index.js";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
@@ -27,6 +30,9 @@ const props = defineProps({
 
 const isLoading = ref(false);
 
+/**
+ * @type {Reactive<{data: Transaction|null}>}
+ */
 const transaction = reactive({
   data: null
 });
@@ -50,6 +56,20 @@ onMounted(async () => {
 onUnmounted(async () => {
   Echo.leaveChannel(`client-transaction.${transaction.data.id}`);
 })
+
+const pendingDocuments = [
+  {
+    "id": "9ebcf98f-0c40-4918-8109-10e536522dde",
+    "document_category": {
+      "id": "2b40b5e1-e512-41a6-b061-9e7f71534b55",
+      "code": "POA",
+      "title": "Proof of Address",
+      "description": "Documents that confirm the customer\u2019s residential address, such as utility bills, bank statements, or rental agreements."
+    },
+    "created_at": "2025-04-22T17:59:39.000000Z",
+    "updated_at": "2025-04-22T17:59:39.000000Z"
+  }
+];
 
 </script>
 
@@ -113,6 +133,23 @@ onUnmounted(async () => {
                 </div>
               </div>
             </div>
+            <div v-if="transaction.data.pendingDocuments.length > 0 && (transaction.data.state.code === TransactionState['DOCUMENT-REQUIRED'] || transaction.data.state.code === TransactionState['ADDITIONAL-DOCUMENT-REQUIRED'])">
+              <ul role="list" class="mt-4 grid grid-cols-1 gap-5">
+                <template v-for="document in transaction.data.pendingDocuments" :key="document.id">
+                  <li @click="router.push({name: 'categoryView', params: {category: document.documentCategory.id}, query: {'_rtr': 'viewTransaction', '_rti': transaction.data.id}})" class="col-span-1 flex rounded-md shadow-xs cursor-pointer">
+                    <div class="flex flex-1 items-center justify-between rounded-l-md rounded-r-md border border-yellow-200 bg-yellow-50">
+                      <div class="flex-1 px-4 py-2 text-sm">
+                        <p class="font-medium text-yellow-700">{{ document.documentCategory.title }}</p>
+                        <p class="text-yellow-600 leading-6">Upload your {{ document.documentCategory.title.toLowerCase() }} to process the transaction</p>
+                      </div>
+                      <div class="shrink-0 px-3 text-yellow-700">
+                        <ArrowUpTrayIcon class="size-5" aria-hidden="true" />
+                      </div>
+                    </div>
+                  </li>
+                </template>
+              </ul>
+            </div>
             <dl class="mt-6 grid grid-cols-1 text-sm/6 lg:grid-cols-2">
               <div class="sm:pr-4 col-span-2 sm:col-span-1">
                 <dt class="inline text-gray-500">Date</dt>
@@ -125,7 +162,7 @@ onUnmounted(async () => {
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
-                <dt class="font-semibold text-gray-900">Sending from <span class="text-purple-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
+                <dt class="font-semibold text-gray-900">Sending from <span class="text-blue-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">You sent</span>
                   <span class="text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</span>
@@ -183,7 +220,7 @@ onUnmounted(async () => {
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">
                     <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
-                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
+                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
                     <span v-else class="text-sm font-medium">Paid</span>
                   </p>
                 </div>
@@ -201,34 +238,34 @@ onUnmounted(async () => {
                 <div class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
                   <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
+                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
                   <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
                 </div>
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">
                     <span class="sr-only">Client</span>
-                    <RocketLaunchIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                    <RocketLaunchIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Fees</span>
-                    <PlusCircleIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                    <PlusCircleIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Total</span>
-                    <CalculatorIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                    <CalculatorIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
                   <dt class="flex-none">
                     <span class="sr-only">Status</span>
-                    <CreditCardIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                    <CreditCardIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
                 </div>
