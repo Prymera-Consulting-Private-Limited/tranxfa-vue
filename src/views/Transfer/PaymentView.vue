@@ -4,10 +4,9 @@ import { useTransactionUtils } from "@/composables/transaction_utils.js";
 import {computed, onMounted, ref, watch} from "vue";
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import Transaction from "@/models/transaction.js";
-import Apaylo from "@/components/Payment/Apaylo.vue";
-import Paga from "@/components/Payment/Paga.vue";
 import PaymentTransaction from "@/models/payment_transaction.js";
 import router from "@/router/index.js";
+import ManualPayment from "@/components/Payment/ManualPayment.vue";
 
 const transactionUtils = useTransactionUtils();
 
@@ -87,8 +86,7 @@ watch(canAttemptPayment, async () => {
               <div class="p-8 sm:pb-6">
                 <div class="mt-3 text-center sm:mt-5">
                   <div v-if="transaction" class="text-center">
-                    <Apaylo v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  />
-                    <Paga v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction"  />
+                    <ManualPayment v-if="transaction.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction"  />
                   </div>
                 </div>
               </div>
