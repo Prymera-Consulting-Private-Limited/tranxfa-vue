@@ -48,7 +48,7 @@ const getTransaction = async () => {
 onMounted(async () => {
   await getTransaction()
   Echo.channel(`client-transaction.${transaction.data.id}`)
-      .listen('TransactionStateUpdated', (e) => {
+      .listen('TransactionStateUpdated', () => {
         getTransaction();
       });
 });
@@ -56,20 +56,6 @@ onMounted(async () => {
 onUnmounted(async () => {
   Echo.leaveChannel(`client-transaction.${transaction.data.id}`);
 })
-
-const pendingDocuments = [
-  {
-    "id": "9ebcf98f-0c40-4918-8109-10e536522dde",
-    "document_category": {
-      "id": "2b40b5e1-e512-41a6-b061-9e7f71534b55",
-      "code": "POA",
-      "title": "Proof of Address",
-      "description": "Documents that confirm the customer\u2019s residential address, such as utility bills, bank statements, or rental agreements."
-    },
-    "created_at": "2025-04-22T17:59:39.000000Z",
-    "updated_at": "2025-04-22T17:59:39.000000Z"
-  }
-];
 
 </script>
 
