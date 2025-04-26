@@ -15,6 +15,11 @@ const props = defineProps({
   transaction: {
     type: Object(Transaction),
     required: true
+  },
+  showViewTransfer: {
+    type: Boolean,
+    required: false,
+    default: true,
   }
 })
 
@@ -85,10 +90,10 @@ const status = computed(() => {
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
       <template v-if="transaction.payment.clientPaymentAccount">
         <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" />
-        <div class="mt-6">
+        <div class="my-6">
           <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-purple-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600 cursor-pointer">I've made payment</button>
         </div>
-        <div class="my-6 leading-6 text-center text-gray-900 hover:text-purple-700 font-semibold text-sm">
+        <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-purple-700 font-semibold text-sm">
           <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
         </div>
       </template>
