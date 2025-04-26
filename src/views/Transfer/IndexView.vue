@@ -21,6 +21,7 @@ import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import { RadioGroup, RadioGroupOption } from '@headlessui/vue'
 import { CheckCircleIcon } from '@heroicons/vue/20/solid'
+import {createPopper} from "@popperjs/core";
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const customerStore = useCustomerStore();
@@ -170,6 +171,37 @@ const addRecipientLoadingStateUpdated = (e) => {
   console.log(e);
   isSubComponentLoading.value = e;
 }
+
+function withPopper(dropdownList, component, { width }) {
+  dropdownList.style.width = width;
+  const popper = createPopper(component.$refs.toggle, dropdownList, {
+    placement: 'bottom-start',
+    modifiers: [
+      {
+        name: 'flip',
+        options: {
+          fallbackPlacements: ['top-start'],
+        },
+      },
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 0],
+        },
+      },
+      {
+        name: 'toggleClass',
+        enabled: true,
+        phase: 'write',
+        fn({ state }) {
+          component.$el.classList.toggle('drop-up', state.placement.startsWith('top'));
+        },
+      },
+    ],
+  });
+
+  return () => popper.destroy();
+}
 </script>
 
 <template>
@@ -262,7 +294,7 @@ const addRecipientLoadingStateUpdated = (e) => {
                   <div class="px-3 sm:px-0">
                     <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose <span class="text-red-500">*</span></label>
                     <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
-                    <v-select v-model="purpose" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="purpose">
+                    <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="purpose">
                       <template v-slot:no-options="{ search, searching }">
                         <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
                         <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>

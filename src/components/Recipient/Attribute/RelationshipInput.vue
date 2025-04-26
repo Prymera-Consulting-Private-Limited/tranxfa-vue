@@ -2,6 +2,7 @@
 import vSelect from 'vue-select';
 import {ref} from "vue";
 import Relationship from "@/models/relationship.js";
+import {createPopper} from "@popperjs/core";
 
 const props = defineProps({
   relationships: {
@@ -28,10 +29,40 @@ const emit = defineEmits(['recipient:relationship:updated']);
 const optionSelected = (option) => {
   emit('recipient:relationship:updated', option);
 };
+function withPopper(dropdownList, component, { width }) {
+  dropdownList.style.width = width;
+  const popper = createPopper(component.$refs.toggle, dropdownList, {
+    placement: 'bottom-start',
+    modifiers: [
+      {
+        name: 'flip',
+        options: {
+          fallbackPlacements: ['top-start'],
+        },
+      },
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 0],
+        },
+      },
+      {
+        name: 'toggleClass',
+        enabled: true,
+        phase: 'write',
+        fn({ state }) {
+          component.$el.classList.toggle('drop-up', state.placement.startsWith('top'));
+        },
+      },
+    ],
+  });
+
+  return () => popper.destroy();
+}
 </script>
 
 <template>
-  <v-select append-to-body v-on:option:selected="optionSelected" v-model="relationship" :options="relationships" :placeholder="`${placeholder}`" key-by="id" label="relationship">
+  <v-select append-to-body :calculate-position="withPopper" v-on:option:selected="optionSelected" v-model="relationship" :options="relationships" :placeholder="`${placeholder}`" key-by="id" label="relationship">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
       <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
