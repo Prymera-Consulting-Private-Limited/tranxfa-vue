@@ -1,6 +1,6 @@
 <script setup>
 import Transaction from "@/models/transaction.js";
-import {computed, onMounted, onUnmounted, ref} from "vue";
+import {computed, onMounted, onUnmounted} from "vue";
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentState from "@/enums/payment_state.js";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
@@ -21,16 +21,42 @@ const props = defineProps({
 
 const transactionUtils = useTransactionUtils();
 
+const getTransaction = async () => {
+  transactionUtils.getTransaction(props.transaction.id).then((response) => {
+    const transaction = Transaction.getInstance(response.data);
+    props.transaction.payment = transaction.payment;
+    if (props.transaction.payment.state.code === PaymentState.PENDING) {
+      clearPullInterval();
+    }
+  });
+}
+
+let intervalId = null;
+
 onMounted(async () => {
   Echo.channel(`client-payment.${props.transaction.payment.id}`)
       .listen('PaymentTransactionStateUpdated', (e) => {
         props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
         props.transaction.payment.sharedReference = e.shared_reference;
+        if (props.transaction.payment.state.code === PaymentState.PENDING) {
+          clearPullInterval();
+        }
       });
+  if (props.transaction.payment.state.code !== PaymentState.PENDING) {
+    intervalId = setInterval(getTransaction, 5000);
+  }
 })
+
+const clearPullInterval = async () => {
+  if (intervalId) {
+    clearInterval(intervalId);
+    intervalId = null;
+  }
+}
 
 onUnmounted(async () => {
   Echo.leaveChannel(`client-payment.${props.transaction.payment.id}`);
+  await clearPullInterval();
 })
 
 const iHaveMadePayment = async () => {
