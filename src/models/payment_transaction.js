@@ -21,6 +21,11 @@ class PaymentTransaction {
     clientPaymentAccount = null;
 
     /**
+     * @type {Boolean|null}
+     */
+    customerConfirmedPayment = null;
+
+    /**
      * @type {Object|null}
      */
     paymentMethod = null;
@@ -80,6 +85,7 @@ class PaymentTransaction {
         paymentTransaction.totalPaymentAmountCurrencyPrefixed = data.total_payment_amount_currency_prefixed;
         paymentTransaction.createdAt = data.created_at;
         paymentTransaction.updatedAt = data.updated_at;
+        paymentTransaction.customerConfirmedPayment = data.customer_confirmed_payment;
         if (data.state) {
             paymentTransaction.state = PaymentTransactionState.getInstance(data.state);
         }
