@@ -113,7 +113,12 @@ const isShowPaymentAccountModalOpen = ref(false);
                        }" :is="TransactionStateIcon[transaction.data.state.code]" class="size-5 mt-1" />
                   </div>
                   <div class="ml-3">
-                    <p :style="{
+                    <p v-if="transaction.data.payment.customerConfirmedPayment" :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                       }" class="text-sm leading-6">
+                      {{ transaction.data.payment.clientPaymentAccount.waitTimeMessage }}
+                    </p>
+                    <p v-else :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
                        }" class="text-sm leading-6">
                       {{ transaction.data.state.description }}
