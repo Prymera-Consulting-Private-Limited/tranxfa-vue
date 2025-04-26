@@ -17,6 +17,8 @@ import RecipientDataType from "@/enums/recipient_data_type.js";
 import PaymentState from "@/enums/payment_state.js";
 import TransactionState from "@/enums/transaction_state.js";
 import router from "@/router/index.js";
+import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import ManualPayment from "@/components/Payment/ManualPayment.vue";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
@@ -57,6 +59,7 @@ onUnmounted(async () => {
   Echo.leaveChannel(`client-transaction.${transaction.data.id}`);
 })
 
+const isShowPaymentAccountModalOpen = ref(false);
 </script>
 
 <template>
@@ -98,7 +101,33 @@ onUnmounted(async () => {
           <!-- Invoice -->
           <div class="-mx-4 px-4 py-8 print:px-0 print:py-4 print:ring-0 print:shadow-none ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20">
             <h2 class="text-base font-semibold text-gray-900">Transaction #{{ transaction.data.transactionNumber }}</h2>
-            <div class="col-span-2">
+            <div v-if="transaction.data.state.code === TransactionState['PENDING-PAYMENT'] && transaction.data.payment.clientPaymentAccount">
+              <div  :style="{
+                 backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
+                 borderColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 400),
+               }" class="border-l-4 border-1 rounded-md mt-4 p-4">
+                <div class="flex">
+                  <div class="shrink-0">
+                    <component :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                       }" :is="TransactionStateIcon[transaction.data.state.code]" class="size-5 mt-1" />
+                  </div>
+                  <div class="ml-3">
+                    <p :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                       }" class="text-sm leading-6">
+                      {{ transaction.data.state.description }}
+                    </p>
+                    <div :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                       }" class="text-sm leading-6 mt-2">
+                      <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm hover:underline">View Our {{ transaction.data.payment.paymentMethod.title }} Account</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="col-span-2">
               <div  :style="{
                  backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
                  borderColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 400),
@@ -265,4 +294,27 @@ onUnmounted(async () => {
       </div>
     </main>
   </CustomerLayout>
+  <TransitionRoot as="template" :show="isShowPaymentAccountModalOpen">
+    <Dialog class="relative z-10" @close="isShowPaymentAccountModalOpen = false">
+      <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+        <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+      </TransitionChild>
+      <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+            <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+              <button class="sr-only"></button>
+              <div class="p-8 sm:pb-6">
+                <div class="mt-3 text-center sm:mt-5">
+                  <div v-if="transaction" class="text-center">
+                    <ManualPayment v-if="transaction.data.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
+                  </div>
+                </div>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
 </template>
