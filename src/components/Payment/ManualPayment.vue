@@ -90,7 +90,7 @@ const status = computed(() => {
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
       <template v-if="transaction.payment.clientPaymentAccount">
         <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" />
-        <div class="my-6">
+        <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
           <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-purple-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600 cursor-pointer">I've made payment</button>
         </div>
         <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-purple-700 font-semibold text-sm">
