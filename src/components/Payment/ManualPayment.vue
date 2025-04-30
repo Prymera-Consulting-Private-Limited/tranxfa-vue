@@ -10,7 +10,8 @@ import Failed from "@/components/Payment/State/Failed.vue";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import router from "@/router/index.js";
 import ClientPaymentAccount from "@/components/ClientPaymentAccount.vue";
-import {ClipboardIcon} from "@heroicons/vue/24/outline"
+import {ClipboardIcon} from "@heroicons/vue/24/outline/index.js";
+import {UseClipboard} from "@vueuse/components";
 
 const props = defineProps({
   transaction: {
