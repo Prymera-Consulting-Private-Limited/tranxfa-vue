@@ -102,7 +102,7 @@ const isShowPaymentAccountModalOpen = ref(false);
           <div class="-mx-4 px-4 py-8 print:px-0 print:py-4 print:ring-0 print:shadow-none ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20">
             <h2 class="text-base font-semibold text-gray-900">Transaction #{{ transaction.data.transactionNumber }}</h2>
             <div v-if="transaction.data.state.code === TransactionState['PENDING-PAYMENT'] && transaction.data.payment.clientPaymentAccount">
-              <div  :style="{
+              <div :style="{
                  backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
                  borderColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 400),
                }" class="border-l-4 border-1 rounded-md mt-4 p-4">
@@ -238,7 +238,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 </div>
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                  <p v-if="false" class="mt-1 max-w-2xl text-sm text-gray-500">
                     <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
                     <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
                     <span v-else class="text-sm font-medium">Paid</span>
@@ -255,7 +255,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
                   <dd class="text-base font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
-                <div class="flex-none px-6">
+                <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
                   <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
                   <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
