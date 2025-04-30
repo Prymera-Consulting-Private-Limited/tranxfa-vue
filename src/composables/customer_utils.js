@@ -169,8 +169,12 @@ export function useCustomerUtils() {
             confirm_password: confirmNewPassword,
         });
     }
+    async function applyNameFromPoiDocument() {
+        return axios.post(`/client/v1/apply-name-from-poi`);
+    }
 
     return {
+        updateStore,
         register,
         login,
         mfa,
@@ -191,5 +195,6 @@ export function useCustomerUtils() {
         changePassword,
         forgotPassword,
         resetPassword,
+        applyNameFromPoiDocument,
     }
 }
