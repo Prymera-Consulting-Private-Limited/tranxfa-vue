@@ -55,7 +55,7 @@ onMounted(async () => {
 
 const clearPullInterval = async () => {
   if (intervalId) {
-    clearInterval(intervalId);
+    await clearInterval(intervalId);
     intervalId = null;
   }
 }
@@ -66,9 +66,11 @@ onUnmounted(async () => {
 })
 
 const iHaveMadePayment = async () => {
-  props.transaction.payment.state.code = PaymentState.REDIRECTED;
   await clearPullInterval();
-  await transactionUtils.iHaveMadePayment(props.transaction.payment.id);
+  props.transaction.payment.state.code = PaymentState.REDIRECTED;
+  await transactionUtils.iHaveMadePayment(props.transaction.payment.id).then(() => {
+    props.transaction.payment.customerConfirmedPayment = true;
+  });
 }
 
 const status = computed(() => {
@@ -77,10 +79,10 @@ const status = computed(() => {
         props.transaction.payment.state.code === PaymentState.PENDING ||
         props.transaction.payment.state.code === PaymentState.INITIALIZED ||
         props.transaction.payment.state.code === PaymentState.CREATED
-      ) && !props.transaction.payment.customerConfirmedPayment
+      )
   ) {
     return 'pending';
-  } else if (props.transaction.payment.state.code === PaymentState.REDIRECTED || (props.transaction.payment.state.code === PaymentState.PENDING && props.transaction.payment.customerConfirmedPayment)) {
+  } else if (props.transaction.payment.state.code === PaymentState.REDIRECTED) {
     return 'processing';
   } else if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
     return 'completed';
@@ -91,7 +93,7 @@ const status = computed(() => {
 </script>
 
 <template>
-  <template v-if="transaction.payment.state.code === PaymentState.PENDING && !props.transaction.payment.customerConfirmedPayment">
+  <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div class="-m-5">
       <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Payment</h2>
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
