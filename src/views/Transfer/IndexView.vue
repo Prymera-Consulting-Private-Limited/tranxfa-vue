@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
 import {useMachine} from "@xstate/vue";
 import {transactionNavigationMachine} from "@/machines/transaction_navigation_machine.js";
@@ -20,8 +20,9 @@ import {useCustomerStore} from "@/stores/customer.js";
 import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {Dialog, DialogPanel, RadioGroup, RadioGroupOption, TransitionChild, TransitionRoot} from '@headlessui/vue'
-import { CheckCircleIcon, ChevronRightIcon, ArrowUpTrayIcon, IdentificationIcon } from '@heroicons/vue/20/solid'
+import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon} from '@heroicons/vue/20/solid'
 import {createPopper} from "@popperjs/core";
+import DocumentCategory from "@/models/document_category.js";
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const customerStore = useCustomerStore();
@@ -80,7 +81,8 @@ const isIdentityDocumentRequired = computed(() => {
   return (customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null) !== null;
 });
 
-const identityDocumentCategory = computed(() => customer.data?.pendingDocuments?.find(category => category.code === 'POI'));
+const identityDocumentCategory = ref(null);
+identityDocumentCategory.value = customer.data?.pendingDocuments?.find(category => category.code === 'POI');
 
 const showContinueButton = computed(() => {
   return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'verifyIdentity');
@@ -90,6 +92,20 @@ const createRecipient = async () => {
   send({ type: 'ADD_RECIPIENT' });
   isSubComponentLoading.value = true;
 };
+
+watch(snapshot, () => {
+  if (snapshot.value?.value === 'verifyIdentity' && (identityDocumentCategory?.value || null) === null) {
+    isLoading.value = true;
+    customerUtils.documentCategories().then((response) => {
+      const documentCategories = response.data.map((category) => DocumentCategory.getInstance(category));
+      identityDocumentCategory.value =  documentCategories.find(category => category.code === 'POI');
+    }).catch((e) => {
+      console.error(e);
+    }).finally(() => {
+      isLoading.value = false;
+    });
+  }
+});
 
 const setRecipient =  async (recipient) => {
   isLoading.value = true;
