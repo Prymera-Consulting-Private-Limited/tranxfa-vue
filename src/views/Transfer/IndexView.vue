@@ -180,7 +180,7 @@ const applyNameFromPoiDocument = async () => {
   isApplyingNameFromPoiDocument.value = true;
   customerUtils.applyNameFromPoiDocument().then((response) => {
     customerUtils.updateStore(response.data);
-    send({ type: 'PROCEED' });
+    confirmQuote();
   }).catch((e) => {
     console.error(e);
   }).finally(() => {
