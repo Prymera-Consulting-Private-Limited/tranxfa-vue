@@ -127,6 +127,21 @@ export const transactionNavigationMachine = createMachine({
                 },
             }
         },
+        poiNameCheckFailed: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'confirm',
+                    },
+                ],
+                SELECT_RECIPIENT: {
+                    target: 'selectRecipient'
+                },
+                UPLOAD_ANOTHER_DOCUMENT: {
+                    target: 'verifyIdentity'
+                },
+            }
+        },
         confirm: {
             on: {
                 CONFIRMED: [
@@ -142,6 +157,11 @@ export const transactionNavigationMachine = createMachine({
                 POI_REQUIRED: [
                     {
                         target: 'verifyIdentity',
+                    },
+                ],
+                POI_NAME_CHECK_FAILED: [
+                    {
+                        target: 'poiNameCheckFailed',
                     },
                 ],
                 SELECT_RECIPIENT: {
