@@ -72,9 +72,15 @@ const iHaveMadePayment = async () => {
 }
 
 const status = computed(() => {
-  if (props.transaction.payment.state.code === PaymentState.PENDING || props.transaction.payment.state.code === PaymentState.INITIALIZED || props.transaction.payment.state.code === PaymentState.CREATED) {
+  if (
+      (
+        props.transaction.payment.state.code === PaymentState.PENDING ||
+        props.transaction.payment.state.code === PaymentState.INITIALIZED ||
+        props.transaction.payment.state.code === PaymentState.CREATED
+      ) && !props.transaction.payment.customerConfirmedPayment
+  ) {
     return 'pending';
-  } else if (props.transaction.payment.state.code === PaymentState.REDIRECTED) {
+  } else if (props.transaction.payment.state.code === PaymentState.REDIRECTED || (props.transaction.payment.state.code === PaymentState.PENDING && props.transaction.payment.customerConfirmedPayment)) {
     return 'processing';
   } else if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
     return 'completed';
@@ -85,7 +91,7 @@ const status = computed(() => {
 </script>
 
 <template>
-  <template v-if="transaction.payment.state.code === PaymentState.PENDING">
+  <template v-if="transaction.payment.state.code === PaymentState.PENDING && !props.transaction.payment.customerConfirmedPayment">
     <div class="-m-5">
       <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Payment</h2>
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
