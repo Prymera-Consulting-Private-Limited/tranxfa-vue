@@ -91,11 +91,11 @@ const status = computed(() => {
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
       <template v-if="transaction.payment.clientPaymentAccount">
         <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" /><div class="text-left my-5">
-        <label :for="`payment-reference`" class="block text-sm/6 font-medium text-gray-900">Payment Amount</label>
+        <label :for="`payment-amount`" class="block text-sm/6 font-medium text-gray-900">Payment Amount</label>
         <UseClipboard v-slot="{ copy, copied }" :source="transaction.payment.totalPaymentAmountFormatted">
           <div class="mt-2 flex">
             <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
-              <input type="text" readonly :value="transaction.payment.totalPaymentAmountCurrencyPrefixed" :id="`payment-reference`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-purple-600 sm:text-sm/6" />
+              <input type="text" readonly :value="transaction.payment.totalPaymentAmountCurrencyPrefixed" :id="`payment-amount`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-purple-600 sm:text-sm/6" />
             </div>
             <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-purple-600 cursor-pointer">
               <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
