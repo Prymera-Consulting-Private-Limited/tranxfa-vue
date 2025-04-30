@@ -124,6 +124,10 @@ export function useCustomerUtils() {
         });
     }
 
+    async function documentCategories() {
+        return axios.get(`/client/v1/document-categories`);
+    }
+
     async function uploadDocument(documentCategory, documentType, pages = []) {
         const data = {
             pages: pages,
@@ -188,6 +192,7 @@ export function useCustomerUtils() {
         logout,
         getAccountVerificationToken,
         getLivelinessToken,
+        documentCategories,
         uploadDocument,
         tasks,
         devices,
