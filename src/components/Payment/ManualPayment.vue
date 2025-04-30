@@ -67,9 +67,8 @@ onUnmounted(async () => {
 
 const iHaveMadePayment = async () => {
   props.transaction.payment.state.code = PaymentState.REDIRECTED;
-  transactionUtils.iHaveMadePayment(props.transaction.payment.id).then(() => {
-      router.replace({name: 'viewTransaction', params: {transactionId: props.transaction.id}})
-  });
+  await clearPullInterval();
+  await transactionUtils.iHaveMadePayment(props.transaction.payment.id);
 }
 
 const status = computed(() => {
@@ -86,7 +85,7 @@ const status = computed(() => {
 </script>
 
 <template>
-  <template v-if="transaction.payment.state.code === PaymentState.PENDING">
+  <template v-if="transaction.payment.state.code === PaymentState.PENDING && !transaction.payment.customerConfirmedPayment">
     <div class="-m-5">
       <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Payment</h2>
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
@@ -125,6 +124,9 @@ const status = computed(() => {
     <Processing class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
     <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage }}</p>
+    <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-purple-700 font-semibold text-sm">
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
+    </div>
   </template>
 
   <template v-else-if="status === 'completed'">
