@@ -85,7 +85,7 @@ const status = computed(() => {
 </script>
 
 <template>
-  <template v-if="transaction.payment.state.code === PaymentState.PENDING && !transaction.payment.customerConfirmedPayment">
+  <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div class="-m-5">
       <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Payment</h2>
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
