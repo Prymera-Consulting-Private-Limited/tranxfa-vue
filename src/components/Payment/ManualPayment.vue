@@ -8,10 +8,10 @@ import Processing from "@/components/Payment/State/Processing.vue";
 import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import Failed from "@/components/Payment/State/Failed.vue";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
-import router from "@/router/index.js";
 import ClientPaymentAccount from "@/components/ClientPaymentAccount.vue";
 import {ClipboardIcon} from "@heroicons/vue/24/outline/index.js";
 import {UseClipboard} from "@vueuse/components";
+import router from "@/router/index.js";
 
 const props = defineProps({
   transaction: {
@@ -70,6 +70,14 @@ const iHaveMadePayment = async () => {
   props.transaction.payment.state.code = PaymentState.REDIRECTED;
   await transactionUtils.iHaveMadePayment(props.transaction.payment.id).then(() => {
     props.transaction.payment.customerConfirmedPayment = true;
+    setTimeout(() => {
+      router.push({
+        name: 'viewTransaction',
+        params: {
+          transactionId: props.transaction.id
+        }
+      });
+    }, 3000)
   });
 }
 
