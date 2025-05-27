@@ -176,6 +176,9 @@ function saveQuote() {
                         v-on:option:updated="sourceUpdated"
                     />
                     <MoneyInputShimmer v-else />
+                    <p v-if="quoteUtil.quote.data.alert && ! isFetchingQuote" class="ml-8 px-4 py-3 rounded text-xs bg-yellow-100 leading-4.5 mt-3 border border-yellow-400 text-yellow-800">
+                      {{ quoteUtil.quote.data.alert }}
+                    </p>
                   </div>
                 </div>
               </div>
