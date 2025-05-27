@@ -137,12 +137,9 @@ const confirmQuote = async () => {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
         await send({ type: 'ADDRESS_REQUIRED' });
-      } else if (error.response.data.type === "poi_required") {
+      } else if (error.response.data.type === "poi_info_check_failed") {
         isStepProcessing.value = false;
-        await send({ type: 'POI_REQUIRED' });
-      } else if (error.response.data.type === "poi_name_check_failed") {
-        isStepProcessing.value = false;
-        await send({ type: 'POI_NAME_CHECK_FAILED' });
+        await send({ type: 'POI_INFO_CHECK_FAILED' });
       }
     }
   }
@@ -152,6 +149,12 @@ const submitAndContinue = async () => {
   isStepProcessing.value = true
   if (snapshot.value?.value === 'confirm') {
     await confirmQuote();
+  } else if (snapshot.value?.value === 'addRecipient') {
+    isStepProcessing.value = true;
+  } else if (snapshot.value?.value !== 'provideAddress') {
+    await send({ type: 'SET_CONTEXT', quote: quote.data });
+    await send({ type: 'PROCEED' });
+    isStepProcessing.value = false;
   } else if (snapshot.value?.value === 'verifyIdentity') {
     await customerUtils.refresh();
     await send({ type: 'SET_CONTEXT', quote: quote.data });
@@ -159,12 +162,6 @@ const submitAndContinue = async () => {
     if (purpose) {
       await confirmQuote();
     }
-  } else if (snapshot.value?.value === 'addRecipient') {
-    isStepProcessing.value = true;
-  } else if (snapshot.value?.value !== 'provideAddress') {
-    await send({ type: 'SET_CONTEXT', quote: quote.data });
-    await send({ type: 'PROCEED' });
-    isStepProcessing.value = false;
   }
 }
 
@@ -190,11 +187,11 @@ const addRecipientLoadingStateUpdated = (e) => {
   isSubComponentLoading.value = e;
 }
 
-const isApplyingNameFromPoiDocument = ref(false);
+const isApplyingInfoFromPoiDocument = ref(false);
 
-const applyNameFromPoiDocument = async () => {
-  isApplyingNameFromPoiDocument.value = true;
-  customerUtils.applyNameFromPoiDocument().then((response) => {
+const applyInfoFromPoiDocument = async () => {
+  isApplyingInfoFromPoiDocument.value = true;
+  customerUtils.applyInfoFromPoiDocument().then((response) => {
     customerUtils.updateStore(response.data);
     send({ type: 'PROCEED' });
     isStepProcessing.value = true;
@@ -202,7 +199,7 @@ const applyNameFromPoiDocument = async () => {
   }).catch((e) => {
     console.error(e);
   }).finally(() => {
-    isApplyingNameFromPoiDocument.value = false;
+    isApplyingInfoFromPoiDocument.value = false;
   });
 }
 
@@ -241,7 +238,7 @@ function withPopper(dropdownList, component, { width }) {
 <template>
   <CustomerLayout>
     <main class="-mt-24 py-8">
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-5"  v-if="snapshot.value !== 'poiNameCheckFailed'">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-5"  v-if="snapshot.value !== 'poiInfoCheckFailed'">
         <h1 class="sr-only">Review & Confirm</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-lg p-4 md:px-6 md:py-10 shadow-lg">
@@ -383,7 +380,6 @@ function withPopper(dropdownList, component, { width }) {
       </div>
       <template v-else>
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-          <h1 class="sr-only">Make Payment</h1>
           <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
             <div class="text-center" v-if="isLoading">
               <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-500"></span>
@@ -400,16 +396,15 @@ function withPopper(dropdownList, component, { width }) {
               <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                   <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                    <button class="sr-only"></button>
+                    <button class="sr-only">Identity Mismatch Detected</button>
                     <div class="">
                       <div class="text-left">
-                        <h3 class="font-semibold text-red-600">Name Mismatch Detected</h3>
+                        <h3 class="font-semibold text-red-600">Identity Mismatch Detected</h3>
                         <p class="leading-5 font-normal text-sm/8 text-red-500 mt-3">
-                          The name you entered doesn't match the name shown on your identity document.
-                          To proceed, please choose one of the following options:
+                          We’ve detected a discrepancy between your profile and your submitted identity document. To continue with the verification process, please choose one of the following options:
                         </p>
-                        <ul role="list" class="mt-6 divide-y divide-gray-200" :class="isApplyingNameFromPoiDocument ? 'opacity:70 animate animate-pulse' : ''">
-                          <li @click="stepCommandExecuted('UPLOAD_ANOTHER_DOCUMENT')" :class="isApplyingNameFromPoiDocument ? '' : 'cursor-pointer'">
+                        <ul role="list" class="mt-6 divide-y divide-gray-200" :class="isApplyingInfoFromPoiDocument ? 'opacity:70 animate animate-pulse' : ''">
+                          <li @click="stepCommandExecuted('UPLOAD_ANOTHER_DOCUMENT')" :class="isApplyingInfoFromPoiDocument ? '' : 'cursor-pointer'">
                             <div class="group relative flex items-start space-x-3 py-4">
                               <div class="shrink-0">
                                 <span :class="['inline-flex size-10 items-center justify-center rounded-lg bg-purple-600 mt-1']">
@@ -420,11 +415,11 @@ function withPopper(dropdownList, component, { width }) {
                                 <div class="text-sm font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
-                                    Update My Document
+                                    Update my profile with the info from this document.
                                   </div>
                                 </div>
                                 <p class="text-sm text-gray-500 mt-1">
-                                  Upload a new identity document that matches the name you entered.
+                                  I'll provide a different document that matches my profile.
                                 </p>
                               </div>
                               <div class="shrink-0 self-center">
@@ -432,7 +427,7 @@ function withPopper(dropdownList, component, { width }) {
                               </div>
                             </div>
                           </li>
-                          <li @click="applyNameFromPoiDocument" :class="isApplyingNameFromPoiDocument ? 'bg-gray-100' : 'cursor-pointer'">
+                          <li @click="applyInfoFromPoiDocument" :class="isApplyingInfoFromPoiDocument ? 'bg-gray-100' : 'cursor-pointer'">
                             <div class="group relative flex items-start space-x-3 py-4">
                               <div class="shrink-0">
                                 <span :class="['inline-flex size-10 items-center justify-center rounded-lg bg-purple-600 mt-1']">
