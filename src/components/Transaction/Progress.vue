@@ -17,11 +17,6 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
-  },
-  identityDocumentRequired: {
-    type: Boolean,
-    required: false,
-    default: false
   }
 })
 
@@ -46,14 +41,14 @@ const steps = [
     id: 'provideAddress',
     name: 'Provide Your Address',
     description: 'For security and compliance, we need your address details before proceeding.',
-    show: false,
+    show: props.addressRequired,
     stepCommand: null,
     isMain: false,
   },
   {
-    id: 'verifyIdentity',
-    name: 'Verify Your Identity',
-    description: 'For security and compliance, please verify your identity before proceeding with the transaction.',
+    id: 'accountVerification',
+    name: 'Account verification',
+    description: 'For security and compliance, please verify your account before proceeding with the transaction.',
     show: false,
     stepCommand: null,
     isMain: false,
@@ -87,21 +82,17 @@ const getStepStatus = (stepId, currentStep) => {
 
 const shouldShowStep = (step, status) => {
   if (step.isMain) return true;
-  if (step.id === 'provideAddress') return props.addressRequired;
-  if (step.id === 'verifyIdentity') return props.identityDocumentRequired;
 
-  // Handle mutually exclusive recipient steps
   if (step.id === 'selectRecipient' || step.id === 'addRecipient') {
     const hasRecipients = props.quote?.recipients?.length > 0;
-    
-    // If we're on the current step, show it regardless
+
     if (status === 'current') return true;
-    
-    // For completed steps, show based on recipient state
+
     if (status === 'complete') return step.id !== 'addRecipient';
-    
-    // For upcoming steps, show selectRecipient if recipients, addRecipient if there are no recipients
+
     return step.id === 'selectRecipient' ? hasRecipients : !hasRecipients;
+  } else if (step.id === 'accountVerification') {
+    return props.quote?.pendingDocuments?.length > 0;
   }
 
   return step.show;
