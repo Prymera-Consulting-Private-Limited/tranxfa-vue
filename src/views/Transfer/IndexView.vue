@@ -23,6 +23,7 @@ import {Dialog, DialogPanel, RadioGroup, RadioGroupOption, TransitionChild, Tran
 import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon} from '@heroicons/vue/20/solid'
 import {createPopper} from "@popperjs/core";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
+import QuotePendingDocument from "@/models/quote_pending_document.js";
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const customerStore = useCustomerStore();
@@ -121,6 +122,14 @@ const confirmQuote = async () => {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
         await send({ type: 'ADDRESS_REQUIRED' });
+      } else if (error.response.data.type === "account_verification_required") {
+        isStepProcessing.value = false;
+        if (error.response.data.pending_documents?.length > 0) {
+          quote.data.pendingDocuments = error.response.data.pending_documents.map((document) => {
+            return QuotePendingDocument.getInstance(document);
+          })
+        }
+        await send({ type: 'ACCOUNT_VERIFICATION_REQUIRED' });
       } else if (error.response.data.type === "poi_info_check_failed") {
         isStepProcessing.value = false;
         await send({ type: 'POI_INFO_CHECK_FAILED' });
