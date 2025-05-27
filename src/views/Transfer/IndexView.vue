@@ -411,15 +411,15 @@ function withPopper(dropdownList, component, { width }) {
                                   <ArrowUpTrayIcon class="size-6 text-white" aria-hidden="true" />
                                 </span>
                               </div>
-                              <div class="min-w-0 flex-1">
+                              <div class="min-w-0 flex-1 px-2.5">
                                 <div class="text-sm font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
-                                    Update my profile with the info from this document.
+                                    Upload Another Document
                                   </div>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-1">
-                                  I'll provide a different document that matches my profile.
+                                <p class="text-sm text-gray-500 mt-1 leading-5">
+                                  I’ll provide a different document that matches my profile.
                                 </p>
                               </div>
                               <div class="shrink-0 self-center">
@@ -434,15 +434,15 @@ function withPopper(dropdownList, component, { width }) {
                                   <IdentificationIcon class="size-6 text-white" aria-hidden="true" />
                                 </span>
                               </div>
-                              <div class="min-w-0 flex-1">
+                              <div class="min-w-0 flex-1 px-2.5">
                                 <div class="text-sm font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
-                                    Use the Name from My ID
+                                    Use Document Details
                                   </div>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-1">
-                                  Automatically update your name to match the one on your identity document.
+                                <p class="text-sm text-gray-500 mt-1 leading-5">
+                                  Update my profile with the info from this document.
                                 </p>
                               </div>
                               <div class="shrink-0 self-center">
