@@ -18,10 +18,6 @@ const props = defineProps({
     required: true,
   },
   defaultValue: {
-    type: Object({
-      country: String,
-      number: String,
-    }),
     required: false,
     default: '',
   },
