@@ -41,7 +41,7 @@ const steps = [
     id: 'provideAddress',
     name: 'Provide Your Address',
     description: 'For security and compliance, we need your address details before proceeding.',
-    show: props.addressRequired,
+    show: false,
     stepCommand: null,
     isMain: false,
   },
@@ -93,6 +93,8 @@ const shouldShowStep = (step, status) => {
     return step.id === 'selectRecipient' ? hasRecipients : !hasRecipients;
   } else if (step.id === 'accountVerification') {
     return props.quote?.pendingDocuments?.length > 0;
+  } else if (step.id === 'provideAddress') {
+    return props.addressRequired;
   }
 
   return step.show;
