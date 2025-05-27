@@ -173,8 +173,8 @@ export function useCustomerUtils() {
             confirm_password: confirmNewPassword,
         });
     }
-    async function applyNameFromPoiDocument() {
-        return axios.post(`/client/v1/apply-name-from-poi`);
+    async function applyInfoFromPoiDocument() {
+        return axios.post(`/client/v1/apply-info-from-poi`);
     }
 
     return {
@@ -200,6 +200,6 @@ export function useCustomerUtils() {
         changePassword,
         forgotPassword,
         resetPassword,
-        applyNameFromPoiDocument,
+        applyInfoFromPoiDocument,
     }
 }
