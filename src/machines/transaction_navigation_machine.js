@@ -28,11 +28,13 @@ export const transactionNavigationMachine = createMachine({
                         guard: ({context}) => (context.quote?.recipient || null) === null,
                     },
                     {
-                        target: 'verifyIdentity',
+                        target: 'provideAddress',
+                        guard: ({context}) => customer.data.addressInformationRequired() && (context.quote?.recipient || null) !== null,
+                    },
+                    {
+                        target: 'accountVerification',
                         guard: ({context}) => {
-                            return customerStore.isLoaded && (
-                                customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null
-                            ) !== null && (context.quote?.recipient || null) !== null
+                            return context.quote?.pendingDocuments?.length > 0 && (context.quote?.recipient || null) !== null;
                         },
                     },
                     {
@@ -50,11 +52,12 @@ export const transactionNavigationMachine = createMachine({
             on: {
                 PROCEED: [
                     {
-                        target: 'verifyIdentity',
+                        target: 'provideAddress',
+                        guard: ({context}) => customer.data.addressInformationRequired() && (context.quote?.recipient || null) !== null,
+                    }, {
+                        target: 'accountVerification',
                         guard: ({context}) => {
-                            return customerStore.isLoaded && (
-                                customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null
-                            ) !== null && (context.quote?.recipient || null) !== null
+                            return context.quote?.pendingDocuments?.length > 0 && (context.quote?.recipient || null) !== null;
                         },
                     },
                     {
@@ -76,11 +79,12 @@ export const transactionNavigationMachine = createMachine({
             on: {
                 PROCEED: [
                     {
-                        target: 'verifyIdentity',
+                        target: 'provideAddress',
+                        guard: ({context}) => customer.data.addressInformationRequired() && (context.quote?.recipient || null) !== null,
+                    }, {
+                        target: 'accountVerification',
                         guard: ({context}) => {
-                            return customerStore.isLoaded && (
-                                customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null
-                            ) !== null && (context.quote?.recipient || null) !== null
+                            return context.quote?.pendingDocuments?.length > 0 && (context.quote?.recipient || null) !== null;
                         },
                     },
                     {
@@ -98,11 +102,31 @@ export const transactionNavigationMachine = createMachine({
                 },
             }
         },
-        verifyIdentity: {
+        provideAddress: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'accountVerification',
+                        guard: ({context}) => {
+                            return context.quote?.pendingDocuments?.length > 0 && (context.quote?.recipient || null) !== null;
+                        },
+                    }, {
+                        target: 'confirm',
+                    },
+                ],
+                SELECT_RECIPIENT: {
+                    target: 'selectRecipient'
+                },
+            }
+        },
+        accountVerification: {
             on: {
                 PROCEED: [
                     {
                         target: 'confirm',
+                        guard: ({context}) => {
+                            return context.quote?.pendingDocuments?.length === 0 && (context.quote?.recipient || null) !== null;
+                        },
                     },
                 ],
                 SELECT_RECIPIENT: {
@@ -115,16 +139,13 @@ export const transactionNavigationMachine = createMachine({
                 },
             }
         },
-        provideAddress: {
+        uploadAnotherPoi: {
             on: {
                 PROCEED: [
                     {
                         target: 'confirm',
                     },
                 ],
-                SELECT_RECIPIENT: {
-                    target: 'selectRecipient'
-                },
             }
         },
         poiInfoCheckFailed: {
@@ -137,8 +158,8 @@ export const transactionNavigationMachine = createMachine({
                 SELECT_RECIPIENT: {
                     target: 'selectRecipient'
                 },
-                UPLOAD_ANOTHER_DOCUMENT: {
-                    target: 'verifyIdentity'
+                UPLOAD_ANOTHER_POI: {
+                    target: 'uploadAnotherPoi'
                 },
             }
         },
@@ -152,11 +173,6 @@ export const transactionNavigationMachine = createMachine({
                 ADDRESS_REQUIRED: [
                     {
                         target: 'provideAddress',
-                    },
-                ],
-                POI_REQUIRED: [
-                    {
-                        target: 'verifyIdentity',
                     },
                 ],
                 POI_INFO_CHECK_FAILED: [
