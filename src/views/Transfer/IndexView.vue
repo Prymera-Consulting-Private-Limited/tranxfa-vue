@@ -22,7 +22,6 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {Dialog, DialogPanel, RadioGroup, RadioGroupOption, TransitionChild, TransitionRoot} from '@headlessui/vue'
 import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon} from '@heroicons/vue/20/solid'
 import {createPopper} from "@popperjs/core";
-import DocumentCategory from "@/models/document_category.js";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
@@ -83,35 +82,14 @@ const canContinue = computed(() => {
   return !isStepProcessing.value && !isLoading.value && !isSubComponentLoading.value;
 });
 
-const isIdentityDocumentRequired = computed(() => {
-  return (customer.data?.pendingDocuments?.find(category => category.code === 'POI') || null) !== null;
-});
-
-const identityDocumentCategory = ref(null);
-identityDocumentCategory.value = customer.data?.pendingDocuments?.find(category => category.code === 'POI');
-
 const showContinueButton = computed(() => {
-  return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'verifyIdentity');
+  return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'accountVerification');
 });
 
 const createRecipient = async () => {
   send({ type: 'ADD_RECIPIENT' });
   isSubComponentLoading.value = true;
 };
-
-watch(snapshot, () => {
-  if (snapshot.value?.value === 'verifyIdentity' && (identityDocumentCategory?.value || null) === null) {
-    isLoading.value = true;
-    customerUtils.documentCategories().then((response) => {
-      const documentCategories = response.data.map((category) => DocumentCategory.getInstance(category));
-      identityDocumentCategory.value =  documentCategories.find(category => category.code === 'POI');
-    }).catch((e) => {
-      console.error(e);
-    }).finally(() => {
-      isLoading.value = false;
-    });
-  }
-});
 
 const setRecipient =  async (recipient) => {
   isLoading.value = true;
@@ -161,10 +139,7 @@ const submitAndContinue = async () => {
     await send({ type: 'SET_CONTEXT', quote: quote.data });
     await send({ type: 'PROCEED' });
     isStepProcessing.value = false;
-  } else if (snapshot.value?.value === 'verifyIdentity') {
-    await customerUtils.refresh();
-    await send({ type: 'SET_CONTEXT', quote: quote.data });
-    await send({ type: 'PROCEED' });
+  } else if (snapshot.value?.value === 'accountVerification') {
     if (purpose) {
       await confirmQuote();
     }
@@ -173,14 +148,19 @@ const submitAndContinue = async () => {
 
 const customerAttributeCategoryUpdated = async () => {
   await send({ type: 'PROCEED' });
-  await confirmQuote();
   isStepProcessing.value = false;
 }
 
 const sdkFinalStateReached = async () => {
-  await customerUtils.refresh();
   isStepProcessing.value = false;
-  await send({ type: 'PROCEED' });
+  await quoteUtils.getTransferQuote(props.id).then((response) => {
+    quote.data = TransactionQuote.getInstance(response.data);
+    send({ type: 'SET_CONTEXT', quote: quote.data });
+    if (quote.data.pendingDocuments.length === 0) {
+      send({ type: 'PROCEED' });
+    }
+  });
+  selectedUploadDocumentCategory.value = null;
 }
 
 const stepCommandExecuted = (e) => {
