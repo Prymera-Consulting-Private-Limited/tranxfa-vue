@@ -56,6 +56,7 @@ onMounted(async () => {
     isLoading.value = true;
     await customerUtils.refresh()
   }
+  isAddressRequired.value = customerStore.customer.data.addressInformationRequired();
   if (! quote.data) {
     isLoading.value = true;
     await quoteUtils.getTransferQuote(props.id).then((response) => {
@@ -283,6 +284,14 @@ function withPopper(dropdownList, component, { width }) {
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
                       <h3 class="text-gray-900 mb-4 font-semibold">Provide Your Address</h3>
+                      <p class="text-gray-500 text-sm mb-3 -mt-2">
+                        Please provide your full residential address in
+                        <span class="font-semibold text-purple-700">{{ customer.data?.country?.commonName }}</span>.
+                      </p>
+                      <p class="text-gray-500 text-sm mb-6 -mt-2 leading-5">
+                        <span>Accurate address information is required to comply with financial regulations and ensure secure transfers.</span>
+                      </p>
+
                       <CustomerAttributeForm
                           v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
                           v-bind:updateOutsourced="true"
