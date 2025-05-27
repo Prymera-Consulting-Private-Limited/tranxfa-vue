@@ -175,6 +175,11 @@ export const transactionNavigationMachine = createMachine({
                         target: 'provideAddress',
                     },
                 ],
+                ACCOUNT_VERIFICATION_REQUIRED: [
+                    {
+                        target: 'accountVerification',
+                    },
+                ],
                 POI_INFO_CHECK_FAILED: [
                     {
                         target: 'poiInfoCheckFailed',
