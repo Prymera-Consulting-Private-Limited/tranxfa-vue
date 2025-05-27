@@ -251,7 +251,6 @@ function withPopper(dropdownList, component, { width }) {
                     v-bind:currentStep="snapshot.value"
                     v-bind:quote="quote.data"
                     v-bind:addressRequired="isAddressRequired"
-                    v-bind:identityDocumentRequired="isIdentityDocumentRequired"
                     v-on:stepCommandExecuted="stepCommandExecuted"
                 />
                 <div :class="{'animate-pulse': isStepProcessing}" class="xl:col-span-2 px-3">
@@ -301,8 +300,8 @@ function withPopper(dropdownList, component, { width }) {
                           v-on:customer:attribute_category:update_failed="isStepProcessing = false"
                       />
                     </template>
-                    <template v-if="snapshot.value === 'verifyIdentity'">
-                      <h3 class="text-gray-900 mb-4 font-semibold">Verify your identity</h3>
+                    <template v-if="snapshot.value === 'accountVerification'">
+                      <h3 class="text-gray-900 mb-4 font-semibold">Account verification</h3>
                       <p class="text-gray-500 text-sm mb-6">For security and compliance, please upload a valid government-issued ID. Ensure the details match those in your profile.</p>
                       <ul v-if="identityDocumentCategory?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <li v-for="documentType in identityDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
