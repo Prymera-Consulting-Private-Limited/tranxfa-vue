@@ -23,6 +23,7 @@ import {Dialog, DialogPanel, RadioGroup, RadioGroupOption, TransitionChild, Tran
 import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon} from '@heroicons/vue/20/solid'
 import {createPopper} from "@popperjs/core";
 import DocumentCategory from "@/models/document_category.js";
+import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const customerStore = useCustomerStore();
@@ -50,6 +51,7 @@ const isSubComponentLoading = ref(false);
 const purpose = ref(null);
 const paymentMethod = ref(null);
 const isAddressRequired = ref(false);
+const selectedUploadDocumentCategory = ref(null);
 
 onMounted(async () => {
   if (customerStore.isLoaded === false) {
@@ -67,6 +69,9 @@ onMounted(async () => {
   }
   if (quote.data.paymentMethods.length === 1) {
     paymentMethod.value = quote.data.paymentMethods[0];
+  }
+  if (quote.data.pendingDocuments.length === 1) {
+    selectedUploadDocumentCategory.value = quote.data.pendingDocuments[0];
   }
   isLoading.value = false;
 });
@@ -234,6 +239,11 @@ function withPopper(dropdownList, component, { width }) {
 
   return () => popper.destroy();
 }
+
+function startVerification(category) {
+  selectedUploadDocumentCategory.value = category;
+}
+
 </script>
 
 <template>
@@ -302,16 +312,40 @@ function withPopper(dropdownList, component, { width }) {
                     </template>
                     <template v-if="snapshot.value === 'accountVerification'">
                       <h3 class="text-gray-900 mb-4 font-semibold">Account verification</h3>
-                      <p class="text-gray-500 text-sm mb-6">For security and compliance, please upload a valid government-issued ID. Ensure the details match those in your profile.</p>
-                      <ul v-if="identityDocumentCategory?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <li v-for="documentType in identityDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
-                          <DocumentTypeItem
-                              v-bind:documentType="documentType"
-                              v-bind:documentCategory="identityDocumentCategory"
-                              v-on:sdkFinalStateReached="sdkFinalStateReached"
-                          />
-                        </li>
-                      </ul>
+                      <template v-if="selectedUploadDocumentCategory">
+                        <CategoryDescription v-bind:category="selectedUploadDocumentCategory" />
+                        <ul v-if="selectedUploadDocumentCategory.documentTypes?.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                          <li v-for="documentType in selectedUploadDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
+                            <DocumentTypeItem
+                                v-bind:documentType="documentType"
+                                v-bind:documentCategory="selectedUploadDocumentCategory"
+                                v-on:sdkFinalStateReached="sdkFinalStateReached"
+                            />
+                          </li>
+                        </ul>
+                      </template>
+                      <template v-else>
+                        <p class="text-gray-500 text-sm mb-6">
+                          We need to verify your account in order to process with this transaction. For processing please documents in each category provided below.
+                        </p>
+                        <ul v-if="quote.data.pendingDocuments[0].documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6">
+                          <li v-for="pendingCategory in quote.data?.pendingDocuments" :key="pendingCategory.id" class="col-span-1 flex rounded-lg bg-white items-start border-1 border-gray-200 hover:shadow-sm transition-transform transform hover:scale-105 px-6 py-3">
+                            <div class="text-left pl-3 py-3">
+                              <h3 class="text-sm font-medium text-gray-900">{{ pendingCategory.title }}</h3>
+                              <dl v-if="pendingCategory.description" class="mt-0 flex grow flex-col justify-between">
+                                <dt class="sr-only">Information</dt>
+                                <dd class="mt-1 text-sm text-gray-500">
+                                  <CategoryDescription v-bind:category="pendingCategory" />
+                                </dd>
+                                <dt class="sr-only">Start Verification</dt>
+                                <dd class="text-sm text-gray-500">
+                                  <a href="javascript:" @click="startVerification(pendingCategory)" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
+                                </dd>
+                              </dl>
+                            </div>
+                          </li>
+                        </ul>
+                      </template>
                     </template>
                     <Confirm
                         v-else-if="snapshot.value === 'confirm'"
