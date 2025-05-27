@@ -37,9 +37,15 @@ class Quote extends BaseQuote {
      */
     payoutCompanies = [];
 
+    /**
+     * @type {String|null}
+     */
+    alert= null;
+
     static getInstance(data) {
         const quote = new Quote();
         BaseQuote.getInstance(quote, data);
+        quote.alert = data['alert'];
         quote.exchangeRateDate = data.exchange_rate_date;
         if (data.sources.length > 0) {
             quote.sources = data.sources.map((data) => {
