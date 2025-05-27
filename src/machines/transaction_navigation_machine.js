@@ -127,7 +127,7 @@ export const transactionNavigationMachine = createMachine({
                 },
             }
         },
-        poiNameCheckFailed: {
+        poiInfoCheckFailed: {
             on: {
                 PROCEED: [
                     {
@@ -159,9 +159,9 @@ export const transactionNavigationMachine = createMachine({
                         target: 'verifyIdentity',
                     },
                 ],
-                POI_NAME_CHECK_FAILED: [
+                POI_INFO_CHECK_FAILED: [
                     {
-                        target: 'poiNameCheckFailed',
+                        target: 'poiInfoCheckFailed',
                     },
                 ],
                 SELECT_RECIPIENT: {
