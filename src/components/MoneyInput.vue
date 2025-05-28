@@ -46,7 +46,7 @@ const maskaOptions = reactive({
 const unmaskedValue = ref(null);
 
 const onMaska = (event) => {
-  unmaskedValue.value = event.detail.unmasked < Math.pow(10, props.currency.decimalPlaces) ? event.detail.unmasked * Math.pow(10, props.currency.decimalPlaces) : event.detail.unmasked;
+  unmaskedValue.value = event.detail.unmasked;
 }
 
 const amountModel = computed({
