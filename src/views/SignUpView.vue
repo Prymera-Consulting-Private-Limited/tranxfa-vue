@@ -4,6 +4,7 @@ import router from "@/router/index.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {usePasswordPolicyUtils} from "@/composables/password_policy_utils.js";
+import axios from "axios";
 
 const isLoading = ref(false);
 const showPassword = ref(false);

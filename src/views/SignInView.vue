@@ -3,6 +3,7 @@ import {reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import axios from "axios";
 
 const showPassword = ref(false);
 const customerUtils = useCustomerUtils();

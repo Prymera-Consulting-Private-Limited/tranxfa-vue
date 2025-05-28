@@ -2,6 +2,7 @@
 import {reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import axios from "axios";
 
 const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
