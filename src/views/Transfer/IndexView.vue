@@ -149,10 +149,6 @@ const submitAndContinue = async () => {
     await send({ type: 'SET_CONTEXT', quote: quote.data });
     await send({ type: 'PROCEED' });
     isStepProcessing.value = false;
-  } else if (snapshot.value?.value === 'accountVerification') {
-    if (purpose) {
-      await confirmQuote();
-    }
   }
 }
 
@@ -168,6 +164,9 @@ const sdkFinalStateReached = async () => {
     send({ type: 'SET_CONTEXT', quote: quote.data });
     if (quote.data.pendingDocuments.length === 0) {
       send({ type: 'PROCEED' });
+      if (purpose?.value) {
+        confirmQuote();
+      }
     }
   });
   selectedUploadDocumentCategory.value = null;
