@@ -66,6 +66,7 @@ async function resetPassword() {
   formErrors.password = [];
   formErrors.confirm_password = [];
   resetPasswordFailureMessage.value = '';
+  await axios.get('/sanctum/csrf-cookie');
   customerUtils.resetPassword(props.token, form.password, form.confirm_password).then(() => {
     router.push({name: 'signIn', query: {referer: "reset-password"}});
   }).catch((e) => {

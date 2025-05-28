@@ -17,6 +17,7 @@ const loginError = ref(null);
 async function login() {
   isLoading.value = true;
   loginError.value = null;
+  await axios.get('/sanctum/csrf-cookie');
   await customerUtils.login(form.email, form.password).then(() => {
     if (customerStore.customer.data?.account?.isEmailVerified && customerStore.customer.data?.session?.mfaMethod !== null) {
       router.push({name: 'multiFactorAuth'});

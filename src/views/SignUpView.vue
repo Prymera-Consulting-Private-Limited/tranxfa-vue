@@ -63,6 +63,7 @@ async function register() {
   formErrors.email = [];
   formErrors.password = [];
   formErrors.confirm_password = [];
+  await axios.get('/sanctum/csrf-cookie');
   customerUtils.register(form.email, form.password, form.confirm_password).then(() => {
     router.push({name: 'onboardingWorkflow'});
   }).catch((e) => {

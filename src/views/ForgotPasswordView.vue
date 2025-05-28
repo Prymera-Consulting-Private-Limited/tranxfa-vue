@@ -14,6 +14,7 @@ const forgotPasswordMessage = ref(null);
 async function requestResetPassword() {
   isLoading.value = true;
   forgotPasswordMessage.value = null;
+  await axios.get('/sanctum/csrf-cookie');
   await customerUtils.forgotPassword(form.email).then((response) => {
     forgotPasswordMessage.value = response?.data?.message;
     form.email = '';
