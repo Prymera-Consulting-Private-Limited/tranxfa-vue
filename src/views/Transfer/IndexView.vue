@@ -24,6 +24,7 @@ import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon} 
 import {createPopper} from "@popperjs/core";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
 import QuotePendingDocument from "@/models/quote_pending_document.js";
+import DocumentCategory from "@/models/document_category.js";
 
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const customerStore = useCustomerStore();
@@ -233,6 +234,25 @@ function startVerification(category) {
   selectedUploadDocumentCategory.value = category;
 }
 
+watch(snapshot, () => {
+  console.log(snapshot.value)
+  if (snapshot.value?.value === 'uploadAnotherPoi') {
+    isLoading.value = true;
+    customerUtils.documentCategories().then((response) => {
+      const documentCategories = response.data.map((category) => DocumentCategory.getInstance(category));
+      const poiDocumentCategory = documentCategories.find(category => category.code === 'POI');
+      if (poiDocumentCategory) {
+        selectedUploadDocumentCategory.value =  poiDocumentCategory;
+        quote.data.pendingDocuments.push(poiDocumentCategory);
+      }
+      send({ type: 'PROCEED' });
+    }).catch((e) => {
+      console.error(e);
+    }).finally(() => {
+      isLoading.value = false;
+    });
+  }
+});
 </script>
 
 <template>
@@ -435,7 +455,7 @@ function startVerification(category) {
                           We’ve detected a discrepancy between your profile and your submitted identity document. To continue with the verification process, please choose one of the following options:
                         </p>
                         <ul role="list" class="mt-6 divide-y divide-gray-200" :class="isApplyingInfoFromPoiDocument ? 'opacity:70 animate animate-pulse' : ''">
-                          <li @click="stepCommandExecuted('UPLOAD_ANOTHER_DOCUMENT')" :class="isApplyingInfoFromPoiDocument ? '' : 'cursor-pointer'">
+                          <li @click="stepCommandExecuted('UPLOAD_ANOTHER_POI')" :class="isApplyingInfoFromPoiDocument ? '' : 'cursor-pointer'">
                             <div class="group relative flex items-start space-x-3 py-4">
                               <div class="shrink-0">
                                 <span :class="['inline-flex size-10 items-center justify-center rounded-lg bg-purple-600 mt-1']">

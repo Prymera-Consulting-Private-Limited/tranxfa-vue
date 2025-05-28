@@ -143,7 +143,7 @@ export const transactionNavigationMachine = createMachine({
             on: {
                 PROCEED: [
                     {
-                        target: 'confirm',
+                        target: 'accountVerification',
                     },
                 ],
             }
