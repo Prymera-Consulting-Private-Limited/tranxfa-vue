@@ -250,7 +250,6 @@ function startVerification(category) {
 }
 
 watch(snapshot, () => {
-  console.log(snapshot.value)
   if (snapshot.value?.value === 'uploadAnotherPoi') {
     isLoading.value = true;
     customerUtils.documentCategories().then((response) => {
