@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
 import {useMachine} from "@xstate/vue";
 import {transactionNavigationMachine} from "@/machines/transaction_navigation_machine.js";
@@ -157,8 +157,7 @@ const customerAttributeCategoryUpdated = async () => {
   isStepProcessing.value = false;
 }
 
-const sdkFinalStateReached = async () => {
-  isStepProcessing.value = false;
+async function documentUploaded() {
   await quoteUtils.getTransferQuote(props.id).then((response) => {
     quote.data = TransactionQuote.getInstance(response.data);
     send({ type: 'SET_CONTEXT', quote: quote.data });
@@ -171,6 +170,23 @@ const sdkFinalStateReached = async () => {
   });
   selectedUploadDocumentCategory.value = null;
 }
+
+const watchForDocumentUpdate = ref(false);
+
+const sdkFinalStateReached = async () => {
+  isStepProcessing.value = true;
+  watchForDocumentUpdate.value = true;
+}
+
+watchEffect(() => {
+  if (watchForDocumentUpdate.value) {
+    let isDocumentPending = customer.data?.pendingDocuments?.find(o => o.code === selectedUploadDocumentCategory.value.code);
+    if (! isDocumentPending) {
+      watchForDocumentUpdate.value = false;
+      documentUploaded()
+    }
+  }
+});
 
 const stepCommandExecuted = (e) => {
   if (e) {
@@ -374,7 +390,7 @@ watch(snapshot, () => {
                   <div class="px-3 sm:px-0">
                     <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose <span class="text-red-500">*</span></label>
                     <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
-                    <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="purpose">
+                    <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="title">
                       <template v-slot:no-options="{ search, searching }">
                         <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
                         <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
