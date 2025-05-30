@@ -22,7 +22,9 @@ onMounted(async () => {
   }
   if (customer.data?.id) {
     Echo.channel(`client-customer.${customer.data?.id}`)
-        .listen('CustomerDocumentProcessing', (e) => {
+        .listen('CustomerDocumentUploaded', (e) => {
+          customerUtils.refresh();
+        }).listen('CustomerDocumentProcessing', (e) => {
           const category = e.category;
           const document = e.document_type.toLowerCase();
           customerUtils.refresh();
