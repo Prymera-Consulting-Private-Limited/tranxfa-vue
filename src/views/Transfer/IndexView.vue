@@ -105,6 +105,7 @@ const setRecipient =  async (recipient) => {
 
 const recipientAddedOnQuote = async (recipient)  => {
   isStepProcessing.value = false;
+  isSubComponentLoading.value = false;
   quote.data.recipients.push(recipient);
   quote.data.recipient = recipient;
   send({ type: 'SET_CONTEXT', quote: quote.data });
@@ -169,12 +170,14 @@ async function documentUploaded() {
     }
   });
   selectedUploadDocumentCategory.value = null;
+  isLoading.value = false;
 }
 
 const watchForDocumentUpdate = ref(false);
 
 const sdkFinalStateReached = async () => {
-  isStepProcessing.value = true;
+  isStepProcessing.value = false;
+  isLoading.value = true;
   watchForDocumentUpdate.value = true;
 }
 
@@ -183,6 +186,7 @@ watchEffect(() => {
     let isDocumentPending = customer.data?.pendingDocuments?.find(o => o.code === selectedUploadDocumentCategory.value.code);
     if (! isDocumentPending) {
       watchForDocumentUpdate.value = false;
+      isStepProcessing.value = false;
       documentUploaded()
     }
   }
