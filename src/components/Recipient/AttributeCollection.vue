@@ -20,7 +20,6 @@ import TransactionQuote from "@/models/transaction_quote.js";
 import NameInput from "@/components/Recipient/Attribute/NameInput.vue";
 import SecondNameInput from "@/components/Recipient/Attribute/SecondNameInput.vue";
 import ThirdNameInput from "@/components/Recipient/Attribute/ThirdNameInput.vue";
-import { debounce } from 'lodash'
 
 const props = defineProps({
   country: {
@@ -133,6 +132,7 @@ const recipientUtils = useRecipientUtils();
 const emit = defineEmits([
     'recipient:added',
     'recipient:add:failed',
+    'recipient:add:loadingStateUpdated',
 ]);
 
 async function addRecipient() {
@@ -226,10 +226,13 @@ watchEffect(() => {
 });
 
 watch(nameLookup, function (newValue) {
-  console.log(newValue);
   if (newValue.isValid) {
     doLookup();
   }
+});
+
+watchEffect(() => {
+  emit('recipient:add:loadingStateUpdated', isSaving.value || isLookingUp.value || false);
 })
 </script>
 

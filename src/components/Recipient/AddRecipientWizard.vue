@@ -1,6 +1,6 @@
 <script setup>
 import TargetSelection from "@/components/Recipient/TargetSelection.vue";
-import {onMounted, reactive, ref, watch} from "vue";
+import {onMounted, reactive, ref, watch, watchEffect} from "vue";
 import Spinner from "@/components/Spinner.vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
 import {addRecipientNavigationMachine} from "@/machines/add_recipient_navigation_machine.js";
@@ -139,9 +139,15 @@ const saveRecipientFailed = (error) => {
   emit('recipient:add:failed', error);
 }
 
-watch(isLoading, (newValue) => {
-  emit('recipient:add:loadingStateUpdated', newValue);
-});
+const isChildComponentLoading = ref(false);
+
+watchEffect(() => {
+  emit('recipient:add:loadingStateUpdated', isLoading.value || isChildComponentLoading.value || false);
+})
+
+function updateChildComponentLoadingState(newState) {
+  isChildComponentLoading.value = newState;
+}
 
 </script>
 
@@ -166,6 +172,7 @@ watch(isLoading, (newValue) => {
             v-bind:quote="props.quote"
             v-on:recipient:added="recipientAdded"
             v-on:recipient:add:failed="saveRecipientFailed"
+            v-on:recipient:add:loadingStateUpdated="updateChildComponentLoadingState"
         />
       </template>
       <template v-else-if="snapshot?.value === 'recipientTypeSelection'">
