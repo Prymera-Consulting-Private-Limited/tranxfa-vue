@@ -9,7 +9,7 @@ import MobileNumberInput from "@/components/Recipient/Attribute/MobileNumberInpu
 import EmailInput from "@/components/Recipient/Attribute/EmailInput.vue";
 import AccountNumberInput from "@/components/Recipient/Attribute/AccountNumberInput.vue";
 import PhoneNumberInput from "@/components/Recipient/Attribute/PhoneNumberInput.vue";
-import {computed, reactive, ref, watchEffect} from "vue";
+import {computed, reactive, ref, watch, watchEffect} from "vue";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import Relationship from "@/models/relationship.js";
 import RelationshipInput from "@/components/Recipient/Attribute/RelationshipInput.vue";
@@ -118,42 +118,6 @@ async function updateRelationship(relationship) {
   input.data.relationship_id = relationship.id;
 }
 
-const nameLookup = computed(() => {
-  if (props.payoutChannel.configuration?.nameLookupRequirements?.length > 0) {
-    return {
-      attributes: props.payoutChannel.configuration.nameLookupRequirements.map((attribute => {
-        return {
-          attribute: attribute,
-          isValid: input.data[attribute] !== null && input.data[attribute] !== undefined && input.data[attribute].length > 0
-        }
-      })),
-      isValid: props.payoutChannel.configuration.nameLookupRequirements.every((attribute) => {
-        if (input.data[attribute] === null || input.data[attribute] === undefined) {
-          return false;
-        }
-        const payoutChannelAttribute = props.payoutChannel.attributes.find((payoutChannelAttribute) => {
-          return payoutChannelAttribute.attribute === attribute;
-        });
-        if (payoutChannelAttribute?.minLength && input.data[attribute].length < payoutChannelAttribute.minLength) {
-          return false;
-        }
-        if (payoutChannelAttribute?.maxLength && input.data[attribute].length > payoutChannelAttribute.maxLength) {
-          return false;
-        }
-        if (payoutChannelAttribute?.exactLength && input.data[attribute].length !== payoutChannelAttribute.exactLength) {
-          return false;
-        }
-        if(payoutChannelAttribute.regexPattern && !new RegExp(payoutChannelAttribute.regexPattern).test(input.data[attribute])) {
-          return false;
-        }
-
-        return input.data[attribute].length > 0;
-      }),
-    };
-  }
-  return [];
-});
-
 async function updateRecipientInput(updated, attribute) {
   if (attribute.type === RecipientDataType.DELIVERY_OPTION) {
     input.data[attribute.attribute] = updated.id;
@@ -196,6 +160,41 @@ async function addRecipient() {
 }
 
 const isLookingUp = ref(false);
+const nameLookup = computed(() => {
+  if (props.payoutChannel.configuration?.nameLookupRequirements?.length > 0) {
+    return {
+      attributes: props.payoutChannel.configuration.nameLookupRequirements.map((attribute => {
+        return {
+          attribute: attribute,
+          isValid: input.data[attribute] !== null && input.data[attribute] !== undefined && input.data[attribute].length > 0
+        }
+      })),
+      isValid: props.payoutChannel.configuration.nameLookupRequirements.every((attribute) => {
+        if (input.data[attribute] === null || input.data[attribute] === undefined) {
+          return false;
+        }
+        const payoutChannelAttribute = props.payoutChannel.attributes.find((payoutChannelAttribute) => {
+          return payoutChannelAttribute.attribute === attribute;
+        });
+        if (payoutChannelAttribute?.minLength && input.data[attribute].length < payoutChannelAttribute.minLength) {
+          return false;
+        }
+        if (payoutChannelAttribute?.maxLength && input.data[attribute].length > payoutChannelAttribute.maxLength) {
+          return false;
+        }
+        if (payoutChannelAttribute?.exactLength && input.data[attribute].length !== payoutChannelAttribute.exactLength) {
+          return false;
+        }
+        if(payoutChannelAttribute.regexPattern && !new RegExp(payoutChannelAttribute.regexPattern).test(input.data[attribute])) {
+          return false;
+        }
+
+        return input.data[attribute].length > 0;
+      }),
+    };
+  }
+  return [];
+});
 
 const doLookup = () => {
   if (nameLookup.value.isValid) {
@@ -224,10 +223,14 @@ watchEffect(() => {
   if (props.isSubmitted && props.quote && !isSaving.value) {
     addRecipient();
   }
-  if (nameLookup.value.isValid) {
+});
+
+watch(nameLookup, function (newValue) {
+  console.log(newValue);
+  if (newValue.isValid) {
     doLookup();
   }
-});
+})
 </script>
 
 <template>
