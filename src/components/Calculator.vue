@@ -70,6 +70,9 @@ async function getQuote() {
     query.payoutCurrency = quoteUtil.quote.data?.payoutCurrency;
     query.payoutMethod = quoteUtil.quote.data?.payoutMethod;
     query.payoutCompany = quoteUtil.quote.data?.payoutCompany;
+    if (quoteUtil.quote.data.alerts?.send_amount) {
+      quoteErrors.payment.push(quoteUtil.quote.data.alerts.send_amount);
+    }
   }).catch((e) => {
     if (e.response.status === 422) {
       const errors = e.response.data.errors;
@@ -82,6 +85,10 @@ async function getQuote() {
           for (const error of errors.amount) {
             quoteErrors.payout.push(error);
           }
+        }
+      } else if (errors?.send_amount?.length > 0) {
+        for (const error of errors.send_amount) {
+          quoteErrors.payment.push(error);
         }
       }
     } else {
@@ -176,9 +183,6 @@ function saveQuote() {
                         v-on:option:updated="sourceUpdated"
                     />
                     <MoneyInputShimmer v-else />
-                    <p v-if="quoteUtil.quote.data.alert && ! isFetchingQuote" class="ml-8 px-4 py-3 rounded text-xs bg-yellow-100 leading-4.5 mt-3 border border-yellow-400 text-yellow-800">
-                      {{ quoteUtil.quote.data.alert }}
-                    </p>
                   </div>
                 </div>
               </div>
