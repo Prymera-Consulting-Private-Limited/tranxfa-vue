@@ -60,6 +60,7 @@ const handleFileSelect = (event) => {
 
 const handleDrop = (event) => {
   event.preventDefault();
+  isDragging.value = false
   Array.from(event.dataTransfer.files).forEach((file) => {
     if (file.size / 1024 / 1024 > MAX_FILE_SIZE_MB) {
       alert(`Upload Error! File ${file.name} exceeds the ${MAX_FILE_SIZE_MB}MB limit.`);
@@ -109,6 +110,8 @@ const isUploading = computed(() => {
 
 const isSaving = ref(false);
 
+const isDragging = ref(false);
+
 async function save() {
   isSaving.value = true;
   customerUtils.uploadDocument(props.documentCategory, props.documentType, files.value.map((file) => file.path)).then((response) => {
@@ -127,8 +130,13 @@ async function save() {
     <p class="text-sm text-gray-500 mb-4">Please upload clear images of your <span class="text-brand-700">{{ documentType.title }}</span>.</p>
 
     <div
-        class="border-2 border-dashed border-gray-300 p-6 text-center cursor-pointer rounded-xl hover:border-gray-400 transition-all"
-        @dragover.prevent @drop="handleDrop" @click="$refs.fileInput.click()">
+        :class="{
+      'border-purple-500 bg-purple-50': isDragging,
+      'border-gray-300 bg-white': !isDragging,
+    }"
+        class="border-2 border-dashed p-6 text-center cursor-pointer rounded-xl hover:border-gray-400 transition-all"
+        @dragover.prevent="isDragging = true"
+        @dragleave.prevent="isDragging = false" @drop="handleDrop" @click="$refs.fileInput.click()">
       <input ref="fileInput" type="file" multiple class="hidden" @change="handleFileSelect" />
       <ArrowUpTrayIcon class="mx-auto h-10 w-10 text-gray-500" />
       <p class="text-gray-600 mt-2">Drag & drop files here, or click to browse</p>
