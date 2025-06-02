@@ -13,6 +13,7 @@ import RecipientType from "@/enums/recipient_type.js";
 import {useResourceUtils} from "@/composables/resource_utils.js";
 import Relationship from "@/models/relationship.js";
 import TransactionQuote from "@/models/transaction_quote.js";
+import QuoteTarget from "@/models/quote_target.js";
 
 const isLoading = ref(true);
 const quoteUtils = useQuoteUtils();
@@ -115,8 +116,9 @@ onMounted(async () => {
     send({ type: "PROCEED" })
     await updatePayoutMethod(props.quote.payoutMethod);
   } else {
-    await quoteUtils.getQuote();
-    targets.value = quoteUtils.quote.data.targets;
+    await payoutChannelUtils.getTargets().then((response) => {
+      targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
+    });
     if (targets.value.length === 1) {
       await updateRecipientTarget(targets.value[0]);
     } else {
