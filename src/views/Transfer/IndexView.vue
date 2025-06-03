@@ -136,6 +136,8 @@ const confirmQuote = async () => {
         isStepProcessing.value = false;
         await send({ type: 'POI_INFO_CHECK_FAILED' });
       }
+    } else if (error.response.status === 422) {
+      isStepProcessing.value = false;
     }
   }
 }
