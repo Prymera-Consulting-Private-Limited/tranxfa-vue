@@ -46,6 +46,15 @@ onMounted(async () => {
         props.transaction.payment.sharedReference = e.shared_reference;
         if (props.transaction.payment.state.code === PaymentState.PENDING) {
           clearPullInterval();
+        } else if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
+          setTimeout(() => {
+            router.push({
+              name: 'viewTransaction',
+              params: {
+                transactionId: props.transaction.id
+              }
+            });
+          }, 1500)
         }
       });
   if (props.transaction.payment.state.code !== PaymentState.PENDING) {
