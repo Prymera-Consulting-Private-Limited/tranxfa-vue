@@ -20,7 +20,7 @@ import {useCustomerStore} from "@/stores/customer.js";
 import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {Dialog, DialogPanel, RadioGroup, RadioGroupOption, TransitionChild, TransitionRoot} from '@headlessui/vue'
-import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon} from '@heroicons/vue/20/solid'
+import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon, ExclamationTriangleIcon} from '@heroicons/vue/20/solid'
 import {createPopper} from "@popperjs/core";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
 import QuotePendingDocument from "@/models/quote_pending_document.js";
@@ -112,7 +112,10 @@ const recipientAddedOnQuote = async (recipient)  => {
   send({ type: 'PROCEED' });
 }
 
+const preconditionFailedMessage = ref('');
+
 const confirmQuote = async () => {
+  preconditionFailedMessage.value = '';
   try {
     const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value);
     const transaction = response.data;
@@ -135,6 +138,9 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "poi_info_check_failed") {
         isStepProcessing.value = false;
         await send({ type: 'POI_INFO_CHECK_FAILED' });
+      } else if (error.response.data.type === "duplicate_transaction") {
+        isStepProcessing.value = false;
+        preconditionFailedMessage.value = error.response.data.message;
       }
     } else if (error.response.status === 422) {
       isStepProcessing.value = false;
@@ -298,6 +304,18 @@ watch(snapshot, () => {
                     <span class="sr-only">Loading...</span>
                   </div>
                   <template v-else>
+                    <div v-if="preconditionFailedMessage.value?.length > 0" class="border-l-4 border-yellow-400 bg-yellow-50 p-4 mb-5">
+                      <div class="flex">
+                        <div class="shrink-0">
+                          <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+                        </div>
+                        <div class="ml-3">
+                          <p class="text-sm text-yellow-700">
+                            {{ preconditionFailedMessage }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                     <AddRecipientWizard
                         v-if="snapshot.value === 'addRecipient'"
                         v-bind:externalSaveTrigger="isStepProcessing"
