@@ -304,7 +304,7 @@ watch(snapshot, () => {
                     <span class="sr-only">Loading...</span>
                   </div>
                   <template v-else>
-                    <div v-if="preconditionFailedMessage.value?.length > 0" class="border-l-4 border-yellow-400 bg-yellow-50 p-4 mb-5">
+                    <div v-if="preconditionFailedMessage" class="border-l-4 border-yellow-400 bg-yellow-50 p-4 mb-5">
                       <div class="flex">
                         <div class="shrink-0">
                           <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
