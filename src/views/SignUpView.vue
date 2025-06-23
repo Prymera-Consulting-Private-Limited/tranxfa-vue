@@ -207,7 +207,7 @@ async function register() {
               <!-- Checkbox -->
               <div class="flex items-center space-x-2">
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
-                <label for="terms" class="text-sm text-gray-700">I agree to <a href="#" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy & terms of service.</a></label>
+                <label for="terms" class="text-sm text-gray-700">I agree to <a href="https://www.tranxfa.ca/privacy_policy.html" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy</a> & <a href="https://www.tranxfa.ca/user-agreement.html" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">terms of service</a>.</label>
               </div>
 
               <!-- Submit Button -->
