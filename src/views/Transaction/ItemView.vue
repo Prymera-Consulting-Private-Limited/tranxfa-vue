@@ -9,11 +9,17 @@ import {
   CreditCardIcon,
   PlusCircleIcon,
   CalculatorIcon,
+  ArrowUpTrayIcon
 } from '@heroicons/vue/24/outline'
 import moment from "moment";
 import TransactionStateIcon from "@/enums/transaction_state_icon.js";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import PaymentState from "@/enums/payment_state.js";
+import TransactionState from "@/enums/transaction_state.js";
+import router from "@/router/index.js";
+import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import ManualPayment from "@/components/Payment/ManualPayment.vue";
+import PagaPayment from "@/components/Payment/PagaPayment.vue";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
@@ -27,6 +33,9 @@ const props = defineProps({
 
 const isLoading = ref(false);
 
+/**
+ * @type {Reactive<{data: Transaction|null}>}
+ */
 const transaction = reactive({
   data: null
 });
@@ -51,6 +60,7 @@ onUnmounted(async () => {
   Echo.leaveChannel(`client-transaction.${transaction.data.id}`);
 })
 
+const isShowPaymentAccountModalOpen = ref(false);
 </script>
 
 <template>
@@ -92,7 +102,38 @@ onUnmounted(async () => {
           <!-- Invoice -->
           <div class="-mx-4 px-4 py-8 print:px-0 print:py-4 print:ring-0 print:shadow-none ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20">
             <h2 class="text-base font-semibold text-gray-900">Transaction #{{ transaction.data.transactionNumber }}</h2>
-            <div class="col-span-2">
+            <div v-if="transaction.data.state.code === TransactionState['PENDING-PAYMENT'] && transaction.data.payment.clientPaymentAccount">
+              <div :style="{
+                 backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
+                 borderColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 400),
+               }" class="border-l-4 border-1 rounded-md mt-4 p-4">
+                <div class="flex">
+                  <div class="shrink-0">
+                    <component :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                       }" :is="TransactionStateIcon[transaction.data.state.code]" class="size-5 mt-1" />
+                  </div>
+                  <div class="ml-3">
+                    <p v-if="transaction.data.payment.customerConfirmedPayment" :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                       }" class="text-sm leading-6">
+                      {{ transaction.data.payment.clientPaymentAccount.waitTimeMessage }}
+                    </p>
+                    <p v-else :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                       }" class="text-sm leading-6">
+                      {{ transaction.data.state.description }}
+                    </p>
+                    <div :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                       }" class="text-sm leading-6 mt-2">
+                      <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm hover:underline">View Our {{ transaction.data.payment.paymentMethod.title }} Account</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="col-span-2">
               <div  :style="{
                  backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
                  borderColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 400),
@@ -113,6 +154,23 @@ onUnmounted(async () => {
                 </div>
               </div>
             </div>
+            <div v-if="transaction.data.pendingDocuments.length > 0 && (transaction.data.state.code === TransactionState['DOCUMENT-REQUIRED'] || transaction.data.state.code === TransactionState['ADDITIONAL-DOCUMENT-REQUIRED'])">
+              <ul role="list" class="mt-4 grid grid-cols-1 gap-5">
+                <template v-for="document in transaction.data.pendingDocuments" :key="document.id">
+                  <li @click="router.push({name: 'categoryView', params: {category: document.documentCategory.id}, query: {'_rtr': 'viewTransaction', '_rti': transaction.data.id}})" class="col-span-1 flex rounded-md shadow-xs cursor-pointer">
+                    <div class="flex flex-1 items-center justify-between rounded-l-md rounded-r-md border border-yellow-200 bg-yellow-50">
+                      <div class="flex-1 px-4 py-2 text-sm">
+                        <p class="font-medium text-yellow-700">{{ document.documentCategory.title }}</p>
+                        <p class="text-yellow-600 leading-6">Upload your {{ document.documentCategory.title.toLowerCase() }} to process the transaction</p>
+                      </div>
+                      <div class="shrink-0 px-3 text-yellow-700">
+                        <ArrowUpTrayIcon class="size-5" aria-hidden="true" />
+                      </div>
+                    </div>
+                  </li>
+                </template>
+              </ul>
+            </div>
             <dl class="mt-6 grid grid-cols-1 text-sm/6 lg:grid-cols-2">
               <div class="sm:pr-4 col-span-2 sm:col-span-1">
                 <dt class="inline text-gray-500">Date</dt>
@@ -125,7 +183,7 @@ onUnmounted(async () => {
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
-                <dt class="font-semibold text-gray-900">Sending from <span class="text-blue-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
+                <dt class="font-semibold text-gray-900">Sending from <span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">You sent</span>
                   <span class="text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</span>
@@ -181,9 +239,9 @@ onUnmounted(async () => {
                 </div>
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                  <p v-if="false" class="mt-1 max-w-2xl text-sm text-gray-500">
                     <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
-                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
+                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
                     <span v-else class="text-sm font-medium">Paid</span>
                   </p>
                 </div>
@@ -198,37 +256,37 @@ onUnmounted(async () => {
                   <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
                   <dd class="text-base font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
-                <div class="flex-none px-6">
+                <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
                   <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
+                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
                   <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
                 </div>
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">
                     <span class="sr-only">Client</span>
-                    <RocketLaunchIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
+                    <RocketLaunchIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Fees</span>
-                    <PlusCircleIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
+                    <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Total</span>
-                    <CalculatorIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
+                    <CalculatorIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
                   <dt class="flex-none">
                     <span class="sr-only">Status</span>
-                    <CreditCardIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
+                    <CreditCardIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
                 </div>
@@ -242,4 +300,28 @@ onUnmounted(async () => {
       </div>
     </main>
   </CustomerLayout>
+  <TransitionRoot as="template" :show="isShowPaymentAccountModalOpen">
+    <Dialog class="relative z-10" @close="isShowPaymentAccountModalOpen = false">
+      <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+        <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+      </TransitionChild>
+      <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+            <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+              <button class="sr-only"></button>
+              <div class="p-8 sm:pb-6">
+                <div class="mt-3 text-center sm:mt-5">
+                  <div v-if="transaction" class="text-center">
+                    <ManualPayment v-if="transaction.data.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
+                    <PagaPayment v-else-if="transaction.data.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
+                  </div>
+                </div>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
 </template>

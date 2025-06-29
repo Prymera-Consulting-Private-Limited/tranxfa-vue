@@ -82,6 +82,15 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/payment/cb/:transactionId',
+      name: 'paymentCallback',
+      props: route => ({ id: route.params.transactionId }),
+      component: () => import('@/views/Transfer/PaymentCallbackView.vue'),
+      meta: {
+        title: 'Processing Payment',
+        description: '',
+      },
+    }, {
       path: '/transactions',
       name: 'transactions',
       component: () => import('@/views/Transaction/IndexView.vue'),

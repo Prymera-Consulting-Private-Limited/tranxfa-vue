@@ -4,6 +4,7 @@ import router from "@/router/index.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {usePasswordPolicyUtils} from "@/composables/password_policy_utils.js";
+import axios from "axios";
 
 const isLoading = ref(false);
 const showPassword = ref(false);
@@ -63,6 +64,7 @@ async function register() {
   formErrors.email = [];
   formErrors.password = [];
   formErrors.confirm_password = [];
+  await axios.get('/sanctum/csrf-cookie');
   customerUtils.register(form.email, form.password, form.confirm_password).then(() => {
     router.push({name: 'onboardingWorkflow'});
   }).catch((e) => {
@@ -97,7 +99,17 @@ async function register() {
           <img src="/images/backgrounds/signup.png" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-48 mb-4"></a>
+            <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5"></a>
+            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+              <i class="pi pi-times"></i>
+            </a>
+          </div>
+          <!-- Logo at Top Left (Desktop) -->
+          <!-- Cross Mark at Form Right Corner (Desktop) -->
+          <div class="hidden md:block  absolute top-4 right-4">
+            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 ">
+              <i class="pi pi-times"></i>
+            </a>
           </div>
         </div>
 
@@ -106,7 +118,7 @@ async function register() {
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-48 mb-4"></a>
+              <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5"></a>
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-2">
@@ -195,7 +207,7 @@ async function register() {
               <!-- Checkbox -->
               <div class="flex items-center space-x-2">
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
-                <label for="terms" class="text-sm text-gray-700">I agree to <a href="#" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy & terms of service.</a></label>
+                <label for="terms" class="text-sm text-gray-700">I agree to <a href="https://www.tranxfa.ca/privacy_policy.html" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy</a> & <a href="https://www.tranxfa.ca/user-agreement.html" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">terms of service</a>.</label>
               </div>
 
               <!-- Submit Button -->

@@ -2,6 +2,7 @@
 import CustomerAttribute from "@/models/customer_attribute.js";
 import vSelect from 'vue-select';
 import {computed, h, ref, watchEffect} from "vue";
+import {createPopper} from "@popperjs/core";
 
 const props = defineProps({
   attr: {
@@ -51,10 +52,40 @@ const otherOccupationError = computed(() => {
   return null;
 })
 
+function withPopper(dropdownList, component, { width }) {
+  dropdownList.style.width = width;
+  const popper = createPopper(component.$refs.toggle, dropdownList, {
+    placement: 'bottom-start',
+    modifiers: [
+      {
+        name: 'flip',
+        options: {
+          fallbackPlacements: ['top-start'],
+        },
+      },
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 0],
+        },
+      },
+      {
+        name: 'toggleClass',
+        enabled: true,
+        phase: 'write',
+        fn({ state }) {
+          component.$el.classList.toggle('drop-up', state.placement.startsWith('top'));
+        },
+      },
+    ],
+  });
+
+  return () => popper.destroy();
+}
 </script>
 
 <template>
-  <v-select v-model="selectedOccupation" append-to-body :options="occupations" :placeholder="`Please select`" key-by="id" :label="attr.label">
+  <v-select v-model="selectedOccupation" append-to-body :calculate-position="withPopper" :options="occupations" :placeholder="`Please select`" key-by="id" :label="attr.label">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
       <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>

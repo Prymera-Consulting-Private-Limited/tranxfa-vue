@@ -1,12 +1,13 @@
 <script setup>
 import snsWebSdk from '@sumsub/websdk';
 import {onMounted, ref} from "vue";
-import router from "@/router/index.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
+import {useCustomerStore} from "@/stores/customer.js";
 
 const customerUtils = useCustomerUtils();
+const customerStore = useCustomerStore();
 
 const props = defineProps({
   documentCategory: {
@@ -45,6 +46,7 @@ async function launchSumsubWebSdk(accessToken) {
       .withConf({
         lang: "en",
         theme: "dark" | "light",
+        country: customerStore.customer.data?.country?.iso3Alpha,
       })
       .withOptions({ addViewportTag: false, adaptIframeHeight: true })
       // see below what kind of messages WebSDK generates
@@ -59,7 +61,9 @@ async function launchSumsubWebSdk(accessToken) {
         emit('sdkInitialized');
       })
       .on("idCheck.onApplicantStatusChanged", (payload) => {
-        emit('sdkApplicantStatusChanged', payload);
+        if (payload.reviewStatus === 'completed' && payload?.reviewResult?.reviewAnswer === 'GREEN') {
+          emit('sdkApplicantStatusChanged', payload);
+        }
       })
       .build();
 

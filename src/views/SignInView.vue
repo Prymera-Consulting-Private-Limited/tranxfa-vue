@@ -3,6 +3,7 @@ import {reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import axios from "axios";
 
 const showPassword = ref(false);
 const customerUtils = useCustomerUtils();
@@ -17,6 +18,7 @@ const loginError = ref(null);
 async function login() {
   isLoading.value = true;
   loginError.value = null;
+  await axios.get('/sanctum/csrf-cookie');
   await customerUtils.login(form.email, form.password).then(() => {
     if (customerStore.customer.data?.account?.isEmailVerified && customerStore.customer.data?.session?.mfaMethod !== null) {
       router.push({name: 'multiFactorAuth'});
@@ -41,7 +43,15 @@ async function login() {
           <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-48 mb-4"></a>
+            <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5"></a>
+            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+              <i class="pi pi-times"></i>
+            </a>
+          </div>
+          <div class="hidden md:block  absolute top-4 right-4">
+            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+              <i class="pi pi-times"></i>
+            </a>
           </div>
         </div>
 
@@ -50,7 +60,7 @@ async function login() {
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-48 mb-4"></a>
+              <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5 -ml-2"></a>
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-2">Love to see you again</h2>
@@ -115,7 +125,7 @@ async function login() {
               <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
-                Don’t have an account? <router-link :to="{name: 'signUp'}" class="text-blue-700 hover:text-blue-700 hover:underline">Sign up instead</router-link>
+                Don’t have an account? <router-link :to="{name: 'signUp'}" class="text-brand-700 hover:text-brand-700 hover:underline">Sign up instead</router-link>
               </p>
             </form>
           </div>

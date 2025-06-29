@@ -1,6 +1,6 @@
 <script setup>
 import TargetSelection from "@/components/Recipient/TargetSelection.vue";
-import {onMounted, reactive, ref, watch} from "vue";
+import {onMounted, reactive, ref, watch, watchEffect} from "vue";
 import Spinner from "@/components/Spinner.vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
 import {addRecipientNavigationMachine} from "@/machines/add_recipient_navigation_machine.js";
@@ -13,6 +13,7 @@ import RecipientType from "@/enums/recipient_type.js";
 import {useResourceUtils} from "@/composables/resource_utils.js";
 import Relationship from "@/models/relationship.js";
 import TransactionQuote from "@/models/transaction_quote.js";
+import QuoteTarget from "@/models/quote_target.js";
 
 const isLoading = ref(true);
 const quoteUtils = useQuoteUtils();
@@ -115,8 +116,9 @@ onMounted(async () => {
     send({ type: "PROCEED" })
     await updatePayoutMethod(props.quote.payoutMethod);
   } else {
-    await quoteUtils.getQuote();
-    targets.value = quoteUtils.quote.data.targets;
+    await payoutChannelUtils.getTargets().then((response) => {
+      targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
+    });
     if (targets.value.length === 1) {
       await updateRecipientTarget(targets.value[0]);
     } else {
@@ -139,9 +141,15 @@ const saveRecipientFailed = (error) => {
   emit('recipient:add:failed', error);
 }
 
-watch(isLoading, (newValue) => {
-  emit('recipient:add:loadingStateUpdated', newValue);
-});
+const isChildComponentLoading = ref(false);
+
+watchEffect(() => {
+  emit('recipient:add:loadingStateUpdated', isLoading.value || isChildComponentLoading.value || false);
+})
+
+function updateChildComponentLoadingState(newState) {
+  isChildComponentLoading.value = newState;
+}
 
 </script>
 
@@ -154,7 +162,7 @@ watch(isLoading, (newValue) => {
     <template v-else>
       <template v-if="snapshot?.value === 'addRecipientForm'">
         <h4 class="text-base text-gray-800 font-semibold">Recipient Details</h4>
-        <p class="mt-1 text-sm text-gray-700 mb-5">For receiving <span class="text-blue-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span> in <span class="text-blue-700 font-semibold">{{ recipient.country?.commonName }}</span> using <span class="text-blue-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></p>
+        <p class="mt-1 text-sm text-gray-700 mb-5">For receiving <span class="text-brand-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span> in <span class="text-brand-700 font-semibold">{{ recipient.country?.commonName }}</span> using <span class="text-brand-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></p>
         <AttributeCollection
             v-bind:country="recipient.country"
             v-bind:currency="recipient.currency"
@@ -166,6 +174,7 @@ watch(isLoading, (newValue) => {
             v-bind:quote="props.quote"
             v-on:recipient:added="recipientAdded"
             v-on:recipient:add:failed="saveRecipientFailed"
+            v-on:recipient:add:loadingStateUpdated="updateChildComponentLoadingState"
         />
       </template>
       <template v-else-if="snapshot?.value === 'recipientTypeSelection'">

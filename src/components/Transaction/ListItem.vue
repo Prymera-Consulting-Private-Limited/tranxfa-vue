@@ -29,7 +29,7 @@ const props = defineProps({
        }" :is="TransactionStateIcon[transaction.state.code]" class="size-6" />
     </span>
     <div class="min-w-0 flex-auto">
-      <div class="text-sm/6 font-semibold text-gray-900">{{ transaction.localAmountCurrencyPrefixed }} to <span class="text-blue-700">{{ transaction.recipient.wholeName }}</span></div>
+      <div class="text-sm/6 font-semibold text-gray-900">{{ transaction.localAmountCurrencyPrefixed }} to <span class="text-brand-700">{{ transaction.recipient.wholeName }}</span></div>
       <div class="text-xs/5 text-gray-800 flex justify-start items-center gap-x-1.5">
         Sent {{ transaction.foreignAmountCurrencyPrefixed }} via {{ transaction.payoutMethod.title }}
         <span class="flex justify-center items-center text-xs/5 text-gray-500">

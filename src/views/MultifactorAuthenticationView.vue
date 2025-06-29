@@ -97,7 +97,7 @@ onMounted(async () => {
     <div v-show="! isLoading || isVerifying" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
       <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto mx-auto max-w-sm"></a>
+        <a href="javascript:" class="mx-auto"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5 mx-auto"></a>
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">More authentication needed</h2>

@@ -3,6 +3,7 @@ import CustomerAttribute from "@/models/customer_attribute.js";
 import vSelect from 'vue-select';
 import {h, onMounted, ref, watch} from "vue";
 import FlagIcon from 'vue3-flag-icons'
+import {createPopper} from "@popperjs/core";
 
 const props = defineProps({
   attr: CustomerAttribute,
@@ -60,10 +61,41 @@ onMounted(() => {
     selectedCountry.value = props.model;
   }
 });
+
+function withPopper(dropdownList, component, { width }) {
+  dropdownList.style.width = width;
+  const popper = createPopper(component.$refs.toggle, dropdownList, {
+    placement: 'bottom-start',
+    modifiers: [
+      {
+        name: 'flip',
+        options: {
+          fallbackPlacements: ['top-start'],
+        },
+      },
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 0],
+        },
+      },
+      {
+        name: 'toggleClass',
+        enabled: true,
+        phase: 'write',
+        fn({ state }) {
+          component.$el.classList.toggle('drop-up', state.placement.startsWith('top'));
+        },
+      },
+    ],
+  });
+
+  return () => popper.destroy();
+}
 </script>
 
 <template>
-  <v-select v-model="selectedCountry" append-to-body :options="countries" :placeholder="`Please select`" key-by="id" label="demonym">
+  <v-select v-model="selectedCountry" append-to-body :calculate-position="withPopper" :options="countries" :placeholder="`Please select`" key-by="id" label="demonym">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
       <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>

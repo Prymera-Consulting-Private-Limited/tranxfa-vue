@@ -2,6 +2,7 @@ import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentMethod from "@/models/payment_method.js";
 import PaymentProvider from "@/models/payment_provider.js";
 import PaymentAccount from "@/models/payment_account.js";
+import ClientPaymentAccount from "@/models/client_payment_account.js";
 
 class PaymentTransaction {
     /**
@@ -13,6 +14,16 @@ class PaymentTransaction {
      * @type {Object|null}
      */
     paymentAccount = null;
+
+    /**
+     * @type {ClientPaymentAccount|null}
+     */
+    clientPaymentAccount = null;
+
+    /**
+     * @type {Boolean|null}
+     */
+    customerConfirmedPayment = null;
 
     /**
      * @type {Object|null}
@@ -74,8 +85,12 @@ class PaymentTransaction {
         paymentTransaction.totalPaymentAmountCurrencyPrefixed = data.total_payment_amount_currency_prefixed;
         paymentTransaction.createdAt = data.created_at;
         paymentTransaction.updatedAt = data.updated_at;
+        paymentTransaction.customerConfirmedPayment = data.customer_confirmed_payment;
         if (data.state) {
             paymentTransaction.state = PaymentTransactionState.getInstance(data.state);
+        }
+        if (data.client_payment_account) {
+            paymentTransaction.clientPaymentAccount = ClientPaymentAccount.getInstance(data.client_payment_account);
         }
 
         return paymentTransaction;

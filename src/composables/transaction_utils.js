@@ -12,9 +12,14 @@ export function useTransactionUtils() {
         return axios.get(`/client/v1/transactions`);
     }
 
+    const iHaveMadePayment = async (id) => {
+        return axios.post(`/client/v1/transaction/payment-sent/${id}`);
+    }
+
     return {
         get,
         retryPayment,
         getTransaction,
+        iHaveMadePayment,
     }
 }

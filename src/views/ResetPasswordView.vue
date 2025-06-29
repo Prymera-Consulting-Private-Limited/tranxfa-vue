@@ -4,6 +4,7 @@ import router from "@/router/index.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {usePasswordPolicyUtils} from "@/composables/password_policy_utils.js";
+import axios from "axios";
 
 const isLoading = ref(false);
 const showPassword = ref(false);
@@ -66,6 +67,7 @@ async function resetPassword() {
   formErrors.password = [];
   formErrors.confirm_password = [];
   resetPasswordFailureMessage.value = '';
+  await axios.get('/sanctum/csrf-cookie');
   customerUtils.resetPassword(props.token, form.password, form.confirm_password).then(() => {
     router.push({name: 'signIn', query: {referer: "reset-password"}});
   }).catch((e) => {
@@ -100,7 +102,7 @@ async function resetPassword() {
           <img src="/images/backgrounds/signup.png" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo" class="w-auto max-w-sm"></a>
+            <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5"></a>
             <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
@@ -119,7 +121,7 @@ async function resetPassword() {
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo" class="w-auto max-w-sm"></a>
+              <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5"></a>
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-6">Reset Password</h2>

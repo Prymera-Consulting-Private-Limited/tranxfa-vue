@@ -94,9 +94,9 @@ const removeFile = () => {
 </script>
 
 <template>
-  <div class="relative w-full border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all hover:border-blue-500 hover:bg-blue-50 p-1"
+  <div class="relative w-full border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all hover:border-brand-500 hover:bg-brand-50 p-1"
        :class="{
-      'border-blue-500 bg-blue-50': isDragging,
+      'border-brand-500 bg-brand-50': isDragging,
       'border-gray-300 bg-white': !isDragging && !error,
       'border-red-500 bg-red-50': error,
       'px-6 py-4': !filePreview

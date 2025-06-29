@@ -59,8 +59,8 @@ onMounted(async () => {
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
-            <span class="sr-only">RemitSo</span>
-            <img class="h-8 w-auto" src="/images/logo.png" alt="RemitSo" />
+            <span class="sr-only">Tranxfa</span>
+            <img class="h-8 w-auto" src="/images/logo.png" alt="Tranxfa" />
           </a>
         </div>
 
@@ -105,7 +105,7 @@ onMounted(async () => {
           </PopoverButton>
         </div>
       </div>
-      <div class="hidden border-t border-blue-100/20 py-5 lg:block  print:hidden">
+      <div class="hidden border-t border-brand-100/20 py-5 lg:block  print:hidden">
         <div class="grid grid-cols-3 items-center gap-8">
           <div class="col-span-2">
             <nav class="flex space-x-4">
@@ -128,7 +128,7 @@ onMounted(async () => {
               <div class="pt-3 pb-2">
                 <div class="flex items-center justify-between px-4">
                   <div>
-                    <img class="h-8 w-auto" src="/images/logo.png" alt="RemitSo Inc" />
+                    <img class="h-8 w-auto" src="/images/logo.png" alt="Tranxfa Inc" />
                   </div>
                   <div class="-mr-2">
                     <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 outline-none focus:ring-0 focus:ring-brand-700 focus:outline-hidden focus:ring-inset">
