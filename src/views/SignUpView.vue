@@ -86,6 +86,10 @@ async function register() {
     isLoading.value = false;
   })
 }
+
+const userAgreementUrl = import.meta.env.VITE_USER_AGREEMENT_URL;
+const privacyPolicyUrl = import.meta.env.VITE_PRIVACY_POLICY_URL;
+const appUrl = import.meta.env.VITE_APP_URL;
 </script>
 
 <template>
@@ -100,14 +104,14 @@ async function register() {
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5"></a>
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
           <!-- Logo at Top Left (Desktop) -->
           <!-- Cross Mark at Form Right Corner (Desktop) -->
           <div class="hidden md:block  absolute top-4 right-4">
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 ">
+            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 ">
               <i class="pi pi-times"></i>
             </a>
           </div>
@@ -207,7 +211,7 @@ async function register() {
               <!-- Checkbox -->
               <div class="flex items-center space-x-2">
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
-                <label for="terms" class="text-sm text-gray-700">I agree to <a href="https://www.tranxfa.ca/privacy_policy.html" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy</a> & <a href="https://www.tranxfa.ca/user-agreement.html" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">terms of service</a>.</label>
+                <label for="terms" class="text-sm text-gray-700">I agree to <a :href="privacyPolicyUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy</a> & <a :href="userAgreementUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">terms of service</a>.</label>
               </div>
 
               <!-- Submit Button -->
