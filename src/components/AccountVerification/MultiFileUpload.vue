@@ -131,7 +131,7 @@ async function save() {
 
     <div
         :class="{
-      'border-purple-500 bg-purple-50': isDragging,
+      'border-brand-500 bg-brand-50': isDragging,
       'border-gray-300 bg-white': !isDragging,
     }"
         class="border-2 border-dashed p-6 text-center cursor-pointer rounded-xl hover:border-gray-400 transition-all"

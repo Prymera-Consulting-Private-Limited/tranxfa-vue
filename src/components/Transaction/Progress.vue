@@ -131,14 +131,14 @@ const stepCommandExecuted = async (e) => {
     <p class="text-sm font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
     <ol role="list" class="flex items-center space-x-5">
       <li v-for="step in progress" :key="step.name">
-        <a v-if="step.status === 'complete'" @click="stepCommandExecuted(step.stepCommand)" class="block size-2.5 rounded-full bg-purple-600 hover:bg-purple-900">
+        <a v-if="step.status === 'complete'" @click="stepCommandExecuted(step.stepCommand)" class="block size-2.5 rounded-full bg-brand-600 hover:bg-brand-900">
           <span class="sr-only">{{ step.name }}</span>
         </a>
         <a v-else-if="step.status === 'current'" class="relative flex items-center justify-center" aria-current="step">
           <span class="absolute flex size-5 p-px" aria-hidden="true">
-            <span class="size-full rounded-full bg-purple-200" />
+            <span class="size-full rounded-full bg-brand-200" />
           </span>
-          <span class="relative block size-2.5 rounded-full bg-purple-600" aria-hidden="true" />
+          <span class="relative block size-2.5 rounded-full bg-brand-600" aria-hidden="true" />
           <span class="sr-only">{{ step.name }}</span>
         </a>
         <a v-else class="block size-2.5 rounded-full bg-gray-200 hover:bg-gray-400">
@@ -152,10 +152,10 @@ const stepCommandExecuted = async (e) => {
       <template v-for="(step, stepIdx) in progress" :key="step.id">
         <li :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
           <template v-if="step.status === 'complete'">
-            <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-purple-600" aria-hidden="true" />
+            <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-brand-600" aria-hidden="true" />
             <div @click="stepCommandExecuted(step.stepCommand)" class="group relative flex items-start cursor-pointer">
               <div class="flex h-9 items-center">
-                <div :class="{'bg-purple-600 group-hover:bg-purple-800' : stepIdx !== 0 || !quote}" class="relative z-10 flex size-8 items-center justify-center rounded-full">
+                <div :class="{'bg-brand-600 group-hover:bg-brand-800' : stepIdx !== 0 || !quote}" class="relative z-10 flex size-8 items-center justify-center rounded-full">
                   <FlagIcon v-if="stepIdx === 0 && quote" :code="quote.payoutCountry.iso2Alpha.toLowerCase()" circle size="30"  />
                   <CheckIcon v-else class="size-5 text-white" aria-hidden="true" />
                 </div>
@@ -170,12 +170,12 @@ const stepCommandExecuted = async (e) => {
             <div v-if="stepIdx !== progress.length - 1" class="absolute top-4 left-4 mt-0.5 -ml-px h-full w-0.5 bg-gray-300" aria-hidden="true" />
             <div class="group relative flex items-start" aria-current="step">
               <div class="flex h-9 items-center" aria-hidden="true">
-                <div class="relative z-10 flex size-8 items-center justify-center rounded-full border-2 border-purple-600 bg-white">
-                  <div class="size-2.5 rounded-full bg-purple-600" />
+                <div class="relative z-10 flex size-8 items-center justify-center rounded-full border-2 border-brand-600 bg-white">
+                  <div class="size-2.5 rounded-full bg-brand-600" />
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium text-purple-600 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
+                <div class="text-sm font-medium text-brand-600 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
                 <p class="text-sm text-gray-500"></p>
               </div>
             </div>

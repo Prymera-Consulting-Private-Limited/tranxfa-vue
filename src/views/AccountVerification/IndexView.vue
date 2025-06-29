@@ -96,7 +96,7 @@ onMounted(async () => {
                     <template  v-if="customer.data?.pendingDocuments.length > 0">
                       <li v-for="pendingCategory in customer.data?.pendingDocuments" :key="pendingCategory.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm">
                         <div class="flex flex-1 flex-col p-8">
-                          <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-purple-700" />
+                          <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-brand-700" />
                           <h3 class="mt-6 text-sm font-medium text-gray-900">{{ pendingCategory.title }}</h3>
                           <dl v-if="pendingCategory.description" class="mt-1 flex grow flex-col justify-between">
                             <dt class="sr-only">Information</dt>

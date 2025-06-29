@@ -80,7 +80,7 @@ async function requestResetPassword() {
               <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Send Reset Link</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
-                Changed mind? <router-link :to="{name: 'signIn'}" class="text-purple-700 hover:text-purple-700 hover:underline">Sign in instead</router-link>
+                Changed mind? <router-link :to="{name: 'signIn'}" class="text-brand-700 hover:text-brand-700 hover:underline">Sign in instead</router-link>
               </p>
             </form>
           </div>

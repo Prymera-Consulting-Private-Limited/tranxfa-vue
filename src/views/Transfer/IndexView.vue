@@ -342,7 +342,7 @@ watch(snapshot, () => {
                       <h3 class="text-gray-900 mb-4 font-semibold">Provide Your Address</h3>
                       <p class="text-gray-500 text-sm mb-3 -mt-2">
                         Please provide your full residential address in
-                        <span class="font-semibold text-purple-700">{{ customer.data?.country?.commonName }}</span>.
+                        <span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span>.
                       </p>
                       <p class="text-gray-500 text-sm mb-6 -mt-2 leading-5">
                         <span>Accurate address information is required to comply with financial regulations and ensure secure transfers.</span>
@@ -439,14 +439,14 @@ watch(snapshot, () => {
                       <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
-                          <div :class="[(active || checked) ? 'border-purple-600 ring-1 ring-purple-600 bg-purple-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
+                          <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
                           <span class="flex flex-1">
                             <span class="flex flex-col">
                               <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
                               <!--<span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
-                            <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-purple-600', 'size-5']" aria-hidden="true" />
+                            <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-brand-600', 'size-5']" aria-hidden="true" />
                           </div>
                         </RadioGroupOption>
                       </RadioGroup>
@@ -496,7 +496,7 @@ watch(snapshot, () => {
                           <li @click="stepCommandExecuted('UPLOAD_ANOTHER_POI')" :class="isApplyingInfoFromPoiDocument ? '' : 'cursor-pointer'">
                             <div class="group relative flex items-start space-x-3 py-4">
                               <div class="shrink-0">
-                                <span :class="['inline-flex size-10 items-center justify-center rounded-lg bg-purple-600 mt-1']">
+                                <span :class="['inline-flex size-10 items-center justify-center rounded-lg bg-brand-600 mt-1']">
                                   <ArrowUpTrayIcon class="size-6 text-white" aria-hidden="true" />
                                 </span>
                               </div>
@@ -519,7 +519,7 @@ watch(snapshot, () => {
                           <li @click="applyInfoFromPoiDocument" :class="isApplyingInfoFromPoiDocument ? 'bg-gray-100' : 'cursor-pointer'">
                             <div class="group relative flex items-start space-x-3 py-4">
                               <div class="shrink-0">
-                                <span :class="['inline-flex size-10 items-center justify-center rounded-lg bg-purple-600 mt-1']">
+                                <span :class="['inline-flex size-10 items-center justify-center rounded-lg bg-brand-600 mt-1']">
                                   <IdentificationIcon class="size-6 text-white" aria-hidden="true" />
                                 </span>
                               </div>

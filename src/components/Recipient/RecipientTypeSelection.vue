@@ -55,8 +55,8 @@ const emit = defineEmits([
       </div>
       <div class="flow-root" v-if="payoutChannel.configuration.recipientType === RecipientType.BUSINESS || payoutChannel.configuration.recipientType === null">
         <a href="javascript:" @click="emit('recipient:typeSelected', RecipientType.BUSINESS)" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-0 hover:bg-gray-50">
-          <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-purple-50">
-            <BuildingOfficeIcon class="size-6 text-purple-600" />
+          <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-brand-50">
+            <BuildingOfficeIcon class="size-6 text-brand-600" />
           </div>
           <div class="tracking-wider">
             <h3 class="text-sm font-medium text-gray-900">

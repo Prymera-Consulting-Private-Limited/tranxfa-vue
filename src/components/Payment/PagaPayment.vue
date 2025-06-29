@@ -103,9 +103,9 @@ const status = computed(() => {
         <UseClipboard v-slot="{ copy, copied }" :source="transaction.payment.totalPaymentAmountFormatted">
           <div class="mt-2 flex">
             <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
-              <input type="text" readonly :value="transaction.payment.totalPaymentAmountCurrencyPrefixed" :id="`payment-amount`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-purple-600 sm:text-sm/6" />
+              <input type="text" readonly :value="transaction.payment.totalPaymentAmountCurrencyPrefixed" :id="`payment-amount`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6" />
             </div>
-            <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-purple-600 cursor-pointer">
+            <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
               <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
             </button>
           </div>
@@ -113,9 +113,9 @@ const status = computed(() => {
         </UseClipboard>
       </div>
         <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
-          <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-purple-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600 cursor-pointer">I've made payment</button>
+          <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 cursor-pointer">I've made payment</button>
         </div>
-        <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-purple-700 font-semibold text-sm">
+        <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
           <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
         </div>
       </template>
@@ -132,7 +132,7 @@ const status = computed(() => {
     <Processing class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
     <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage }}</p>
-    <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-purple-700 font-semibold text-sm">
+    <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
     </div>
   </template>

@@ -183,7 +183,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
-                <dt class="font-semibold text-gray-900">Sending from <span class="text-purple-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
+                <dt class="font-semibold text-gray-900">Sending from <span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">You sent</span>
                   <span class="text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</span>
@@ -265,28 +265,28 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">
                     <span class="sr-only">Client</span>
-                    <RocketLaunchIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                    <RocketLaunchIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Fees</span>
-                    <PlusCircleIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                    <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Total</span>
-                    <CalculatorIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                    <CalculatorIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
                   <dt class="flex-none">
                     <span class="sr-only">Status</span>
-                    <CreditCardIcon class="h-6 w-5 text-purple-500" aria-hidden="true" />
+                    <CreditCardIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
                 </div>

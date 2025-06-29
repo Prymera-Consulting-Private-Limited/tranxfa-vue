@@ -309,7 +309,7 @@ function saveQuote() {
                                       <CheckIcon class="size-5" aria-hidden="true" />
                                     </span>
                                   </div>
-                                  <p :class="[active ? 'text-purple-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
+                                  <p :class="[active ? 'text-brand-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
                                 </div>
                               </li>
                             </ListboxOption>

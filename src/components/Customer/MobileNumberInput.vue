@@ -82,7 +82,7 @@ const editPersonalInformation = () => {
         </button>
       </form>
       <div class="text-center mt-12">
-        <a @click="editPersonalInformation" class="text-purple-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
+        <a @click="editPersonalInformation" class="text-brand-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
       </div>
     </div>
   </div>

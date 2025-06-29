@@ -105,7 +105,7 @@ onMounted(async () => {
           </PopoverButton>
         </div>
       </div>
-      <div class="hidden border-t border-purple-100/20 py-5 lg:block  print:hidden">
+      <div class="hidden border-t border-brand-100/20 py-5 lg:block  print:hidden">
         <div class="grid grid-cols-3 items-center gap-8">
           <div class="col-span-2">
             <nav class="flex space-x-4">
