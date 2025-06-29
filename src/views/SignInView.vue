@@ -33,6 +33,8 @@ async function login() {
     isLoading.value = false;
   })
 }
+
+const appUrl = import.meta.env.VITE_APP_URL;
 </script>
 <template>
   <main>
@@ -44,12 +46,12 @@ async function login() {
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5"></a>
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
           <div class="hidden md:block  absolute top-4 right-4">
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
