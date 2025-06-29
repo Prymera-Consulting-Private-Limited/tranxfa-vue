@@ -98,6 +98,11 @@ export class Customer {
      */
     pendingDocuments = [];
 
+    /**
+     * @type {string|null}
+     */
+    poiNameCheck = null;
+
     identityInformationRequired () {
         if (this.country === null) {
             return true;
@@ -133,6 +138,7 @@ export class Customer {
         customer.uniqueIdentityNumber = data.unique_identity_number;
         customer.createdAt = data.created_at;
         customer.updatedAt = data.updated_at;
+        customer.poiNameCheck = data.poi_name_check;
         if (data.account) {
             customer.account = Account.getInstance(data.account);
         }

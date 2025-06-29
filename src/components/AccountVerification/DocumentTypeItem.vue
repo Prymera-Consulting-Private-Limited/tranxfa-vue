@@ -42,7 +42,7 @@ async function sdkFinalStateReached () {
 
 <template>
   <div class="flex flex-1 flex-col p-8">
-    <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-blue-700" />
+    <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-brand-700" />
     <h3 class="mt-6 text-sm font-medium text-gray-900">{{ documentType.title }}</h3>
     <dl v-if="documentType.description" class="mt-1 flex grow flex-col justify-between">
       <dt class="sr-only">Information</dt>

@@ -63,8 +63,8 @@ const editPersonalInformation = () => {
       <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
     </div>
     <div v-show="! showLoading || isSaving" class="w-full max-w-xl">
-      <div class="hidden md:block">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="w-auto max-w-48 mb-4"></a>
+      <div class="hidden md:block flex items-center justify-center w-full">
+        <a href="javascript:"><img src="/images/logo.png" alt="Tranxfa Logo" class="max-w-64 max-h-10 mb-5"></a>
       </div>
       <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Enter Your Mobile Number</h2>
       <p class="text-md text-gray-900 mb-8 text-left">Please provide your mobile number to continue.</p>
@@ -82,7 +82,7 @@ const editPersonalInformation = () => {
         </button>
       </form>
       <div class="text-center mt-12">
-        <a @click="editPersonalInformation" class="text-blue-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
+        <a @click="editPersonalInformation" class="text-brand-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
       </div>
     </div>
   </div>

@@ -46,7 +46,7 @@ const maskaOptions = reactive({
 const unmaskedValue = ref(null);
 
 const onMaska = (event) => {
-  unmaskedValue.value = event.detail.unmasked < Math.pow(10, props.currency.decimalPlaces) ? event.detail.unmasked * Math.pow(10, props.currency.decimalPlaces) : event.detail.unmasked;
+  unmaskedValue.value = event.detail.unmasked;
 }
 
 const amountModel = computed({
@@ -83,7 +83,7 @@ function amountUpdated() {
           <MenuItems v-if="options.length > 1 && !disableSelection" class="absolute right-0 mt-2 w-86 origin-top-right divide-y divide-gray-300 rounded-md bg-gray-50 shadow-lg ring-1 ring-black/5 focus:outline-none z-99">
             <MenuItem as="div" v-for="(option, index) in options" v-slot="{ active }">
               <button @click="selectOption(option)" :class="[
-                active ? 'text-blue-900' : 'text-gray-900',
+                active ? 'text-brand-900' : 'text-gray-900',
                 'group flex w-full items-center px-4 py-4 text-sm tracking-wider gap-x-2 cursor-pointer',
                 index === 0 ? 'rounded-t-md' : '',
                 index === options.length - 1 ? 'rounded-b-md' : ''

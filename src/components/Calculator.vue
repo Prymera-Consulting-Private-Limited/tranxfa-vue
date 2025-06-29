@@ -70,6 +70,9 @@ async function getQuote() {
     query.payoutCurrency = quoteUtil.quote.data?.payoutCurrency;
     query.payoutMethod = quoteUtil.quote.data?.payoutMethod;
     query.payoutCompany = quoteUtil.quote.data?.payoutCompany;
+    if (quoteUtil.quote.data.alerts?.send_amount) {
+      quoteErrors.payment.push(quoteUtil.quote.data.alerts.send_amount);
+    }
   }).catch((e) => {
     if (e.response.status === 422) {
       const errors = e.response.data.errors;
@@ -82,6 +85,10 @@ async function getQuote() {
           for (const error of errors.amount) {
             quoteErrors.payout.push(error);
           }
+        }
+      } else if (errors?.send_amount?.length > 0) {
+        for (const error of errors.send_amount) {
+          quoteErrors.payment.push(error);
         }
       }
     } else {
@@ -302,7 +309,7 @@ function saveQuote() {
                                       <CheckIcon class="size-5" aria-hidden="true" />
                                     </span>
                                   </div>
-                                  <p :class="[active ? 'text-blue-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
+                                  <p :class="[active ? 'text-brand-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
                                 </div>
                               </li>
                             </ListboxOption>

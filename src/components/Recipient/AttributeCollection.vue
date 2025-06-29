@@ -9,7 +9,7 @@ import MobileNumberInput from "@/components/Recipient/Attribute/MobileNumberInpu
 import EmailInput from "@/components/Recipient/Attribute/EmailInput.vue";
 import AccountNumberInput from "@/components/Recipient/Attribute/AccountNumberInput.vue";
 import PhoneNumberInput from "@/components/Recipient/Attribute/PhoneNumberInput.vue";
-import {computed, reactive, ref, watchEffect} from "vue";
+import {computed, reactive, ref, watch, watchEffect} from "vue";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 import Relationship from "@/models/relationship.js";
 import RelationshipInput from "@/components/Recipient/Attribute/RelationshipInput.vue";
@@ -20,7 +20,6 @@ import TransactionQuote from "@/models/transaction_quote.js";
 import NameInput from "@/components/Recipient/Attribute/NameInput.vue";
 import SecondNameInput from "@/components/Recipient/Attribute/SecondNameInput.vue";
 import ThirdNameInput from "@/components/Recipient/Attribute/ThirdNameInput.vue";
-import { debounce } from 'lodash'
 
 const props = defineProps({
   country: {
@@ -118,6 +117,49 @@ async function updateRelationship(relationship) {
   input.data.relationship_id = relationship.id;
 }
 
+async function updateRecipientInput(updated, attribute) {
+  if (attribute.type === RecipientDataType.DELIVERY_OPTION) {
+    input.data[attribute.attribute] = updated.id;
+  } else {
+    input.data[attribute.attribute] = updated;
+  }
+}
+
+const isSaving = ref(false);
+
+const recipientUtils = useRecipientUtils();
+
+const emit = defineEmits([
+    'recipient:added',
+    'recipient:add:failed',
+    'recipient:add:loadingStateUpdated',
+]);
+
+async function addRecipient() {
+  isSaving.value = true;
+  Object.entries(errors).forEach(([key]) => {
+    errors[key] = [];
+  });
+  await recipientUtils.add(props.payoutChannel, input.data, props.quote).then((response) => {
+    const recipient = Recipient.getInstance(response.data);
+    emit('recipient:added', recipient);
+  }).catch((e) => {
+    if (e.status === 422) {
+      for (const [key, value] of Object.entries(e.response.data.errors)) {
+        errors[key] = value;
+      }
+    } else {
+      console.error(e)
+      isSaving.value = false;
+      throw e;
+    }
+    emit('recipient:add:failed');
+  }).finally(() => {
+    isSaving.value = false;
+  });
+}
+
+const isLookingUp = ref(false);
 const nameLookup = computed(() => {
   if (props.payoutChannel.configuration?.nameLookupRequirements?.length > 0) {
     return {
@@ -154,49 +196,6 @@ const nameLookup = computed(() => {
   return [];
 });
 
-async function updateRecipientInput(updated, attribute) {
-  if (attribute.type === RecipientDataType.DELIVERY_OPTION) {
-    input.data[attribute.attribute] = updated.id;
-  } else {
-    input.data[attribute.attribute] = updated;
-  }
-}
-
-const isSaving = ref(false);
-
-const recipientUtils = useRecipientUtils();
-
-const emit = defineEmits([
-    'recipient:added',
-    'recipient:add:failed',
-]);
-
-async function addRecipient() {
-  isSaving.value = true;
-  Object.entries(errors).forEach(([key]) => {
-    errors[key] = [];
-  });
-  await recipientUtils.add(props.payoutChannel, input.data, props.quote).then((response) => {
-    const recipient = Recipient.getInstance(response.data);
-    emit('recipient:added', recipient);
-  }).catch((e) => {
-    if (e.status === 422) {
-      for (const [key, value] of Object.entries(e.response.data.errors)) {
-        errors[key] = value;
-      }
-    } else {
-      console.error(e)
-      isSaving.value = false;
-      throw e;
-    }
-    emit('recipient:add:failed');
-  }).finally(() => {
-    isSaving.value = false;
-  });
-}
-
-const isLookingUp = ref(false);
-
 const doLookup = () => {
   if (nameLookup.value.isValid) {
     isLookingUp.value = true;
@@ -224,10 +223,17 @@ watchEffect(() => {
   if (props.isSubmitted && props.quote && !isSaving.value) {
     addRecipient();
   }
-  if (nameLookup.value.isValid) {
+});
+
+watch(nameLookup, function (newValue) {
+  if (newValue.isValid) {
     doLookup();
   }
 });
+
+watchEffect(() => {
+  emit('recipient:add:loadingStateUpdated', isSaving.value || isLookingUp.value || false);
+})
 </script>
 
 <template>

@@ -31,13 +31,8 @@ const getTransaction = async () => {
   transactionUtils.getTransaction(props.transaction.id).then((response) => {
     const transaction = Transaction.getInstance(response.data);
     props.transaction.payment = transaction.payment;
-    if (props.transaction.payment.state.code === PaymentState.PENDING) {
-      clearPullInterval();
-    }
   });
 }
-
-let intervalId = null;
 
 onMounted(async () => {
   Echo.channel(`client-payment.${props.transaction.payment.id}`)
@@ -45,7 +40,7 @@ onMounted(async () => {
         props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
         props.transaction.payment.sharedReference = e.shared_reference;
         if (props.transaction.payment.state.code === PaymentState.PENDING) {
-          clearPullInterval();
+          getTransaction();
         } else if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
           setTimeout(() => {
             router.push({
@@ -57,25 +52,13 @@ onMounted(async () => {
           }, 1500)
         }
       });
-  if (props.transaction.payment.state.code !== PaymentState.PENDING) {
-    intervalId = setInterval(getTransaction, 5000);
-  }
 })
-
-const clearPullInterval = async () => {
-  if (intervalId) {
-    await clearInterval(intervalId);
-    intervalId = null;
-  }
-}
 
 onUnmounted(async () => {
   Echo.leaveChannel(`client-payment.${props.transaction.payment.id}`);
-  await clearPullInterval();
 })
 
 const iHaveMadePayment = async () => {
-  await clearPullInterval();
   props.transaction.payment.state.code = PaymentState.REDIRECTED;
   await transactionUtils.iHaveMadePayment(props.transaction.payment.id).then(() => {
     props.transaction.payment.customerConfirmedPayment = true;

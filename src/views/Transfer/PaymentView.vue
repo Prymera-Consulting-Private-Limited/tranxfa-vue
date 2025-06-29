@@ -7,6 +7,7 @@ import Transaction from "@/models/transaction.js";
 import PaymentTransaction from "@/models/payment_transaction.js";
 import router from "@/router/index.js";
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
+import PagaPayment from "@/components/Payment/PagaPayment.vue";
 import Volume from "@/components/Payment/Volume.vue";
 
 const transactionUtils = useTransactionUtils();
@@ -88,6 +89,7 @@ watch(canAttemptPayment, async () => {
                 <div class="mt-3 text-center sm:mt-5">
                   <div v-if="transaction" class="text-center">
                     <ManualPayment v-if="transaction.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction"  />
+                    <PagaPayment v-if="transaction.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction"  />
                     <Volume v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'VOLUME-PAYMENTS'" v-bind:transaction="transaction"  />
                   </div>
                 </div>

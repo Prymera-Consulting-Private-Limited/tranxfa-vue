@@ -124,6 +124,10 @@ export function useCustomerUtils() {
         });
     }
 
+    async function documentCategories() {
+        return axios.get(`/client/v1/document-categories`);
+    }
+
     async function uploadDocument(documentCategory, documentType, pages = []) {
         const data = {
             pages: pages,
@@ -169,8 +173,12 @@ export function useCustomerUtils() {
             confirm_password: confirmNewPassword,
         });
     }
+    async function applyInfoFromPoiDocument() {
+        return axios.post(`/client/v1/apply-info-from-poi`);
+    }
 
     return {
+        updateStore,
         register,
         login,
         mfa,
@@ -184,6 +192,7 @@ export function useCustomerUtils() {
         logout,
         getAccountVerificationToken,
         getLivelinessToken,
+        documentCategories,
         uploadDocument,
         tasks,
         devices,
@@ -191,5 +200,6 @@ export function useCustomerUtils() {
         changePassword,
         forgotPassword,
         resetPassword,
+        applyInfoFromPoiDocument,
     }
 }

@@ -5,6 +5,7 @@ import {
     DocumentCheckIcon, // DOCUMENT_PROVIDED, ADDITIONAL_DOCUMENT_PROVIDED
     ClipboardDocumentListIcon, // VERIFYING_DOCUMENT
     ClipboardDocumentCheckIcon, // DOCUMENT_VERIFIED
+    ShieldCheckIcon, // RISK_ASSESSMENT
     ArrowPathIcon, // CONVERTING_FOREX
     CheckCircleIcon, // AVAILABLE_FOR_PAYOUT
     RocketLaunchIcon, // SENDING_FOR_PAYOUT
@@ -27,7 +28,9 @@ const TransactionStateIcon = {
     [TransactionState['ADDITIONAL-DOCUMENT-REQUIRED']]: ExclamationTriangleIcon,
     [TransactionState['ADDITIONAL-DOCUMENT-PROVIDED']]: DocumentCheckIcon,
     [TransactionState['VERIFYING-DOCUMENT']]: ClipboardDocumentListIcon,
+    [TransactionState['RISK-ASSESSMENT']]: ClipboardDocumentListIcon,
     [TransactionState['DOCUMENT-VERIFIED']]: ClipboardDocumentCheckIcon,
+    [TransactionState['RISK-ASSESSMENT']]: ShieldCheckIcon,
     [TransactionState['UNDER-REVIEW']]: ExclamationTriangleIcon,
     [TransactionState['CONVERTING-FOREX']]: ArrowPathIcon,
     [TransactionState['AVAILABLE-FOR-PAYOUT']]: CheckCircleIcon,

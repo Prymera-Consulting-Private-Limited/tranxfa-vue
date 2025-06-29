@@ -19,6 +19,7 @@ import TransactionState from "@/enums/transaction_state.js";
 import router from "@/router/index.js";
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
+import PagaPayment from "@/components/Payment/PagaPayment.vue";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
@@ -102,7 +103,7 @@ const isShowPaymentAccountModalOpen = ref(false);
           <div class="-mx-4 px-4 py-8 print:px-0 print:py-4 print:ring-0 print:shadow-none ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20">
             <h2 class="text-base font-semibold text-gray-900">Transaction #{{ transaction.data.transactionNumber }}</h2>
             <div v-if="transaction.data.state.code === TransactionState['PENDING-PAYMENT'] && transaction.data.payment.clientPaymentAccount">
-              <div  :style="{
+              <div :style="{
                  backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
                  borderColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 400),
                }" class="border-l-4 border-1 rounded-md mt-4 p-4">
@@ -182,7 +183,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
-                <dt class="font-semibold text-gray-900">Sending from <span class="text-blue-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
+                <dt class="font-semibold text-gray-900">Sending from <span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">You sent</span>
                   <span class="text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</span>
@@ -238,7 +239,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 </div>
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                  <p v-if="false" class="mt-1 max-w-2xl text-sm text-gray-500">
                     <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
                     <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
                     <span v-else class="text-sm font-medium">Paid</span>
@@ -255,7 +256,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
                   <dd class="text-base font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
-                <div class="flex-none px-6">
+                <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
                   <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
                   <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
@@ -264,28 +265,28 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">
                     <span class="sr-only">Client</span>
-                    <RocketLaunchIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
+                    <RocketLaunchIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Fees</span>
-                    <PlusCircleIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
+                    <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Total</span>
-                    <CalculatorIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
+                    <CalculatorIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
                   <dt class="flex-none">
                     <span class="sr-only">Status</span>
-                    <CreditCardIcon class="h-6 w-5 text-blue-500" aria-hidden="true" />
+                    <CreditCardIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
                 </div>
@@ -313,6 +314,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <div class="mt-3 text-center sm:mt-5">
                   <div v-if="transaction" class="text-center">
                     <ManualPayment v-if="transaction.data.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
+                    <PagaPayment v-else-if="transaction.data.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
                   </div>
                 </div>
               </div>

@@ -56,7 +56,7 @@ onMounted(() => {
         <dt class="sr-only">Last transaction sent on</dt>
         <dd class="text-gray-500 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
           <p>Last transaction</p>
-          <p class="text-blue-700">{{ lastSentOn }}</p>
+          <p class="text-brand-700">{{ lastSentOn }}</p>
         </dd>
       </template>
       <template v-else>

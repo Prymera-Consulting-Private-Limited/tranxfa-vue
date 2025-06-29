@@ -15,7 +15,18 @@ export function usePayoutChannelUtils() {
         });
     }
 
+    const getTargets = async (query = null) => {
+        const params = {
+            country_id: query?.country?.id,
+            currency_id: query?.currency?.id
+        };
+        return axios.get('/client/v1/payout/targets', {
+            params: params,
+        });
+    }
+
     return {
-        getChannel
+        getChannel,
+        getTargets,
     }
 }
