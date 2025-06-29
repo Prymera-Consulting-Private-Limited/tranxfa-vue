@@ -1,6 +1,6 @@
 <script setup>
 import Transaction from "@/models/transaction.js";
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import {computed, onMounted, onUnmounted, ref, watch, watchEffect} from "vue";
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentState from "@/enums/payment_state.js";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
@@ -50,6 +50,9 @@ const initPayment = async () => {
     applicationId: import.meta.env.VITE_VOLUME_PAYMENT_MERCHANT_ID,
     eventConsumer: (event) => {
       console.log("A VOLUME EVENT: " + event)
+      if (event === 'payment_initiated') {
+        props.transaction.payment.state.code = PaymentState.REDIRECTED;
+      }
     },
     errorConsumer: (error) => {
       console.error(JSON.stringify(error))
@@ -62,9 +65,10 @@ const initPayment = async () => {
   });
   volume.injectComponent('volume-element-container');
   volume.openInstitutionSelection()
+
 }
 
-watch(props.transaction.payment.state, () => {
+watch(props.transaction, () => {
   if (props.transaction.payment.state.code === PaymentState.PENDING) {
     initPayment();
   }
