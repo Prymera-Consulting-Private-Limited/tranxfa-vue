@@ -14,6 +14,7 @@ import {useResourceUtils} from "@/composables/resource_utils.js";
 import Relationship from "@/models/relationship.js";
 import TransactionQuote from "@/models/transaction_quote.js";
 import QuoteTarget from "@/models/quote_target.js";
+import PayoutMethod from "@/models/payout_method.js";
 
 const isLoading = ref(true);
 const quoteUtils = useQuoteUtils();
@@ -55,11 +56,11 @@ async function updateRecipientTarget(target) {
   });
   send({ type: "PROCEED" })
   isLoading.value = true;
-  await quoteUtils.getQuote({
-    payoutCountry: recipient.country,
-    payoutCurrency: recipient.currency,
+  const response = await payoutChannelUtils.getMethods({
+    country: recipient.country,
+    currency: recipient.currency,
   });
-  payoutMethods.value = quoteUtils.quote.data.payoutMethods;
+  payoutMethods.value = response.data.data.map((o) => PayoutMethod.getInstance(o));
   if (payoutMethods.value.length === 1) {
     await updatePayoutMethod(payoutMethods.value[0]);
   } else {
