@@ -185,8 +185,21 @@ const nameLookup = computed(() => {
         if (payoutChannelAttribute?.exactLength && input.data[attribute].length !== payoutChannelAttribute.exactLength) {
           return false;
         }
-        if(payoutChannelAttribute.regexPattern && !new RegExp(payoutChannelAttribute.regexPattern).test(input.data[attribute])) {
-          return false;
+        if(payoutChannelAttribute.regexPattern) {
+          if (payoutChannelAttribute.regexPattern.startsWith('/') && payoutChannelAttribute.regexPattern.lastIndexOf('/') > 0) {
+            const lastSlashIndex = payoutChannelAttribute.regexPattern.lastIndexOf('/');
+            const body = payoutChannelAttribute.regexPattern.slice(1, lastSlashIndex);
+            const flags = payoutChannelAttribute.regexPattern.slice(lastSlashIndex + 1);
+            const regex = new RegExp(body, flags);
+            if (! regex.test(input.data[attribute])) {
+              return false;
+            }
+          } else {
+            const regex = new RegExp(payoutChannelAttribute.regexPattern);
+            if (! regex.test(input.data[attribute])) {
+              return false;
+            }
+          }
         }
 
         return input.data[attribute].length > 0;
