@@ -8,6 +8,7 @@ import Sumsub from "@/components/AccountVerification/Provider/Sumsub.vue";
 import Spinner from "@/components/Spinner.vue";
 import DocumentCategory from "@/models/document_category.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
+import UpPass from "@/components/AccountVerification/Provider/UpPass.vue";
 
 const customerUtils = useCustomerUtils();
 
@@ -35,7 +36,12 @@ const emit = defineEmits([
 
 async function sdkFinalStateReached () {
   await emit('sdkFinalStateReached');
+
+}
+
+async function closeSdk() {
   openSdk.value = false;
+  isSdkInitialized.value = false;
 }
 
 </script>
@@ -56,7 +62,7 @@ async function sdkFinalStateReached () {
     </dl>
   </div>
   <TransitionRoot as="div" :show="openSdk">
-    <Dialog class="relative z-10" @close="openSdk = false">
+    <Dialog class="relative z-10" @close="closeSdk">
       <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
       </TransitionChild>
@@ -75,6 +81,13 @@ async function sdkFinalStateReached () {
                   v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                   v-bind:documentType="documentType"
                   v-bind:documentCategory="documentCategory"
+              />
+              <UpPass
+                v-if="documentType.api === 'UPPASS'"
+                v-on:sdkInitialized="isSdkInitialized = true"
+                v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                v-bind:documentType="documentType"
+                v-bind:documentCategory="documentCategory"
               />
               <System
                   v-if="documentType.api === 'SYSTEM'"
