@@ -1,0 +1,17 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.remitso_app",
+            "sha256_cert_fingerprints": [
+                "AA:CC:69:2F:D2:FF:E0:2D:31:80:34:DE:2F:4C:2E:62:0A:94:58:A4:2E:F0:7E:6E:ED:DD:AF:2B:E0:2C:4A:70",
+                "A6:8A:DF:24:F7:4C:E3:EC:FA:91:48:64:F3:58:CE:AB:62:1B:D7:43:59:71:A9:16:3F:12:A8:71:A9:7D:B0:D6",
+                "85:99:B8:25:B2:C7:96:E9:41:8F:2A:54:01:5C:FB:0B:8F:DF:E8:79:31:2C:FC:1F:B2:B8:19:C4:C4:F6:3F:04",
+                "23:A8:66:E9:4A:20:DC:05:05:52:4C:49:C4:2A:C7:5F:DB:2A:91:77:F9:FD:8B:54:D8:43:BB:6F:44:89:E7:C2"
+            ]
+        }
+    }
+]
