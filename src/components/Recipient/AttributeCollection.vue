@@ -20,6 +20,7 @@ import TransactionQuote from "@/models/transaction_quote.js";
 import NameInput from "@/components/Recipient/Attribute/NameInput.vue";
 import SecondNameInput from "@/components/Recipient/Attribute/SecondNameInput.vue";
 import ThirdNameInput from "@/components/Recipient/Attribute/ThirdNameInput.vue";
+import { debounce } from 'lodash'
 
 const props = defineProps({
   country: {
@@ -238,9 +239,13 @@ watchEffect(() => {
   }
 });
 
+const debouncedLookup = debounce(() => {
+  doLookup();
+}, 1000);
+
 watch(nameLookup, function (newValue) {
   if (newValue.isValid) {
-    doLookup();
+    debouncedLookup();
   }
 });
 
