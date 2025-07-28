@@ -354,6 +354,7 @@ function saveQuote() {
       </template>
     </button>
   </form>
+  <p class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">KYC verification</router-link> is required before you can send money. This is a one-time process to ensure your account and transactions are secure.</p>
 </template>
 
 <style scoped>
