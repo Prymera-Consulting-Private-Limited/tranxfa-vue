@@ -6,7 +6,7 @@ import {
   PaperAirplaneIcon,
   PlusIcon,
   TruckIcon,
-  UserIcon, XMarkIcon, DivideIcon, BanknotesIcon
+  UserIcon, XMarkIcon, DivideIcon, BanknotesIcon, ExclamationTriangleIcon
 } from "@heroicons/vue/20/solid/index.js";
 import {
   Listbox,
@@ -26,6 +26,16 @@ import Spinner from "@/components/Spinner.vue";
 import router from "@/router/index.js";
 import TransactionQuote from "@/models/transaction_quote.js";
 import {useRecipientUtils} from "@/composables/recipient_utils.js";
+import {useCustomerStore} from "@/stores/customer.js";
+
+const customerStore = useCustomerStore();
+
+/**
+ * @type {{data: Customer|null}}
+ */
+const customer = customerStore.customer;
+
+const pendingPoi = customer.data?.pendingDocuments?.find(cat => cat.code === 'POI');
 
 const props = defineProps({
   recipient: {
@@ -343,18 +353,33 @@ function saveQuote() {
         </div>
       </li>
     </ul>
-    <button :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
-      <template v-if="isSavingQuote">
-        <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
-        Saving ...
-      </template>
-      <template v-else>
-        Send Money
-        <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
-      </template>
-    </button>
+    <template v-if="customer.data?.isBlockedForSending === false">
+      <button :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
+        <template v-if="isSavingQuote">
+          <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
+          Saving ...
+        </template>
+        <template v-else>
+          Send Money
+          <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
+        </template>
+      </button>
+    </template>
+    <div v-else class="rounded-b-md bg-yellow-50 p-4 mt-12 -mx-5 -mb-8">
+      <div class="flex">
+        <div class="shrink-0">
+          <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-yellow-800">Your ability to send money is temporarily restricted.</h3>
+          <div class="mt-2 text-sm text-yellow-700">
+            <p>Please reach out to our customer support team for assistance or to understand the reason behind this restriction.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </form>
-  <p class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">KYC verification</router-link> is required before you can send money. This is a one-time process to ensure your account and transactions are secure.</p>
+  <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">KYC verification</router-link> is required before you can send money. This is a one-time process to ensure your account and transactions are secure.</p>
 </template>
 
 <style scoped>

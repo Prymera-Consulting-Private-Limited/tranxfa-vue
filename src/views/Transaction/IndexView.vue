@@ -75,7 +75,9 @@ const transactions = computed(() => {
           </template>
         </template>
         <div>
-          <Calculator :class="'rounded-lg bg-white p-5 pb-8 border border-solid border-gray-300 border-1 shadow-lg min-w-sm'" />
+          <div class="rounded-lg bg-white shadow-lg p-5 pb-8">
+            <Calculator />
+          </div>
         </div>
       </div>
     </main>
