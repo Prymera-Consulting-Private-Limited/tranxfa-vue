@@ -60,7 +60,7 @@ onMounted(async () => {
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
             <span class="sr-only">VeloxPays</span>
-            <img class="h-8 w-auto" src="/images/logo.png" alt="VeloxPays" />
+            <img class="h-8 w-auto" src="/images/logo-light.png" alt="VeloxPays" />
           </a>
         </div>
 
