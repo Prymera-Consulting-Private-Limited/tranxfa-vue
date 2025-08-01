@@ -103,6 +103,11 @@ export class Customer {
      */
     poiNameCheck = null;
 
+    /**
+     * @type {Boolean}
+     */
+    isBlockedForSending = false;
+
     identityInformationRequired () {
         if (this.country === null) {
             return true;
@@ -139,6 +144,7 @@ export class Customer {
         customer.createdAt = data.created_at;
         customer.updatedAt = data.updated_at;
         customer.poiNameCheck = data.poi_name_check;
+        customer.isBlockedForSending = data.is_blocked_for_sending;
         if (data.account) {
             customer.account = Account.getInstance(data.account);
         }
