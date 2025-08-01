@@ -101,7 +101,8 @@ onMounted(async () => {
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">More authentication needed</h2>
-      <p class="text-md text-[#B7A3C1] mb-8 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
+      <p class="text-md text-[#B7A3C1] mb-2 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
+      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
       <!-- Form -->
       <form @submit.prevent="authenticate" class="space-y-10">
         <div v-if="otpError" class="rounded-md bg-red-50 p-4">
