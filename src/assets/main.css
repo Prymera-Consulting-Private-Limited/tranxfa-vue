@@ -9,16 +9,16 @@
 @layer theme {
     @theme {
         --default-font-family: 'Inter', sans-serif;
-        --color-brand-50:  #e6f7fd;
-        --color-brand-100: #c5eafa;
-        --color-brand-200: #99d8f5;
-        --color-brand-300: #66bfee;
-        --color-brand-400: #33a4e3;
-        --color-brand-500: #0190d1;
-        --color-brand-600: #017dc0; /* Your base */
-        --color-brand-700: #0166a3;
-        --color-brand-800: #014f82;
-        --color-brand-900: #00395e;
+        --color-brand-50:  #e6f3fe;
+        --color-brand-100: #c6e4fb;
+        --color-brand-200: #9fd1f9;
+        --color-brand-300: #6db5f2;
+        --color-brand-400: #3b9be9;
+        --color-brand-500: #1988e0;
+        --color-brand-600: #0c7edc;
+        --color-brand-700: #0579d8; /* your base */
+        --color-brand-800: #0564b4;
+        --color-brand-900: #054a87;
     }
 }
 
