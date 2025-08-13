@@ -21,6 +21,7 @@ import NameInput from "@/components/Recipient/Attribute/NameInput.vue";
 import SecondNameInput from "@/components/Recipient/Attribute/SecondNameInput.vue";
 import ThirdNameInput from "@/components/Recipient/Attribute/ThirdNameInput.vue";
 import { debounce } from 'lodash'
+import SelectInput from "@/components/Recipient/Attribute/SelectInput.vue";
 
 const props = defineProps({
   country: {
@@ -68,7 +69,7 @@ const componentMap = {
   'second_name': SecondNameInput,
   'third_name': ThirdNameInput,
   'default': TextInput,
-  'select': null,
+  'select': SelectInput,
   'radio': null,
   'delivery_option': DeliveryOptionInput,
   'account_number': AccountNumberInput,
@@ -121,6 +122,8 @@ async function updateRelationship(relationship) {
 async function updateRecipientInput(updated, attribute) {
   if (attribute.type === RecipientDataType.DELIVERY_OPTION) {
     input.data[attribute.attribute] = updated.id;
+  } else if (attribute.type === RecipientDataType.SELECT) {
+    input.data[attribute.attribute] = updated.id;
   } else {
     input.data[attribute.attribute] = updated;
   }
@@ -162,15 +165,20 @@ async function addRecipient() {
 
 const isLookingUp = ref(false);
 const nameLookup = computed(() => {
-  if (props.payoutChannel.configuration?.nameLookupRequirements?.length > 0) {
+  let requirements = props.payoutChannel.configuration?.nameLookupRequirements;
+  if (requirements?.length === 0) {
+    requirements = props.payoutChannel.configuration?.nameValidationRequirements;
+  }
+  //console.log(requirements);
+  if (requirements?.length > 0) {
     return {
-      attributes: props.payoutChannel.configuration.nameLookupRequirements.map((attribute => {
+      attributes: requirements.map((attribute => {
         return {
           attribute: attribute,
           isValid: input.data[attribute] !== null && input.data[attribute] !== undefined && input.data[attribute].length > 0
         }
       })),
-      isValid: props.payoutChannel.configuration.nameLookupRequirements.every((attribute) => {
+      isValid: requirements.every((attribute) => {
         if (input.data[attribute] === null || input.data[attribute] === undefined) {
           return false;
         }
