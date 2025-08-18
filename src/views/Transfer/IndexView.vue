@@ -196,6 +196,8 @@ watchEffect(() => {
       watchForDocumentUpdate.value = false;
       isStepProcessing.value = false;
       documentUploaded()
+    } else {
+      isLoading.value = false;
     }
   }
 });
