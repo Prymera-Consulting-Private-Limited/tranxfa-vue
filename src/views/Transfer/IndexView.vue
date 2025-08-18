@@ -199,6 +199,7 @@ watchEffect(() => {
     } else {
       isLoading.value = false;
     }
+    watchForDocumentUpdate.value = false;
   }
 });
 
