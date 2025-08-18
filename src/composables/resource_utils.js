@@ -13,9 +13,18 @@ export function useResourceUtils () {
         return axios.get('/client/v1/resources/currency-salary-ranges');
     }
 
+    /**
+     * @param option
+     * @returns {Promise<axios.AxiosResponse<any>>}
+     */
+    const subDeliveryOptions =  async (option) => {
+        return axios.get('/client/v1/resources/sub-delivery-options/' + option);
+    }
+
     return {
         relationships,
         occupations,
         currencySalaryRanges,
+        subDeliveryOptions,
     }
 }
