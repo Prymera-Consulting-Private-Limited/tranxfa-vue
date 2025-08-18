@@ -218,6 +218,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                         <dt class="text-sm font-medium text-gray-500">{{ attribute.label }}</dt>
                         <dd v-if="attribute.type === RecipientDataType.MOBILE_NUMBER" class="mt-1 text-sm text-gray-900">+{{ attribute.value?.country?.callingCode }} {{  attribute.value?.number }}</dd>
                         <dd v-else-if="attribute.type === RecipientDataType.DELIVERY_OPTION" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
+                        <dd v-else-if="attribute.type === RecipientDataType.SUB_DELIVERY_OPTION" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
                         <dd v-else-if="attribute.type === RecipientDataType.SELECT" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
                         <dd v-else class="mt-1 text-sm text-gray-900">{{ attribute.value }}</dd>
                       </div>
