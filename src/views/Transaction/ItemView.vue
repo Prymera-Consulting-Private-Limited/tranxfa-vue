@@ -218,6 +218,8 @@ const isShowPaymentAccountModalOpen = ref(false);
                         <dt class="text-sm font-medium text-gray-500">{{ attribute.label }}</dt>
                         <dd v-if="attribute.type === RecipientDataType.MOBILE_NUMBER" class="mt-1 text-sm text-gray-900">+{{ attribute.value?.country?.callingCode }} {{  attribute.value?.number }}</dd>
                         <dd v-else-if="attribute.type === RecipientDataType.DELIVERY_OPTION" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
+                        <dd v-else-if="attribute.type === RecipientDataType.SUB_DELIVERY_OPTION" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
+                        <dd v-else-if="attribute.type === RecipientDataType.SELECT" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
                         <dd v-else class="mt-1 text-sm text-gray-900">{{ attribute.value }}</dd>
                       </div>
                     </template>
@@ -238,7 +240,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
+                  <h2 v-if="false" id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
                   <p v-if="false" class="mt-1 max-w-2xl text-sm text-gray-500">
                     <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
                     <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
