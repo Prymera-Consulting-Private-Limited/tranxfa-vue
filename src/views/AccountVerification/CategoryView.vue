@@ -38,7 +38,10 @@ onMounted(async () => {
 
 const finalStateReached = async () => {
   await customerUtils.refresh();
-  await router.push({name: 'accountVerification'});
+  if (router.currentRoute.value.query._utm === 'dashboard-todos') {
+    return router.push({ name: 'dashboard' });
+  }
+  return router.push({ name: 'accountVerification' });
 }
 </script>
 
