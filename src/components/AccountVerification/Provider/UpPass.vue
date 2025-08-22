@@ -68,5 +68,5 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <iframe class="min-h-160" width="100%" v-if="accessToken" :src="accessToken"></iframe>
+  <iframe class="min-h-160" allow="camera;" width="100%" v-if="accessToken" :src="accessToken"></iframe>
 </template>
