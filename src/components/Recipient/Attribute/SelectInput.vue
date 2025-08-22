@@ -24,11 +24,10 @@ const props = defineProps({
   },
 })
 
-const deliveryOption = ref(null);
+const selectedOption = ref(null);
 if (props.defaultValue) {
-  deliveryOption.value = props.attribute.options.find(o => o.id === props.defaultValue);
+  selectedOption.value = props.attribute.options.find(o => o.id === props.defaultValue);
 }
-
 
 const emit = defineEmits(['recipient:input:updated']);
 
@@ -73,7 +72,7 @@ function withPopper(dropdownList, component, { width }) {
 </script>
 
 <template>
-  <v-select v-on:option:selected="optionSelected" v-on:option:deselected="optionRemoved" :calculate-position="withPopper" v-model="deliveryOption" :options="attribute.options" :placeholder="`${placeholder}`" key-by="id" label="title">
+  <v-select v-on:option:selected="optionSelected" v-on:option:deselected="optionRemoved" :calculate-position="withPopper" v-model="selectedOption" :options="attribute.options" :placeholder="`${placeholder}`" key-by="id" label="title">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
       <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>

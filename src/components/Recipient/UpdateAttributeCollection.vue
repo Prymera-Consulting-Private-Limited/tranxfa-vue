@@ -16,6 +16,7 @@ import NameInput from "@/components/Recipient/Attribute/NameInput.vue";
 import SecondNameInput from "@/components/Recipient/Attribute/SecondNameInput.vue";
 import ThirdNameInput from "@/components/Recipient/Attribute/ThirdNameInput.vue";
 import {useResourceUtils} from "@/composables/resource_utils.js";
+import SelectInput from "@/components/Recipient/Attribute/SelectInput.vue";
 
 const props = defineProps({
   recipient: {
@@ -35,7 +36,7 @@ const componentMap = {
   'second_name': SecondNameInput,
   'third_name': ThirdNameInput,
   'default': TextInput,
-  'select': null,
+  'select': SelectInput,
   'radio': null,
   'delivery_option': DeliveryOptionInput,
   'account_number': AccountNumberInput,
@@ -74,6 +75,8 @@ for (const attribute of props.recipient.attributes) {
       number: attribute.value?.number,
     };
   } else if (attribute.type === RecipientDataType.DELIVERY_OPTION) {
+    input.data[attribute.attribute] = attribute.value?.id;
+  } else if (attribute.type === RecipientDataType.SELECT) {
     input.data[attribute.attribute] = attribute.value?.id;
   } else {
     input.data[attribute.attribute] = attribute.value;

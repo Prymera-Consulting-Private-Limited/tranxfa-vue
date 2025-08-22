@@ -1,7 +1,7 @@
 <script setup>
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
 
@@ -25,6 +25,11 @@ const props = defineProps({
     required: true,
   }
 })
+
+/**
+ * @type {{data: Customer|null}}
+ */
+const customer = customerStore.customer;
 
 const sdkInitialized = () => {
   emit('sdkInitialized');
@@ -51,9 +56,17 @@ const accessToken = ref('');
 onMounted(async () => {
   accessToken.value = await getNewAccessToken();
   sdkInitialized();
+  Echo.channel(`client-customer.${customer.data?.id}`)
+      .listen('CustomerDocumentUploaded', () => {
+        sdkFinalStateReached();
+      });
 })
+
+onUnmounted(() => {
+  Echo.leaveChannel(`client-customer.${customer.data?.id}`);
+});
 </script>
 
 <template>
-  <iframe class="min-h-160" width="100%" v-if="accessToken" :src="accessToken"></iframe>
+  <iframe class="min-h-160" allow="camera;" width="100%" v-if="accessToken" :src="accessToken"></iframe>
 </template>
