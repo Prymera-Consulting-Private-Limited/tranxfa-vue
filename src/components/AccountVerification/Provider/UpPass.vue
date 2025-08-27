@@ -68,5 +68,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <iframe class="min-h-160" allow="camera;" width="100%" v-if="accessToken" :src="accessToken"></iframe>
+  <div class="px-6 py-6" v-if="accessToken">
+    <p class="text-gray-600 text-sm mb-6">
+      To continue, you’ll be redirected to our trusted verification partner.
+      Please complete the process to verify your identity securely.
+    </p>
+    <div class="flex justify-end gap-3">
+      <button @click="sdkFinalStateReached" class="px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm">
+        Cancel
+      </button>
+      <a :href="accessToken" target="_blank"
+         class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-700 text-sm">
+        Continue
+      </a>
+    </div>
+  </div>
 </template>
