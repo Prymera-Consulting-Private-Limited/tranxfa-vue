@@ -153,6 +153,12 @@ const recipientUpdated = async (updatedRecipient) => {
                             <div v-if="attribute.type === RecipientDataType.DELIVERY_OPTION" class="text-gray-900">
                               {{ attribute.value.title }}
                             </div>
+                            <div v-else-if="attribute.type === RecipientDataType.SUB_DELIVERY_OPTION" class="text-gray-900">
+                              {{ attribute.value?.title }}
+                            </div>
+                            <div v-else-if="attribute.type === RecipientDataType.SELECT" class="text-gray-900">
+                              {{ attribute.value?.title }}
+                            </div>
                             <div v-else-if="attribute.type === RecipientDataType.MOBILE_NUMBER || attribute.type === RecipientDataType.PHONE_NUMBER" class="text-gray-900">
                               {{ `+${attribute.value.country.callingCode}` }} {{ attribute.value.number }}
                             </div>

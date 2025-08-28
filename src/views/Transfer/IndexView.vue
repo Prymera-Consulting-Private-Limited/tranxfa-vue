@@ -196,7 +196,10 @@ watchEffect(() => {
       watchForDocumentUpdate.value = false;
       isStepProcessing.value = false;
       documentUploaded()
+    } else {
+      isLoading.value = false;
     }
+    watchForDocumentUpdate.value = false;
   }
 });
 
@@ -446,7 +449,8 @@ watch(snapshot, () => {
                               <!--<span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
-                            <CheckCircleIcon :class="[!checked ? 'text-gray-400' : 'text-brand-600', 'size-5']" aria-hidden="true" />
+                            <CheckCircleIcon v-if="checked" :class="[!checked ? 'text-gray-400' : 'text-brand-600', 'size-5']" aria-hidden="true" />
+                            <div v-else :class="['text-gray-300', 'size-4 mt-0.5 mr-0.5 border border-2 rounded-full border-gray-300']" aria-hidden="true" />
                           </div>
                         </RadioGroupOption>
                       </RadioGroup>

@@ -36,7 +36,7 @@ const emit = defineEmits([
 
 async function sdkFinalStateReached () {
   await emit('sdkFinalStateReached');
-
+  await closeSdk();
 }
 
 async function closeSdk() {
