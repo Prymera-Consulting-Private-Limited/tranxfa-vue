@@ -3,6 +3,7 @@ const RecipientDataType = Object.freeze({
     SELECT: 'select',
     RADIO: 'radio',
     DELIVERY_OPTION: 'delivery_option',
+    SUB_DELIVERY_OPTION: 'sub_delivery_option',
     ACCOUNT_NUMBER: 'account_number',
     PHONE_NUMBER: 'phone_number',
     MOBILE_NUMBER: 'mobile_number',

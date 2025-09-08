@@ -5,6 +5,7 @@ import PayoutMethod from "@/models/payout_method.js";
 import PayoutChannel from "@/models/payout_channel.js";
 import TextInput from "@/components/Recipient/Attribute/TextInput.vue";
 import DeliveryOptionInput from "@/components/Recipient/Attribute/DeliveryOptionInput.vue";
+import SubDeliveryOptionInput from "@/components/Recipient/Attribute/SubDeliveryOptionInput.vue";
 import MobileNumberInput from "@/components/Recipient/Attribute/MobileNumberInput.vue";
 import EmailInput from "@/components/Recipient/Attribute/EmailInput.vue";
 import AccountNumberInput from "@/components/Recipient/Attribute/AccountNumberInput.vue";
@@ -20,7 +21,12 @@ import TransactionQuote from "@/models/transaction_quote.js";
 import NameInput from "@/components/Recipient/Attribute/NameInput.vue";
 import SecondNameInput from "@/components/Recipient/Attribute/SecondNameInput.vue";
 import ThirdNameInput from "@/components/Recipient/Attribute/ThirdNameInput.vue";
+import { debounce } from 'lodash'
+import SelectInput from "@/components/Recipient/Attribute/SelectInput.vue";
+import {useResourceUtils} from "@/composables/resource_utils.js";
+import SubDeliveryOption from "@/models/sub_delivery_option.js";
 
+const resourceUtils = useResourceUtils();
 const props = defineProps({
   country: {
     type: Country,
@@ -67,9 +73,10 @@ const componentMap = {
   'second_name': SecondNameInput,
   'third_name': ThirdNameInput,
   'default': TextInput,
-  'select': null,
+  'select': SelectInput,
   'radio': null,
   'delivery_option': DeliveryOptionInput,
+  'sub_delivery_option': SubDeliveryOptionInput,
   'account_number': AccountNumberInput,
   'phone_number': PhoneNumberInput,
   'mobile_number': MobileNumberInput,
@@ -110,6 +117,10 @@ for (const attribute of props.payoutChannel.attributes) {
   }
 }
 
+const hasSubDeliveryOptionAttribute = computed(() => {
+  return !!props.payoutChannel.attributes.find(o => o.type === RecipientDataType.SUB_DELIVERY_OPTION);
+});
+
 async function updateRecipientAccountNumberConfirmation(updated) {
   confirmAccountNumberInput.value = updated;
 }
@@ -117,9 +128,36 @@ async function updateRelationship(relationship) {
   input.data.relationship_id = relationship.id;
 }
 
+const isFetchingDeliveryOptions = ref(false);
+
+function loadSubDeliveryOptions(deliveryOption) {
+  isFetchingDeliveryOptions.value = true;
+  props.payoutChannel.attributes.forEach(function (attribute) {
+    if (attribute.type === RecipientDataType.SUB_DELIVERY_OPTION) {
+      attribute.options = [];
+    }
+  });
+  resourceUtils.subDeliveryOptions(deliveryOption).then((response) => {
+    props.payoutChannel.attributes.forEach(function (attribute) {
+      if (attribute.type === RecipientDataType.SUB_DELIVERY_OPTION) {
+        attribute.options = response.data.map(o => SubDeliveryOption.getInstance(o));
+      }
+    });
+  }).finally(() => {
+    isFetchingDeliveryOptions.value = false;
+  });
+}
+
 async function updateRecipientInput(updated, attribute) {
   if (attribute.type === RecipientDataType.DELIVERY_OPTION) {
-    input.data[attribute.attribute] = updated.id;
+    input.data[attribute.attribute] = updated?.id;
+    if (hasSubDeliveryOptionAttribute.value && input.data[attribute.attribute]) {
+      loadSubDeliveryOptions(input.data[attribute.attribute])
+    }
+  } else if (attribute.type === RecipientDataType.SUB_DELIVERY_OPTION) {
+    input.data[attribute.attribute] = updated?.id;
+  } else if (attribute.type === RecipientDataType.SELECT) {
+    input.data[attribute.attribute] = updated?.id;
   } else {
     input.data[attribute.attribute] = updated;
   }
@@ -161,15 +199,19 @@ async function addRecipient() {
 
 const isLookingUp = ref(false);
 const nameLookup = computed(() => {
-  if (props.payoutChannel.configuration?.nameLookupRequirements?.length > 0) {
+  let requirements = props.payoutChannel.configuration?.nameLookupRequirements;
+  if (requirements?.length === 0) {
+    requirements = props.payoutChannel.configuration?.nameValidationRequirements;
+  }
+  if (requirements?.length > 0) {
     return {
-      attributes: props.payoutChannel.configuration.nameLookupRequirements.map((attribute => {
+      attributes: requirements.map((attribute => {
         return {
           attribute: attribute,
           isValid: input.data[attribute] !== null && input.data[attribute] !== undefined && input.data[attribute].length > 0
         }
       })),
-      isValid: props.payoutChannel.configuration.nameLookupRequirements.every((attribute) => {
+      isValid: requirements.every((attribute) => {
         if (input.data[attribute] === null || input.data[attribute] === undefined) {
           return false;
         }
@@ -238,9 +280,13 @@ watchEffect(() => {
   }
 });
 
+const debouncedLookup = debounce(() => {
+  doLookup();
+}, 1000);
+
 watch(nameLookup, function (newValue) {
   if (newValue.isValid) {
-    doLookup();
+    debouncedLookup();
   }
 });
 

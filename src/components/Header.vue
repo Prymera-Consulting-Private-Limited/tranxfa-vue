@@ -59,8 +59,8 @@ onMounted(async () => {
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
-            <span class="sr-only">Tranxfa</span>
-            <img class="h-8 w-auto" src="/images/logo-light.png" alt="Tranxfa" />
+            <span class="sr-only">RemitSo</span>
+            <img class="h-8 w-auto" src="/images/logo.png" alt="RemitSo" />
           </a>
         </div>
 
