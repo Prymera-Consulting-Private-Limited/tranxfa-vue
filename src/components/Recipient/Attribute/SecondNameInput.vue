@@ -17,6 +17,8 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits(['recipient:input:updated']);
+
 const secondNameUpdated = (value) => {
   emit('recipient:input:updated', value, props.attribute);
 }
