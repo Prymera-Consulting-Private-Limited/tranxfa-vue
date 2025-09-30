@@ -59,8 +59,8 @@ onMounted(async () => {
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
-            <span class="sr-only">RemitSo</span>
-            <img class="h-8 w-auto" src="/images/logo.png" alt="RemitSo" />
+            <span class="sr-only">FamRemit</span>
+            <img class="h-16 w-auto" src="/images/logo-white.png" alt="FamRemit" />
           </a>
         </div>
 
@@ -128,7 +128,7 @@ onMounted(async () => {
               <div class="pt-3 pb-2">
                 <div class="flex items-center justify-between px-4">
                   <div>
-                    <img class="h-8 w-auto" src="/images/logo.png" alt="RemitSo Inc" />
+                    <img class="h-8 w-auto" src="/images/logo-white.png" alt="FamRemit" />
                   </div>
                   <div class="-mr-2">
                     <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 outline-none focus:ring-0 focus:ring-brand-700 focus:outline-hidden focus:ring-inset">
