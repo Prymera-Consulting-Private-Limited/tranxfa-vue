@@ -107,12 +107,15 @@ export function useCustomerUtils() {
         })
     }
 
-    async function getAccountVerificationToken(documentCategory, documentType, file = null) {
+    async function getAccountVerificationToken(documentCategory, documentType, file = null, returnUrl = null) {
+        let requestParams = {};
+        requestParams = file ? {
+            file_name: file.name,
+            file_type: file.type,
+        } : {};
+        requestParams.return_url = returnUrl;
         return axios.get(`/client/v1/account-verification/token/${documentCategory.id}/${documentType.id}`, {
-            params: file ? {
-                file_name: file.name,
-                file_type: file.type,
-            } : null
+            params: requestParams
         });
     }
 
