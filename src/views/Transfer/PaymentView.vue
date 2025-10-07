@@ -9,6 +9,8 @@ import router from "@/router/index.js";
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
 import PagaPayment from "@/components/Payment/PagaPayment.vue";
 import Volume from "@/components/Payment/Volume.vue";
+import Monoova from "@/components/Payment/Monoova.vue";
+import Apaylo from "@/components/Payment/Apaylo.vue";
 
 const transactionUtils = useTransactionUtils();
 
@@ -90,7 +92,9 @@ watch(canAttemptPayment, async () => {
                   <div v-if="transaction" class="text-center">
                     <ManualPayment v-if="transaction.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction"  />
                     <PagaPayment v-if="transaction.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction"  />
+                    <Monoova v-if="transaction.payment.paymentProvider.code === 'MONOOVA'" v-bind:transaction="transaction"  />
                     <Volume v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'VOLUME-PAYMENTS'" v-bind:transaction="transaction"  />
+                    <Apaylo v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  />
                   </div>
                 </div>
               </div>

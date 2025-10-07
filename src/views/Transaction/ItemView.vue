@@ -20,6 +20,7 @@ import router from "@/router/index.js";
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
 import PagaPayment from "@/components/Payment/PagaPayment.vue";
+import Monoova from "@/components/Payment/Monoova.vue";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
@@ -317,6 +318,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <div v-if="transaction" class="text-center">
                     <ManualPayment v-if="transaction.data.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
                     <PagaPayment v-else-if="transaction.data.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
+                    <Monoova v-else-if="transaction.data.payment.paymentProvider.code === 'MONOOVA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
                   </div>
                 </div>
               </div>
