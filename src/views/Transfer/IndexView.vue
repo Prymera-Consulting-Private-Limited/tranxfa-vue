@@ -196,10 +196,10 @@ watchEffect(() => {
       watchForDocumentUpdate.value = false;
       isStepProcessing.value = false;
       documentUploaded()
+      watchForDocumentUpdate.value = false;
     } else {
       isLoading.value = false;
     }
-    watchForDocumentUpdate.value = false;
   }
 });
 
