@@ -9,6 +9,8 @@ import Spinner from "@/components/Spinner.vue";
 import DocumentCategory from "@/models/document_category.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import UpPass from "@/components/AccountVerification/Provider/UpPass.vue";
+import Persona from "@/components/AccountVerification/Provider/Persona.vue";
+import Shufti from "@/components/AccountVerification/Provider/Shufti.vue";
 
 const customerUtils = useCustomerUtils();
 
@@ -88,6 +90,21 @@ async function closeSdk() {
                 v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                 v-bind:documentType="documentType"
                 v-bind:documentCategory="documentCategory"
+              />
+              <Persona
+                  v-if="documentType.api === 'CYBRID'"
+                  v-on:sdkInitialized="isSdkInitialized = true"
+                  v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                  v-on:sdkCancelled="closeSdk"
+                  v-bind:documentType="documentType"
+                  v-bind:documentCategory="documentCategory"
+              />
+              <Shufti
+                  v-if="documentType.api === 'SHUFTI'"
+                  v-on:sdkInitialized="isSdkInitialized = true"
+                  v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                  v-bind:documentType="documentType"
+                  v-bind:documentCategory="documentCategory"
               />
               <System
                   v-if="documentType.api === 'SYSTEM'"
