@@ -8,8 +8,12 @@ export function useTransactionUtils() {
         return axios.post(`/client/v1/transaction/payment/${id}`);
     }
 
-    const get = async () => {
-        return axios.get(`/client/v1/transactions`);
+    const get = async (page = null) => {
+        return axios.get(`/client/v1/transactions`, {
+            params: {
+                page: page,
+            },
+        });
     }
 
     const iHaveMadePayment = async (id) => {
