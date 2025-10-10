@@ -238,7 +238,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 </div>
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Total Amount</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
                   <h2 v-if="false" id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
@@ -257,7 +257,7 @@ const isShowPaymentAccountModalOpen = ref(false);
               <dl class="flex items-center flex-wrap">
                 <div class="flex-auto pt-6 pl-6">
                   <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
-                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
@@ -284,7 +284,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <span class="sr-only">Total</span>
                     <CalculatorIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
                   <dt class="flex-none">
