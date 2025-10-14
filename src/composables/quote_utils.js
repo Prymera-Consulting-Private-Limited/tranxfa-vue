@@ -54,12 +54,14 @@ export function useQuoteUtils() {
      * @param {TransactionQuote} quote
      * @param {Object} purpose
      * @param {PaymentMethod} paymentMethod
+     * @param {Object|null} paymentDataAttributes
      * @returns {Promise<axios.AxiosResponse<any>>}
      */
-    const confirmQuote = async (quote, purpose, paymentMethod) => {
+    const confirmQuote = async (quote, purpose, paymentMethod, paymentDataAttributes = null) => {
         return axios.post(`/client/v1/quote/confirm/${quote.id}`, {
             purpose_id: purpose.id,
             payment_method_id: paymentMethod.id,
+            payment_data: paymentDataAttributes
         });
     }
 
