@@ -28,9 +28,6 @@ const getTransaction = async () => {
   transactionUtils.getTransaction(props.transaction.id).then((response) => {
     const transaction = Transaction.getInstance(response.data);
     props.transaction.payment = transaction.payment;
-    if (props.transaction.payment.state.code === PaymentState.PENDING) {
-      clearPullInterval();
-    }
   });
 }
 
@@ -42,9 +39,7 @@ onMounted(async () => {
         props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
         props.transaction.payment.sharedReference = e.shared_reference;
         props.transaction.payment.paymentUrl = e.payment_url;
-        if (props.transaction.payment.state.code === PaymentState.PENDING) {
-          clearPullInterval();
-        } else if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
+        if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
           setTimeout(() => {
             router.push({
               name: 'viewTransaction',
@@ -55,21 +50,10 @@ onMounted(async () => {
           }, 1500)
         }
       });
-  if (props.transaction.payment.state.code !== PaymentState.PENDING) {
-    intervalId = setInterval(getTransaction, 10000);
-  }
 })
-
-const clearPullInterval = async () => {
-  if (intervalId) {
-    await clearInterval(intervalId);
-    intervalId = null;
-  }
-}
 
 onUnmounted(async () => {
   Echo.leaveChannel(`client-payment.${props.transaction.payment.id}`);
-  await clearPullInterval();
 })
 
 const status = computed(() => {
