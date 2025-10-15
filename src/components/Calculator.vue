@@ -372,7 +372,21 @@ function saveQuote() {
         </li>
       </ul>
       <template v-if="(customer.data?.isBlockedForSending || false) === false">
-        <button :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
+        <template v-if="quoteUtil.quote?.data?.transferDisableReason">
+          <div class="rounded-b-md bg-yellow-50 p-4 mt-12 -mx-5 -mb-8">
+            <div class="flex">
+              <div class="shrink-0">
+                <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
+              </div>
+              <div class="ml-3">
+                <div class="text-sm text-yellow-700">
+                  <p>{{ quoteUtil.quote?.data?.transferDisableReason }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <button v-else :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
           <template v-if="isSavingQuote">
             <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
             Saving ...

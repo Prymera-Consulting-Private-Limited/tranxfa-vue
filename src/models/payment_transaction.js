@@ -43,6 +43,11 @@ class PaymentTransaction {
     /**
      * @type {String|null}
      */
+    paymentUrl = null;
+
+    /**
+     * @type {String|null}
+     */
     totalPaymentAmount = null;
 
     /**
@@ -80,6 +85,7 @@ class PaymentTransaction {
         paymentTransaction.paymentMethod = PaymentMethod.getInstance(data.payment_method);
         paymentTransaction.paymentProvider = PaymentProvider.getInstance(data.payment_provider);
         paymentTransaction.sharedReference = data.shared_reference;
+        paymentTransaction.paymentUrl = data.payment_url;
         paymentTransaction.totalPaymentAmount = data.total_payment_amount;
         paymentTransaction.totalPaymentAmountFormatted = data.total_payment_amount_formatted;
         paymentTransaction.totalPaymentAmountCurrencyPrefixed = data.total_payment_amount_currency_prefixed;
