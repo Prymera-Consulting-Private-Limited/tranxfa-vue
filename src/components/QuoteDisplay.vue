@@ -37,11 +37,11 @@ const props = defineProps({
     </li>
     <li class="px-4 py-4 sm:px-6 flex justify-between items-center gap-4 border-b border-dashed border-gray-300">
       <div class="text-gray-700 font-semibold text-sm">Subtotal</div>
-      <p class="text-gray-700 text-sm">{{ quote.localAmountCurrencyPrefixed }}</p>
+      <p class="text-gray-700 text-sm">{{ quote.subTotalAmountCurrencyPrefixed }}</p>
     </li>
     <li class="px-4 py-4 sm:px-6 flex justify-between items-center gap-4 bg-gray-50 rounded-b-lg">
       <div class="text-gray-700 font-semibold text-sm">Total Due</div>
-      <p class="text-gray-700 text-sm">{{ quote.localAmountCurrencyPrefixed }}</p>
+      <p class="text-gray-700 text-sm">{{ quote.totalAmountCurrencyPrefixed }}</p>
     </li>
   </ul>
 </template>

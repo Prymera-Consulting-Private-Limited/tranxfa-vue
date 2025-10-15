@@ -11,12 +11,14 @@ import {UserPlusIcon, PlusIcon} from "@heroicons/vue/24/outline/index.js";
 import AddRecipientWizard from "@/components/Recipient/AddRecipientWizard.vue";
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import router from "@/router/index.js";
+import Pagination from "@/components/Pagination.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const recipientUtils = useRecipientUtils();
 const isLoading = ref(true);
 const recipients = ref([]);
+const pagination = ref(null);
 const colors = [
   "pink",
   "indigo",
@@ -26,16 +28,24 @@ const colors = [
   "blue",
 ]
 
+async function getRecipients(page = null) {
+  const query = {
+    page: page
+  };
+  await recipientUtils.get(query).then((response) => {
+    recipients.value = response.data.data.map((recipient) => Recipient.getInstance(recipient));
+    pagination.value = response.data.pagination;
+    isLoading.value = false;
+  });
+}
+
 onMounted(async () => {
   if (! customerStore.isLoaded) {
     customerUtils.refresh().then(() => {
       customerStore.isLoaded = true;
     });
   }
-  recipientUtils.get().then((response) => {
-    recipients.value = response.data.data.map((recipient) => Recipient.getInstance(recipient));
-    isLoading.value = false;
-  });
+  await getRecipients();
 });
 
 const isCreateRecipientModalOpen = ref(false);
@@ -77,13 +87,23 @@ const recipientCreated = (recipient) => {
                 </ul>
               </template>
               <template v-else>
-                <ul v-if="recipients.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-gray-200 py-6">
-                  <li v-for="(recipient, index) in recipients" :key="recipient.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center transition-transform transform hover:scale-105 shadow-sm hover:shadow-md">
-                    <router-link :to="{ name: 'viewRecipient', params: { id: recipient.id } }" class="cursor-pointer">
-                      <RecipientCard v-bind:cardColor="colors[index%6]" v-bind:recipient="recipient" />
-                    </router-link>
-                  </li>
-                </ul>
+                <template v-if="recipients.length > 0">
+                  <ul  role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-gray-200 py-6">
+                    <li v-for="(recipient, index) in recipients" :key="recipient.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center transition-transform transform hover:scale-105 shadow-sm hover:shadow-md">
+                      <router-link :to="{ name: 'viewRecipient', params: { id: recipient.id } }" class="cursor-pointer">
+                        <RecipientCard v-bind:cardColor="colors[index%6]" v-bind:recipient="recipient" />
+                      </router-link>
+                    </li>
+                  </ul>
+                  <div class="-mb-4">
+                    <Pagination
+                        v-bind:pagination="pagination"
+                        v-on:pageClicked="getRecipients"
+                    />
+                  </div>
+
+                </template>
+
                 <template v-else>
                   <div  class="mt-6 border-t border-gray-200 py-6">
                     <div class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:ring-0 focus:ring-offset-0 focus:outline-hidden">

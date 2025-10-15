@@ -83,12 +83,12 @@ reviewItems.push({
 reviewItems.push({
   icon: CalculatorIcon,
   label: 'Subtotal',
-  value: props.quote.localAmountCurrencyPrefixed,
+  value: props.quote.subTotalAmountCurrencyPrefixed,
 });
 reviewItems.push({
   icon: WalletIcon,
   label: 'Total Due',
-  value: props.quote.localAmountCurrencyPrefixed,
+  value: props.quote.totalAmountCurrencyPrefixed,
 });
 </script>
 
