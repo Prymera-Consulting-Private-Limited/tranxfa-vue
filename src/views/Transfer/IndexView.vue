@@ -495,7 +495,7 @@ const canContinue = computed(() => {
                     <template v-if="paymentMethod?.providers[0]?.paymentDataAttributes?.length > 0">
                       <template v-for="attribute in paymentMethod?.providers[0].paymentDataAttributes">
                         <div class="mb-4">
-                          <label :for="`payment-data-${attribute.attribute}`" class="text-sm/6 font-semibold text-gray-900">{{ attribute.label }} <span class="text-red-500" v-if="attribute.isRequired">*</span></label>
+                          <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-red-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-red-500" v-if="attribute.isRequired">*</span></label>
                           <p v-if="attribute.info" class="mb-4 text-sm text-gray-500">{{ attribute.info }}</p>
                           <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
                           <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
