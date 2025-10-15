@@ -79,6 +79,22 @@ const emits = defineEmits(['retryPayment']);
 const retryPayment = async () => {
   emits('retryPayment');
 }
+
+function redirectToPaymentUrl() {
+  props.transaction.payment.state.code = PaymentState.REDIRECTED;
+}
+
+const iHaveMadePayment = async () => {
+  props.transaction.payment.customerConfirmedPayment = true;
+  await transactionUtils.iHaveMadePayment(props.transaction.payment.id).then(() => {
+    router.push({
+      name: 'viewTransaction',
+      params: {
+        transactionId: props.transaction.id
+      }
+    });
+  });
+}
 </script>
 
 <template>
@@ -88,7 +104,7 @@ const retryPayment = async () => {
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
         Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your Interac e-Transfer.
       </p>
-      <a :href="transaction.payment.paymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
+      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the Interac platform to finalize your payment.</p>
     </div>
   </template>
@@ -102,9 +118,9 @@ const retryPayment = async () => {
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
-    <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage }}</p>
-    <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
-      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
+    <p class="text-base/6 text-gray-600 mb-6">Once you've sent the Interac e-Transfer, click "I have made the payment" below to let us know. It usually takes <strong>up to 5 minutes</strong> for the payment to be confirmed.</p>
+    <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
+      <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 cursor-pointer">I've made payment</button>
     </div>
   </template>
 
