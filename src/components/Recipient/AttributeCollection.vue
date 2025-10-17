@@ -182,6 +182,7 @@ async function addRecipient() {
     const recipient = Recipient.getInstance(response.data);
     emit('recipient:added', recipient);
   }).catch((e) => {
+    emit('recipient:add:failed');
     if (e.status === 422) {
       for (const [key, value] of Object.entries(e.response.data.errors)) {
         errors[key] = value;
@@ -191,7 +192,6 @@ async function addRecipient() {
       isSaving.value = false;
       throw e;
     }
-    emit('recipient:add:failed');
   }).finally(() => {
     isSaving.value = false;
   });
@@ -259,7 +259,6 @@ const doLookup = () => {
       return attribute.type === RecipientDataType.NAME;
     });
     errors[nameAttribute.attribute] = [];
-    input.data[nameAttribute.attribute] = null;
     for (const attribute of nameLookup.value.attributes) {
       query[attribute.attribute] = input.data[attribute.attribute];
     }
@@ -285,6 +284,10 @@ const debouncedLookup = debounce(() => {
 }, 1000);
 
 watch(nameLookup, function (newValue) {
+  const nameAttribute = props.payoutChannel.attributes.find((attribute) => {
+    return attribute.type === RecipientDataType.NAME;
+  });
+  input.data[nameAttribute.attribute] = null;
   if (newValue.isValid) {
     debouncedLookup();
   }

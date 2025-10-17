@@ -26,6 +26,8 @@ import CategoryDescription from "@/components/AccountVerification/CategoryDescri
 import QuotePendingDocument from "@/models/quote_pending_document.js";
 import DocumentCategory from "@/models/document_category.js";
 
+const thirdPartyDeclaration = import.meta.env.VITE_THIRD_PARTY_TRANSACTION_DECLARATION;
+const thirdPartyDeclarationAccepted = ref(false);
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -77,13 +79,6 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
-const canContinue = computed(() => {
-  if (snapshot.value?.value === 'confirm') {
-    return !!purpose.value && !!paymentMethod.value && !isStepProcessing.value && !isLoading.value;
-  }
-  return !isStepProcessing.value && !isLoading.value && !isSubComponentLoading.value;
-});
-
 const showContinueButton = computed(() => {
   return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'accountVerification');
 });
@@ -114,10 +109,18 @@ const recipientAddedOnQuote = async (recipient)  => {
 
 const preconditionFailedMessage = ref('');
 
+const confirmFormErrors = ref([]);
+
 const confirmQuote = async () => {
   preconditionFailedMessage.value = '';
   try {
-    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value);
+    let paymentDataAttributes = {};
+    if (paymentData.data) {
+      for (const paymentDataAttribute of Object.entries(paymentData.data)) {
+        paymentDataAttributes[paymentDataAttribute[0]] = paymentDataAttribute[1].value;
+      }
+    }
+    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes, thirdPartyDeclarationAccepted.value);
     const transaction = response.data;
     isStepProcessing.value = false;
     await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
@@ -138,11 +141,12 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "poi_info_check_failed") {
         isStepProcessing.value = false;
         await send({ type: 'POI_INFO_CHECK_FAILED' });
-      } else if (error.response.data.type === "duplicate_transaction") {
+      } else if (error.response.data.type === "duplicate_transaction" || error.response.data.type === "active_transfer_disable_rule") {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message;
       }
     } else if (error.response.status === 422) {
+      confirmFormErrors.value = error.response.data.errors;
       isStepProcessing.value = false;
     }
   }
@@ -196,10 +200,10 @@ watchEffect(() => {
       watchForDocumentUpdate.value = false;
       isStepProcessing.value = false;
       documentUploaded()
+      watchForDocumentUpdate.value = false;
     } else {
       isLoading.value = false;
     }
-    watchForDocumentUpdate.value = false;
   }
 });
 
@@ -281,6 +285,42 @@ watch(snapshot, () => {
       isLoading.value = false;
     });
   }
+});
+
+const paymentData = reactive({
+  data: null,
+});
+
+watch(paymentMethod, (newValue) => {
+  if (newValue) {
+    paymentData.data = [];
+    if (newValue?.providers[0]?.paymentDataAttributes?.length > 0) {
+      newValue.providers[0].paymentDataAttributes.forEach(function (attribute) {
+        paymentData.data[attribute.attribute] = attribute;
+      });
+    }
+  }
+});
+
+const canContinue = computed(() => {
+  if (snapshot.value?.value === 'confirm') {
+    if (!!purpose.value && !!paymentMethod.value && !isStepProcessing.value && !isLoading.value) {
+      if (paymentData.data) {
+        for (const paymentDataAttribute of Object.entries(paymentData.data)) {
+          if (paymentDataAttribute[1].isRequired && !paymentDataAttribute[1].value) {
+            return false;
+          }
+        }
+      }
+      if (thirdPartyDeclaration) {
+        return thirdPartyDeclarationAccepted.value;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return !isStepProcessing.value && !isLoading.value && !isSubComponentLoading.value;
 });
 </script>
 
@@ -437,8 +477,8 @@ watch(snapshot, () => {
                       </template>
                     </v-select>
 
-                    <fieldset aria-label="Server size" class="mt-6 mb-4">
-                      <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-red-500">*</span></label>
+                    <fieldset aria-label="Payment Method" class="mt-6 mb-4">
+                      <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-red-500">*</span></label>
                       <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
@@ -455,6 +495,25 @@ watch(snapshot, () => {
                         </RadioGroupOption>
                       </RadioGroup>
                     </fieldset>
+
+                    <template v-if="paymentMethod?.providers[0]?.paymentDataAttributes?.length > 0">
+                      <template v-for="attribute in paymentMethod?.providers[0].paymentDataAttributes">
+                        <div class="mb-4">
+                          <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-red-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-red-500" v-if="attribute.isRequired">*</span></label>
+                          <p v-if="attribute.info" class="mb-4 text-sm text-gray-500">{{ attribute.info }}</p>
+                          <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
+                          <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
+                          <p v-if="confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ confirmFormErrors[`payment_data.${attribute.attribute}`][0] }}</p>
+                        </div>
+                      </template>
+                    </template>
+
+                    <!-- Checkbox -->
+                    <div v-if="thirdPartyDeclaration" class="flex items-start space-x-2">
+                      <input type="checkbox" id="third-party-declaration-accepted" v-model="thirdPartyDeclarationAccepted" class="mt-1.5 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
+                      <label for="third-party-declaration-accepted" class="text-sm/6 text-gray-700">{{ thirdPartyDeclaration }}</label>
+                    </div>
+
                   </div>
                 </template>
               </template>
