@@ -113,7 +113,7 @@ const retryPayment = async () => {
                   <template v-if="status === 'pending' || status === 'processing'">
                     <Processing class="-mt-10" />
                     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
-                    <p class="text-base text-gray-600 mb-6">We have opened a new browser window for you to complete the payment.</p>
+                    <p class="text-base text-gray-600 mb-6">Your payment is being processed. Please wait a moment while we confirm the status.</p>
                   </template>
 
                   <template v-else-if="status === 'completed'">

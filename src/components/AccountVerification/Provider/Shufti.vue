@@ -4,6 +4,7 @@ import DocumentType from "@/models/document_type.js";
 import {onMounted, onUnmounted, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import router from "@/router/index.js";
 
 const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
@@ -41,7 +42,9 @@ const sdkFinalStateReached = () => {
 
 async function getNewAccessToken() {
   let accessToken = null;
-  await customerUtils.getAccountVerificationToken(props.documentCategory, props.documentType).then((response) => {
+  const route = router.currentRoute.value;
+  const fullUrl = window.location.origin + route.fullPath;
+  await customerUtils.getAccountVerificationToken(props.documentCategory, props.documentType, null, fullUrl).then((response) => {
     accessToken = response.data.token;
   }).catch((e) => {
     console.error(e);
@@ -77,7 +80,7 @@ onUnmounted(() => {
       <button @click="sdkFinalStateReached" class="px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm">
         Cancel
       </button>
-      <a :href="accessToken" target="_blank"
+      <a :href="accessToken"
          class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-700 text-sm">
         Continue
       </a>

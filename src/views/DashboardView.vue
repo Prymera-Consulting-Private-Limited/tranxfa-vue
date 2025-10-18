@@ -25,6 +25,7 @@ import {useTimeUtils} from "@/composables/time_utils.js";
 import Transaction from "@/models/transaction.js";
 import ListItem from "@/components/Transaction/ListItem.vue";
 import ListShimmer from "@/components/Transaction/ListShimmer.vue";
+import Pagination from "@/components/Pagination.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -55,7 +56,7 @@ const taskItems = [
     description: '',
     status: '',
     icon: DevicePhoneMobileIcon,
-    background: 'bg-indigo-500',
+    background: 'bg-brand-500',
     completed: false,
     href: {name: 'onboardingWorkflow'},
   },
@@ -139,15 +140,20 @@ const getTasks = async () => {
 const timeUtils = useTimeUtils();
 const transactionsData = ref(null);
 
-onMounted(async () => {
-  if (! customerStore.isLoaded) {
-    customerUtils.refresh().catch();
-  }
-  transactionUtils.get().then((response) => {
+async function getTransactions(page = null) {
+  isTransactionLoading.value = true;
+  await transactionUtils.get(page).then((response) => {
     transactionsData.value = response.data;
   }).finally(() => {
     isTransactionLoading.value = false;
   });
+}
+
+onMounted(async () => {
+  if (! customerStore.isLoaded) {
+    customerUtils.refresh().catch();
+  }
+  await getTransactions();
   getTasks().catch();
 });
 
@@ -193,6 +199,12 @@ const recipientCreated = (recipient) => {
                               <ListItem v-bind:niceTime="transaction.niceTime" v-bind:transaction="transaction.data" />
                             </router-link>
                           </template>
+                          <li class="px-4 pb-4">
+                            <Pagination
+                                v-bind:pagination="transactionsData.pagination"
+                                v-on:pageClicked="getTransactions"
+                            />
+                          </li>
                         </ul>
                       </div>
                     </div>
