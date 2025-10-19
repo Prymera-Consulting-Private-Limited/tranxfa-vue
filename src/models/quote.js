@@ -47,9 +47,15 @@ class Quote extends BaseQuote {
      */
     transferDisableReason= null;
 
+    /**
+     * @type {Boolean|null}
+     */
+    requirePayoutCompanySelection= null;
+
     static getInstance(data) {
         const quote = new Quote();
         BaseQuote.getInstance(quote, data);
+        quote.requirePayoutCompanySelection = data.require_payout_company_selection;
         quote.transferDisableReason = data.transfer_disable_reason;
         quote.exchangeRateDate = data.exchange_rate_date;
         if (data.alerts) {
