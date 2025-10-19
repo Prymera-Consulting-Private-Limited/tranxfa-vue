@@ -235,7 +235,7 @@ function saveQuote() {
                   <p v-else class="text-sm bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
-                  <span>Exchange Rate</span>
+                  <span>Our Rate</span>
                 </div>
               </div>
             </div>
@@ -314,11 +314,11 @@ function saveQuote() {
                         <ListboxLabel class="sr-only">Select or Change Delivery Method</ListboxLabel>
                         <div class="relative">
                           <div  class="flex divide-x divide-brand-700 rounded-md outline-2 outline-brand-700 bg-white w-full">
-                            <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-3 bg-white w-full">
-                              <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                              <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
-                            </div>
-                            <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 mt-1 outline-hidden outline-0 w-full']">
+                            <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
+                              <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
+                                <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
+                                <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
+                              </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
                                 <span class="sr-only">Select or Change Delivery Method</span>
                                 <ChevronDownIcon class="size-5 text-brand-700 forced-colors:text-[Highlight]" aria-hidden="true" />
@@ -337,7 +337,7 @@ function saveQuote() {
                                       <CheckIcon class="size-5" aria-hidden="true" />
                                     </span>
                                     </div>
-                                    <p :class="[active ? 'text-brand-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
+                                    <p v-if="payoutMethod.description" :class="[active ? 'text-brand-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
                                   </div>
                                 </li>
                               </ListboxOption>

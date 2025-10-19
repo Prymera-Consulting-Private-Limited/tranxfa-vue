@@ -24,6 +24,11 @@ class PayoutMethod {
     /**
      * @type {String|null}
      */
+    instructions = null;
+
+    /**
+     * @type {String|null}
+     */
     iconUri = null
 
     /**
@@ -37,6 +42,7 @@ class PayoutMethod {
         payoutMethod.code = data.code;
         payoutMethod.title = data.title;
         payoutMethod.description = data.description;
+        payoutMethod.instructions = data.instruction;
         payoutMethod.iconUri = data.icon_uri;
         if (data.channel) {
             payoutMethod.channel = PayoutChannel.getInstance(data.channel);
