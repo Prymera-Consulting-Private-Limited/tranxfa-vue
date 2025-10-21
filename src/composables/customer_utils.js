@@ -10,11 +10,12 @@ export function useCustomerUtils() {
         customerStore.isLoaded = true;
     }
 
-    async function register(email, password, confirmPassword) {
+    async function register(email, password, confirmPassword, thirdPartyDeclarationAccepted = false) {
         await axios.post('/client/v1/signup', {
             email: email,
             password: password,
             confirm_password: confirmPassword,
+            third_party_declaration_accepted: thirdPartyDeclarationAccepted,
         }).then((response) => {
             updateStore(response.data);
         });
