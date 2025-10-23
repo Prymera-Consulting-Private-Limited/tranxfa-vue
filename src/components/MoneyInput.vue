@@ -59,10 +59,14 @@ function selectOption(option) {
     emit('option:updated', option);
   }
 }
-function amountUpdated() {
-  const newValue = Number.parseInt(unmaskedValue.value) / Math.pow(10, props.currency.decimalPlaces);
-  if (!isNaN(newValue) && newValue !== props.amount) {
-    emit('update:amount', newValue);
+function amountUpdated(event) {
+  const raw = event.target.value?.replace(/,/g, '');
+  const newValue = parseFloat(raw);
+  if (!isNaN(newValue)) {
+    const fixedValue = Number(newValue.toFixed(props.currency.decimalPlaces));
+    if (fixedValue !== props.amount) {
+      emit('update:amount', fixedValue);
+    }
   }
 }
 </script>

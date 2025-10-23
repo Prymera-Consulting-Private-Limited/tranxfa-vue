@@ -26,6 +26,8 @@ import CategoryDescription from "@/components/AccountVerification/CategoryDescri
 import QuotePendingDocument from "@/models/quote_pending_document.js";
 import DocumentCategory from "@/models/document_category.js";
 
+const thirdPartyDeclaration = import.meta.env.VITE_THIRD_PARTY_TRANSACTION_DECLARATION;
+const thirdPartyDeclarationAccepted = ref(false);
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -118,7 +120,7 @@ const confirmQuote = async () => {
         paymentDataAttributes[paymentDataAttribute[0]] = paymentDataAttribute[1].value;
       }
     }
-    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes);
+    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes, thirdPartyDeclarationAccepted.value);
     const transaction = response.data;
     isStepProcessing.value = false;
     await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
@@ -309,9 +311,11 @@ const canContinue = computed(() => {
             return false;
           }
         }
-
-        return true;
       }
+      if (thirdPartyDeclaration) {
+        return thirdPartyDeclarationAccepted.value;
+      }
+      return true;
     } else {
       return false;
     }
@@ -503,6 +507,12 @@ const canContinue = computed(() => {
                         </div>
                       </template>
                     </template>
+
+                    <!-- Checkbox -->
+                    <div v-if="thirdPartyDeclaration" class="flex items-start space-x-2">
+                      <input type="checkbox" id="third-party-declaration-accepted" v-model="thirdPartyDeclarationAccepted" class="mt-1.5 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
+                      <label for="third-party-declaration-accepted" class="text-sm/6 text-gray-700">{{ thirdPartyDeclaration }}</label>
+                    </div>
 
                   </div>
                 </template>
