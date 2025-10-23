@@ -259,7 +259,6 @@ const doLookup = () => {
       return attribute.type === RecipientDataType.NAME;
     });
     errors[nameAttribute.attribute] = [];
-    input.data[nameAttribute.attribute] = null;
     for (const attribute of nameLookup.value.attributes) {
       query[attribute.attribute] = input.data[attribute.attribute];
     }
@@ -285,6 +284,10 @@ const debouncedLookup = debounce(() => {
 }, 1000);
 
 watch(nameLookup, function (newValue) {
+  const nameAttribute = props.payoutChannel.attributes.find((attribute) => {
+    return attribute.type === RecipientDataType.NAME;
+  });
+  input.data[nameAttribute.attribute] = null;
   if (newValue.isValid) {
     debouncedLookup();
   }
