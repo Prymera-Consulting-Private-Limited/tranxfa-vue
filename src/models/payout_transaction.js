@@ -12,19 +12,14 @@ class PayoutTransaction {
     sharedReference = null;
 
     /**
+     * @type {Boolean|null}
+     */
+    collectionPinAvailable = false;
+
+    /**
      * @type {String|null}
      */
     collectionPin = null;
-
-    /**
-     * @type {String|null}
-     */
-    createdAt = null;
-
-    /**
-     * @type {String|null}
-     */
-    updatedAt = null
 
     /**
      * @type {PayoutTransactionState|null}
@@ -36,6 +31,7 @@ class PayoutTransaction {
         payoutTransaction.id = data.id;
         payoutTransaction.sharedReference = data.shared_reference;
         payoutTransaction.collectionPin = data.collection_pin;
+        payoutTransaction.collectionPinAvailable = data.collection_pin_available || false;
         if (data.state) {
             payoutTransaction.state = PayoutTransactionState.getInstance(data.state);
         }
