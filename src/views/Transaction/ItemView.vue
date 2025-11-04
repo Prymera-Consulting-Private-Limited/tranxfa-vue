@@ -20,6 +20,7 @@ import router from "@/router/index.js";
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
 import PagaPayment from "@/components/Payment/PagaPayment.vue";
+import Monoova from "@/components/Payment/Monoova.vue";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
@@ -196,6 +197,10 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <span class="font-medium text-gray-900">{{ transaction.data.recipient.wholeName }}</span>
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
                   <span class="">{{ transaction.data.payoutMethod.title }}</span>
+                  <span v-if="transaction.data.payout.collectionPin" :class="transaction.data.payout.collectionPinAvailable ? 'text-gray-900 font-semibold' : 'text-yellow-700 text-xs mt-1'" class="">
+                    <template v-if="transaction.data.payout.collectionPinAvailable">Collection PIN: </template>
+                    {{ transaction.data.payout.collectionPin }}
+                  </span>
                 </dd>
               </div>
               <div class="col-span-2 mt-8 sm:mt-6 border-t border-gray-900/5">
@@ -218,6 +223,8 @@ const isShowPaymentAccountModalOpen = ref(false);
                         <dt class="text-sm font-medium text-gray-500">{{ attribute.label }}</dt>
                         <dd v-if="attribute.type === RecipientDataType.MOBILE_NUMBER" class="mt-1 text-sm text-gray-900">+{{ attribute.value?.country?.callingCode }} {{  attribute.value?.number }}</dd>
                         <dd v-else-if="attribute.type === RecipientDataType.DELIVERY_OPTION" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
+                        <dd v-else-if="attribute.type === RecipientDataType.SUB_DELIVERY_OPTION" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
+                        <dd v-else-if="attribute.type === RecipientDataType.SELECT" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
                         <dd v-else class="mt-1 text-sm text-gray-900">{{ attribute.value }}</dd>
                       </div>
                     </template>
@@ -235,10 +242,10 @@ const isShowPaymentAccountModalOpen = ref(false);
                 </div>
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Total Amount</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
+                  <h2 v-if="false" id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
                   <p v-if="false" class="mt-1 max-w-2xl text-sm text-gray-500">
                     <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
                     <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
@@ -254,7 +261,7 @@ const isShowPaymentAccountModalOpen = ref(false);
               <dl class="flex items-center flex-wrap">
                 <div class="flex-auto pt-6 pl-6">
                   <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
-                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
@@ -281,7 +288,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <span class="sr-only">Total</span>
                     <CalculatorIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
                   <dt class="flex-none">
@@ -315,6 +322,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <div v-if="transaction" class="text-center">
                     <ManualPayment v-if="transaction.data.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
                     <PagaPayment v-else-if="transaction.data.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
+                    <Monoova v-else-if="transaction.data.payment.paymentProvider.code === 'MONOOVA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
                   </div>
                 </div>
               </div>

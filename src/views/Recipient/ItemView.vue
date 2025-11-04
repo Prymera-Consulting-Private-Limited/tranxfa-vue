@@ -26,8 +26,6 @@ const isConfirmDeleteModalOpen = ref(false);
 const isDeleting = ref(false);
 const isDeleted = ref(false);
 
-const isEditModalOpen = ref(false);
-
 const timeUtils = useTimeUtils();
 const lastSentOn = ref(null)
 
@@ -59,26 +57,6 @@ const handleDelete = async () => {
   }
 };
 
-const recipientUpdated = async (updatedRecipient) => {
-  isEditModalOpen.value = false;
-  recipient.value.attributes = updatedRecipient.attributes;
-  recipient.value.relationship = updatedRecipient.relationship;
-  recipient.value.name = updatedRecipient.name;
-  recipient.value.secondName = updatedRecipient.secondName;
-  recipient.value.thirdName = updatedRecipient.thirdName;
-  recipient.value.wholeName = updatedRecipient.wholeName;
-  recipient.value.updatedAt = updatedRecipient.updatedAt;
-  notify(
-      {
-        group: 'customer',
-        title: `Recipient Updated`,
-        text: `Recipient information has been successfully updated.`,
-        type: 'success',
-      },
-      -1,
-  )
-}
-
 </script>
 
 <template>
@@ -104,7 +82,6 @@ const recipientUpdated = async (updatedRecipient) => {
                     </p>
                   </div>
                   <div class="flex-none mt-3">
-                    <button @click="isEditModalOpen = true" type="button" class="rounded-sm bg-white px-5 py-2 font-medium text-sm text-gray-800 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 cursor-pointer">Edit</button>
                     <button @click="isConfirmDeleteModalOpen = true" type="button" class="ml-3 rounded-sm px-5 py-2 font-medium text-sm text-white shadow-xs ring-1 ring-red-600 ring-inset bg-red-600 hover:bg-red-500 cursor-pointer">Delete</button>
                   </div>
                 </div>
@@ -152,6 +129,12 @@ const recipientUpdated = async (updatedRecipient) => {
                           <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                             <div v-if="attribute.type === RecipientDataType.DELIVERY_OPTION" class="text-gray-900">
                               {{ attribute.value.title }}
+                            </div>
+                            <div v-else-if="attribute.type === RecipientDataType.SUB_DELIVERY_OPTION" class="text-gray-900">
+                              {{ attribute.value?.title }}
+                            </div>
+                            <div v-else-if="attribute.type === RecipientDataType.SELECT" class="text-gray-900">
+                              {{ attribute.value?.title }}
                             </div>
                             <div v-else-if="attribute.type === RecipientDataType.MOBILE_NUMBER || attribute.type === RecipientDataType.PHONE_NUMBER" class="text-gray-900">
                               {{ `+${attribute.value.country.callingCode}` }} {{ attribute.value.number }}
@@ -220,25 +203,6 @@ const recipientUpdated = async (updatedRecipient) => {
                     Cancel
                   </button>
                 </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
-    <TransitionRoot as="template" :show="isEditModalOpen">
-      <Dialog class="relative z-10" @close="isEditModalOpen = false">
-        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
-        </TransitionChild>
-        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl px-6 py-8">
-                <UpdateAttributeCollection
-                    v-bind:recipient="recipient"
-                    v-on:recipient:updated="recipientUpdated"
-                />
               </DialogPanel>
             </TransitionChild>
           </div>
