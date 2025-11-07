@@ -9,7 +9,7 @@ defineProps({
 </script>
 
 <template>
-  <div v-for="(accountAttribute, index) in account?.attributes" :key="`account-attribute-${index}`" class="text-left my-5">
+  <div v-for="(accountAttribute, index) in account?.attributes" :key="`account-attribute-${index}`" class="text-left my-3">
     <label :for="`account-attribute-${index}`" class="block text-sm/6 font-medium text-gray-900">{{ accountAttribute.key }}</label>
     <UseClipboard v-slot="{ copy, copied }" :source="accountAttribute.value">
       <div class="mt-2 flex">
@@ -23,7 +23,7 @@ defineProps({
       <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">{{ accountAttribute.key }} has been copied!</p>
     </UseClipboard>
   </div>
-  <div class="text-left my-5">
+  <div class="text-left my-3">
     <label :for="`payment-reference`" class="block text-sm/6 font-medium text-gray-900">Payment Reference</label>
     <UseClipboard v-slot="{ copy, copied }" :source="account.paymentReference">
       <div class="mt-2 flex">

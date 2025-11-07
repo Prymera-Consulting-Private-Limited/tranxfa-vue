@@ -6,7 +6,8 @@ import {
   PaperAirplaneIcon,
   PlusIcon,
   TruckIcon,
-  UserIcon, XMarkIcon, DivideIcon, BanknotesIcon, ExclamationTriangleIcon
+  UserIcon, XMarkIcon, DivideIcon, BanknotesIcon, ExclamationTriangleIcon,
+    PercentBadgeIcon, InformationCircleIcon
 } from "@heroicons/vue/20/solid/index.js";
 import {
   Listbox,
@@ -235,7 +236,7 @@ function saveQuote() {
                   <p v-else class="text-sm bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
-                  <span>Exchange Rate</span>
+                  <span>Our Rate</span>
                 </div>
               </div>
             </div>
@@ -314,11 +315,11 @@ function saveQuote() {
                         <ListboxLabel class="sr-only">Select or Change Delivery Method</ListboxLabel>
                         <div class="relative">
                           <div  class="flex divide-x divide-brand-700 rounded-md outline-2 outline-brand-700 bg-white w-full">
-                            <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-3 bg-white w-full">
-                              <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                              <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
-                            </div>
-                            <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 mt-1 outline-hidden outline-0 w-full']">
+                            <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
+                              <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
+                                <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
+                                <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
+                              </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
                                 <span class="sr-only">Select or Change Delivery Method</span>
                                 <ChevronDownIcon class="size-5 text-brand-700 forced-colors:text-[Highlight]" aria-hidden="true" />
@@ -337,7 +338,7 @@ function saveQuote() {
                                       <CheckIcon class="size-5" aria-hidden="true" />
                                     </span>
                                     </div>
-                                    <p :class="[active ? 'text-brand-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
+                                    <p v-if="payoutMethod.description" :class="[active ? 'text-brand-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
                                   </div>
                                 </li>
                               </ListboxOption>
@@ -353,9 +354,47 @@ function saveQuote() {
             </div>
           </div>
         </li>
+        <li v-if="quoteUtil.quote?.data?.payoutMethod?.instructions && ! isFetchingQuote">
+          <div class="relative pb-2">
+            <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
+            <div class="relative flex space-x-3">
+              <div>
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
+                  <InformationCircleIcon class="size-5 text-white"/>
+              </span>
+              </div>
+              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
+                <div>
+                  <p v-if="! isFetchingQuote" class="text-xs text-gray-900 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.instructions }}</p>
+                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li v-if="quoteUtil.quote?.data?.payoutMethod?.promo && ! isFetchingQuote">
+          <div class="relative pb-2">
+            <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
+            <div class="relative flex space-x-3">
+              <div>
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-lime-700' : 'bg-gray-300']">
+                  <PercentBadgeIcon class="size-5 text-white"/>
+              </span>
+              </div>
+              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
+                <div>
+                  <p v-if="! isFetchingQuote" class="text-xs text-lime-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
+                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
         <li>
           <div class="relative pb-2">
+
             <div class="relative flex space-x-3">
+
               <div>
               <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                   <ClockIcon class="size-5 text-white"/>
