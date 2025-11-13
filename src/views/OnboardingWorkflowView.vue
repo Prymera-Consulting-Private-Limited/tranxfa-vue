@@ -57,7 +57,7 @@ const editPersonalInformation = () => {
           <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-h-16 mb-5"></a>
           </div>
         </div>
         <EmailVerification v-if="snapshot?.value === 'emailVerification'" v-on:emailVerified="proceed" />
