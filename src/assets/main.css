@@ -9,16 +9,16 @@
 @layer theme {
     @theme {
         --default-font-family: 'Inter', sans-serif;
-        --color-brand-50: theme('colors.sky.50');
-        --color-brand-100: theme('colors.sky.100');
-        --color-brand-200: theme('colors.sky.200');
-        --color-brand-300: theme('colors.sky.300');
-        --color-brand-400: theme('colors.sky.400');
-        --color-brand-500: theme('colors.sky.500');
-        --color-brand-600: theme('colors.sky.600');
-        --color-brand-700: theme('colors.sky.700');
-        --color-brand-800: theme('colors.sky.800');
-        --color-brand-900: theme('colors.sky.900');
+        --color-brand-50:  #fff7f1;
+        --color-brand-100: #ffe9d6;
+        --color-brand-200: #ffd1ac;
+        --color-brand-300: #ffaf75;
+        --color-brand-400: #ff8a42;
+        --color-brand-500: #ff6d1d;
+        --color-brand-600: #f15910;
+        --color-brand-700: #FF751F; /* base */
+        --color-brand-800: #c25415;
+        --color-brand-900: #8a3a0e;
     }
 }
 
