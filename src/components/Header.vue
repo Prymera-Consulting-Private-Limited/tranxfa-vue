@@ -28,6 +28,8 @@ const navigation = [
   { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
   { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
   { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },
+  { name: 'Contact Support', href: 'contact', current: router.currentRoute.value.name === 'contact' },
+  
 ]
 
 async function logout() {
@@ -60,7 +62,7 @@ onMounted(async () => {
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
             <span class="sr-only">RemitSo</span>
-            <img class="lg:h-12 h-8 w-auto" src="/images/logo-white.png" alt="RemitSo" />
+            <img class="lg:h-14 h-8 w-auto" src="/images/logo-white.png" alt="RemitSo" />
           </a>
         </div>
 
