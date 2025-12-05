@@ -158,6 +158,15 @@ const router = createRouter({
         description: '',
       },
     },
+    {
+  path: '/contact',
+  name: 'contact',
+  component: () => import('@/views/ContactView.vue'),
+  meta: {
+    title: 'Contact Support',
+    description: 'Reach us via WhatsApp or Email.',
+  },
+},
   ],
 })
 
