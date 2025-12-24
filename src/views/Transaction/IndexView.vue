@@ -8,6 +8,7 @@ import {useTimeUtils} from "@/composables/time_utils.js";
 import {BanknotesIcon} from "@heroicons/vue/24/outline";
 import ListItem from "@/components/Transaction/ListItem.vue";
 import ListShimmer from "@/components/Transaction/ListShimmer.vue";
+import Pagination from "@/components/Pagination.vue";
 
 const transactionUtils = useTransactionUtils();
 const timeUtils = useTimeUtils();
@@ -15,11 +16,17 @@ const timeUtils = useTimeUtils();
 const data = ref(null);
 const isLoading = ref(true);
 
-onMounted(async () => {
-  await transactionUtils.get().then((response) => {
+async function getTransactions(page = null) {
+  isLoading.value = true;
+  await transactionUtils.get(page).then((response) => {
     data.value = response.data;
+  }).finally(() => {
     isLoading.value = false;
-  })
+  });
+}
+
+onMounted(async () => {
+  getTransactions();
 });
 
 const transactions = computed(() => {
@@ -49,19 +56,29 @@ const transactions = computed(() => {
           </div>
         </template>
         <template v-else>
-          <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
-            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                <ul role="list" class="divide-y divide-gray-100">
-                  <template v-for="(transaction, i) in transactions" :key="transaction.data.id">
-                    <router-link :class="{'rounded-t-lg': i === 0}" as="li" :to="{name: 'viewTransaction', params: {transactionId: transaction.data.id}}" class="flex justify-between gap-x-6 py-5 px-6 sm:px-8 cursor-pointer hover:bg-gray-50">
-                      <ListItem v-bind:niceTime="transaction.niceTime" v-bind:transaction="transaction.data" />
-                    </router-link>
-                  </template>
-                </ul>
+          <template v-if="transactions?.length > 0">
+            <div class="lg:col-span-2 flex-col">
+              <div class="grid grid-cols-1 gap-4 rounded-t-lg bg-white border border-solid border-gray-100">
+                <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                  <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                    <ul role="list" class="divide-y divide-gray-100">
+                      <template v-for="(transaction, i) in transactions" :key="transaction.data.id">
+                        <router-link :class="{'rounded-t-lg': i === 0}" as="li" :to="{name: 'viewTransaction', params: {transactionId: transaction.data.id}}" class="flex justify-between gap-x-6 py-5 px-6 sm:px-8 cursor-pointer hover:bg-gray-50">
+                          <ListItem v-bind:niceTime="transaction.niceTime" v-bind:transaction="transaction.data" />
+                        </router-link>
+                      </template>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="-mb-4">
+                <Pagination
+                    v-bind:pagination="data.pagination"
+                    v-on:pageClicked="getTransactions"
+                />
               </div>
             </div>
-          </div>
+          </template>
           <template v-else>
             <div class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white lg:col-span-2 shadow-lg">
               <div>

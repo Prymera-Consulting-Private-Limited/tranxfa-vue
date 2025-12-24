@@ -62,6 +62,26 @@ class BaseTransaction {
     /**
      * @type {String|null}
      */
+    subTotalAmountCurrencyPrefixed = null;
+
+    /**
+     * @type {String|null}
+     */
+    subTotalAmountFormatted = null;
+
+    /**
+     * @type {String|null}
+     */
+    totalAmountCurrencyPrefixed = null;
+
+    /**
+     * @type {String|null}
+     */
+    totalAmountFormatted = null;
+
+    /**
+     * @type {String|null}
+     */
     localAmountCurrencyPrefixed = null;
 
     /**
@@ -115,6 +135,10 @@ class BaseTransaction {
         obj.localAmount = data.local_amount;
         obj.localAmountCurrencyPrefixed = data.local_amount_currency_prefixed;
         obj.localAmountFormatted = data.local_amount_formatted;
+        obj.subTotalAmountCurrencyPrefixed = data.sub_total_amount_currency_prefixed;
+        obj.subTotalAmountFormatted = data.sub_total_amount_formatted;
+        obj.totalAmountCurrencyPrefixed = data.total_amount_currency_prefixed;
+        obj.totalAmountFormatted = data.total_amount_formatted;
         obj.foreignAmount = data.foreign_amount || data.payout_amount;
         obj.foreignAmountCurrencyPrefixed = data.foreign_amount_currency_prefixed || data.payout_amount_currency_prefixed;
         obj.foreignAmountFormatted = data.foreign_amount_formatted || data.payout_amount_formatted;

@@ -22,7 +22,7 @@ const input = reactive({
 });
 
 watch(() => input.dateOfBirth, (newDateOfBirth) => {
-  emit('customer:attribute:updated', props.attr, newDateOfBirth);
+  emit('customer:attribute:updated', props.attr, moment(newDateOfBirth).format('YYYY-MM-DD'));
 });
 </script>
 
