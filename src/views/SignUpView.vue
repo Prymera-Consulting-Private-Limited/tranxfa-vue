@@ -89,7 +89,7 @@ async function register() {
   })
 }
 
-const userAgreementUrl = import.meta.env.VITE_USER_AGREEMENT_URL;
+const termsOfServiceUrl = import.meta.env.VITE_TERMS_OF_SERVICE_URL;
 const privacyPolicyUrl = import.meta.env.VITE_PRIVACY_POLICY_URL;
 const appUrl = import.meta.env.VITE_APP_URL;
 
@@ -223,7 +223,7 @@ const canContinue = computed(() => {
               <!-- Checkbox -->
               <div class="flex items-start space-x-2">
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="mt-0.5 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
-                <label for="terms" class="text-sm/6 text-gray-700 leading-snug">I agree to <a :href="privacyPolicyUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy</a> & <a :href="userAgreementUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">terms of service</a>.</label>
+                <label for="terms" class="text-sm/6 text-gray-700 leading-snug">I agree to <a :href="privacyPolicyUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy</a> & <a :href="termsOfServiceUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">terms of service</a>.</label>
               </div>
 
               <!-- Checkbox -->
