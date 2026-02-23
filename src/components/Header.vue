@@ -60,7 +60,7 @@ onMounted(async () => {
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
             <span class="sr-only">RemitSo</span>
-            <img class="h-8 w-auto" src="/images/logo.png" alt="RemitSo" />
+            <img class="h-8 md:h-16 w-auto" src="/images/logo-light.png" alt="RemitSo" />
           </a>
         </div>
 
