@@ -197,6 +197,10 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <span class="font-medium text-gray-900">{{ transaction.data.recipient.wholeName }}</span>
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
                   <span class="">{{ transaction.data.payoutMethod.title }}</span>
+                  <span v-if="transaction.data.payout.collectionPin" :class="transaction.data.payout.collectionPinAvailable ? 'text-gray-900 font-semibold' : 'text-yellow-700 text-xs mt-1'" class="">
+                    <template v-if="transaction.data.payout.collectionPinAvailable">Collection PIN: </template>
+                    {{ transaction.data.payout.collectionPin }}
+                  </span>
                 </dd>
               </div>
               <div class="col-span-2 mt-8 sm:mt-6 border-t border-gray-900/5">

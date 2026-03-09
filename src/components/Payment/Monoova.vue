@@ -9,7 +9,7 @@ import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import Failed from "@/components/Payment/State/Failed.vue";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import ClientPaymentAccount from "@/components/ClientPaymentAccount.vue";
-import {ClipboardIcon} from "@heroicons/vue/24/outline/index.js";
+import {ClipboardIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import {UseClipboard} from "@vueuse/components";
 import router from "@/router/index.js";
 
@@ -90,18 +90,25 @@ const status = computed(() => {
     return 'failed';
   }
 })
+
+const emits = defineEmits(['retryPayment']);
+
+const retryPayment = async () => {
+  emits('retryPayment');
+}
 </script>
 
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div class="-m-5">
-      <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Payment</h2>
-      <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
+      <h2 class="text-lg font-semibold text-gray-900 mb-3 text-left">Complete Your Payment</h2>
+      <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-3 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
       <template v-if="transaction.payment.clientPaymentAccount">
-        <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" /><div class="text-left my-5">
+        <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" />
+        <div class="text-left space-y-3 my-3">
         <label :for="`payment-amount`" class="block text-sm/6 font-medium text-gray-900">Payment Amount</label>
         <UseClipboard v-slot="{ copy, copied }" :source="transaction.payment.totalPaymentAmountFormatted">
-          <div class="mt-2 flex">
+          <div class="mt-3 flex">
             <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
               <input type="text" readonly :value="transaction.payment.totalPaymentAmountCurrencyPrefixed" :id="`payment-amount`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6" />
             </div>
@@ -111,12 +118,19 @@ const status = computed(() => {
           </div>
           <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Payment Amount has been copied!</p>
         </UseClipboard>
+        <div class="border-l-4 my-5 border-yellow-400 bg-yellow-50 p-4">
+          <div class="flex">
+            <div class="shrink-0">
+              <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-yellow-700">Ensure you pay the exact amount of <strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong>. Payments with incorrect amounts will be automatically refunded within 30–60 minutes.</p>
+            </div>
+          </div>
+        </div>
       </div>
         <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
           <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 cursor-pointer">I've made payment</button>
-        </div>
-        <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
-          <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
         </div>
       </template>
     </div>
@@ -147,5 +161,6 @@ const status = computed(() => {
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
     <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
   </template>
 </template>

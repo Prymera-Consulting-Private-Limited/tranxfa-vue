@@ -6,7 +6,8 @@ import {
   PaperAirplaneIcon,
   PlusIcon,
   TruckIcon,
-  UserIcon, XMarkIcon, DivideIcon, BanknotesIcon, ExclamationTriangleIcon
+  UserIcon, XMarkIcon, DivideIcon, BanknotesIcon, ExclamationTriangleIcon,
+    PercentBadgeIcon, InformationCircleIcon
 } from "@heroicons/vue/20/solid/index.js";
 import {
   Listbox,
@@ -85,6 +86,11 @@ async function getQuote() {
     query.payoutCompany = quoteUtil.quote.data?.payoutCompany;
     if (quoteUtil.quote.data.alerts?.send_amount) {
       quoteErrors.payment.push(quoteUtil.quote.data.alerts.send_amount);
+      quoteErrors.payout = [];
+    }
+    if (quoteUtil.quote.data.alerts?.payout_amount) {
+      quoteErrors.payment = [];
+      quoteErrors.payout.push(quoteUtil.quote.data.alerts.payout_amount);
     }
   }).catch((e) => {
     if (e.response.status === 422) {
@@ -102,6 +108,10 @@ async function getQuote() {
       } else if (errors?.send_amount?.length > 0) {
         for (const error of errors.send_amount) {
           quoteErrors.payment.push(error);
+        }
+      } else if (errors?.payout_amount?.length > 0) {
+        for (const error of errors.payout_amount) {
+          quoteErrors.payout.push(error);
         }
       }
     } else if (e.response.status === 503) {
@@ -252,7 +262,10 @@ function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-emerald-700 font-semibold tracking-wider">Zero</p>
+                  <p v-if="! isFetchingQuote" class="text-sm tracking-wider">
+                    <span class="text-emerald-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
+                    <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
+                  </p>
                   <p v-else class="text-sm bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
@@ -353,9 +366,47 @@ function saveQuote() {
             </div>
           </div>
         </li>
+        <li v-if="quoteUtil.quote?.data?.payoutMethod?.instructions && ! isFetchingQuote">
+          <div class="relative pb-2">
+            <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
+            <div class="relative flex space-x-3">
+              <div>
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
+                  <InformationCircleIcon class="size-5 text-white"/>
+              </span>
+              </div>
+              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
+                <div>
+                  <p v-if="! isFetchingQuote" class="text-xs text-gray-900 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.instructions }}</p>
+                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li v-if="quoteUtil.quote?.data?.payoutMethod?.promo && ! isFetchingQuote">
+          <div class="relative pb-2">
+            <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
+            <div class="relative flex space-x-3">
+              <div>
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-lime-700' : 'bg-gray-300']">
+                  <PercentBadgeIcon class="size-5 text-white"/>
+              </span>
+              </div>
+              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
+                <div>
+                  <p v-if="! isFetchingQuote" class="text-xs text-lime-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
+                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
         <li>
           <div class="relative pb-2">
+
             <div class="relative flex space-x-3">
+
               <div>
               <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                   <ClockIcon class="size-5 text-white"/>
