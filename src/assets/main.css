@@ -8,18 +8,19 @@
 
 @layer theme {
     @theme {
-        --default-font-family: 'Inter', sans-serif;
-        --color-brand-50: theme('colors.purple.50');
-        --color-brand-100: theme('colors.purple.100');
-        --color-brand-200: theme('colors.purple.200');
-        --color-brand-300: theme('colors.purple.300');
-        --color-brand-400: theme('colors.purple.400');
-        --color-brand-500: theme('colors.purple.500');
-        --color-brand-600: theme('colors.purple.600');
-        --color-brand-700: theme('colors.purple.700');
-        --color-brand-800: theme('colors.purple.800');
-        --color-brand-900: theme('colors.purple.900');
-    }
+    --default-font-family: 'Inter', sans-serif;
+
+    --color-brand-50:  #E6F0F6;
+    --color-brand-100: #BFD6E6;
+    --color-brand-200: #99BDD6;
+    --color-brand-300: #73A3C6;
+    --color-brand-400: #4D8AB6;
+    --color-brand-500: #226CA2; /* Base color */
+    --color-brand-600: #1E5F90;
+    --color-brand-700: #1A537E;
+    --color-brand-800: #16466C;
+    --color-brand-900: #123A5A;
+}
 }
 
 .dp__theme_light {
