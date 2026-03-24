@@ -111,13 +111,18 @@ const tasks = computed(() => {
     taskItem.status = serverTask?.status;
     if (taskItem.id === CustomerTask.HAS_IDENTITY_DOCUMENT) {
       const pendingPoi = customer.data?.pendingDocuments?.find(cat => cat.code === 'POI');
-      taskItem.href = serverTask?.status === CustomerTaskStatus.PENDING && pendingPoi ? {
-        name: 'categoryView',
-        params: {
-          category: pendingPoi.id
-        },
-        query: {_utm: 'dashboard-todos'}
-      } : null;
+      if (pendingPoi) {
+        taskItem.href = serverTask?.status === CustomerTaskStatus.PENDING ? {
+          name: 'categoryView',
+          params: {
+            category: pendingPoi.id
+          },
+          query: {_utm: 'dashboard-todos'}
+        } : null;
+      } else {
+        taskItem.status = CustomerTaskStatus.COMPLETED;
+        taskItem.completed = true;
+      }
     }
 
     return taskItem;
