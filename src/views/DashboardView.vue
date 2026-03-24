@@ -111,7 +111,7 @@ const tasks = computed(() => {
     taskItem.status = serverTask?.status;
     if (taskItem.id === CustomerTask.HAS_IDENTITY_DOCUMENT) {
       const pendingPoi = customer.data?.pendingDocuments?.find(cat => cat.code === 'POI');
-      taskItem.href = serverTask?.status === CustomerTaskStatus.PENDING ? {
+      taskItem.href = serverTask?.status === CustomerTaskStatus.PENDING && pendingPoi ? {
         name: 'categoryView',
         params: {
           category: pendingPoi.id
