@@ -86,6 +86,11 @@ async function getQuote() {
     query.payoutCompany = quoteUtil.quote.data?.payoutCompany;
     if (quoteUtil.quote.data.alerts?.send_amount) {
       quoteErrors.payment.push(quoteUtil.quote.data.alerts.send_amount);
+      quoteErrors.payout = [];
+    }
+    if (quoteUtil.quote.data.alerts?.payout_amount) {
+      quoteErrors.payment = [];
+      quoteErrors.payout.push(quoteUtil.quote.data.alerts.payout_amount);
     }
   }).catch((e) => {
     if (e.response.status === 422) {
@@ -103,6 +108,10 @@ async function getQuote() {
       } else if (errors?.send_amount?.length > 0) {
         for (const error of errors.send_amount) {
           quoteErrors.payment.push(error);
+        }
+      } else if (errors?.payout_amount?.length > 0) {
+        for (const error of errors.payout_amount) {
+          quoteErrors.payout.push(error);
         }
       }
     } else if (e.response.status === 503) {
