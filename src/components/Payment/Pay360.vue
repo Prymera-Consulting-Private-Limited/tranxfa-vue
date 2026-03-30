@@ -100,9 +100,9 @@ const retryPayment = async () => {
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div class="-m-5 -mt-10">
-      <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Interac Payment</h2>
+      <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Payment</h2>
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
-        Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your Interac e-Transfer.
+        Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your payment.
       </p>
       <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the secure site to finalize your payment.</p>
