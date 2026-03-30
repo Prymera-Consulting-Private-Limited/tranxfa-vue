@@ -37,7 +37,7 @@ const emit = defineEmits([
 ]);
 
 const maskaOptions = reactive({
-  mask: '#,###,###,###,###,###.##',
+  mask: '#,###,###,###,###,###' + (props.currency.decimalPlaces > 0 ? '.' + ('#'.repeat(props.currency.decimalPlaces)) : ''),
   numberFraction: props.currency.decimalPlaces,
   reversed: true,
   tokens: ''
