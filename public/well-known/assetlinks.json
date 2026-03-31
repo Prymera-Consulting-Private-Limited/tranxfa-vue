@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.remitso.choiceremit",
+      "sha256_cert_fingerprints": [
+        "A6:8A:DF:24:F7:4C:E3:EC:FA:91:48:64:F3:58:CE:AB:62:1B:D7:43:59:71:A9:16:3F:12:A8:71:A9:7D:B0:D6",
+        "23:A8:66:E9:4A:20:DC:05:05:52:4C:49:C4:2A:C7:5F:DB:2A:91:77:F9:FD:8B:54:D8:43:BB:6F:44:89:E7:C2",
+        "31:5A:46:BE:38:31:2D:53:CE:BD:D2:14:71:77:D8:33:28:0D:82:23:45:B1:BC:CD:01:67:25:E9:C3:2F:E0:1A"
+      ]
+    }
+  }
+]
