@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.tuhfapay",
+      "sha256_cert_fingerprints": [
+        "A6:8A:DF:24:F7:4C:E3:EC:FA:91:48:64:F3:58:CE:AB:62:1B:D7:43:59:71:A9:16:3F:12:A8:71:A9:7D:B0:D6",
+        "23:A8:66:E9:4A:20:DC:05:05:52:4C:49:C4:2A:C7:5F:DB:2A:91:77:F9:FD:8B:54:D8:43:BB:6F:44:89:E7:C2",
+        "3A:29:B8:DA:F6:29:D5:94:AE:75:2F:6D:9A:88:BE:08:09:46:87:BA:F8:74:22:57:C7:7A:0C:3B:1F:EF:21:51"
+      ]
+    }
+  }
+]
