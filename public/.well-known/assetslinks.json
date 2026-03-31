@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.famremit",
+      "sha256_cert_fingerprints": [
+        "A6:8A:DF:24:F7:4C:E3:EC:FA:91:48:64:F3:58:CE:AB:62:1B:D7:43:59:71:A9:16:3F:12:A8:71:A9:7D:B0:D6",
+        "23:A8:66:E9:4A:20:DC:05:05:52:4C:49:C4:2A:C7:5F:DB:2A:91:77:F9:FD:8B:54:D8:43:BB:6F:44:89:E7:C2",
+        "EF:87:F5:E4:11:2C:2D:04:0B:DD:5D:4B:8D:EF:1E:83:02:33:4E:0F:3B:32:B4:23:38:9C:C6:98:EF:04:45:EA"
+      ]
+    }
+  }
+]
