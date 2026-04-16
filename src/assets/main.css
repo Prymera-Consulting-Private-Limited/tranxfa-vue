@@ -9,16 +9,17 @@
 @layer theme {
     @theme {
         --default-font-family: 'Manrope', sans-serif;
-        --color-brand-50:  #eff6ff;
-        --color-brand-100: #dbeafe;
-        --color-brand-200: #bfdbfe;
-        --color-brand-300: #93c5fd;
-        --color-brand-400: #60a5fa;
-        --color-brand-500: #3b8cff;
-        --color-brand-600: #2f7ae6;
-        --color-brand-700: #2a83ff; /* your base */
-        --color-brand-800: #1f63cc;
-        --color-brand-900: #174a99;
+        
+        --color-brand-50:  #f0fdfa;
+        --color-brand-100: #ccfbf1;
+        --color-brand-200: #99f6e4;
+        --color-brand-300: #5eead4;
+        --color-brand-400: #2dd4bf;
+        --color-brand-500: #14b8a6; /* ✅ proper teal-500 */
+        --color-brand-600: #0d9488;
+        --color-brand-700: #0f766e;
+        --color-brand-800: #115e59;
+        --color-brand-900: #134e4a;
     }
 }
 

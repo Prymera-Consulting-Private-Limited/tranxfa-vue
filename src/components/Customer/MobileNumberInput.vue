@@ -64,14 +64,14 @@ const editPersonalInformation = () => {
     </div>
     <div v-show="! showLoading || isSaving" class="w-full max-w-xl">
       <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="h-12 md:h-16 mb-5"></a>
       </div>
       <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Enter Your Mobile Number</h2>
       <p class="text-md text-gray-900 mb-8 text-left">Please provide your mobile number to continue.</p>
       <!-- Form -->
       <form @submit.prevent="updateMobileNumber" class="space-y-6 mt-12">
         <MobileNumberInput v-bind:mobile="mobile" v-bind:errors="errors" v-on:update:mobileNumberUpdated="mobileNumberUpdated" />
-        <button :disabled="showLoading || isSaving" :class="[{'opacity-70': isLoading || isSaving}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
+        <button :disabled="showLoading || isSaving" :class="[{'opacity-70': isLoading || isSaving}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-500 transition cursor-pointer">
           <template v-if="isSaving">
               <span class="flex items-center justify-center whitespace-nowrap">
                 <Spinner :class="'size-4 mr-2'" />

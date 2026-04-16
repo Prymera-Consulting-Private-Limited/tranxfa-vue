@@ -134,7 +134,7 @@ watchEffect(() => {
     <button
       v-if="! updateOutsourced" :disabled="showLoading || isSaving" :class="[{'opacity-70': showLoading || isSaving}]"
       type="submit"
-      class="block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition cursor-pointer">
+      class="block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium hover:bg-brand-500 transition cursor-pointer">
       <template v-if="isSaving">
         <span class="flex items-center justify-center whitespace-nowrap">
           <Spinner :class="'size-4 mr-2'" />
