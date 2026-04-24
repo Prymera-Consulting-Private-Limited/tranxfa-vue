@@ -1,8 +1,8 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {useCustomerStore} from "@/stores/customer.js";
-import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {computed, onMounted, ref} from "vue";
+import { useCustomerStore } from "@/stores/customer.js";
+import { useCustomerUtils } from "@/composables/customer_utils.js";
+import { computed, onMounted, ref } from "vue";
 import Calculator from "@/components/Calculator.vue";
 import {
   EnvelopeIcon,
@@ -13,23 +13,30 @@ import {
   DevicePhoneMobileIcon,
   DocumentTextIcon,
 } from '@heroicons/vue/24/outline'
-import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from "@headlessui/vue";
 import AddRecipientWizard from "@/components/Recipient/AddRecipientWizard.vue";
 import router from "@/router/index.js";
 import CustomerTask from "@/enums/customer_task.js";
-import {CustomerTask as CustomerTaskModal} from "@/models/customer_task.js";
+import { CustomerTask as CustomerTaskModal } from "@/models/customer_task.js";
 import CustomerTaskStatus from "@/enums/customer_task_status.js";
 import Task from "@/components/Customer/Task.vue";
-import {useTransactionUtils} from "@/composables/transaction_utils.js";
-import {useTimeUtils} from "@/composables/time_utils.js";
+import { useTransactionUtils } from "@/composables/transaction_utils.js";
+import { useTimeUtils } from "@/composables/time_utils.js";
 import Transaction from "@/models/transaction.js";
 import ListItem from "@/components/Transaction/ListItem.vue";
 import ListShimmer from "@/components/Transaction/ListShimmer.vue";
 import Pagination from "@/components/Pagination.vue";
+import { useRecipientUtils } from "@/composables/recipient_utils.js";
+import Recipient from "@/models/recipient.js";
+import RecipientCard from "@/components/Recipient/RecipientCard.vue";
+import RecipientCardShimmer from "@/components/Recipient/RecipientCardShimmer.vue";
+import { UserPlusIcon, PlusIcon } from "@heroicons/vue/24/outline/index.js";
+import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const transactionUtils = useTransactionUtils();
+const recipientUtils = useRecipientUtils();
 const isCreateRecipientModalOpen = ref(false);
 const createRecipient = () => {
   isCreateRecipientModalOpen.value = true;
@@ -48,7 +55,7 @@ const taskItems = [
     status: '',
     icon: EnvelopeIcon,
     background: 'bg-pink-500',
-    href: {name: 'onboardingWorkflow'},
+    href: { name: 'onboardingWorkflow' },
   },
   {
     id: CustomerTask.HAS_CONTACT_NUMBER,
@@ -58,7 +65,7 @@ const taskItems = [
     icon: DevicePhoneMobileIcon,
     background: 'bg-brand-500',
     completed: false,
-    href: {name: 'onboardingWorkflow'},
+    href: { name: 'onboardingWorkflow' },
   },
   {
     id: CustomerTask.HAS_IDENTITY_DOCUMENT,
@@ -117,7 +124,7 @@ const tasks = computed(() => {
           params: {
             category: pendingPoi.id
           },
-          query: {_utm: 'dashboard-todos'}
+          query: { _utm: 'dashboard-todos' }
         } : null;
       } else {
         taskItem.status = CustomerTaskStatus.COMPLETED;
@@ -132,7 +139,40 @@ const tasks = computed(() => {
 
 const isTransactionLoading = ref(true);
 const isTaskLoading = ref(true);
+const isRecipientsLoading = ref(true);
 const serverTasks = ref([]);
+const recipients = ref([]);
+const recipientsPagination = ref(null);
+const colors = [
+  "pink",
+  "indigo",
+  "yellow",
+  "green",
+  "blue",
+  "blue",
+];
+
+// --- map color names for avatars
+const colorClasses = {
+  pink: "bg-pink-100 text-pink-700",
+  indigo: "bg-indigo-100 text-indigo-700",
+  yellow: "bg-yellow-100 text-yellow-700",
+  green: "bg-green-100 text-green-700",
+  blue: "bg-blue-100 text-blue-700",
+};
+
+// --- initials helper (first + last initials; if single name use first two chars)
+function getInitials(name) {
+  if (!name || typeof name !== "string") return "";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "";
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  const first = parts[0][0] || "";
+  const last = parts[parts.length - 1][0] || "";
+  return (first + last).toUpperCase();
+}
 
 const getTasks = async () => {
   customerUtils.tasks().then((response) => {
@@ -154,12 +194,22 @@ async function getTransactions(page = null) {
   });
 }
 
+async function getRecipients(page = null) {
+  const query = { page: page };
+  await recipientUtils.get(query).then((response) => {
+    recipients.value = response.data.data.map((r) => Recipient.getInstance(r));
+    recipientsPagination.value = response.data.pagination;
+    isRecipientsLoading.value = false;
+  });
+}
+
 onMounted(async () => {
-  if (! customerStore.isLoaded) {
+  if (!customerStore.isLoaded) {
     customerUtils.refresh().catch();
   }
   await getTransactions();
   getTasks().catch();
+  await getRecipients();
 });
 
 const transactions = computed(() => {
@@ -174,123 +224,183 @@ const transactions = computed(() => {
 
 const recipientCreated = (recipient) => {
   isCreateRecipientModalOpen.value = false;
-  router.push({name: 'viewRecipient', params: {id: recipient.id}});
+  router.push({ name: 'viewRecipient', params: { id: recipient.id } });
 };
 </script>
 <template>
   <CustomerLayout>
-    <main class="-mt-24 py-8 bg-gray-50">
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+    <main class="bg-gray-50">
+      <div class="mx-auto max-w-3xl  sm:px-6 lg:max-w-full lg:px-8">
+        <div
+          class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_50%_-20%,rgba(20,184,166,0.12),transparent)]"
+          aria-hidden="true" />
+        <div class="pointer-events-none absolute -bottom-20 right-0 h-56 w-56 rounded-full bg-brand-400/[0.1] blur-3xl"
+          aria-hidden="true" />
         <h1 class="sr-only">Dashboard</h1>
         <!-- Main 3 column grid -->
         <h2 class="text-base font-semibold text-gray-900 mb-5">Welcome {{ customer.data?.name }}</h2>
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 lg:flex-row-reverse">
-
-          <!-- Left column -->
-          <div class="grid grid-cols-1 gap-4 lg:col-span-2 order-last lg:order-first">
-            <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Section title</h2>
-              <div>
-                <template v-if="isTransactionLoading">
-                  <ListShimmer />
-                </template>
-                <template v-else>
-                  <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
-                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                        <ul role="list" class="divide-y divide-gray-100 shadow-md">
-                          <template v-for="(transaction, i) in transactions" :key="transaction.data.id">
-                            <router-link :class="{'rounded-t-lg': i === 0}" as="li" :to="{name: 'viewTransaction', params: {transactionId: transaction.data.id}}" class="flex justify-between gap-x-6 py-5 px-6 sm:px-8 cursor-pointer hover:bg-gray-50">
-                              <ListItem v-bind:niceTime="transaction.niceTime" v-bind:transaction="transaction.data" />
-                            </router-link>
-                          </template>
-                          <li class="px-4 pb-4">
-                            <Pagination
-                                v-bind:pagination="transactionsData.pagination"
-                                v-on:pageClicked="getTransactions"
-                            />
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                  <template v-else>
-                    <p class="mt-1 text-sm text-gray-500 hidden lg:block">Get started by completing the following steps.</p>
-                    <ul v-if="tasks.length === 0 && isTaskLoading" role="list" class="mt-6 grid-cols-1 gap-6 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 sm:grid-cols-2 hidden lg:grid">
-                      <li v-for="i of 6" :key="i" class="flow-root pulse">
-                        <div v-if="isTaskLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
-                          <div :class="['bg-gray-300', 'flex size-16 shrink-0 items-center justify-center rounded-lg']">
-                            <DocumentTextIcon class="size-6 text-white" aria-hidden="true" />
-                          </div>
-                          <div>
-                            <h3 class="text-sm font-medium text-gray-900 mb-3">
-                              <a href="#" class="focus:outline-hidden">
-                                <span class="absolute inset-0" aria-hidden="true" />
-                                <div class="h-3 block pulse bg-gray-300 w-full w-64"></div>
-                              </a>
-                            </h3>
-                            <p class="flex flex-col mt-1 text-sm text-gray-500 space-y-1">
-                              <span class="h-2 block pulse bg-gray-300 w-48"></span>
-                              <span class="h-2 block pulse bg-gray-300 w-32"></span>
-                              <span class="h-2 block pulse bg-gray-300 w-24"></span>
-                            </p>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                    <ul v-if="tasks.length > 0 && !isTaskLoading" role="list" class="mt-6 grid-cols-1 xl:grid-cols-3 gap-10 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 hidden lg:grid">
-                      <li v-for="(task, index) in tasks" :key="task.id" class="flow-root xl:flex-grow">
-                        <div :class="{'opacity-60': task.status !== CustomerTaskStatus.PENDING}" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0 xl:hover:bg-brand-50 xl:hover:border-brand-200 xl:flex-col xl:space-y-5 xl:text-center xl:border xl:border-dashed xl:border-gray-200 xl:px-5 xl:py-8 xl:bg-white h-full xl:shadow-xs">
-                          <div :class="[task.background, 'flex xl:mx-auto size-16 shrink-0 items-center justify-center rounded-lg xl:hidden']">
-                            <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
-                          </div>
-                          <div :class="['xl:mx-auto size-16 shrink-0 items-center bg-brand-700 justify-center rounded-full hidden xl:flex']">
-                            <component :is="task.icon" class="size-6 text-white" aria-hidden="true" />
-                          </div>
-                          <div v-if="task.status !== CustomerTaskStatus.PENDING">
-                            <Task :task="task" :index="index" />
-                          </div>
-                          <template v-else>
-                            <router-link v-if="task.href" :to="task.href" class="cursor-pointer">
-                              <Task :task="task" :index="index" />
-                            </router-link>
-                            <div v-else-if="task.action || null" @click="task.action" class="cursor-pointer">
-                              <Task :task="task" :index="index" />
-                            </div>
-                            <div v-else>
-                              <Task :task="task" :index="index" />
-                            </div>
-                          </template>
-                        </div>
-                      </li>
-                    </ul>
-                  </template>
-                </template>
-              </div>
-            </section>
-          </div>
-
-          <!-- Right column -->
-          <div class="grid grid-cols-1 gap-4">
-            <section aria-labelledby="section-2-title">
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-stretch lg:gap-8">
+          <!-- Left column (Calculator) -->
+          <div class="grid min-h-0 grid-cols-1 gap-4 lg:h-full lg:min-h-0">
+            <section id="send-money" aria-labelledby="section-2-title"
+              class="flex min-h-0 flex-col scroll-mt-24 lg:h-full">
               <h2 class="sr-only" id="section-2-title">Send Money</h2>
-              <div class="rounded-lg bg-white shadow-lg p-5 pb-8">
+              <div class="flex min-h-0 flex-1 flex-col rounded-3xl bg-white p-5 pb-8 shadow-lg lg:h-full">
                 <Calculator />
               </div>
             </section>
           </div>
+          <!-- Right column: TRANSACTION HISTORY -->
+          <aside class="flex min-h-0 flex-col lg:col-span-2 lg:h-full">
+            <section aria-labelledby="transactions-title" class="flex min-h-0 flex-1 flex-col lg:h-full">
+              <h2 id="transactions-title" class="sr-only">Recent transactions</h2>
+
+              <div class="-mt-2 flex min-h-0 flex-1 flex-col lg:h-full">
+                <template v-if="isTransactionLoading">
+                  <div class="flex min-h-0 flex-1 flex-col rounded-t-lg border border-solid border-gray-100 bg-white">
+                    <div class="-mx-4 -my-2 min-h-0 flex-1 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                        <ListShimmer />
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <template v-if="transactions?.length > 0">
+                    <div class="flex min-h-0 flex-1 flex-col gap-4">
+                      <div class="min-h-0 flex-1 rounded-t-lg border border-solid border-gray-100 bg-white">
+                        <div class="-mx-4 -my-2 min-h-0 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                            <ul role="list" class="divide-y divide-gray-100">
+                              <template v-for="(transaction, i) in transactions" :key="transaction.data.id">
+                                <router-link :class="{ 'rounded-t-lg': i === 0 }" as="li"
+                                  :to="{ name: 'viewTransaction', params: { transactionId: transaction.data.id } }"
+                                  class="flex cursor-pointer justify-between gap-x-6 px-6 py-5 hover:bg-gray-50 sm:px-8">
+                                  <ListItem :niceTime="transaction.niceTime" :transaction="transaction.data" />
+                                </router-link>
+                              </template>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="shrink-0 px-4 pb-4">
+                        <Pagination v-if="transactionsData?.pagination" :pagination="transactionsData.pagination"
+                          @pageClicked="getTransactions" />
+                      </div>
+                    </div>
+                  </template>
+
+                  <template v-else>
+                    <div
+                      class="relative flex min-h-0 w-full flex-1 flex-col items-center justify-center rounded-3xl border border-gray-300 bg-white p-12 text-center shadow-lg lg:min-h-0">
+                      <div
+                        class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_50%_-20%,rgba(20,184,166,0.12),transparent)]"
+                        aria-hidden="true" />
+                      <div
+                        class="pointer-events-none absolute -bottom-20 right-0 h-56 w-56 rounded-full bg-brand-400/[0.1] blur-3xl"
+                        aria-hidden="true" />
+                      <div class="mb-3 flex w-full shrink-0 justify-center" role="img"
+                        aria-label="Animation illustrating money transfer">
+                        <DotLottieVue
+                          class="mx-auto h-28 w-full max-w-[min(100%,22rem)] object-contain md:h-[17rem] md:max-w-[36rem]"
+                          autoplay loop src="/animation/money.json" />
+                      </div>
+                      <p class="mt-2 block text-lg font-semibold text-gray-900">No Transactions Yet</p>
+                      <p class="mt-2 max-w-sm text-sm text-gray-600">
+                        Your recent transactions will appear here.
+                      </p>
+                    </div>
+                  </template>
+                </template>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <!--------- recipients ---------->
+        <div class="mt-8">
+          <section aria-labelledby="recipients-title">
+            <!-- CARD CONTAINER -->
+            <div class="relative overflow-hidden rounded-3xl bg-white p-6 shadow-sm">
+              <!-- Friends illustration: desktop top-right only -->
+              <div
+                class="pointer-events-none absolute right-2 top-2 z-0 hidden h-28 w-28 lg:block xl:right-3 xl:top-3 xl:h-32 xl:w-32"
+                aria-hidden="true">
+                <DotLottieVue class="h-full w-full object-contain object-right object-top" autoplay loop
+                  src="/animation/friends.json" />
+              </div>
+
+              <!-- HEADER -->
+              <div
+                class="relative z-10 mb-4 flex items-center justify-between gap-4 pr-0 lg:pr-[8.5rem] xl:pr-[9.5rem]">
+                <h2 id="recipients-title" class="min-w-0 text-lg font-semibold text-gray-800">
+                  Send to Friend
+                </h2>
+                <button type="button" class="shrink-0 text-sm font-medium text-brand-700 hover:underline"
+                  @click="router.push({ name: 'recipients' })">
+                  Manage Contacts
+                </button>
+              </div>
+              <!-- AVATAR LIST -->
+              <div class="relative z-10 flex items-center gap-4 overflow-x-auto scrollbar-hide">
+                <!-- ADD NEW -->
+                <div @click="createRecipient" class="flex flex-col items-center cursor-pointer min-w-[60px]">
+                  <div
+                    class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xl">
+                    +
+                  </div>
+                  <span class="text-xs mt-2 text-gray-500">New</span>
+                </div>
+                <!-- RECIPIENTS -->
+                <div v-for="(recipient, index) in recipients" :key="recipient.id"
+                  class="flex flex-col items-center justify-center min-w-[60px] cursor-pointer">
+                  <router-link :to="{ name: 'viewRecipient', params: { id: recipient.id } }"
+                    class="flex flex-col items-center justify-center">
+                    <!-- Circle Avatar -->
+                    <div
+                      class="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold leading-none text-center shrink-0 overflow-hidden"
+                      :class="colorClasses[colors[index % colors.length]]">
+                      <span class="block leading-none">
+                        {{ getInitials(recipient.name) }}
+                      </span>
+                    </div>
+                    <!-- Name -->
+                    <span class="text-xs mt-2 text-gray-600 truncate w-14 text-center">
+                      {{ recipient.name }}
+                    </span>
+                  </router-link>
+                </div>
+              </div>
+            </div>
+
+            <template v-if="isRecipientsLoading">
+              <ul class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 border-t border-gray-200 py-6">
+                <li v-for="i in 6" :key="i">
+                  <RecipientCardShimmer />
+                </li>
+              </ul>
+            </template>
+          </section>
         </div>
       </div>
     </main>
     <TransitionRoot as="div" :show="isCreateRecipientModalOpen">
       <Dialog class="relative z-10" @close="isCreateRecipientModalOpen = false">
-        <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+        <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
+          leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
           <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
         </TransitionChild>
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+            <TransitionChild as="div" enter="ease-out duration-300"
+              enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
+              leave-from="opacity-100 translate-y-0 sm:scale-100"
+              leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel
+                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
                 <AddRecipientWizard class="p-6 sm:px-8" v-on:recipient:added="recipientCreated" />
               </DialogPanel>
             </TransitionChild>
@@ -303,9 +413,12 @@ const recipientCreated = (recipient) => {
 
 <style scoped>
 @keyframes heartbeat-opacity {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }

@@ -66,8 +66,8 @@ const isShowPaymentAccountModalOpen = ref(false);
 
 <template>
   <CustomerLayout>
-    <main class="-mt-24 py-8 print:py-0">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <main class="py-8 print:py-0">
+      <div class="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
         <template v-if="isLoading">
           <div class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
             <div class="-mx-4 px-4 py-8 ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20 ">

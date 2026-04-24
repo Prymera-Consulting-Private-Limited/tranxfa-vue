@@ -89,60 +89,103 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <!-- Form Section -->
-  <div class="relative flex-1 flex items-center justify-center p-4 md:p-8">
-    <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center bg-white/75 z-10">
-      <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
+  <!-- Background Wrapper -->
+  <div
+    class="min-h-screen flex items-center justify-center bg-no-repeat bg-center bg-cover relative"
+    style="background-image: url('/images/backgrounds/login.png');"
+  >
+    <!-- Loader Overlay -->
+    <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center bg-black/20 z-20">
+      <i class="pi pi-spin pi-spinner text-5xl text-white"></i>
     </div>
-    <div v-show="! isLoading || isVerifying" class="w-full max-w-xl">
-      <!-- Logo at Top Left (Desktop)  -->
-      <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:" class="mx-auto"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5 mx-auto"></a>
+
+    <!-- Card -->
+    <div class="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-xl p-8">
+
+      <!-- Logo -->
+      <div class="text-center mb-6">
+        <img src="/images/logo.png" class="h-8 mx-auto mb-3" />
+        <p class="text-xs text-gray-400">
+          Secure access to your account
+        </p>
       </div>
-      <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">More authentication needed</h2>
-      <p class="text-md text-[#B7A3C1] mb-2 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
-      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
+
+      <!-- Heading -->
+      <h2 class="text-xl font-semibold text-center mb-3">
+        More authentication needed
+      </h2>
+
+      <p class="text-sm text-gray-400 text-center mb-2">
+        Enter the OTP sent to
+        <span class="text-gray-600 font-medium">
+          {{ customer.data?.account?.email }}
+        </span>
+      </p>
+
+      <p class="text-xs text-gray-400 text-center mb-6 px-4">
+        It may take up to a minute. Check spam/junk if needed.
+      </p>
+
       <!-- Form -->
-      <form @submit.prevent="authenticate" class="space-y-10">
-        <div v-if="otpError" class="rounded-md bg-red-50 p-4">
-          <div class="flex">
-            <div class="">
-              <div class="text-sm text-red-700">
-                {{ otpError }}
-              </div>
-            </div>
-          </div>
+      <form @submit.prevent="authenticate" class="space-y-6">
+
+        <!-- Error -->
+        <div v-if="otpError" class="bg-red-50 text-red-700 text-sm p-3 rounded">
+          {{ otpError }}
         </div>
+
+        <!-- OTP Input -->
         <v-otp-input
-            class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"
-            input-classes="w-12 h-12 lg:w-16 lg:h-16 flex flex-col items-center justify-center text-center px-3 lg:px-5 border-b border border-gray-300 rounded-lg text-lg otp-input"
-            separator=""
-            inputType="number"
-            inputmode="numeric"
-            :num-inputs="6"
-            v-model:value="otp"
-            :should-auto-focus="true"
-            :should-focus-order="true"
-            :placeholder="['*', '*', '*', '*', '*', '*']"
-            @on-complete="authenticate"
+          class="flex justify-center gap-3"
+          input-classes="w-12 h-12 lg:w-14 lg:h-14 text-center border border-gray-200 rounded-lg bg-gray-100 focus:ring-2 focus:ring-teal-400 text-lg"
+          separator=""
+          inputType="number"
+          inputmode="numeric"
+          :num-inputs="6"
+          v-model:value="otp"
+          :should-auto-focus="true"
+          :should-focus-order="true"
+          :placeholder="['*', '*', '*', '*', '*', '*']"
+          @on-complete="authenticate"
         />
-        <div class="mt-6 max-w-md flex justify-between mx-auto">
-          <button :disabled="isLoading" :class="[{'opacity-70': isLoading}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
-            <template v-if="isVerifying">
-              <span class="flex items-center justify-center whitespace-nowrap">
-                <Spinner :class="'size-4 mr-2'" />
-                Please wait...
-              </span>
-            </template>
-            <template v-else>Login</template>
-          </button>
-        </div>
+
+        <!-- Button -->
+        <button
+          type="submit"
+          class="w-full py-3 rounded-full bg-brand-700 hover:bg-brand-800 text-white font-medium transition"
+        >
+          <template v-if="isVerifying">
+            <span class="flex items-center justify-center">
+              <Spinner class="size-4 mr-2" />
+              Please wait...
+            </span>
+          </template>
+          <template v-else>
+            Verify & Continue
+          </template>
+        </button>
+
+        <!-- Resend -->
         <template v-if="! isLoading && ! isVerifying">
-          <div v-if="! isResendingOtp" class="text-sm text-gray-500 text-center">Didn't receive OTP? <a @click="resend" class="text-brand-700 hover:text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
+          <div v-if="! isResendingOtp" class="text-xs text-gray-500 text-center">
+            Didn’t receive OTP?
+            <span
+              v-if="showResendButton"
+              @click="resend"
+              class="text-teal-500 hover:underline cursor-pointer"
+            >
+              Resend code
+            </span>
+            <span v-else>
+              Resend in {{ countdown }}s
+            </span>
           </div>
-          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending one time password to your email {{ customer.data?.account?.email }} ...</div>
+
+          <div v-else class="text-xs text-gray-400 text-center animate-pulse">
+            Resending OTP to {{ customer.data?.account?.email }}...
+          </div>
         </template>
+
       </form>
     </div>
   </div>
