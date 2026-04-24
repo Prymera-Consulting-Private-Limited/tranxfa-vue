@@ -6,6 +6,12 @@
 @import 'vue3-flag-icons/styles';
 @import 'nprogress/nprogress.css';
 
+/* Reserve space for the vertical scrollbar so width does not flip when overflow changes
+   (avoids md: breakpoint / fixed sidebar edge jitter on some browsers). */
+html {
+    scrollbar-gutter: stable;
+}
+
 @layer theme {
     @theme {
         --default-font-family: 'Manrope', sans-serif;

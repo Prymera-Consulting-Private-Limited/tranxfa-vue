@@ -2,12 +2,12 @@
 import {
   ArrowRightIcon,
   CheckIcon, ChevronDownIcon,
-  ClockIcon,
   PaperAirplaneIcon,
   PlusIcon,
   TruckIcon,
   UserIcon, XMarkIcon, DivideIcon, BanknotesIcon, ExclamationTriangleIcon,
-    PercentBadgeIcon, InformationCircleIcon
+  PercentBadgeIcon, InformationCircleIcon,
+  ClipboardDocumentIcon,
 } from "@heroicons/vue/20/solid/index.js";
 import {
   Listbox,
@@ -15,9 +15,12 @@ import {
   ListboxLabel,
   ListboxOption,
   ListboxOptions,
-
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
 } from "@headlessui/vue";
-import {computed, onMounted, reactive, ref} from "vue";
+import { useClipboard } from '@vueuse/core'
+import {computed, onMounted, onUnmounted, reactive, ref, watch} from "vue";
 import { useQuoteUtils } from "@/composables/quote_utils.js";
 import MoneyInput from "@/components/MoneyInput.vue";
 import MoneyInputShimmer from "@/components/MoneyInputShimmer.vue";
@@ -156,6 +159,107 @@ const selectedPayoutMethod = computed({
   }
 })
 
+function pickNonEmpty(...values) {
+  for (const v of values) {
+    if (v === null || v === undefined) continue
+    const s = String(v).trim()
+    if (s !== '') return v
+  }
+  return null
+}
+
+/** Total payable in payment currency — API string first, else sum local + fees. */
+const totalDueDisplay = computed(() => {
+  const q = quoteUtil.quote.data
+  if (!q) return ''
+
+  const fromApi = pickNonEmpty(
+    q.totalAmountCurrencyPrefixed,
+    q.totalAmountFormatted,
+  )
+  if (fromApi != null) return fromApi
+
+  const currency = q.paymentCurrency
+  const local = Number(q.localAmount)
+  const fees = Number(q.baseFees ?? 0)
+  if (currency?.code && !Number.isNaN(local)) {
+    const total = local + (Number.isNaN(fees) ? 0 : fees)
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: currency.code,
+        minimumFractionDigits: currency.decimalPlaces ?? 2,
+        maximumFractionDigits: currency.decimalPlaces ?? 2,
+      }).format(total)
+    } catch {
+      /* invalid currency code */
+    }
+  }
+
+  return pickNonEmpty(
+    q.subTotalAmountCurrencyPrefixed,
+    q.subTotalAmountFormatted,
+    q.localAmountCurrencyPrefixed,
+    q.localAmountFormatted,
+  ) ?? ''
+})
+
+const totalDueBreakdown = computed(() => {
+  const q = quoteUtil.quote.data
+  if (!q) return ''
+  const sub = pickNonEmpty(q.subTotalAmountCurrencyPrefixed, q.subTotalAmountFormatted)
+  const fees = pickNonEmpty(q.baseFeesCurrencyPrefixed, q.baseFeesFormatted)
+  if (sub && fees) return `Subtotal ${sub} · Fees ${fees}`
+  if (sub) return `Subtotal ${sub}`
+  return ''
+})
+
+const totalAmountTransitionKey = computed(() =>
+  isFetchingQuote.value ? 'loading' : (totalDueDisplay.value || '—'),
+)
+
+const amountFlash = ref(false)
+let amountFlashTimer = null
+watch(totalDueDisplay, (newVal, oldVal) => {
+  if (isFetchingQuote.value) return
+  const o = pickNonEmpty(oldVal)
+  const n = pickNonEmpty(newVal)
+  if (!o || !n || o === n) return
+  amountFlash.value = true
+  clearTimeout(amountFlashTimer)
+  amountFlashTimer = setTimeout(() => {
+    amountFlash.value = false
+  }, 700)
+})
+
+const { copy } = useClipboard()
+const copySucceeded = ref(false)
+let copySucceededTimer = null
+
+async function copyTotalDue() {
+  const t = totalDueDisplay.value
+  if (!t || t === '—') return
+  try {
+    await copy(t)
+  } catch {
+    try {
+      await navigator.clipboard.writeText(t)
+    } catch {
+      return
+    }
+  }
+  copySucceeded.value = true
+  clearTimeout(copySucceededTimer)
+  copySucceededTimer = setTimeout(() => {
+    copySucceeded.value = false
+  }, 2000)
+}
+
+onUnmounted(() => {
+  clearTimeout(amountFlashTimer)
+  clearTimeout(copySucceededTimer)
+})
+
 onMounted(getQuote)
 
 function saveQuote() {
@@ -197,16 +301,16 @@ function saveQuote() {
       <ul role="list" class="-mb-8">
         <li>
           <div class="relative pb-4">
-            <span class="absolute top-6 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
+            <!-- <span class="absolute top-6 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" /> -->
             <div class="relative flex space-x-3">
               <div class="flex flex-1 justify-between space-x-4 pt-1.5">
                 <div class="flex-1">
                   <div>
                     <div class="flex items-center justify-start">
-                    <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
+                    <!-- <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <PaperAirplaneIcon class="size-4 text-white"/>
-                    </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="send-money-input" class="block text-sm/6 font-medium ml-2  tracking-wider">You send</label>
+                    </span> -->
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="send-money-input" class="block text-sm/6 font-medium ml-2  tracking-wider">If you send</label>
                     </div>
                     <div class="mt-2">
                       <MoneyInput
@@ -230,63 +334,16 @@ function saveQuote() {
         </li>
         <li>
           <div class="relative pb-4">
-            <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
-            <div class="relative flex space-x-3">
-              <div>
-              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
-                  <DivideIcon v-if="! isFetchingQuote && quoteUtil.quote.data?.exchangeRateIsInverse" class="size-5 text-white"/>
-                  <XMarkIcon v-else-if="! isFetchingQuote && !quoteUtil.quote.data?.exchangeRateIsInverse" class="size-4 text-white"/>
-                  <BanknotesIcon v-else class="size-4 text-white" />
-              </span>
-              </div>
-              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRateFormatted }}</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
-                </div>
-                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
-                  <span>Our Rate</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li>
-          <div class="relative pb-2">
-            <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
-            <div class="relative flex space-x-3">
-              <div>
-              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
-                  <PlusIcon class="size-5 text-white"/>
-              </span>
-              </div>
-              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                <div>
-                  <p v-if="! isFetchingQuote" class="text-sm tracking-wider">
-                    <span class="text-emerald-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
-                    <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
-                  </p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
-                </div>
-                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
-                  <span>Fees</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li>
-          <div class="relative pb-4">
-            <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
+            <!-- <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" /> -->
             <div class="relative flex space-x-3">
               <div class="flex flex-1 justify-between space-x-4 pt-1.5">
                 <div class="flex-1">
                   <div>
                     <div class="flex items-center justify-start">
-                    <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
+                    <!-- <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <UserIcon class="size-4 text-white"/>
-                    </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.wholeName || 'Recipient' }} Gets</label>
+                    </span> -->
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.wholeName || 'Recipient' }} they will receive</label>
                     </div>
                     <div class="mt-4">
                       <MoneyInput
@@ -311,15 +368,62 @@ function saveQuote() {
         </li>
         <li>
           <div class="relative pb-4">
-            <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
+            <!-- <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" /> -->
+            <div class="relative flex space-x-3">
+              <div>
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
+                  <DivideIcon v-if="! isFetchingQuote && quoteUtil.quote.data?.exchangeRateIsInverse" class="size-5 text-white"/>
+                  <XMarkIcon v-else-if="! isFetchingQuote && !quoteUtil.quote.data?.exchangeRateIsInverse" class="size-4 text-white"/>
+                  <BanknotesIcon v-else class="size-4 text-white" />
+              </span>
+              </div>
+              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                <div>
+                  <p v-if="! isFetchingQuote" class="text-sm text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRateFormatted }}</p>
+                  <p v-else class="text-sm bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
+                </div>
+                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
+                  <span>Our Rate</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="relative pb-2">
+            <!-- <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" /> -->
+            <div class="relative flex space-x-3">
+              <div>
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
+                  <PlusIcon class="size-5 text-white"/>
+              </span>
+              </div>
+              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                <div>
+                  <p v-if="! isFetchingQuote" class="text-sm tracking-wider">
+                    <span class="text-emerald-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
+                    <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
+                  </p>
+                  <p v-else class="text-sm bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
+                </div>
+                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
+                  <span>Fees</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="relative pb-4">
+            <!-- <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" /> -->
             <div class="relative flex space-x-3">
               <div class="flex flex-1 justify-between space-x-4 pt-1.5">
                 <div class="flex-1">
                   <div>
                     <div class="flex items-center justify-start">
-                    <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
+                    <!-- <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <TruckIcon class="size-4 text-white"/>
-                    </span>
+                    </span> -->
                       <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="price" class="block text-sm/6 font-medium ml-2 tracking-wider">Delivery Method</label>
                     </div>
                     <div class="mt-4">
@@ -402,21 +506,84 @@ function saveQuote() {
             </div>
           </div>
         </li>
-        <li>
-          <div class="relative pb-2">
+        <li class="pt-1">
+          <div
+            class="total-due-shell group relative overflow-hidden rounded-2xl border border-brand-100/90 bg-gradient-to-br from-white via-brand-50/40 to-white p-4 shadow-sm ring-1 ring-brand-100/40 transition-[box-shadow,transform,border-color,ring-color] duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-200/90 hover:shadow-md hover:ring-brand-200/70"
+          >
+            <div
+              class="pointer-events-none absolute -right-10 -top-12 size-36 rounded-full bg-gradient-to-br from-brand-200/25 to-brand-400/10 blur-2xl transition-all duration-500 group-hover:from-brand-300/35 group-hover:to-brand-500/15"
+              aria-hidden="true"
+            />
+            <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-200/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" aria-hidden="true" />
 
-            <div class="relative flex space-x-3">
-
-              <div>
-              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
-                  <ClockIcon class="size-5 text-white"/>
-              </span>
+            <div class="relative flex items-start gap-3">
+              <div class="shrink-0 pt-0.5">
+                <span
+                  :class="[
+                    'flex size-10 items-center justify-center rounded-xl shadow-md ring-2 ring-white/80 transition-transform duration-300 ease-out group-hover:scale-105 group-hover:shadow-lg',
+                    !isFetchingQuote ? 'bg-gradient-to-br from-brand-600 to-brand-800' : 'bg-gray-300',
+                  ]"
+                >
+                  <BanknotesIcon class="size-5 text-white drop-shadow-sm" aria-hidden="true" />
+                </span>
               </div>
-              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-brand-700 font-semibold tracking-wider">Blazing Fast, Instant Transfers</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
-                </div>
+
+              <div class="min-w-0 flex-1 pt-0.5">
+                <template v-if="!isFetchingQuote">
+                  <div class="flex items-start justify-between gap-2">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.12em] text-brand-900/70">
+                      Total pay
+                    </p>
+                    <button
+                      v-if="totalDueDisplay && totalDueDisplay !== '—'"
+                      type="button"
+                      class="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-brand-800/80 transition-colors hover:bg-brand-100/90 hover:text-brand-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1"
+                      :title="copySucceeded ? 'Copied' : 'Copy amount'"
+                      @click="copyTotalDue"
+                    >
+                      <CheckIcon v-if="copySucceeded" class="size-4 text-emerald-600" aria-hidden="true" />
+                      <ClipboardDocumentIcon v-else class="size-4 text-brand-700/80" aria-hidden="true" />
+                      <span class="hidden sm:inline">{{ copySucceeded ? 'Copied' : 'Copy' }}</span>
+                    </button>
+                  </div>
+
+                  <Transition name="total-amount" mode="out-in">
+                    <p
+                      :key="totalAmountTransitionKey"
+                      :class="[
+                        'mt-2 break-words text-2xl font-bold leading-tight tracking-tight text-gray-900 tabular-nums sm:text-3xl',
+                        amountFlash ? 'total-due-flash' : '',
+                      ]"
+                    >
+                      {{ totalDueDisplay || '—' }}
+                    </p>
+                  </Transition>
+
+                  <Disclosure v-if="totalDueBreakdown" v-slot="{ open }" as="div" class="mt-3">
+                    <DisclosureButton
+                      type="button"
+                      class="flex w-full items-center justify-between gap-2 rounded-xl border border-brand-100/80 bg-white/70 px-3 py-2.5 text-left text-xs font-semibold text-brand-900 shadow-sm backdrop-blur-sm transition hover:border-brand-200 hover:bg-brand-50/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                    >
+                      <span>{{ open ? 'Hide breakdown' : 'Fee breakdown' }}</span>
+                      <ChevronDownIcon
+                        :class="[
+                          'size-4 shrink-0 text-brand-700 transition-transform duration-200',
+                          open ? 'rotate-180' : '',
+                        ]"
+                        aria-hidden="true"
+                      />
+                    </DisclosureButton>
+                    <DisclosurePanel class="mt-2 rounded-xl border border-gray-100 bg-gray-50/80 px-3 py-2.5 text-xs leading-relaxed text-gray-600">
+                      {{ totalDueBreakdown }}
+                    </DisclosurePanel>
+                  </Disclosure>
+                </template>
+
+                <template v-else>
+                  <p class="h-3 w-28 max-w-full rounded bg-gray-200/90 pulse"></p>
+                  <p class="mt-4 h-10 w-full max-w-[14rem] rounded-lg bg-gray-300/90 pulse"></p>
+                  <p class="mt-3 h-3 w-full max-w-[18rem] rounded bg-gray-200/80 pulse"></p>
+                </template>
               </div>
             </div>
           </div>
@@ -478,5 +645,34 @@ function saveQuote() {
 
 .pulse {
   animation: heartbeat-opacity 1.5s infinite ease-in-out;
+}
+
+.total-amount-enter-active,
+.total-amount-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.total-amount-enter-from {
+  opacity: 0;
+  transform: translateY(0.35rem);
+}
+
+.total-amount-leave-to {
+  opacity: 0;
+  transform: translateY(-0.25rem);
+}
+
+@keyframes total-due-flash-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(13, 148, 136, 0);
+  }
+}
+
+.total-due-flash {
+  animation: total-due-flash-ring 0.7s ease-out;
+  border-radius: 0.375rem;
 }
 </style>

@@ -72,8 +72,8 @@ watch(canAttemptPayment, async () => {
 
 <template>
   <CustomerLayout>
-    <main class="-mt-24 py-8">
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+    <main class="py-8">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-full lg:px-8">
         <h1 class="sr-only">Make Payment</h1>
         <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
           <div class="text-center" v-if="isLoading">

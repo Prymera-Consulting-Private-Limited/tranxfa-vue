@@ -79,49 +79,166 @@ const passwordChanged = async () => {
 
 <template>
   <CustomerLayout>
-    <main class="-mt-24 py-8">
-      <div class="mx-auto max-w-3xl lg:max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="rounded-lg bg-white px-4 sm:px-6 lg:px-8 py-6">
-          <section aria-labelledby="section-2-title">
+    <main class="relative">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:max-w-full lg:px-8">
+        <section
+          aria-labelledby="section-2-title"
+          class="relative overflow-hidden rounded-3xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/[0.04]"
+        >
+          <div
+            class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_55%_at_50%_-25%,rgba(20,184,166,0.14),transparent)]"
+            aria-hidden="true"
+          />
+          <div
+            class="pointer-events-none absolute -right-20 top-0 h-56 w-56 rounded-full bg-violet-400/[0.12] blur-3xl sm:right-10"
+            aria-hidden="true"
+          />
+          <div
+            class="pointer-events-none absolute -bottom-24 left-0 h-64 w-64 rounded-full bg-brand-400/[0.08] blur-3xl"
+            aria-hidden="true"
+          />
+
+          <div class="relative px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
             <h1 class="sr-only" id="section-2-title">Account Settings</h1>
-            <div class="mb-6">
-              <h2 class="text-base font-semibold text-gray-900">Account Settings</h2>
-              <p class="mt-1 text-sm text-gray-500">Manage your personal details, security settings, and connected devices all in one place.</p>
-            </div>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 lg:gap-8 max-w-2xl">
-              <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
-                <UserIcon class="h-6 w-6 text-brand-600 mb-2" />
+
+            <header class="mb-10 max-w-2xl lg:mb-12">
+              <p
+                class="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-100/90 bg-brand-50/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-800"
+              >
+                <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-500" aria-hidden="true" />
+                Your account
+              </p>
+              <h2 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                Account
+                <span
+                  class="bg-gradient-to-r from-brand-600 via-teal-600 to-brand-500 bg-clip-text text-transparent"
+                >
+                  settings
+                </span>
+              </h2>
+              <p class="mt-3 text-sm leading-relaxed text-gray-600 sm:text-base">
+                Manage your personal details, security settings, and connected devices all in one place.
+              </p>
+            </header>
+
+            <div class="grid max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:gap-7">
+              <article
+                class="group relative flex min-h-[11.5rem] flex-col overflow-hidden rounded-2xl border border-gray-200/90 bg-gradient-to-b from-white to-gray-50/50 p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-brand-300/70 hover:shadow-md lg:min-h-[12rem] lg:p-6"
+              >
+                <div
+                  class="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-brand-400/15 opacity-0 blur-2xl transition duration-500 group-hover:opacity-100"
+                  aria-hidden="true"
+                />
+                <div
+                  class="relative mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-100 to-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200/50 transition duration-300 group-hover:scale-[1.03] group-hover:shadow-md"
+                >
+                  <UserIcon class="h-6 w-6" />
+                </div>
                 <h3 class="text-base font-semibold text-gray-900">Personal Details</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">View and update your name, email address, and other personal information.</p>
-                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Modify &rarr;</a>
-              </div>
-              <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
-                <HomeIcon class="h-6 w-6 text-brand-600 mb-2" />
+                <p class="mt-2 flex-grow text-sm leading-relaxed text-gray-600">
+                  View and update your name, email address, and other personal information.
+                </p>
+                <a
+                  href="javascript:"
+                  class="relative mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition hover:gap-2.5 hover:text-brand-500"
+                  @click="isPersonalDetailsModalOpen = true"
+                >
+                  Modify
+                  <span aria-hidden="true">→</span>
+                </a>
+              </article>
+
+              <article
+                class="group relative flex min-h-[11.5rem] flex-col overflow-hidden rounded-2xl border border-gray-200/90 bg-gradient-to-b from-white to-emerald-50/20 p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-emerald-200/90 hover:shadow-md lg:min-h-[12rem] lg:p-6"
+              >
+                <div
+                  class="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-emerald-400/15 opacity-0 blur-2xl transition duration-500 group-hover:opacity-100"
+                  aria-hidden="true"
+                />
+                <div
+                  class="relative mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50/90 text-emerald-700 shadow-sm ring-1 ring-emerald-200/60 transition duration-300 group-hover:scale-[1.03] group-hover:shadow-md"
+                >
+                  <HomeIcon class="h-6 w-6" />
+                </div>
                 <h3 class="text-base font-semibold text-gray-900">Address</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Ensure your billing and shipping address details are up-to-date.</p>
-                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Modify &rarr;</a>
-              </div>
-              <div v-if="false" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
-                <PhoneIcon class="h-6 w-6 text-brand-600 mb-2" />
+                <p class="mt-2 flex-grow text-sm leading-relaxed text-gray-600">
+                  Ensure your billing and shipping address details are up-to-date.
+                </p>
+                <a
+                  href="javascript:"
+                  class="relative mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 transition hover:gap-2.5 hover:text-emerald-600"
+                  @click="isAddressModalOpen = true"
+                >
+                  Modify
+                  <span aria-hidden="true">→</span>
+                </a>
+              </article>
+
+              <div
+                v-if="false"
+                class="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 lg:p-6"
+              >
+                <PhoneIcon class="mb-2 h-6 w-6 text-brand-600" />
                 <h3 class="text-base font-semibold text-gray-900">Mobile Number</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Update your phone number for account recovery and notifications.</p>
-                <a href="#" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Update &rarr;</a>
+                <p class="mt-2 flex-grow text-sm text-gray-500">
+                  Update your phone number for account recovery and notifications.
+                </p>
+                <a href="#" class="mt-auto text-sm font-semibold text-brand-600 hover:text-brand-500">Update &rarr;</a>
               </div>
-              <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
-                <LockClosedIcon class="h-6 w-6 text-brand-600 mb-2" />
+
+              <article
+                class="group relative flex min-h-[11.5rem] flex-col overflow-hidden rounded-2xl border border-gray-200/90 bg-gradient-to-b from-white to-amber-50/25 p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-amber-200/90 hover:shadow-md lg:min-h-[12rem] lg:p-6"
+              >
+                <div
+                  class="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-amber-400/15 opacity-0 blur-2xl transition duration-500 group-hover:opacity-100"
+                  aria-hidden="true"
+                />
+                <div
+                  class="relative mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-100 to-amber-50 text-amber-800 shadow-sm ring-1 ring-amber-200/70 transition duration-300 group-hover:scale-[1.03] group-hover:shadow-md"
+                >
+                  <LockClosedIcon class="h-6 w-6" />
+                </div>
                 <h3 class="text-base font-semibold text-gray-900">Password</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Change your password to keep your account secure.</p>
-                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Change Password &rarr;</a>
-              </div>
-              <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
-                <DevicePhoneMobileIcon class="h-6 w-6 text-brand-600 mb-2" />
+                <p class="mt-2 flex-grow text-sm leading-relaxed text-gray-600">
+                  Change your password to keep your account secure.
+                </p>
+                <a
+                  href="javascript:"
+                  class="relative mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-amber-800 transition hover:gap-2.5 hover:text-amber-700"
+                  @click="isChangePasswordModalOpen = true"
+                >
+                  Change Password
+                  <span aria-hidden="true">→</span>
+                </a>
+              </article>
+
+              <article
+                class="group relative flex min-h-[11.5rem] flex-col overflow-hidden rounded-2xl border border-gray-200/90 bg-gradient-to-b from-white to-indigo-50/25 p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-indigo-200/90 hover:shadow-md lg:min-h-[12rem] lg:p-6"
+              >
+                <div
+                  class="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-indigo-400/15 opacity-0 blur-2xl transition duration-500 group-hover:opacity-100"
+                  aria-hidden="true"
+                />
+                <div
+                  class="relative mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-100 to-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200/60 transition duration-300 group-hover:scale-[1.03] group-hover:shadow-md"
+                >
+                  <DevicePhoneMobileIcon class="h-6 w-6" />
+                </div>
                 <h3 class="text-base font-semibold text-gray-900">Devices</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Manage devices that have access to your account.</p>
-                <router-link class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500 cursor-pointer" :to="{name: 'devices'}">Manage Devices &rarr;</router-link>
-              </div>
+                <p class="mt-2 flex-grow text-sm leading-relaxed text-gray-600">
+                  Manage devices that have access to your account.
+                </p>
+                <router-link
+                  class="relative mt-4 inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-indigo-700 transition hover:gap-2.5 hover:text-indigo-600"
+                  :to="{ name: 'devices' }"
+                >
+                  Manage Devices
+                  <span aria-hidden="true">→</span>
+                </router-link>
+              </article>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
     </main>
     <TransitionRoot as="div" :show="isChangePasswordModalOpen">

@@ -326,8 +326,8 @@ const canContinue = computed(() => {
 
 <template>
   <CustomerLayout>
-    <main class="-mt-24 py-8">
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-5"  v-if="snapshot.value !== 'poiInfoCheckFailed'">
+    <main class=" py-8">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-full lg:px-8 py-5"  v-if="snapshot.value !== 'poiInfoCheckFailed'">
         <h1 class="sr-only">Review & Confirm</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-lg p-4 md:px-6 md:py-10 shadow-lg">

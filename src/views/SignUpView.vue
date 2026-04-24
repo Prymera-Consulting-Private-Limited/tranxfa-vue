@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, unref } from "vue";
 import router from "@/router/index.js";
 import { usePasswordPolicyStore } from "@/stores/password_policy.js";
 import { useCustomerUtils } from "@/composables/customer_utils.js";
@@ -102,6 +102,23 @@ const canContinue = computed(() => {
   }
   return false;
 })
+
+const passwordRulesStats = computed(() => {
+  const rules = validatedPasswordPolicies.rules;
+  if (!rules.length) {
+    return { failed: 0, passed: 0, total: 0, allPass: false, hasInput: false };
+  }
+  let failed = 0;
+  let passed = 0;
+  for (const r of rules) {
+    const ok = unref(r.outcome);
+    if (ok === true) passed++;
+    else if (ok === false) failed++;
+  }
+  const hasInput = form.password.length > 0;
+  const allPass = hasInput && failed === 0 && passed === rules.length;
+  return { failed, passed, total: rules.length, allPass, hasInput };
+})
 </script>
 
 <template>
@@ -167,26 +184,60 @@ const canContinue = computed(() => {
           </div>
 
           <!-- Password Rules -->
-          <ul class="space-y-1">
-            <li v-for="validatedPasswordPolicyRule in validatedPasswordPolicies.rules">
-              <div class="flex items-center gap-2 text-xs">
-                <i v-if="validatedPasswordPolicyRule?.outcome === true" class="pi pi-check-circle text-emerald-500"></i>
-                <i v-else-if="validatedPasswordPolicyRule?.outcome === false"
-                  class="pi pi-times-circle text-red-500"></i>
-                <i v-else class="pi pi-circle text-gray-400"></i>
+          <details
+            class="group rounded-xl border border-gray-200 bg-gray-50/80 overflow-hidden transition-shadow hover:border-gray-300 open:shadow-sm">
+            <summary
+              class="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 text-xs select-none [&::-webkit-details-marker]:hidden">
+              <span class="flex min-w-0 flex-1 items-center gap-2">
+                <template v-if="passwordRulesStats.total === 0">
+                  <i class="pi pi-shield text-gray-400 shrink-0"></i>
+                  <span class="font-medium text-gray-500">Password requirements</span>
+                </template>
+                <template v-else-if="passwordRulesStats.allPass">
+                  <i class="pi pi-check-circle shrink-0 text-emerald-500"></i>
+                  <span class="font-medium text-emerald-700">All requirements met</span>
+                </template>
+                <template v-else-if="passwordRulesStats.hasInput && passwordRulesStats.failed > 0">
+                  <i class="pi pi-times-circle shrink-0 text-red-500"></i>
+                  <span class="font-medium text-red-700">
+                    {{ passwordRulesStats.failed }} of {{ passwordRulesStats.total }} not met
+                  </span>
+                </template>
+                <template v-else>
+                  <i class="pi pi-shield text-gray-400 shrink-0"></i>
+                  <span class="font-medium text-gray-600">Password requirements</span>
+                </template>
+              </span>
+              <i
+                class="pi pi-chevron-down text-gray-400 transition-transform duration-200 group-open:rotate-180 shrink-0"></i>
+            </summary>
+            <div class="space-y-1.5 border-t border-gray-200/80 bg-white/60 px-3 py-2.5">
+              <p v-if="passwordRulesStats.total === 0" class="text-[11px] text-gray-400">
+                Loading rules…
+              </p>
+              <ul v-else class="space-y-1">
+                <li v-for="validatedPasswordPolicyRule in validatedPasswordPolicies.rules" :key="validatedPasswordPolicyRule.id">
+                  <div class="flex items-start gap-2 text-xs leading-snug">
+                    <i v-if="validatedPasswordPolicyRule?.outcome === true"
+                      class="pi pi-check-circle mt-0.5 shrink-0 text-emerald-500"></i>
+                    <i v-else-if="validatedPasswordPolicyRule?.outcome === false"
+                      class="pi pi-times-circle mt-0.5 shrink-0 text-red-500"></i>
+                    <i v-else class="pi pi-circle mt-0.5 shrink-0 text-gray-400"></i>
 
-                <span :class="[
-                  validatedPasswordPolicyRule?.outcome === true
-                    ? 'text-emerald-500'
-                    : validatedPasswordPolicyRule?.outcome === false
-                      ? 'text-red-500'
-                      : 'text-gray-400'
-                ]">
-                  {{ validatedPasswordPolicyRule.message }}
-                </span>
-              </div>
-            </li>
-          </ul>
+                    <span :class="[
+                      validatedPasswordPolicyRule?.outcome === true
+                        ? 'text-emerald-700'
+                        : validatedPasswordPolicyRule?.outcome === false
+                          ? 'text-red-700'
+                          : 'text-gray-500'
+                    ]">
+                      {{ validatedPasswordPolicyRule.message }}
+                    </span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </details>
 
           <!-- Confirm Password -->
           <div>
