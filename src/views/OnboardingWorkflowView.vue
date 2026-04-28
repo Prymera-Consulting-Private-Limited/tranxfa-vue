@@ -4,10 +4,8 @@ import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useMachine} from "@xstate/vue";
 import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_machine.js";
-import EmailVerification from "@/components/Customer/EmailVerification.vue";
 import OriginCountrySelection from "@/components/Customer/OriginCountrySelection.vue";
 import IdentityInformation from "@/components/Customer/IdentityInformation.vue";
-import MobileNumberInput from "@/components/Customer/MobileNumberInput.vue";
 import router from "@/router/index.js";
 import EmploymentInformation from "@/components/Customer/EmploymentInformation.vue";
 
@@ -60,9 +58,8 @@ const editPersonalInformation = () => {
             <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
           </div>
         </div>
-        <EmailVerification v-if="snapshot?.value === 'emailVerification'" v-on:emailVerified="proceed" />
         <OriginCountrySelection
-            v-else-if="snapshot?.value === 'sourceCountrySelection'"
+            v-if="snapshot?.value === 'sourceCountrySelection'"
             v-on:countryUpdated="proceed" />
         <IdentityInformation
             v-else-if="snapshot?.value === 'identityInformation'"
@@ -72,11 +69,6 @@ const editPersonalInformation = () => {
             v-else-if="snapshot?.value === 'employmentInformation'"
             v-on:employmentUpdated="proceed"
             v-on:editPersonalInformationRequested="editPersonalInformation" />
-        <MobileNumberInput
-            v-else-if="snapshot?.value === 'mobileNumberInput'"
-            v-on:mobileNumberUpdated="proceed"
-            v-on:editPersonalInformationRequested="editPersonalInformation"
-        />
       </div>
     </div>
   </main>

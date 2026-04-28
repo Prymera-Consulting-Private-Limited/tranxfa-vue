@@ -1,6 +1,6 @@
 <script setup>
 import IsdCodeInput from "@/components/IsdCodeInput.vue";
-import {reactive, watch} from "vue";
+import {computed, reactive, watch} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
 
 const customerStore = useCustomerStore();
@@ -29,14 +29,24 @@ function updateIsdCode(updated) {
 watch(mobileNumber, () => {
   emit('update:mobileNumberUpdated', mobileNumber);
 })
+
+const countryErrorMessage = computed(() => {
+  const e = props.errors;
+  if (!e) return null;
+  if (e.country?.length) return e.country[0];
+  if (e.mobile_number_country_id?.length) return e.mobile_number_country_id[0];
+  return null;
+});
+
+const countryHasError = computed(() => countryErrorMessage.value != null);
 </script>
 
 <template>
   <div>
-    <label :class="[errors?.mobile_number_country_id?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Country</label>
+    <label :class="[countryHasError ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Country</label>
     <p class="mt-2 mb-3 text-gray-400 text-sm"></p>
     <IsdCodeInput v-bind:modelValue="mobileNumber?.country" v-on:update:modelValue="updateIsdCode" />
-    <p v-if="errors?.mobile_number_country_id?.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ errors.mobile_number_country_id[0] }}</p>
+    <p v-if="countryHasError" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ countryErrorMessage }}</p>
   </div>
   <div>
     <label for="mobile-number" :class="[errors?.mobile_number?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">Mobile Number</label>

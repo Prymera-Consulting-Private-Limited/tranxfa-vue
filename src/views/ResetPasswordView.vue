@@ -121,7 +121,7 @@ async function resetPassword() {
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-16 mb-5"></a>
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-6">Reset Password</h2>

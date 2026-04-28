@@ -3,6 +3,29 @@ import {useCustomerStore} from "@/stores/customer.js";
 import axios from "axios";
 
 let refreshPromise = null;
+
+function clientMobileAuthHeaders() {
+    const token = import.meta.env.VITE_APP_CLIENT_TOKEN;
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+    return headers;
+}
+
+function optionalFcmToken() {
+    const t = import.meta.env.VITE_FCM_TOKEN;
+    return t && String(t).length > 0 ? String(t) : undefined;
+}
+
+function withFcm(payload) {
+    const fcm = optionalFcmToken();
+    if (fcm) {
+        return { ...payload, fcm_token: fcm };
+    }
+    return { ...payload };
+}
+
 export function useCustomerUtils() {
     const customerStore = useCustomerStore();
     function updateStore(data) {
@@ -10,24 +33,71 @@ export function useCustomerUtils() {
         customerStore.isLoaded = true;
     }
 
-    async function register(email, password, confirmPassword, thirdPartyDeclarationAccepted = false) {
-        await axios.post('/client/v1/signup', {
-            email: email,
-            password: password,
-            confirm_password: confirmPassword,
-            third_party_declaration_accepted: thirdPartyDeclarationAccepted,
-        }).then((response) => {
+    /**
+     * Step 1 signup: request OTP to mobile
+     * @param {object} [options]
+     * @param {boolean} [options.third_party_declaration_accepted]
+     */
+    async function requestSignupOtp(country, mobile_number, options = {}) {
+        const payload = {
+            country: String(country),
+            mobile_number: String(mobile_number),
+        };
+        if (options.third_party_declaration_accepted !== undefined) {
+            payload.third_party_declaration_accepted = options.third_party_declaration_accepted;
+        }
+        await axios.post(
+            '/client/v1/signup',
+            withFcm(payload),
+            { headers: clientMobileAuthHeaders() },
+        );
+    }
+
+    async function requestLoginOtp(country, mobile_number) {
+        await axios.post(
+            '/client/v1/get-login-otp',
+            withFcm({
+                country: String(country),
+                mobile_number: String(mobile_number),
+            }),
+            { headers: clientMobileAuthHeaders() },
+        );
+    }
+
+    async function loginWithMobileOtp(country, mobile_number, otp) {
+        await axios.post(
+            '/client/v1/login',
+            withFcm({
+                country: String(country),
+                mobile_number: String(mobile_number),
+                password: String(otp),
+            }),
+            { headers: clientMobileAuthHeaders() },
+        ).then((response) => {
             updateStore(response.data);
         });
     }
 
-    async function login(email, password) {
-        await axios.post('/client/v1/login', {
-            email: email,
-            password: password,
-        }).then((response) => {
-            updateStore(response.data);
-        })
+    async function resendLoginOtp(country, mobile_number) {
+        await axios.post(
+            '/client/v1/get-login-otp',
+            withFcm({
+                country: String(country),
+                mobile_number: String(mobile_number),
+            }),
+            { headers: clientMobileAuthHeaders() },
+        );
+    }
+
+    async function resendMobileVerification(country, mobile_number) {
+        await axios.post(
+            '/client/v1/resend-mobile-verification',
+            withFcm({
+                country: String(country),
+                mobile_number: String(mobile_number),
+            }),
+            { headers: clientMobileAuthHeaders() },
+        );
     }
 
     async function mfa(otp) {
@@ -183,8 +253,11 @@ export function useCustomerUtils() {
 
     return {
         updateStore,
-        register,
-        login,
+        requestSignupOtp,
+        requestLoginOtp,
+        loginWithMobileOtp,
+        resendLoginOtp,
+        resendMobileVerification,
         mfa,
         resendMfaOtp,
         refresh,
