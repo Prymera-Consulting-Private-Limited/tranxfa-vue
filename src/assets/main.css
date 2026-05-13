@@ -9,15 +9,12 @@
 @layer theme {
     @theme {
     --default-font-family: 'Inter', sans-serif;
-
     --color-brand-50: #E6F0EC;
     --color-brand-100: #CCE0D8;
     --color-brand-200: #99C2B1;
     --color-brand-300: #66A38A;
     --color-brand-400: #338563;
-
     --color-brand-500: #045F3D;
-
     --color-brand-600: #035635;
     --color-brand-700: #024D2E;
     --color-brand-800: #013C24;
