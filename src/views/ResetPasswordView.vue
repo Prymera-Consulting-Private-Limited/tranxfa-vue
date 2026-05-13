@@ -99,7 +99,7 @@ async function resetPassword() {
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
-          <img src="/images/backgrounds/forgot-password.webp" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/forgot-password.png" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-h-16 mb-5"></a>
