@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import { UserIcon, HomeIcon, PhoneIcon, LockClosedIcon, DevicePhoneMobileIcon } from '@heroicons/vue/24/outline';
+import { UserIcon, HomeIcon, PhoneIcon, DevicePhoneMobileIcon } from '@heroicons/vue/24/outline';
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {computed, onMounted, ref} from "vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
@@ -10,12 +10,9 @@ import {useCountriesStore} from "@/stores/countries.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountryUtils} from "@/composables/country_utils.js";
 import {notify} from 'notiwind';
-import ChangePassword from "@/components/ChangePassword.vue";
-import router from "@/router/index.js";
 
 const isPersonalDetailsModalOpen = ref(false);
 const isAddressModalOpen = ref(false);
-const isChangePasswordModalOpen = ref(false);
 
 const isLoading = ref(false)
 const customerStore = useCustomerStore()
@@ -70,11 +67,6 @@ const addressUpdateFailed = () => {
   isAddressModalOpen.value = true;
 }
 
-const passwordChanged = async () => {
-  isChangePasswordModalOpen.value = false;
-  await router.push({name: 'signIn', query: {referer: "change-password"}});
-}
-
 </script>
 
 <template>
@@ -107,11 +99,10 @@ const passwordChanged = async () => {
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Update your phone number for account recovery and notifications.</p>
                 <a href="#" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Update &rarr;</a>
               </div>
-              <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
-                <LockClosedIcon class="h-6 w-6 text-brand-600 mb-2" />
+              <div v-if="false" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <h3 class="text-base font-semibold text-gray-900">Password</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Change your password to keep your account secure.</p>
-                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Change Password &rarr;</a>
+                <a href="javascript:" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Change Password &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <DevicePhoneMobileIcon class="h-6 w-6 text-brand-600 mb-2" />
@@ -124,24 +115,6 @@ const passwordChanged = async () => {
         </div>
       </div>
     </main>
-    <TransitionRoot as="div" :show="isChangePasswordModalOpen">
-      <Dialog class="relative z-10" @close="isChangePasswordModalOpen = false">
-        <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
-        </TransitionChild>
-        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full min-w-sm md:min-w-md sm:max-w-2xl px-5 sm:px-6 lg:px-8 py-8">
-                <ChangePassword
-                    v-on:account:password:changed="passwordChanged"
-                />
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
     <TransitionRoot as="div" :show="isPersonalDetailsModalOpen">
       <Dialog class="relative z-10" @close="isPersonalDetailsModalOpen = false">
         <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">

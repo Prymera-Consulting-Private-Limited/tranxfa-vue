@@ -48,6 +48,14 @@ const router = createRouter({
         description: 'Register your account',
       },
     }, {
+      path: '/mobile-otp',
+      name: 'otpAuthentication',
+      component: () => import('@/views/OtpAuthenticationView.vue'),
+      meta: {
+        title: 'Verify mobile',
+        description: 'Enter the code sent to your phone',
+      },
+    }, {
       path: '/workflow/onboarding',
       name: 'onboardingWorkflow',
       component: () => import('@/views/OnboardingWorkflowView.vue'),

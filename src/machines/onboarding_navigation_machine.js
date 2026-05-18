@@ -8,37 +8,31 @@ const customerStore = useCustomerStore();
  */
 const customer = customerStore.customer;
 
+/** Skips email verification UI and mobile number step; mobile is already captured during auth. */
 export const onboardingNavigationMachine = createMachine({
     id: 'onboardingNavigation',
-    initial: 'emailVerification',
+    initial: 'bootstrap',
     context: {
     },
     states: {
-        emailVerification: {
-            on: {
-                PROCEED: [
-                    {
-                        target: 'onboardingComplete',
-                        guard: 'mobileNumberProvided',
-                    },
-                    {
-                        target: 'mobileNumberInput',
-                        guard: 'employmentInformationProvided',
-                    },
-                    {
-                        target: 'employmentInformation',
-                        guard: 'employmentInformationRequired',
-                    },
-                    {
-                        target: 'identityInformation',
-                        guard: 'countryProvided',
-                    },
-                    {
-                        target: 'sourceCountrySelection',
-                        guard: 'emailVerified',
-                    }
-                ],
-            },
+        bootstrap: {
+            always: [
+                {
+                    target: 'onboardingComplete',
+                    guard: 'employmentInformationProvided',
+                },
+                {
+                    target: 'employmentInformation',
+                    guard: 'employmentInformationRequired',
+                },
+                {
+                    target: 'identityInformation',
+                    guard: 'countryProvided',
+                },
+                {
+                    target: 'sourceCountrySelection',
+                },
+            ],
         },
         sourceCountrySelection: {
             on: {
@@ -57,7 +51,7 @@ export const onboardingNavigationMachine = createMachine({
                         target: 'employmentInformation',
                         guard: 'employmentInformationRequired',
                     }, {
-                        target: 'mobileNumberInput',
+                        target: 'onboardingComplete',
                         guard: 'employmentInformationProvided',
                     },
                 ],
@@ -70,21 +64,8 @@ export const onboardingNavigationMachine = createMachine({
             on: {
                 PROCEED: [
                     {
-                        target: 'mobileNumberInput',
-                        guard: 'employmentInformationProvided',
-                    },
-                ],
-                EDIT_PERSONAL_INFORMATION: {
-                    target: 'identityInformation',
-                }
-            },
-        },
-        mobileNumberInput: {
-            on: {
-                PROCEED: [
-                    {
                         target: 'onboardingComplete',
-                        guard: 'mobileNumberProvided',
+                        guard: 'employmentInformationProvided',
                     },
                 ],
                 EDIT_PERSONAL_INFORMATION: {
@@ -98,30 +79,15 @@ export const onboardingNavigationMachine = createMachine({
     }
 }, {
     guards: {
-        emailVerified: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true,
         countryProvided: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
             ((customer.data?.country || null) !== null),
-        identityInformationProvided: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
-            ((customer.data?.country || null) !== null) &&
-            ((customer.data?.identityInformationRequired?.() ?? false) === false),
         employmentInformationRequired: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
             ((customer.data?.country || null) !== null) &&
             ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
             ((customer.data?.employmentInformationRequired?.() ?? false) === true),
         employmentInformationProvided: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
             ((customer.data?.country || null) !== null) &&
             ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
             ((customer.data?.employmentInformationRequired?.() ?? false) === false),
-        mobileNumberProvided: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
-            ((customer.data?.country || null) !== null) &&
-            ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
-            ((customer.data?.employmentInformationRequired?.() ?? false) === false) &&
-            (customer.data?.account?.mobileNumber || null) !== null,
     }
 });
