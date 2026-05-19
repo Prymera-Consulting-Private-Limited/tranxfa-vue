@@ -34,7 +34,7 @@ const navSections = [
     id: 'budget',
     label: 'Budget',
     items: [
-      { name: 'Budgets', icon: 'pi pi-money-bill', to: { name: 'comingSoon', params: { feature: 'budgets' } } },
+      { name: 'Budgets', icon: 'pi pi-money-bill', to: { name: 'budgets' } },
     ],
   },
   {

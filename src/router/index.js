@@ -109,6 +109,14 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/budgets',
+      name: 'budgets',
+      component: () => import('@/views/Budget/IndexView.vue'),
+      meta: {
+        title: 'Budgets',
+        description: 'Manage your monthly spending budgets.',
+      },
+    }, {
       path: '/recipients',
       name: 'recipients',
       component: () => import('@/views/Recipient/IndexView.vue'),

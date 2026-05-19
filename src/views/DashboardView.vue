@@ -30,16 +30,27 @@ import { useRecipientUtils } from "@/composables/recipient_utils.js";
 import Recipient from "@/models/recipient.js";
 import RecipientCard from "@/components/Recipient/RecipientCard.vue";
 import RecipientCardShimmer from "@/components/Recipient/RecipientCardShimmer.vue";
-import { UserPlusIcon, PlusIcon } from "@heroicons/vue/24/outline/index.js";
+import { PlusIcon } from "@heroicons/vue/24/outline/index.js";
 import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
+import { useMonthlyBudgetUtils } from "@/composables/monthly_budget_utils.js";
+import MonthlyBudget from "@/models/monthly_budget.js";
+import CreateBudgetForm from "@/components/Budget/CreateBudgetForm.vue";
+import BudgetDashboardCard from "@/components/Budget/BudgetDashboardCard.vue";
+import BudgetDashboardCardShimmer from "@/components/Budget/BudgetDashboardCardShimmer.vue";
+import { BanknotesIcon, ArrowRightIcon } from "@heroicons/vue/24/outline";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const transactionUtils = useTransactionUtils();
 const recipientUtils = useRecipientUtils();
+const monthlyBudgetUtils = useMonthlyBudgetUtils();
 const isCreateRecipientModalOpen = ref(false);
+const isCreateBudgetModalOpen = ref(false);
 const createRecipient = () => {
   isCreateRecipientModalOpen.value = true;
+};
+const createBudget = () => {
+  isCreateBudgetModalOpen.value = true;
 };
 
 /**
@@ -140,9 +151,11 @@ const tasks = computed(() => {
 const isTransactionLoading = ref(true);
 const isTaskLoading = ref(true);
 const isRecipientsLoading = ref(true);
+const isBudgetsLoading = ref(true);
 const serverTasks = ref([]);
 const recipients = ref([]);
 const recipientsPagination = ref(null);
+const budgets = ref([]);
 const colors = [
   "pink",
   "indigo",
@@ -203,6 +216,14 @@ async function getRecipients(page = null) {
   });
 }
 
+async function getBudgets() {
+  await monthlyBudgetUtils.getCurrent().then((response) => {
+    budgets.value = response.data.data.map((b) => MonthlyBudget.getInstance(b));
+  }).finally(() => {
+    isBudgetsLoading.value = false;
+  });
+}
+
 onMounted(async () => {
   if (!customerStore.isLoaded) {
     customerUtils.refresh().catch();
@@ -210,6 +231,7 @@ onMounted(async () => {
   await getTransactions();
   getTasks().catch();
   await getRecipients();
+  getBudgets().catch();
 });
 
 const transactions = computed(() => {
@@ -225,6 +247,11 @@ const transactions = computed(() => {
 const recipientCreated = (recipient) => {
   isCreateRecipientModalOpen.value = false;
   router.push({ name: 'viewRecipient', params: { id: recipient.id } });
+};
+
+const budgetCreated = () => {
+  isCreateBudgetModalOpen.value = false;
+  getBudgets().catch();
 };
 </script>
 <template>
@@ -384,6 +411,94 @@ const recipientCreated = (recipient) => {
             </template>
           </section>
         </div>
+
+
+        <div class="mt-8">
+          <section
+            aria-labelledby="budgets-title"
+            class="overflow-hidden rounded-3xl border border-gray-200/90 bg-white shadow-sm"
+          >
+            <div class="border-b border-gray-100 bg-gradient-to-r from-brand-50/90 via-white to-teal-50/50 px-5 py-5 sm:px-6 sm:py-6">
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-start gap-4">
+
+                  <div class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-brand-700 text-white shadow-md shadow-brand-700/25">
+                    <BanknotesIcon class="size-6" aria-hidden="true" />
+                  </div>
+                  <div class="min-w-0">
+                    <h2 id="budgets-title" class="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">
+                      Monthly budgets
+                    </h2>
+                    <p class="mt-1 max-w-md text-sm text-gray-600">
+                      See how much you have left to spend this month, by currency.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+                  <button
+                    type="button"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+                    @click="createBudget"
+                  >
+                    <PlusIcon class="size-4" aria-hidden="true" />
+                    New budget
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex items-center justify-center gap-1 rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 transition hover:bg-gray-50"
+                    @click="router.push({ name: 'budgets' })"
+                  >
+                    View all
+                    <ArrowRightIcon class="size-4 text-gray-400" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-5 sm:p-6">
+              <template v-if="isBudgetsLoading">
+                <ul role="list" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <li v-for="i in 3" :key="`budget-shimmer-${i}`">
+                    <BudgetDashboardCardShimmer />
+                  </li>
+                </ul>
+              </template>
+
+              <template v-else-if="budgets.length > 0">
+                <ul role="list" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <li v-for="budget in budgets" :key="budget.id">
+                    <router-link
+                      :to="{ name: 'budgets' }"
+                      class="block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                    >
+                      <BudgetDashboardCard :budget="budget" />
+                    </router-link>
+                  </li>
+                </ul>
+              </template>
+
+              <template v-else>
+                <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50/80 px-6 py-12 text-center">
+                  <div class="flex size-14 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-gray-200">
+                    <BanknotesIcon class="size-7 text-brand-600" aria-hidden="true" />
+                  </div>
+                  <h3 class="mt-5 text-base font-semibold text-gray-900">No budgets yet</h3>
+                  <p class="mt-2 max-w-sm text-sm text-gray-600">
+                    Set a monthly spending cap per currency and keep transfers within your plan.
+                  </p>
+                  <button
+                    type="button"
+                    class="mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600"
+                    @click="createBudget"
+                  >
+                    <PlusIcon class="size-4" aria-hidden="true" />
+                    Create your first budget
+                  </button>
+                </div>
+              </template>
+            </div>
+          </section>
+        </div>
       </div>
     </main>
     <TransitionRoot as="div" :show="isCreateRecipientModalOpen">
@@ -402,6 +517,43 @@ const recipientCreated = (recipient) => {
               <DialogPanel
                 class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
                 <AddRecipientWizard class="p-6 sm:px-8" v-on:recipient:added="recipientCreated" />
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
+    <TransitionRoot as="div" :show="isCreateBudgetModalOpen">
+      <Dialog class="relative z-10" @close="isCreateBudgetModalOpen = false">
+        <TransitionChild
+          as="div"
+          enter="ease-out duration-300"
+          enter-from="opacity-0"
+          enter-to="opacity-100"
+          leave="ease-in duration-200"
+          leave-from="opacity-100"
+          leave-to="opacity-0"
+        >
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+        </TransitionChild>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild
+              as="div"
+              enter="ease-out duration-300"
+              enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enter-to="opacity-100 translate-y-0 sm:scale-100"
+              leave="ease-in duration-200"
+              leave-from="opacity-100 translate-y-0 sm:scale-100"
+              leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+              <DialogPanel
+                class="relative w-full transform overflow-hidden rounded-2xl bg-white px-5 py-6 text-left shadow-xl transition-all sm:my-8 sm:max-w-lg sm:p-8"
+              >
+                <CreateBudgetForm
+                  @budget:created="budgetCreated"
+                  @cancel="isCreateBudgetModalOpen = false"
+                />
               </DialogPanel>
             </TransitionChild>
           </div>
