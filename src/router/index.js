@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import SignUpView from "@/views/SignUpView.vue";
 import SignInView from "@/views/SignInView.vue";
 import NProgress from 'nprogress'
+import { comingSoonByFeature } from '@/config/coming_soon.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -108,6 +109,14 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/budgets',
+      name: 'budgets',
+      component: () => import('@/views/Budget/IndexView.vue'),
+      meta: {
+        title: 'Budgets',
+        description: 'Manage your monthly spending budgets.',
+      },
+    }, {
       path: '/recipients',
       name: 'recipients',
       component: () => import('@/views/Recipient/IndexView.vue'),
@@ -142,6 +151,14 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/accounts',
+      name: 'accounts',
+      component: () => import('@/views/AccountsView.vue'),
+      meta: {
+        title: 'Accounts',
+        description: 'Your profile and account details.',
+      },
+    }, {
       path: '/settings',
       name: 'settings',
       component: () => import('@/views/SettingsView.vue'),
@@ -149,6 +166,31 @@ const router = createRouter({
         title: 'Settings',
         description: '',
       },
+    }, {
+      path: '/support',
+      name: 'support',
+      component: () => import('@/views/SupportView.vue'),
+      meta: {
+        title: 'Support',
+        description: 'Contact our team for help with your account and transfers.',
+      },
+    }, {
+      path: '/coming-soon/:feature',
+      name: 'comingSoon',
+      props: true,
+      component: () => import('@/views/ComingSoonView.vue'),
+      meta: {
+        title: 'Coming soon',
+        description: '',
+      },
+    }, {
+      path: '/rate-alerts',
+      redirect: to => ({
+        name: 'comingSoon',
+        params: { feature: 'rate-alerts' },
+        query: to.query,
+        hash: to.hash,
+      }),
     }, {
       path: '/devices',
       name: 'devices',
@@ -168,8 +210,13 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-router.beforeEach((to, from) => {
-  document.title = to.meta?.title ?? 'Default Title'
+router.beforeEach((to) => {
+  if (to.name === 'comingSoon' && to.params.feature) {
+    const key = String(to.params.feature).toLowerCase()
+    document.title = comingSoonByFeature[key]?.pageTitle ?? to.meta?.title ?? 'Coming soon'
+  } else {
+    document.title = to.meta?.title ?? 'Default Title'
+  }
 })
 
 router.afterEach(() => {

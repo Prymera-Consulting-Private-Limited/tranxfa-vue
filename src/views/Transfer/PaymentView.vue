@@ -12,6 +12,7 @@ import Volume from "@/components/Payment/Volume.vue";
 import Monoova from "@/components/Payment/Monoova.vue";
 import Apaylo from "@/components/Payment/Apaylo.vue";
 import Pay360 from "@/components/Payment/Pay360.vue";
+import PayCross from "@/components/Payment/PayCross.vue";
 import CinetPay from "@/components/Payment/CinetPay.vue";
 
 const transactionUtils = useTransactionUtils();
@@ -72,8 +73,8 @@ watch(canAttemptPayment, async () => {
 
 <template>
   <CustomerLayout>
-    <main class="-mt-24 py-8">
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+    <main class="py-8">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-full lg:px-8">
         <h1 class="sr-only">Make Payment</h1>
         <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
           <div class="text-center" v-if="isLoading">
@@ -104,6 +105,7 @@ watch(canAttemptPayment, async () => {
                     <Volume v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'VOLUME-PAYMENTS'" v-bind:transaction="transaction"  />
                     <Apaylo v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  v-bind:retryFormErrors="retryPaymentErrors"  />
                     <Pay360 v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'PAY360'" v-bind:transaction="transaction"  />
+                    <PayCross v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'PAY-CROSS'" v-bind:transaction="transaction"  />
                     <CinetPay v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'CINET_PAY'" v-bind:transaction="transaction"  />
                   </div>
                 </div>

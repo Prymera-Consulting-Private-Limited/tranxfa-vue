@@ -38,100 +38,103 @@ const appUrl = import.meta.env.VITE_APP_URL;
 </script>
 <template>
   <main>
-    <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
-      <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
-      <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
-        <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
-          <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
-            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
-              <i class="pi pi-times"></i>
-            </a>
-          </div>
-          <div class="hidden md:block  absolute top-4 right-4">
-            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
-              <i class="pi pi-times"></i>
-            </a>
-          </div>
+    <!-- Background Wrapper -->
+    <div
+      class="min-h-screen flex items-center justify-center bg-no-repeat bg-center bg-cover"
+      style="background-image: url('/images/backgrounds/login.png');"
+    >
+      <!-- Overlay Gradient (for readability like design) -->
+      <!-- <div class="absolute inset-0 bg-gradient-to-r from-green-300/70 via-teal-400/70 to-green-500/70"></div> -->
+
+      <!-- Loader -->
+      <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-white z-10"></i>
+
+      <!-- Card -->
+      <div v-else class="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+
+        <!-- Logo -->
+        <div class="text-center mb-6">
+          <img src="/images/logo.png" class="h-12 md:h-16 mx-auto mb-3" />
+          <p class="text-xs text-gray-400">
+            Secure access to your global movement portal.
+          </p>
         </div>
 
-        <!-- Form Section -->
-        <div class="flex-1 flex items-center justify-center p-4 md:p-8">
-          <div class="w-full max-w-xl">
-            <!-- Logo at Top Left (Desktop)  -->
-            <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5 -ml-2"></a>
+        <!-- Heading -->
+        <h2 class="text-xl font-semibold text-center mb-6">Welcome Back</h2>
+
+        <!-- Error -->
+        <div v-if="loginError" class="bg-red-50 text-red-700 text-sm p-3 rounded mb-4">
+          {{ loginError }}
+        </div>
+
+        <!-- Form -->
+        <form @submit.prevent="login" class="space-y-4">
+
+          <!-- Email -->
+          <div>
+            <label class="text-xs text-gray-500 mb-1 block">EMAIL ADDRESS</label>
+            <input
+              type="email"
+              v-model="form.email"
+              placeholder="name@company.com"
+              class="w-full px-4 py-3 bg-gray-100 rounded-lg outline-none focus:ring-2 focus:ring-teal-400"
+            />
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="text-xs text-gray-500 mb-1 block">PASSWORD</label>
+            <div class="relative">
+              <input
+                :type="showPassword ? 'text' : 'password'"
+                v-model="form.password"
+                placeholder="••••••••"
+                class="w-full px-4 py-3 bg-gray-100 rounded-lg outline-none focus:ring-2 focus:ring-teal-400"
+              />
+              <span
+                @click="showPassword = !showPassword"
+                class="absolute right-3 top-3 cursor-pointer text-gray-400"
+              >
+                <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </span>
             </div>
-            <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-2">Love to see you again</h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Send your money transfer easy and Fun!</p>
-            <!-- Form -->
-            <form @submit.prevent="login" class="space-y-6">
-              <div v-if="loginError" class="rounded-md bg-red-50 p-4">
-                <div class="flex">
-                  <div class="">
-                    <h3 class="text-sm font-medium text-red-800">Login failed</h3>
-                    <div class="mt-2 text-sm text-red-700">
-                      {{ loginError }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div v-if="router.currentRoute.value.query?.referer" class="rounded-md bg-blue-50 p-4">
-                <div class="flex">
-                  <div class="">
-                    <div v-if="router.currentRoute.value.query.referer === 'change-password'" class="text-sm text-blue-700">
-                      Your password has been successfully changed. Please log in using your new password.
-                    </div>
-                    <div v-if="router.currentRoute.value.query.referer === 'reset-password'" class="text-sm text-blue-700">
-                      Your password has been successfully reset. Please log in using your new password.
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label for="email" class="block text-brand-700 mb-3">Email</label>
-                <div class="relative">
-                  <input type="email" id="email" v-model="form.email" placeholder="example@email.com" class="w-full px-4 py-2 border-b border border-gray-300 rounded-lg">
-                  <button type="button" class="absolute inset-y-0 right-0 top-1 flex items-center px-3">
-                    <span class="pi pi-envelope w-5 h-5 text-gray-400"></span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Password Field -->
-              <div>
-                <label for="password" class="block text-brand-700 mb-3">Password</label>
-                <div class="relative">
-                  <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                  <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
-                    <span @click="showPassword = !showPassword" v-if="showPassword" class="pi pi-eye-slash w-5 h-5 text-gray-400"></span>
-                    <span @click="showPassword = !showPassword" v-else class="pi pi-eye w-5 h-5 text-gray-400"></span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Remember Me & Forgot Password -->
-              <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center">
-                  <input id="remember-me" type="checkbox" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700">
-                  <label for="remember-me" class="ml-2 text-sm text-gray-600">Remember me</label>
-                </div>
-                <router-link :to="{name: 'forgotPassword'}" class="text-sm text-brand-600 hover:text-brand-700 underline">Forgot password?</router-link>
-              </div>
-
-              <!-- Submit Button -->
-              <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
-              <!-- Sign Up Link -->
-              <p class="mt-4 text-center text-sm text-gray-600">
-                Don’t have an account? <router-link :to="{name: 'signUp'}" class="text-brand-700 hover:text-brand-700 hover:underline">Sign up instead</router-link>
-              </p>
-            </form>
           </div>
-        </div>
+
+           <!-- Bottom Row -->
+           <div class="flex items-center justify-between text-sm mt-2">
+            <label class="flex items-center gap-2 text-gray-600">
+              <input type="checkbox" class="accent-teal-500" />
+              Remember me
+            </label>
+
+            <router-link
+              :to="{name: 'forgotPassword'}"
+              class="text-teal-500 hover:underline"
+            >
+              Forgot password?
+            </router-link>
+          </div>
+
+          <!-- Button -->
+          <button
+            :disabled="isLoading"
+            :class="{'opacity-70': isLoading}"
+            type="submit"
+            class="w-full py-3 rounded-full bg-brand-700 hover:bg-teal-500 text-white font-medium transition"
+          >
+            Secure Log In →
+          </button>
+
+          <!-- Signup -->
+          <p class="text-center text-sm text-gray-500 mt-4">
+            New to Payvel? 
+            <router-link :to="{name: 'signUp'}" class="text-teal-500 hover:underline">
+               Create Account
+            </router-link>
+          </p>
+
+        </form>
       </div>
     </div>
   </main>

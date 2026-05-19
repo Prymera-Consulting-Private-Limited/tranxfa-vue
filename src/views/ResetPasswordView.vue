@@ -93,115 +93,148 @@ async function resetPassword() {
 
 <template>
   <main>
-    <div class="flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
-      <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
-      <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
-        <!-- Left Section with Full Size Image -->
-        <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <!-- Top Image in Mobile View -->
-          <img src="/images/backgrounds/signup.png" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
-          <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
-              <i class="pi pi-times"></i>
-            </a>
-          </div>
-          <!-- Logo at Top Left (Desktop) -->
-          <!-- Cross Mark at Form Right Corner (Desktop) -->
-          <div class="hidden md:block  absolute top-4 right-4">
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 ">
-              <i class="pi pi-times"></i>
-            </a>
-          </div>
+    <!-- Background Wrapper -->
+    <div
+      class="min-h-screen flex items-center justify-center bg-no-repeat bg-center bg-cover relative"
+      style="background-image: url('/images/backgrounds/login.png');"
+    >
+      <!-- Loader -->
+      <i
+        v-if="isLoading"
+        class="pi pi-spin pi-spinner text-5xl text-white z-20"
+      ></i>
+
+      <!-- Card -->
+      <div
+        v-else
+        class="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-xl p-8"
+      >
+        <!-- Logo -->
+        <div class="text-center mb-6">
+          <img src="/images/logo.png" class="h-12 md:h-16 mx-auto mb-3" />
+          <p class="text-xs text-gray-400">
+            Securely reset your password
+          </p>
         </div>
 
-        <!-- Form Section -->
-        <div class="flex-1 flex items-center justify-center p-4 md:p-16 pt-[100px] sm:pt-0">
-          <div class="w-full max-w-xl">
-            <!-- Logo at Top Left (Desktop)  -->
-            <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+        <!-- Heading -->
+        <h2 class="text-xl font-semibold text-center mb-6">
+          Reset Password
+        </h2>
+
+        <!-- Form -->
+        <form @submit.prevent="resetPassword" class="space-y-5">
+
+          <!-- Error -->
+          <div
+            v-if="resetPasswordFailureMessage"
+            class="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded"
+          >
+            {{ resetPasswordFailureMessage }}
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label
+              :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-gray-500']"
+              class="text-xs block mb-1"
+            >
+              CHOOSE PASSWORD
+            </label>
+
+            <div class="relative">
+              <input
+                :type="showPassword ? 'text' : 'password'"
+                v-model="form.password"
+                placeholder="••••••••"
+                :class="[formErrors.password.length > 0 ? 'border-red-500 text-red-500' : 'border-gray-200']"
+                class="w-full px-4 py-3 bg-gray-100 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400"
+              />
+
+              <span
+                @click="showPassword = !showPassword"
+                class="absolute right-3 top-3 cursor-pointer text-gray-400"
+              >
+                <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </span>
             </div>
-            <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-6">Reset Password</h2>
 
-            <!-- Form -->
-            <form @submit.prevent="resetPassword" class="space-y-6">
-              <div v-if="resetPasswordFailureMessage" class="rounded-md bg-red-50 border-red-100 border p-4">
-                <div class="flex">
-                  <div class="text-sm text-red-700">
-                    {{ resetPasswordFailureMessage }}
-                  </div>
-                </div>
-              </div>
-              <!-- Password Field -->
-              <div>
-                <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Choose Password</label>
-                <div class="mb-3">
-                  <div class="relative">
-                    <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" :class="[formErrors.password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
-                    <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
-                      <span @click="showPassword = !showPassword" v-if="showPassword" class="pi pi-eye-slash w-5 h-5 text-gray-400"></span>
-                      <span @click="showPassword = !showPassword" v-else class="pi pi-eye w-5 h-5 text-gray-400"></span>
-                    </button>
-                  </div>
-                  <p v-if="formErrors.password.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ formErrors.password[0] }}</p>
-                </div>
-              </div>
-              <ul role="list" class="space-y-2">
-                <li v-for="validatedPasswordPolicyRule in validatedPasswordPolicies.rules">
-                  <div class="relative">
-                    <div v-if="validatedPasswordPolicyRule?.outcome === true" class="relative flex items-center space-x-3">
-                      <div>
-                        <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
-                          <i class="pi pi-check-circle text-emerald-500"></i>
-                        </span>
-                      </div>
-                      <div>
-                        <p class="text-sm text-emerald-500">{{ validatedPasswordPolicyRule.message }}</p>
-                      </div>
-                    </div>
-                    <div v-else-if="(validatedPasswordPolicyRule?.outcome || true) === false" class="relative flex items-center space-x-3">
-                      <div>
-                        <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
-                          <i class="pi pi-times-circle text-red-500"></i>
-                        </span>
-                      </div>
-                      <div>
-                        <p class="text-sm text-red-500">{{ validatedPasswordPolicyRule.message }}</p>
-                      </div>
-                    </div>
-                    <div v-else class="relative flex items-center space-x-3">
-                      <div>
-                        <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
-                          <i class="pi pi-check-circle text-gray-500"></i>
-                        </span>
-                      </div>
-                      <div>
-                        <p class="text-sm text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-              <!-- Confirm Password -->
-              <div>
-                <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirm Password</label>
-                <div class="relative">
-                  <input :type="showConfirmPassword ? 'text' : 'password'" id="confirm_password" v-model="form.confirm_password" :class="[formErrors.confirm_password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
-                  <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
-                    <span @click="showConfirmPassword = !showConfirmPassword" v-if="showConfirmPassword" class="pi pi-eye-slash w-5 h-5 text-gray-400"></span>
-                    <span @click="showConfirmPassword = !showConfirmPassword" v-else class="pi pi-eye w-5 h-5 text-gray-400"></span>
-                  </button>
-                </div>
-                <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ formErrors.confirm_password[0] }}</p>
-              </div>
-              <!-- Submit Button -->
-              <button :disabled="isLoading" :class="[!isLoading ? 'hover:bg-brand-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-brand-700 text-center py-3 font-medium text-white rounded-[10px]">Continue</button>
-            </form>
+            <p v-if="formErrors.password.length > 0" class="text-xs text-red-500 mt-1">
+              {{ formErrors.password[0] }}
+            </p>
           </div>
-        </div>
+
+          <!-- Password Rules -->
+          <ul class="space-y-1">
+            <li v-for="validatedPasswordPolicyRule in validatedPasswordPolicies.rules">
+              <div class="flex items-center gap-2 text-xs">
+                <i
+                  v-if="validatedPasswordPolicyRule?.outcome === true"
+                  class="pi pi-check-circle text-emerald-500"
+                ></i>
+                <i
+                  v-else-if="validatedPasswordPolicyRule?.outcome === false"
+                  class="pi pi-times-circle text-red-500"
+                ></i>
+                <i v-else class="pi pi-circle text-gray-400"></i>
+
+                <span
+                  :class="[
+                    validatedPasswordPolicyRule?.outcome === true
+                      ? 'text-emerald-500'
+                      : validatedPasswordPolicyRule?.outcome === false
+                      ? 'text-red-500'
+                      : 'text-gray-400'
+                  ]"
+                >
+                  {{ validatedPasswordPolicyRule.message }}
+                </span>
+              </div>
+            </li>
+          </ul>
+
+          <!-- Confirm Password -->
+          <div>
+            <label
+              :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-gray-500']"
+              class="text-xs block mb-1"
+            >
+              CONFIRM PASSWORD
+            </label>
+
+            <div class="relative">
+              <input
+                :type="showConfirmPassword ? 'text' : 'password'"
+                v-model="form.confirm_password"
+                placeholder="••••••••"
+                :class="[formErrors.confirm_password.length > 0 ? 'border-red-500 text-red-500' : 'border-gray-200']"
+                class="w-full px-4 py-3 bg-gray-100 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400"
+              />
+
+              <span
+                @click="showConfirmPassword = !showConfirmPassword"
+                class="absolute right-3 top-3 cursor-pointer text-gray-400"
+              >
+                <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </span>
+            </div>
+
+            <p v-if="formErrors.confirm_password.length > 0" class="text-xs text-red-500 mt-1">
+              {{ formErrors.confirm_password[0] }}
+            </p>
+          </div>
+
+          <!-- Button -->
+          <button
+            :disabled="isLoading"
+            :class="[!isLoading ? 'bg-brand-700 hover:bg-brand-500' : 'opacity-60 cursor-not-allowed']"
+            type="submit"
+            class="w-full py-3 text-white rounded-full font-medium transition"
+          >
+            Continue
+          </button>
+
+        </form>
       </div>
     </div>
   </main>

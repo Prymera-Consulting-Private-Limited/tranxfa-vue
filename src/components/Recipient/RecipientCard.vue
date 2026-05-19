@@ -2,7 +2,16 @@
 import Recipient from "@/models/recipient.js";
 import FlagIcon from "vue3-flag-icons";
 import {useTimeUtils} from "@/composables/time_utils.js";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
+
+/** Full class strings so Tailwind includes them (dynamic `bg-${x}-500` is not scanned). */
+const AVATAR_BG_BY_COLOR = {
+  pink: "bg-pink-500",
+  indigo: "bg-indigo-500",
+  yellow: "bg-yellow-500",
+  green: "bg-green-500",
+  blue: "bg-blue-500",
+};
 
 const props = defineProps({
   recipient: {
@@ -14,6 +23,16 @@ const props = defineProps({
     required: true,
   }
 })
+
+const avatarBgClass = computed(
+  () => AVATAR_BG_BY_COLOR[props.cardColor] ?? "bg-gray-500",
+);
+
+const nameInitial = computed(() => {
+  const raw = props.recipient.name ?? props.recipient.wholeName ?? "";
+  const letter = String(raw).trim().charAt(0);
+  return letter ? letter.toUpperCase() : "?";
+});
 
 const timeUtils = useTimeUtils();
 
@@ -33,8 +52,10 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-1 flex-col px-4 py-5">
-    <div :class="[`bg-${cardColor}-500`]" class="flex items-center justify-center mx-auto size-10 shrink-0 rounded-full text-white tracking-wider text-sm">
-      {{ recipient.name.charAt(0) }}
+    <div
+      :class="avatarBgClass"
+      class="flex items-center justify-center mx-auto size-10 shrink-0 rounded-full text-white tracking-wider text-sm">
+      {{ nameInitial }}
     </div>
     <h3 class="mt-6 text-sm font-medium text-gray-900 break-words">{{ recipient.wholeName }}</h3>
     <dl class="mt-1 flex grow flex-col justify-between">

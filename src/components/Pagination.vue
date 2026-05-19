@@ -33,18 +33,18 @@ async function pageNumber(page) {
 }
 </script>
 <template>
-  <nav class="flex items-center justify-between border-t border-gray-200">
-    <div class="-mt-px flex w-0 flex-1">
-      <a v-if="pagination.links.prev" href="javascript:" @click="pageNumber(props.pagination.current_page - 1)" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
-        <ArrowLongLeftIcon class="mr-3 size-5 text-gray-400" aria-hidden="true" />
+  <nav class="flex w-full min-w-0 items-center justify-between gap-2 border-t border-gray-200">
+    <div class="-mt-px flex min-w-0 flex-1 basis-0 justify-start">
+      <a v-if="pagination.links.prev" href="javascript:" @click="pageNumber(props.pagination.current_page - 1)" class="inline-flex shrink-0 items-center whitespace-nowrap border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
+        <ArrowLongLeftIcon class="mr-3 size-5 shrink-0 text-gray-400" aria-hidden="true" />
         Previous
       </a>
-      <a v-else href="javascript:" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-300 cursor-default">
-        <ArrowLongLeftIcon class="mr-3 size-5 text-gray-300" aria-hidden="true" />
+      <a v-else href="javascript:" class="inline-flex shrink-0 cursor-default items-center whitespace-nowrap border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-300">
+        <ArrowLongLeftIcon class="mr-3 size-5 shrink-0 text-gray-300" aria-hidden="true" />
         Previous
       </a>
     </div>
-    <div class="hidden md:-mt-px md:flex">
+    <div class="hidden shrink-0 md:-mt-px md:flex md:justify-center">
       <template v-for="page in pages" :key="page">
         <template v-if="page === '...'">
           <span class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500">...</span>
@@ -56,14 +56,14 @@ async function pageNumber(page) {
 
       </template>
     </div>
-    <div class="-mt-px flex w-0 flex-1 justify-end">
-      <a v-if="pagination.links.next" href="javascript:"  @click="pageNumber(props.pagination.current_page + 1)" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
+    <div class="-mt-px flex min-w-0 flex-1 basis-0 justify-end">
+      <a v-if="pagination.links.next" href="javascript:"  @click="pageNumber(props.pagination.current_page + 1)" class="inline-flex shrink-0 items-center whitespace-nowrap border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
         Next
-        <ArrowLongRightIcon class="ml-3 size-5 text-gray-400" aria-hidden="true" />
+        <ArrowLongRightIcon class="ml-3 size-5 shrink-0 text-gray-400" aria-hidden="true" />
       </a>
-      <a v-else href="#" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-300">
+      <a v-else href="#" class="inline-flex shrink-0 items-center whitespace-nowrap border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-300">
         Next
-        <ArrowLongRightIcon class="ml-3 size-5 text-gray-300" aria-hidden="true" />
+        <ArrowLongRightIcon class="ml-3 size-5 shrink-0 text-gray-300" aria-hidden="true" />
       </a>
     </div>
   </nav>
