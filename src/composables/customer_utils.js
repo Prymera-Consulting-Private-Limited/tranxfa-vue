@@ -21,9 +21,36 @@ export function useCustomerUtils() {
         });
     }
 
+    async function registerWithMobileNumber(country, mobileNumber, thirdPartyDeclarationAccepted = false) {
+        await axios.post('/client/v1/signup', {
+            country: country,
+            mobile_number: mobileNumber,
+            third_party_declaration_accepted: thirdPartyDeclarationAccepted,
+        }).then((response) => {
+            updateStore(response.data);
+        });
+    }
+
     async function login(email, password) {
         await axios.post('/client/v1/login', {
             email: email,
+            password: password,
+        }).then((response) => {
+            updateStore(response.data);
+        })
+    }
+
+    async function getLoginOtp(country, mobileNumber) {
+        await axios.post('/client/v1/get-login-otp', {
+            country: country,
+            mobile_number: mobileNumber,
+        })
+    }
+
+    async function loginWithMobileNumber(country, mobileNumber, password) {
+        await axios.post('/client/v1/login', {
+            country: country,
+            mobile_number: mobileNumber,
             password: password,
         }).then((response) => {
             updateStore(response.data);
@@ -108,6 +135,12 @@ export function useCustomerUtils() {
         })
     }
 
+    async function updateEmailAddress(email) {
+        await axios.post('/client/v1/update-email', {
+            email: email,
+        })
+    }
+
     async function getAccountVerificationToken(documentCategory, documentType, file = null, returnUrl = null) {
         let requestParams = {};
         requestParams = file ? {
@@ -184,7 +217,10 @@ export function useCustomerUtils() {
     return {
         updateStore,
         register,
+        registerWithMobileNumber,
         login,
+        getLoginOtp,
+        loginWithMobileNumber,
         mfa,
         resendMfaOtp,
         refresh,
@@ -193,6 +229,7 @@ export function useCustomerUtils() {
         updateCountry,
         updateProfileAttribute,
         updateMobileNumber,
+        updateEmailAddress,
         logout,
         getAccountVerificationToken,
         getLivelinessToken,
