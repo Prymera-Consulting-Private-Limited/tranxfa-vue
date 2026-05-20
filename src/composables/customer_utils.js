@@ -52,6 +52,8 @@ export function useCustomerUtils() {
             country: country,
             mobile_number: mobileNumber,
             password: password,
+        }, {
+            skipAuthRedirect: true,
         }).then((response) => {
             updateStore(response.data);
         })

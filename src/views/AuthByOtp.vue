@@ -31,7 +31,7 @@ async function authenticate() {
   await customerUtils.loginWithMobileNumber(country.id, number, otp.value).then(() => {
     router.push({name: 'onboardingWorkflow'});
   }).catch((e) => {
-    if (e.response?.status === 422) {
+    if (e.response?.status === 422 || e.response?.status === 401) {
       otpError.value = e.response.data.message;
     } else {
       console.error(e);
