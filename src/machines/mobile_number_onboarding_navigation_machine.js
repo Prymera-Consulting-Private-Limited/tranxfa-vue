@@ -38,6 +38,15 @@ function hasEmail() {
     return !!customer?.account?.email;
 }
 
+function doesNotHaveEmail() {
+    const customer = getCustomer();
+
+    return isLoaded() &&
+        !requiresIdentityInformation() &&
+        !requiresEmploymentInformation() &&
+        ! (!!customer?.account?.email);
+}
+
 function emailVerified() {
     const customer = getCustomer();
 
@@ -64,7 +73,15 @@ export const mobileAuthOnboardingMachine = createMachine({
                     },
                     {
                         target: 'emailInput',
-                        guard: employmentInformationCompleted,
+                        guard: doesNotHaveEmail,
+                    },
+                    {
+                        target: 'emailVerification',
+                        guard: emailVerificationRequired,
+                    },
+                    {
+                        target: 'onboardingComplete',
+                        guard: emailVerified,
                     },
                 ],
             },
@@ -74,7 +91,7 @@ export const mobileAuthOnboardingMachine = createMachine({
             on: {
                 PROCEED: {
                     target: 'emailInput',
-                    guard: employmentInformationCompleted,
+                    guard: doesNotHaveEmail,
                 },
 
                 EDIT_PERSONAL_INFORMATION: {
