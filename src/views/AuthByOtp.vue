@@ -70,10 +70,8 @@ async function startResendOtpTimer() {
 
 async function resend() {
   isResendingOtp.value = true;
-  customerUtils.resendMfaOtp().catch(async (e) => {
-    if (e.status === 403) {
-      await customerUtils.refresh();
-    }
+  customerUtils.getLoginOtp(otpData.country.id, otpData.number).catch(async (e) => {
+    console.error(e);
   }).finally(() => {
     isResendingOtp.value = false;
   });
