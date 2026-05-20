@@ -40,6 +40,13 @@ export function useCustomerUtils() {
         })
     }
 
+    async function getLoginOtp(country, mobileNumber) {
+        await axios.post('/client/v1/get-login-otp', {
+            country: country,
+            mobile_number: mobileNumber,
+        })
+    }
+
     async function loginWithMobileNumber(country, mobileNumber, password) {
         await axios.post('/client/v1/login', {
             country: country,
@@ -212,6 +219,7 @@ export function useCustomerUtils() {
         register,
         registerWithMobileNumber,
         login,
+        getLoginOtp,
         loginWithMobileNumber,
         mfa,
         resendMfaOtp,
