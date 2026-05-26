@@ -100,9 +100,9 @@ onMounted(async () => {
         <a href="javascript:" class="mx-auto"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5 mx-auto"></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">More authentication needed</h2>
-      <p class="text-md text-[#B7A3C1] mb-2 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
-      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">Necesitamos verificar que eres tú</h2>
+      <p class="text-md text-[#B7A3C1] mb-2 text-center">Ingresa el código de un solo uso que enviamos a tu correo {{ customer.data?.account?.email }}</p>
+      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Ten en cuenta que el correo puede tardar hasta un minuto en llegar. Si no lo ves en tu bandeja de entrada, revisa también tu carpeta de spam o correo no deseado.</p>
       <!-- Form -->
       <form @submit.prevent="authenticate" class="space-y-10">
         <div v-if="otpError" class="rounded-md bg-red-50 p-4">
@@ -132,16 +132,16 @@ onMounted(async () => {
             <template v-if="isVerifying">
               <span class="flex items-center justify-center whitespace-nowrap">
                 <Spinner :class="'size-4 mr-2'" />
-                Please wait...
+                Espera un momento...
               </span>
             </template>
-            <template v-else>Login</template>
+            <template v-else>Iniciar sesión</template>
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
-          <div v-if="! isResendingOtp" class="text-sm text-gray-500 text-center">Didn't receive OTP? <a @click="resend" class="text-brand-700 hover:text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
+          <div v-if="! isResendingOtp" class="text-sm text-gray-500 text-center">¿No recibiste el código? <a @click="resend" class="text-brand-700 hover:text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Reenviar código</a> <template v-else>Reenviar en {{ countdown }}s</template>
           </div>
-          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending one time password to your email {{ customer.data?.account?.email }} ...</div>
+          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Reenviando el código a tu correo {{ customer.data?.account?.email }} ...</div>
         </template>
       </form>
     </div>

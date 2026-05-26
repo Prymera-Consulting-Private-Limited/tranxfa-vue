@@ -146,9 +146,9 @@ const canContinue = computed(() => {
             <form @submit.prevent="register" class="space-y-6">
               <!-- Email Field -->
               <div>
-                <label :class="[formErrors.email.length > 0 ? 'text-red-700' : 'text-brand-700']" for="email" class="block mb-3 text-base">Email</label>
+                <label :class="[formErrors.email.length > 0 ? 'text-red-700' : 'text-brand-700']" for="email" class="block mb-3 text-base">Correo electrónico</label>
                 <div class="relative ">
-                  <input type="email" id="email" v-model="form.email" :class="[formErrors.email.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="enter your email" class="w-full px-4 py-2 border rounded-lg">
+                  <input type="email" id="email" v-model="form.email" :class="[formErrors.email.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="ingresa tu correo" class="w-full px-4 py-2 border rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1 flex items-center px-3">
                     <span class="pi pi-envelope w-5 h-5 text-gray-400"></span>
                   </button>
@@ -158,7 +158,7 @@ const canContinue = computed(() => {
 
               <!-- Password Field -->
               <div>
-                <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Password</label>
+                <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Contraseña</label>
                 <div class="mb-3">
                   <div class="relative">
                     <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" :class="[formErrors.password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
@@ -208,7 +208,7 @@ const canContinue = computed(() => {
               </ul>
               <!-- Confirm Password -->
               <div>
-                <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirm Password</label>
+                <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirmar contraseña</label>
                 <div class="relative">
                   <input :type="showConfirmPassword ? 'text' : 'password'" id="confirm_password" v-model="form.confirm_password" :class="[formErrors.confirm_password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
@@ -222,7 +222,7 @@ const canContinue = computed(() => {
               <!-- Checkbox -->
               <div class="flex items-start space-x-2">
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="mt-0.5 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
-                <label for="terms" class="text-sm/6 text-gray-700 leading-snug">I agree to <a :href="privacyPolicyUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">privacy policy</a> & <a :href="userAgreementUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">terms of service</a>.</label>
+                <label for="terms" class="text-sm/6 text-gray-700 leading-snug">Acepto la <a :href="privacyPolicyUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">política de privacidad</a> y los <a :href="userAgreementUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">términos del servicio</a>.</label>
               </div>
 
               <!-- Checkbox -->
@@ -231,11 +231,11 @@ const canContinue = computed(() => {
                 <label for="third-party-declaration-accepted" class="text-sm/6 text-gray-700">{{ thirdPartyDeclaration }}</label>
               </div>
               <!-- Submit Button -->
-              <button :disabled="!canContinue" :class="[canContinue ? 'hover:bg-brand-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-brand-700 text-center py-3 font-medium text-white rounded-[10px]">Continue</button>
+              <button :disabled="!canContinue" :class="[canContinue ? 'hover:bg-brand-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-brand-700 text-center py-3 font-medium text-white rounded-[10px]">Continuar</button>
             </form>
 
             <p class="text-sm text-gray-500 mt-10 text-center">
-              Already have an account? <router-link class="text-brand-700 hover:text-brand-700 hover:underline" :to="{name: 'signIn'}">Sign in instead</router-link>
+              ¿Ya tienes cuenta? <router-link class="text-brand-700 hover:text-brand-700 hover:underline" :to="{name: 'signIn'}">Inicia sesión</router-link>
             </p>
           </div>
         </div>

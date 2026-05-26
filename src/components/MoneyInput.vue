@@ -69,6 +69,8 @@ function amountUpdated(event) {
     }
   }
 }
+
+
 </script>
 <template>
   <div class="flex items-center rounded-md bg-white pl-3 outline-2 -outline-offset-1 outline-brand-700 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-brand-700">

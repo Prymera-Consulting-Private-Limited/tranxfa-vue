@@ -30,10 +30,10 @@ const refreshDevices = async () => {
       <div class="mx-auto max-w-3xl lg:max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="rounded-lg bg-white px-4 sm:px-6 lg:px-8 py-6">
           <section aria-labelledby="section-2-title">
-            <h1 class="sr-only" id="section-2-title">Devices</h1>
+            <h1 class="sr-only" id="section-2-title">Dispositivos</h1>
             <div class="mb-6">
-              <h2 class="text-base font-semibold text-gray-900">Your Devices</h2>
-              <p class="mt-1 text-sm text-gray-500">View and manage all devices where you're signed in. You can sign out of any device that's not currently in use.</p>
+              <h2 class="text-base font-semibold text-gray-900">Tus dispositivos</h2>
+              <p class="mt-1 text-sm text-gray-500">Consulta y administra todos los dispositivos donde tienes la sesión abierta. Puedes cerrar sesión en cualquier dispositivo que no estés usando.</p>
             </div>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-4xl">
               <template v-if="isLoading">

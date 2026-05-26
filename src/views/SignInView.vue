@@ -65,14 +65,14 @@ const appUrl = import.meta.env.VITE_APP_URL;
               <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5 -ml-2"></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-2">Love to see you again</h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Send your money transfer easy and Fun!</p>
+            <h2 class="text-2xl font-bold text-black mb-2">¡Qué bueno verte de nuevo!</h2>
+            <p class="text-sm text-[#B7A3C1] mb-6 ">Envía tu dinero de forma fácil y rápida.</p>
             <!-- Form -->
             <form @submit.prevent="login" class="space-y-6">
               <div v-if="loginError" class="rounded-md bg-red-50 p-4">
                 <div class="flex">
                   <div class="">
-                    <h3 class="text-sm font-medium text-red-800">Login failed</h3>
+                    <h3 class="text-sm font-medium text-red-800">Error al iniciar sesión</h3>
                     <div class="mt-2 text-sm text-red-700">
                       {{ loginError }}
                     </div>
@@ -83,19 +83,19 @@ const appUrl = import.meta.env.VITE_APP_URL;
                 <div class="flex">
                   <div class="">
                     <div v-if="router.currentRoute.value.query.referer === 'change-password'" class="text-sm text-blue-700">
-                      Your password has been successfully changed. Please log in using your new password.
+                      Tu contraseña se cambió correctamente. Inicia sesión con tu nueva contraseña.
                     </div>
                     <div v-if="router.currentRoute.value.query.referer === 'reset-password'" class="text-sm text-blue-700">
-                      Your password has been successfully reset. Please log in using your new password.
+                      Tu contraseña se restableció correctamente. Inicia sesión con tu nueva contraseña.
                     </div>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label for="email" class="block text-brand-700 mb-3">Email</label>
+                <label for="email" class="block text-brand-700 mb-3">Correo electrónico</label>
                 <div class="relative">
-                  <input type="email" id="email" v-model="form.email" placeholder="example@email.com" class="w-full px-4 py-2 border-b border border-gray-300 rounded-lg">
+                  <input type="email" id="email" v-model="form.email" placeholder="ejemplo@correo.com" class="w-full px-4 py-2 border-b border border-gray-300 rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1 flex items-center px-3">
                     <span class="pi pi-envelope w-5 h-5 text-gray-400"></span>
                   </button>
@@ -104,7 +104,7 @@ const appUrl = import.meta.env.VITE_APP_URL;
 
               <!-- Password Field -->
               <div>
-                <label for="password" class="block text-brand-700 mb-3">Password</label>
+                <label for="password" class="block text-brand-700 mb-3">Contraseña</label>
                 <div class="relative">
                   <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
@@ -118,16 +118,16 @@ const appUrl = import.meta.env.VITE_APP_URL;
               <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center">
                   <input id="remember-me" type="checkbox" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700">
-                  <label for="remember-me" class="ml-2 text-sm text-gray-600">Remember me</label>
+                  <label for="remember-me" class="ml-2 text-sm text-gray-600">Recordarme</label>
                 </div>
-                <router-link :to="{name: 'forgotPassword'}" class="text-sm text-brand-600 hover:text-brand-700 underline">Forgot password?</router-link>
+                <router-link :to="{name: 'forgotPassword'}" class="text-sm text-brand-600 hover:text-brand-700 underline">¿Olvidaste tu contraseña?</router-link>
               </div>
 
               <!-- Submit Button -->
-              <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
+              <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continuar</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
-                Don’t have an account? <router-link :to="{name: 'signUp'}" class="text-brand-700 hover:text-brand-700 hover:underline">Sign up instead</router-link>
+                ¿Aún no tienes cuenta? <router-link :to="{name: 'signUp'}" class="text-brand-700 hover:text-brand-700 hover:underline">Regístrate</router-link>
               </p>
             </form>
           </div>

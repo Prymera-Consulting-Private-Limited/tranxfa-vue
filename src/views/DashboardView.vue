@@ -26,10 +26,12 @@ import Transaction from "@/models/transaction.js";
 import ListItem from "@/components/Transaction/ListItem.vue";
 import ListShimmer from "@/components/Transaction/ListShimmer.vue";
 import Pagination from "@/components/Pagination.vue";
+import {useMonthlyBudgetUtils} from "@/composables/monthly_budget_utils.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const transactionUtils = useTransactionUtils();
+const monthlyBudgetUtils = useMonthlyBudgetUtils();
 const isCreateRecipientModalOpen = ref(false);
 const createRecipient = () => {
   isCreateRecipientModalOpen.value = true;
@@ -155,6 +157,9 @@ async function getTransactions(page = null) {
 }
 
 onMounted(async () => {
+  // await monthlyBudgetUtils.createBudget('299e5c3d-0485-4b04-9249-39d87fd8e0a3', 1000.00);
+  // await monthlyBudgetUtils.getHistory();
+  // await monthlyBudgetUtils.getCurrent();
   if (! customerStore.isLoaded) {
     customerUtils.refresh().catch();
   }
@@ -181,15 +186,15 @@ const recipientCreated = (recipient) => {
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Dashboard</h1>
+        <h1 class="sr-only">Panel</h1>
         <!-- Main 3 column grid -->
-        <h2 class="text-base font-semibold text-gray-900 mb-5">Welcome {{ customer.data?.name }}</h2>
+        <h2 class="text-base font-semibold text-gray-900 mb-5">Hola, {{ customer.data?.name }}</h2>
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 lg:flex-row-reverse">
 
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2 order-last lg:order-first">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Section title</h2>
+              <h2 class="sr-only" id="section-2-title">Título de sección</h2>
               <div>
                 <template v-if="isTransactionLoading">
                   <ListShimmer />
@@ -215,7 +220,7 @@ const recipientCreated = (recipient) => {
                     </div>
                   </div>
                   <template v-else>
-                    <p class="mt-1 text-sm text-gray-500 hidden lg:block">Get started by completing the following steps.</p>
+                    <p class="mt-1 text-sm text-gray-500 hidden lg:block">Empieza completando los siguientes pasos.</p>
                     <ul v-if="tasks.length === 0 && isTaskLoading" role="list" class="mt-6 grid-cols-1 gap-6 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 sm:grid-cols-2 hidden lg:grid">
                       <li v-for="i of 6" :key="i" class="flow-root pulse">
                         <div v-if="isTaskLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
@@ -273,7 +278,7 @@ const recipientCreated = (recipient) => {
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Send Money</h2>
+              <h2 class="sr-only" id="section-2-title">Enviar dinero</h2>
               <div class="rounded-lg bg-white shadow-lg p-5 pb-8">
                 <Calculator />
               </div>

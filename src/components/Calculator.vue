@@ -206,7 +206,7 @@ function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <PaperAirplaneIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="send-money-input" class="block text-sm/6 font-medium ml-2  tracking-wider">You send</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="send-money-input" class="block text-sm/6 font-medium ml-2  tracking-wider">Tú envías</label>
                     </div>
                     <div class="mt-2">
                       <MoneyInput
@@ -245,7 +245,7 @@ function saveQuote() {
                   <p v-else class="text-sm bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
-                  <span>Our Rate</span>
+                  <span>Nuestra tasa</span>
                 </div>
               </div>
             </div>
@@ -263,13 +263,13 @@ function saveQuote() {
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
                   <p v-if="! isFetchingQuote" class="text-sm tracking-wider">
-                    <span class="text-emerald-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
+                    <span class="text-emerald-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Sin comisión</span>
                     <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
                   </p>
                   <p v-else class="text-sm bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
-                  <span>Fees</span>
+                  <span>Comisión</span>
                 </div>
               </div>
             </div>
@@ -286,7 +286,7 @@ function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <UserIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.wholeName || 'Recipient' }} Gets</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.wholeName || 'Beneficiario' }} recibe</label>
                     </div>
                     <div class="mt-4">
                       <MoneyInput
@@ -320,20 +320,20 @@ function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <TruckIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="price" class="block text-sm/6 font-medium ml-2 tracking-wider">Delivery Method</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="price" class="block text-sm/6 font-medium ml-2 tracking-wider">Método de pago</label>
                     </div>
                     <div class="mt-4">
                       <Listbox v-if="! isFetchingQuote" as="div" v-model="selectedPayoutMethod">
-                        <ListboxLabel class="sr-only">Select or Change Delivery Method</ListboxLabel>
+                        <ListboxLabel class="sr-only">Selecciona o cambia el método de pago</ListboxLabel>
                         <div class="relative">
                           <div  class="flex divide-x divide-brand-700 rounded-md outline-2 outline-brand-700 bg-white w-full">
                             <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
                               <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
                                 <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                                <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
+                                <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Selecciona una opción' }}</p>
                               </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
-                                <span class="sr-only">Select or Change Delivery Method</span>
+                                <span class="sr-only">Selecciona o cambia el método de pago</span>
                                 <ChevronDownIcon class="size-5 text-brand-700 forced-colors:text-[Highlight]" aria-hidden="true" />
                               </template>
                             </ListboxButton>
@@ -414,7 +414,7 @@ function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-brand-700 font-semibold tracking-wider">Blazing Fast, Instant Transfers</p>
+                  <p v-if="! isFetchingQuote" class="text-sm text-brand-700 font-semibold tracking-wider">Transferencias instantáneas, súper rápidas</p>
                   <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
@@ -440,10 +440,10 @@ function saveQuote() {
         <button v-else :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
           <template v-if="isSavingQuote">
             <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
-            Saving ...
+            Guardando...
           </template>
           <template v-else>
-            Send Money
+            Enviar dinero
             <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
           </template>
         </button>
@@ -454,15 +454,15 @@ function saveQuote() {
             <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-yellow-800">Your ability to send money is temporarily restricted.</h3>
+            <h3 class="text-sm font-medium text-yellow-800">Tu posibilidad de enviar dinero está restringida temporalmente.</h3>
             <div class="mt-2 text-sm text-yellow-700">
-              <p>Please reach out to our customer support team for assistance or to understand the reason behind this restriction.</p>
+              <p>Contacta a nuestro equipo de soporte para recibir ayuda o conocer el motivo de esta restricción.</p>
             </div>
           </div>
         </div>
       </div>
     </form>
-    <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">KYC verification</router-link> is required before you can send money. This is a one-time process to ensure your account and transactions are secure.</p>
+    <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">Verificación KYC</router-link> es necesaria antes de que puedas enviar dinero. Es un proceso de una sola vez para mantener tu cuenta y tus transacciones seguras.</p>
   </template>
 </template>
 

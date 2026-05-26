@@ -39,7 +39,7 @@ const props = defineProps({
   saveBtnText: {
     type: String,
     required: false,
-    default: 'Continue',
+    default: 'Continuar',
   },
 })
 
@@ -138,7 +138,7 @@ watchEffect(() => {
       <template v-if="isSaving">
         <span class="flex items-center justify-center whitespace-nowrap">
           <Spinner :class="'size-4 mr-2'" />
-          Saving ...
+          Guardando...
         </span>
       </template>
       <template v-else>{{ saveBtnText }}</template>

@@ -124,7 +124,7 @@ async function resetPassword() {
               <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-6">Reset Password</h2>
+            <h2 class="text-2xl font-bold text-black mb-6">Restablecer contraseña</h2>
 
             <!-- Form -->
             <form @submit.prevent="resetPassword" class="space-y-6">
@@ -137,7 +137,7 @@ async function resetPassword() {
               </div>
               <!-- Password Field -->
               <div>
-                <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Choose Password</label>
+                <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Elige tu contraseña</label>
                 <div class="mb-3">
                   <div class="relative">
                     <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" :class="[formErrors.password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
@@ -187,7 +187,7 @@ async function resetPassword() {
               </ul>
               <!-- Confirm Password -->
               <div>
-                <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirm Password</label>
+                <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirmar contraseña</label>
                 <div class="relative">
                   <input :type="showConfirmPassword ? 'text' : 'password'" id="confirm_password" v-model="form.confirm_password" :class="[formErrors.confirm_password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
@@ -198,7 +198,7 @@ async function resetPassword() {
                 <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ formErrors.confirm_password[0] }}</p>
               </div>
               <!-- Submit Button -->
-              <button :disabled="isLoading" :class="[!isLoading ? 'hover:bg-brand-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-brand-700 text-center py-3 font-medium text-white rounded-[10px]">Continue</button>
+              <button :disabled="isLoading" :class="[!isLoading ? 'hover:bg-brand-800 transition cursor-pointer' : 'opacity-60 cursor-not-allowed']" type="submit" class="block w-full bg-brand-700 text-center py-3 font-medium text-white rounded-[10px]">Continuar</button>
             </form>
           </div>
         </div>
