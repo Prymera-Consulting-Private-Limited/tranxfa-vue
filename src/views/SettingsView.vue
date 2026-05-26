@@ -41,8 +41,8 @@ const identityUpdated = () => {
   notify(
       {
         group: 'customer',
-        title: 'Personal Details Updated',
-        text: 'Your personal information has been successfully updated.',
+        title: 'Datos personales actualizados',
+        text: 'Tus datos personales se actualizaron correctamente.',
         type: 'success',
       },
       -1,
@@ -54,8 +54,8 @@ const addressUpdated = () => {
   notify(
       {
         group: 'customer',
-        title: 'Address Updated',
-        text: 'Your address details have been successfully updated.',
+        title: 'Dirección actualizada',
+        text: 'Los datos de tu dirección se actualizaron correctamente.',
         type: 'success',
       },
       -1,
@@ -83,41 +83,41 @@ const passwordChanged = async () => {
       <div class="mx-auto max-w-3xl lg:max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="rounded-lg bg-white px-4 sm:px-6 lg:px-8 py-6">
           <section aria-labelledby="section-2-title">
-            <h1 class="sr-only" id="section-2-title">Account Settings</h1>
+            <h1 class="sr-only" id="section-2-title">Configuración de la cuenta</h1>
             <div class="mb-6">
-              <h2 class="text-base font-semibold text-gray-900">Account Settings</h2>
-              <p class="mt-1 text-sm text-gray-500">Manage your personal details, security settings, and connected devices all in one place.</p>
+              <h2 class="text-base font-semibold text-gray-900">Configuración de la cuenta</h2>
+              <p class="mt-1 text-sm text-gray-500">Administra tus datos personales, ajustes de seguridad y dispositivos conectados, todo en un solo lugar.</p>
             </div>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 lg:gap-8 max-w-2xl">
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <UserIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Personal Details</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">View and update your name, email address, and other personal information.</p>
-                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Modify &rarr;</a>
+                <h3 class="text-base font-semibold text-gray-900">Datos personales</h3>
+                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Consulta y actualiza tu nombre, correo electrónico y otros datos personales.</p>
+                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Modificar &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <HomeIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Address</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Ensure your billing and shipping address details are up-to-date.</p>
-                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Modify &rarr;</a>
+                <h3 class="text-base font-semibold text-gray-900">Dirección</h3>
+                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Asegúrate de que los datos de tu dirección estén actualizados.</p>
+                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Modificar &rarr;</a>
               </div>
               <div v-if="false" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <PhoneIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Mobile Number</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Update your phone number for account recovery and notifications.</p>
-                <a href="#" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Update &rarr;</a>
+                <h3 class="text-base font-semibold text-gray-900">Teléfono móvil</h3>
+                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Actualiza tu número de teléfono para recuperar la cuenta y recibir notificaciones.</p>
+                <a href="#" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Actualizar &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <LockClosedIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Password</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Change your password to keep your account secure.</p>
-                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Change Password &rarr;</a>
+                <h3 class="text-base font-semibold text-gray-900">Contraseña</h3>
+                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Cambia tu contraseña para mantener tu cuenta segura.</p>
+                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Cambiar contraseña &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <DevicePhoneMobileIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Devices</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Manage devices that have access to your account.</p>
-                <router-link class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500 cursor-pointer" :to="{name: 'devices'}">Manage Devices &rarr;</router-link>
+                <h3 class="text-base font-semibold text-gray-900">Dispositivos</h3>
+                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Administra los dispositivos que tienen acceso a tu cuenta.</p>
+                <router-link class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500 cursor-pointer" :to="{name: 'devices'}">Administrar dispositivos &rarr;</router-link>
               </div>
             </div>
           </section>
@@ -154,7 +154,7 @@ const passwordChanged = async () => {
                 <div class="rounded-t-md bg-brand-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
-                      <p class="text-xs text-brand-700 max-w-sm">Updating verified personal details may require re-verification of your identity to ensure accuracy and compliance. Please review changes carefully before proceeding.</p>
+                      <p class="text-xs text-brand-700 max-w-sm">Actualizar datos personales ya verificados puede requerir que verifiques tu identidad de nuevo para garantizar la exactitud y el cumplimiento. Revisa los cambios con cuidado antes de continuar.</p>
                     </div>
                   </div>
                 </div>
@@ -162,7 +162,7 @@ const passwordChanged = async () => {
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`"
                       v-bind:showLoading="showLoading"
-                      v-bind:saveBtnText="'Save Changes'"
+                      v-bind:saveBtnText="'Guardar cambios'"
                       v-on:customer:attribute_category:updated="identityUpdated"
                       v-on:customer:attribute_category:update_failed="identityUpdateFailed"
                   />
@@ -185,7 +185,7 @@ const passwordChanged = async () => {
                 <div class="rounded-t-md bg-brand-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
-                      <p class="text-xs text-brand-700 max-w-sm">Updating your address may require re-verification of your address to ensure accuracy and compliance. Please review your changes carefully before proceeding.</p>
+                      <p class="text-xs text-brand-700 max-w-sm">Actualizar tu dirección puede requerir que la verifiques de nuevo para garantizar la exactitud y el cumplimiento. Revisa los cambios con cuidado antes de continuar.</p>
                     </div>
                   </div>
                 </div>
@@ -193,7 +193,7 @@ const passwordChanged = async () => {
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
                       v-bind:showLoading="showLoading"
-                      v-bind:saveBtnText="'Save Changes'"
+                      v-bind:saveBtnText="'Guardar cambios'"
                       v-on:customer:attribute_category:updated="addressUpdated"
                       v-on:customer:attribute_category:update_failed="addressUpdateFailed"
                   />

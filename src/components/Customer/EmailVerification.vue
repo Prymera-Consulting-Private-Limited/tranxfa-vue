@@ -99,9 +99,9 @@ onMounted(async () => {
         <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5 mx-auto"></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">Verify your Email!</h2>
-      <p class="text-md text-[#B7A3C1] mb-2 text-center">We have sent an email verification code to your email {{ customer.data?.account?.email }}</p>
-      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">¡Verifica tu correo!</h2>
+      <p class="text-md text-[#B7A3C1] mb-2 text-center">Enviamos un código de verificación a tu correo {{ customer.data?.account?.email }}</p>
+      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Ten en cuenta que el correo puede tardar hasta un minuto en llegar. Si no lo ves en tu bandeja de entrada, revisa también tu carpeta de spam o correo no deseado.</p>
       <!-- Form -->
       <form @submit.prevent="verifyEmailAddress" class="space-y-10">
         <div v-if="otpError" class="rounded-md bg-red-50 p-4">
@@ -131,16 +131,16 @@ onMounted(async () => {
             <template v-if="isVerifying">
               <span class="flex items-center justify-center whitespace-nowrap">
                 <Spinner :class="'size-4 mr-2'" />
-                Verifying Email ...
+                Verificando correo...
               </span>
             </template>
-            <template v-else>Verify Email</template>
+            <template v-else>Verificar correo</template>
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
-          <div v-if="! isResendingToken" class="text-sm text-gray-500 text-center">Didn't receive verification code? <a @click="resend" class="text-brand-700 hover:text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
+          <div v-if="! isResendingToken" class="text-sm text-gray-500 text-center">¿No recibiste el código de verificación? <a @click="resend" class="text-brand-700 hover:text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Reenviar código</a> <template v-else>Reenviar en {{ countdown }}s</template>
           </div>
-          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending verification code to your email {{ customer.data?.account?.email }} ...</div>
+          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Reenviando el código de verificación a tu correo {{ customer.data?.account?.email }} ...</div>
         </template>
       </form>
     </div>

@@ -66,8 +66,8 @@ const editPersonalInformation = () => {
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
       </div>
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Enter Your Mobile Number</h2>
-      <p class="text-md text-gray-900 mb-8 text-left">Please provide your mobile number to continue.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Ingresa tu número de teléfono móvil</h2>
+      <p class="text-md text-gray-900 mb-8 text-left">Indícanos tu número de teléfono móvil para continuar.</p>
       <!-- Form -->
       <form @submit.prevent="updateMobileNumber" class="space-y-6 mt-12">
         <MobileNumberInput v-bind:mobile="mobile" v-bind:errors="errors" v-on:update:mobileNumberUpdated="mobileNumberUpdated" />
@@ -75,14 +75,14 @@ const editPersonalInformation = () => {
           <template v-if="isSaving">
               <span class="flex items-center justify-center whitespace-nowrap">
                 <Spinner :class="'size-4 mr-2'" />
-                Saving ...
+                Guardando...
               </span>
           </template>
-          <template v-else>Continue</template>
+          <template v-else>Continuar</template>
         </button>
       </form>
       <div class="text-center mt-12">
-        <a @click="editPersonalInformation" class="text-brand-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
+        <a @click="editPersonalInformation" class="text-brand-700 text-sm hover:underline" href="javascript:">Editar información personal</a>
       </div>
     </div>
   </div>

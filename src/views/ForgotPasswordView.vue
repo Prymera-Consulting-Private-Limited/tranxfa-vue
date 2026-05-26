@@ -56,8 +56,8 @@ async function requestResetPassword() {
               <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-2">Forgot Password</h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Forgot your password? No problem. Enter the email linked to your account and click "Send Reset Link." We'll email you a secure link to reset your password.</p>
+            <h2 class="text-2xl font-bold text-black mb-2">¿Olvidaste tu contraseña?</h2>
+            <p class="text-sm text-[#B7A3C1] mb-6 ">¿Olvidaste tu contraseña? No te preocupes. Ingresa el correo vinculado a tu cuenta y haz clic en "Enviar enlace de restablecimiento". Te enviaremos un enlace seguro para restablecerla.</p>
             <!-- Form -->
             <form @submit.prevent="requestResetPassword" class="space-y-6">
               <div v-if="forgotPasswordMessage" class="rounded-md bg-blue-50 border-blue-100 border p-4">
@@ -70,17 +70,17 @@ async function requestResetPassword() {
 
               <div>
                 <div class="relative">
-                  <input type="email" id="email" v-model="form.email" placeholder="example@email.com" class="w-full px-4 py-2 border-b border border-gray-300 rounded-lg">
+                  <input type="email" id="email" v-model="form.email" placeholder="ejemplo@correo.com" class="w-full px-4 py-2 border-b border border-gray-300 rounded-lg">
                   <button type="button" class="absolute inset-y-0 right-0 top-1 flex items-center px-3">
                     <span class="pi pi-envelope w-5 h-5 text-gray-400"></span>
                   </button>
                 </div>
               </div>
               <!-- Submit Button -->
-              <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Send Reset Link</button>
+              <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Enviar enlace de restablecimiento</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
-                Changed mind? <router-link :to="{name: 'signIn'}" class="text-brand-700 hover:text-brand-700 hover:underline">Sign in instead</router-link>
+                ¿Cambiaste de opinión? <router-link :to="{name: 'signIn'}" class="text-brand-700 hover:text-brand-700 hover:underline">Inicia sesión</router-link>
               </p>
             </form>
           </div>
