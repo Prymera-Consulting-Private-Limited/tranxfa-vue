@@ -2,6 +2,7 @@ import BaseQuote from "@/models/base_quote.js";
 import Recipient from "@/models/recipient.js";
 import PaymentMethod from "@/models/payment_method.js";
 import QuotePendingDocument from "@/models/quote_pending_document.js";
+import LinkedPaymentAccount from "@/models/linked_payment_account.js";
 
 class TransactionQuote extends BaseQuote {
     /**
@@ -15,6 +16,12 @@ class TransactionQuote extends BaseQuote {
     recipient = null;
 
     purposes = [];
+
+    /**
+     *
+     * @type {LinkedPaymentAccount[]}
+     */
+    linkedPaymentAccounts = [];
 
     /**
      * @type {PaymentMethod[]}
@@ -50,6 +57,11 @@ class TransactionQuote extends BaseQuote {
         if (data.pending_documents?.length > 0) {
             quote.pendingDocuments = data.pending_documents.map((data) => {
                 return QuotePendingDocument.getInstance(data);
+            });
+        }
+        if (data.linked_accounts?.length > 0) {
+            quote.linkedPaymentAccounts = data.linked_accounts.map((data) => {
+                return LinkedPaymentAccount.getInstance(data);
             });
         }
         return quote;
