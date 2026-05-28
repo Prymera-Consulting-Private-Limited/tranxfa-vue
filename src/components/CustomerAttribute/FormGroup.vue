@@ -8,6 +8,7 @@ import NationalityInput from "@/components/CustomerAttribute/NationalityInput.vu
 import TextInput from "@/components/CustomerAttribute/TextInput.vue";
 import OccupationInput from "@/components/CustomerAttribute/OccupationInput.vue";
 import EarningRangeInput from "@/components/CustomerAttribute/EarningRangeInput.vue";
+import GenderInput from "@/components/CustomerAttribute/GenderInput.vue";
 
 defineProps({
   attr: {
@@ -56,6 +57,11 @@ const notifyOccupationUpdated = (attr, value) => {
   />
   <ThirdNameInput
       v-else-if="attr.attribute === 'third_name'"
+      v-bind:attr="attr"
+      v-on:customer:attribute:updated="notifyAttributeUpdated"
+  />
+  <GenderInput
+      v-else-if="attr.attribute === 'gender'"
       v-bind:attr="attr"
       v-on:customer:attribute:updated="notifyAttributeUpdated"
   />
