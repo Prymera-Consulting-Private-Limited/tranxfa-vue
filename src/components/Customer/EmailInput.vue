@@ -1,29 +1,33 @@
 <script setup>
 import {computed, onMounted, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {useCountriesStore} from "@/stores/countries.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import Spinner from "@/components/Spinner.vue";
 
-const countriesStore = useCountriesStore();
 const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
+const props = defineProps({
+  showEditPersonalInformation: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 const isLoading = ref(false);
 const isSaving = ref(false);
 
 const showLoading = computed(() => {
-  return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
+  return isLoading.value || customerStore.isLoaded === false;
 })
 
 const emit = defineEmits([
-  'editPersonalInformation',
+  'editPersonalInformationRequested',
   'skipEmailInput',
   'emailUpdated',
 ])
 
 const editPersonalInformation = () => {
-  emit('editPersonalInformation');
+  emit('editPersonalInformationRequested');
 }
 const skip = () => {
   emit('skipEmailInput');
@@ -90,7 +94,7 @@ onMounted( async () => {
           Skip
         </button>
       </form>
-      <div class="text-center mt-12">
+      <div v-if="props.showEditPersonalInformation" class="text-center mt-12">
         <a @click="editPersonalInformation" class="text-brand-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
       </div>
     </div>

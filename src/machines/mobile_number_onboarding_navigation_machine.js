@@ -126,6 +126,9 @@ export const mobileAuthOnboardingMachine = createMachine({
                         guard: emailVerified,
                     },
                 ],
+                EDIT_EMAIL: {
+                    target: 'emailInput',
+                },
             },
         },
 

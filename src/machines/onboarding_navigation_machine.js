@@ -18,6 +18,18 @@ function isEmailVerified() {
         !!customer?.account?.isEmailVerified;
 }
 
+function hasEmail() {
+    const customer = getCustomer();
+
+    return isLoaded() &&
+        !!customer?.account?.email;
+}
+
+function emailVerificationRequired() {
+    return hasEmail() &&
+        !isEmailVerified();
+}
+
 function hasCountry() {
     const customer = getCustomer();
 
@@ -78,6 +90,24 @@ export const onboardingNavigationMachine = createMachine({
                     {
                         target: 'identityInformation',
                         guard: hasCountry,
+                    },
+                    {
+                        target: 'sourceCountrySelection',
+                        guard: isEmailVerified,
+                    },
+                ],
+                EDIT_EMAIL: {
+                    target: 'emailInput',
+                },
+            },
+        },
+
+        emailInput: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'emailVerification',
+                        guard: emailVerificationRequired,
                     },
                     {
                         target: 'sourceCountrySelection',
