@@ -92,7 +92,7 @@ const changePassword = async () => {
   </template>
     <form v-else @submit.prevent="changePassword" class="space-y-6">
         <div>
-            <label :class="[formErrors.current_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="current_password" class="block mb-3 text-base">Current Password</label>
+            <label :class="[formErrors.current_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="current_password" class="block mb-3 text-base">Contraseña actual</label>
             <div class="relative ">
                 <input :type="showCurrentPassword ? 'text' : 'password'" id="current_password" v-model="form.current_password" :class="[formErrors.current_password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
                 <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
@@ -105,7 +105,7 @@ const changePassword = async () => {
 
         <!-- Password Field -->
         <div>
-            <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Password</label>
+            <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Contraseña</label>
             <div class="mb-3">
                 <div class="relative">
                 <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" :class="[formErrors.password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
@@ -155,7 +155,7 @@ const changePassword = async () => {
         </ul>
         <!-- Confirm Password -->
         <div>
-            <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirm Password</label>
+            <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirmar contraseña</label>
             <div class="relative">
                 <input :type="showConfirmPassword ? 'text' : 'password'" id="confirm_password" v-model="form.confirm_password" :class="[formErrors.confirm_password.length > 0 ? 'text-red-500 border-red-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
                 <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
@@ -166,6 +166,6 @@ const changePassword = async () => {
             <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ formErrors.confirm_password[0] }}</p>
         </div>
         <!-- Submit Button -->
-        <button :class="[isLoading ? 'opacity-60 cursor-not-allowed' : '']" type="submit" class="block w-full bg-brand-700 text-center py-2.5 font-medium text-white rounded-md hover:bg-brand-800 transition cursor-pointer">Change Password</button>
+        <button :class="[isLoading ? 'opacity-60 cursor-not-allowed' : '']" type="submit" class="block w-full bg-brand-700 text-center py-2.5 font-medium text-white rounded-md hover:bg-brand-800 transition cursor-pointer">Cambiar contraseña</button>
     </form>
 </template>

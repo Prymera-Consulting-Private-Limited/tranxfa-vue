@@ -71,12 +71,14 @@ const recipientCreated = (recipient) => {
             <section aria-labelledby="section-2-title">
               <div class="flex justify-between items-center gap-3">
                 <div>
-                  <h2 class="text-base font-semibold text-gray-900">Your Recipients</h2>
-                  <p class="mt-1 text-sm text-gray-500">Here you can manage all your recipients and perform various actions such as adding, editing, or deleting recipients.</p>
+                  <h2 class="text-base font-semibold text-gray-900">Tus beneficiarios</h2>
+                  <p class="mt-1 text-sm text-gray-500">Aquí puedes gestionar a todos tus   
+beneficiarios y realizar acciones como   
+agregar o eliminar.  </p>
                 </div>
                 <button @click="createRecipient" type="button" class="inline-flex w-auto whitespace-nowrap items-center rounded-md bg-brand-700 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-brand-700/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer ml-3">
                   <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />
-                  Add Recipient
+                  Agregar beneficiario
                 </button>
               </div>
               <template v-if="isLoading">
@@ -108,11 +110,12 @@ const recipientCreated = (recipient) => {
                   <div  class="mt-6 border-t border-gray-200 py-6">
                     <div class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:ring-0 focus:ring-offset-0 focus:outline-hidden">
                       <UserPlusIcon class="mx-auto size-12 text-gray-400" />
-                      <span class="mt-4 block text-sm font-semibold text-gray-400">Oops! No recipients found. Let's add some!</span>
+                      <span class="mt-4 block text-sm font-semibold text-gray-400">¡Vaya! Aún no tienes beneficiarios. ¡Agrega   
+                        uno!  </span>
                       <div class="mt-6">
                         <button @click="createRecipient" type="button" class="inline-flex items-center rounded-md bg-brand-700 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-brand-700/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer">
                           <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />
-                          Recipient
+                          Beneficiario
                         </button>
                       </div>
                     </div>

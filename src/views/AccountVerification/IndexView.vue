@@ -35,8 +35,11 @@ onMounted(async () => {
             <section aria-labelledby="section-2-title">
               <h2 class="sr-only" id="section-2-title">Account Verification</h2>
               <div>
-                <h2 class="text-base font-semibold text-gray-900">One Time Verification</h2>
-                <p class="mt-1 text-sm text-gray-500">To keep your account secure and compliant, we just need to verify a few details.<br />This is a quick, one-time process - please follow the steps below to continue.</p>
+                <h2 class="text-base font-semibold text-gray-900">Verificación única</h2>
+                <p class="mt-1 text-sm text-gray-500">Para mantener tu cuenta segura y en regla,   
+solo necesitamos verificar algunos datos. Es   
+un proceso rápido y por única vez; sigue los   
+pasos a continuación para continuar.</p>
                 <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
                   <ul v-if="customerStore.isLoaded === true" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <template v-if="customer.data?.documents.length > 0">

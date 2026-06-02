@@ -12,11 +12,11 @@ const props = defineProps({
 const items = computed(() => {
   const items = [];
   items.push({
-    label: 'Destination',
+    label: 'Destino',
     value: props.quote.payoutCountry.commonName
   });
   items.push({
-    label: 'Payout Method',
+    label: 'Método de entrega',
     value: props.quote.payoutMethod.title
   });
   if (props.quote.payoutMethod.instructions) {
@@ -26,11 +26,11 @@ const items = computed(() => {
     });
   }
   items.push({
-    label: 'Amount',
+    label: 'Monto',
     value: props.quote.localAmountCurrencyPrefixed
   });
   items.push({
-    label: 'Our Rate',
+    label: 'Nuestra tasa',
     value: props.quote.exchangeRateFormatted
   });
   items.push({
@@ -38,7 +38,7 @@ const items = computed(() => {
     value: props.quote.foreignAmountCurrencyPrefixed
   });
   items.push({
-    label: 'Our Fees',
+    label: 'Comisión',
     value: props.quote.baseFeesCurrencyPrefixed
   });
   items.push({
@@ -46,7 +46,7 @@ const items = computed(() => {
     value: props.quote.subTotalAmountCurrencyPrefixed
   });
   items.push({
-    label: 'Total Due',
+    label: 'Total a pagar',
     value: props.quote.totalAmountCurrencyPrefixed
   });
 

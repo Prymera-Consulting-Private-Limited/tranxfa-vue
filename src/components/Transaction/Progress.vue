@@ -23,7 +23,7 @@ const props = defineProps({
 const steps = [
   {
     id: 'selectRecipient',
-    name: 'Choose your recipient',
+    name: 'Elige tu beneficiario',
     description: 'Tell us who you are sending money to by providing their name and transfer information.',
     show: true,
     stepCommand: 'SELECT_RECIPIENT',
@@ -31,7 +31,7 @@ const steps = [
   },
   {
     id: 'addRecipient',
-    name: 'Add Recipient Details',
+    name: 'Datos del beneficiario',
     description: 'Tell us who you are sending money to by providing their name and transfer information.',
     show: false,
     stepCommand: 'ADD_RECIPIENT',
@@ -39,7 +39,7 @@ const steps = [
   },
   {
     id: 'provideAddress',
-    name: 'Provide Your Address',
+    name: 'Tu dirección',
     description: 'For security and compliance, we need your address details before proceeding.',
     show: false,
     stepCommand: null,
@@ -47,7 +47,7 @@ const steps = [
   },
   {
     id: 'accountVerification',
-    name: 'Account verification',
+    name: 'Verificación de cuenta',
     description: 'For security and compliance, please verify your account before proceeding with the transaction.',
     show: false,
     stepCommand: null,
@@ -55,7 +55,7 @@ const steps = [
   },
   {
     id: 'confirm',
-    name: 'Review & Confirm',
+    name: 'Revisa y confirma',
     description: 'Double-check all details before finalizing your transfer.',
     show: true,
     stepCommand: null,
@@ -63,7 +63,7 @@ const steps = [
   },
   {
     id: 'makePayment',
-    name: 'Make Payment',
+    name: 'Realiza el pago',
     description: 'Complete your transfer by choosing a payment method and sending the funds.',
     show: true,
     stepCommand: null,

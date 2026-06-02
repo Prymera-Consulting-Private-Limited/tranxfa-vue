@@ -23,11 +23,11 @@ const customerUtils = useCustomerUtils();
 const customer = customerStore.customer;
 
 const navigation = [
-  { name: 'Home', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
-  { name: 'Transactions', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
-  { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
-  { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
-  { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },
+  { name: 'Inicio', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
+  { name: 'Transacciones', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
+  { name: 'Beneficiarios', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
+  { name: 'Verificación de cuenta', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
+  { name: 'Configuración', href: 'settings', current: router.currentRoute.value.name === 'settings' },
 ]
 
 async function logout() {

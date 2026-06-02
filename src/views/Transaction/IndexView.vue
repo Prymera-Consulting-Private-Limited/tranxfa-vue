@@ -104,10 +104,12 @@ const transactions = computed(() => {
                 class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white shadow-lg">
                 <div>
                   <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
-                  <span class="mt-4 block text-lg font-semibold text-gray-900">No Transactions Yet</span>
+                  <span class="mt-4 block text-lg font-semibold text-gray-900">Aún no tienes transacciones</span>
                   <p class="mt-2 text-sm text-gray-600 max-w-sm">
-                    Ready to send money? Your first transfer is just a few clicks away! Start now and experience fast,
-                    secure, and hassle-free transactions.
+                    ¿Listo para enviar dinero? Tu primera
+                    transferencia está a solo unos clics.
+                    Comienza ahora y disfruta de envíos
+                    rápidos, seguros y sin complicaciones.
                   </p>
                 </div>
               </div>
