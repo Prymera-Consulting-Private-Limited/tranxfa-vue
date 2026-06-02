@@ -15,7 +15,7 @@ import EmailInput from "@/components/Customer/EmailInput.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
-const authChannel = import.meta.env.VITE_AUTH_CHANNEL ??  'EMAIL';
+const authChannel = String(import.meta.env.VITE_AUTH_CHANNEL ?? 'EMAIL').toUpperCase();
 
 /**
  * @type {{data: Customer | null}}
@@ -52,6 +52,9 @@ const proceed = () => {
 const editPersonalInformation = () => {
   send({type: 'EDIT_PERSONAL_INFORMATION'});
 }
+const editEmail = () => {
+  send({type: 'EDIT_EMAIL'});
+}
 </script>
 
 <template>
@@ -66,7 +69,11 @@ const editPersonalInformation = () => {
             <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
           </div>
         </div>
-        <EmailVerification v-if="snapshot?.value === 'emailVerification'" v-on:emailVerified="proceed" />
+        <EmailVerification
+            v-if="snapshot?.value === 'emailVerification'"
+            v-on:emailVerified="proceed"
+            v-on:editEmailRequested="editEmail"
+        />
         <OriginCountrySelection
             v-else-if="snapshot?.value === 'sourceCountrySelection'"
             v-on:countryUpdated="proceed" />
@@ -85,6 +92,7 @@ const editPersonalInformation = () => {
         />
         <EmailInput
             v-else-if="snapshot?.value === 'emailInput'"
+            :show-edit-personal-information="authChannel === 'MOBILE_NUMBER'"
             v-on:editPersonalInformationRequested="editPersonalInformation"
             v-on:skipEmailInput="proceed"
             v-on:emailUpdated="proceed"
