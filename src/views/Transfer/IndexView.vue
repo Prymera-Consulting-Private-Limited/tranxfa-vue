@@ -401,7 +401,7 @@ const canContinue = computed(() => {
                       />
                     </template>
                     <template v-if="snapshot.value === 'accountVerification'">
-                      <h3 class="text-gray-900 mb-4 font-semibold">One-time account verification</h3>
+                      <h3 class="text-gray-900 mb-4 font-semibold">Verificación única</h3>
                       <template v-if="selectedUploadDocumentCategory">
                         <CategoryDescription v-bind:category="selectedUploadDocumentCategory" />
                         <ul v-if="selectedUploadDocumentCategory.documentTypes?.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">

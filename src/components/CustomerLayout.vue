@@ -45,8 +45,8 @@ onMounted(async () => {
           notify(
               {
                 group: 'customer',
-                title: `${category} - Accepted`,
-                text: `Your ${document} has been accepted by our compliance team.`,
+                title: `${category} - Aceptada`,
+                text: `Tu ${document} fue aceptado por nuestro equipo de cumplimiento.`,
                 type: 'success',
               },
               -1,
