@@ -53,16 +53,16 @@ const transactions = computed(() => {
           <div
             class="flex flex-col gap-3 rounded-lg border border-gray-100 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div>
-              <h2 class="text-base font-semibold text-gray-900">Your transactions</h2>
+              <h2 class="text-base font-semibold text-gray-900">Tus transacciones</h2>
               <p class="mt-0.5 text-sm text-gray-500">
-                Request a statement by email for any date range.
+                Solicite un extracto por correo electrónico para cualquier rango de fechas.
               </p>
             </div>
             <button type="button"
               class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
               @click="isStatementModalOpen = true">
               <ArrowDownTrayIcon class="size-5" aria-hidden="true" />
-              Download statement
+              Descargar declaración
             </button>
           </div>
           <template v-if="isLoading">

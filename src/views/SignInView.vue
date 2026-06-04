@@ -117,8 +117,8 @@ const appUrl = import.meta.env.VITE_APP_URL;
               <!-- Remember Me & Forgot Password -->
               <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center">
-                  <input id="remember-me" type="checkbox" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700">
-                  <label for="remember-me" class="ml-2 text-sm text-gray-600">Recordarme</label>
+                  <!-- <input id="remember-me" type="checkbox" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700">
+                  <label for="remember-me" class="ml-2 text-sm text-gray-600">Recordarme</label> -->
                 </div>
                 <router-link :to="{name: 'forgotPassword'}" class="text-sm text-brand-600 hover:text-brand-700 underline">¿Olvidaste tu contraseña?</router-link>
               </div>
