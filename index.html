@@ -7,6 +7,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Xenvia</title>
   <script src="https://js.volumepay.io"></script>
+  <!-- #230: GA4 library deferred to after first paint via requestIdleCallback -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied'
+    });
+    gtag('js', new Date());
+    gtag('config', 'G-09D5GXFFJ7', { send_page_view: false });
+    (function () {
+      function loadGA4() {
+        var s = document.createElement('script');
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-09D5GXFFJ7';
+        document.head.appendChild(s);
+      }
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadGA4);
+      } else {
+        setTimeout(loadGA4, 2000);
+      }
+    })();
+  </script>
+  <!-- Microsoft Clarity -->
+  <script
+    type="text/javascript">(function (c, l, a, r, i, t, y) { c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) }; t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, "clarity", "script", "vvrtw05a16");</script>
+  <script>
+
+    (function () {
+      var k = 'xenvia_cookie_consent', c = localStorage.getItem(k), show = false;
+      if (!c) { show = true } else { try { var d = JSON.parse(c); if (Date.now() - new Date(d.timestamp).getTime() > 7776000000) { localStorage.removeItem(k); show = true } } catch (e) { localStorage.removeItem(k); show = true } }
+      if (!show) return;
+      document.addEventListener('DOMContentLoaded', function () {
+        var bar = document.getElementById('cookie-bar');
+        if (!bar) return;
+        requestAnimationFrame(function () { requestAnimationFrame(function () { bar.classList.add('visible') }) });
+        document.getElementById('cookie-bar-accept').onclick = function () {
+          localStorage.setItem(k, JSON.stringify({ level: 'all', timestamp: new Date().toISOString() }));
+          bar.classList.remove('visible');
+          window.dispatchEvent(new CustomEvent('xenvia-consent-update', { detail: { level: 'all' } }));
+        };
+        document.getElementById('cookie-bar-essential').onclick = function () {
+          localStorage.setItem(k, JSON.stringify({ level: 'essential', timestamp: new Date().toISOString() }));
+          bar.classList.remove('visible');
+          window.dispatchEvent(new CustomEvent('xenvia-consent-update', { detail: { level: 'essential' } }));
+        };
+      });
+    })();
+  </script>
+  <!-- Meta Pixel XENVIA -->
+  <script>!function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s) }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js"); fbq("init", "766471166259284"); fbq("track", "PageView");</script>
 </head>
 
 <body class="min-h-screen">
@@ -46,7 +97,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding:10px 22px 10px 10px;
+    padding: 10px 22px 10px 10px;
     background: #46d160;
     border-radius: 999px;
     text-decoration: none;
