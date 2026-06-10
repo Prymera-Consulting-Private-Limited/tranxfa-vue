@@ -1,40 +1,86 @@
 <script setup>
-import {reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import axios from "axios";
+import IsdCodeInput from "@/components/IsdCodeInput.vue";
+import {useCountryUtils} from "@/composables/country_utils.js";
+
+const authChannel = import.meta.env.VITE_AUTH_CHANNEL ??  'EMAIL';
 
 const showPassword = ref(false);
 const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
-const form = reactive({
-  email: '',
-  password: '',
-});
+const form = reactive({});
+if (authChannel === 'EMAIL') {
+  form.email = '';
+  form.password = '';
+} else if (authChannel === 'MOBILE_NUMBER') {
+  form.country = '';
+  form.mobile_number = '';
+}
 const isLoading = ref(false);
 const loginError = ref(null);
+const countries = ref([]);
+const countryUtils = useCountryUtils();
+
+onMounted(async () => {
+  if (authChannel === 'MOBILE_NUMBER') {
+    isLoading.value = true;
+    await countryUtils.getSources();
+    countries.value = countryUtils.sources.value;
+    isLoading.value = false;
+  }
+});
 
 async function login() {
   isLoading.value = true;
   loginError.value = null;
   await axios.get('/sanctum/csrf-cookie');
-  await customerUtils.login(form.email, form.password).then(() => {
-    if (customerStore.customer.data?.account?.isEmailVerified && customerStore.customer.data?.session?.mfaMethod !== null) {
-      router.push({name: 'multiFactorAuth'});
-    } else {
-      router.push({name: 'onboardingWorkflow'});
-    }
+  if (authChannel === 'MOBILE_NUMBER') {
+    await customerUtils.getLoginOtp(form.country, form.mobile_number).then(() => {
+      const country = countries.value.find(o => o.id === form.country)
+      sessionStorage.setItem(
+          'otpData',
+          JSON.stringify({
+            country: country,
+            number: form.mobile_number
+          })
+      );
+      router.push({name: 'authByOtp'});
+    }).catch((e) => {
+      loginError.value = e.response?.data?.message;
+      console.error(e);
+    }).finally(() => {
+      isLoading.value = false;
+    })
+  } else {
+    await customerUtils.login(form.email, form.password).then(() => {
+      if (customerStore.customer.data?.account?.isEmailVerified && customerStore.customer.data?.session?.mfaMethod !== null) {
+        router.push({name: 'multiFactorAuth'});
+      } else {
+        router.push({name: 'onboardingWorkflow'});
+      }
 
-  }).catch((e) => {
-    loginError.value = e.response?.data?.message;
-    console.error(e);
-  }).finally(() => {
-    isLoading.value = false;
-  })
+    }).catch((e) => {
+      loginError.value = e.response?.data?.message;
+      console.error(e);
+    }).finally(() => {
+      isLoading.value = false;
+    })
+  }
 }
 
 const appUrl = import.meta.env.VITE_APP_URL;
+
+const itemLabelGenerator = (country) => {
+  return '+' + country.callingCode + ' ' + country.commonName;
+}
+
+function updateIsdCode(updated) {
+  form.country = updated?.id;
+}
 </script>
 <template>
   <main>
@@ -92,39 +138,50 @@ const appUrl = import.meta.env.VITE_APP_URL;
                 </div>
               </div>
 
-              <div>
-                <label for="email" class="block text-brand-700 mb-3">Email</label>
-                <div class="relative">
-                  <input type="email" id="email" v-model="form.email" placeholder="example@email.com" class="w-full px-4 py-2 border-b border border-gray-300 rounded-lg">
-                  <button type="button" class="absolute inset-y-0 right-0 top-1 flex items-center px-3">
-                    <span class="pi pi-envelope w-5 h-5 text-gray-400"></span>
-                  </button>
+              <template v-if="authChannel === 'MOBILE_NUMBER'">
+                <div v-if="! isLoading">
+                  <label for="mobile-number" class="block mb-3 text-base text-brand-700">Mobile Number</label>
+                  <div class="input-group flex-cols space-y-3 items-center">
+                    <IsdCodeInput v-bind:countries="countries" v-bind:fetchCountries="false" :class="['min-w-36 sm:min-w-40']" v-bind:modelValue="form.country" v-bind:itemLabelGenerator="itemLabelGenerator" v-on:update:modelValue="updateIsdCode" />
+                    <input id="mobile-number" type="tel" v-model="form.mobile_number" class="w-full px-4 py-2 border rounded-lg text-gray-900 border-gray-300" placeholder="Mobile Number" />
+                  </div>
                 </div>
-              </div>
+              </template>
+              <template v-else-if="authChannel === 'EMAIL'">
 
-              <!-- Password Field -->
-              <div>
-                <label for="password" class="block text-brand-700 mb-3">Password</label>
-                <div class="relative">
-                  <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                  <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
-                    <span @click="showPassword = !showPassword" v-if="showPassword" class="pi pi-eye-slash w-5 h-5 text-gray-400"></span>
-                    <span @click="showPassword = !showPassword" v-else class="pi pi-eye w-5 h-5 text-gray-400"></span>
-                  </button>
+                <div>
+                  <label for="email" class="block text-brand-700 mb-3">Email</label>
+                  <div class="relative">
+                    <input type="email" id="email" v-model="form.email" placeholder="example@email.com" class="w-full px-4 py-2 border-b border border-gray-300 rounded-lg">
+                    <button type="button" class="absolute inset-y-0 right-0 top-1 flex items-center px-3">
+                      <span class="pi pi-envelope w-5 h-5 text-gray-400"></span>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Remember Me & Forgot Password -->
-              <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center">
-                  <input id="remember-me" type="checkbox" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700">
-                  <label for="remember-me" class="ml-2 text-sm text-gray-600">Remember me</label>
+                <!-- Password Field -->
+                <div>
+                  <label for="password" class="block text-brand-700 mb-3">Password</label>
+                  <div class="relative">
+                    <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
+                      <span @click="showPassword = !showPassword" v-if="showPassword" class="pi pi-eye-slash w-5 h-5 text-gray-400"></span>
+                      <span @click="showPassword = !showPassword" v-else class="pi pi-eye w-5 h-5 text-gray-400"></span>
+                    </button>
+                  </div>
                 </div>
-                <router-link :to="{name: 'forgotPassword'}" class="text-sm text-brand-600 hover:text-brand-700 underline">Forgot password?</router-link>
-              </div>
 
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between mb-6">
+                  <div class="flex items-center">
+                    <input id="remember-me" type="checkbox" class="w-4 h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700">
+                    <label for="remember-me" class="ml-2 text-sm text-gray-600">Remember me</label>
+                  </div>
+                  <router-link :to="{name: 'forgotPassword'}" class="text-sm text-brand-600 hover:text-brand-700 underline">Forgot password?</router-link>
+                </div>
+              </template>
               <!-- Submit Button -->
-              <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">Continue</button>
+              <button :disabled="isLoading" :class="{'opacity-70': isLoading}" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">{{ authChannel === 'MOBILE_NUMBER' ? 'Get Code' : 'Continue' }}</button>
               <!-- Sign Up Link -->
               <p class="mt-4 text-center text-sm text-gray-600">
                 Don’t have an account? <router-link :to="{name: 'signUp'}" class="text-brand-700 hover:text-brand-700 hover:underline">Sign up instead</router-link>

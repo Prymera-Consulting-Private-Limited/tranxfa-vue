@@ -4,15 +4,18 @@ import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useMachine} from "@xstate/vue";
 import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_machine.js";
+import {mobileAuthOnboardingMachine} from "@/machines/mobile_number_onboarding_navigation_machine.js";
 import EmailVerification from "@/components/Customer/EmailVerification.vue";
 import OriginCountrySelection from "@/components/Customer/OriginCountrySelection.vue";
 import IdentityInformation from "@/components/Customer/IdentityInformation.vue";
 import MobileNumberInput from "@/components/Customer/MobileNumberInput.vue";
 import router from "@/router/index.js";
 import EmploymentInformation from "@/components/Customer/EmploymentInformation.vue";
+import EmailInput from "@/components/Customer/EmailInput.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
+const authChannel = import.meta.env.VITE_AUTH_CHANNEL ??  'EMAIL';
 
 /**
  * @type {{data: Customer | null}}
@@ -28,8 +31,11 @@ onMounted(async () => {
   }
   proceed();
 });
+const machine = authChannel === 'MOBILE_NUMBER'
+    ? mobileAuthOnboardingMachine
+    : onboardingNavigationMachine;
 
-const {snapshot, send} = useMachine(onboardingNavigationMachine);
+const { snapshot, send } = useMachine(machine);
 
 watch(() => snapshot.value, (newSnapshot) => {
   if (newSnapshot?.value === 'onboardingComplete') {
@@ -76,6 +82,12 @@ const editPersonalInformation = () => {
             v-else-if="snapshot?.value === 'mobileNumberInput'"
             v-on:mobileNumberUpdated="proceed"
             v-on:editPersonalInformationRequested="editPersonalInformation"
+        />
+        <EmailInput
+            v-else-if="snapshot?.value === 'emailInput'"
+            v-on:editPersonalInformationRequested="editPersonalInformation"
+            v-on:skipEmailInput="proceed"
+            v-on:emailUpdated="proceed"
         />
       </div>
     </div>
