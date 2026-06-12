@@ -28,6 +28,7 @@ const navigation = [
   { name: 'Beneficiarios', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
   { name: 'Verificación de cuenta', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
   { name: 'Configuración', href: 'settings', current: router.currentRoute.value.name === 'settings' },
+  { name: 'Contactar con el soporte técnico', href: 'contact', current: router.currentRoute.value.name === 'contact' },
 ]
 
 async function logout() {
@@ -37,9 +38,9 @@ async function logout() {
 }
 
 const userNavigation = [
-  { name: 'Account Verification', href: 'accountVerification' },
-  { name: 'Settings', href: 'settings' },
-  { name: 'Sign out', action: logout },
+  { name: 'Verificación de cuenta', href: 'accountVerification' },
+  { name: 'Configuración', href: 'settings' },
+  { name: 'Cerrar sesión', action: logout },
 ]
 
 const isLoading = ref(false);
@@ -55,7 +56,7 @@ onMounted(async () => {
 <template>
   <Popover as="header" class="bg-brand-700 pb-24" v-slot="{ open }">
     <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-      <div class="relative flex items-center justify-center py-10 md:py-5 lg:justify-between">
+      <div class="relative flex items-center justify-center py-10 md:py-8 lg:justify-between">
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
@@ -107,7 +108,7 @@ onMounted(async () => {
       </div>
       <div class="hidden border-t border-brand-100/20 py-5 lg:block  print:hidden">
         <div class="grid grid-cols-3 items-center gap-8">
-          <div class="col-span-2">
+          <div class="col-span-3">
             <nav class="flex space-x-4">
               <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-indigo-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
             </nav>

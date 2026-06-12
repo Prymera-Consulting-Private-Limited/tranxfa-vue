@@ -6,6 +6,8 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {usePasswordPolicyUtils} from "@/composables/password_policy_utils.js";
 import axios from "axios";
 
+const thirdPartyDeclaration = import.meta.env.VITE_THIRD_PARTY_SIGNUP_DECLARATION;
+const thirdPartyDeclarationAccepted = ref(false);
 const isLoading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
@@ -65,8 +67,7 @@ async function register() {
   formErrors.password = [];
   formErrors.confirm_password = [];
   await axios.get('/sanctum/csrf-cookie');
-  const thirdPartyDeclarationAccepted = Boolean(import.meta.env.VITE_THIRD_PARTY_SIGNUP_DECLARATION);
-  customerUtils.register(form.email, form.password, form.confirm_password, thirdPartyDeclarationAccepted).then(() => {
+  customerUtils.register(form.email, form.password, form.confirm_password, thirdPartyDeclarationAccepted.value).then(() => {
     router.push({name: 'onboardingWorkflow'});
   }).catch((e) => {
     if (e.status === 422) {
@@ -92,7 +93,15 @@ const userAgreementUrl = import.meta.env.VITE_USER_AGREEMENT_URL;
 const privacyPolicyUrl = import.meta.env.VITE_PRIVACY_POLICY_URL;
 const appUrl = import.meta.env.VITE_APP_URL;
 
-const canContinue = computed(() => termsAccepted.value && !isLoading.value);
+const canContinue = computed(() => {
+  if (termsAccepted.value && !isLoading.value) {
+    if (thirdPartyDeclaration) {
+      return thirdPartyDeclarationAccepted.value;
+    }
+    return true;
+  }
+  return false;
+})
 
 const passwordRequirementsOpen = ref(false);
 
@@ -298,6 +307,12 @@ watch(
               <div class="flex items-start space-x-2">
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="mt-0.5 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
                 <label for="terms" class="text-sm/6 text-gray-700 leading-snug">Acepto la <a :href="privacyPolicyUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">política de privacidad</a> y los <a :href="userAgreementUrl" target="_blank" class="text-brand-700 hover:text-brand-800 hover:underline">términos del servicio</a>.</label>
+              </div>
+
+              <!-- Checkbox -->
+              <div v-if="thirdPartyDeclaration" class="flex items-start space-x-2">
+                <input type="checkbox" id="third-party-declaration-accepted" v-model="thirdPartyDeclarationAccepted" class="mt-1 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
+                <label for="third-party-declaration-accepted" class="text-sm/6 text-gray-700">{{ thirdPartyDeclaration }}</label>
               </div>
 
               <!-- Submit Button -->
