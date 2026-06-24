@@ -14,6 +14,7 @@ import Apaylo from "@/components/Payment/Apaylo.vue";
 import Pay360 from "@/components/Payment/Pay360.vue";
 import PayCross from "@/components/Payment/PayCross.vue";
 import CinetPay from "@/components/Payment/CinetPay.vue";
+import Cybrid from "@/components/Payment/Cybrid.vue";
 
 const transactionUtils = useTransactionUtils();
 
@@ -101,6 +102,7 @@ watch(canAttemptPayment, async () => {
                   <div v-if="transaction" class="text-center">
                     <ManualPayment v-if="transaction.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction"  />
                     <PagaPayment v-if="transaction.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction"  />
+                    <Cybrid v-if="transaction.payment.paymentProvider.code === 'CYBRID'" v-bind:transaction="transaction"  />
                     <Monoova v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'MONOOVA'" v-bind:transaction="transaction"  />
                     <Volume v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'VOLUME-PAYMENTS'" v-bind:transaction="transaction"  />
                     <Apaylo v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  v-bind:retryFormErrors="retryPaymentErrors"  />

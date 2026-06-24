@@ -21,16 +21,19 @@ import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {Dialog, DialogPanel, RadioGroup, RadioGroupOption, TransitionChild, TransitionRoot} from '@headlessui/vue'
 import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon, ExclamationTriangleIcon} from '@heroicons/vue/20/solid'
+import {BuildingLibraryIcon} from '@heroicons/vue/24/outline'
 import {createPopper} from "@popperjs/core";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
 import QuotePendingDocument from "@/models/quote_pending_document.js";
 import DocumentCategory from "@/models/document_category.js";
+import {usePaymentMethodUtils} from "@/composables/payment_method_utils.js";
 
 const thirdPartyDeclaration = import.meta.env.VITE_THIRD_PARTY_TRANSACTION_DECLARATION;
 const thirdPartyDeclarationAccepted = ref(false);
 const { snapshot, send } = useMachine(transactionNavigationMachine);
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
+const paymentMethodUtils = usePaymentMethodUtils();
 /**
  * @type {{data: Customer|null}}
  */
@@ -120,7 +123,7 @@ const confirmQuote = async () => {
         paymentDataAttributes[paymentDataAttribute[0]] = paymentDataAttribute[1].value;
       }
     }
-    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes, thirdPartyDeclarationAccepted.value);
+    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes, thirdPartyDeclarationAccepted.value, linkedPaymentAccount?.value?.id);
     const transaction = response.data;
     isStepProcessing.value = false;
     await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
@@ -287,12 +290,19 @@ watch(snapshot, () => {
   }
 });
 
+const paymentMethodSetViaLinkedAccount = ref(false);
+
 const paymentData = reactive({
   data: null,
 });
 
+const linkedPaymentAccount = ref(null);
+
 watch(paymentMethod, (newValue) => {
   if (newValue) {
+    if (paymentMethodSetViaLinkedAccount.value === false) {
+      linkedPaymentAccount.value = null;
+    }
     paymentData.data = [];
     if (newValue?.providers[0]?.paymentDataAttributes?.length > 0) {
       newValue.providers[0].paymentDataAttributes.forEach(function (attribute) {
@@ -300,7 +310,13 @@ watch(paymentMethod, (newValue) => {
       });
     }
   }
+  paymentMethodSetViaLinkedAccount.value = false;
 });
+
+watch (linkedPaymentAccount, (newValue) => {
+  paymentMethodSetViaLinkedAccount.value = true;
+  paymentMethod.value = newValue?.paymentMethod;
+})
 
 const canContinue = computed(() => {
   if (snapshot.value?.value === 'confirm') {
@@ -312,6 +328,9 @@ const canContinue = computed(() => {
           }
         }
       }
+      if (paymentMethod.value.code === 'DIRECT-DEBIT' && ! linkedPaymentAccount) {
+        return false;
+      }
       if (thirdPartyDeclaration) {
         return thirdPartyDeclarationAccepted.value;
       }
@@ -322,6 +341,65 @@ const canContinue = computed(() => {
   }
   return !isStepProcessing.value && !isLoading.value && !isSubComponentLoading.value;
 });
+
+const plaidHandler = ref(null);
+
+const plaidInitialize = async (token) => {
+  plaidHandler.value?.destroy();
+  plaidHandler.value = Plaid.create({
+    token: token,
+    onSuccess: (public_token, metadata) => {
+      isLoading.value = true;
+      paymentMethodUtils.linkPaymentAccount(
+          quote.data.paymentCurrency.id,
+          paymentMethod?.value?.id,
+          paymentMethod.value.providers[0].code,
+          metadata
+      ).then((response) => {
+        quoteUtils.getTransferQuote(props.id).then((response) => {
+          quote.data = TransactionQuote.getInstance(response.data);
+          isDirectDebitModalOpen.value = false;
+          isLoading.value = false;
+        });
+      });
+    },
+    onLoad: () => {
+      isGettingPaymentMethodLinkAccountToken.value = false;
+    },
+    onExit: (err, metadata) => {
+      console.error('err', err)
+      console.log('metadata', metadata)
+      isDirectDebitModalOpen.value = false;
+    },
+    onEvent: (eventName, metadata) => {
+      // console.info('eventName', eventName)
+      // console.info('metadata', metadata)
+    },
+  });
+  plaidHandler.value.open();
+}
+
+const paymentMethods = computed(() => {
+  return quote.data.paymentMethods.filter((paymentMethod) => {
+    return paymentMethod.code !== 'DIRECT-DEBIT';
+  })
+});
+
+const directDebitPaymentMethod = computed(() => {
+  return quote.data.paymentMethods.find((paymentMethod) => paymentMethod.code === 'DIRECT-DEBIT')
+});
+
+const isDirectDebitModalOpen = ref(false);
+const isGettingPaymentMethodLinkAccountToken = ref(false);
+
+function initializeDirectDebit() {
+  isDirectDebitModalOpen.value = true;
+  isGettingPaymentMethodLinkAccountToken.value = true;
+  paymentMethodUtils.getPaymentMethodLinkAccountToken(directDebitPaymentMethod.value.providers[0].code).then((response) => {
+    plaidInitialize(response.data.token);
+  });
+}
+
 </script>
 
 <template>
@@ -480,8 +558,23 @@ const canContinue = computed(() => {
                     <fieldset aria-label="Payment Method" class="mt-6 mb-4">
                       <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-red-500">*</span></label>
                       <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
-                      <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
-                        <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
+
+                      <div v-if="quote.data.linkedPaymentAccounts.length > 0" class="divide-y divide-white/10 space-y-4 mb-4">
+                        <template v-for="(account, accountIdx) in quote.data.linkedPaymentAccounts" :key="accountIdx">
+                          <label :for="`account-${account.id}`" :class="account.id === linkedPaymentAccount?.id ? 'border-brand-600 bg-brand-50' : 'border-gray-200'" class="relative flex items-start pt-3.5 pb-4 rounded-md border border-dashed hover:border-brand-600 hover:bg-brand-50 px-4 cursor-pointer">
+                            <div class="min-w-0 flex-1 text-sm/6">
+                              <div class="font-medium text-gray-900">{{ account.institutionName }} {{ account.accountNumber }}</div>
+                              <p :id="`account-${account.id}-description`" class="text-gray-500">{{ account.displayName }}</p>
+                            </div>
+                            <div class="ml-3 flex h-6 items-center">
+                              <input v-model="linkedPaymentAccount" :value="account" :id="`account-${account.id}`" :aria-describedby="`account-${account.id}-description`" name="account" type="radio" :checked="account.id === linkedPaymentAccount?.id" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-brand-600 checked:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden" />
+                            </div>
+                          </label>
+                        </template>
+                      </div>
+
+                      <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4" v-if="paymentMethods.length > 0">
+                        <RadioGroupOption as="template" v-for="paymentMethod in paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
                           <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
                           <span class="flex flex-1">
                             <span class="flex flex-col">
@@ -494,6 +587,23 @@ const canContinue = computed(() => {
                           </div>
                         </RadioGroupOption>
                       </RadioGroup>
+
+                      <template v-if="directDebitPaymentMethod">
+                        <div @click="() => { linkedPaymentAccount = null; initializeDirectDebit(); }" class="rounded-md border border-dashed border-gray-200 hover:border-brand-600 hover:bg-brand-50 px-4 py-5 sm:flex sm:items-start sm:justify-between mb-5 cursor-pointer group">
+                          <h4 class="sr-only">Visa</h4>
+                          <div class="sm:flex sm:items-start">
+                            <BuildingLibraryIcon class="h-8 w-auto sm:h-6 sm:mt-0.5 sm:shrink-0 text-gray-800 group-hover:text-brand-800" />
+                            <div class="mt-3 sm:mt-0 sm:ml-4">
+                              <div class="text-sm font-medium text-gray-800 group-hover:text-brand-800">Link a new bank account</div>
+                              <div class="mt-1 text-xs/4 tracking-wider text-gray-500 sm:flex sm:items-center">
+                                <div>Securely link your USD bank account via Plaid. Your credentials are never shared and connections are protected with bank-level security.</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="mt-4 sm:mt-0 sm:ml-6 sm:shrink-0">
+                          </div>
+                        </div>
+                      </template>
                     </fieldset>
 
                     <template v-if="paymentMethod?.providers[0]?.paymentDataAttributes?.length > 0">
@@ -613,5 +723,27 @@ const canContinue = computed(() => {
         </TransitionRoot>
       </template>
     </main>
+    <TransitionRoot as="template" :show="isDirectDebitModalOpen">
+      <Dialog class="relative z-10">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-900/75 transition-opacity" />
+        </TransitionChild>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg px-4 pt-5 pb-4 text-left transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                <button class="sr-only">Loading...</button>
+                <div v-if="isGettingPaymentMethodLinkAccountToken" class="space-y-6 flex-col items-center justify-center text-center">
+                  <div>
+                    <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-200"></span>
+                  </div>
+                  <p class="text-lg text-gray-200 text-center">Please wait...</p>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </CustomerLayout>
 </template>
