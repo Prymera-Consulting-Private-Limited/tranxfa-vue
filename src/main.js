@@ -24,6 +24,7 @@ axios.defaults.withXSRFToken = true;
 axios.interceptors.request.use((config) => {
     NProgress.start()
     config.headers['Accept'] = 'application/json'
+    config.headers['Accept-Language'] = import.meta.env.VITE_APP_LOCALE
     config.headers['ngrok-skip-browser-warning'] = 'yes'
 
     return config;
