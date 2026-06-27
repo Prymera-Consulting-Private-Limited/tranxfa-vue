@@ -11,7 +11,8 @@ import {
     UserCircleIcon,
     BuildingLibraryIcon,
     DocumentCurrencyDollarIcon,
-    InformationCircleIcon
+    InformationCircleIcon,
+    PercentBadgeIcon
 } from "@heroicons/vue/24/outline";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 
@@ -83,6 +84,15 @@ reviewItems.push({
   label: 'Recipient Gets',
   value: props.quote.foreignAmountCurrencyPrefixed,
 });
+if (props.quote.payoutMethod.promo) {
+  reviewItems.push({
+    icon: PercentBadgeIcon,
+    label: null,
+    value: props.quote.payoutMethod.promo,
+    color: 'bg-lime-50 border-lime-400 ',
+    textColor: 'text-lime-700',
+  });
+}
 reviewItems.push({
   icon: PlusIcon,
   label: 'Fees',
@@ -104,7 +114,10 @@ reviewItems.push({
   <section class="">
     <div class="text-sm/6">
       <template v-for="reviewItem in reviewItems">
-        <div :class="[reviewItem.label ? '' : 'bg-blue-50 border border-blue-400 rounded-md text-blue-700 my-2']" class="py-2 px-0 sm:px-5 flex space-x-6 flex-col sm:flex-row">
+        <div :class="reviewItem.label ? '' : [
+            'rounded-md my-2 border',
+            reviewItem.color ? reviewItem.color : 'bg-blue-50 border-blue-400 text-blue-700'
+          ]" class="py-2 px-0 sm:px-5 flex space-x-6 flex-col sm:flex-row">
           <dt v-if="reviewItem.label" class="font-medium text-gray-900 sm:w-64 sm:flex-none">
             <div class="flex justify-start items-center gap-4 text-sm/7">
               <component :is="reviewItem.icon" class="h-4.5 w-4.5 text-gray-600" />
@@ -113,11 +126,11 @@ reviewItems.push({
           </dt>
           <dt v-else class="font-medium text-gray-900 sm:flex-none py-2">
             <div class="flex justify-start items-center gap-4">
-              <component :is="reviewItem.icon" class="h-4.5 w-4.5 text-blue-700 mt-1" />
+              <component :is="reviewItem.icon" :class="reviewItem.textColor ? reviewItem.textColor : 'text-blue-700'" class="h-4.5 w-4.5  mt-1" />
             </div>
           </dt>
           <dd :class="[reviewItem.label ? 'text-gray-900 ml-8.5 sm:ml-0' : 'text-blue-700 py-2 ml-6.5 sm:-ml-2']" class="">
-            <div :class="[reviewItem.label ? 'text-gray-900' : 'text-blue-700']" class=" font-normal text-sm/6">{{ reviewItem.value }}</div>
+            <div :class="[reviewItem.label ? 'text-gray-900' : reviewItem.textColor ? reviewItem.textColor : 'text-blue-700']" class=" font-normal text-sm/6">{{ reviewItem.value }}</div>
           </dd>
         </div>
       </template>
