@@ -13,6 +13,7 @@ import Monoova from "@/components/Payment/Monoova.vue";
 import Apaylo from "@/components/Payment/Apaylo.vue";
 import Pay360 from "@/components/Payment/Pay360.vue";
 import PayCross from "@/components/Payment/PayCross.vue";
+import Fincode from "@/components/Payment/Fincode.vue";
 import CinetPay from "@/components/Payment/CinetPay.vue";
 
 const transactionUtils = useTransactionUtils();
@@ -106,6 +107,7 @@ watch(canAttemptPayment, async () => {
                     <Apaylo v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  v-bind:retryFormErrors="retryPaymentErrors"  />
                     <Pay360 v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'PAY360'" v-bind:transaction="transaction"  />
                     <PayCross v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'PAY-CROSS'" v-bind:transaction="transaction"  />
+                    <Fincode v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'FINCODE'" v-bind:transaction="transaction"  />
                     <CinetPay v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'CINET_PAY'" v-bind:transaction="transaction"  />
                   </div>
                 </div>
