@@ -55,7 +55,7 @@ onMounted(async () => {
 <template>
   <Popover as="header" class="bg-brand-700 pb-24" v-slot="{ open }">
     <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-      <div class="relative flex items-center justify-center py-5 lg:justify-between">
+      <div class="relative flex items-center justify-center py-8 md:py-5 lg:justify-between">
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
