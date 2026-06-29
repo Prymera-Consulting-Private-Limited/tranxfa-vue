@@ -548,12 +548,12 @@ const canContinue = computed(() => {
               <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                   <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                    <button class="sr-only">Identity Mismatch Detected</button>
+                    <button class="sr-only">Se ha detectado una discrepancia de identidad</button>
                     <div class="">
                       <div class="text-left">
-                        <h3 class="font-semibold text-red-600">Identity Mismatch Detected</h3>
-                        <p class="leading-5 font-normal text-sm/8 text-red-500 mt-3">
-                          We’ve detected a discrepancy between your profile and your submitted identity document. To continue with the verification process, please choose one of the following options:
+                        <h3 class="font-semibold text-gray-600">Se ha detectado una discrepancia de identidad</h3>
+                        <p class="leading-5 font-normal text-sm/8 text-gray-500 mt-3">
+                          Hemos detectado una discrepancia entre su perfil y el documento de identidad que ha enviado. Para continuar con el proceso de verificación, por favor elija una de las siguientes opciones:
                         </p>
                         <ul role="list" class="mt-6 divide-y divide-gray-200" :class="isApplyingInfoFromPoiDocument ? 'opacity:70 animate animate-pulse' : ''">
                           <li @click="stepCommandExecuted('UPLOAD_ANOTHER_POI')" :class="isApplyingInfoFromPoiDocument ? '' : 'cursor-pointer'">
