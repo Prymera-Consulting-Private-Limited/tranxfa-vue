@@ -194,7 +194,7 @@ watch(
             <h2 class="text-2xl font-bold text-black mb-2">
               Bienvenido a XENVIA · Envía dinero a Venezuela.
             </h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Sencillo, seguro e instantáneo.</p>
+            <p class="text-sm text-[#B7A3C1] mb-6 ">Sencillo, seguro y rápido.</p>
 
             <!-- Form -->
             <form @submit.prevent="register" class="space-y-6">
