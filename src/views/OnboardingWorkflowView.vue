@@ -11,6 +11,7 @@ import IdentityInformation from "@/components/Customer/IdentityInformation.vue";
 import MobileNumberInput from "@/components/Customer/MobileNumberInput.vue";
 import router from "@/router/index.js";
 import EmploymentInformation from "@/components/Customer/EmploymentInformation.vue";
+import AddressInformation from "@/components/Customer/AddressInformation.vue";
 import EmailInput from "@/components/Customer/EmailInput.vue";
 
 const customerStore = useCustomerStore();
@@ -60,7 +61,7 @@ const editPersonalInformation = () => {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class="w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/login.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/signup.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
@@ -77,6 +78,10 @@ const editPersonalInformation = () => {
         <EmploymentInformation
             v-else-if="snapshot?.value === 'employmentInformation'"
             v-on:employmentUpdated="proceed"
+            v-on:editPersonalInformationRequested="editPersonalInformation" />
+        <AddressInformation
+            v-else-if="snapshot?.value === 'addressInformation'"
+            v-on:addressUpdated="proceed"
             v-on:editPersonalInformationRequested="editPersonalInformation" />
         <MobileNumberInput
             v-else-if="snapshot?.value === 'mobileNumberInput'"
