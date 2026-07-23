@@ -103,8 +103,8 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
-    <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
+    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Pago exitosa</h2>
+    <p class="text-lg text-gray-600 mb-6">Su pago se ha recibido correctamente.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
