@@ -48,10 +48,24 @@ function employmentInformationCompleted() {
         !customer?.employmentInformationRequired?.();
 }
 
-function hasMobileNumber() {
+function requiresAddressInformation() {
     const customer = getCustomer();
 
     return employmentInformationCompleted() &&
+        !!customer?.addressInformationRequired?.();
+}
+
+function addressInformationCompleted() {
+    const customer = getCustomer();
+
+    return employmentInformationCompleted() &&
+        !customer?.addressInformationRequired?.();
+}
+
+function hasMobileNumber() {
+    const customer = getCustomer();
+
+    return addressInformationCompleted() &&
         !!customer?.account?.mobileNumber;
 }
 
@@ -69,7 +83,11 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: employmentInformationCompleted,
+                        guard: addressInformationCompleted,
+                    },
+                    {
+                        target: 'addressInformation',
+                        guard: requiresAddressInformation,
                     },
                     {
                         target: 'employmentInformation',
@@ -104,8 +122,12 @@ export const onboardingNavigationMachine = createMachine({
                         guard: requiresEmploymentInformation,
                     },
                     {
+                        target: 'addressInformation',
+                        guard: requiresAddressInformation,
+                    },
+                    {
                         target: 'mobileNumberInput',
-                        guard: employmentInformationCompleted,
+                        guard: addressInformationCompleted,
                     },
                 ],
 
@@ -117,9 +139,28 @@ export const onboardingNavigationMachine = createMachine({
 
         employmentInformation: {
             on: {
+                PROCEED: [
+                    {
+                        target: 'addressInformation',
+                        guard: requiresAddressInformation,
+                    },
+                    {
+                        target: 'mobileNumberInput',
+                        guard: addressInformationCompleted,
+                    },
+                ],
+
+                EDIT_PERSONAL_INFORMATION: {
+                    target: 'identityInformation',
+                },
+            },
+        },
+
+        addressInformation: {
+            on: {
                 PROCEED: {
                     target: 'mobileNumberInput',
-                    guard: employmentInformationCompleted,
+                    guard: addressInformationCompleted,
                 },
 
                 EDIT_PERSONAL_INFORMATION: {
