@@ -54,13 +54,13 @@ onMounted(async () => {
 </script>
 <template>
   <Popover as="header" class="bg-brand-700 pb-24" v-slot="{ open }">
-    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+    <div class="mx-auto max-w-3xl py-4 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
       <div class="relative flex items-center justify-center py-5 lg:justify-between">
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
             <span class="sr-only">RemitSo</span>
-            <img class="h-8 w-auto" src="/images/logo.png" alt="RemitSo" />
+            <img class="h-8 w-auto" src="/images/logo-white.png" alt="RemitSo" />
           </a>
         </div>
 

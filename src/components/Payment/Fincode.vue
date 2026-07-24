@@ -99,7 +99,7 @@ const retryPayment = async () => {
 
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
-    <div class="-m-5 -mt-10">
+    <div class="">
       <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Payment</h2>
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
         Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your payment.

@@ -30,12 +30,13 @@ axios.interceptors.request.use((config) => {
 })
 
 axios.interceptors.response.use((response) => {
-    NProgress.done()
+    NProgress.done();
 
     return response;
 }, function (e) {
     NProgress.done()
-    if (e.status === 401) {
+    const shouldSkipAuthRedirect = e.config?.skipAuthRedirect === true;
+    if (e.status === 401 && ! shouldSkipAuthRedirect) {
         router.push({ name: 'signIn' });
     }
     throw e;

@@ -19,18 +19,20 @@ const customerStore = useCustomerStore();
  * @type {{data: Customer | null}}
  */
 const customer = customerStore.customer;
+const otpData = JSON.parse(
+    sessionStorage.getItem('otpData') || '{}'
+)
 
+const country = otpData.country
+const number = otpData.number
 async function authenticate() {
   isLoading.value = true;
   isVerifying.value = true;
-  await customerUtils.mfa(otp.value).then(() => {
+  await customerUtils.loginWithMobileNumber(country.id, number, otp.value).then(() => {
     router.push({name: 'onboardingWorkflow'});
   }).catch((e) => {
-    if (e.response?.status === 422) {
+    if (e.response?.status === 422 || e.response?.status === 401) {
       otpError.value = e.response.data.message;
-    } else if (e.response?.status === 403) {
-      customerUtils.refresh();
-      router.push({name: 'onboardingWorkflow'});
     } else {
       console.error(e);
       throw e;
@@ -68,10 +70,8 @@ async function startResendOtpTimer() {
 
 async function resend() {
   isResendingOtp.value = true;
-  customerUtils.resendMfaOtp().catch(async (e) => {
-    if (e.status === 403) {
-      await customerUtils.refresh();
-    }
+  customerUtils.getLoginOtp(otpData.country.id, otpData.number).catch(async (e) => {
+    console.error(e);
   }).finally(() => {
     isResendingOtp.value = false;
   });
@@ -80,11 +80,6 @@ async function resend() {
 }
 
 onMounted(async () => {
-  if (! customerStore.isLoaded) {
-    isLoading.value = true;
-    await customerUtils.refresh();
-    isLoading.value = false;
-  }
   await startResendOtpTimer();
 });
 </script>
@@ -100,9 +95,9 @@ onMounted(async () => {
         <a href="javascript:" class="mx-auto"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5 mx-auto"></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">More authentication needed</h2>
-      <p class="text-md text-[#B7A3C1] mb-2 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
-      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">Secure Login</h2>
+      <p class="text-md text-[#B7A3C1] mb-2 text-center">Enter the verification code sent to <span class="font-bold">+{{ otpData.country.callingCode }}{{ otpData.number }}</span></p>
+      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">The code may take a few seconds to arrive.</p>
       <!-- Form -->
       <form @submit.prevent="authenticate" class="space-y-10">
         <div v-if="otpError" class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
@@ -151,7 +146,7 @@ onMounted(async () => {
             >Resend code</a>
             <template v-else> Resend in {{ countdown }}s</template>
           </div>
-          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending one time password to your email {{ customer.data?.account?.email }} ...</div>
+          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending OTP ...</div>
         </template>
       </form>
     </div>

@@ -93,7 +93,7 @@ const editPersonalInformation = () => {
           v-on:customer:attribute_category:updated="employmentUpdated"
       />
       <div class="text-center mt-12">
-        <a @click="editPersonalInformation" class="text-brand-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
+        <a @click="editPersonalInformation" class="inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline" href="javascript:">Edit Personal Information</a>
       </div>
     </div>
   </div>

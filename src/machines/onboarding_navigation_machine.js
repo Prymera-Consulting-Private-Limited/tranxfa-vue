@@ -1,127 +1,189 @@
-import {createMachine} from 'xstate';
-import {useCustomerStore} from "@/stores/customer.js";
+import { createMachine } from 'xstate';
+import { useCustomerStore } from '@/stores/customer.js';
 
 const customerStore = useCustomerStore();
 
-/**
- * @type {{data: Customer | null}}
- */
-const customer = customerStore.customer;
+function getCustomer() {
+    return customerStore.customer?.data;
+}
+
+function isLoaded() {
+    return customerStore.isLoaded;
+}
+
+function isEmailVerified() {
+    const customer = getCustomer();
+
+    return isLoaded() &&
+        !!customer?.account?.isEmailVerified;
+}
+
+function hasCountry() {
+    const customer = getCustomer();
+
+    return isEmailVerified() &&
+        !!customer?.country;
+}
+
+function requiresIdentityInformation() {
+    const customer = getCustomer();
+
+    return isEmailVerified() &&
+        !!customer?.identityInformationRequired?.();
+}
+
+function requiresEmploymentInformation() {
+    const customer = getCustomer();
+
+    return hasCountry() &&
+        !requiresIdentityInformation() &&
+        !!customer?.employmentInformationRequired?.();
+}
+
+function employmentInformationCompleted() {
+    const customer = getCustomer();
+
+    return hasCountry() &&
+        !requiresIdentityInformation() &&
+        !customer?.employmentInformationRequired?.();
+}
+
+function requiresAddressInformation() {
+    const customer = getCustomer();
+
+    return employmentInformationCompleted() &&
+        !!customer?.addressInformationRequired?.();
+}
+
+function addressInformationCompleted() {
+    const customer = getCustomer();
+
+    return employmentInformationCompleted() &&
+        !customer?.addressInformationRequired?.();
+}
+
+function hasMobileNumber() {
+    const customer = getCustomer();
+
+    return addressInformationCompleted() &&
+        !!customer?.account?.mobileNumber;
+}
 
 export const onboardingNavigationMachine = createMachine({
     id: 'onboardingNavigation',
     initial: 'emailVerification',
-    context: {
-    },
+
     states: {
         emailVerification: {
             on: {
                 PROCEED: [
                     {
                         target: 'onboardingComplete',
-                        guard: 'mobileNumberProvided',
+                        guard: hasMobileNumber,
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: 'employmentInformationProvided',
+                        guard: addressInformationCompleted,
+                    },
+                    {
+                        target: 'addressInformation',
+                        guard: requiresAddressInformation,
                     },
                     {
                         target: 'employmentInformation',
-                        guard: 'employmentInformationRequired',
+                        guard: requiresEmploymentInformation,
                     },
                     {
                         target: 'identityInformation',
-                        guard: 'countryProvided',
+                        guard: hasCountry,
                     },
                     {
                         target: 'sourceCountrySelection',
-                        guard: 'emailVerified',
-                    }
-                ],
-            },
-        },
-        sourceCountrySelection: {
-            on: {
-                PROCEED: [
-                    {
-                        target: 'identityInformation',
-                        guard: 'countryProvided',
+                        guard: isEmailVerified,
                     },
                 ],
             },
         },
+
+        sourceCountrySelection: {
+            on: {
+                PROCEED: {
+                    target: 'identityInformation',
+                    guard: hasCountry,
+                },
+            },
+        },
+
         identityInformation: {
             on: {
                 PROCEED: [
                     {
                         target: 'employmentInformation',
-                        guard: 'employmentInformationRequired',
-                    }, {
+                        guard: requiresEmploymentInformation,
+                    },
+                    {
+                        target: 'addressInformation',
+                        guard: requiresAddressInformation,
+                    },
+                    {
                         target: 'mobileNumberInput',
-                        guard: 'employmentInformationProvided',
+                        guard: addressInformationCompleted,
                     },
                 ],
+
                 CHANGE_COUNTRY: {
                     target: 'sourceCountrySelection',
-                }
+                },
             },
         },
+
         employmentInformation: {
             on: {
                 PROCEED: [
                     {
+                        target: 'addressInformation',
+                        guard: requiresAddressInformation,
+                    },
+                    {
                         target: 'mobileNumberInput',
-                        guard: 'employmentInformationProvided',
+                        guard: addressInformationCompleted,
                     },
                 ],
+
                 EDIT_PERSONAL_INFORMATION: {
                     target: 'identityInformation',
-                }
+                },
             },
         },
+
+        addressInformation: {
+            on: {
+                PROCEED: {
+                    target: 'mobileNumberInput',
+                    guard: addressInformationCompleted,
+                },
+
+                EDIT_PERSONAL_INFORMATION: {
+                    target: 'identityInformation',
+                },
+            },
+        },
+
         mobileNumberInput: {
             on: {
-                PROCEED: [
-                    {
-                        target: 'onboardingComplete',
-                        guard: 'mobileNumberProvided',
-                    },
-                ],
+                PROCEED: {
+                    target: 'onboardingComplete',
+                    guard: hasMobileNumber,
+                },
+
                 EDIT_PERSONAL_INFORMATION: {
                     target: 'identityInformation',
-                }
+                },
             },
         },
+
         onboardingComplete: {
-            final: true,
+            type: 'final',
         },
-    }
-}, {
-    guards: {
-        emailVerified: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true,
-        countryProvided: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
-            ((customer.data?.country || null) !== null),
-        identityInformationProvided: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
-            ((customer.data?.country || null) !== null) &&
-            ((customer.data?.identityInformationRequired?.() ?? false) === false),
-        employmentInformationRequired: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
-            ((customer.data?.country || null) !== null) &&
-            ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
-            ((customer.data?.employmentInformationRequired?.() ?? false) === true),
-        employmentInformationProvided: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
-            ((customer.data?.country || null) !== null) &&
-            ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
-            ((customer.data?.employmentInformationRequired?.() ?? false) === false),
-        mobileNumberProvided: () => customerStore.isLoaded &&
-            (customer.data?.account?.isEmailVerified ?? false) === true &&
-            ((customer.data?.country || null) !== null) &&
-            ((customer.data?.identityInformationRequired?.() ?? false) === false) &&
-            ((customer.data?.employmentInformationRequired?.() ?? false) === false) &&
-            (customer.data?.account?.mobileNumber || null) !== null,
-    }
+    },
 });
