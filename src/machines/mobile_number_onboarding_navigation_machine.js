@@ -32,6 +32,20 @@ function employmentInformationCompleted() {
         !requiresEmploymentInformation();
 }
 
+function requiresAddressInformation() {
+    const customer = getCustomer();
+
+    return employmentInformationCompleted() &&
+        !!customer?.addressInformationRequired?.();
+}
+
+function addressInformationCompleted() {
+    const customer = getCustomer();
+
+    return employmentInformationCompleted() &&
+        !customer?.addressInformationRequired?.();
+}
+
 function hasEmail() {
     const customer = getCustomer();
 
@@ -41,9 +55,7 @@ function hasEmail() {
 function doesNotHaveEmail() {
     const customer = getCustomer();
 
-    return isLoaded() &&
-        !requiresIdentityInformation() &&
-        !requiresEmploymentInformation() &&
+    return addressInformationCompleted() &&
         ! (!!customer?.account?.email);
 }
 
@@ -72,6 +84,10 @@ export const mobileAuthOnboardingMachine = createMachine({
                         guard: requiresEmploymentInformation,
                     },
                     {
+                        target: 'addressInformation',
+                        guard: requiresAddressInformation,
+                    },
+                    {
                         target: 'emailInput',
                         guard: doesNotHaveEmail,
                     },
@@ -89,10 +105,47 @@ export const mobileAuthOnboardingMachine = createMachine({
 
         employmentInformation: {
             on: {
-                PROCEED: {
-                    target: 'emailInput',
-                    guard: doesNotHaveEmail,
+                PROCEED: [
+                    {
+                        target: 'addressInformation',
+                        guard: requiresAddressInformation,
+                    },
+                    {
+                        target: 'emailInput',
+                        guard: doesNotHaveEmail,
+                    },
+                    {
+                        target: 'emailVerification',
+                        guard: emailVerificationRequired,
+                    },
+                    {
+                        target: 'onboardingComplete',
+                        guard: emailVerified,
+                    },
+                ],
+
+                EDIT_PERSONAL_INFORMATION: {
+                    target: 'identityInformation',
                 },
+            },
+        },
+
+        addressInformation: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'emailInput',
+                        guard: doesNotHaveEmail,
+                    },
+                    {
+                        target: 'emailVerification',
+                        guard: emailVerificationRequired,
+                    },
+                    {
+                        target: 'onboardingComplete',
+                        guard: emailVerified,
+                    },
+                ],
 
                 EDIT_PERSONAL_INFORMATION: {
                     target: 'identityInformation',
