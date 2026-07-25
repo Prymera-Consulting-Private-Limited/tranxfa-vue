@@ -24,7 +24,8 @@ const customer = customerStore.customer;
 
 const navigation = [
   { name: 'Home', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
-  { name: 'Transactions', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
+  { name: 'Transfers', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
+  { name: 'Hotels', href: 'hotels', current: router.currentRoute.value.name === 'hotels' },
   { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
   { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
   { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },
