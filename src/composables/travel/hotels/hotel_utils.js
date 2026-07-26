@@ -395,6 +395,14 @@ export function useHotelUtils() {
         });
     }
 
+    async function popularRegions(query = null) {
+        return await axios.get('/client/v1/travel/hotels/catalog/popular-regions', {
+            params: {
+                q: query,
+            },
+        });
+    }
+
     async function search() {
         return await axios.post('/client/v1/travel/hotels/search/region', {
             ...criteria.value,
@@ -409,5 +417,6 @@ export function useHotelUtils() {
         guestLabel,
         search,
         regions,
+        popularRegions,
     }
 }
