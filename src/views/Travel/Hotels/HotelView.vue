@@ -187,7 +187,7 @@ onMounted(() => {
             <!-- Loading -->
             <HotelDetailSkeleton v-if="isLoading" />
             <!-- Failed -->
-            <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-white px-8 py-16 text-center">
+            <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-red-200">
               <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
                 <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
               </div>
@@ -215,8 +215,23 @@ onMounted(() => {
               </div>
             </template>
           </div>
-          <!-- Search -->
+          <!-- Stay and search -->
           <aside class="mt-6 space-y-4 lg:col-span-1 lg:mt-0 lg:sticky lg:top-6">
+            <!-- Held open while the stay is re-priced, so the search below it does not jump. -->
+            <div v-if="isLoading" class="animate-pulse space-y-3 rounded-2xl bg-white p-5 ring-1 ring-gray-200">
+              <div class="h-3 w-14 rounded bg-gray-100" />
+              <div class="h-8 w-32 rounded bg-gray-200" />
+              <div class="h-10 w-full rounded-xl bg-gray-100" />
+            </div>
+            <HotelStayCard
+                v-else-if="!hasFailed"
+                :stay="stayLabel"
+                :nights="nights"
+                :guests="guestLabel"
+                :cheapest="cheapestRate"
+                :selected="selectedRate"
+                @clear="selectedRate = null"
+            />
             <SearchBar
                 stacked
                 :criteria="criteria"
@@ -226,15 +241,6 @@ onMounted(() => {
                 :is-searching-regions="isSearchingRegions"
                 @search="updateSearch"
                 @region-search="getRegions"
-            />
-            <HotelStayCard
-                v-if="!isLoading && !hasFailed"
-                :stay="stayLabel"
-                :nights="nights"
-                :guests="guestLabel"
-                :cheapest="cheapestRate"
-                :selected="selectedRate"
-                @clear="selectedRate = null"
             />
           </aside>
         </div>

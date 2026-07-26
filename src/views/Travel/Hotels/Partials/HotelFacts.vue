@@ -65,10 +65,10 @@ const facts = computed(() => {
 </script>
 
 <template>
-  <section v-if="facts.length" class="rounded-2xl border border-gray-200 bg-white p-5">
-    <h2 class="text-base font-semibold text-gray-900">Good to know</h2>
+  <section v-if="facts.length" class="rounded-2xl bg-white p-5 ring-1 ring-gray-200 sm:p-6">
+    <h2 class="text-base font-semibold tracking-tight text-gray-900">Good to know</h2>
     <dl class="mt-4 grid gap-3 sm:grid-cols-2">
-      <div v-for="fact in facts" :key="fact.key" class="flex items-center gap-3 rounded-xl bg-gray-50 p-3">
+      <div v-for="fact in facts" :key="fact.key" class="flex items-center gap-3 rounded-xl bg-gray-50/70 p-3">
         <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white text-gray-500 ring-1 ring-gray-200">
           <component :is="fact.icon" class="size-4.5" aria-hidden="true" />
         </span>

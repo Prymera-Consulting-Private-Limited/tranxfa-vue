@@ -3,7 +3,7 @@ import {computed} from 'vue';
 import HotelMealBadge from "@/views/Travel/Hotels/Partials/HotelMealBadge.vue";
 import HotelCancellationBadge from "@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue";
 import {formatAmount, getRateAmount, getRateCurrency} from "@/composables/travel/hotels/hotel_utils.js";
-import {CalendarDaysIcon, MoonIcon, UserGroupIcon} from "@heroicons/vue/24/outline";
+import {ArrowDownIcon, CalendarDaysIcon, CheckIcon, MoonIcon, UserGroupIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
   stay: {
@@ -74,16 +74,23 @@ const facts = computed(() => [
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xs">
-    <!-- Price -->
-    <div v-if="rate" class="border-b border-gray-100 px-5 py-4">
-      <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">{{ selected ? 'Your room' : 'From' }}</p>
-      <p v-if="roomName" class="mt-1 text-sm font-medium text-gray-900">{{ roomName }}</p>
-      <p class="mt-1 flex items-baseline gap-1.5">
+  <div class="overflow-hidden rounded-2xl bg-white ring-1 ring-gray-200">
+    <!-- Price. Tinted once a room is chosen, so the rail reads as a summary rather than a teaser. -->
+    <div v-if="rate" :class="[selected ? 'bg-gradient-to-br from-brand-50 via-white to-white' : '', 'px-5 py-5']">
+      <div class="flex items-center justify-between gap-2">
+        <p :class="[selected ? 'text-brand-700' : 'text-gray-400', 'text-xs font-semibold tracking-wide uppercase']">
+          {{ selected ? 'Your room' : 'From' }}
+        </p>
+        <span v-if="selected" class="flex size-5 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+          <CheckIcon class="size-3" aria-hidden="true" />
+        </span>
+      </div>
+      <p v-if="roomName" class="mt-1.5 text-sm font-medium text-gray-900">{{ roomName }}</p>
+      <p class="mt-2 flex items-baseline gap-1.5">
         <span class="text-sm font-medium text-gray-500">{{ currency }}</span>
-        <span class="text-2xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
+        <span class="text-3xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
       </p>
-      <p v-if="perNight" class="mt-0.5 text-xs text-gray-500">
+      <p v-if="perNight" class="mt-1 text-xs text-gray-500">
         total for {{ nights }} night{{ nights === 1 ? '' : 's' }} &middot; {{ currency }} {{ perNight }} / night
       </p>
       <div v-if="selected" class="mt-3 flex flex-wrap items-center gap-2">
@@ -94,14 +101,23 @@ const facts = computed(() => [
           v-if="selected"
           type="button"
           @click="$emit('clear')"
-          class="mt-3 cursor-pointer text-xs font-medium text-brand-700 transition hover:text-brand-800"
+          class="mt-4 cursor-pointer text-xs font-medium text-brand-700 underline decoration-brand-200 underline-offset-2 transition hover:text-brand-800 hover:decoration-brand-400"
       >Choose a different room</button>
-      <a v-else href="#rooms" class="mt-3 inline-block text-xs font-medium text-brand-700 transition hover:text-brand-800">See all rooms</a>
+      <a
+          v-else
+          href="#rooms"
+          class="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800"
+      >
+        <ArrowDownIcon class="size-4" aria-hidden="true" />
+        Choose a room
+      </a>
     </div>
     <!-- Stay -->
-    <dl class="divide-y divide-gray-100">
-      <div v-for="fact in facts" :key="fact.key" class="flex items-center gap-3 px-5 py-3">
-        <component :is="fact.icon" class="size-4 shrink-0 text-gray-400" aria-hidden="true" />
+    <dl :class="[rate ? 'border-t border-gray-100' : '', 'space-y-3 bg-gray-50/70 px-5 py-4']">
+      <div v-for="fact in facts" :key="fact.key" class="flex items-center gap-3">
+        <span class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white text-gray-500 ring-1 ring-gray-200">
+          <component :is="fact.icon" class="size-4" aria-hidden="true" />
+        </span>
         <dt class="text-xs text-gray-500">{{ fact.label }}</dt>
         <dd class="ml-auto min-w-0 truncate text-sm font-medium text-gray-900">{{ fact.value }}</dd>
       </div>

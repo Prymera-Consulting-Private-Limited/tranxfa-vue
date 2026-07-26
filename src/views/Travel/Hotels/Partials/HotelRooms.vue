@@ -41,13 +41,19 @@ const bestKey = computed(() => {
 
 <template>
   <section id="rooms" class="scroll-mt-6">
-    <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-      <h2 class="text-lg font-semibold tracking-tight text-gray-900">Choose your room</h2>
-      <p v-if="groups.length" class="text-sm text-gray-500">
-        {{ groups.length }} room type{{ groups.length === 1 ? '' : 's' }} &middot; {{ rateCount }} rate{{ rateCount === 1 ? '' : 's' }} for your dates
+    <header class="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+      <div>
+        <h2 class="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">Choose your room</h2>
+        <!-- The supplier prices a stay, not a night, which the rows below repeat one by one. -->
+        <p v-if="groups.length && nights" class="mt-1 text-sm text-gray-500">
+          Every price is the total for {{ nights }} night{{ nights === 1 ? '' : 's' }}.
+        </p>
+      </div>
+      <p v-if="groups.length" class="rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
+        {{ groups.length }} room type{{ groups.length === 1 ? '' : 's' }} &middot; {{ rateCount }} rate{{ rateCount === 1 ? '' : 's' }}
       </p>
     </header>
-    <div v-if="groups.length" class="mt-4 space-y-4">
+    <div v-if="groups.length" class="mt-4 space-y-3">
       <HotelRoomCard
           v-for="group in groups"
           :key="group.name"

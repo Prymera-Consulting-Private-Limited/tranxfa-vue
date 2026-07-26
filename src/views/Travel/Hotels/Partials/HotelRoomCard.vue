@@ -58,12 +58,28 @@ const features = computed(() => {
 
 const capacity = computed(() => props.group.rates[0].roomExtension?.capacity ?? null);
 
+// A single rate already shows its own price, so the header would only repeat it.
+const hasRange = computed(() => props.group.rates.length > 1);
+
+/**
+ * When the money is taken, which the supplier states per payment type.
+ */
+const PAYMENT_LABELS = {
+  now: 'Pay now',
+  hotel: 'Pay at the hotel',
+  deposit: 'Deposit now, rest later',
+};
+
 function payment(rate) {
   return rate.paymentOptions.paymentTypes[0];
 }
 
+function paymentLabel(rate) {
+  return PAYMENT_LABELS[payment(rate).type] ?? null;
+}
+
 function total(rate) {
-  return `${getRateCurrency(rate)} ${formatAmount(getRateAmount(rate))}`;
+  return formatAmount(getRateAmount(rate));
 }
 
 function perNight(rate) {
@@ -71,7 +87,7 @@ function perNight(rate) {
     return null;
   }
 
-  return `${getRateCurrency(rate)} ${formatAmount(getRateAmount(rate) / props.nights)}`;
+  return formatAmount(getRateAmount(rate) / props.nights);
 }
 
 /**
@@ -86,48 +102,59 @@ const key = getRateKey;
 </script>
 
 <template>
-  <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xs">
+  <article class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300">
     <!-- Room -->
-    <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-gray-100 bg-gray-50/60 px-5 py-4">
+    <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 pt-5 pb-4 sm:px-6">
       <div class="min-w-0">
-        <h3 class="text-base font-semibold text-gray-900">{{ group.name }}</h3>
-        <div class="mt-1.5 flex flex-wrap items-center gap-2">
-          <span v-if="capacity" class="inline-flex items-center gap-1 rounded-lg bg-white px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
+        <h3 class="text-base font-semibold tracking-tight text-gray-900 sm:text-lg">{{ group.name }}</h3>
+        <!-- Stated plainly rather than as chips, so the badges below stay the loudest thing in the card. -->
+        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
+          <span v-if="capacity" class="inline-flex items-center gap-1">
             <UsersIcon class="size-3.5 text-gray-400" aria-hidden="true" />
             Sleeps {{ capacity }}
           </span>
-          <span v-for="feature in features" :key="feature" class="rounded-lg bg-white px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-gray-200">{{ feature }}</span>
+          <template v-for="(feature, position) in features" :key="feature">
+            <span v-if="capacity || position" class="text-gray-300" aria-hidden="true">&middot;</span>
+            <span>{{ feature }}</span>
+          </template>
         </div>
       </div>
-      <p class="shrink-0 text-right">
-        <span class="block text-xs text-gray-500">from</span>
-        <span class="text-lg font-semibold tracking-tight text-gray-900 tabular-nums">{{ group.currency }} {{ formatAmount(group.amount) }}</span>
+      <p v-if="hasRange" class="shrink-0 text-right">
+        <span class="block text-xs text-gray-400">from</span>
+        <span class="text-base font-semibold tracking-tight text-gray-900 tabular-nums">{{ group.currency }} {{ formatAmount(group.amount) }}</span>
       </p>
     </header>
     <!-- Rates -->
-    <ul class="divide-y divide-gray-100">
+    <ul>
       <li
           v-for="rate in group.rates"
           :key="key(rate)"
           :class="[
-            key(rate) === selectedKey ? 'bg-brand-50/50' : '',
-            'flex flex-col gap-4 px-5 py-4 transition sm:flex-row sm:items-center sm:justify-between',
+            key(rate) === selectedKey ? 'bg-brand-50/60' : 'hover:bg-gray-50/70',
+            'relative flex flex-col gap-4 border-t border-gray-100 px-5 py-4 transition sm:flex-row sm:items-center sm:px-6',
           ]"
       >
-        <div class="min-w-0 space-y-2">
+        <!-- The chosen rate is marked on the edge of the row as well, since the button alone is easy to lose in a long list. -->
+        <span v-if="key(rate) === selectedKey" class="absolute inset-y-0 left-0 w-1 bg-brand-600" aria-hidden="true" />
+        <div class="min-w-0 flex-1 space-y-2">
           <div class="flex flex-wrap items-center gap-2">
+            <span v-if="key(rate) === bestKey" class="inline-flex items-center rounded-lg bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white">Lowest price</span>
             <HotelMealBadge :meal="rate.mealData" />
             <HotelCancellationBadge :payment="payment(rate)" />
             <HotelAvailability :allotment="rate.allotment" />
-            <span v-if="key(rate) === bestKey" class="inline-flex items-center rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-800 ring-1 ring-brand-200 ring-inset">Lowest price</span>
           </div>
           <HotelAmenities :amenities="rate.amenitiesData" />
           <p v-if="note(rate)" class="text-xs text-gray-400">{{ prettifyLabel(note(rate)) }}</p>
         </div>
-        <div class="flex shrink-0 items-end justify-between gap-4 sm:flex-col sm:items-end sm:gap-2">
-          <div class="text-left sm:text-right">
-            <p class="text-lg font-semibold tracking-tight text-gray-900 tabular-nums">{{ total(rate) }}</p>
-            <p v-if="perNight(rate)" class="text-xs text-gray-500">{{ perNight(rate) }} / night</p>
+        <!-- Price rail, so every row lines up on the number and the button. -->
+        <div class="flex shrink-0 items-end justify-between gap-4 sm:w-48 sm:flex-col sm:items-stretch sm:gap-3 sm:border-l sm:border-gray-100 sm:pl-6">
+          <div class="sm:text-right">
+            <p class="flex items-baseline gap-1 sm:justify-end">
+              <span class="text-xs font-medium text-gray-500">{{ getRateCurrency(rate) }}</span>
+              <span class="text-xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ total(rate) }}</span>
+            </p>
+            <p v-if="perNight(rate)" class="mt-0.5 text-xs text-gray-500 tabular-nums">{{ perNight(rate) }} / night</p>
+            <p v-if="paymentLabel(rate)" class="mt-0.5 text-xs text-gray-400">{{ paymentLabel(rate) }}</p>
           </div>
           <button
               type="button"
@@ -135,8 +162,8 @@ const key = getRateKey;
               :class="[
                 key(rate) === selectedKey
                   ? 'bg-brand-700 text-white hover:bg-brand-800'
-                  : 'bg-white text-brand-700 ring-1 ring-brand-200 ring-inset hover:bg-brand-50',
-                'flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold transition focus-visible:outline-0',
+                  : 'bg-white text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 hover:ring-gray-400',
+                'flex cursor-pointer items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-sm font-semibold transition focus-visible:outline-0',
               ]"
           >
             <CheckIcon v-if="key(rate) === selectedKey" class="size-4" aria-hidden="true" />

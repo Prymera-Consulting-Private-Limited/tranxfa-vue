@@ -316,11 +316,13 @@ function search() {
 </script>
 
 <template>
-  <!-- Rounded only in a sidebar, where it sits next to other cards rather than spanning the page. -->
-  <div :class="[stacked ? 'rounded-2xl' : '', 'bg-white p-2 shadow-lg ring-1 ring-black/5']">
-    <div :class="[stacked ? '' : 'lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0', 'flex flex-col divide-y divide-gray-200']">
+  <!-- In a sidebar it is a card among cards, so it drops the floating bar's shadow. -->
+  <div :class="[stacked ? 'rounded-2xl p-2 shadow-xs ring-1 ring-gray-200' : 'p-2 shadow-lg ring-1 ring-black/5', 'bg-white']">
+    <p v-if="stacked" class="px-2 pt-1 pb-2 text-sm font-semibold text-gray-900">Change your stay</p>
+    <!-- Stacked, the hairlines between cells become gaps, so each field reads as its own control. -->
+    <div :class="[stacked ? 'gap-2' : 'divide-y divide-gray-200 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0', 'flex flex-col']">
       <!-- Destination -->
-      <Combobox as="div" v-model="selectedRegion" nullable class="relative flex flex-1">
+      <Combobox as="div" v-model="selectedRegion" nullable :class="[stacked ? 'rounded-xl ring-1 ring-gray-200 transition focus-within:ring-brand-300 hover:ring-gray-300' : '', 'relative flex flex-1']">
         <div class="flex w-full items-center gap-3 px-4 py-3">
           <MapPinIcon class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
@@ -357,7 +359,7 @@ function search() {
       </Combobox>
       <!-- Dates -->
       <!-- The cells stretch to the row height, so top-full drops the panel clear of the bar. -->
-      <Popover as="div" class="relative flex flex-1">
+      <Popover as="div" :class="[stacked ? 'rounded-xl ring-1 ring-gray-200 transition hover:ring-gray-300' : '', 'relative flex flex-1']">
         <PopoverButton class="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left focus-visible:outline-0">
           <CalendarDaysIcon class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
@@ -380,7 +382,7 @@ function search() {
         </PopoverPanel>
       </Popover>
       <!-- Occupancy -->
-      <Popover as="div" class="relative flex flex-1" v-slot="{ open }">
+      <Popover as="div" :class="[stacked ? 'rounded-xl ring-1 ring-gray-200 transition hover:ring-gray-300' : '', 'relative flex flex-1']" v-slot="{ open }">
         <PopoverButton class="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left focus-visible:outline-0">
           <UserGroupIcon class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
@@ -486,7 +488,7 @@ function search() {
         </PopoverPanel>
       </Popover>
       <!-- Search -->
-      <div :class="[stacked ? '' : 'lg:pl-4', 'flex items-center p-2']">
+      <div :class="[stacked ? 'pt-1' : 'p-2 lg:pl-4', 'flex items-center']">
         <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? '' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
           <MagnifyingGlassIcon class="size-4" aria-hidden="true" />
           Search
