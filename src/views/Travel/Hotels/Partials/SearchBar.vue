@@ -44,6 +44,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+
+  /**
+   * Keeps the fields in one column at every width, for the hotel page where the
+   * bar lives in a sidebar instead of across the top.
+   */
+  stacked: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -130,6 +139,8 @@ function trackViewport(event) {
 
 wideViewport.addEventListener('change', trackViewport);
 onUnmounted(() => wideViewport.removeEventListener('change', trackViewport));
+
+const months = computed(() => (isWide.value && !props.stacked ? 2 : 1));
 
 const stayLabel = computed(() => {
   if (!nights.value) {
@@ -305,8 +316,9 @@ function search() {
 </script>
 
 <template>
-  <div class="bg-white p-2 shadow-lg ring-1 ring-black/5">
-    <div class="flex flex-col divide-y divide-gray-200 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0">
+  <!-- Rounded only in a sidebar, where it sits next to other cards rather than spanning the page. -->
+  <div :class="[stacked ? 'rounded-2xl' : '', 'bg-white p-2 shadow-lg ring-1 ring-black/5']">
+    <div :class="[stacked ? '' : 'lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0', 'flex flex-col divide-y divide-gray-200']">
       <!-- Destination -->
       <Combobox as="div" v-model="selectedRegion" nullable class="relative flex flex-1">
         <div class="flex w-full items-center gap-3 px-4 py-3">
@@ -358,7 +370,7 @@ function search() {
               v-model="dates"
               inline
               range
-              :multi-calendars="isWide ? 2 : 1"
+              :multi-calendars="months"
               :min-date="new Date()"
               :enable-time-picker="false"
               :clearable="false"
@@ -377,7 +389,7 @@ function search() {
           </div>
           <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'size-4 shrink-0 text-gray-400 transition']" aria-hidden="true" />
         </PopoverButton>
-        <PopoverPanel v-slot="{ close }" class="absolute top-full right-0 z-20 mt-2 flex max-h-96 w-80 flex-col rounded-xl border border-gray-200 bg-white shadow-lg">
+        <PopoverPanel v-slot="{ close }" :class="[stacked ? 'left-0' : 'right-0', 'absolute top-full z-20 mt-2 flex max-h-96 w-80 flex-col rounded-xl border border-gray-200 bg-white shadow-lg']">
           <!-- Rooms are only separated by a dashed rule, so the panel stays shallow. -->
           <div class="flex-1 divide-y divide-dashed divide-gray-200 overflow-y-auto px-4">
             <section v-for="(room, index) in guests" :key="index" class="py-3">
@@ -474,8 +486,8 @@ function search() {
         </PopoverPanel>
       </Popover>
       <!-- Search -->
-      <div class="flex items-center p-2 lg:pl-4">
-        <button type="button" @click="search" :disabled="isLoading || ! canSearch" class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto">
+      <div :class="[stacked ? '' : 'lg:pl-4', 'flex items-center p-2']">
+        <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? '' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
           <MagnifyingGlassIcon class="size-4" aria-hidden="true" />
           Search
         </button>

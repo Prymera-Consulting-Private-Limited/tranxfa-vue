@@ -6,6 +6,13 @@ import RoomDataTranslation from "@/models/travel/hotels/room_data_translation.js
 
 class HotelRate {
     /**
+     * What a booking is placed against, so it has to survive to the checkout.
+     *
+     * @type {string|null}
+     */
+    bookHash = null;
+
+    /**
      * @type {string|null}
      */
     matchHash = null;
@@ -108,6 +115,7 @@ class HotelRate {
     static getInstance(data) {
         const rate = new HotelRate();
 
+        rate.bookHash = data.book_hash;
         rate.matchHash = data.match_hash;
         rate.searchHash = data.search_hash;
         rate.dailyPrices = data.daily_prices ?? [];
@@ -148,6 +156,14 @@ class HotelRate {
         rate.isPackage = data.is_package;
 
         return rate;
+    }
+
+    /**
+     * @param {Array} data
+     * @returns {HotelRate[]}
+     */
+    static getCollection(data) {
+        return data.map(item => HotelRate.getInstance(item));
     }
 }
 

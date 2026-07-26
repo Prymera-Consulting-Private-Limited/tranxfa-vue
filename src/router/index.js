@@ -80,6 +80,15 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/travel/hotel/:id/:slug',
+      name: 'viewHotel',
+      props: route => ({ id: route.params.id, slug: route.params.slug }),
+      component: () => import('@/views/Travel/Hotels/HotelView.vue'),
+      meta: {
+        title: 'View Hotel',
+        description: '',
+      },
+    }, {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
       props: route => ({ id: route.params.quoteId }),

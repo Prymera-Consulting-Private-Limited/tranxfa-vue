@@ -163,6 +163,16 @@ function getCount(value, fallback, min, max) {
 }
 
 /**
+ * The dimensions the supplier's cdn renders for the {size} placeholder. Anything
+ * outside its own set comes back as a 404, so every caller picks from here.
+ */
+export const PHOTO_SIZE = {
+    thumbnail: '240x240',
+    card: '640x400',
+    large: '1024x768',
+};
+
+/**
  * Photo urls arrive with a {size} placeholder that has to be swapped for one of
  * the supplier's supported dimensions before the image can be requested.
  *
@@ -170,7 +180,7 @@ function getCount(value, fallback, min, max) {
  * @param {string} size
  * @returns {string|null}
  */
-export function getPhotoUrl(url, size = '640x400') {
+export function getPhotoUrl(url, size = PHOTO_SIZE.card) {
     if (!url) {
         return null;
     }
@@ -231,6 +241,60 @@ export function getRateCurrency(rate) {
     const payment = rate.paymentOptions.paymentTypes[0];
 
     return payment.showCurrencyCode ?? payment.currencyCode ?? '';
+}
+
+/**
+ * @param {number|string|null} amount
+ * @returns {string}
+ */
+export function formatAmount(amount) {
+    return new Intl.NumberFormat(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(Number(amount ?? 0));
+}
+
+/**
+ * Rates are keyed on the hash a booking is placed against, which is also what
+ * makes a selected rate identifiable across a re-render.
+ *
+ * @param {HotelRate} rate
+ * @returns {string}
+ */
+export function getRateKey(rate) {
+    return rate.bookHash ?? rate.matchHash ?? '';
+}
+
+/**
+ * The supplier returns one rate per room and board combination, so a hotel with
+ * three room types can come back as twenty rates. They are grouped the way the
+ * stay is actually chosen: pick the room, then pick how it is booked.
+ *
+ * @param {HotelRate[]} rates
+ * @returns {Array<{name: string, rates: HotelRate[], amount: number, currency: string}>}
+ */
+export function getRoomGroups(rates) {
+    const groups = new Map();
+
+    // A rate with no payment option cannot be priced, so it cannot be offered.
+    rates.filter(rate => rate.paymentOptions?.paymentTypes?.length > 0).forEach(rate => {
+        const name = rate.roomDataTranslation?.mainRoomType || rate.roomName || 'Room';
+
+        groups.set(name, [...(groups.get(name) ?? []), rate]);
+    });
+
+    return [...groups.entries()]
+        .map(([name, items]) => {
+            const sorted = [...items].sort((a, b) => getRateAmount(a) - getRateAmount(b));
+
+            return {
+                name: name,
+                rates: sorted,
+                amount: getRateAmount(sorted[0]),
+                currency: getRateCurrency(sorted[0]),
+            };
+        })
+        .sort((a, b) => a.amount - b.amount);
 }
 
 /**
@@ -336,6 +400,33 @@ export function hasFilters(filters) {
         || filters.amenities.length > 0;
 }
 
+/**
+ * Facilities arrive as a flat list tagged with a group. The supplier leaves the
+ * name null whenever it only knows the group, so the group is kept either way and
+ * a group with nothing named is still worth showing as a category on its own.
+ *
+ * @param {HotelFacility[]} facilities
+ * @returns {Array<{group: string, items: HotelFacility[]}>}
+ */
+export function getFacilityGroups(facilities) {
+    const groups = new Map();
+
+    facilities.forEach(facility => {
+        const group = facility.group ?? 'General';
+
+        groups.set(group, [...(groups.get(group) ?? []), facility]);
+    });
+
+    return [...groups.entries()]
+        .map(([group, items]) => ({
+            group: group,
+            items: items
+                .filter(facility => facility.name)
+                .sort((a, b) => a.name.localeCompare(b.name)),
+        }))
+        .sort((a, b) => a.group.localeCompare(b.group));
+}
+
 function countValue(map, key) {
     map.set(key, (map.get(key) ?? 0) + 1);
 }
@@ -410,6 +501,21 @@ export function useHotelUtils() {
         });
     }
 
+    /**
+     * The stay comes off the url, so the hotel is priced for the same search the
+     * customer arrived from. hotels_limit belongs to a region search only.
+     *
+     * @param {string} id
+     */
+    async function getHotel(id) {
+        const {hotels_limit, ...stay} = criteria.value;
+
+        return await axios.post(`/client/v1/travel/hotel/${id}`, {
+            ...stay,
+            residency: residency.value,
+        });
+    }
+
     return {
         criteria,
         nights,
@@ -418,5 +524,6 @@ export function useHotelUtils() {
         search,
         regions,
         popularRegions,
+        getHotel,
     }
 }

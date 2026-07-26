@@ -15,6 +15,8 @@ Group style supplier, so most odd rules below come from the supplier, not from u
 - `src/models/travel/hotels/*.js` — `Hotel`, `HotelRate`, `Region`, and the rate sub-objects
   (payment options, cancellation policy, meal data, VAT, commission…).
 - `src/views/Travel/Hotels/IndexView.vue` — owns the search, the region lookup and all page state.
+- `src/views/Travel/Hotels/HotelView.vue` — one hotel, priced for the stay on the url. Gallery and
+  detail in a two-column span, the same `SearchBar` in a sticky sidebar (`stacked`).
 - `src/views/Travel/Hotels/Partials/*.vue` — `SearchBar`, `HotelCard` and the small display
   components the card composes (image, rating, room type, badges, price, action, skeleton, empty).
 
@@ -35,9 +37,44 @@ back button therefore all replay the same search.
   into range, non-numeric ages are dropped, a repeated `?region=` (an array) is treated as absent.
 - No `region_id` means no request at all — the page shows the "Start with a destination" prompt
   instead of skeletons or an empty result.
+- The same query contract carries onto the hotel page: `viewHotel` pushes
+  `/travel/hotel/:id/:slug` with `getQuery(criteria)`, so `HotelView` rebuilds the stay with
+  `getCriteria(route.query)` and never has to ask for the dates again.
 - `residency` is not part of the criteria: it is read per request from
   `customerStore.customer.data?.country?.iso2Alpha` (fallback `IN`), because `CustomerLayout`
   is still loading the customer while this page mounts.
+
+## The hotel page
+
+`getHotel(id)` posts the same criteria as a search minus `hotels_limit`, so the detail endpoint
+prices the stay the customer arrived with. `HotelView` mirrors `IndexView`: one
+`watch([() => props.id, () => route.query])` starts every load, and the signature carries the
+hotel id because the router reuses the page from one result to the next.
+
+- The response is the **catalog hotel**, not a search result, so it has its own models:
+  `CatalogHotel` → `Region` + `HotelProvider` (→ `HotelPhoto[]`, `HotelFacility[]`) + the same
+  `HotelRate[]` the search returns. `provider.room_types` is still an empty list from the api and
+  deliberately unmodelled — the rooms on screen come from `rates`, not from it.
+- Rates arrive one per room-and-board combination, so `getRoomGroups(rates)` folds them by
+  `room_data_trans.main_room_type` and sorts both the groups and the rates inside them by price.
+  `HotelRooms` → `HotelRoomCard` renders group headers with a "from" price and one row per rate,
+  reusing the meal, cancellation, availability and amenity partials from the card.
+- Picking a rate sets `selectedRate` in the view and is surfaced by `HotelStayCard` in the sidebar.
+  It is keyed by `getRateKey` (`book_hash`, which is also what a booking is placed against) and is
+  cleared on every reload, since a rate is only priced for the stay it was returned for. There is
+  no booking step yet — selection is where the flow currently stops.
+- Changing the dates or guests re-prices in place (`router.replace`); changing the **destination**
+  is a region search, so it pushes back to the results page.
+- A link that arrives without `?region=` backfills `criteria.region_id` from the hotel's own
+  `primary_region`, so the search bar is never stuck with a disabled Search button.
+- Provider addresses use semicolons here (`"220 Venice Way; Venice; CA 90291; USA, Los Angeles"`),
+  which `CatalogHotel.getAddress` normalises before reusing `Hotel.getAddress` to drop the
+  repeated city.
+- `primary_region` is the same full region payload the autocomplete returns, nested country and
+  all, so `Region.getInstance` covers it and the heading can show `region.country.commonName`.
+- Facility names are null whenever the supplier only knows the group. `getFacilityGroups` keeps
+  the group either way, and `HotelFacilities` renders named ones as a checklist and the rest as
+  plain category chips — most hotels currently come back as chips only.
 
 ## Occupancy
 
@@ -79,7 +116,9 @@ left column (collapsed behind a Filters button below `lg`).
 
 ## Supplier quirks worth remembering
 
-- Photo urls contain a literal `{size}` placeholder — always go through `getPhotoUrl(url, size)`.
+- Photo urls contain a literal `{size}` placeholder — always go through `getPhotoUrl(url, size)`,
+  and pick the size from `PHOTO_SIZE` (`thumbnail` / `card` / `large`): the cdn 404s on anything
+  outside its own set.
 - A rate with no `paymentOptions.paymentTypes` cannot be priced, so `getCheapestRate` skips it and
   `IndexView` only lists hotels that have one. Cards never guard against a missing rate.
 - Prices come per stay, not per night, and `showAmount` wins over `amount`.

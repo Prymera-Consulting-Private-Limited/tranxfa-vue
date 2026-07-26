@@ -9,6 +9,11 @@ class Hotel {
     /**
      * @type {string|null}
      */
+    hotelId = null;
+
+    /**
+     * @type {string|null}
+     */
     name = null;
 
     /**
@@ -74,6 +79,7 @@ class Hotel {
         }
 
         if (data.catalog_hotel) {
+            hotel.hotelId = data.catalog_hotel.id;
             hotel.name = data.catalog_hotel.name;
             hotel.slug = data.catalog_hotel.slug;
             hotel.starRating = data.catalog_hotel.star_rating;

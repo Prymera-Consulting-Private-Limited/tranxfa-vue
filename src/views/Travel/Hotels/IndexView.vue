@@ -197,6 +197,20 @@ watch(() => route.query, applySearch, {immediate: true});
 onMounted(() => {
   getRegions();
 });
+
+/**
+ * The stay carries over in the url, so the hotel page can price the same search
+ * on a refresh or a shared link instead of asking for the dates again.
+ *
+ * @param {Hotel} hotel
+ */
+function viewHotel(hotel) {
+  router.push({
+    name: 'viewHotel',
+    params: {id: hotel.hotelId, slug: hotel.slug},
+    query: getQuery(criteria.value),
+  });
+}
 </script>
 
 <template>
@@ -273,6 +287,7 @@ onMounted(() => {
                   :hotel="result.hotel"
                   :rate="result.rate"
                   :nights="nights"
+                  @select="viewHotel"
               />
               <HotelPagination
                   :page="page"
