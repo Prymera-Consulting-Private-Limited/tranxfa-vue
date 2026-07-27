@@ -464,9 +464,9 @@ function countValue(map, key) {
 }
 
 /**
- * Each room is priced on its own adults and the individual ages of its
- * children, so the breakdown is one line per room rather than a combined
- * total that hides which room a child belongs to.
+ * Each room is priced on its own adults and children, so the breakdown is one
+ * line per room rather than a combined total that hides which room a child
+ * belongs to. Ages are collected at booking, not shown here.
  *
  * @param {Array<{adults: number, children: number[]}>} guests
  * @returns {string[]}
@@ -476,10 +476,7 @@ export function getGuestBreakdown(guests) {
         const parts = [`${room.adults} adult${room.adults === 1 ? '' : 's'}`];
 
         if (room.children.length) {
-            // Matches the picker, where an age of 0 means under a year old.
-            const ages = room.children.map(age => (age === 0 ? '<1' : age)).join(', ');
-
-            parts.push(`${room.children.length} child${room.children.length === 1 ? '' : 'ren'} (age${room.children.length === 1 ? '' : 's'} ${ages})`);
+            parts.push(`${room.children.length} child${room.children.length === 1 ? '' : 'ren'}`);
         }
 
         return parts.join(', ');

@@ -127,11 +127,12 @@ const facts = computed(() => [
         </span>
         <div class="min-w-0 flex-1">
           <dt class="text-xs text-gray-500">Guests</dt>
-          <dd v-if="guests.length === 1" class="truncate text-sm font-medium text-gray-900">{{ guests[0] }}</dd>
-          <dd v-else class="mt-0.5 space-y-0.5">
-            <p v-for="(room, index) in guests" :key="index" class="truncate text-sm font-medium text-gray-900">
-              <span class="font-normal text-gray-400">Room {{ index + 1 }}</span> &middot; {{ room }}
-            </p>
+          <dd v-if="guests.length === 1" class="text-sm font-medium text-gray-900">{{ guests[0] }}</dd>
+          <dd v-else class="mt-1 space-y-1.5">
+            <div v-for="(room, index) in guests" :key="index">
+              <p class="text-xs text-gray-400">Room {{ index + 1 }}</p>
+              <p class="text-sm font-medium text-gray-900">{{ room }}</p>
+            </div>
           </dd>
         </div>
       </div>
