@@ -389,6 +389,38 @@ export function getFilteredResults(results, filters) {
 }
 
 /**
+ * The order the supplier returns is its own idea of "recommended", so that is
+ * the default rather than a sort of its own.
+ */
+export const SORT_OPTIONS = [
+    {value: 'recommended', label: 'Recommended'},
+    {value: 'price_asc', label: 'Price: low to high'},
+    {value: 'price_desc', label: 'Price: high to low'},
+    {value: 'rating_desc', label: 'Star rating'},
+];
+
+/**
+ * Sorting runs after filtering, against the same cheapest-bookable rate the
+ * card shows, so the order on screen always matches the price in front of it.
+ *
+ * @param {Array<{hotel: Hotel, rate: HotelRate}>} results
+ * @param {string} sort
+ * @returns {Array<{hotel: Hotel, rate: HotelRate}>}
+ */
+export function getSortedResults(results, sort) {
+    switch (sort) {
+        case 'price_asc':
+            return [...results].sort((a, b) => getRateAmount(a.rate) - getRateAmount(b.rate));
+        case 'price_desc':
+            return [...results].sort((a, b) => getRateAmount(b.rate) - getRateAmount(a.rate));
+        case 'rating_desc':
+            return [...results].sort((a, b) => (b.hotel.starRating ?? 0) - (a.hotel.starRating ?? 0));
+        default:
+            return results;
+    }
+}
+
+/**
  * @param {object} filters
  * @returns {boolean}
  */

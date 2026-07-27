@@ -7,6 +7,7 @@ import HotelSkeleton from "@/views/Travel/Hotels/Partials/HotelSkeleton.vue";
 import EmptyHotels from "@/views/Travel/Hotels/Partials/EmptyHotels.vue";
 import SearchBar from "@/views/Travel/Hotels/Partials/SearchBar.vue";
 import HotelFilters from "@/views/Travel/Hotels/Partials/HotelFilters.vue";
+import HotelSort from "@/views/Travel/Hotels/Partials/HotelSort.vue";
 import HotelPagination from "@/views/Travel/Hotels/Partials/HotelPagination.vue";
 import {
   getCheapestRate,
@@ -15,8 +16,10 @@ import {
   getFilteredResults,
   getFilters,
   getQuery,
+  getSortedResults,
   hasFilters,
   HOTELS_PER_PAGE,
+  SORT_OPTIONS,
   useHotelUtils,
 } from "@/composables/travel/hotels/hotel_utils.js";
 import Hotel from "@/models/travel/hotels/hotel.js";
@@ -56,21 +59,25 @@ const filteredResults = computed(() => getFilteredResults(results.value, filters
 
 const isFiltered = computed(() => hasFilters(filters.value));
 
+const sort = ref(SORT_OPTIONS[0].value);
+
+const sortedResults = computed(() => getSortedResults(filteredResults.value, sort.value));
+
 const page = ref(1);
 
 // The whole region is already here, so paging is a slice of what is on screen.
-const pageCount = computed(() => Math.max(1, Math.ceil(filteredResults.value.length / HOTELS_PER_PAGE)));
+const pageCount = computed(() => Math.max(1, Math.ceil(sortedResults.value.length / HOTELS_PER_PAGE)));
 
 const pagedResults = computed(() => {
   const start = (page.value - 1) * HOTELS_PER_PAGE;
 
-  return filteredResults.value.slice(start, start + HOTELS_PER_PAGE);
+  return sortedResults.value.slice(start, start + HOTELS_PER_PAGE);
 });
 
 const resultsTop = ref(null);
 
-// A narrowed list makes the page you were on meaningless.
-watch(filteredResults, () => {
+// A narrowed or reordered list makes the page you were on meaningless.
+watch([filteredResults, sort], () => {
   page.value = 1;
 });
 
@@ -228,18 +235,21 @@ function viewHotel(hotel) {
             @region-search="getRegions"
         />
         <!-- Summary -->
-        <div class="mt-8">
-          <h2 class="text-base font-semibold text-gray-900">
-            <template v-if="!hasDestination">Where do you want to stay?</template>
-            <template v-else-if="isLoading">Searching for hotels…</template>
-            <template v-else-if="filteredResults.length">{{ filteredResults.length }} hotel{{ filteredResults.length === 1 ? '' : 's' }} available<template v-if="region"> in {{ region }}</template></template>
-            <template v-else>No results</template>
-          </h2>
-          <p class="mt-1 text-sm text-gray-500">
-            <template v-if="!hasDestination">Pick a destination, your dates and who is travelling to see live prices.</template>
-            <template v-else-if="isFiltered">Filtered from {{ results.length }} hotel{{ results.length === 1 ? '' : 's' }} the supplier had for your dates.</template>
-            <template v-else>Prices shown are the lowest available for your dates, for the whole stay.</template>
-          </p>
+        <div class="mt-8 sm:flex sm:items-end sm:justify-between sm:gap-4">
+          <div>
+            <h2 class="text-base font-semibold text-gray-900">
+              <template v-if="!hasDestination">Where do you want to stay?</template>
+              <template v-else-if="isLoading">Searching for hotels…</template>
+              <template v-else-if="filteredResults.length">{{ filteredResults.length }} hotel{{ filteredResults.length === 1 ? '' : 's' }} available<template v-if="region"> in {{ region }}</template></template>
+              <template v-else>No results</template>
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">
+              <template v-if="!hasDestination">Pick a destination, your dates and who is travelling to see live prices.</template>
+              <template v-else-if="isFiltered">Filtered from {{ results.length }} hotel{{ results.length === 1 ? '' : 's' }} the supplier had for your dates.</template>
+              <template v-else>Prices shown are the lowest available for your dates, for the whole stay.</template>
+            </p>
+          </div>
+          <HotelSort v-if="showFilters" v-model="sort" class="mt-3 sm:mt-0" />
         </div>
         <div class="mt-6 lg:grid lg:grid-cols-4 lg:items-start lg:gap-6">
           <!-- Filters, once there is a result set to filter -->
