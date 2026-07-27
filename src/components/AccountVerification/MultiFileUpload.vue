@@ -179,7 +179,7 @@ async function save() {
         </template>
         <template v-else-if="isUploading">
           <span class="flex items-center justify-center whitespace-nowrap">
-            Please wait...
+           Un momento...
           </span>
         </template>
         <template v-else>Upload</template>

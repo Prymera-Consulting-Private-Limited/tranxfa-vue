@@ -21,9 +21,42 @@ import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
 import PagaPayment from "@/components/Payment/PagaPayment.vue";
 import Monoova from "@/components/Payment/Monoova.vue";
+import {useCustomerStore} from "@/stores/customer.js";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
+const customerStore = useCustomerStore();
+
+const FIRST_PURCHASE_TRACKED_KEY = 'fbq_first_purchase_tracked';
+
+function isPaymentCompleted(payment) {
+  const code = payment?.state?.code;
+  return code === PaymentState.AUTHORIZED || code === PaymentState.CAPTURED;
+}
+
+function trackFirstPurchase(transactionData) {
+  if (!isPaymentCompleted(transactionData.payment)) {
+    return;
+  }
+
+  const customerId = customerStore.customer.data?.id;
+  if (!customerId) {
+    return;
+  }
+
+  const trackedKey = `${FIRST_PURCHASE_TRACKED_KEY}_${customerId}`;
+  if (localStorage.getItem(trackedKey)) {
+    return;
+  }
+
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'Purchase', {
+      value: transactionData.localAmount,
+      currency: transactionData.paymentCurrency?.isoAlpha,
+    });
+    localStorage.setItem(trackedKey, '1');
+  }
+}
 
 const props = defineProps({
   id: {
@@ -45,6 +78,7 @@ const getTransaction = async () => {
   isLoading.value = true;
   await transactionUtils.getTransaction(props.id).then((response) => {
     transaction.data = Transaction.getInstance(response.data);
+    trackFirstPurchase(transaction.data);
   })
   isLoading.value = false;
 }
@@ -187,7 +221,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
-                <dt class="font-semibold text-gray-900">Sending from <span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
+                <dt class="font-semibold text-gray-900">Envías desde <span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">You sent</span>
                   <span class="text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</span>
@@ -208,7 +242,7 @@ const isShowPaymentAccountModalOpen = ref(false);
               </div>
               <div class="col-span-2 mt-8 sm:mt-6 border-t border-gray-900/5">
                 <div class="py-6">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Recipient Information</h2>
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Datos del beneficiario</h2>
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ transaction.data.payoutMethod.title }} in {{ transaction.data.payoutCountry.commonName }}</p>
                 </div>
                 <div class="">
@@ -298,11 +332,11 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <span class="sr-only">Status</span>
                     <CreditCardIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Método de pago</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
                 </div>
               </dl>
               <div class="mt-6 border-t border-gray-900/5 px-6 py-6 print:hidden">
-                <a href="javascript:window.print()" class="text-sm/6 font-semibold text-gray-900">Print receipt <span aria-hidden="true">&rarr;</span></a>
+                <a href="javascript:window.print()" class="text-sm/6 font-semibold text-gray-900">Imprimir comprobante<span aria-hidden="true">&rarr;</span></a>
               </div>
             </div>
           </div>

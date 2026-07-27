@@ -130,8 +130,8 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
 
   <template v-else-if="status === 'pending'">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait...</h2>
-    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Un momento...</h2>
+    <p class="text-base text-gray-600 mb-6">Estamos preparando tu pago.</p>
   </template>
 
   <template v-else-if="status === 'processing'">

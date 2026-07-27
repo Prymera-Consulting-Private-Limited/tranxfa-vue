@@ -39,6 +39,9 @@ onMounted(async () => {
           )
         })
         .listen('CustomerDocumentApproved', (e) => {
+          if (typeof window.fbq === 'function') {
+            window.fbq('trackCustom', 'KYCApproved');
+          }
           customerUtils.refresh();
           const category = e.category;
           const document = e.document_type.toLowerCase();

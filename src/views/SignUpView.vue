@@ -68,6 +68,9 @@ async function register() {
   formErrors.confirm_password = [];
   await axios.get('/sanctum/csrf-cookie');
   customerUtils.register(form.email, form.password, form.confirm_password, thirdPartyDeclarationAccepted.value).then(() => {
+    if (typeof window.fbq === 'function') {
+      window.fbq('track', 'CompleteRegistration');
+    }
     router.push({name: 'onboardingWorkflow'});
   }).catch((e) => {
     if (e.status === 422) {
