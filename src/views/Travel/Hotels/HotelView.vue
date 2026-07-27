@@ -29,7 +29,7 @@ const props = defineProps({
 const route = useRoute();
 const router = useRouter();
 
-const {criteria, nights, stayLabel, guestLabel, getHotel, regions} = useHotelUtils();
+const {criteria, nights, stayLabel, guestBreakdown, getHotel, regions} = useHotelUtils();
 
 /**
  * @type {import('vue').Ref<CatalogHotel|null>}
@@ -231,7 +231,7 @@ onMounted(() => {
                 v-else-if="!hasFailed"
                 :stay="stayLabel"
                 :nights="nights"
-                :guests="guestLabel"
+                :guests="guestBreakdown"
                 :cheapest="cheapestRate"
                 :selected="selectedRate"
             />

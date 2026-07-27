@@ -102,11 +102,13 @@ const key = getRateKey;
 </script>
 
 <template>
-  <article class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300">
+  <!-- @container: this card lives beside a filter or stay-card column, so its available
+       width has nothing to do with the viewport, and sm:/lg: would react to the wrong thing. -->
+  <article class="@container overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300">
     <!-- Room -->
-    <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 pt-5 pb-4 sm:px-6">
+    <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 pt-5 pb-4 @2xl:px-6">
       <div class="min-w-0">
-        <h3 class="text-base font-semibold tracking-tight text-gray-900 sm:text-lg">{{ group.name }}</h3>
+        <h3 class="text-base font-semibold tracking-tight text-gray-900 @2xl:text-lg">{{ group.name }}</h3>
         <!-- Stated plainly rather than as chips, so the badges below stay the loudest thing in the card. -->
         <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
           <span v-if="capacity" class="inline-flex items-center gap-1">
@@ -131,7 +133,7 @@ const key = getRateKey;
           :key="key(rate)"
           :class="[
             key(rate) === selectedKey ? 'bg-brand-50/60' : 'hover:bg-gray-50/70',
-            'relative flex flex-col gap-4 border-t border-gray-100 px-5 py-4 transition sm:flex-row sm:items-center sm:px-6',
+            'relative flex flex-col gap-4 border-t border-gray-100 px-5 py-4 transition @2xl:flex-row @2xl:items-center @2xl:px-6',
           ]"
       >
         <!-- The chosen rate is marked on the edge of the row as well, since the button alone is easy to lose in a long list. -->
@@ -147,9 +149,9 @@ const key = getRateKey;
           <p v-if="note(rate)" class="text-xs text-gray-400">{{ prettifyLabel(note(rate)) }}</p>
         </div>
         <!-- Price rail, so every row lines up on the number and the button. -->
-        <div class="flex shrink-0 items-end justify-between gap-4 sm:w-48 sm:flex-col sm:items-stretch sm:gap-3 sm:border-l sm:border-gray-100 sm:pl-6">
-          <div class="sm:text-right">
-            <p class="flex items-baseline gap-1 sm:justify-end">
+        <div class="flex shrink-0 items-end justify-between gap-4 @2xl:w-48 @2xl:flex-col @2xl:items-stretch @2xl:gap-3 @2xl:border-l @2xl:border-gray-100 @2xl:pl-6">
+          <div class="@2xl:text-right">
+            <p class="flex items-baseline gap-1 @2xl:justify-end">
               <span class="text-xs font-medium text-gray-500">{{ getRateCurrency(rate) }}</span>
               <span class="text-xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ total(rate) }}</span>
             </p>

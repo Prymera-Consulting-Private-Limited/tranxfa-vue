@@ -464,6 +464,29 @@ function countValue(map, key) {
 }
 
 /**
+ * Each room is priced on its own adults and the individual ages of its
+ * children, so the breakdown is one line per room rather than a combined
+ * total that hides which room a child belongs to.
+ *
+ * @param {Array<{adults: number, children: number[]}>} guests
+ * @returns {string[]}
+ */
+export function getGuestBreakdown(guests) {
+    return guests.map(room => {
+        const parts = [`${room.adults} adult${room.adults === 1 ? '' : 's'}`];
+
+        if (room.children.length) {
+            // Matches the picker, where an age of 0 means under a year old.
+            const ages = room.children.map(age => (age === 0 ? '<1' : age)).join(', ');
+
+            parts.push(`${room.children.length} child${room.children.length === 1 ? '' : 'ren'} (age${room.children.length === 1 ? '' : 's'} ${ages})`);
+        }
+
+        return parts.join(', ');
+    });
+}
+
+/**
  * Most useful first, so the longest lists still open on something worth picking.
  */
 function getOptions(map) {
@@ -491,18 +514,7 @@ export function useHotelUtils() {
         return `${moment(criteria.value.checkin).format('D MMM')} – ${moment(criteria.value.checkout).format('D MMM YYYY')}`;
     });
 
-    const guestLabel = computed(() => {
-        const adults = criteria.value.guests.reduce((total, room) => total + (room.adults ?? 0), 0);
-        const children = criteria.value.guests.reduce((total, room) => total + (room.children?.length ?? 0), 0);
-
-        const parts = [`${adults} adult${adults === 1 ? '' : 's'}`];
-
-        if (children > 0) {
-            parts.push(`${children} child${children === 1 ? '' : 'ren'}`);
-        }
-
-        return parts.join(', ');
-    });
+    const guestBreakdown = computed(() => getGuestBreakdown(criteria.value.guests));
 
     /**
      * Without a query the endpoint answers with its own default list, which is
@@ -552,7 +564,7 @@ export function useHotelUtils() {
         criteria,
         nights,
         stayLabel,
-        guestLabel,
+        guestBreakdown,
         search,
         regions,
         popularRegions,

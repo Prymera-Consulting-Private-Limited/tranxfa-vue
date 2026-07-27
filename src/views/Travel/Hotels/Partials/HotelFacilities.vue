@@ -24,9 +24,11 @@ const categories = computed(() => {
 </script>
 
 <template>
-  <section v-if="groups.length" class="rounded-2xl bg-white p-5 ring-1 ring-gray-200 sm:p-6">
+  <!-- @container: this sits in the page's 2/3-width column, so its own width, not the
+       viewport's, decides when a 2-column grid actually has room to breathe. -->
+  <section v-if="groups.length" class="@container rounded-2xl bg-white p-5 ring-1 ring-gray-200 @lg:p-6">
     <h2 class="text-base font-semibold tracking-tight text-gray-900">Facilities</h2>
-    <div v-if="detailed.length" class="mt-4 grid gap-5 sm:grid-cols-2">
+    <div v-if="detailed.length" class="mt-4 grid gap-5 @lg:grid-cols-2">
       <div v-for="group in detailed" :key="group.group">
         <h3 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">{{ group.group }}</h3>
         <ul class="mt-2 space-y-1.5">

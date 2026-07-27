@@ -16,9 +16,14 @@ const props = defineProps({
     default: 0,
   },
 
+  /**
+   * One line per room, since each is priced on its own adults and children.
+   *
+   * @type {string[]}
+   */
   guests: {
-    type: String,
-    default: null,
+    type: Array,
+    default: () => [],
   },
 
   /**
@@ -65,7 +70,6 @@ const payment = computed(() => props.selected?.paymentOptions?.paymentTypes?.[0]
 const facts = computed(() => [
   {key: 'dates', icon: CalendarDaysIcon, label: 'Dates', value: props.stay},
   {key: 'nights', icon: MoonIcon, label: 'Nights', value: String(props.nights)},
-  {key: 'guests', icon: UserGroupIcon, label: 'Guests', value: props.guests},
 ]);
 </script>
 
@@ -115,6 +119,21 @@ const facts = computed(() => [
         </span>
         <dt class="text-xs text-gray-500">{{ fact.label }}</dt>
         <dd class="ml-auto min-w-0 truncate text-sm font-medium text-gray-900">{{ fact.value }}</dd>
+      </div>
+      <!-- One line per room once there is more than one, so a child never reads as belonging to the wrong room. -->
+      <div v-if="guests.length" class="flex gap-3">
+        <span class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white text-gray-500 ring-1 ring-gray-200">
+          <UserGroupIcon class="size-4" aria-hidden="true" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <dt class="text-xs text-gray-500">Guests</dt>
+          <dd v-if="guests.length === 1" class="truncate text-sm font-medium text-gray-900">{{ guests[0] }}</dd>
+          <dd v-else class="mt-0.5 space-y-0.5">
+            <p v-for="(room, index) in guests" :key="index" class="truncate text-sm font-medium text-gray-900">
+              <span class="font-normal text-gray-400">Room {{ index + 1 }}</span> &middot; {{ room }}
+            </p>
+          </dd>
+        </div>
       </div>
     </dl>
   </div>
