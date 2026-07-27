@@ -42,7 +42,7 @@ const nameUpdated = (value) => {
     <template v-if="isLookingUp">
       <div class="flex gap-2 items-center justify-start animate-pulse text-gray-700">
         <i class="pi pi-spin pi-spinner mt-0.5 text-sm"></i>
-        <span>Please wait...</span>
+        <span>Un momento...</span>
       </div>
     </template>
     <template v-else>

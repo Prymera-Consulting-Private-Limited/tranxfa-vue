@@ -64,7 +64,7 @@ const steps = [
   {
     id: 'makePayment',
     name: 'Realiza el pago',
-    description: 'Complete your transfer by choosing a payment method and sending the funds.',
+    description: 'Complete your transfer by choosing a EMétodo de pagoand sending the funds.',
     show: true,
     stepCommand: null,
     isMain: true,

@@ -101,7 +101,7 @@ const retryPayment = async () => {
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div class="-m-5">
-      <h2 class="text-lg font-semibold text-gray-900 mb-3 text-left">Complete Your Payment</h2>
+      <h2 class="text-lg font-semibold text-gray-900 mb-3 text-left">Completa tu pago</h2>
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-3 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
       <template v-if="transaction.payment.clientPaymentAccount">
         <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" />
@@ -138,8 +138,8 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'pending'">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait...</h2>
-    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Un momento...</h2>
+    <p class="text-base text-gray-600 mb-6">Estamos preparando tu pago.</p>
   </template>
 
   <template v-else-if="status === 'processing'">

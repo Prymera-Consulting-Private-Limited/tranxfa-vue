@@ -84,7 +84,7 @@ onMounted( async () => {
                 Saving ...
               </span>
           </template>
-          <template v-else>Continue</template>
+          <template v-else>Continuar</template>
         </button>
         <button @click="skip" :disabled="showLoading || isSaving" :class="[{'opacity-70': isLoading || isSaving}]" type="button" class="block mt-3 w-full bg-gray-200 hover:text-gray-500 text-gray-600 text-center py-3  rounded-[10px] font-medium hover:bg-gray-300 transition cursor-pointer">
           Skip

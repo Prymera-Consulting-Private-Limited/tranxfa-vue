@@ -127,7 +127,7 @@ onMounted(async () => {
             <template v-if="isVerifying">
               <span class="flex items-center justify-center whitespace-nowrap">
                 <Spinner :class="'size-4 mr-2'" />
-                Please wait...
+                Un momento...
               </span>
             </template>
             <template v-else>Login</template>
