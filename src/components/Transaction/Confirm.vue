@@ -71,12 +71,12 @@ for (let i = 0; i < props.quote.recipient.accountDetailHashMap.length; i++) {
 }
 reviewItems.push({
   icon: PaperAirplaneIcon,
-  label: 'Sending Amount',
+  label: 'Importe a enviar',
   value: props.quote.localAmountCurrencyPrefixed,
 });
 reviewItems.push({
   icon: BanknotesIcon,
-  label: 'Exchange Rate',
+  label: 'Tasa de cambio',
   value: props.quote.exchangeRateFormatted,
 });
 reviewItems.push({
@@ -105,7 +105,7 @@ reviewItems.push({
 });
 reviewItems.push({
   icon: WalletIcon,
-  label: 'Total Due',
+  label: 'Total a pagar',
   value: props.quote.totalAmountCurrencyPrefixed,
 });
 </script>

@@ -454,7 +454,7 @@ const canContinue = computed(() => {
                 <div v-if="snapshot.value !== 'confirm'" class="hidden sm:grid"><QuoteDisplay v-bind:quote="quote.data" /></div>
                 <template v-else>
                   <div class="px-3 sm:px-0">
-                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose <span class="text-red-500">*</span></label>
+                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Selecciona el motivo <span class="text-red-500">*</span></label>
                     <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
                     <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="title">
                       <template v-slot:no-options="{ search, searching }">
@@ -478,7 +478,7 @@ const canContinue = computed(() => {
                     </v-select>
 
                     <fieldset aria-label="Payment Method" class="mt-6 mb-4">
-                      <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-red-500">*</span></label>
+                      <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Método de pago<span class="text-red-500">*</span></label>
                       <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
