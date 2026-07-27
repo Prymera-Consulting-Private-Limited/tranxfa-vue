@@ -38,10 +38,6 @@ const props = defineProps({
   },
 });
 
-defineEmits([
-  'clear',
-]);
-
 const rate = computed(() => props.selected ?? props.cheapest);
 
 const currency = computed(() => (rate.value ? getRateCurrency(rate.value) : null));
@@ -97,12 +93,11 @@ const facts = computed(() => [
         <HotelMealBadge :meal="selected.mealData" />
         <HotelCancellationBadge :payment="payment" />
       </div>
-      <button
+      <a
           v-if="selected"
-          type="button"
-          @click="$emit('clear')"
-          class="mt-4 cursor-pointer text-xs font-medium text-brand-700 underline decoration-brand-200 underline-offset-2 transition hover:text-brand-800 hover:decoration-brand-400"
-      >Choose a different room</button>
+          href="#rooms"
+          class="mt-4 inline-block cursor-pointer text-xs font-medium text-brand-700 underline decoration-brand-200 underline-offset-2 transition hover:text-brand-800 hover:decoration-brand-400"
+      >Choose a different room</a>
       <a
           v-else
           href="#rooms"

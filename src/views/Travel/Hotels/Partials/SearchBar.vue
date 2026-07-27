@@ -13,7 +13,7 @@ import {
   MIN_ADULTS,
 } from '@/composables/travel/hotels/hotel_utils.js';
 import {Combobox, ComboboxButton, ComboboxInput, ComboboxLabel, ComboboxOption, ComboboxOptions, Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
-import {CalendarDaysIcon, ChevronDownIcon, MagnifyingGlassIcon, MapPinIcon, MinusIcon, PlusIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
+import {CalendarDaysIcon, ChevronDownIcon, MagnifyingGlassIcon, MapPinIcon, MinusIcon, PencilSquareIcon, PlusIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
   criteria: {
@@ -316,15 +316,24 @@ function search() {
 </script>
 
 <template>
-  <!-- In a sidebar it is a card among cards, so it drops the floating bar's shadow. -->
-  <div :class="[stacked ? 'rounded-2xl p-2 shadow-xs ring-1 ring-gray-200' : 'p-2 shadow-lg ring-1 ring-black/5', 'bg-white']">
-    <p v-if="stacked" class="px-2 pt-1 pb-2 text-sm font-semibold text-gray-900">Change your stay</p>
-    <!-- Stacked, the hairlines between cells become gaps, so each field reads as its own control. -->
-    <div :class="[stacked ? 'gap-2' : 'divide-y divide-gray-200 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0', 'flex flex-col']">
+  <!-- In a sidebar it is a card among cards, so it drops the floating bar's shadow and takes the
+       stay card's two-tone treatment instead: a plain header over a tinted band of fields. -->
+  <div :class="[stacked ? 'overflow-hidden rounded-2xl shadow-xs ring-1 ring-gray-200' : 'p-2 shadow-lg ring-1 ring-black/5', 'bg-white']">
+    <div v-if="stacked" class="flex items-center gap-2.5 px-5 py-4">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-gray-500 ring-1 ring-gray-200">
+        <PencilSquareIcon class="size-4" aria-hidden="true" />
+      </span>
+      <p class="text-sm font-semibold text-gray-900">Edit your search</p>
+    </div>
+    <!-- Stacked, the hairlines between cells become gaps between white chips on a tinted band. -->
+    <div :class="[stacked ? 'gap-2.5 border-t border-gray-100 bg-gray-50/70 p-3' : 'divide-y divide-gray-200 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0', 'flex flex-col']">
       <!-- Destination -->
-      <Combobox as="div" v-model="selectedRegion" nullable :class="[stacked ? 'rounded-xl ring-1 ring-gray-200 transition focus-within:ring-brand-300 hover:ring-gray-300' : '', 'relative flex flex-1']">
+      <Combobox as="div" v-model="selectedRegion" nullable :class="[stacked ? 'rounded-xl bg-white ring-1 ring-gray-200 transition focus-within:ring-brand-300 hover:ring-gray-300' : '', 'relative flex flex-1']">
         <div class="flex w-full items-center gap-3 px-4 py-3">
-          <MapPinIcon class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
+          <span v-if="stacked" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-500 ring-1 ring-gray-200">
+            <MapPinIcon class="size-4" aria-hidden="true" />
+          </span>
+          <MapPinIcon v-else class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
             <ComboboxLabel class="block text-xs text-gray-500">Destination</ComboboxLabel>
             <ComboboxInput
@@ -359,9 +368,12 @@ function search() {
       </Combobox>
       <!-- Dates -->
       <!-- The cells stretch to the row height, so top-full drops the panel clear of the bar. -->
-      <Popover as="div" :class="[stacked ? 'rounded-xl ring-1 ring-gray-200 transition hover:ring-gray-300' : '', 'relative flex flex-1']">
+      <Popover as="div" :class="[stacked ? 'rounded-xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300' : '', 'relative flex flex-1']">
         <PopoverButton class="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left focus-visible:outline-0">
-          <CalendarDaysIcon class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
+          <span v-if="stacked" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-500 ring-1 ring-gray-200">
+            <CalendarDaysIcon class="size-4" aria-hidden="true" />
+          </span>
+          <CalendarDaysIcon v-else class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
             <p class="text-xs text-gray-500">{{ nights ? `${nights} night${nights === 1 ? '' : 's'}` : 'Stay' }}</p>
             <p class="truncate text-sm font-medium text-gray-900">{{ stayLabel }}</p>
@@ -382,9 +394,12 @@ function search() {
         </PopoverPanel>
       </Popover>
       <!-- Occupancy -->
-      <Popover as="div" :class="[stacked ? 'rounded-xl ring-1 ring-gray-200 transition hover:ring-gray-300' : '', 'relative flex flex-1']" v-slot="{ open }">
+      <Popover as="div" :class="[stacked ? 'rounded-xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300' : '', 'relative flex flex-1']" v-slot="{ open }">
         <PopoverButton class="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left focus-visible:outline-0">
-          <UserGroupIcon class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
+          <span v-if="stacked" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-500 ring-1 ring-gray-200">
+            <UserGroupIcon class="size-4" aria-hidden="true" />
+          </span>
+          <UserGroupIcon v-else class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
             <p class="text-xs text-gray-500">Guests</p>
             <p class="truncate text-sm font-medium text-gray-900">{{ occupancyLabel }}</p>
@@ -488,8 +503,8 @@ function search() {
         </PopoverPanel>
       </Popover>
       <!-- Search -->
-      <div :class="[stacked ? 'pt-1' : 'p-2 lg:pl-4', 'flex items-center']">
-        <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? '' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
+      <div :class="[stacked ? '' : 'p-2 lg:pl-4', 'flex items-center']">
+        <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? 'shadow-sm' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
           <MagnifyingGlassIcon class="size-4" aria-hidden="true" />
           Search
         </button>

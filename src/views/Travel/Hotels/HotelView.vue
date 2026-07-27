@@ -77,6 +77,10 @@ async function getHotelDetails() {
     if (!criteria.value.region_id && hotel.value.region) {
       criteria.value.region_id = hotel.value.region.id;
     }
+
+    // The stay card should never sit on a bare "from" price when there is
+    // already a bookable room, so the cheapest one is picked for the customer.
+    selectedRate.value = getCheapestRate(hotel.value);
   }).catch(() => {
     hotel.value = null;
     hasFailed.value = true;
@@ -230,7 +234,6 @@ onMounted(() => {
                 :guests="guestLabel"
                 :cheapest="cheapestRate"
                 :selected="selectedRate"
-                @clear="selectedRate = null"
             />
             <SearchBar
                 stacked
