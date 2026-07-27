@@ -21,9 +21,42 @@ import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
 import PagaPayment from "@/components/Payment/PagaPayment.vue";
 import Monoova from "@/components/Payment/Monoova.vue";
+import {useCustomerStore} from "@/stores/customer.js";
 
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
+const customerStore = useCustomerStore();
+
+const FIRST_PURCHASE_TRACKED_KEY = 'fbq_first_purchase_tracked';
+
+function isPaymentCompleted(payment) {
+  const code = payment?.state?.code;
+  return code === PaymentState.AUTHORIZED || code === PaymentState.CAPTURED;
+}
+
+function trackFirstPurchase(transactionData) {
+  if (!isPaymentCompleted(transactionData.payment)) {
+    return;
+  }
+
+  const customerId = customerStore.customer.data?.id;
+  if (!customerId) {
+    return;
+  }
+
+  const trackedKey = `${FIRST_PURCHASE_TRACKED_KEY}_${customerId}`;
+  if (localStorage.getItem(trackedKey)) {
+    return;
+  }
+
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'Purchase', {
+      value: transactionData.localAmount,
+      currency: transactionData.paymentCurrency?.isoAlpha,
+    });
+    localStorage.setItem(trackedKey, '1');
+  }
+}
 
 const props = defineProps({
   id: {
@@ -45,6 +78,7 @@ const getTransaction = async () => {
   isLoading.value = true;
   await transactionUtils.getTransaction(props.id).then((response) => {
     transaction.data = Transaction.getInstance(response.data);
+    trackFirstPurchase(transaction.data);
   })
   isLoading.value = false;
 }
