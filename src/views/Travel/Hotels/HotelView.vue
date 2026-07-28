@@ -1,8 +1,7 @@
 <script setup>
-import {computed, onMounted, ref, watch} from 'vue';
-import {RouterLink, useRoute, useRouter} from 'vue-router';
+import {computed, ref, watch} from 'vue';
+import {RouterLink, useRoute} from 'vue-router';
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import SearchBar from "@/views/Travel/Hotels/Partials/SearchBar.vue";
 import HotelGallery from "@/views/Travel/Hotels/Partials/HotelGallery.vue";
 import HotelHeading from "@/views/Travel/Hotels/Partials/HotelHeading.vue";
 import HotelRooms from "@/views/Travel/Hotels/Partials/HotelRooms.vue";
@@ -12,7 +11,6 @@ import HotelFacts from "@/views/Travel/Hotels/Partials/HotelFacts.vue";
 import HotelDetailSkeleton from "@/views/Travel/Hotels/Partials/HotelDetailSkeleton.vue";
 import {getCheapestRate, getCriteria, getQuery, getRateKey, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import CatalogHotel from "@/models/travel/hotels/catalog_hotel.js";
-import Region from "@/models/travel/region.js";
 import {ChevronLeftIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -27,9 +25,8 @@ const props = defineProps({
 });
 
 const route = useRoute();
-const router = useRouter();
 
-const {criteria, nights, stayLabel, guestBreakdown, getHotel, regions} = useHotelUtils();
+const {criteria, nights, stayLabel, guestBreakdown, getHotel} = useHotelUtils();
 
 /**
  * @type {import('vue').Ref<CatalogHotel|null>}
@@ -38,14 +35,6 @@ const hotel = ref(null);
 
 const isLoading = ref(false);
 const hasFailed = ref(false);
-
-const regionOptions = ref([]);
-const isSearchingRegions = ref(false);
-
-// Keystrokes can resolve out of order, so only the newest lookup may answer.
-let regionLookup = 0;
-
-const regionName = computed(() => hotel.value?.region?.name ?? null);
 
 /**
  * The rate the customer picked, kept as the rate itself so the booking step can
@@ -89,28 +78,6 @@ async function getHotelDetails() {
   });
 }
 
-async function getRegions(query = null) {
-  const lookup = ++regionLookup;
-
-  isSearchingRegions.value = true;
-
-  await regions(query).then((response) => {
-    if (lookup !== regionLookup) {
-      return;
-    }
-
-    regionOptions.value = Region.getCollection(response.data);
-  }).catch(() => {
-    if (lookup === regionLookup) {
-      regionOptions.value = [];
-    }
-  }).finally(() => {
-    if (lookup === regionLookup) {
-      isSearchingRegions.value = false;
-    }
-  });
-}
-
 /**
  * The hotel is part of the signature, since the router reuses this page when one
  * result is opened straight after another.
@@ -142,38 +109,7 @@ function applyStay() {
   getHotelDetails();
 }
 
-/**
- * @param {object} update
- */
-function updateSearch(update) {
-  const query = getQuery({...criteria.value, ...update});
-
-  // Another destination is a region search, which this page cannot answer.
-  if (update.region_id !== criteria.value.region_id) {
-    router.push({name: 'hotels', query: query});
-
-    return;
-  }
-
-  // An unchanged url is never replayed, so a repeat search is run directly.
-  if (`${props.id}:${JSON.stringify(query)}` === appliedStay) {
-    getHotelDetails();
-
-    return;
-  }
-
-  // The navigation only lands on the next tick, and until then the page still
-  // shows the previous stay.
-  isLoading.value = true;
-
-  router.replace({query: query});
-}
-
 watch([() => props.id, () => route.query], applyStay, {immediate: true});
-
-onMounted(() => {
-  getRegions();
-});
 </script>
 
 <template>
@@ -219,9 +155,8 @@ onMounted(() => {
               </div>
             </template>
           </div>
-          <!-- Stay and search -->
+          <!-- Stay -->
           <aside class="mt-6 space-y-4 lg:col-span-1 lg:mt-0 lg:sticky lg:top-6">
-            <!-- Held open while the stay is re-priced, so the search below it does not jump. -->
             <div v-if="isLoading" class="animate-pulse space-y-3 rounded-2xl bg-white p-5 ring-1 ring-gray-200">
               <div class="h-3 w-14 rounded bg-gray-100" />
               <div class="h-8 w-32 rounded bg-gray-200" />
@@ -234,16 +169,6 @@ onMounted(() => {
                 :guests="guestBreakdown"
                 :cheapest="cheapestRate"
                 :selected="selectedRate"
-            />
-            <SearchBar
-                stacked
-                :criteria="criteria"
-                :region="regionName"
-                :regions="regionOptions"
-                :is-loading="isLoading"
-                :is-searching-regions="isSearchingRegions"
-                @search="updateSearch"
-                @region-search="getRegions"
             />
           </aside>
         </div>
