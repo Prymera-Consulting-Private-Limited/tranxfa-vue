@@ -82,7 +82,7 @@ const router = createRouter({
     }, {
       path: '/travel/hotel/:id/:slug',
       name: 'viewHotel',
-      props: route => ({ id: route.params.id, slug: route.params.slug }),
+      props: route => ({ id: route.params.id, slug: route.params.slug, search: route.query.search }),
       component: () => import('@/views/Travel/Hotels/HotelView.vue'),
       meta: {
         title: 'View Hotel',

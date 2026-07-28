@@ -29,6 +29,7 @@ import {
   useHotelUtils,
 } from "@/composables/travel/hotels/hotel_utils.js";
 import Hotel from "@/models/travel/hotels/hotel.js";
+import HotelSearch from "@/models/travel/hotels/hotel_search.js";
 import Region from "@/models/travel/region.js";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
@@ -40,6 +41,11 @@ const {criteria, nights, search, regions} = useHotelUtils();
 const hotels = ref([]);
 const isLoading = ref(false);
 const hasFailed = ref(false);
+
+// Opaque, minted by every real search and handed forward to the hotel page.
+// Never read back out of the url or reconstructed — a fresh mount or a new
+// tab always earns its own by searching again, never reuses an old one.
+const searchId = ref(null);
 
 const regionOptions = ref([]);
 const isSearchingRegions = ref(false);
@@ -143,9 +149,11 @@ async function getHotels() {
 
   await search().then((response) => {
     hotels.value = Hotel.getCollection(response.data.hotels);
+    searchId.value = response.data.search ? HotelSearch.getInstance(response.data.search).id : null;
   }).catch(() => {
     hotels.value = [];
     hasFailed.value = true;
+    searchId.value = null;
   }).finally(() => {
     isLoading.value = false;
   });
@@ -211,6 +219,7 @@ function applySearch(query) {
   if (!criteria.value.region_id) {
     hotels.value = [];
     hasFailed.value = false;
+    searchId.value = null;
 
     return;
   }
@@ -251,8 +260,8 @@ onMounted(() => {
 });
 
 /**
- * The stay carries over in the url, so the hotel page can price the same search
- * on a refresh or a shared link instead of asking for the dates again.
+ * The hotel page re-resolves its own stay from search_id, so the only thing
+ * it needs from here is the id of the search that hotel was found under.
  *
  * @param {Hotel} hotel
  */
@@ -260,7 +269,7 @@ function viewHotel(hotel) {
   router.push({
     name: 'viewHotel',
     params: {id: hotel.hotelId, slug: hotel.slug},
-    query: getQuery(criteria.value),
+    query: {search: searchId.value ?? undefined},
   });
 }
 </script>

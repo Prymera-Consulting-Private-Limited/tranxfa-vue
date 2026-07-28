@@ -58,6 +58,22 @@ export function getCriteria(query = {}) {
 }
 
 /**
+ * The hotel page no longer derives its stay from the url — the hotel-view
+ * response resolves it server-side instead, as a HotelSearch.
+ *
+ * @param {HotelSearch} search
+ * @returns {object}
+ */
+export function getCriteriaFromSearch(search) {
+    return {
+        region_id: search.region?.id ?? null,
+        checkin: search.checkin,
+        checkout: search.checkout,
+        guests: search.guests ?? [],
+    };
+}
+
+/**
  * @param {object} criteria
  * @returns {object}
  */
@@ -646,18 +662,14 @@ export function useHotelUtils() {
     }
 
     /**
-     * The stay comes off the url, so the hotel is priced for the same search the
-     * customer arrived from. hotels_limit belongs to a region search only.
+     * The backend re-resolves the stay from search_id itself, so the request
+     * carries nothing but the two opaque ids it was handed.
      *
-     * @param {string} id
+     * @param {string} searchId
+     * @param {string} hotelId
      */
-    async function getHotel(id) {
-        const {hotels_limit, ...stay} = criteria.value;
-
-        return await axios.post(`/client/v1/travel/hotel/${id}`, {
-            ...stay,
-            residency: residency.value,
-        });
+    async function getHotelView(searchId, hotelId) {
+        return await axios.post(`/client/v1/travel/hotel/${searchId}/${hotelId}`);
     }
 
     return {
@@ -666,8 +678,8 @@ export function useHotelUtils() {
         stayLabel,
         guestBreakdown,
         search,
+        getHotelView,
         regions,
         popularRegions,
-        getHotel,
     }
 }

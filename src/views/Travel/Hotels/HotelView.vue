@@ -1,6 +1,6 @@
 <script setup>
 import {computed, ref, watch} from 'vue';
-import {RouterLink, useRoute} from 'vue-router';
+import {RouterLink} from 'vue-router';
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import HotelGallery from "@/views/Travel/Hotels/Partials/HotelGallery.vue";
 import HotelHeading from "@/views/Travel/Hotels/Partials/HotelHeading.vue";
@@ -9,8 +9,9 @@ import HotelStayCard from "@/views/Travel/Hotels/Partials/HotelStayCard.vue";
 import HotelFacilities from "@/views/Travel/Hotels/Partials/HotelFacilities.vue";
 import HotelFacts from "@/views/Travel/Hotels/Partials/HotelFacts.vue";
 import HotelDetailSkeleton from "@/views/Travel/Hotels/Partials/HotelDetailSkeleton.vue";
-import {getCheapestRate, getCriteria, getQuery, getRateKey, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
+import {getCheapestRate, getCriteriaFromSearch, getQuery, getRateKey, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import CatalogHotel from "@/models/travel/hotels/catalog_hotel.js";
+import HotelSearch from "@/models/travel/hotels/hotel_search.js";
 import {ChevronLeftIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -21,12 +22,15 @@ const props = defineProps({
   slug: {
     type: String,
     required: true
+  },
+  // A repeated ?search= arrives as an array, which is not an id.
+  search: {
+    type: String,
+    default: null
   }
 });
 
-const route = useRoute();
-
-const {criteria, nights, stayLabel, guestBreakdown, getHotel} = useHotelUtils();
+const {criteria, nights, stayLabel, guestBreakdown, getHotelView} = useHotelUtils();
 
 /**
  * @type {import('vue').Ref<CatalogHotel|null>}
@@ -35,6 +39,10 @@ const hotel = ref(null);
 
 const isLoading = ref(false);
 const hasFailed = ref(false);
+
+// Stored per the contract, opaque and forwarded when there is a booking step
+// to hand it to. Nothing reads it yet.
+const hotelViewId = ref(null);
 
 /**
  * The rate the customer picked, kept as the rate itself so the booking step can
@@ -51,21 +59,28 @@ const cheapestRate = computed(() => (hotel.value ? getCheapestRate(hotel.value) 
 // The results this hotel was opened from, replayed through the same query contract.
 const resultsLink = computed(() => ({name: 'hotels', query: getQuery(criteria.value)}));
 
+// Nothing past search/region ever carries raw criteria again, so without a
+// search_id there is no request this page is allowed to make.
+const searchId = computed(() => (typeof props.search === 'string' && props.search.length ? props.search : null));
+
 async function getHotelDetails() {
+  if (!searchId.value) {
+    hotel.value = null;
+    hasFailed.value = true;
+
+    return;
+  }
+
   isLoading.value = true;
   hasFailed.value = false;
 
   // Rates are priced for a stay, so a room chosen for the previous one is void.
   selectedRate.value = null;
 
-  await getHotel(props.id).then((response) => {
+  await getHotelView(searchId.value, props.id).then((response) => {
     hotel.value = CatalogHotel.getInstance(response.data);
-
-    // A link shared without the search still has to be able to run one, and the
-    // hotel knows the region the url did not carry.
-    if (!criteria.value.region_id && hotel.value.region) {
-      criteria.value.region_id = hotel.value.region.id;
-    }
+    criteria.value = getCriteriaFromSearch(HotelSearch.getInstance(response.data.search));
+    hotelViewId.value = response.headers['x-hotel-selection-id'] ?? null;
 
     // The stay card should never sit on a bare "from" price when there is
     // already a bookable room, so the cheapest one is picked for the customer.
@@ -78,38 +93,9 @@ async function getHotelDetails() {
   });
 }
 
-/**
- * The hotel is part of the signature, since the router reuses this page when one
- * result is opened straight after another.
- *
- * @param {object} query
- * @returns {string}
- */
-function getSignature(query) {
-  return `${props.id}:${JSON.stringify(getQuery(getCriteria(query)))}`;
-}
-
-// Nothing has been priced yet, so the first url always runs.
-let appliedStay = null;
-
-/**
- * The url owns the stay here as well, so the hotel is always priced for whatever
- * the address bar says, including after a back or forward.
- */
-function applyStay() {
-  const signature = getSignature(route.query);
-
-  if (signature === appliedStay) {
-    return;
-  }
-
-  appliedStay = signature;
-  criteria.value = getCriteria(route.query);
-
-  getHotelDetails();
-}
-
-watch([() => props.id, () => route.query], applyStay, {immediate: true});
+// A different hotel or a different search both mean a new view, the same way
+// the router reuses this page when one result is opened straight after another.
+watch([() => props.id, searchId], getHotelDetails, {immediate: true});
 </script>
 
 <template>
