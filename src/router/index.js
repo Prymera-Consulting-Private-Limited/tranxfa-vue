@@ -89,6 +89,15 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/travel/hotel/quote/:id',
+      name: 'hotelQuote',
+      props: route => ({ id: route.params.id, search: route.query.search }),
+      component: () => import('@/views/Travel/Hotels/QuoteView.vue'),
+      meta: {
+        title: 'Booking Summary',
+        description: '',
+      },
+    }, {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
       props: route => ({ id: route.params.quoteId }),

@@ -1,6 +1,5 @@
 <script setup>
 import {computed} from 'vue';
-import moment from "moment";
 import HotelMealBadge from "@/views/Travel/Hotels/Partials/HotelMealBadge.vue";
 import HotelSelectionCancellationBadge from "@/views/Travel/Hotels/Partials/HotelSelectionCancellationBadge.vue";
 import {formatAmount, getSelectionRateAmount, getSelectionRateCurrency} from "@/composables/travel/hotels/hotel_utils.js";
@@ -52,14 +51,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-
-  /**
-   * @type {HotelPrebook|null}
-   */
-  prebook: {
-    type: Object,
-    default: null,
-  },
 });
 
 defineEmits([
@@ -68,40 +59,16 @@ defineEmits([
 
 const rate = computed(() => props.selected ?? props.cheapest);
 
-// Once held, the prebook's own price is what counts — it may have moved
-// since the customer clicked "Book now".
-const priceAmount = computed(() => {
-  if (props.prebook) {
-    return Number(props.prebook.price.amount ?? 0);
-  }
+const currency = computed(() => (rate.value ? getSelectionRateCurrency(rate.value) : null));
 
-  return rate.value ? getSelectionRateAmount(rate.value) : null;
-});
-
-const currency = computed(() => {
-  if (props.prebook) {
-    return props.prebook.price.currency;
-  }
-
-  return rate.value ? getSelectionRateCurrency(rate.value) : null;
-});
-
-const amount = computed(() => (priceAmount.value !== null ? formatAmount(priceAmount.value) : null));
+const amount = computed(() => (rate.value ? formatAmount(getSelectionRateAmount(rate.value)) : null));
 
 const perNight = computed(() => {
-  if (priceAmount.value === null || !props.nights) {
+  if (!rate.value || !props.nights) {
     return null;
   }
 
-  return formatAmount(priceAmount.value / props.nights);
-});
-
-// The prebook's cancellation terms are what was actually held, so they take
-// over from the rate's own once a hold exists.
-const cancellation = computed(() => props.prebook?.cancellation ?? props.selected?.cancellation ?? null);
-
-const holdExpiry = computed(() => {
-  return props.prebook ? moment(props.prebook.expiresAt).format('D MMM, h:mm A') : null;
+  return formatAmount(getSelectionRateAmount(rate.value) / props.nights);
 });
 
 const roomName = computed(() => {
@@ -138,19 +105,13 @@ const facts = computed(() => [
       <p v-if="perNight" class="mt-1 text-xs text-gray-500">
         total for {{ nights }} night{{ nights === 1 ? '' : 's' }} &middot; {{ currency }} {{ perNight }} / night
       </p>
-      <p v-if="prebook?.priceChanged" class="mt-2 text-xs text-amber-600">The price changed to {{ currency }} {{ amount }} when we confirmed availability.</p>
       <div v-if="selected" class="mt-3 flex flex-wrap items-center gap-2">
         <HotelMealBadge :meal-type="selected.mealType" />
-        <HotelSelectionCancellationBadge :cancellation="cancellation" />
+        <HotelSelectionCancellationBadge :cancellation="selected.cancellation" />
       </div>
       <p v-if="bookingFailed" class="mt-3 text-xs text-red-600">Something went wrong starting your booking. Please try again.</p>
-      <!-- Held rather than booked: the supplier still expects a checkout step to follow before expiresAt. -->
-      <div v-if="prebook" class="mt-4 rounded-xl bg-emerald-50 px-4 py-3 ring-1 ring-emerald-200">
-        <p class="text-sm font-semibold text-emerald-800">Reservation held</p>
-        <p class="mt-1 text-xs text-emerald-700">Complete your booking before {{ holdExpiry }}.</p>
-      </div>
       <button
-          v-else-if="selected"
+          v-if="selected"
           type="button"
           :disabled="isBooking"
           @click="$emit('book')"

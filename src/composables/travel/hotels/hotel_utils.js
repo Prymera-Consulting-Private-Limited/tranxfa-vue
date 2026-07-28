@@ -756,6 +756,15 @@ export function useHotelUtils() {
         return await axios.post(`/client/v1/travel/hotel/prebook/${rateId}`);
     }
 
+    /**
+     * Fetches the priced, ready-to-book quote a prebook resolves into.
+     *
+     * @param {string} quoteId
+     */
+    async function getHotelQuote(quoteId) {
+        return await axios.get(`/client/v1/travel/hotel/quote/${quoteId}`);
+    }
+
     return {
         criteria,
         nights,
@@ -764,6 +773,7 @@ export function useHotelUtils() {
         search,
         getHotelView,
         prebookRate,
+        getHotelQuote,
         regions,
         popularRegions,
     }

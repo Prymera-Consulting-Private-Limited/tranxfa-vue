@@ -1,6 +1,6 @@
 <script setup>
 import {computed, ref, watch} from 'vue';
-import {RouterLink} from 'vue-router';
+import {RouterLink, useRouter} from 'vue-router';
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import HotelGallery from "@/views/Travel/Hotels/Partials/HotelGallery.vue";
 import HotelHeading from "@/views/Travel/Hotels/Partials/HotelHeading.vue";
@@ -29,6 +29,8 @@ const props = defineProps({
     default: null
   }
 });
+
+const router = useRouter();
 
 const {criteria, nights, stayLabel, guestBreakdown, getHotelView, prebookRate} = useHotelUtils();
 
@@ -60,22 +62,18 @@ const isBooking = ref(false);
 const bookingFailed = ref(false);
 
 /**
- * The held rate, once the supplier has confirmed it is still available. A
- * different rate invalidates it, so picking one clears it back to null.
- *
- * @type {import('vue').Ref<HotelPrebook|null>}
- */
-const prebook = ref(null);
-
-/**
  * @param {HotelSelectionRate} rate
  */
 function selectRate(rate) {
   selectedRate.value = rate;
   bookingFailed.value = false;
-  prebook.value = null;
 }
 
+/**
+ * A successful prebook hands off to the quote page, so isBooking is only
+ * ever reset on failure — there's nothing left on this page to update once
+ * the navigation away starts.
+ */
 async function bookNow() {
   if (!selectedRate.value) {
     return;
@@ -85,10 +83,13 @@ async function bookNow() {
   bookingFailed.value = false;
 
   await prebookRate(selectedRate.value.id).then((response) => {
-    prebook.value = HotelPrebook.getInstance(response.data);
+    const prebook = HotelPrebook.getInstance(response.data);
+
+    // Carried along so the quote page can send the customer back to change
+    // room without losing the search this hotel was opened from.
+    router.push({name: 'hotelQuote', params: {id: prebook.id}, query: {search: searchId.value ?? undefined}});
   }).catch(() => {
     bookingFailed.value = true;
-  }).finally(() => {
     isBooking.value = false;
   });
 }
@@ -114,7 +115,6 @@ async function getHotelDetails() {
   // Rates are priced for a stay, so a room chosen for the previous one is void.
   selectedRate.value = null;
   bookingFailed.value = false;
-  prebook.value = null;
 
   await getHotelView(searchId.value, props.id).then((response) => {
     hotel.value = CatalogHotel.getInstance(response.data);
@@ -196,7 +196,6 @@ watch([() => props.id, searchId], getHotelDetails, {immediate: true});
                 :selected="selectedRate"
                 :is-booking="isBooking"
                 :booking-failed="bookingFailed"
-                :prebook="prebook"
                 @book="bookNow"
             />
           </aside>
