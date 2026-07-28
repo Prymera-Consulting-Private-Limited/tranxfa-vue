@@ -1,10 +1,10 @@
 <script setup>
 import {computed} from 'vue';
 import HotelMealBadge from "@/views/Travel/Hotels/Partials/HotelMealBadge.vue";
-import HotelCancellationBadge from "@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue";
+import HotelSelectionCancellationBadge from "@/views/Travel/Hotels/Partials/HotelSelectionCancellationBadge.vue";
 import HotelAvailability from "@/views/Travel/Hotels/Partials/HotelAvailability.vue";
 import HotelAmenities from "@/views/Travel/Hotels/Partials/HotelAmenities.vue";
-import {formatAmount, getRateAmount, getRateCurrency, getRateKey, prettifyLabel} from "@/composables/travel/hotels/hotel_utils.js";
+import {formatAmount, getSelectionRateAmount, getSelectionRateCurrency, getSelectionRateKey, prettifyLabel} from "@/composables/travel/hotels/hotel_utils.js";
 import {CheckIcon, UsersIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -45,41 +45,24 @@ const features = computed(() => {
   const rate = props.group.rates[0];
   const features = [];
 
-  if (rate.roomExtension?.bedrooms) {
-    features.push(`${rate.roomExtension.bedrooms} bedroom${rate.roomExtension.bedrooms === 1 ? '' : 's'}`);
+  if (rate.rgExt?.bedrooms) {
+    features.push(`${rate.rgExt.bedrooms} bedroom${rate.rgExt.bedrooms === 1 ? '' : 's'}`);
   }
 
-  if (rate.roomDataTranslation?.beddingType) {
-    features.push(prettifyLabel(rate.roomDataTranslation.beddingType));
+  if (rate.roomData?.beddingType) {
+    features.push(prettifyLabel(rate.roomData.beddingType));
   }
 
   return features;
 });
 
-const capacity = computed(() => props.group.rates[0].roomExtension?.capacity ?? null);
+const capacity = computed(() => props.group.rates[0].rgExt?.capacity ?? null);
 
 // A single rate already shows its own price, so the header would only repeat it.
 const hasRange = computed(() => props.group.rates.length > 1);
 
-/**
- * When the money is taken, which the supplier states per payment type.
- */
-const PAYMENT_LABELS = {
-  now: 'Pay now',
-  hotel: 'Pay at the hotel',
-  deposit: 'Deposit now, rest later',
-};
-
-function payment(rate) {
-  return rate.paymentOptions.paymentTypes[0];
-}
-
-function paymentLabel(rate) {
-  return PAYMENT_LABELS[payment(rate).type] ?? null;
-}
-
 function total(rate) {
-  return formatAmount(getRateAmount(rate));
+  return formatAmount(getSelectionRateAmount(rate));
 }
 
 function perNight(rate) {
@@ -87,7 +70,7 @@ function perNight(rate) {
     return null;
   }
 
-  return formatAmount(getRateAmount(rate) / props.nights);
+  return formatAmount(getSelectionRateAmount(rate) / props.nights);
 }
 
 /**
@@ -95,10 +78,10 @@ function perNight(rate) {
  * is subject to availability".
  */
 function note(rate) {
-  return rate.roomDataTranslation?.miscRoomType ?? null;
+  return rate.roomData?.miscRoomType ?? null;
 }
 
-const key = getRateKey;
+const key = getSelectionRateKey;
 </script>
 
 <template>
@@ -141,22 +124,21 @@ const key = getRateKey;
         <div class="min-w-0 flex-1 space-y-2">
           <div class="flex flex-wrap items-center gap-2">
             <span v-if="key(rate) === bestKey" class="inline-flex items-center rounded-lg bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white">Lowest price</span>
-            <HotelMealBadge :meal="rate.mealData" />
-            <HotelCancellationBadge :payment="payment(rate)" />
+            <HotelMealBadge :meal-type="rate.mealType" />
+            <HotelSelectionCancellationBadge :cancellation="rate.cancellation" />
             <HotelAvailability :allotment="rate.allotment" />
           </div>
-          <HotelAmenities :amenities="rate.amenitiesData" />
+          <HotelAmenities :amenities="rate.amenities" />
           <p v-if="note(rate)" class="text-xs text-gray-400">{{ prettifyLabel(note(rate)) }}</p>
         </div>
         <!-- Price rail, so every row lines up on the number and the button. -->
         <div class="flex shrink-0 items-end justify-between gap-4 @2xl:w-48 @2xl:flex-col @2xl:items-stretch @2xl:gap-3 @2xl:border-l @2xl:border-gray-100 @2xl:pl-6">
           <div class="@2xl:text-right">
             <p class="flex items-baseline gap-1 @2xl:justify-end">
-              <span class="text-xs font-medium text-gray-500">{{ getRateCurrency(rate) }}</span>
+              <span class="text-xs font-medium text-gray-500">{{ getSelectionRateCurrency(rate) }}</span>
               <span class="text-xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ total(rate) }}</span>
             </p>
             <p v-if="perNight(rate)" class="mt-0.5 text-xs text-gray-500 tabular-nums">{{ perNight(rate) }} / night</p>
-            <p v-if="paymentLabel(rate)" class="mt-0.5 text-xs text-gray-400">{{ paymentLabel(rate) }}</p>
           </div>
           <button
               type="button"

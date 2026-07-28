@@ -2,7 +2,7 @@
 import {computed} from 'vue';
 import HotelRoomCard from "@/views/Travel/Hotels/Partials/HotelRoomCard.vue";
 import EmptyHotels from "@/views/Travel/Hotels/Partials/EmptyHotels.vue";
-import {getCheapestRate, getRateKey, getRoomGroups} from "@/composables/travel/hotels/hotel_utils.js";
+import {getCheapestSelectionRate, getSelectionRateKey, getSelectionRoomGroups} from "@/composables/travel/hotels/hotel_utils.js";
 
 const props = defineProps({
   /**
@@ -28,14 +28,14 @@ defineEmits([
   'select',
 ]);
 
-const groups = computed(() => getRoomGroups(props.hotel.rates));
+const groups = computed(() => getSelectionRoomGroups(props.hotel.rates));
 
 const rateCount = computed(() => groups.value.reduce((total, group) => total + group.rates.length, 0));
 
 const bestKey = computed(() => {
-  const cheapest = getCheapestRate(props.hotel);
+  const cheapest = getCheapestSelectionRate(props.hotel);
 
-  return cheapest ? getRateKey(cheapest) : null;
+  return cheapest ? getSelectionRateKey(cheapest) : null;
 });
 </script>
 

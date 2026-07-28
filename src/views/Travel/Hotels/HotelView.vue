@@ -9,9 +9,8 @@ import HotelStayCard from "@/views/Travel/Hotels/Partials/HotelStayCard.vue";
 import HotelFacilities from "@/views/Travel/Hotels/Partials/HotelFacilities.vue";
 import HotelFacts from "@/views/Travel/Hotels/Partials/HotelFacts.vue";
 import HotelDetailSkeleton from "@/views/Travel/Hotels/Partials/HotelDetailSkeleton.vue";
-import {getCheapestRate, getCriteriaFromSearch, getQuery, getRateKey, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
+import {getCheapestSelectionRate, getCriteriaFromSearch, getQuery, getSelectionRateKey, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import CatalogHotel from "@/models/travel/hotels/catalog_hotel.js";
-import HotelSearch from "@/models/travel/hotels/hotel_search.js";
 import {ChevronLeftIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -45,16 +44,16 @@ const hasFailed = ref(false);
 const hotelViewId = ref(null);
 
 /**
- * The rate the customer picked, kept as the rate itself so the booking step can
- * be handed its book_hash without looking it up again.
+ * The rate the customer picked, kept as the rate itself so a booking step can
+ * be handed its id without looking it up again.
  *
- * @type {import('vue').Ref<HotelRate|null>}
+ * @type {import('vue').Ref<HotelSelectionRate|null>}
  */
 const selectedRate = ref(null);
 
-const selectedKey = computed(() => (selectedRate.value ? getRateKey(selectedRate.value) : null));
+const selectedKey = computed(() => (selectedRate.value ? getSelectionRateKey(selectedRate.value) : null));
 
-const cheapestRate = computed(() => (hotel.value ? getCheapestRate(hotel.value) : null));
+const cheapestRate = computed(() => (hotel.value ? getCheapestSelectionRate(hotel.value) : null));
 
 // The results this hotel was opened from, replayed through the same query contract.
 const resultsLink = computed(() => ({name: 'hotels', query: getQuery(criteria.value)}));
@@ -79,12 +78,12 @@ async function getHotelDetails() {
 
   await getHotelView(searchId.value, props.id).then((response) => {
     hotel.value = CatalogHotel.getInstance(response.data);
-    criteria.value = getCriteriaFromSearch(HotelSearch.getInstance(response.data.search));
-    hotelViewId.value = response.headers['x-hotel-selection-id'] ?? null;
+    criteria.value = getCriteriaFromSearch(hotel.value.selection.search);
+    hotelViewId.value = hotel.value.selection?.id ?? null;
 
     // The stay card should never sit on a bare "from" price when there is
     // already a bookable room, so the cheapest one is picked for the customer.
-    selectedRate.value = getCheapestRate(hotel.value);
+    selectedRate.value = getCheapestSelectionRate(hotel.value);
   }).catch(() => {
     hotel.value = null;
     hasFailed.value = true;

@@ -1,8 +1,8 @@
 <script setup>
 import {computed} from 'vue';
 import HotelMealBadge from "@/views/Travel/Hotels/Partials/HotelMealBadge.vue";
-import HotelCancellationBadge from "@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue";
-import {formatAmount, getRateAmount, getRateCurrency} from "@/composables/travel/hotels/hotel_utils.js";
+import HotelSelectionCancellationBadge from "@/views/Travel/Hotels/Partials/HotelSelectionCancellationBadge.vue";
+import {formatAmount, getSelectionRateAmount, getSelectionRateCurrency} from "@/composables/travel/hotels/hotel_utils.js";
 import {ArrowDownIcon, CalendarDaysIcon, CheckIcon, MoonIcon, UserGroupIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -27,7 +27,7 @@ const props = defineProps({
   },
 
   /**
-   * @type {HotelRate|null}
+   * @type {HotelSelectionRate|null}
    */
   cheapest: {
     type: Object,
@@ -35,7 +35,7 @@ const props = defineProps({
   },
 
   /**
-   * @type {HotelRate|null}
+   * @type {HotelSelectionRate|null}
    */
   selected: {
     type: Object,
@@ -45,16 +45,16 @@ const props = defineProps({
 
 const rate = computed(() => props.selected ?? props.cheapest);
 
-const currency = computed(() => (rate.value ? getRateCurrency(rate.value) : null));
+const currency = computed(() => (rate.value ? getSelectionRateCurrency(rate.value) : null));
 
-const amount = computed(() => (rate.value ? formatAmount(getRateAmount(rate.value)) : null));
+const amount = computed(() => (rate.value ? formatAmount(getSelectionRateAmount(rate.value)) : null));
 
 const perNight = computed(() => {
   if (!rate.value || !props.nights) {
     return null;
   }
 
-  return formatAmount(getRateAmount(rate.value) / props.nights);
+  return formatAmount(getSelectionRateAmount(rate.value) / props.nights);
 });
 
 const roomName = computed(() => {
@@ -62,10 +62,8 @@ const roomName = computed(() => {
     return null;
   }
 
-  return props.selected.roomDataTranslation?.mainRoomType || props.selected.roomName;
+  return props.selected.roomData?.mainRoomType || props.selected.roomName;
 });
-
-const payment = computed(() => props.selected?.paymentOptions?.paymentTypes?.[0] ?? null);
 
 const facts = computed(() => [
   {key: 'dates', icon: CalendarDaysIcon, label: 'Dates', value: props.stay},
@@ -94,8 +92,8 @@ const facts = computed(() => [
         total for {{ nights }} night{{ nights === 1 ? '' : 's' }} &middot; {{ currency }} {{ perNight }} / night
       </p>
       <div v-if="selected" class="mt-3 flex flex-wrap items-center gap-2">
-        <HotelMealBadge :meal="selected.mealData" />
-        <HotelCancellationBadge :payment="payment" />
+        <HotelMealBadge :meal-type="selected.mealType" />
+        <HotelSelectionCancellationBadge :cancellation="selected.cancellation" />
       </div>
       <a
           v-if="selected"

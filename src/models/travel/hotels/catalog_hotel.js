@@ -1,7 +1,7 @@
 import Region from "@/models/travel/region.js";
 import Hotel from "@/models/travel/hotels/hotel.js";
-import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 import HotelProvider from "@/models/travel/hotels/hotel_provider.js";
+import HotelSelection from "@/models/travel/hotels/hotel_selection.js";
 
 /**
  * A single hotel as our catalog holds it. The search returns this nested inside a
@@ -54,12 +54,12 @@ class CatalogHotel {
     region = null;
 
     /**
-     * Priced for the stay that was asked for, one rate per room and board
-     * combination, so the same room appears several times over.
+     * The priced, time-limited view this hotel was resolved into for a
+     * search_id, one rate per room and board combination.
      *
-     * @type {HotelRate[]}
+     * @type {HotelSelection|null}
      */
-    rates = [];
+    selection = null;
 
     /**
      * @type {HotelProvider|null}
@@ -72,6 +72,13 @@ class CatalogHotel {
      * @type {string|null}
      */
     address = null;
+
+    /**
+     * @returns {HotelSelectionRate[]}
+     */
+    get rates() {
+        return this.selection?.rates ?? [];
+    }
 
     /**
      * @returns {HotelPhoto[]}
@@ -120,8 +127,8 @@ class CatalogHotel {
             hotel.region = Region.getInstance(data.primary_region);
         }
 
-        if (Array.isArray(data.rates)) {
-            hotel.rates = HotelRate.getCollection(data.rates);
+        if (data.selection) {
+            hotel.selection = HotelSelection.getInstance(data.selection);
         }
 
         if (data.provider) {

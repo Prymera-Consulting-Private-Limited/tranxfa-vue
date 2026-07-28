@@ -314,6 +314,81 @@ export function getRoomGroups(rates) {
 }
 
 /**
+ * The hotel-view endpoint prices a selection rate as a single total rather
+ * than per payment type, so it needs its own cheapest/amount/currency/key
+ * helpers instead of the ones above, which read a supplier rate's payment
+ * options.
+ *
+ * @param {CatalogHotel} hotel
+ * @returns {HotelSelectionRate|null}
+ */
+export function getCheapestSelectionRate(hotel) {
+    const priced = hotel.rates.filter(rate => rate.price?.amount != null);
+
+    if (priced.length === 0) {
+        return null;
+    }
+
+    return priced.reduce((cheapest, rate) => {
+        return getSelectionRateAmount(rate) < getSelectionRateAmount(cheapest) ? rate : cheapest;
+    });
+}
+
+/**
+ * @param {HotelSelectionRate} rate
+ * @returns {number}
+ */
+export function getSelectionRateAmount(rate) {
+    return Number(rate.price?.amount ?? 0);
+}
+
+/**
+ * @param {HotelSelectionRate} rate
+ * @returns {string}
+ */
+export function getSelectionRateCurrency(rate) {
+    return rate.price?.currency ?? '';
+}
+
+/**
+ * @param {HotelSelectionRate} rate
+ * @returns {string}
+ */
+export function getSelectionRateKey(rate) {
+    return rate.id ?? '';
+}
+
+/**
+ * Same room/board grouping as getRoomGroups, against the hotel-view endpoint's
+ * own rate shape.
+ *
+ * @param {HotelSelectionRate[]} rates
+ * @returns {Array<{name: string, rates: HotelSelectionRate[], amount: number, currency: string}>}
+ */
+export function getSelectionRoomGroups(rates) {
+    const groups = new Map();
+
+    rates.forEach(rate => {
+        const name = rate.roomData?.mainRoomType || rate.roomName || 'Room';
+
+        groups.set(name, [...(groups.get(name) ?? []), rate]);
+    });
+
+    return [...groups.entries()]
+        .map(([name, items]) => {
+            const sorted = [...items].sort((a, b) => getSelectionRateAmount(a) - getSelectionRateAmount(b));
+
+            return {
+                name: name,
+                rates: sorted,
+                amount: getSelectionRateAmount(sorted[0]),
+                currency: getSelectionRateCurrency(sorted[0]),
+            };
+        })
+        .sort((a, b) => a.amount - b.amount);
+}
+
+/**
  * A search is filtered in the browser, since one region search already returns
  * every hotel we are allowed to show.
  *

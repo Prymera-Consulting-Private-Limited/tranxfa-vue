@@ -60,7 +60,7 @@ const payment = computed(() => props.rate.paymentOptions?.paymentTypes?.[0] ?? n
         <HotelRoomType :rate="rate" />
         <!-- Rate Highlights -->
         <div class="flex flex-wrap items-center gap-2">
-          <HotelMealBadge :meal="rate.mealData" />
+          <HotelMealBadge :meal-type="rate.mealData?.value" />
           <HotelCancellationBadge :payment="payment" />
           <HotelAvailability :allotment="rate.allotment" />
         </div>
