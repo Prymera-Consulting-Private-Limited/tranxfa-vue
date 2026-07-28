@@ -433,6 +433,109 @@ export function hasFilters(filters) {
 }
 
 /**
+ * A single value arrives as a plain string, so this only rejects the one
+ * shape that can't mean anything here: an empty or missing param.
+ *
+ * @param {*} value
+ * @returns {string|null}
+ */
+function getQueryString(value) {
+    return typeof value === 'string' && value.length ? value : null;
+}
+
+/**
+ * Feature and amenity text comes straight from the supplier and is never
+ * guaranteed to be a clean slug, so it cannot be joined into one param on a
+ * delimiter that the text itself might contain. A repeated param is what the
+ * router already uses for a real list, so stars/features/amenities go out
+ * the same way instead of being comma-joined into a single string.
+ *
+ * @param {*} value
+ * @returns {string[]}
+ */
+function getQueryList(value) {
+    if (Array.isArray(value)) {
+        return value.filter(item => typeof item === 'string' && item.length);
+    }
+
+    return typeof value === 'string' && value.length ? [value] : [];
+}
+
+/**
+ * Filters, sort and page are view state rather than part of the search itself,
+ * so they live alongside the criteria in the url instead of inside getQuery,
+ * and a default never has to appear as a param at all.
+ *
+ * @param {object} filters
+ * @returns {object}
+ */
+export function getFiltersQuery(filters) {
+    return {
+        max_price: filters.maxPrice ?? undefined,
+        stars: filters.stars.length ? filters.stars.map(String) : undefined,
+        photos: filters.photos ?? undefined,
+        features: filters.features.length ? filters.features : undefined,
+        amenities: filters.amenities.length ? filters.amenities : undefined,
+    };
+}
+
+/**
+ * @param {object} query
+ * @returns {object}
+ */
+export function getFiltersFromQuery(query) {
+    const maxPrice = Number.parseFloat(getQueryString(query.max_price));
+    const photos = getQueryString(query.photos);
+
+    return {
+        maxPrice: Number.isFinite(maxPrice) ? maxPrice : null,
+        stars: getQueryList(query.stars).map(value => Number.parseInt(value, 10)).filter(Number.isInteger),
+        photos: photos === 'with' || photos === 'without' ? photos : null,
+        features: getQueryList(query.features),
+        amenities: getQueryList(query.amenities),
+    };
+}
+
+/**
+ * @param {string} sort
+ * @returns {string|undefined}
+ */
+export function getSortQuery(sort) {
+    return sort !== SORT_OPTIONS[0].value ? sort : undefined;
+}
+
+/**
+ * @param {object} query
+ * @returns {string}
+ */
+export function getSortFromQuery(query) {
+    const value = getQueryString(query.sort);
+
+    return SORT_OPTIONS.some(option => option.value === value) ? value : SORT_OPTIONS[0].value;
+}
+
+/**
+ * @param {number} page
+ * @returns {string|undefined}
+ */
+export function getPageQuery(page) {
+    return page > 1 ? String(page) : undefined;
+}
+
+/**
+ * Anything a filter or the result count would rule out is left for the page
+ * to clamp, since neither is known while the url is still being parsed.
+ *
+ * @param {object} query
+ * @returns {number}
+ */
+export function getPageFromQuery(query) {
+    const page = Number.parseInt(getQueryString(query.page), 10);
+
+    return Number.isInteger(page) && page > 0 ? page : 1;
+}
+
+/**
  * Facilities arrive as a flat list tagged with a group. The supplier leaves the
  * name null whenever it only knows the group, so the group is kept either way and
  * a group with nothing named is still worth showing as a category on its own.

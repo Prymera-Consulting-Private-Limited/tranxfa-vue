@@ -15,8 +15,14 @@ import {
   getFacets,
   getFilteredResults,
   getFilters,
+  getFiltersFromQuery,
+  getFiltersQuery,
+  getPageFromQuery,
+  getPageQuery,
   getQuery,
   getSortedResults,
+  getSortFromQuery,
+  getSortQuery,
   hasFilters,
   HOTELS_PER_PAGE,
   SORT_OPTIONS,
@@ -51,7 +57,12 @@ const results = computed(() => {
       .filter(result => result.rate !== null);
 });
 
+// Filters, sort and page are read from the url by applySearch below and never
+// set directly, so a search replayed by the back button restores exactly what
+// was on screen rather than whatever these happened to default to.
 const filters = ref(getFilters());
+const sort = ref(SORT_OPTIONS[0].value);
+const page = ref(1);
 
 const facets = computed(() => getFacets(results.value));
 
@@ -59,30 +70,58 @@ const filteredResults = computed(() => getFilteredResults(results.value, filters
 
 const isFiltered = computed(() => hasFilters(filters.value));
 
-const sort = ref(SORT_OPTIONS[0].value);
-
 const sortedResults = computed(() => getSortedResults(filteredResults.value, sort.value));
-
-const page = ref(1);
 
 // The whole region is already here, so paging is a slice of what is on screen.
 const pageCount = computed(() => Math.max(1, Math.ceil(sortedResults.value.length / HOTELS_PER_PAGE)));
 
+// A stale or hand-edited url can ask for a page a filter has since ruled out.
+const currentPage = computed(() => Math.min(page.value, pageCount.value));
+
 const pagedResults = computed(() => {
-  const start = (page.value - 1) * HOTELS_PER_PAGE;
+  const start = (currentPage.value - 1) * HOTELS_PER_PAGE;
 
   return sortedResults.value.slice(start, start + HOTELS_PER_PAGE);
 });
 
 const resultsTop = ref(null);
 
-// A narrowed or reordered list makes the page you were on meaningless.
-watch([filteredResults, sort], () => {
-  page.value = 1;
-});
+/**
+ * Everything but the criteria itself, folded into one url so a filter tweak,
+ * a sort change or a page turn all replay the same way the search does.
+ *
+ * @param {object} patch
+ * @returns {object}
+ */
+function getListQuery(patch = {}) {
+  const nextFilters = patch.filters ?? filters.value;
+  const nextSort = patch.sort ?? sort.value;
+  const nextPage = patch.page ?? page.value;
+
+  return {
+    ...getQuery(criteria.value),
+    ...getFiltersQuery(nextFilters),
+    sort: getSortQuery(nextSort),
+    page: getPageQuery(nextPage),
+  };
+}
+
+/**
+ * @param {object} update
+ */
+function updateFilters(update) {
+  router.replace({query: getListQuery({filters: update, page: 1})});
+}
+
+/**
+ * @param {string} value
+ */
+function updateSort(value) {
+  router.replace({query: getListQuery({sort: value, page: 1})});
+}
 
 function goToPage(next) {
-  page.value = next;
+  router.replace({query: getListQuery({page: next})});
 
   resultsTop.value?.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
@@ -101,9 +140,6 @@ const hasDestination = computed(() => criteria.value.region_id !== null);
 async function getHotels() {
   isLoading.value = true;
   hasFailed.value = false;
-
-  // A price cap or an amenity from one search says nothing about the next one.
-  filters.value = getFilters();
 
   await search().then((response) => {
     hotels.value = Hotel.getCollection(response.data.hotels);
@@ -152,11 +188,17 @@ function getSignature(query) {
 let appliedSearch = null;
 
 /**
- * Runs whatever the url asks for, including the back and forward buttons.
+ * Runs whatever the url asks for, including the back and forward buttons. The
+ * view state is read every time regardless of the signature below, so a page
+ * turn or a filter tweak is picked up without re-running the search itself.
  *
  * @param {object} query
  */
 function applySearch(query) {
+  filters.value = getFiltersFromQuery(query);
+  sort.value = getSortFromQuery(query);
+  page.value = getPageFromQuery(query);
+
   const signature = getSignature(query);
 
   if (signature === appliedSearch) {
@@ -178,14 +220,17 @@ function applySearch(query) {
 
 /**
  * The url owns the criteria, so a new search is a navigation and applySearch
- * runs it from there.
+ * runs it from there. The fresh url carries none of the previous search's
+ * filters, sort or page, since a price cap or an amenity from one destination
+ * says nothing about the next.
  *
  * @param {object} update
  */
 function updateSearch(update) {
   const query = getQuery({...criteria.value, ...update});
 
-  // An unchanged url is never replayed, so a repeat search is run directly.
+  // An unchanged url is never replayed, so a repeat search is run directly,
+  // leaving whatever filters, sort and page were already in place.
   if (JSON.stringify(query) === appliedSearch) {
     getHotels();
 
@@ -249,7 +294,7 @@ function viewHotel(hotel) {
               <template v-else>Prices shown are the lowest available for your dates, for the whole stay.</template>
             </p>
           </div>
-          <HotelSort v-if="showFilters" v-model="sort" class="mt-3 sm:mt-0" />
+          <HotelSort v-if="showFilters" :model-value="sort" @update:model-value="updateSort" class="mt-3 sm:mt-0" />
         </div>
         <div class="mt-6 lg:grid lg:grid-cols-4 lg:items-start lg:gap-6">
           <!-- Filters, once there is a result set to filter -->
@@ -259,7 +304,7 @@ function viewHotel(hotel) {
               :filters="filters"
               :match-count="filteredResults.length"
               :total-count="results.length"
-              @update:filters="filters = $event"
+              @update:filters="updateFilters"
               class="lg:col-span-1"
           />
           <section ref="resultsTop" :class="[showFilters ? 'mt-4 lg:col-span-3 lg:mt-0' : 'lg:col-span-4', 'scroll-mt-6 space-y-4']">
@@ -300,7 +345,7 @@ function viewHotel(hotel) {
                   @select="viewHotel"
               />
               <HotelPagination
-                  :page="page"
+                  :page="currentPage"
                   :page-count="pageCount"
                   :total="filteredResults.length"
                   :per-page="HOTELS_PER_PAGE"
