@@ -11,6 +11,7 @@ import HotelFacts from "@/views/Travel/Hotels/Partials/HotelFacts.vue";
 import HotelDetailSkeleton from "@/views/Travel/Hotels/Partials/HotelDetailSkeleton.vue";
 import {getCheapestSelectionRate, getCriteriaFromSearch, getQuery, getSelectionRateKey, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import CatalogHotel from "@/models/travel/hotels/catalog_hotel.js";
+import HotelPrebook from "@/models/travel/hotels/hotel_prebook.js";
 import {ChevronLeftIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -29,7 +30,7 @@ const props = defineProps({
   }
 });
 
-const {criteria, nights, stayLabel, guestBreakdown, getHotelView} = useHotelUtils();
+const {criteria, nights, stayLabel, guestBreakdown, getHotelView, prebookRate} = useHotelUtils();
 
 /**
  * @type {import('vue').Ref<CatalogHotel|null>}
@@ -55,6 +56,43 @@ const selectedKey = computed(() => (selectedRate.value ? getSelectionRateKey(sel
 
 const cheapestRate = computed(() => (hotel.value ? getCheapestSelectionRate(hotel.value) : null));
 
+const isBooking = ref(false);
+const bookingFailed = ref(false);
+
+/**
+ * The held rate, once the supplier has confirmed it is still available. A
+ * different rate invalidates it, so picking one clears it back to null.
+ *
+ * @type {import('vue').Ref<HotelPrebook|null>}
+ */
+const prebook = ref(null);
+
+/**
+ * @param {HotelSelectionRate} rate
+ */
+function selectRate(rate) {
+  selectedRate.value = rate;
+  bookingFailed.value = false;
+  prebook.value = null;
+}
+
+async function bookNow() {
+  if (!selectedRate.value) {
+    return;
+  }
+
+  isBooking.value = true;
+  bookingFailed.value = false;
+
+  await prebookRate(selectedRate.value.id).then((response) => {
+    prebook.value = HotelPrebook.getInstance(response.data);
+  }).catch(() => {
+    bookingFailed.value = true;
+  }).finally(() => {
+    isBooking.value = false;
+  });
+}
+
 // The results this hotel was opened from, replayed through the same query contract.
 const resultsLink = computed(() => ({name: 'hotels', query: getQuery(criteria.value)}));
 
@@ -75,6 +113,8 @@ async function getHotelDetails() {
 
   // Rates are priced for a stay, so a room chosen for the previous one is void.
   selectedRate.value = null;
+  bookingFailed.value = false;
+  prebook.value = null;
 
   await getHotelView(searchId.value, props.id).then((response) => {
     hotel.value = CatalogHotel.getInstance(response.data);
@@ -133,7 +173,7 @@ watch([() => props.id, searchId], getHotelDetails, {immediate: true});
                     :hotel="hotel"
                     :nights="nights"
                     :selected-key="selectedKey"
-                    @select="selectedRate = $event"
+                    @select="selectRate"
                 />
                 <HotelFacts :provider="hotel.provider" />
                 <HotelFacilities :facilities="hotel.facilities" />
@@ -154,6 +194,10 @@ watch([() => props.id, searchId], getHotelDetails, {immediate: true});
                 :guests="guestBreakdown"
                 :cheapest="cheapestRate"
                 :selected="selectedRate"
+                :is-booking="isBooking"
+                :booking-failed="bookingFailed"
+                :prebook="prebook"
+                @book="bookNow"
             />
           </aside>
         </div>

@@ -747,6 +747,15 @@ export function useHotelUtils() {
         return await axios.post(`/client/v1/travel/hotel/${searchId}/${hotelId}`);
     }
 
+    /**
+     * Reserves the chosen rate with the supplier ahead of checkout.
+     *
+     * @param {string} rateId
+     */
+    async function prebookRate(rateId) {
+        return await axios.post(`/client/v1/travel/hotel/prebook/${rateId}`);
+    }
+
     return {
         criteria,
         nights,
@@ -754,6 +763,7 @@ export function useHotelUtils() {
         guestBreakdown,
         search,
         getHotelView,
+        prebookRate,
         regions,
         popularRegions,
     }
