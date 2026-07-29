@@ -28,7 +28,7 @@ const showLoading = computed(() => {
   return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
 })
 
-const emit = defineEmits(['addressUpdated', 'editPersonalInformationRequested'])
+const emit = defineEmits(['addressUpdated', 'editPersonalInformationRequested', 'skipAddressInformation'])
 
 const addressUpdated = () => {
   emit('addressUpdated')
@@ -36,6 +36,10 @@ const addressUpdated = () => {
 
 const editPersonalInformation = () => {
   emit('editPersonalInformationRequested');
+}
+
+const skip = () => {
+  emit('skipAddressInformation');
 }
 </script>
 <template>
@@ -54,6 +58,7 @@ const editPersonalInformation = () => {
         Please provide your full residential address in
         <span class="font-semibold text-brand-700">{{ customer?.data?.country?.commonName }}</span>.
         Accurate address information is required to comply with financial regulations.
+        You can skip for now and provide it when you send money.
       </p>
       <!-- Form -->
       <CustomerAttributeForm
@@ -61,6 +66,14 @@ const editPersonalInformation = () => {
           v-bind:showLoading="showLoading"
           v-on:customer:attribute_category:updated="addressUpdated"
       />
+      <button
+          @click="skip"
+          :disabled="showLoading"
+          :class="[{'opacity-70': showLoading}]"
+          type="button"
+          class="block mt-3 w-full bg-gray-200 hover:text-gray-500 text-gray-600 text-center py-3 rounded-[10px] font-medium hover:bg-gray-300 transition cursor-pointer">
+        Skip for now
+      </button>
       <div class="text-center mt-12">
         <a @click="editPersonalInformation" class="text-brand-700 text-sm hover:underline" href="javascript:">Edit Personal Information</a>
       </div>

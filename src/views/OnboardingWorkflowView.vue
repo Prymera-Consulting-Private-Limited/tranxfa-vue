@@ -82,6 +82,7 @@ const editPersonalInformation = () => {
         <AddressInformation
             v-else-if="snapshot?.value === 'addressInformation'"
             v-on:addressUpdated="proceed"
+            v-on:skipAddressInformation="proceed"
             v-on:editPersonalInformationRequested="editPersonalInformation" />
         <MobileNumberInput
             v-else-if="snapshot?.value === 'mobileNumberInput'"
