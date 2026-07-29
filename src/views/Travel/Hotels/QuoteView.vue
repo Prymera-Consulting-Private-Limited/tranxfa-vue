@@ -1,6 +1,6 @@
 <script setup>
-import {computed, onMounted, onUnmounted, ref} from 'vue';
-import {RouterLink} from 'vue-router';
+import {computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from 'vue';
+import {onBeforeRouteLeave, RouterLink, useRouter} from 'vue-router';
 import moment from "moment";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import Spinner from "@/components/Spinner.vue";
@@ -10,14 +10,32 @@ import HotelMealBadge from "@/views/Travel/Hotels/Partials/HotelMealBadge.vue";
 import HotelSelectionCancellationBadge from "@/views/Travel/Hotels/Partials/HotelSelectionCancellationBadge.vue";
 import HotelAvailability from "@/views/Travel/Hotels/Partials/HotelAvailability.vue";
 import HotelAmenities from "@/views/Travel/Hotels/Partials/HotelAmenities.vue";
+import PriceChangeDialog from "@/views/Travel/Hotels/Partials/PriceChangeDialog.vue";
+import GuestDetailsForm from "@/views/Travel/Hotels/Partials/GuestDetailsForm.vue";
+import BookingProgressDialog from "@/views/Travel/Hotels/Partials/BookingProgressDialog.vue";
 import {formatAmount, prettifyLabel, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import HotelQuote from "@/models/travel/hotels/hotel_quote.js";
-import {ChevronLeftIcon, ClockIcon, ExclamationTriangleIcon, MapPinIcon, UsersIcon} from "@heroicons/vue/24/outline";
+import HotelBooking from "@/models/travel/hotels/hotel_booking.js";
+import {CheckCircleIcon, ChevronLeftIcon, ClockIcon, ExclamationTriangleIcon, MapPinIcon, UsersIcon} from "@heroicons/vue/24/outline";
+
+// Polling has no spec yet for interval or backoff, so this is a plain fixed
+// interval with a hard cap — enough to not hammer the endpoint or spin forever
+// on a status call that never resolves.
+const STATUS_POLL_INTERVAL_MS = 3000;
+const MAX_STATUS_POLLS = 40;
 
 const props = defineProps({
-  id: {
+  // Set on the quote route, before a booking attempt exists.
+  quoteId: {
     type: String,
-    required: true,
+    default: null,
+  },
+  // Set on the booking route instead, once "book" has been accepted — its
+  // own id, not the quote's, so a refresh here resumes the attempt rather
+  // than landing back on "Continue Booking".
+  attemptId: {
+    type: String,
+    default: null,
   },
   // A repeated ?search= arrives as an array, which is not an id.
   search: {
@@ -26,7 +44,9 @@ const props = defineProps({
   },
 });
 
-const {getHotelQuote} = useHotelUtils();
+const router = useRouter();
+
+const {getHotelQuote, bookHotel, getBookingAttempt, finishBooking, getBookingStatus} = useHotelUtils();
 
 /**
  * @type {import('vue').Ref<HotelQuote|null>}
@@ -36,12 +56,88 @@ const quote = ref(null);
 const isLoading = ref(false);
 const hasFailed = ref(false);
 
-async function loadQuote() {
+// ETG only flags a price change, it never re-asks — the customer has to see
+// the new total and explicitly accept or walk away before booking can proceed.
+const priceChangeConfirmed = ref(true);
+const priceChangeDialogOpen = ref(false);
+
+const isBooking = ref(false);
+const bookingFailed = ref(false);
+
+/**
+ * Set once "book" is accepted — a booking attempt, not a finished
+ * reservation, since its own status starts at "form_started" and still needs
+ * guest details before it can be finished.
+ *
+ * @type {import('vue').Ref<HotelBooking|null>}
+ */
+const attempt = ref(null);
+
+/**
+ * Drives what shows once there is an attempt: collecting guest details,
+ * waiting on the finish call's async result, or the outcome that call's
+ * polling eventually settles on. Also what a refresh has to reconstruct from
+ * the attempt's own status, since the attempt route carries no other state.
+ *
+ * @type {import('vue').Ref<'guestDetails'|'processing'|'confirmed'|'failed'|null>}
+ */
+const attemptStep = ref(null);
+
+let statusPollTimer = null;
+let statusPollCount = 0;
+
+function resolveAttemptStep(status) {
+  if (status === 'confirmed') {
+    return 'confirmed';
+  }
+
+  if (status === 'failed') {
+    return 'failed';
+  }
+
+  if (status === 'form_started') {
+    return 'guestDetails';
+  }
+
+  // Any other in-progress status means finish was already called — pick the
+  // poll back up instead of showing the guest form again.
+  return 'processing';
+}
+
+async function loadPage() {
   isLoading.value = true;
   hasFailed.value = false;
+  attempt.value = null;
+  attemptStep.value = null;
 
-  await getHotelQuote(props.id).then((response) => {
+  if (props.attemptId) {
+    await getBookingAttempt(props.attemptId).then((response) => {
+      attempt.value = HotelBooking.getInstance(response.data);
+      quote.value = attempt.value.quote;
+      // The price-change gate only guards the "book" call itself — an
+      // attempt existing at all means that call already went through.
+      priceChangeConfirmed.value = true;
+      priceChangeDialogOpen.value = false;
+      attemptStep.value = resolveAttemptStep(attempt.value.status);
+
+      if (attemptStep.value === 'processing') {
+        statusPollCount = 0;
+        scheduleStatusPoll();
+      }
+    }).catch(() => {
+      quote.value = null;
+      hasFailed.value = true;
+    }).finally(() => {
+      isLoading.value = false;
+    });
+
+    return;
+  }
+
+  await getHotelQuote(props.quoteId).then((response) => {
     quote.value = HotelQuote.getInstance(response.data);
+    priceChangeConfirmed.value = !quote.value.priceChanged;
+    priceChangeDialogOpen.value = quote.value.priceChanged;
   }).catch(() => {
     quote.value = null;
     hasFailed.value = true;
@@ -50,7 +146,140 @@ async function loadQuote() {
   });
 }
 
-onMounted(loadQuote);
+// A quote and an attempt are different pages sharing this component, so
+// whichever id the route carries reloads it — the same way HotelView keys
+// its watch off the route rather than assuming it's always mounting fresh.
+watch([() => props.quoteId, () => props.attemptId], loadPage, {immediate: true});
+
+/**
+ * The single go-ahead to book, reached either by confirming a changed price
+ * in the dialog or by clicking Continue Booking on an unchanged one — both
+ * are the customer accepting the price the quote is currently showing.
+ * Hands off to the booking route rather than swapping state in place, so the
+ * attempt this creates is refreshable from the moment it exists.
+ */
+async function startBooking() {
+  if (!quote.value || isBooking.value) {
+    return;
+  }
+
+  priceChangeConfirmed.value = true;
+  priceChangeDialogOpen.value = false;
+  isBooking.value = true;
+  bookingFailed.value = false;
+
+  await bookHotel(quote.value.id).then((response) => {
+    const newAttempt = HotelBooking.getInstance(response.data);
+
+    router.push({name: 'hotelBooking', params: {id: newAttempt.id}, query: {search: props.search ?? undefined}});
+  }).catch(() => {
+    bookingFailed.value = true;
+  }).finally(() => {
+    isBooking.value = false;
+  });
+}
+
+// Declining a changed price cancels the booking outright, per the ETG rule —
+// there is nothing to fall back to at the old price, so this sends the
+// customer back to pick a room again rather than re-showing the quote.
+function cancelPriceChange() {
+  priceChangeDialogOpen.value = false;
+  router.push(backLink.value);
+}
+
+const isSubmittingGuestDetails = ref(false);
+const guestDetailsFailed = ref(false);
+
+async function submitGuestDetails(formData) {
+  if (!attempt.value || isSubmittingGuestDetails.value) {
+    return;
+  }
+
+  isSubmittingGuestDetails.value = true;
+  guestDetailsFailed.value = false;
+
+  await finishBooking(attempt.value.id, {attempt_id: attempt.value.id, ...formData}).then(() => {
+    attemptStep.value = 'processing';
+    statusPollCount = 0;
+    scheduleStatusPoll();
+  }).catch(() => {
+    guestDetailsFailed.value = true;
+  }).finally(() => {
+    isSubmittingGuestDetails.value = false;
+  });
+}
+
+function scheduleStatusPoll() {
+  statusPollTimer = setTimeout(checkBookingStatus, STATUS_POLL_INTERVAL_MS);
+}
+
+async function checkBookingStatus() {
+  if (!attempt.value) {
+    return;
+  }
+
+  statusPollCount += 1;
+
+  await getBookingStatus(attempt.value.id).then((response) => {
+    const status = response.data?.status;
+
+    if (status === 'confirmed') {
+      attemptStep.value = 'confirmed';
+      return;
+    }
+
+    if (status === 'failed') {
+      attemptStep.value = 'failed';
+      return;
+    }
+
+    // Still processing, or a status we don't recognise yet — keep polling
+    // until the cap rather than treating an unknown value as a failure.
+    if (statusPollCount >= MAX_STATUS_POLLS) {
+      attemptStep.value = 'failed';
+      return;
+    }
+
+    scheduleStatusPoll();
+  }).catch(() => {
+    // A transient failure to poll isn't the booking failing, so this retries
+    // rather than giving up on the first dropped request.
+    if (statusPollCount >= MAX_STATUS_POLLS) {
+      attemptStep.value = 'failed';
+      return;
+    }
+
+    scheduleStatusPoll();
+  });
+}
+
+onUnmounted(() => {
+  clearTimeout(statusPollTimer);
+});
+
+// The finish call is already in flight once processing starts, so leaving
+// mid-poll would abandon a booking that may still go through — blocked both
+// for in-app navigation and for closing or refreshing the tab.
+onBeforeRouteLeave(() => {
+  if (attemptStep.value === 'processing') {
+    return false;
+  }
+});
+
+function handleBeforeUnload(event) {
+  if (attemptStep.value === 'processing') {
+    event.preventDefault();
+    event.returnValue = '';
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+});
 
 // Ticks the countdown against the hold's own expiry rather than a fixed
 // duration, so it stays correct even if loading the quote took a while.
@@ -242,14 +471,14 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
           <p class="mt-2 max-w-md text-sm text-gray-500">Something went wrong while contacting our travel partner. Please try again in a moment.</p>
           <button
               type="button"
-              @click="loadQuote"
+              @click="loadPage"
               class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >Try again</button>
         </div>
         <!-- Quote -->
         <template v-else-if="quote">
-          <!-- Hold countdown, full width so it reads as a status banner rather than a sidebar detail -->
-          <div :class="[holdAlertStyle.wrap, 'mt-3 flex flex-wrap items-center justify-between gap-4 rounded-2xl px-5 py-4 ring-1 ring-inset']">
+          <!-- Hold countdown, full width so it reads as a status banner rather than a sidebar detail. Dropped once booking is underway — the hold no longer applies to a room that's already being booked. -->
+          <div v-if="!attempt" :class="[holdAlertStyle.wrap, 'mt-3 flex flex-wrap items-center justify-between gap-4 rounded-2xl px-5 py-4 ring-1 ring-inset']">
             <div class="flex items-center gap-3">
               <span :class="[holdAlertStyle.iconWrap, 'flex size-10 shrink-0 items-center justify-center rounded-full']">
                 <component :is="holdAlertStyle.icon" class="size-5" aria-hidden="true" />
@@ -262,9 +491,31 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
             <p v-if="countdownLabel" class="text-xl font-semibold tabular-nums">{{ countdownLabel }}</p>
           </div>
           <div class="mt-6 lg:grid lg:grid-cols-3 lg:items-start lg:gap-6">
-            <!-- Gallery -->
-            <div class="lg:col-span-2">
+            <!-- Gallery, then the booking attempt's own flow once it starts -->
+            <div class="space-y-6 lg:col-span-2">
               <HotelGallery v-if="quote.hotel" :photos="quote.hotel.photos" :name="quote.hotel.name" />
+              <GuestDetailsForm
+                  v-if="attemptStep === 'guestDetails'"
+                  :guests="quote.guests"
+                  :gender-required="attempt.isGenderSpecificationRequired"
+                  :submitting="isSubmittingGuestDetails"
+                  :submit-failed="guestDetailsFailed"
+                  @submit="submitGuestDetails"
+              />
+              <div v-else-if="attemptStep === 'confirmed'" class="rounded-2xl bg-white p-8 text-center ring-1 ring-gray-200">
+                <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                  <CheckCircleIcon class="size-7" aria-hidden="true" />
+                </div>
+                <h2 class="mt-6 text-base font-semibold text-gray-900">Booking confirmed</h2>
+                <p class="mt-2 text-sm text-gray-500">Your reservation is confirmed. A confirmation will be sent to the email you provided.</p>
+              </div>
+              <div v-else-if="attemptStep === 'failed'" class="rounded-2xl bg-white p-8 text-center ring-1 ring-red-200">
+                <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+                  <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
+                </div>
+                <h2 class="mt-6 text-base font-semibold text-gray-900">We couldn't confirm this booking</h2>
+                <p class="mt-2 text-sm text-gray-500">Something went wrong finishing your booking with the hotel. Please go back and try again.</p>
+              </div>
             </div>
             <!-- Hotel, room -->
             <aside class="mt-6 space-y-4 lg:col-span-1 lg:mt-0 lg:sticky lg:top-6">
@@ -307,13 +558,16 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                     <span class="text-sm font-medium text-gray-500">{{ quote.price.currency }}</span>
                     <span class="text-3xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
                   </p>
-                  <p v-if="quote.priceChanged" class="mt-2 text-xs text-amber-600">The price changed when we confirmed availability.</p>
-                  <!-- Not wired up yet — the ETG booking-start call this hands off to hasn't been specified. -->
+                  <p v-if="quote.priceChanged && priceChangeConfirmed" class="mt-2 text-xs text-amber-600">You confirmed this updated price.</p>
+                  <p v-if="bookingFailed" class="mt-2 text-xs text-red-600">Something went wrong starting your booking. Please try again.</p>
                   <button
+                      v-if="!attempt"
                       type="button"
-                      :disabled="isExpired"
+                      :disabled="isExpired || !priceChangeConfirmed || isBooking"
+                      @click="startBooking"
                       class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
-                  >{{ isExpired ? 'Reservation expired' : 'Continue Booking' }}</button>
+                  >{{ isExpired ? 'Reservation expired' : (isBooking ? 'Starting booking…' : 'Continue Booking') }}</button>
+                  <p v-else class="mt-4 text-xs text-gray-500">Booking started — finish the details below to confirm it.</p>
                 </div>
               </section>
             </aside>
@@ -321,5 +575,14 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
         </template>
       </div>
     </main>
+    <PriceChangeDialog
+        :open="priceChangeDialogOpen"
+        :currency="quote?.price?.currency"
+        :amount="amount"
+        :is-booking="isBooking"
+        @confirm="startBooking"
+        @cancel="cancelPriceChange"
+    />
+    <BookingProgressDialog :open="attemptStep === 'processing'" />
   </CustomerLayout>
 </template>

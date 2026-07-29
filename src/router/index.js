@@ -91,10 +91,21 @@ const router = createRouter({
     }, {
       path: '/travel/hotel/quote/:id',
       name: 'hotelQuote',
-      props: route => ({ id: route.params.id, search: route.query.search }),
+      props: route => ({ quoteId: route.params.id, search: route.query.search }),
       component: () => import('@/views/Travel/Hotels/QuoteView.vue'),
       meta: {
         title: 'Booking Summary',
+        description: '',
+      },
+    }, {
+      // Reached once "book" succeeds — its own id, not the quote's, so a
+      // refresh here re-fetches the attempt instead of restarting the booking.
+      path: '/travel/hotel/book/:id',
+      name: 'hotelBooking',
+      props: route => ({ attemptId: route.params.id, search: route.query.search }),
+      component: () => import('@/views/Travel/Hotels/QuoteView.vue'),
+      meta: {
+        title: 'Complete Booking',
         description: '',
       },
     }, {

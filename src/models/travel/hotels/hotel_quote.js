@@ -43,6 +43,15 @@ class HotelQuote {
      */
     hotel = null;
 
+    /**
+     * Room occupancy from the search this quote was priced under — lifted out
+     * of the same rate.hotel_selection wrapper hotel is, since the guest
+     * details form needs it to know how many guest rows to seed per room.
+     *
+     * @type {Array<{adults: number, children: number[]}>}
+     */
+    guests = [];
+
     static getInstance(data) {
         const quote = new HotelQuote();
 
@@ -65,6 +74,8 @@ class HotelQuote {
         if (data.rate?.hotel_selection?.hotel) {
             quote.hotel = CatalogHotel.getInstance(data.rate.hotel_selection.hotel);
         }
+
+        quote.guests = data.rate?.hotel_selection?.search?.guests ?? [];
 
         return quote;
     }

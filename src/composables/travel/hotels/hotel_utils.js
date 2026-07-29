@@ -765,6 +765,50 @@ export function useHotelUtils() {
         return await axios.get(`/client/v1/travel/hotel/quote/${quoteId}`);
     }
 
+    /**
+     * Starts the booking against a quote — the step a "Continue Booking" or a
+     * price-change confirmation both funnel into, since either one is the
+     * customer's go-ahead to book at the price the quote is currently showing.
+     *
+     * @param {string} quoteId
+     */
+    async function bookHotel(quoteId) {
+        return await axios.post(`/client/v1/travel/hotel/book/${quoteId}`);
+    }
+
+    /**
+     * Re-fetches a booking attempt already in progress, so landing on its url
+     * directly — a refresh mid-flow, a shared link — resumes it instead of
+     * having nothing to show until "book" is clicked again.
+     *
+     * @param {string} attemptId
+     */
+    async function getBookingAttempt(attemptId) {
+        return await axios.get(`/client/v1/travel/hotel/booking-attempt/${attemptId}`);
+    }
+
+    /**
+     * Submits guest and contact details for a booking attempt. The finish
+     * endpoint isn't live yet, so this path is a placeholder to swap out once
+     * it is — the caller only needs attemptId and the form payload either way.
+     *
+     * @param {string} attemptId
+     * @param {object} payload
+     */
+    async function finishBooking(attemptId, payload) {
+        return await axios.post(`/client/v1/travel/hotel/book/${attemptId}/finish`, payload);
+    }
+
+    /**
+     * Polls the outcome of a submitted booking attempt. Placeholder path, same
+     * as finishBooking — swap in the real one once it exists.
+     *
+     * @param {string} attemptId
+     */
+    async function getBookingStatus(attemptId) {
+        return await axios.get(`/client/v1/travel/hotel/book/${attemptId}/status`);
+    }
+
     return {
         criteria,
         nights,
@@ -774,6 +818,10 @@ export function useHotelUtils() {
         getHotelView,
         prebookRate,
         getHotelQuote,
+        bookHotel,
+        getBookingAttempt,
+        finishBooking,
+        getBookingStatus,
         regions,
         popularRegions,
     }
