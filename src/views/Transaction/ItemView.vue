@@ -211,25 +211,25 @@ const isShowPaymentAccountModalOpen = ref(false);
             </div>
             <dl class="mt-6 grid grid-cols-1 text-sm/6 lg:grid-cols-2">
               <div class="sm:pr-4 col-span-2 sm:col-span-1">
-                <dt class="inline text-gray-500">Date</dt>
+                <dt class="inline text-gray-500">Fecha</dt>
                 {{  }}
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.createdAt">{{ moment(transaction.data.createdAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-2 sm:mt-0 sm:pl-4 col-span-2 sm:col-span-1">
-                <dt class="inline text-gray-500">Updated on</dt>
+                <dt class="inline text-gray-500">Actualizado el</dt>
                 {{ ' ' }}
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
                 <dt class="font-semibold text-gray-900">Envías desde <span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
-                  <span class="font-medium text-gray-900">You sent</span>
+                  <span class="font-medium text-gray-900">Enviaste</span>
                   <span class="text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</span>
                   <span class="">{{ transaction.data.payment.paymentMethod.title }}</span>
                 </dd>
               </div>
               <div class="mt-8 sm:mt-6 sm:border-t sm:border-gray-900/5 sm:pt-6 sm:pl-4 col-span-2 sm:col-span-1">
-                <dt class="font-semibold text-gray-900">Payout in {{ transaction.data.payoutCountry.commonName }}</dt>
+                <dt class="font-semibold text-gray-900">Pago en {{ transaction.data.payoutCountry.commonName }}</dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">{{ transaction.data.recipient.wholeName }}</span>
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
@@ -248,11 +248,11 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <div class="">
                   <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                     <div class="sm:col-span-1">
-                      <dt class="text-sm font-medium text-gray-500">Name</dt>
+                      <dt class="text-sm font-medium text-gray-500">Nombre</dt>
                       <dd class="mt-1 text-sm text-gray-900">{{ transaction.data.recipient.wholeName }}</dd>
                     </div>
                     <div class="sm:col-span-1">
-                      <dt class="text-sm font-medium text-gray-500">Relation</dt>
+                      <dt class="text-sm font-medium text-gray-500">Relación</dt>
                       <dd class="mt-1 text-sm text-gray-900">{{ transaction.data.recipient.relationship.title }}</dd>
                     </div>
                     <template v-for="attribute in transaction.data.recipient.attributes">
@@ -270,52 +270,52 @@ const isShowPaymentAccountModalOpen = ref(false);
               </div>
               <div class="col-span-2 print:grid grid-cols-2 mt-8 sm:mt-6 border-t border-gray-900/5 hidden py-3">
                 <div class="py-3">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Sent Amount</h2>
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Importe enviado</h2>
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Fee</h2>
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Tarifa</h2>
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Total Amount</h2>
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Importe total</h2>
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
-                  <h2 v-if="false" id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
+                  <h2 v-if="false" id="applicant-information-title" class="text-small font-medium text-gray-900">Estado del pago</h2>
                   <p v-if="false" class="mt-1 max-w-2xl text-sm text-gray-500">
-                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
-                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
-                    <span v-else class="text-sm font-medium">Paid</span>
+                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pendiente</span>
+                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Fallida</span>
+                    <span v-else class="text-sm font-medium">Pagada</span>
                   </p>
                 </div>
               </div>
             </dl>
           </div>
           <div class="lg:col-start-3 lg:row-end-1 print:hidden">
-            <h2 class="sr-only">Summary</h2>
+            <h2 class="sr-only">Resumen</h2>
             <div class="rounded-lg bg-white ring-1 shadow-xs ring-gray-900/5">
               <dl class="flex items-center flex-wrap">
                 <div class="flex-auto pt-6 pl-6">
-                  <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
+                  <dt class="text-sm/6 font-semibold text-gray-900">Importe total</dt>
                   <dd class="text-base font-semibold text-gray-900">{{ transaction.data.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div v-if="false" class="flex-none px-6">
-                  <dt class="sr-only">Status</dt>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
-                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
-                  <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
+                  <dt class="sr-only">Estado</dt>
+                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pendiente</dd>
+                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Fallida</dd>
+                  <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Pagada</dd>
                 </div>
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">
-                    <span class="sr-only">Client</span>
+                    <span class="sr-only">Cliente</span>
                     <RocketLaunchIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
-                    <span class="sr-only">Fees</span>
+                    <span class="sr-only">Honorarios</span>
                     <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
@@ -329,7 +329,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 </div>
                 <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
                   <dt class="flex-none">
-                    <span class="sr-only">Status</span>
+                    <span class="sr-only">Estado</span>
                     <CreditCardIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Método de pago</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>

@@ -328,7 +328,7 @@ const canContinue = computed(() => {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-5"  v-if="snapshot.value !== 'poiInfoCheckFailed'">
-        <h1 class="sr-only">Review & Confirm</h1>
+        <h1 class="sr-only">Revisar y confirmar</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-lg p-4 md:px-6 md:py-10 shadow-lg">
           <!-- Left column -->
@@ -344,7 +344,7 @@ const canContinue = computed(() => {
                 <div :class="{'animate-pulse': isStepProcessing}" class="xl:col-span-2 px-3">
                   <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center w-64 lg:min-w-96 mx-auto min-h-96">
                     <Spinner class="size-16 mx-auto" />
-                    <span class="sr-only">Loading...</span>
+                    <span class="sr-only">Cargando...</span>
                   </div>
                   <template v-else>
                     <div v-if="preconditionFailedMessage" class="border-l-4 border-yellow-400 bg-yellow-50 p-4 mb-5">
@@ -382,13 +382,13 @@ const canContinue = computed(() => {
                       </template>
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
-                      <h3 class="text-gray-900 mb-4 font-semibold">Provide Your Address</h3>
+                      <h3 class="text-gray-900 mb-4 font-semibold">Proporcione su dirección</h3>
                       <p class="text-gray-500 text-sm mb-3 -mt-2">
-                        Please provide your full residential address in
+                        Por favor, proporcione su dirección residencial completa en
                         <span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span>.
                       </p>
                       <p class="text-gray-500 text-sm mb-6 -mt-2 leading-5">
-                        <span>Accurate address information is required to comply with financial regulations and ensure secure transfers.</span>
+                        <span>Se requiere información precisa sobre la dirección para cumplir con las normativas financieras y garantizar transferencias seguras.</span>
                       </p>
 
                       <CustomerAttributeForm
@@ -416,20 +416,20 @@ const canContinue = computed(() => {
                       </template>
                       <template v-else>
                         <p class="text-gray-500 text-sm mb-6">
-                          We need to verify your account in order to process with this transaction. For processing please documents in each category provided below.
+                          Necesitamos verificar su cuenta para procesar esta transacción. Para ello, por favor proporcione los documentos correspondientes a cada una de las categorías que se indican a continuación.
                         </p>
                         <ul v-if="quote.data.pendingDocuments[0].documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6">
                           <li v-for="pendingCategory in quote.data?.pendingDocuments" :key="pendingCategory.id" class="col-span-1 flex rounded-lg bg-white items-start border-1 border-gray-200 hover:shadow-sm transition-transform transform hover:scale-105 px-6 py-3">
                             <div class="text-left pl-3 py-3">
                               <h3 class="text-sm font-medium text-gray-900">{{ pendingCategory.title }}</h3>
                               <dl v-if="pendingCategory.description" class="mt-0 flex grow flex-col justify-between">
-                                <dt class="sr-only">Information</dt>
+                                <dt class="sr-only">Información</dt>
                                 <dd class="mt-1 text-sm text-gray-500">
                                   <CategoryDescription v-bind:category="pendingCategory" />
                                 </dd>
-                                <dt class="sr-only">Start Verification</dt>
+                                <dt class="sr-only">Iniciar verificación</dt>
                                 <dd class="text-sm text-gray-500">
-                                  <a href="javascript:" @click="startVerification(pendingCategory)" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
+                                  <a href="javascript:" @click="startVerification(pendingCategory)" class="text-brand-700 font-semibold hover:underline">Iniciar verificación</a>
                                 </dd>
                               </dl>
                             </div>
@@ -449,17 +449,17 @@ const canContinue = computed(() => {
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Transaction Summary</h2>
+              <h2 class="sr-only" id="section-2-title">Resumen de la transacción</h2>
               <template v-if="quote.data">
                 <div v-if="snapshot.value !== 'confirm'" class="hidden sm:grid"><QuoteDisplay v-bind:quote="quote.data" /></div>
                 <template v-else>
                   <div class="px-3 sm:px-0">
                     <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Selecciona el motivo <span class="text-red-500">*</span></label>
-                    <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
-                    <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="title">
+                    <p class="mb-4 text-sm text-gray-500">Por favor, indique al destinatario el motivo de su transferencia.</p>
+                    <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Por favor, seleccione`" key-by="id" label="title">
                       <template v-slot:no-options="{ search, searching }">
-                        <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
-                        <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
+                        <template class="text-sm text-gray-300" v-if="searching">No se encontraron resultados para <em>{{ search }}</em>.</template>
+                        <em class="text-sm text-gray-400 opacity-50" v-else>Empieza a escribir para buscar...</em>
                       </template>
                       <template #selected-option-container="{ option, deselect, multiple, disabled }">
                         <div class="vs__selected">
@@ -479,7 +479,7 @@ const canContinue = computed(() => {
 
                     <fieldset aria-label="Payment Method" class="mt-6 mb-4">
                       <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Método de pago<span class="text-red-500">*</span></label>
-                      <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
+                      <p class="mb-4 text-sm text-gray-500">Por favor, seleccione cómo desea pagar.</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
                           <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
@@ -523,7 +523,7 @@ const canContinue = computed(() => {
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>Saving...</span>
                   </span>
-                  <span v-else>Continue</span>
+                  <span v-else>Continuar</span>
                 </button>
               </div>
             </section>
@@ -535,7 +535,7 @@ const canContinue = computed(() => {
           <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
             <div class="text-center" v-if="isLoading">
               <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-500"></span>
-              <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Please wait ...</h2>
+              <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Por favor, espere ...</h2>
             </div>
           </div>
         </div>
@@ -567,11 +567,11 @@ const canContinue = computed(() => {
                                 <div class="text-sm font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
-                                    Upload Another Document
+                                    Subir otro documento
                                   </div>
                                 </div>
                                 <p class="text-sm text-gray-500 mt-1 leading-5">
-                                  I’ll provide a different document that matches my profile.
+                                  Proporcionaré un documento diferente que coincida con mi perfil.
                                 </p>
                               </div>
                               <div class="shrink-0 self-center">
@@ -590,11 +590,11 @@ const canContinue = computed(() => {
                                 <div class="text-sm font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
-                                    Use Document Details
+                                    Usar detalles del documento
                                   </div>
                                 </div>
                                 <p class="text-sm text-gray-500 mt-1 leading-5">
-                                  Update my profile with the info from this document.
+                                  Actualizar mi perfil con la información de este documento.
                                 </p>
                               </div>
                               <div class="shrink-0 self-center">

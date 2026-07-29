@@ -102,10 +102,10 @@ const retryPayment = async () => {
     <div class="-m-5 -mt-10">
       <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Completa tu pago</h2>
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
-        Your transaction is awaiting payment. Please proceed by clicking the button below to securely Completa tu pago.
+        Su transacción está pendiente de pago. Por favor, haga clic en el botón de abajo para completar su pago de forma segura.
       </p>
       <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
-      <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the secure site to finalize your payment.</p>
+      <p class="text-sm/6 text-gray-600 mt-4 text-left">Será redirigido al sitio seguro para finalizar su pago.</p>
     </div>
   </template>
 
@@ -117,7 +117,7 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">A la espera de actualización del pago</h2>
     <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage }}</p>
     <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
@@ -132,8 +132,8 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
-    <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
+    <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Pago fallido</h2>
+    <p class="text-base text-red-600">Su pago ha fallado. Por favor, intente de nuevo</p>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Reintentar pago</button>
   </template>
 </template>

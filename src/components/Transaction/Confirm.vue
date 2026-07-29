@@ -26,17 +26,17 @@ const props = defineProps({
 const reviewItems = [
   {
     icon: UserCircleIcon,
-    label: 'Recipient',
+    label: 'Beneficiaria',
     value: props.quote.recipient.wholeName,
   },
   {
     icon: FlagIcon,
-    label: 'Payout Country',
+    label: 'País de pago',
     value: props.quote.payoutCountry.commonName,
   },
   {
     icon: TruckIcon,
-    label: 'Payout Method',
+    label: 'Método de pago',
     value: props.quote.payoutMethod.title,
   }
 ];
@@ -81,7 +81,7 @@ reviewItems.push({
 });
 reviewItems.push({
   icon: WalletIcon,
-  label: 'Recipient Gets',
+  label: 'La destinataria obtiene',
   value: props.quote.foreignAmountCurrencyPrefixed,
 });
 if (props.quote.payoutMethod.promo) {
@@ -95,12 +95,12 @@ if (props.quote.payoutMethod.promo) {
 }
 reviewItems.push({
   icon: PlusIcon,
-  label: 'Fees',
+  label: 'Honorarios',
   value: props.quote.baseFeesCurrencyPrefixed,
 });
 reviewItems.push({
   icon: CalculatorIcon,
-  label: 'Subtotal',
+  label: 'Total parcial',
   value: props.quote.subTotalAmountCurrencyPrefixed,
 });
 reviewItems.push({
