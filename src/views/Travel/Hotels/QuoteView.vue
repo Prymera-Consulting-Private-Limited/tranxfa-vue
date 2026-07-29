@@ -13,7 +13,7 @@ import HotelAmenities from "@/views/Travel/Hotels/Partials/HotelAmenities.vue";
 import PriceChangeDialog from "@/views/Travel/Hotels/Partials/PriceChangeDialog.vue";
 import GuestDetailsForm from "@/views/Travel/Hotels/Partials/GuestDetailsForm.vue";
 import BookingProgressDialog from "@/views/Travel/Hotels/Partials/BookingProgressDialog.vue";
-import {formatAmount, prettifyLabel, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
+import {formatAmount, getGuestBreakdown, prettifyLabel, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import HotelQuote from "@/models/travel/hotels/hotel_quote.js";
 import HotelBooking from "@/models/travel/hotels/hotel_booking.js";
 import {CheckCircleIcon, ChevronLeftIcon, ClockIcon, ExclamationTriangleIcon, MapPinIcon, UsersIcon} from "@heroicons/vue/24/outline";
@@ -425,6 +425,9 @@ const capacity = computed(() => quote.value?.rate?.rgExt?.capacity ?? null);
 
 const roomNote = computed(() => quote.value?.rate?.roomData?.miscRoomType ?? null);
 
+// One line per room, same formatting as the search/hotel-view sidebar.
+const guestBreakdown = computed(() => getGuestBreakdown(quote.value?.guests ?? []));
+
 const amount = computed(() => (quote.value ? formatAmount(quote.value.price.amount) : null));
 
 const holdExpiry = computed(() => {
@@ -496,9 +499,8 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
               <HotelGallery v-if="quote.hotel" :photos="quote.hotel.photos" :name="quote.hotel.name" />
               <GuestDetailsForm
                   v-if="attemptStep === 'guestDetails'"
-                  :guests="quote.guests"
+                  :rooms="attempt.rooms"
                   :gender-required="attempt.isGenderSpecificationRequired"
-                  :submitting="isSubmittingGuestDetails"
                   :submit-failed="guestDetailsFailed"
                   @submit="submitGuestDetails"
               />
@@ -551,6 +553,28 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                 </div>
                 <HotelAmenities v-if="quote.rate?.amenities?.length" :amenities="quote.rate.amenities" class="mt-3" />
                 <p v-if="roomNote" class="mt-3 text-xs text-gray-400">{{ prettifyLabel(roomNote) }}</p>
+                <!-- Booking action, right under the room itself -->
+                <div class="mt-4 border-t border-gray-100 pt-4">
+                  <p v-if="bookingFailed" class="mb-3 text-xs text-red-600">Something went wrong starting your booking. Please try again.</p>
+                  <button
+                      v-if="!attempt"
+                      type="button"
+                      :disabled="isExpired || !priceChangeConfirmed || isBooking"
+                      @click="startBooking"
+                      class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+                  >{{ isExpired ? 'Reservation expired' : (isBooking ? 'Starting booking…' : 'Continue Booking') }}</button>
+                  <p v-else class="text-xs text-gray-500">Booking started — finish the details below to confirm it.</p>
+                </div>
+                <!-- Guests -->
+                <div v-if="guestBreakdown.length" class="mt-4 border-t border-gray-100 pt-4">
+                  <p class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Guests</p>
+                  <div class="mt-1.5 space-y-1.5">
+                    <div v-for="(room, index) in guestBreakdown" :key="index">
+                      <p v-if="guestBreakdown.length > 1" class="text-xs text-gray-400">Room {{ index + 1 }}</p>
+                      <p class="text-sm font-medium text-gray-900">{{ room }}</p>
+                    </div>
+                  </div>
+                </div>
                 <!-- Price -->
                 <div class="mt-4 border-t border-gray-100 pt-4">
                   <p class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Total price</p>
@@ -559,15 +583,15 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                     <span class="text-3xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
                   </p>
                   <p v-if="quote.priceChanged && priceChangeConfirmed" class="mt-2 text-xs text-amber-600">You confirmed this updated price.</p>
-                  <p v-if="bookingFailed" class="mt-2 text-xs text-red-600">Something went wrong starting your booking. Please try again.</p>
+                  <!-- Submits GuestDetailsForm from here via its form id, so the -->
+                  <!-- CTA sits with the price instead of at the bottom of a long form. -->
                   <button
-                      v-if="!attempt"
-                      type="button"
-                      :disabled="isExpired || !priceChangeConfirmed || isBooking"
-                      @click="startBooking"
+                      v-if="attemptStep === 'guestDetails'"
+                      type="submit"
+                      form="guest-details-form"
+                      :disabled="isSubmittingGuestDetails"
                       class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
-                  >{{ isExpired ? 'Reservation expired' : (isBooking ? 'Starting booking…' : 'Continue Booking') }}</button>
-                  <p v-else class="mt-4 text-xs text-gray-500">Booking started — finish the details below to confirm it.</p>
+                  >{{ isSubmittingGuestDetails ? 'Submitting…' : 'Continue' }}</button>
                 </div>
               </section>
             </aside>

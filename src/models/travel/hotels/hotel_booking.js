@@ -35,6 +35,15 @@ class HotelBooking {
      */
     quote = null;
 
+    /**
+     * One entry per room, each already holding a guest slot per adult/child
+     * the search priced it for — created server-side so every guest has a
+     * real id from the start, for the guest-details form to submit against.
+     *
+     * @type {{id: string, roomNumber: number, guests: {id: string, isChild: boolean, age: number|null}[]}[]}
+     */
+    rooms = [];
+
     static getInstance(data) {
         const booking = new HotelBooking();
 
@@ -52,6 +61,18 @@ class HotelBooking {
         if (data.quote) {
             booking.quote = HotelQuote.getInstance(data.quote);
         }
+
+        booking.rooms = (data.rooms ?? [])
+            .map(room => ({
+                id: room.id,
+                roomNumber: room.room_number,
+                guests: (room.guests ?? []).map(guest => ({
+                    id: guest.id,
+                    isChild: guest.is_child ?? false,
+                    age: guest.age ?? null,
+                })),
+            }))
+            .sort((a, b) => a.roomNumber - b.roomNumber);
 
         return booking;
     }
