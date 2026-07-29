@@ -53,13 +53,13 @@ async function closeSdk() {
     <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-brand-700" />
     <h3 class="mt-6 text-sm font-medium text-gray-900">{{ documentType.title }}</h3>
     <dl v-if="documentType.description" class="mt-1 flex grow flex-col justify-between">
-      <dt class="sr-only">Information</dt>
+      <dt class="sr-only">Información</dt>
       <dd class="mt-3 text-sm text-gray-500">
         <p>{{ documentType.description }}</p>
       </dd>
-      <dt class="sr-only">Start Verification</dt>
+      <dt class="sr-only">Iniciar verificación</dt>
       <dd class="mt-3 text-sm text-gray-500">
-        <a @click="openAccountVerificationModal(documentType)" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
+        <a @click="openAccountVerificationModal(documentType)" href="javascript:" class="text-brand-700 font-semibold hover:underline">Iniciar verificación</a>
       </dd>
     </dl>
   </div>

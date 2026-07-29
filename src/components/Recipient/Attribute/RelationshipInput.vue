@@ -11,7 +11,7 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: 'Please Select',
+    default: 'Por favor, seleccione',
   },
   defaultValue: {
     type: Object(Relationship),
