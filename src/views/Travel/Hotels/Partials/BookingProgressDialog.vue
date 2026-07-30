@@ -11,9 +11,11 @@ defineProps({
 </script>
 
 <template>
+  <!-- The Dialog swallows @close and offers no buttons — this call is already
+  in flight, so there is nothing safe to cancel back out to. Kept out here
+  because Vue keeps template comments as vnodes in dev, and a comment inside
+  TransitionRoot/TransitionChild breaks their single-child ref passthrough. -->
   <TransitionRoot as="template" :show="open">
-    <!-- No @close handler and no buttons — this call is already in flight, so -->
-    <!-- there is nothing safe to cancel back out to; the poll is what closes it. -->
     <Dialog class="relative z-50" @close="() => {}">
       <TransitionChild
           as="template"
