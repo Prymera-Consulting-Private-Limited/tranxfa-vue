@@ -211,13 +211,12 @@ const saveGuestsError = ref(null);
  */
 const validationErrors = ref(null);
 
-const guestsSavedRecently = ref(false);
-let savedIndicatorTimer = null;
-
 /**
  * Callable any number of times while the attempt is still "form_started" —
  * each call only touches the guests it includes, so filling in one guest now
- * and the rest later both just work.
+ * and the rest later both just work. On success this is also the customer's
+ * go-ahead to move on, so it hands off to the booking-details page rather
+ * than just leaving a saved indicator on this one.
  *
  * @param {{guests: Array}} payload
  */
@@ -229,14 +228,9 @@ async function submitGuestDetails(payload) {
   isSavingGuests.value = true;
   saveGuestsError.value = null;
   validationErrors.value = null;
-  guestsSavedRecently.value = false;
 
   await saveBookingGuests(attempt.value.id, payload).then(() => {
-    guestsSavedRecently.value = true;
-    clearTimeout(savedIndicatorTimer);
-    savedIndicatorTimer = setTimeout(() => {
-      guestsSavedRecently.value = false;
-    }, 4000);
+    router.push({name: 'hotelBookingDetails', params: {id: attempt.value.id}});
   }).catch(async (error) => {
     const status = error.response?.status;
 
@@ -282,10 +276,6 @@ async function submitGuestDetails(payload) {
     isSavingGuests.value = false;
   });
 }
-
-onUnmounted(() => {
-  clearTimeout(savedIndicatorTimer);
-});
 
 // Ticks the countdown against the hold's own expiry rather than a fixed
 // duration, so it stays correct even if loading the quote took a while.
@@ -636,13 +626,12 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                         form="guest-details-form"
                         :disabled="isSavingGuests || !allRoomsHaveNamedAdult"
                         class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
-                    >{{ isSavingGuests ? 'Saving…' : 'Save guest details' }}</button>
+                    >{{ isSavingGuests ? 'Saving…' : 'Continue' }}</button>
                     <!-- Right where the action is, since a validation message left only -->
                     <!-- at the top of a long form is easy to miss from down here. -->
-                    <p v-if="!allRoomsHaveNamedAdult" class="mt-2 text-xs text-gray-500">Add a name for at least one adult in every room to save.</p>
+                    <p v-if="!allRoomsHaveNamedAdult" class="mt-2 text-xs text-gray-500">Add a name for at least one adult in every room to continue.</p>
                     <p v-else-if="validationErrors" class="mt-2 text-xs font-medium text-red-600">Some guest details need attention above.</p>
                     <p v-else-if="saveGuestsError" class="mt-2 text-xs font-medium text-red-600">{{ saveGuestsError }}</p>
-                    <p v-else-if="guestsSavedRecently" class="mt-2 text-xs font-medium text-emerald-600">Guest details saved.</p>
                   </template>
                 </div>
               </section>

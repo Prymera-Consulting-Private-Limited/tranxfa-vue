@@ -109,6 +109,17 @@ const router = createRouter({
         description: '',
       },
     }, {
+      // Reached once guest details are saved — a read-only recap of the
+      // attempt, since there's no further submit step built yet.
+      path: '/travel/hotel/booking/:id',
+      name: 'hotelBookingDetails',
+      props: route => ({ attemptId: route.params.id }),
+      component: () => import('@/views/Travel/Hotels/BookingDetailsView.vue'),
+      meta: {
+        title: 'Booking Details',
+        description: '',
+      },
+    }, {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
       props: route => ({ id: route.params.quoteId }),

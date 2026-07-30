@@ -39,8 +39,10 @@ class HotelBooking {
      * One entry per room, each already holding a guest slot per adult/child
      * the search priced it for — created server-side so every guest has a
      * real id from the start, for the guest-details form to submit against.
+     * firstName/lastName/gender are null until the guest-details form has
+     * saved that slot.
      *
-     * @type {{id: string, roomNumber: number, guests: {id: string, isChild: boolean, age: number|null}[]}[]}
+     * @type {{id: string, roomNumber: number, guests: {id: string, isChild: boolean, age: number|null, firstName: string|null, lastName: string|null, gender: string|null}[]}[]}
      */
     rooms = [];
 
@@ -70,6 +72,9 @@ class HotelBooking {
                     id: guest.id,
                     isChild: guest.is_child ?? false,
                     age: guest.age ?? null,
+                    firstName: guest.first_name ?? null,
+                    lastName: guest.last_name ?? null,
+                    gender: guest.gender ?? null,
                 })),
             }))
             .sort((a, b) => a.roomNumber - b.roomNumber);
