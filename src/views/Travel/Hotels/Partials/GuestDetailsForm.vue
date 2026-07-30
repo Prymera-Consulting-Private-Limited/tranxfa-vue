@@ -228,7 +228,9 @@ function validate() {
         continue;
       }
 
-      if (guest.age !== '') {
+      // Age is only meaningful for children — the supplier rejects it outright
+      // for adults, so it's not collected for them at all.
+      if (guest.isChild && guest.age !== '') {
         const age = Number(guest.age);
 
         if (Number.isNaN(age) || age < 0 || age > 120) {
@@ -267,7 +269,8 @@ function submit() {
         id: guest.id,
         first_name: guest.firstName.trim(),
         last_name: guest.lastName.trim(),
-        age: guest.age !== '' ? Number(guest.age) : null,
+        // Adults never carry an age — the supplier rejects it outright above 17.
+        age: guest.isChild && guest.age !== '' ? Number(guest.age) : null,
         ...(props.genderRequired ? {gender: guest.gender || null} : {}),
       }));
 
@@ -342,7 +345,7 @@ const topErrors = computed(() => {
               >No details yet</span>
             </div>
             <p v-for="(message, index) in otherGuestErrors(guest)" :key="index" class="mt-1 text-xs font-medium text-red-600">{{ message }}</p>
-            <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div :class="['mt-3 grid grid-cols-1 gap-3', guest.isChild ? 'sm:grid-cols-3' : 'sm:grid-cols-2']">
               <div>
                 <label class="block text-xs font-medium text-gray-700">First name</label>
                 <input
@@ -365,14 +368,17 @@ const topErrors = computed(() => {
                 />
                 <p v-if="fieldError(guest, 'last_name')" class="mt-1 text-xs text-red-600">{{ fieldError(guest, 'last_name') }}</p>
               </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-700">Age <span class="font-normal text-gray-400">(optional)</span></label>
+              <!-- Age is only collected for children — the supplier rejects it
+              for adults outright, since it's meant for child-pricing/eligibility
+              rules rather than as a general age field. -->
+              <div v-if="guest.isChild">
+                <label class="block text-xs font-medium text-gray-700">Age</label>
                 <div class="relative mt-1">
                   <input
                       v-model="guest.age"
                       type="number"
                       min="0"
-                      max="120"
+                      max="17"
                       :name="`age-${guest.id}`"
                       autocomplete="off"
                       class="block w-full rounded-lg border-0 bg-white py-2 pl-3 pr-14 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600"
@@ -380,7 +386,7 @@ const topErrors = computed(() => {
                   <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-gray-400">years</span>
                 </div>
                 <p v-if="fieldError(guest, 'age')" class="mt-1 text-xs text-red-600">{{ fieldError(guest, 'age') }}</p>
-                <p v-else-if="guest.isChild" class="mt-1 text-xs text-gray-400">From your search — change only to correct it.</p>
+                <p v-else class="mt-1 text-xs text-gray-400">From your search — change only to correct it.</p>
               </div>
             </div>
             <div v-if="genderRequired" class="mt-3 sm:max-w-[calc((100%-1.5rem)/3)]">
