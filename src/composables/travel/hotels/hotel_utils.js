@@ -811,25 +811,17 @@ export function useHotelUtils() {
     }
 
     /**
-     * Submits guest and contact details for a booking attempt. The finish
-     * endpoint isn't live yet, so this path is a placeholder to swap out once
-     * it is — the caller only needs attemptId and the form payload either way.
+     * Saves whichever guests the customer has real names for, against their
+     * pre-created slots on the attempt. Callable repeatedly while the attempt
+     * is still "form_started" — each call only touches the guests it mentions,
+     * so a partial fill now and the rest later both work. Rejected with a 409
+     * once the attempt has moved past guest collection.
      *
      * @param {string} attemptId
-     * @param {object} payload
+     * @param {{guests: Array}} payload
      */
-    async function finishBooking(attemptId, payload) {
-        return await axios.post(`/client/v1/travel/hotel/book/${attemptId}/finish`, payload);
-    }
-
-    /**
-     * Polls the outcome of a submitted booking attempt. Placeholder path, same
-     * as finishBooking — swap in the real one once it exists.
-     *
-     * @param {string} attemptId
-     */
-    async function getBookingStatus(attemptId) {
-        return await axios.get(`/client/v1/travel/hotel/book/${attemptId}/status`);
+    async function saveBookingGuests(attemptId, payload) {
+        return await axios.put(`/client/v1/travel/hotel/booking-attempt/${attemptId}/guests`, payload);
     }
 
     return {
@@ -843,8 +835,7 @@ export function useHotelUtils() {
         getHotelQuote,
         bookHotel,
         getBookingAttempt,
-        finishBooking,
-        getBookingStatus,
+        saveBookingGuests,
         regions,
         popularRegions,
     }
