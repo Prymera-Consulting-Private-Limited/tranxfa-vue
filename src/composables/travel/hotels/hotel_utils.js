@@ -19,6 +19,8 @@ export const MAX_ADULTS = 6;
 export const MAX_CHILDREN = 4;
 export const MAX_ROOM_GUESTS = 10;
 export const MAX_CHILD_AGE = 17;
+export const MAX_STAY_NIGHTS = 30;
+export const MAX_CHECKIN_DAYS = 730;
 
 /**
  * Only used until the customer's own country is loaded, since the supplier
@@ -45,13 +47,12 @@ const DEFAULT_ROOM = {adults: 2, children: []};
  */
 export function getCriteria(query = {}) {
     const checkin = getStayDate(query.checkin, 1);
-    const checkout = getStayDate(query.checkout, 2);
 
     return {
         // A repeated ?region= arrives as an array, which is not an id.
         region_id: typeof query.region === 'string' && query.region.length ? query.region : null,
         checkin: checkin,
-        checkout: moment(checkout).isAfter(checkin) ? checkout : moment(checkin).add(1, 'day').format(DATE_FORMAT),
+        checkout: getCheckoutDate(query.checkout, checkin),
         guests: getGuests(query.guests),
         hotels_limit: HOTELS_LIMIT,
     };
@@ -142,7 +143,8 @@ function getRoom(value) {
 }
 
 /**
- * A stay in the past cannot be priced, so it falls back to the default window.
+ * A stay in the past cannot be priced, and the supplier won't quote a check-in
+ * beyond MAX_CHECKIN_DAYS out, so either falls back to the default window.
  *
  * @param {string|undefined} value
  * @param {number} fallbackDays
@@ -150,9 +152,30 @@ function getRoom(value) {
  */
 function getStayDate(value, fallbackDays) {
     const date = moment(value, DATE_FORMAT, true);
+    const latest = moment().add(MAX_CHECKIN_DAYS, 'days').startOf('day');
 
-    if (!date.isValid() || date.isBefore(moment().startOf('day'))) {
+    if (!date.isValid() || date.isBefore(moment().startOf('day')) || date.isAfter(latest)) {
         return moment().add(fallbackDays, 'days').format(DATE_FORMAT);
+    }
+
+    return date.format(DATE_FORMAT);
+}
+
+/**
+ * A stay longer than MAX_STAY_NIGHTS cannot be priced, so a checkout outside
+ * one night to MAX_STAY_NIGHTS nights after check-in falls back to one night.
+ *
+ * @param {string|undefined} value
+ * @param {string} checkin
+ * @returns {string}
+ */
+function getCheckoutDate(value, checkin) {
+    const date = moment(value, DATE_FORMAT, true);
+    const earliest = moment(checkin).add(1, 'day');
+    const latest = moment(checkin).add(MAX_STAY_NIGHTS, 'days');
+
+    if (!date.isValid() || date.isBefore(earliest) || date.isAfter(latest)) {
+        return earliest.format(DATE_FORMAT);
     }
 
     return date.format(DATE_FORMAT);

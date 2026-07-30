@@ -6,10 +6,12 @@ import {debounce} from 'lodash';
 import {
   CHILD_AGE,
   MAX_ADULTS,
+  MAX_CHECKIN_DAYS,
   MAX_CHILD_AGE,
   MAX_CHILDREN,
   MAX_ROOM_GUESTS,
   MAX_ROOMS,
+  MAX_STAY_NIGHTS,
   MIN_ADULTS,
 } from '@/composables/travel/hotels/hotel_utils.js';
 import {Combobox, ComboboxButton, ComboboxInput, ComboboxLabel, ComboboxOption, ComboboxOptions, Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
@@ -104,6 +106,9 @@ function getRooms(rooms) {
     children: Array.isArray(room.children) ? [...room.children] : [],
   }));
 }
+
+// The supplier won't quote a check-in this far out, so the picker never offers one.
+const latestDate = moment().add(MAX_CHECKIN_DAYS, 'days').toDate();
 
 const nights = computed(() => {
   if (!dates.value?.[0] || !dates.value?.[1]) {
@@ -386,6 +391,8 @@ function search() {
               range
               :multi-calendars="months"
               :min-date="new Date()"
+              :max-date="latestDate"
+              :max-range="MAX_STAY_NIGHTS"
               :enable-time-picker="false"
               :clearable="false"
               auto-apply
