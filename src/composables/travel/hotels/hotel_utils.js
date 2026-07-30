@@ -26,7 +26,7 @@ export const MAX_CHECKIN_DAYS = 730;
  * Only used until the customer's own country is loaded, since the supplier
  * prices on residency.
  */
-const DEFAULT_RESIDENCY = 'IN';
+const DEFAULT_RESIDENCY = 'AU';
 
 const HOTELS_LIMIT = 250;
 
@@ -717,7 +717,7 @@ export function useHotelUtils() {
     // The customer is still loading while this page mounts, so residency is read
     // per request rather than baked into the criteria.
     const residency = computed(() => {
-        return customerStore.customer.data?.country?.iso2Alpha ?? DEFAULT_RESIDENCY;
+        return customerStore.customer.data?.nationality?.iso2Alpha ?? DEFAULT_RESIDENCY;
     });
 
     const nights = computed(() => {
