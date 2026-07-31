@@ -6,17 +6,17 @@ export function useTimeUtils()
         const instance = moment(time);
 
         if (instance.isAfter(moment().subtract(1, 'minute'))) {
-            return 'Just now';
+            return 'Justo ahora';
         } else if (instance.isAfter(moment().subtract(5, 'minute'))) {
-            return 'A few minutes ago';
+            return 'Hace unos minutos';
         } else if (instance.isAfter(moment().subtract(30, 'minute'))) {
             const minutes = moment().diff(instance, 'minutes');
-            return `${minutes} minutes ago`;
+            return `${minutes} minutos hace`;
         } else if (instance.isAfter(moment().subtract(2, 'hour'))) {
-            return 'An hour ago';
+            return 'Hace una hora';
         } else if (instance.isAfter(moment().subtract(5, 'hour'))) {
             const hours = moment().diff(instance, 'hour');
-            return `${hours} hours ago`;
+            return `${hours} horas hace`;
         } else if (instance.isAfter(moment().subtract(1, 'day'))) {
             return instance.format('h:mm A');
         } else if (instance.isAfter(moment().subtract(1, 'week'))) {

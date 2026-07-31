@@ -104,7 +104,7 @@ const retryPayment = async () => {
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
         Su transacción está pendiente de pago. Por favor, haga clic en el botón de abajo para completar su pago de forma segura.
       </p>
-      <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
+      <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pagar {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">Será redirigido al sitio seguro para finalizar su pago.</p>
     </div>
   </template>

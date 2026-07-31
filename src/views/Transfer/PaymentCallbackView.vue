@@ -88,11 +88,11 @@ const retryPayment = async () => {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Processing Payment</h1>
+        <h1 class="sr-only">Procesando el pago</h1>
         <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
           <div class="text-center" v-if="isLoading">
             <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-500"></span>
-            <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Please wait ...</h2>
+            <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Por favor, espere ...</h2>
           </div>
         </div>
       </div>
