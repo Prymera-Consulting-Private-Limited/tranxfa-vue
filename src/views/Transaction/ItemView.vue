@@ -271,15 +271,15 @@ const isShowPaymentAccountModalOpen = ref(false);
               <div class="col-span-2 print:grid grid-cols-2 mt-8 sm:mt-6 border-t border-gray-900/5 hidden py-3">
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Importe enviado</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">El total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Tarifa</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">El total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Importe total</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">El total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
                   <h2 v-if="false" id="applicant-information-title" class="text-small font-medium text-gray-900">Estado del pago</h2>
