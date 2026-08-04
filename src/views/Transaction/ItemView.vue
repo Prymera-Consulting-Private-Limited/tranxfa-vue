@@ -9,7 +9,8 @@ import {
   CreditCardIcon,
   PlusCircleIcon,
   CalculatorIcon,
-  ArrowUpTrayIcon
+  ArrowUpTrayIcon,
+  PercentBadgeIcon
 } from '@heroicons/vue/24/outline'
 import moment from "moment";
 import TransactionStateIcon from "@/enums/transaction_state_icon.js";
@@ -241,6 +242,14 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Fee</h2>
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
                 </div>
+                <div class="py-3" v-if="transaction.data.couponDiscountAmountCurrencyPrefixed">
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Promo Discount</h2>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">-{{ transaction.data.couponDiscountAmountCurrencyPrefixed }}</span></p>
+                </div>
+                <div class="py-3" v-if="transaction.data.exchangeRateBeforeCouponFormatted">
+                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Promo Rate</h2>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500"><span class="font-medium">{{ transaction.data.exchangeRateFormatted }}</span> <span class="text-gray-400 line-through">{{ transaction.data.exchangeRateBeforeCouponFormatted }}</span></p>
+                </div>
                 <div class="py-3">
                   <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Total Amount</h2>
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
@@ -283,6 +292,25 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
+                </div>
+                <div v-if="transaction.data.couponDiscountAmountCurrencyPrefixed" class="mt-4 flex w-full flex-none gap-x-4 px-6">
+                  <dt class="flex-none">
+                    <span class="sr-only">Promo Discount</span>
+                    <PercentBadgeIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Promo Discount</span><br />-{{ transaction.data.couponDiscountAmountCurrencyPrefixed }}</dd>
+                </div>
+                <div v-if="transaction.data.exchangeRateBeforeCouponFormatted" class="mt-4 flex w-full flex-none gap-x-4 px-6">
+                  <dt class="flex-none">
+                    <span class="sr-only">Promo Rate</span>
+                    <PercentBadgeIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900">
+                    <span class="font-semibold">Promo Rate</span><br />
+                    {{ transaction.data.exchangeRateFormatted }}<br />
+                    <span class="text-gray-400 line-through">{{ transaction.data.exchangeRateBeforeCouponFormatted }}</span>
+                    <span class="sr-only">was the rate before your promo code</span>
+                  </dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">

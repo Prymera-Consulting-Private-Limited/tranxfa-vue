@@ -31,8 +31,14 @@ const items = computed(() => {
   });
   items.push({
     label: 'Our Rate',
-    value: props.quote.exchangeRateFormatted
+    value: props.quote.coupon?.exchangeRateBeforeCouponFormatted || props.quote.exchangeRateFormatted
   });
+  if (props.quote.coupon?.exchangeRateBeforeCoupon) {
+    items.push({
+      label: 'Promo Rate',
+      value: props.quote.exchangeRateFormatted
+    });
+  }
   items.push({
     label: ( props.quote.recipient?.wholeName || 'Recipient' ) + ' Gets',
     value: props.quote.foreignAmountCurrencyPrefixed
@@ -45,6 +51,12 @@ const items = computed(() => {
     label: 'Subtotal',
     value: props.quote.subTotalAmountCurrencyPrefixed
   });
+  if (props.quote.coupon?.discountAmountCurrencyPrefixed) {
+    items.push({
+      label: `Promo ${props.quote.coupon.code}`,
+      value: `-${props.quote.coupon.discountAmountCurrencyPrefixed}`
+    });
+  }
   items.push({
     label: 'Total Due',
     value: props.quote.totalAmountCurrencyPrefixed

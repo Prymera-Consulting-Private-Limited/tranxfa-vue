@@ -51,6 +51,32 @@ export function useQuoteUtils() {
     }
 
     /**
+     * Applies a promotional coupon and returns the repriced quote resource.
+     * A coupon the customer cannot use comes back as a 422 carrying a
+     * customer-facing sentence in `message`; show it verbatim.
+     *
+     * @param {string} quoteId
+     * @param {string} couponCode
+     * @returns {Promise<axios.AxiosResponse<any>>}
+     */
+    const applyCoupon = async (quoteId, couponCode) => {
+        return axios.post(`/client/v1/quote/coupon/${quoteId}`, {
+            coupon_code: couponCode,
+        });
+    }
+
+    /**
+     * Removes the coupon and returns the quote at its original pricing.
+     * Releases the redemption, so the same code can be applied again.
+     *
+     * @param {string} quoteId
+     * @returns {Promise<axios.AxiosResponse<any>>}
+     */
+    const removeCoupon = async (quoteId) => {
+        return axios.delete(`/client/v1/quote/coupon/${quoteId}`);
+    }
+
+    /**
      * @param {TransactionQuote} quote
      * @param {Object} purpose
      * @param {PaymentMethod} paymentMethod
@@ -72,6 +98,8 @@ export function useQuoteUtils() {
         saveQuote,
         getTransferQuote,
         setRecipient,
+        applyCoupon,
+        removeCoupon,
         confirmQuote,
     }
 }

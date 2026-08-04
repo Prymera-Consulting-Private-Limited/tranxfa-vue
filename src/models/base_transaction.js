@@ -105,6 +105,33 @@ class BaseTransaction {
     foreignAmountFormatted = null;
 
     /**
+     * The discount taken off by a promotional coupon. Null when no coupon was
+     * used, and for a better-rate coupon (the improvement is in the rate).
+     *
+     * @type {String|null}
+     */
+    couponDiscountAmount = null;
+
+    /**
+     * @type {String|null}
+     */
+    couponDiscountAmountCurrencyPrefixed = null;
+
+    /**
+     * Set only when a better-rate coupon moved the rate. Null for monetary
+     * coupons, for uncouponed transfers, and on quote responses (where the
+     * pre-coupon rate lives on the `coupon` block instead).
+     *
+     * @type {String|null}
+     */
+    exchangeRateBeforeCoupon = null;
+
+    /**
+     * @type {String|null}
+     */
+    exchangeRateBeforeCouponFormatted = null;
+
+    /**
      * @type {string|null}
      */
     exchangeRate = null;
@@ -139,6 +166,10 @@ class BaseTransaction {
         obj.subTotalAmountFormatted = data.sub_total_amount_formatted;
         obj.totalAmountCurrencyPrefixed = data.total_amount_currency_prefixed;
         obj.totalAmountFormatted = data.total_amount_formatted;
+        obj.couponDiscountAmount = data.coupon_discount_amount;
+        obj.couponDiscountAmountCurrencyPrefixed = data.coupon_discount_amount_currency_prefixed;
+        obj.exchangeRateBeforeCoupon = data.exchange_rate_before_coupon;
+        obj.exchangeRateBeforeCouponFormatted = data.exchange_rate_before_coupon_formatted;
         obj.foreignAmount = data.foreign_amount || data.payout_amount;
         obj.foreignAmountCurrencyPrefixed = data.foreign_amount_currency_prefixed || data.payout_amount_currency_prefixed;
         obj.foreignAmountFormatted = data.foreign_amount_formatted || data.payout_amount_formatted;
