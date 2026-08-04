@@ -136,7 +136,7 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
 
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">A la espera de actualización del pago</h2>
     <p class="text-base/6 text-gray-600 mb-6">Once you've sent the Interac e-Transfer, click "I have made the payment" below to let us know. It usually takes <strong>up to 5 minutes</strong> for the payment to be confirmed.</p>
     <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
       <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 cursor-pointer">I've made payment</button>
@@ -151,10 +151,10 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-red-500 mb-3 -mt-15">Payment Failed</h2>
-    <p class="text-base text-red-600 mb-5">Your payment could not be completed.</p>
+    <h2 class="text-2xl font-semibold text-red-500 mb-3 -mt-15">Pago fallido</h2>
+    <p class="text-base text-red-600 mb-5">Su pago no pudo ser completado.</p>
     <template v-if="transaction.payment.paymentProvider.paymentDataAttributes?.length > 0">
-      <p class="text-sm text-gray-600 mb-2 text-left">Please review or update the information below and double-check that everything is correct, then try again.</p>
+      <p class="text-sm text-gray-600 mb-2 text-left">Por favor, revise o actualice la información a continuación y verifique que todo esté correcto, luego intente de nuevo.</p>
       <template v-for="attribute in transaction.payment.paymentProvider.paymentDataAttributes">
         <div class="mb-3 text-left">
           <label :class="[retryFormErrors[`${attribute.attribute}`]?.length > 0 ? 'text-red-600' : 'text-gray-900']" :for="`payment-data-${attribute.attribute}`" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-red-500" v-if="attribute.isRequired">*</span></label>
@@ -165,7 +165,7 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
         </div>
       </template>
     </template>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-600 text-white text-center py-3 rounded-md font-medium hover:bg-brand-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-600 text-white text-center py-3 rounded-md font-medium hover:bg-brand-700 transition cursor-pointer text-sm outline-none ring-0">Reintentar pago</button>
     <p class="text-base text-red-600 mt-5 text-sm">If the issue continues, please contact our support team. We'll be happy to assist you!</p>
   </template>
 </template>

@@ -27,13 +27,13 @@ onMounted(async () => {
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Account Verification</h1>
+        <h1 class="sr-only">Verificación de la cuenta</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Account Verification</h2>
+              <h2 class="sr-only" id="section-2-title">Verificación de la cuenta</h2>
               <div>
                 <h2 class="text-base font-semibold text-gray-900">Verificación única</h2>
                 <p class="mt-1 text-sm text-gray-500">Para mantener tu cuenta segura y en regla,   
@@ -64,31 +64,31 @@ pasos a continuación para continuar.</p>
                               <template v-if="document.statusCode === KycDocumentStatus.APPROVED">
                                 <dt class="sr-only">Information</dt>
                                 <dd class="mt-3 text-sm text-emerald-700">
-                                  <p>Your {{ document.documentType.title }} has been successfully verified.</p>
+                                  <p>Su {{ document.documentType.title }} ha sido verificado correctamente.</p>
                                 </dd>
-                                <dt class="sr-only">Verified</dt>
+                                <dt class="sr-only">Verificada</dt>
                                 <dd class="mt-3 text-sm">
-                                  <a class="text-emerald-700 font-semibold">Verified</a>
+                                  <a class="text-emerald-700 font-semibold">Verificada</a>
                                 </dd>
                               </template>
                               <template v-else-if="document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED">
-                                <dt class="sr-only">Information</dt>
+                                <dt class="sr-only">Información</dt>
                                 <dd class="mt-3 text-sm text-gray-700">
-                                  <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is currently under verification.</p>
+                                  <p>Su <span class="font-semibold">{{ document.documentType.title }}</span> está siendo verificado.</p>
                                 </dd>
-                                <dt class="sr-only">Verifying</dt>
+                                <dt class="sr-only">Verificando</dt>
                                 <dd class="mt-3 text-sm">
-                                  <a class="text-blue-700 font-semibold">Verifying</a>
+                                  <a class="text-blue-700 font-semibold">Verificando</a>
                                 </dd>
                               </template>
                               <template v-else-if="document.statusCode === KycDocumentStatus.REJECTED">
-                                <dt class="sr-only">Information</dt>
+                                <dt class="sr-only">Información</dt>
                                 <dd class="mt-3 text-sm text-red-700">
-                                  <p>We were unable to verify your document <span class="font-semibold">{{ document.documentType.title }}</span>.</p>
+                                  <p>No pudimos verificar su documento <span class="font-semibold">{{ document.documentType.title }}</span>.</p>
                                 </dd>
-                                <dt class="sr-only">Failed</dt>
+                                <dt class="sr-only">Fallida</dt>
                                 <dd class="mt-3 text-sm">
-                                  <a class="text-red-700 font-semibold">Failed</a>
+                                  <a class="text-red-700 font-semibold">Fallida</a>
                                 </dd>
                               </template>
                             </dl>
@@ -102,13 +102,13 @@ pasos a continuación para continuar.</p>
                           <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-brand-700" />
                           <h3 class="mt-6 text-sm font-medium text-gray-900">{{ pendingCategory.title }}</h3>
                           <dl v-if="pendingCategory.description" class="mt-1 flex grow flex-col justify-between">
-                            <dt class="sr-only">Information</dt>
+                            <dt class="sr-only">Información</dt>
                             <dd class="mt-3 text-sm text-gray-500">
                               <p>{{ pendingCategory.description }}</p>
                             </dd>
-                            <dt class="sr-only">Start Verification</dt>
+                            <dt class="sr-only">Iniciar verificación</dt>
                             <dd class="mt-3 text-sm text-gray-500">
-                              <router-link :to="{name: 'categoryView', params: {category: pendingCategory.id}}" class="text-brand-700 font-semibold hover:underline">Start Verification</router-link>
+                              <router-link :to="{name: 'categoryView', params: {category: pendingCategory.id}}" class="text-brand-700 font-semibold hover:underline">Iniciar verificación</router-link>
                             </dd>
                           </dl>
                         </div>

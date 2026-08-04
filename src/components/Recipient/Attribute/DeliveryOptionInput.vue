@@ -7,7 +7,7 @@ import {createPopper} from "@popperjs/core";
 const props = defineProps({
   placeholder: {
     type: String,
-    default: 'Please Select',
+    default: 'Por favor, seleccione',
   },
   attribute: {
     type: PayoutChannelAttribute,

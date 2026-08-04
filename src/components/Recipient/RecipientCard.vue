@@ -53,16 +53,16 @@ onMounted(() => {
       </template>
       <slot />
       <template v-if="lastSentOn">
-        <dt class="sr-only">Last transaction sent on</dt>
+        <dt class="sr-only">Última transacción enviada el</dt>
         <dd class="text-gray-500 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
-          <p>Last transaction</p>
+          <p>Última transacción</p>
           <p class="text-brand-700">{{ lastSentOn }}</p>
         </dd>
       </template>
       <template v-else>
-        <dt class="sr-only">You've never sent money to {{ recipient.wholeName }}</dt>
+        <dt class="sr-only">Nunca has enviado dinero a {{ recipient.wholeName }}</dt>
         <dd class="text-gray-400 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
-          <p>You've never sent money to</p>
+          <p>Nunca has enviado dinero a</p>
           <p>{{ recipient.wholeName }}</p>
         </dd>
       </template>

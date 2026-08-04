@@ -34,7 +34,7 @@ const items = computed(() => {
     value: props.quote.exchangeRateFormatted
   });
   items.push({
-    label: ( props.quote.recipient?.wholeName || 'Recipient' ) + ' Gets',
+    label: ( props.quote.recipient?.wholeName || 'Beneficiaria' ) + ' Obtiene',
     value: props.quote.foreignAmountCurrencyPrefixed
   });
   items.push({
@@ -42,7 +42,7 @@ const items = computed(() => {
     value: props.quote.baseFeesCurrencyPrefixed
   });
   items.push({
-    label: 'Subtotal',
+    label: 'Total parcial',
     value: props.quote.subTotalAmountCurrencyPrefixed
   });
   items.push({

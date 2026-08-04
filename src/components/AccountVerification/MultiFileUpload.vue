@@ -126,8 +126,8 @@ async function save() {
 
 <template>
   <div class="max-w-xl mx-auto p-6 bg-white">
-    <h2 class="text-lg font-semibold text-gray-900 mb-2">Upload {{ documentType.title }}</h2>
-    <p class="text-sm text-gray-500 mb-4">Please upload clear images of your <span class="text-brand-700">{{ documentType.title }}</span>.</p>
+    <h2 class="text-lg font-semibold text-gray-900 mb-2">Subir {{ documentType.title }}</h2>
+    <p class="text-sm text-gray-500 mb-4">Por favor, suba imágenes claras de su <span class="text-brand-700">{{ documentType.title }}</span>.</p>
 
     <div
         :class="{
@@ -139,7 +139,7 @@ async function save() {
         @dragleave.prevent="isDragging = false" @drop="handleDrop" @click="$refs.fileInput.click()">
       <input ref="fileInput" type="file" multiple class="hidden" @change="handleFileSelect" />
       <ArrowUpTrayIcon class="mx-auto h-10 w-10 text-gray-500" />
-      <p class="text-gray-600 mt-2">Drag & drop files here, or click to browse</p>
+      <p class="text-gray-600 mt-2">Arrastra y suelta archivos aquí, o haz clic para buscarlos.</p>
     </div>
 
     <div v-if="files.length" class="mt-4 space-y-3">
@@ -174,7 +174,7 @@ async function save() {
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
             <Spinner class="size-4 mr-2" />
-            Uploading ...
+            Subiendo ...
           </span>
         </template>
         <template v-else-if="isUploading">
@@ -182,7 +182,7 @@ async function save() {
            Un momento...
           </span>
         </template>
-        <template v-else>Upload</template>
+        <template v-else>Subir</template>
       </button>
     </form>
   </div>
