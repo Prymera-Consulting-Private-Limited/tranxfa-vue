@@ -7,6 +7,8 @@ import {transactionNavigationMachine} from "@/machines/transaction_navigation_ma
 import RecipientListing from "@/components/Transaction/RecipientListing.vue";
 import TransactionQuote from "@/models/transaction_quote.js";
 import Confirm from "@/components/Transaction/Confirm.vue";
+import CouponEntry from "@/components/Transaction/CouponEntry.vue";
+import CostSummary from "@/components/Transaction/CostSummary.vue";
 import Spinner from "@/components/Spinner.vue";
 import AddRecipientWizard from "@/components/Recipient/AddRecipientWizard.vue";
 import QuoteDisplay from "@/components/QuoteDisplay.vue";
@@ -96,6 +98,16 @@ const setRecipient =  async (recipient) => {
     send({ type: 'PROCEED' });
   });
   isLoading.value = false;
+}
+
+/**
+ * Applying or removing a coupon returns the full repriced quote, so it is
+ * swapped in wholesale like any other quote mutation. Nothing about the coupon
+ * is tracked separately — the quote is the only record of it.
+ */
+const quoteUpdated = (data) => {
+  quote.data = TransactionQuote.getInstance(data);
+  send({ type: 'SET_CONTEXT', quote: quote.data });
 }
 
 const recipientAddedOnQuote = async (recipient)  => {
@@ -507,6 +519,15 @@ const canContinue = computed(() => {
                         </div>
                       </template>
                     </template>
+
+                    <div class="mt-6">
+                      <CostSummary v-bind:quote="quote.data" />
+                      <CouponEntry
+                          v-bind:quote="quote.data"
+                          v-on:quote:updated="quoteUpdated"
+                          class="mb-6"
+                      />
+                    </div>
 
                     <!-- Checkbox -->
                     <div v-if="thirdPartyDeclaration" class="flex items-start space-x-2">
