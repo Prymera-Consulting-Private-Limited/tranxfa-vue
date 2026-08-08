@@ -38,10 +38,10 @@ const secondary = computed(() => props.photos.slice(1, 5));
 
 const current = computed(() => props.photos[index.value] ?? null);
 
+// The lightbox uses this too: the supplier serves one asset per photo at
+// whatever size is asked for, so there is no separate high-resolution url to
+// prefer — only a larger size to request.
 const hero = computed(() => getPhotoUrl(current.value?.url, PHOTO_SIZE.large));
-
-// The supplier only fills hd_url for some photos, and it carries the same placeholder.
-const full = computed(() => getPhotoUrl(current.value?.hdUrl ?? current.value?.url, PHOTO_SIZE.large));
 
 const caption = computed(() => current.value?.caption ?? null);
 
@@ -158,7 +158,7 @@ function tile(photo, size = PHOTO_SIZE.card) {
         <DialogPanel class="flex w-full max-w-6xl flex-col items-center gap-4">
           <DialogTitle class="sr-only">{{ name }} photos</DialogTitle>
           <div class="relative w-full">
-            <img v-if="full" :src="full" :alt="caption ?? name" class="max-h-[70vh] w-full rounded-2xl object-contain">
+            <img v-if="hero" :src="hero" :alt="caption ?? name" class="max-h-[70vh] w-full rounded-2xl object-contain">
             <template v-if="photos.length > 1">
               <button
                   type="button"

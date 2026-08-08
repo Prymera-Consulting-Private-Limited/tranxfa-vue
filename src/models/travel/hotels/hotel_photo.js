@@ -15,11 +15,6 @@ class HotelPhoto {
     /**
      * @type {string|null}
      */
-    hdUrl = null;
-
-    /**
-     * @type {string|null}
-     */
     caption = null;
 
     /**
@@ -32,7 +27,6 @@ class HotelPhoto {
 
         photo.id = data.id;
         photo.url = data.url;
-        photo.hdUrl = data.hd_url;
         photo.caption = data.caption;
         photo.sortOrder = data.sort_order ?? 0;
 
