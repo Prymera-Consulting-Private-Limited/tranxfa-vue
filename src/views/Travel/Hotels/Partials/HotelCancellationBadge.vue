@@ -25,18 +25,37 @@ const isFreeWindowOpen = computed(() => {
 });
 
 /**
- * A policy whose window has already closed says nothing about cancelling now.
- * Both bounds null covers the whole stay, so it always applies — whether that
- * means free or non-refundable is decided by the amount, never by the nulls.
+ * What governs cancelling today is the policy whose window contains now, which
+ * is not the same test as "has not ended yet" — a ladder can hold a window that
+ * has not started, and charging its penalty early is simply wrong. Both bounds
+ * null covers the whole stay, so it is always in force; whether that means free
+ * or non-refundable is decided by the amount, never by the nulls.
  *
- * @param {{endAt: string|null}} policy
+ * @param {{startAt: string|null, endAt: string|null}} policy
+ * @param {moment.Moment} now
  * @returns {boolean}
  */
-function isPolicyCurrent(policy) {
-  return !policy.endAt || moment(policy.endAt).isAfter(moment());
+function isPolicyInForce(policy, now) {
+  const started = !policy.startAt || !moment(policy.startAt).isAfter(now);
+  const ended = !!policy.endAt && !moment(policy.endAt).isAfter(now);
+
+  return started && !ended;
 }
 
-const currentPolicies = computed(() => policies.value.filter(isPolicyCurrent));
+const policiesInForce = computed(() => {
+  const now = moment();
+
+  return policies.value.filter(policy => isPolicyInForce(policy, now));
+});
+
+// A rate can be free to cancel across its whole window, in which case the
+// supplier sends a single policy with both bounds null and nothing to charge.
+// That is genuinely free rather than partly refundable, even though it carries
+// no date of its own.
+const isFreeNow = computed(() => {
+  return policiesInForce.value.length > 0
+      && policiesInForce.value.every(policy => Number(policy.amountCharge ?? 0) === 0);
+});
 
 /**
  * amount_charge is a decimal string, so a zero-charge policy means at least part
@@ -45,7 +64,7 @@ const currentPolicies = computed(() => policies.value.filter(isPolicyCurrent));
  * non-refundable rather than infer a refund from a window that has closed.
  */
 const status = computed(() => {
-  if (isFreeWindowOpen.value) {
+  if (isFreeWindowOpen.value || isFreeNow.value) {
     return 'free';
   }
 
@@ -53,15 +72,23 @@ const status = computed(() => {
     return null;
   }
 
-  const refundable = currentPolicies.value.some(policy => Number(policy.amountCharge ?? 0) === 0);
+  if (policiesInForce.value.length === 0) {
+    return 'non-refundable';
+  }
+
+  const refundable = policiesInForce.value.some(policy => Number(policy.amountCharge ?? 0) === 0);
 
   return refundable ? 'partial' : 'non-refundable';
 });
 
 const label = computed(() => {
   switch (status.value) {
+    // The supplier's own date is preferred whenever it is still ahead, since a
+    // whole-window free policy has no date to name.
     case 'free':
-      return `Free cancellation until ${moment(freeUntil.value).format('D MMM')}`;
+      return isFreeWindowOpen.value
+          ? `Free cancellation until ${moment(freeUntil.value).format('D MMM')}`
+          : 'Free cancellation';
 
     case 'partial':
       return 'Partly refundable';
