@@ -50,6 +50,12 @@ const searchId = ref(null);
 const regionOptions = ref([]);
 const isSearchingRegions = ref(false);
 
+// The supplier reports failures inside 200 bodies, so the backend raises rather
+// than answering with an empty list — which means an empty list here really is
+// "no matches" and a rejection really is an outage. Rendering both as "no
+// destinations found" would tell a customer their city does not exist.
+const regionsFailed = ref(false);
+
 // Keystrokes can resolve out of order, so only the newest lookup may answer.
 let regionLookup = 0;
 
@@ -170,9 +176,11 @@ async function getRegions(query = null) {
     }
 
     regionOptions.value = Region.getCollection(response.data);
+    regionsFailed.value = false;
   }).catch(() => {
     if (lookup === regionLookup) {
       regionOptions.value = [];
+      regionsFailed.value = true;
     }
   }).finally(() => {
     if (lookup === regionLookup) {
@@ -285,6 +293,7 @@ function viewHotel(hotel) {
             :regions="regionOptions"
             :is-loading="isLoading"
             :is-searching-regions="isSearchingRegions"
+            :regions-failed="regionsFailed"
             @search="updateSearch"
             @region-search="getRegions"
         />

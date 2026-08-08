@@ -15,7 +15,7 @@ import {
   MIN_ADULTS,
 } from '@/composables/travel/hotels/hotel_utils.js';
 import {Combobox, ComboboxButton, ComboboxInput, ComboboxLabel, ComboboxOption, ComboboxOptions, Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
-import {CalendarDaysIcon, ChevronDownIcon, MagnifyingGlassIcon, MapPinIcon, MinusIcon, PencilSquareIcon, PlusIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
+import {CalendarDaysIcon, ChevronDownIcon, ExclamationTriangleIcon, MagnifyingGlassIcon, MapPinIcon, MinusIcon, PencilSquareIcon, PlusIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
   criteria: {
@@ -43,6 +43,16 @@ const props = defineProps({
   },
 
   isSearchingRegions: {
+    type: Boolean,
+    default: false,
+  },
+
+  /**
+   * The last destination lookup was rejected, as opposed to answering with
+   * nothing — the two must not read the same, since "no destinations found"
+   * during an outage tells the customer their city does not exist.
+   */
+  regionsFailed: {
     type: Boolean,
     default: false,
   },
@@ -120,10 +130,22 @@ const nights = computed(() => {
 
 const lookupRegions = debounce(query => emit('region-search', query), 300);
 
+// Kept so a failed lookup can be retried on exactly what was typed, rather
+// than silently falling back to the default list.
+const lastQuery = ref(null);
+
 function onDestinationQuery(value) {
   const query = value.trim();
 
-  lookupRegions(query.length ? query : null);
+  lastQuery.value = query.length ? query : null;
+
+  lookupRegions(lastQuery.value);
+}
+
+function retryRegions() {
+  lookupRegions.cancel();
+
+  emit('region-search', lastQuery.value);
 }
 
 /**
@@ -356,6 +378,21 @@ function search() {
         </div>
         <ComboboxOptions class="absolute top-full left-0 z-20 mt-2 max-h-80 w-full min-w-72 overflow-y-auto rounded-xl border border-gray-200 bg-white py-2 shadow-lg focus-visible:outline-0">
           <li v-if="isSearchingRegions" class="px-4 py-3 text-sm text-gray-500">Searching destinations…</li>
+          <!-- mousedown.prevent keeps the input focused, so the list is still -->
+          <!-- open by the time the click lands. -->
+          <li v-else-if="regionsFailed" class="px-4 py-3">
+            <p class="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+              <ExclamationTriangleIcon class="size-4 shrink-0 text-amber-500" aria-hidden="true" />
+              We couldn't load destinations
+            </p>
+            <p class="mt-1 text-xs text-gray-500">Something went wrong reaching our travel partner. Your search is fine — please try again.</p>
+            <button
+                type="button"
+                @mousedown.prevent
+                @click="retryRegions"
+                class="mt-2 cursor-pointer text-xs font-medium text-brand-700 transition hover:text-brand-800"
+            >Try again</button>
+          </li>
           <li v-else-if="regions.length === 0" class="px-4 py-3 text-sm text-gray-500">No destinations found</li>
           <ComboboxOption v-for="option in regions" :key="option.id" :value="option" as="template" v-slot="{active, selected}">
             <li :class="[active ? 'bg-gray-50' : '', 'flex cursor-pointer items-center justify-between gap-3 px-4 py-2']">
