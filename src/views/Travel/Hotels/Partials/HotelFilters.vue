@@ -1,6 +1,6 @@
 <script setup>
 import {computed, ref} from 'vue';
-import {getFilters, hasFilters} from "@/composables/travel/hotels/hotel_utils.js";
+import {formatMoney, getFilters, hasFilters} from "@/composables/travel/hotels/hotel_utils.js";
 import {AdjustmentsHorizontalIcon} from "@heroicons/vue/24/outline";
 import {StarIcon} from "@heroicons/vue/24/solid";
 
@@ -14,6 +14,15 @@ const props = defineProps({
   },
 
   filters: {
+    type: Object,
+    required: true,
+  },
+
+  /**
+   * The response's currency and decimal places — the price range is in minor
+   * units like every other amount a search carries.
+   */
+  money: {
     type: Object,
     required: true,
   },
@@ -88,7 +97,7 @@ function clear() {
 }
 
 function formatPrice(amount) {
-  return new Intl.NumberFormat(undefined, {maximumFractionDigits: 0}).format(amount);
+  return formatMoney(amount, props.money);
 }
 </script>
 
@@ -179,22 +188,6 @@ function formatPrice(amount) {
             {{ option.label }}
             <span class="ml-0.5 font-normal text-gray-400 tabular-nums">{{ facets.photos[option.value] }}</span>
           </button>
-        </div>
-      </section>
-      <!-- Rate features, as tagged by the supplier -->
-      <section v-if="facets.features.length" class="px-4 py-3">
-        <h4 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Rate includes</h4>
-        <div class="mt-2 space-y-1.5">
-          <label v-for="feature in facets.features" :key="feature.value" class="flex cursor-pointer items-center gap-2.5">
-            <input
-                type="checkbox"
-                :checked="filters.features.includes(feature.value)"
-                @change="toggle('features', feature.value)"
-                class="size-4 shrink-0 cursor-pointer rounded border-gray-300 accent-brand-700"
-            />
-            <span class="min-w-0 truncate text-sm text-gray-700">{{ feature.label }}</span>
-            <span class="ml-auto text-xs text-gray-400 tabular-nums">{{ feature.count }}</span>
-          </label>
         </div>
       </section>
       <!-- Amenities -->

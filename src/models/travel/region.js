@@ -1,5 +1,8 @@
-import Country from "@/models/country.js";
-
+/**
+ * A destination the supplier actually covers. Anywhere it does not is left out of
+ * the lookup entirely, so an empty result means "we cannot search there" rather
+ * than "no such place".
+ */
 class Region {
     /**
      * @type {string|null}
@@ -9,74 +12,49 @@ class Region {
     /**
      * @type {string|null}
      */
+    slug = null;
+
+    /**
+     * @type {string|null}
+     */
     name = null;
 
     /**
+     * Our own code, whose display text comes from the response's labels. Null for
+     * anything unrecognised, since calling a city an airport would send somebody
+     * to the wrong place.
+     *
+     * @type {string|null}
+     */
+    kind = null;
+
+    /**
+     * A line the operator wrote about a curated destination, when there is one.
+     *
      * @type {string|null}
      */
     about = null;
 
     /**
-     * @type {boolean}
-     */
-    featured = false;
-
-    /**
-     * @type {boolean}
-     */
-    popular = false;
-
-    /**
      * @type {string|null}
-     */
-    image = null;
-
-    /**
-     * @type {string|null}
-     */
-    slug = null;
-
-    /**
-     * Only set for regions that map to an airport city, e.g. "DXB".
-     *
-     * @type {string|null}
-     */
-    iata = null;
-
-    /**
-     * e.g. "City", "Province", "Multi-City (vicinity)".
-     *
-     * @type {string|null}
-     */
-    regionType = null;
-
-    /**
-     * @type {Country|null}
      */
     country = null;
 
     /**
-     * @type {number}
+     * @type {string|null}
      */
-    hotelsCount = 0;
+    countryCode = null;
 
     static getInstance(data) {
         const region = new Region();
 
         region.id = data.id;
-        region.name = data.name;
-        region.about = data.about;
-        region.featured = data.featured ?? false;
-        region.popular = data.popular ?? false;
-        region.image = data.image;
         region.slug = data.slug;
-        region.iata = data.iata;
-        region.regionType = data.region_type;
-        region.hotelsCount = data.hotels_count ?? 0;
-
-        if (data.country) {
-            region.country = Country.getInstance(data.country);
-        }
+        region.name = data.name;
+        region.kind = data.kind ?? null;
+        region.about = data.about ?? null;
+        region.country = data.country ?? null;
+        region.countryCode = data.country_code ?? null;
 
         return region;
     }

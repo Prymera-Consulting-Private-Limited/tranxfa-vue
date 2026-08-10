@@ -584,7 +584,7 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                   </template>
                 </div>
                 <div class="mt-3 flex flex-wrap items-center gap-2">
-                  <HotelMealBadge :meal-type="quote.rate?.mealType" />
+                  <HotelMealBadge :meal="quote.rate?.mealType" />
                   <HotelSelectionCancellationBadge :cancellation="quote.cancellation" />
                   <HotelAvailability :allotment="quote.rate?.allotment" />
                 </div>

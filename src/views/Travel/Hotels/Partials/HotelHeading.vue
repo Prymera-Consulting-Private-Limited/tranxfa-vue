@@ -26,8 +26,10 @@ const location = computed(() => {
 
 <template>
   <header>
+    <!-- The region-kind chip is gone with region_type: a kind is now a code whose
+    display text comes from the response's labels, which this page will have when
+    it is rebuilt against the hotel-page contract. -->
     <div class="flex flex-wrap items-center gap-2">
-      <span v-if="hotel.region?.regionType" class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">{{ hotel.region.regionType }}</span>
       <span v-if="hotel.starRating" class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 ring-1 ring-amber-100 ring-inset">
         <HotelRating :stars="hotel.starRating" />
       </span>

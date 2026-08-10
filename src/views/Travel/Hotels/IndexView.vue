@@ -10,7 +10,6 @@ import HotelFilters from "@/views/Travel/Hotels/Partials/HotelFilters.vue";
 import HotelSort from "@/views/Travel/Hotels/Partials/HotelSort.vue";
 import HotelPagination from "@/views/Travel/Hotels/Partials/HotelPagination.vue";
 import {
-  getCheapestRate,
   getCriteria,
   getFacets,
   getFilteredResults,
@@ -25,6 +24,7 @@ import {
   getSortQuery,
   hasFilters,
   HOTELS_PER_PAGE,
+  REGION_QUERY_MIN,
   SORT_OPTIONS,
   useHotelUtils,
 } from "@/composables/travel/hotels/hotel_utils.js";
@@ -36,11 +36,20 @@ import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 const route = useRoute();
 const router = useRouter();
 
-const {criteria, nights, search, regions} = useHotelUtils();
+const {criteria, search, regions} = useHotelUtils();
 
 const hotels = ref([]);
 const isLoading = ref(false);
 const hasFailed = ref(false);
+
+// The api writes its failures for a customer to read — an expired search, a room
+// that has gone, a supplier it could not reach. Ours is only the fallback for a
+// failure that arrived without one.
+const failureMessage = ref(null);
+
+// Stated by the response rather than worked out from the dates, so the figure on
+// the card and the one the price was divided by are the same.
+const nights = ref(0);
 
 // Opaque, minted by every real search and handed forward to the hotel page.
 // Never read back out of the url or reconstructed — a fresh mount or a new
@@ -50,24 +59,49 @@ const searchId = ref(null);
 const regionOptions = ref([]);
 const isSearchingRegions = ref(false);
 
+// Display text for the region kind codes, on the same terms as the search
+// response's labels.
+const regionLabels = ref({});
+
+// Whether the list on screen is the operator's curated one rather than results
+// for something typed, which the response states rather than us inferring it
+// from whether we sent a query.
+const regionsAreFeatured = ref(false);
+
 // The supplier reports failures inside 200 bodies, so the backend raises rather
 // than answering with an empty list — which means an empty list here really is
 // "no matches" and a rejection really is an outage. Rendering both as "no
 // destinations found" would tell a customer their city does not exist.
-const regionsFailed = ref(false);
+//
+// A 404 is neither: with no travel licence every route answers one, so it means
+// the product is absent rather than broken. Until there is a field to gate the
+// entry point on, this is what keeps an outage and a boundary apart.
+const regionsError = ref(null);
 
 // Keystrokes can resolve out of order, so only the newest lookup may answer.
 let regionLookup = 0;
 
-/**
- * A hotel is only listed once we have a rate we can actually price, so the card
- * never has to guard against a missing rate or payment option.
- */
-const results = computed(() => {
-  return hotels.value
-      .map(hotel => ({hotel, rate: getCheapestRate(hotel)}))
-      .filter(result => result.rate !== null);
-});
+// The curated list does not change between keystrokes, so it is fetched once and
+// replayed. Otherwise deleting back to one character would re-request it, and the
+// picker would flash the operator's list on the way to a search.
+let featuredRegions = null;
+
+// One currency and one set of decimal places for the whole response. Every
+// amount below is an integer in that currency's minor units, so nothing can be
+// rendered without this pair travelling alongside it.
+const money = ref({currency: '', decimalPlaces: 2});
+
+// Display text for every code the response carries, so no amenity or meal slug
+// is ever prettified into something like "Non smoking" in front of a customer.
+const labels = ref({});
+
+// What the region holds before the supplier's cap, so a capped search can say
+// so instead of presenting its slice as the whole destination.
+const totalHotels = ref(0);
+
+// The backend drops a hotel it cannot price before we see it, so this only
+// guards the card against a rate that went missing between the two.
+const results = computed(() => hotels.value.filter(hotel => hotel.cheapestRate !== null));
 
 // Filters, sort and page are read from the url by applySearch below and never
 // set directly, so a search replayed by the back button restores exactly what
@@ -76,7 +110,7 @@ const filters = ref(getFilters());
 const sort = ref(SORT_OPTIONS[0].value);
 const page = ref(1);
 
-const facets = computed(() => getFacets(results.value));
+const facets = computed(() => getFacets(results.value, money.value, labels.value));
 
 const filteredResults = computed(() => getFilteredResults(results.value, filters.value));
 
@@ -144,7 +178,14 @@ const showFilters = computed(() => {
 });
 
 // The search is by region id, so the name only becomes known from the results.
-const region = computed(() => results.value[0]?.hotel.region ?? null);
+const region = computed(() => results.value[0]?.region ?? null);
+
+// The supplier caps how much of a region it will price, so the count on screen
+// is not always the count that exists.
+const isCapped = computed(() => totalHotels.value > results.value.length);
+
+// Destinations run to four figures, which is unreadable without a separator.
+const totalHotelsLabel = computed(() => totalHotels.value.toLocaleString());
 
 // Nothing can be priced until a destination is chosen.
 const hasDestination = computed(() => criteria.value.region_id !== null);
@@ -152,35 +193,79 @@ const hasDestination = computed(() => criteria.value.region_id !== null);
 async function getHotels() {
   isLoading.value = true;
   hasFailed.value = false;
+  failureMessage.value = null;
 
   await search().then((response) => {
     hotels.value = Hotel.getCollection(response.data.hotels);
-    searchId.value = response.data.search ? HotelSearch.getInstance(response.data.search).id : null;
-  }).catch(() => {
+    money.value = {
+      currency: response.data.currency ?? '',
+      decimalPlaces: response.data.currency_decimal_places ?? 2,
+    };
+    labels.value = response.data.labels ?? {};
+    totalHotels.value = response.data.total_hotels ?? hotels.value.length;
+
+    const resolved = response.data.search ? HotelSearch.getInstance(response.data.search) : null;
+
+    searchId.value = resolved?.id ?? null;
+    nights.value = response.data.nights ?? resolved?.nights ?? 0;
+  }).catch((error) => {
     hotels.value = [];
+    totalHotels.value = 0;
     hasFailed.value = true;
+    // A 404 without a message is the licence being absent rather than anything
+    // going wrong, so it must not read as an outage somebody could wait out.
+    failureMessage.value = error.response?.data?.message
+        ?? (error.response?.status === 404 ? "Travel isn't available on this app." : null);
     searchId.value = null;
   }).finally(() => {
     isLoading.value = false;
   });
 }
 
+/**
+ * @param {object} data
+ */
+function applyRegions(data) {
+  regionOptions.value = Region.getCollection(data.regions ?? []);
+  regionLabels.value = data.labels ?? {};
+  regionsAreFeatured.value = data.is_featured ?? false;
+  regionsError.value = null;
+}
+
+/**
+ * Too short to search on means the curated list rather than nothing, so clearing
+ * the box returns to what an operator chose instead of an empty panel.
+ *
+ * @param {string|null} query
+ */
 async function getRegions(query = null) {
   const lookup = ++regionLookup;
+  const search = query && query.length >= REGION_QUERY_MIN ? query : null;
+
+  if (search === null && featuredRegions !== null) {
+    applyRegions(featuredRegions);
+    isSearchingRegions.value = false;
+
+    return;
+  }
 
   isSearchingRegions.value = true;
 
-  await regions(query).then((response) => {
+  await regions(search).then((response) => {
     if (lookup !== regionLookup) {
       return;
     }
 
-    regionOptions.value = Region.getCollection(response.data);
-    regionsFailed.value = false;
-  }).catch(() => {
+    if (search === null) {
+      featuredRegions = response.data;
+    }
+
+    applyRegions(response.data);
+  }).catch((error) => {
     if (lookup === regionLookup) {
       regionOptions.value = [];
-      regionsFailed.value = true;
+      regionsAreFeatured.value = false;
+      regionsError.value = error.response?.status === 404 ? 'unavailable' : 'failed';
     }
   }).finally(() => {
     if (lookup === regionLookup) {
@@ -226,7 +311,10 @@ function applySearch(query) {
 
   if (!criteria.value.region_id) {
     hotels.value = [];
+    totalHotels.value = 0;
+    nights.value = 0;
     hasFailed.value = false;
+    failureMessage.value = null;
     searchId.value = null;
 
     return;
@@ -263,6 +351,8 @@ function updateSearch(update) {
 
 watch(() => route.query, applySearch, {immediate: true});
 
+// The curated list is what the picker opens on, so it is fetched before anyone
+// types rather than in response to typing.
 onMounted(() => {
   getRegions();
 });
@@ -276,7 +366,7 @@ onMounted(() => {
 function viewHotel(hotel) {
   router.push({
     name: 'viewHotel',
-    params: {id: hotel.hotelId, slug: hotel.slug},
+    params: {id: hotel.id, slug: hotel.slug},
     query: {search: searchId.value ?? undefined},
   });
 }
@@ -293,7 +383,9 @@ function viewHotel(hotel) {
             :regions="regionOptions"
             :is-loading="isLoading"
             :is-searching-regions="isSearchingRegions"
-            :regions-failed="regionsFailed"
+            :region-labels="regionLabels"
+            :regions-featured="regionsAreFeatured"
+            :regions-error="regionsError"
             @search="updateSearch"
             @region-search="getRegions"
         />
@@ -309,6 +401,12 @@ function viewHotel(hotel) {
             <p class="mt-1 text-sm text-gray-500">
               <template v-if="!hasDestination">Pick a destination, your dates and who is travelling to see live prices.</template>
               <template v-else-if="isFiltered">Filtered from {{ results.length }} hotel{{ results.length === 1 ? '' : 's' }} the supplier had for your dates.</template>
+              <!-- The count above is what we could price, which is not always
+              what the supplier had. Deliberately silent on why the two differ:
+              total_hotels has been described both as the destination's own count
+              and as the supplier's count before our filtering, and the wording
+              would have to change to suit whichever it turns out to be. -->
+              <template v-else-if="isCapped">Showing {{ results.length }} of the {{ totalHotelsLabel }} hotels the supplier had for your dates.</template>
               <template v-else>Prices shown are the lowest available for your dates, for the whole stay.</template>
             </p>
           </div>
@@ -320,6 +418,7 @@ function viewHotel(hotel) {
               v-if="showFilters"
               :facets="facets"
               :filters="filters"
+              :money="money"
               :match-count="filteredResults.length"
               :total-count="results.length"
               @update:filters="updateFilters"
@@ -342,7 +441,8 @@ function viewHotel(hotel) {
                 <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
               </div>
               <h3 class="mt-6 text-base font-semibold text-gray-900">We couldn't load hotels</h3>
-              <p class="mt-2 max-w-md text-sm text-gray-500">Something went wrong while contacting our travel partner. Please try your search again in a moment.</p>
+              <p v-if="failureMessage" class="mt-2 max-w-md text-sm text-gray-500">{{ failureMessage }}</p>
+              <p v-else class="mt-2 max-w-md text-sm text-gray-500">Something went wrong while contacting our travel partner. Please try your search again in a moment.</p>
             </div>
             <!-- Empty -->
             <EmptyHotels v-else-if="results.length === 0" />
@@ -355,10 +455,11 @@ function viewHotel(hotel) {
             <!-- Results -->
             <template v-else>
               <HotelCard
-                  v-for="result in pagedResults"
-                  :key="result.hotel.id"
-                  :hotel="result.hotel"
-                  :rate="result.rate"
+                  v-for="hotel in pagedResults"
+                  :key="hotel.id"
+                  :hotel="hotel"
+                  :money="money"
+                  :labels="labels"
                   :nights="nights"
                   @select="viewHotel"
               />

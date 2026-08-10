@@ -13,6 +13,7 @@ import {
   MAX_ROOMS,
   MAX_STAY_NIGHTS,
   MIN_ADULTS,
+  REGION_QUERY_MIN,
 } from '@/composables/travel/hotels/hotel_utils.js';
 import {Combobox, ComboboxButton, ComboboxInput, ComboboxLabel, ComboboxOption, ComboboxOptions, Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
 import {CalendarDaysIcon, ChevronDownIcon, ExclamationTriangleIcon, MagnifyingGlassIcon, MapPinIcon, MinusIcon, PencilSquareIcon, PlusIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
@@ -48,13 +49,30 @@ const props = defineProps({
   },
 
   /**
-   * The last destination lookup was rejected, as opposed to answering with
-   * nothing — the two must not read the same, since "no destinations found"
-   * during an outage tells the customer their city does not exist.
+   * Display text for region kind codes.
    */
-  regionsFailed: {
+  regionLabels: {
+    type: Object,
+    default: () => ({}),
+  },
+
+  /**
+   * Whether the list is the operator's curated one rather than search results.
+   */
+  regionsFeatured: {
     type: Boolean,
     default: false,
+  },
+
+  /**
+   * Either "failed" — the lookup was rejected, which must not read the same as
+   * answering with nothing, since "no destinations found" during an outage tells
+   * a customer their city does not exist — or "unavailable", meaning travel is
+   * not part of this product at all.
+   */
+  regionsError: {
+    type: String,
+    default: null,
   },
 
   /**
@@ -153,8 +171,14 @@ function retryRegions() {
  * @returns {string}
  */
 function regionDescription(region) {
-  return [region.regionType, region.country?.commonName].filter(Boolean).join(' · ');
+  return [props.regionLabels[region.kind], region.country].filter(Boolean).join(' · ');
 }
+
+// Nothing curated yet, so there is nothing to open on and typing is the only way
+// through — which is a state to explain rather than an error.
+const showTypePrompt = computed(() => {
+  return (lastQuery.value?.length ?? 0) < REGION_QUERY_MIN && props.regions.length === 0;
+});
 
 // Side by side months only fit once the bar itself is laid out horizontally.
 const wideViewport = window.matchMedia('(min-width: 1024px)');
@@ -378,9 +402,12 @@ function search() {
         </div>
         <ComboboxOptions class="absolute top-full left-0 z-20 mt-2 max-h-80 w-full min-w-72 overflow-y-auto rounded-xl border border-gray-200 bg-white py-2 shadow-lg focus-visible:outline-0">
           <li v-if="isSearchingRegions" class="px-4 py-3 text-sm text-gray-500">Searching destinations…</li>
+          <!-- Travel is simply not part of this product, which must not be -->
+          <!-- dressed up as an outage the customer could wait out. -->
+          <li v-else-if="regionsError === 'unavailable'" class="px-4 py-3 text-sm text-gray-500">Travel isn't available on this app.</li>
           <!-- mousedown.prevent keeps the input focused, so the list is still -->
           <!-- open by the time the click lands. -->
-          <li v-else-if="regionsFailed" class="px-4 py-3">
+          <li v-else-if="regionsError === 'failed'" class="px-4 py-3">
             <p class="flex items-center gap-1.5 text-sm font-medium text-gray-900">
               <ExclamationTriangleIcon class="size-4 shrink-0 text-amber-500" aria-hidden="true" />
               We couldn't load destinations
@@ -393,17 +420,16 @@ function search() {
                 class="mt-2 cursor-pointer text-xs font-medium text-brand-700 transition hover:text-brand-800"
             >Try again</button>
           </li>
+          <li v-else-if="showTypePrompt" class="px-4 py-3 text-sm text-gray-500">Type at least {{ REGION_QUERY_MIN }} characters to find a destination</li>
           <li v-else-if="regions.length === 0" class="px-4 py-3 text-sm text-gray-500">No destinations found</li>
+          <li v-else-if="regionsFeatured" class="px-4 pt-1 pb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">Popular destinations</li>
           <ComboboxOption v-for="option in regions" :key="option.id" :value="option" as="template" v-slot="{active, selected}">
             <li :class="[active ? 'bg-gray-50' : '', 'flex cursor-pointer items-center justify-between gap-3 px-4 py-2']">
               <div class="min-w-0">
-                <p :class="[selected ? 'font-semibold' : 'font-medium', 'truncate text-sm text-gray-900']">
-                  {{ option.name }}
-                  <span v-if="option.iata" class="ml-1 text-xs font-normal text-gray-400">{{ option.iata }}</span>
-                </p>
-                <p class="truncate text-xs text-gray-500">{{ regionDescription(option) }}</p>
+                <p :class="[selected ? 'font-semibold' : 'font-medium', 'truncate text-sm text-gray-900']">{{ option.name }}</p>
+                <!-- The operator's own line wins, since it says something the kind and country cannot. -->
+                <p class="truncate text-xs text-gray-500">{{ option.about || regionDescription(option) }}</p>
               </div>
-              <span v-if="option.hotelsCount" class="shrink-0 text-xs text-gray-400">{{ option.hotelsCount }} hotel{{ option.hotelsCount === 1 ? '' : 's' }}</span>
             </li>
           </ComboboxOption>
         </ComboboxOptions>

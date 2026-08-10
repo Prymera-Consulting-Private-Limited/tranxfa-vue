@@ -1,20 +1,17 @@
 import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 
+/**
+ * One hotel as a region search returns it. The backend resolves the supplier's
+ * rate list down to the cheapest rate before it gets here, so a search hotel
+ * carries exactly one price and a count of what else it has.
+ */
 class Hotel {
     /**
+     * The canonical hotel id, which is what a hotel link routes on.
+     *
      * @type {string|null}
      */
     id = null;
-
-    /**
-     * @type {string|null}
-     */
-    hotelId = null;
-
-    /**
-     * @type {string|null}
-     */
-    name = null;
 
     /**
      * @type {string|null}
@@ -24,108 +21,71 @@ class Hotel {
     /**
      * @type {string|null}
      */
-    region = null;
+    name = null;
 
     /**
-     * @type {number|null}
-     */
-    hid = null;
-
-    /**
-     * @type {number|null}
-     */
-    starRating = null;
-
-    /**
-     * @type {number|null}
-     */
-    latitude = null;
-
-    /**
-     * @type {number|null}
-     */
-    longitude = null;
-
-    /**
+     * Normalised server-side, so it is rendered as it arrives.
+     *
      * @type {string|null}
      */
     address = null;
 
     /**
-     * Photo urls still carry the supplier's {size} placeholder.
+     * @type {string|null}
+     */
+    region = null;
+
+    /**
+     * Null when the hotel is unrated, which is not the same as nought stars.
+     *
+     * @type {number|null}
+     */
+    starRating = null;
+
+    /**
+     * Ready to request at each size, null when the hotel has no photo at all.
+     *
+     * @type {{thumbnail: string, card: string, large: string}|null}
+     */
+    photo = null;
+
+    /**
+     * Codes, whose display text comes from the response's labels dictionary.
      *
      * @type {string[]}
      */
-    photos = [];
+    amenities = [];
 
     /**
-     * @type {HotelRate[]}
+     * How many rates the hotel has in total, only one of which is priced here.
+     *
+     * @type {number}
      */
-    rates = [];
+    rateCount = 0;
 
     /**
-     * @type {object|null}
+     * @type {HotelRate|null}
      */
-    barPriceData = null;
+    cheapestRate = null;
 
     static getInstance(data) {
         const hotel = new Hotel();
 
         hotel.id = data.id;
-        hotel.hid = data.hid;
+        hotel.slug = data.slug;
+        hotel.name = data.name;
+        hotel.address = data.address;
+        hotel.region = data.region;
+        hotel.starRating = data.star_rating ?? null;
+        hotel.photo = data.photo ?? null;
+        hotel.amenities = data.amenities ?? [];
+        hotel.rateCount = data.rate_count ?? 0;
 
-        if (Array.isArray(data.rates)) {
-            hotel.rates = data.rates.map(rate => HotelRate.getInstance(rate));
+        if (data.cheapest_rate) {
+            hotel.cheapestRate = HotelRate.getInstance(data.cheapest_rate);
         }
-
-        if (data.catalog_hotel) {
-            hotel.hotelId = data.catalog_hotel.id;
-            hotel.name = data.catalog_hotel.name;
-            hotel.slug = data.catalog_hotel.slug;
-            hotel.starRating = data.catalog_hotel.star_rating;
-            hotel.latitude = data.catalog_hotel.latitude;
-            hotel.longitude = data.catalog_hotel.longitude;
-
-            if (data.catalog_hotel.primary_region) {
-                hotel.region = data.catalog_hotel.primary_region.name;
-            }
-
-            if (data.catalog_hotel.provider) {
-                hotel.address = Hotel.getAddress(data.catalog_hotel.provider.provider_address, hotel.region);
-
-                if (Array.isArray(data.catalog_hotel.provider.photos)) {
-                    hotel.photos = data.catalog_hotel.provider.photos
-                        .map(photo => photo.url)
-                        .filter(Boolean);
-                }
-            }
-        }
-
-        hotel.barPriceData = data.bar_price_data;
 
         return hotel;
-    }
-
-    /**
-     * Supplier addresses usually repeat the city as the last segment, e.g.
-     * "48 Rue du Commerce, Paris" for a hotel already labelled as Paris.
-     *
-     * @param {string|null} address
-     * @param {string|null} region
-     * @returns {string|null}
-     */
-    static getAddress(address, region) {
-        if (!address) {
-            return null;
-        }
-
-        const segments = address.split(',').map(segment => segment.trim()).filter(Boolean);
-
-        if (region && segments.length > 1 && segments.at(-1).toLowerCase() === region.toLowerCase()) {
-            segments.pop();
-        }
-
-        return segments.join(', ');
     }
 
     /**

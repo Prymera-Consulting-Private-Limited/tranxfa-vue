@@ -8,13 +8,25 @@ const props = defineProps({
     default: () => [],
   },
 
+  /**
+   * The response's code-to-display-text dictionary.
+   */
+  labels: {
+    type: Object,
+    default: () => ({}),
+  },
+
   limit: {
     type: Number,
     default: 5,
   },
 });
 
-const visible = computed(() => props.amenities.slice(0, props.limit).map(prettifyLabel));
+// The dictionary is meant to carry every code present, so prettifying is only a
+// guard against a code that slipped through it.
+const visible = computed(() => {
+  return props.amenities.slice(0, props.limit).map(code => props.labels[code] ?? prettifyLabel(code));
+});
 
 const remaining = computed(() => Math.max(0, props.amenities.length - props.limit));
 </script>

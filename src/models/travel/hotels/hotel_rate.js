@@ -1,76 +1,23 @@
-import MealData from "@/models/travel/hotels/meal_data.js";
-import PaymentOptions from "@/models/travel/hotels/payment_options.js";
-import RoomExtension from "@/models/travel/hotels/room_extension.js";
-import NoShow from "@/models/travel/hotels/no_show.js";
-import RoomDataTranslation from "@/models/travel/hotels/room_data_translation.js";
+import Money from "@/models/travel/hotels/money.js";
+import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
 
+/**
+ * The one rate a search returns per hotel — the cheapest the supplier had. Every
+ * amount arrives already rendered as well as in minor units, so nothing here is
+ * formatted in the client.
+ */
 class HotelRate {
-    /**
-     * What a booking is placed against, so it has to survive to the checkout.
-     *
-     * @type {string|null}
-     */
-    bookHash = null;
-
-    /**
-     * @type {string|null}
-     */
-    matchHash = null;
-
-    /**
-     * @type {string|null}
-     */
-    searchHash = null;
-
-    /**
-     * @type {string[]}
-     */
-    dailyPrices = [];
-
-    /**
-     * @type {string|null}
-     */
-    meal = null;
-
-    /**
-     * @type {MealData|null}
-     */
-    mealData = null;
-
-    /**
-     * @type {PaymentOptions|null}
-     */
-    paymentOptions = null;
-
-    /**
-     * @type {object|null}
-     */
-    barRatePriceData = null;
-
-    /**
-     * @type {RoomExtension|null}
-     */
-    roomExtension = null;
-
     /**
      * @type {string|null}
      */
     roomName = null;
 
     /**
-     * @type {object|null}
+     * A code from the supplier's meal vocabulary, null when it states nothing.
+     *
+     * @type {string|null}
      */
-    roomNameInfo = null;
-
-    /**
-     * @type {string[]}
-     */
-    serpFilters = [];
-
-    /**
-     * @type {object|null}
-     */
-    sellPriceLimits = null;
+    meal = null;
 
     /**
      * @type {number|null}
@@ -78,84 +25,93 @@ class HotelRate {
     allotment = null;
 
     /**
-     * @type {string[]}
+     * Always false on search: the supplier only issues a booking token on the
+     * hotel page, so nothing found here can be booked from here.
+     *
+     * @type {boolean}
      */
-    amenitiesData = [];
+    bookable = false;
 
     /**
-     * @type {boolean|null}
+     * What the customer pays us, line by line, already labelled for display.
+     * A line can legitimately be zero — search results do not itemise taxes.
+     *
+     * @type {Array<{key: string, label: string, amount: Money}>}
      */
-    anyResidency = null;
+    breakdown = [];
 
     /**
-     * @type {object|null}
+     * @type {Money|null}
      */
-    deposit = null;
+    total = null;
 
     /**
-     * @type {NoShow|null}
+     * The total divided by the nights, computed server-side. Nobody is charged
+     * this and the nights are not individually priced at it, so it belongs beside
+     * the total as a comparison rather than in the breakdown.
+     *
+     * @type {Money|null}
      */
-    noShow = null;
+    perNight = null;
 
     /**
-     * @type {RoomDataTranslation|null}
+     * What is owed to the hotel on arrival, on top of the total, converted into
+     * the same currency as everything else and never marked up. Unstated when
+     * nothing is owed.
+     *
+     * @type {Money|null}
      */
-    roomDataTranslation = null;
+    payableAtProperty = null;
 
     /**
-     * @type {object|null}
+     * @type {RateCancellation|null}
      */
-    legalInfo = null;
-
-    /**
-     * @type {boolean|null}
-     */
-    isPackage = null;
+    cancellation = null;
 
     static getInstance(data) {
         const rate = new HotelRate();
 
-        rate.bookHash = data.book_hash;
-        rate.matchHash = data.match_hash;
-        rate.searchHash = data.search_hash;
-        rate.dailyPrices = data.daily_prices ?? [];
-        rate.meal = data.meal;
-
-        if (data.meal_data) {
-            rate.mealData = MealData.getInstance(data.meal_data);
-        }
-
-        if (data.payment_options) {
-            rate.paymentOptions = PaymentOptions.getInstance(data.payment_options);
-        }
-
-        rate.barRatePriceData = data.bar_rate_price_data;
-
-        if (data.rg_ext) {
-            rate.roomExtension = RoomExtension.getInstance(data.rg_ext);
-        }
-
         rate.roomName = data.room_name;
-        rate.roomNameInfo = data.room_name_info;
-        rate.serpFilters = data.serp_filters ?? [];
-        rate.sellPriceLimits = data.sell_price_limits;
-        rate.allotment = data.allotment;
-        rate.amenitiesData = data.amenities_data ?? [];
-        rate.anyResidency = data.any_residency;
-        rate.deposit = data.deposit;
+        rate.meal = data.meal ?? null;
+        rate.allotment = data.allotment ?? null;
+        rate.bookable = data.bookable ?? false;
 
-        if (data.no_show) {
-            rate.noShow = NoShow.getInstance(data.no_show);
+        if (Array.isArray(data.breakdown)) {
+            rate.breakdown = data.breakdown.map(line => ({
+                key: line.key,
+                label: line.label,
+                amount: Money.getInstance(line, 'amount'),
+            }));
         }
 
-        if (data.room_data_trans) {
-            rate.roomDataTranslation = RoomDataTranslation.getInstance(data.room_data_trans);
+        rate.total = Money.getInstance(data, 'total');
+        rate.perNight = Money.getInstance(data, 'per_night');
+        rate.payableAtProperty = Money.getInstance(data, 'payable_at_property');
+
+        if (data.cancellation) {
+            rate.cancellation = RateCancellation.getInstance(data.cancellation);
         }
 
-        rate.legalInfo = data.legal_info;
-        rate.isPackage = data.is_package;
+        rate.assertTotalMatchesBreakdown();
 
         return rate;
+    }
+
+    /**
+     * The backend guarantees the two agree and asked to hear about it rather than
+     * have us pick one, so a mismatch is surfaced where it can be seen instead of
+     * being rendered as if nothing were wrong.
+     */
+    assertTotalMatchesBreakdown() {
+        if (!import.meta.env.DEV || this.breakdown.length === 0) {
+            return;
+        }
+
+        const sum = this.breakdown.reduce((total, line) => total + (line.amount.amount ?? 0), 0);
+
+        if (sum !== this.total.amount) {
+            console.warn(`Hotel rate total ${this.total.amount} does not match its breakdown, which sums to ${sum}.`, this);
+        }
     }
 
     /**

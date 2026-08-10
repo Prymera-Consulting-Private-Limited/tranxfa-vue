@@ -1,9 +1,8 @@
-import Region from "@/models/travel/region.js";
-
 /**
- * The stay as the backend resolved and priced it, returned by both search/region
- * and hotel/{search}/{hotel}/view. Its id is the opaque search_id everything past
- * the first request is forwarded with instead of raw criteria.
+ * The stay as the backend resolved and priced it. Its id is the opaque search_id
+ * every later request is forwarded with instead of raw criteria — it pins which
+ * supplier answered, which is why a rate token means nothing without it, and it
+ * stops the stay drifting between the prices shown and the hotel opened.
  */
 class HotelSearch {
     /**
@@ -12,50 +11,36 @@ class HotelSearch {
     id = null;
 
     /**
-     * @type {string|null}
-     */
-    checkin = null;
-
-    /**
-     * @type {string|null}
-     */
-    checkout = null;
-
-    /**
-     * Per room, the same shape the search criteria and the guest picker use.
+     * Thirty minutes out. Past it the hotel page answers 404 with a message
+     * written to be shown, since an aged-out search is not a customer's mistake.
      *
-     * @type {Array<{adults: number, children: number[]}>}
+     * @type {string|null}
      */
-    guests = [];
+    expiresAt = null;
 
     /**
      * @type {string|null}
      */
-    currency = null;
+    checkIn = null;
 
     /**
      * @type {string|null}
      */
-    language = null;
+    checkOut = null;
 
     /**
-     * @type {Region|null}
+     * @type {number|null}
      */
-    region = null;
+    nights = null;
 
     static getInstance(data) {
         const search = new HotelSearch();
 
         search.id = data.id;
-        search.checkin = data.checkin;
-        search.checkout = data.checkout;
-        search.guests = data.guests ?? [];
-        search.currency = data.currency;
-        search.language = data.language;
-
-        if (data.region) {
-            search.region = Region.getInstance(data.region);
-        }
+        search.expiresAt = data.expires_at ?? null;
+        search.checkIn = data.check_in ?? null;
+        search.checkOut = data.check_out ?? null;
+        search.nights = data.nights ?? null;
 
         return search;
     }

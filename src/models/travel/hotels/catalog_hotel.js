@@ -1,5 +1,4 @@
 import Region from "@/models/travel/region.js";
-import Hotel from "@/models/travel/hotels/hotel.js";
 import HotelProvider from "@/models/travel/hotels/hotel_provider.js";
 import HotelSelection from "@/models/travel/hotels/hotel_selection.js";
 
@@ -141,8 +140,11 @@ class CatalogHotel {
     }
 
     /**
-     * Provider addresses on this endpoint separate segments with semicolons, e.g.
-     * "220 Venice Way; Venice; CA 90291; USA, Los Angeles".
+     * Provider addresses on this endpoint separate segments with semicolons and
+     * repeat the city as the last one, e.g. "220 Venice Way; Venice; CA 90291;
+     * USA, Los Angeles". Search addresses arrive normalised server-side, so this
+     * is the last place we still do it ourselves, and it goes when the hotel page
+     * takes the same treatment.
      *
      * @param {string|null} address
      * @param {string|null} region
@@ -153,7 +155,13 @@ class CatalogHotel {
             return null;
         }
 
-        return Hotel.getAddress(address.replace(/;/g, ','), region);
+        const segments = address.replace(/;/g, ',').split(',').map(segment => segment.trim()).filter(Boolean);
+
+        if (region && segments.length > 1 && segments.at(-1).toLowerCase() === region.toLowerCase()) {
+            segments.pop();
+        }
+
+        return segments.join(', ');
     }
 }
 

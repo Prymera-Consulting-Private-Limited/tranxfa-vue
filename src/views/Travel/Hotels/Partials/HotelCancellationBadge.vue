@@ -1,100 +1,49 @@
 <script setup>
 import {computed} from 'vue';
 import moment from "moment";
+import {CANCELLATION_STATUS} from "@/composables/travel/hotels/hotel_utils.js";
 
 const props = defineProps({
-  payment: {
+  /**
+   * @type {RateCancellation|null}
+   */
+  cancellation: {
     type: Object,
     default: null,
   },
 });
 
-const penalties = computed(() => props.payment?.cancellationPenalties ?? null);
+const status = computed(() => props.cancellation?.status ?? null);
 
-const policies = computed(() => penalties.value?.policies ?? []);
+// The backend resolves the supplier's ladder against the clock before sending
+// it, so the window is never evaluated here. The one thing still worth checking
+// is the date itself: a free_until that has already passed would print a promise
+// with an expired date on it, which is the defect we spent two commits removing.
+// Dropping the date leaves the status it came with intact.
+const freeUntil = computed(() => {
+  const value = props.cancellation?.freeUntil ?? null;
 
-const freeUntil = computed(() => penalties.value?.freeCancellationBefore ?? null);
-
-// The supplier leaves free_cancellation_before in place once it passes, so a
-// date being present says nothing about whether the window is still open. It
-// has to be checked against now, or a card promises free cancellation until a
-// date that has already gone while the hotel page calls the same rate
-// non-refundable.
-const isFreeWindowOpen = computed(() => {
-  return freeUntil.value !== null && moment(freeUntil.value).isAfter(moment());
-});
-
-/**
- * What governs cancelling today is the policy whose window contains now, which
- * is not the same test as "has not ended yet" — a ladder can hold a window that
- * has not started, and charging its penalty early is simply wrong. Both bounds
- * null covers the whole stay, so it is always in force; whether that means free
- * or non-refundable is decided by the amount, never by the nulls.
- *
- * @param {{startAt: string|null, endAt: string|null}} policy
- * @param {moment.Moment} now
- * @returns {boolean}
- */
-function isPolicyInForce(policy, now) {
-  const started = !policy.startAt || !moment(policy.startAt).isAfter(now);
-  const ended = !!policy.endAt && !moment(policy.endAt).isAfter(now);
-
-  return started && !ended;
-}
-
-const policiesInForce = computed(() => {
-  const now = moment();
-
-  return policies.value.filter(policy => isPolicyInForce(policy, now));
-});
-
-// A rate can be free to cancel across its whole window, in which case the
-// supplier sends a single policy with both bounds null and nothing to charge.
-// That is genuinely free rather than partly refundable, even though it carries
-// no date of its own.
-const isFreeNow = computed(() => {
-  return policiesInForce.value.length > 0
-      && policiesInForce.value.every(policy => Number(policy.amountCharge ?? 0) === 0);
-});
-
-/**
- * amount_charge is a decimal string, so a zero-charge policy means at least part
- * of the stay is refundable. Without any policy data we stay silent rather than
- * promise a refund we cannot honour, and once every policy has expired we say
- * non-refundable rather than infer a refund from a window that has closed.
- */
-const status = computed(() => {
-  if (isFreeWindowOpen.value || isFreeNow.value) {
-    return 'free';
-  }
-
-  if (policies.value.length === 0) {
-    return null;
-  }
-
-  if (policiesInForce.value.length === 0) {
-    return 'non-refundable';
-  }
-
-  const refundable = policiesInForce.value.some(policy => Number(policy.amountCharge ?? 0) === 0);
-
-  return refundable ? 'partial' : 'non-refundable';
+  return value && moment(value).isAfter(moment()) ? value : null;
 });
 
 const label = computed(() => {
   switch (status.value) {
-    // The supplier's own date is preferred whenever it is still ahead, since a
-    // whole-window free policy has no date to name.
-    case 'free':
-      return isFreeWindowOpen.value
+    case CANCELLATION_STATUS.free:
+      return freeUntil.value
           ? `Free cancellation until ${moment(freeUntil.value).format('D MMM')}`
           : 'Free cancellation';
 
-    case 'partial':
+    case CANCELLATION_STATUS.partial:
       return 'Partly refundable';
 
-    case 'non-refundable':
+    case CANCELLATION_STATUS.nonRefundable:
       return 'Non-refundable';
+
+    // Some supplier rates state no terms at all. Saying where they will be
+    // answered is the only honest thing to put here — hiding the rate loses a
+    // real result, and guessing either way is a promise we cannot keep.
+    case CANCELLATION_STATUS.unknown:
+      return 'Cancellation terms at the next step';
 
     default:
       return null;
@@ -103,10 +52,10 @@ const label = computed(() => {
 
 const classes = computed(() => {
   switch (status.value) {
-    case 'free':
+    case CANCELLATION_STATUS.free:
       return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
 
-    case 'partial':
+    case CANCELLATION_STATUS.partial:
       return 'bg-amber-50 text-amber-700 ring-amber-200';
 
     default:

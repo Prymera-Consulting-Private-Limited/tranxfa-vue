@@ -12,14 +12,25 @@ import HotelPrice from "@/views/Travel/Hotels/Partials/HotelPrice.vue";
 import HotelAction from "@/views/Travel/Hotels/Partials/HotelAction.vue";
 
 const props = defineProps({
+  /**
+   * @type {Hotel}
+   */
   hotel: {
     type: Object,
     required: true,
   },
 
-  rate: {
+  /**
+   * The response's currency and decimal places, which every amount below needs.
+   */
+  money: {
     type: Object,
     required: true,
+  },
+
+  labels: {
+    type: Object,
+    default: () => ({}),
   },
 
   nights: {
@@ -32,7 +43,8 @@ const emit = defineEmits([
   'select',
 ]);
 
-const payment = computed(() => props.rate.paymentOptions?.paymentTypes?.[0] ?? null);
+// The search returns one rate per hotel, and a hotel with none never reaches us.
+const rate = computed(() => props.hotel.cheapestRate);
 </script>
 
 <template>
@@ -60,17 +72,17 @@ const payment = computed(() => props.rate.paymentOptions?.paymentTypes?.[0] ?? n
         <HotelRoomType :rate="rate" />
         <!-- Rate Highlights -->
         <div class="flex flex-wrap items-center gap-2">
-          <HotelMealBadge :meal-type="rate.mealData?.value" />
-          <HotelCancellationBadge :payment="payment" />
+          <HotelMealBadge :meal="rate.meal" :labels="labels" />
+          <HotelCancellationBadge :cancellation="rate.cancellation" />
           <HotelAvailability :allotment="rate.allotment" />
         </div>
         <!-- Amenities -->
-        <HotelAmenities :amenities="rate.amenitiesData" />
+        <HotelAmenities :amenities="hotel.amenities" :labels="labels" />
       </div>
       <!-- Price -->
-      <aside v-if="payment" class="flex flex-col justify-between gap-4 border-t border-gray-100 bg-gray-50/70 p-5 lg:col-span-3 lg:border-t-0 lg:border-l">
-        <HotelPrice :payment="payment" :nights="nights" />
-        <HotelAction :rate-count="hotel.rates.length" @select="$emit('select', hotel)" />
+      <aside class="flex flex-col justify-between gap-4 border-t border-gray-100 bg-gray-50/70 p-5 lg:col-span-3 lg:border-t-0 lg:border-l">
+        <HotelPrice :rate="rate" :money="money" :nights="nights" />
+        <HotelAction :rate-count="hotel.rateCount" @select="$emit('select', hotel)" />
       </aside>
     </div>
   </article>

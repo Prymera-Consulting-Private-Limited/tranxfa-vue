@@ -28,7 +28,16 @@ export const MAX_CHECKIN_DAYS = 730;
  */
 const DEFAULT_RESIDENCY = 'AU';
 
+/**
+ * Bounds what the supplier sends the backend. Their own cap of 500 applies after
+ * it, so at this figure we never meet it.
+ */
 const HOTELS_LIMIT = 250;
+
+/**
+ * The destination lookup rejects anything shorter, so the picker does not ask.
+ */
+export const REGION_QUERY_MIN = 2;
 
 /**
  * The whole region comes back in one search, so the list is paged in the browser
@@ -54,6 +63,31 @@ export function getCriteria(query = {}) {
         checkin: checkin,
         checkout: getCheckoutDate(query.checkout, checkin),
         guests: getGuests(query.guests),
+    };
+}
+
+/**
+ * The criteria are named for the url, which is their other job and which shared
+ * links depend on. The api names the same things differently, so the two are
+ * mapped here rather than one of them being bent to the other.
+ *
+ * Currency is deliberately absent: a customer is quoted in their own country's
+ * currency, and asking for another would only be a way to get that wrong.
+ *
+ * @param {object} criteria
+ * @param {string} residency
+ * @returns {object}
+ */
+export function getSearchPayload(criteria, residency) {
+    return {
+        region_id: criteria.region_id,
+        check_in: criteria.checkin,
+        check_out: criteria.checkout,
+        residency: residency,
+        rooms: criteria.guests.map(room => ({
+            adults: room.adults,
+            children_ages: room.children,
+        })),
         hotels_limit: HOTELS_LIMIT,
     };
 }
@@ -202,8 +236,23 @@ function getCount(value, fallback, min, max) {
 }
 
 /**
- * The dimensions the supplier's cdn renders for the {size} placeholder. Anything
- * outside its own set comes back as a 404, so every caller picks from here.
+ * How the backend states a rate's cancellation terms, already resolved for now.
+ * "unknown" is a real answer rather than missing data: some supplier rates carry
+ * no terms at all, and neither promising a refund nor threatening a penalty would
+ * be true.
+ */
+export const CANCELLATION_STATUS = {
+    free: 'free',
+    partial: 'partial',
+    nonRefundable: 'non_refundable',
+    unknown: 'unknown',
+};
+
+/**
+ * Search photos arrive ready to request at each size. This is only still needed
+ * on the hotel page, whose urls carry the supplier's {size} placeholder — and
+ * anything outside its own set of dimensions comes back as a 404, so every
+ * caller picks from here.
  */
 export const PHOTO_SIZE = {
     thumbnail: '240x240',
@@ -244,45 +293,6 @@ export function prettifyLabel(value) {
 }
 
 /**
- * The cheapest rate we can actually price. Rates without payment options cannot
- * be displayed, so they are skipped.
- *
- * @param {Hotel} hotel
- * @returns {HotelRate|null}
- */
-export function getCheapestRate(hotel) {
-    const bookable = hotel.rates.filter(rate => rate.paymentOptions?.paymentTypes?.length > 0);
-
-    if (bookable.length === 0) {
-        return null;
-    }
-
-    return bookable.reduce((cheapest, rate) => {
-        return getRateAmount(rate) < getRateAmount(cheapest) ? rate : cheapest;
-    });
-}
-
-/**
- * @param {HotelRate} rate
- * @returns {number}
- */
-export function getRateAmount(rate) {
-    const payment = rate.paymentOptions.paymentTypes[0];
-
-    return Number(payment.showAmount ?? payment.amount ?? 0);
-}
-
-/**
- * @param {HotelRate} rate
- * @returns {string}
- */
-export function getRateCurrency(rate) {
-    const payment = rate.paymentOptions.paymentTypes[0];
-
-    return payment.showCurrencyCode ?? payment.currencyCode ?? '';
-}
-
-/**
  * @param {number|string|null} amount
  * @returns {string}
  */
@@ -294,46 +304,25 @@ export function formatAmount(amount) {
 }
 
 /**
- * Rates are keyed on the hash a booking is placed against, which is also what
- * makes a selected rate identifiable across a re-render.
+ * The price slider only. Its position is a value between two rates that exists
+ * nowhere in the response, so it is the one amount no set of pre-rendered strings
+ * can cover — every amount the api actually sent arrives already formatted and is
+ * shown as it was sent.
  *
- * @param {HotelRate} rate
+ * Even here nothing is assumed — 23000 is 230.00 in USD and 23000 in JPY, so the
+ * response's own decimal places decide.
+ *
+ * @param {number|null} amount
+ * @param {{currency: string, decimalPlaces: number}} money
  * @returns {string}
  */
-export function getRateKey(rate) {
-    return rate.bookHash ?? rate.matchHash ?? '';
-}
+export function formatMoney(amount, money) {
+    const places = Number.isInteger(money?.decimalPlaces) ? money.decimalPlaces : 2;
 
-/**
- * The supplier returns one rate per room and board combination, so a hotel with
- * three room types can come back as twenty rates. They are grouped the way the
- * stay is actually chosen: pick the room, then pick how it is booked.
- *
- * @param {HotelRate[]} rates
- * @returns {Array<{name: string, rates: HotelRate[], amount: number, currency: string}>}
- */
-export function getRoomGroups(rates) {
-    const groups = new Map();
-
-    // A rate with no payment option cannot be priced, so it cannot be offered.
-    rates.filter(rate => rate.paymentOptions?.paymentTypes?.length > 0).forEach(rate => {
-        const name = rate.roomDataTranslation?.mainRoomType || rate.roomName || 'Room';
-
-        groups.set(name, [...(groups.get(name) ?? []), rate]);
-    });
-
-    return [...groups.entries()]
-        .map(([name, items]) => {
-            const sorted = [...items].sort((a, b) => getRateAmount(a) - getRateAmount(b));
-
-            return {
-                name: name,
-                rates: sorted,
-                amount: getRateAmount(sorted[0]),
-                currency: getRateCurrency(sorted[0]),
-            };
-        })
-        .sort((a, b) => a.amount - b.amount);
+    return new Intl.NumberFormat(undefined, {
+        minimumFractionDigits: places,
+        maximumFractionDigits: places,
+    }).format(Number(amount ?? 0) / 10 ** places);
 }
 
 /**
@@ -415,15 +404,15 @@ export function getSelectionRoomGroups(rates) {
  * A search is filtered in the browser, since one region search already returns
  * every hotel we are allowed to show.
  *
- * @returns {{maxPrice: number|null, stars: number[], photos: string|null, features: string[], amenities: string[]}}
+ * @returns {{maxPrice: number|null, stars: number[], photos: string|null, amenities: string[]}}
  */
 export function getFilters() {
     return {
+        // In minor units, like every other amount a search carries.
         maxPrice: null,
         stars: [],
         // Either "with", "without", or no preference at all.
         photos: null,
-        features: [],
         amenities: [],
     };
 }
@@ -432,57 +421,57 @@ export function getFilters() {
  * Counts are taken over the whole result set rather than the filtered one, so an
  * option never reads as empty just because another group is narrowing it.
  *
- * @param {Array<{hotel: Hotel, rate: HotelRate}>} results
+ * @param {Hotel[]} hotels
+ * @param {{currency: string, decimalPlaces: number}} money
+ * @param {object} labels
  * @returns {object}
  */
-export function getFacets(results) {
-    const prices = results.map(result => getRateAmount(result.rate));
+export function getFacets(hotels, money, labels = {}) {
+    const prices = hotels.map(hotel => hotel.cheapestRate.total.amount);
     const stars = new Map();
-    const features = new Map();
     const amenities = new Map();
     const photos = {with: 0, without: 0};
 
-    results.forEach(({hotel, rate}) => {
-        const rating = Math.round(hotel.starRating ?? 0);
-
-        // A 0-star hotel is an apartment or a guest house, not a rating.
-        if (rating > 0) {
-            countValue(stars, rating);
+    hotels.forEach(hotel => {
+        // Unrated arrives as null, and a 0 would be an apartment or a guest
+        // house rather than a rating either way.
+        if (hotel.starRating) {
+            countValue(stars, Math.round(hotel.starRating));
         }
 
-        photos[hotel.photos.length ? 'with' : 'without'] += 1;
+        photos[hotel.photo ? 'with' : 'without'] += 1;
 
-        rate.serpFilters.forEach(value => countValue(features, value));
-        rate.amenitiesData.forEach(value => countValue(amenities, value));
+        hotel.amenities.forEach(value => countValue(amenities, value));
     });
 
     return {
         photos: photos,
         price: {
-            // The supplier prices a search in one currency, so the first rate speaks for all.
-            currency: results.length ? getRateCurrency(results[0].rate) : '',
-            min: prices.length ? Math.floor(Math.min(...prices)) : 0,
-            max: prices.length ? Math.ceil(Math.max(...prices)) : 0,
+            // One currency per response, stated by the response itself — never
+            // read off a rate, which no longer carries one.
+            currency: money.currency,
+            min: prices.length ? Math.min(...prices) : 0,
+            max: prices.length ? Math.max(...prices) : 0,
         },
         stars: [...stars.entries()]
             .map(([value, count]) => ({value: value, count: count}))
             .sort((a, b) => b.value - a.value),
-        features: getOptions(features),
-        amenities: getOptions(amenities),
+        amenities: getOptions(amenities, labels),
     };
 }
 
 /**
- * Filters run against the rate the card shows, which is the cheapest bookable
- * one, so the price and the badges on screen always match what was filtered.
+ * Filters run against the rate the card shows, which is the one the search
+ * returned, so the price and the badges on screen always match what was
+ * filtered.
  *
- * @param {Array<{hotel: Hotel, rate: HotelRate}>} results
+ * @param {Hotel[]} hotels
  * @param {object} filters
- * @returns {Array<{hotel: Hotel, rate: HotelRate}>}
+ * @returns {Hotel[]}
  */
-export function getFilteredResults(results, filters) {
-    return results.filter(({hotel, rate}) => {
-        if (filters.maxPrice !== null && getRateAmount(rate) > filters.maxPrice) {
+export function getFilteredResults(hotels, filters) {
+    return hotels.filter(hotel => {
+        if (filters.maxPrice !== null && hotel.cheapestRate.total.amount > filters.maxPrice) {
             return false;
         }
 
@@ -490,15 +479,11 @@ export function getFilteredResults(results, filters) {
             return false;
         }
 
-        if (filters.photos !== null && (filters.photos === 'with') !== (hotel.photos.length > 0)) {
+        if (filters.photos !== null && (filters.photos === 'with') !== (hotel.photo !== null)) {
             return false;
         }
 
-        if (!filters.features.every(value => rate.serpFilters.includes(value))) {
-            return false;
-        }
-
-        return filters.amenities.every(value => rate.amenitiesData.includes(value));
+        return filters.amenities.every(value => hotel.amenities.includes(value));
     });
 }
 
@@ -514,23 +499,23 @@ export const SORT_OPTIONS = [
 ];
 
 /**
- * Sorting runs after filtering, against the same cheapest-bookable rate the
- * card shows, so the order on screen always matches the price in front of it.
+ * Sorting runs after filtering, against the same rate the card shows, so the
+ * order on screen always matches the price in front of it.
  *
- * @param {Array<{hotel: Hotel, rate: HotelRate}>} results
+ * @param {Hotel[]} hotels
  * @param {string} sort
- * @returns {Array<{hotel: Hotel, rate: HotelRate}>}
+ * @returns {Hotel[]}
  */
-export function getSortedResults(results, sort) {
+export function getSortedResults(hotels, sort) {
     switch (sort) {
         case 'price_asc':
-            return [...results].sort((a, b) => getRateAmount(a.rate) - getRateAmount(b.rate));
+            return [...hotels].sort((a, b) => a.cheapestRate.total.amount - b.cheapestRate.total.amount);
         case 'price_desc':
-            return [...results].sort((a, b) => getRateAmount(b.rate) - getRateAmount(a.rate));
+            return [...hotels].sort((a, b) => b.cheapestRate.total.amount - a.cheapestRate.total.amount);
         case 'rating_desc':
-            return [...results].sort((a, b) => (b.hotel.starRating ?? 0) - (a.hotel.starRating ?? 0));
+            return [...hotels].sort((a, b) => (b.starRating ?? 0) - (a.starRating ?? 0));
         default:
-            return results;
+            return hotels;
     }
 }
 
@@ -542,7 +527,6 @@ export function hasFilters(filters) {
     return filters.maxPrice !== null
         || filters.stars.length > 0
         || filters.photos !== null
-        || filters.features.length > 0
         || filters.amenities.length > 0;
 }
 
@@ -558,11 +542,11 @@ function getQueryString(value) {
 }
 
 /**
- * Feature and amenity text comes straight from the supplier and is never
- * guaranteed to be a clean slug, so it cannot be joined into one param on a
- * delimiter that the text itself might contain. A repeated param is what the
- * router already uses for a real list, so stars/features/amenities go out
- * the same way instead of being comma-joined into a single string.
+ * Amenity codes come straight from the supplier and are never guaranteed to be
+ * clean slugs, so they cannot be joined into one param on a delimiter the code
+ * itself might contain. A repeated param is what the router already uses for a
+ * real list, so stars and amenities go out the same way instead of being
+ * comma-joined into a single string.
  *
  * @param {*} value
  * @returns {string[]}
@@ -588,7 +572,6 @@ export function getFiltersQuery(filters) {
         max_price: filters.maxPrice ?? undefined,
         stars: filters.stars.length ? filters.stars.map(String) : undefined,
         photos: filters.photos ?? undefined,
-        features: filters.features.length ? filters.features : undefined,
         amenities: filters.amenities.length ? filters.amenities : undefined,
     };
 }
@@ -598,14 +581,14 @@ export function getFiltersQuery(filters) {
  * @returns {object}
  */
 export function getFiltersFromQuery(query) {
-    const maxPrice = Number.parseFloat(getQueryString(query.max_price));
+    // Minor units, so a fractional cap could only come from a hand-edited url.
+    const maxPrice = Number.parseInt(getQueryString(query.max_price), 10);
     const photos = getQueryString(query.photos);
 
     return {
-        maxPrice: Number.isFinite(maxPrice) ? maxPrice : null,
+        maxPrice: Number.isInteger(maxPrice) ? maxPrice : null,
         stars: getQueryList(query.stars).map(value => Number.parseInt(value, 10)).filter(Number.isInteger),
         photos: photos === 'with' || photos === 'without' ? photos : null,
-        features: getQueryList(query.features),
         amenities: getQueryList(query.amenities),
     };
 }
@@ -702,10 +685,13 @@ export function getGuestBreakdown(guests) {
 
 /**
  * Most useful first, so the longest lists still open on something worth picking.
+ * Display text comes from the response's own dictionary — prettifying a code we
+ * were not given a label for is a last resort, since it is what used to put
+ * "Non smoking" in front of a customer.
  */
-function getOptions(map) {
+function getOptions(map, labels) {
     return [...map.entries()]
-        .map(([value, count]) => ({value: value, label: prettifyLabel(value), count: count}))
+        .map(([value, count]) => ({value: value, label: labels[value] ?? prettifyLabel(value), count: count}))
         .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
 
@@ -731,32 +717,23 @@ export function useHotelUtils() {
     const guestBreakdown = computed(() => getGuestBreakdown(criteria.value.guests));
 
     /**
-     * Without a query the endpoint answers with its own default list, which is
-     * what the destination picker shows before the customer types.
+     * With a query this searches; without one it answers the destinations an
+     * operator has curated, and says which it gave us in is_featured. Either way
+     * only places a supplier actually covers are offered, so an empty list means
+     * we cannot search there rather than that the place does not exist.
      *
-     * @param {string|null} query
+     * @param {string|null} query At least REGION_QUERY_MIN characters, or null.
      */
     async function regions(query = null) {
-        return await axios.get('/client/v1/travel/hotels/catalog/regions', {
+        return await axios.get('/client/v1/travel/regions', {
             params: {
-                q: query,
-            },
-        });
-    }
-
-    async function popularRegions(query = null) {
-        return await axios.get('/client/v1/travel/hotels/catalog/popular-regions', {
-            params: {
-                q: query,
+                query: query ?? undefined,
             },
         });
     }
 
     async function search() {
-        return await axios.post('/client/v1/travel/hotels/search/region', {
-            ...criteria.value,
-            residency: residency.value,
-        });
+        return await axios.post('/client/v1/travel/hotels/search/region', getSearchPayload(criteria.value, residency.value));
     }
 
     /**
@@ -837,6 +814,5 @@ export function useHotelUtils() {
         getBookingAttempt,
         saveBookingGuests,
         regions,
-        popularRegions,
     }
 }

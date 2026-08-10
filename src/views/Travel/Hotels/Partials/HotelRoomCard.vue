@@ -124,7 +124,7 @@ const key = getSelectionRateKey;
         <div class="min-w-0 flex-1 space-y-2">
           <div class="flex flex-wrap items-center gap-2">
             <span v-if="key(rate) === bestKey" class="inline-flex items-center rounded-lg bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white">Lowest price</span>
-            <HotelMealBadge :meal-type="rate.mealType" />
+            <HotelMealBadge :meal="rate.mealType" />
             <HotelSelectionCancellationBadge :cancellation="rate.cancellation" />
             <HotelAvailability :allotment="rate.allotment" />
           </div>

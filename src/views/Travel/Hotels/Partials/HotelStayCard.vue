@@ -106,7 +106,7 @@ const facts = computed(() => [
         total for {{ nights }} night{{ nights === 1 ? '' : 's' }} &middot; {{ currency }} {{ perNight }} / night
       </p>
       <div v-if="selected" class="mt-3 flex flex-wrap items-center gap-2">
-        <HotelMealBadge :meal-type="selected.mealType" />
+        <HotelMealBadge :meal="selected.mealType" />
         <HotelSelectionCancellationBadge :cancellation="selected.cancellation" />
       </div>
       <p v-if="bookingFailed" class="mt-3 text-xs text-red-600">Something went wrong starting your booking. Please try again.</p>

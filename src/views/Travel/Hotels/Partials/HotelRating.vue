@@ -5,11 +5,12 @@ import {StarIcon} from "@heroicons/vue/24/solid";
 const props = defineProps({
   stars: {
     type: Number,
-    default: 0,
+    default: null,
   },
 });
 
-// Apartments and guest houses come back as 0-star, which is not a rating.
+// An unrated hotel arrives as null, and apartments and guest houses have come
+// back as 0-star, which is not a rating either.
 const rating = computed(() => Math.round(props.stars ?? 0));
 </script>
 
