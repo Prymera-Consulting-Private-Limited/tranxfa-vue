@@ -22,10 +22,18 @@ const customerUtils = useCustomerUtils();
  */
 const customer = customerStore.customer;
 
+/**
+ * Travel is licensed per deployment, and there is nothing on the customer saying
+ * whether this one has it — every travel route simply answers 404 without the
+ * licence. A build flag is the honest stand-in until app and domain scoping lands
+ * and supplies a real field, at which point this comes out.
+ */
+const hasTravel = import.meta.env.VITE_TRAVEL_ENABLED !== 'false';
+
 const navigation = [
   { name: 'Home', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
   { name: 'Transfers', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
-  { name: 'Hotels', href: 'hotels', current: router.currentRoute.value.name === 'hotels' },
+  ...(hasTravel ? [{ name: 'Hotels', href: 'hotels', current: router.currentRoute.value.name === 'hotels' }] : []),
   { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
   { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
   { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },
