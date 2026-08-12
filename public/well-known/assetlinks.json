@@ -1,0 +1,16 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "eu.xenvia.app",
+            "sha256_cert_fingerprints": [
+                "A6:8A:DF:24:F7:4C:E3:EC:FA:91:48:64:F3:58:CE:AB:62:1B:D7:43:59:71:A9:16:3F:12:A8:71:A9:7D:B0:D6",
+                "D7:56:60:13:74:4D:87:BE:EE:88:8D:F2:8A:F3:2D:1C:11:26:A3:36:B9:1D:A9:60:91:C7:D6:64:22:98:8B:0C",
+                "F2:10:3A:F3:F0:04:0A:32:45:FF:A4:E2:DE:CF:13:47:04:01:99:0A:9E:BE:B2:1C:A6:6C:CD:EC:00:BF:ED:B9"
+            ]
+        }
+    }
+]
