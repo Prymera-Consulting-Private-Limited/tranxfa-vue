@@ -44,7 +44,7 @@ async function launchSumsubWebSdk(accessToken) {
            () => getNewAccessToken()
       )
       .withConf({
-        lang: "en",
+        lang: "es",
         theme: "dark" | "light",
         country: customerStore.customer.data?.country?.iso3Alpha,
       })
