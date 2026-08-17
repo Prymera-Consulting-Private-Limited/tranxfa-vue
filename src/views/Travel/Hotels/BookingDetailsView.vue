@@ -13,6 +13,7 @@ import Processing from "@/components/Payment/State/Processing.vue";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
 import Failed from "@/components/Payment/State/Failed.vue";
 import {formatAmount, prettifyLabel, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
+import {CONFIRMATION_POLL_MS} from "@/composables/travel/order_utils.js";
 import HotelBooking from "@/models/travel/hotels/hotel_booking.js";
 import {EnvelopeIcon, ExclamationTriangleIcon, MapPinIcon, UserIcon, UsersIcon} from "@heroicons/vue/24/outline";
 
@@ -60,16 +61,31 @@ async function loadPage() {
   hasFailed.value = false;
   failReason.value = 'load';
   attempt.value = null;
-  unsubscribeFromConfirmation();
+  stopWatchingConfirmation();
+  startedWaitingAt = Date.now();
   timedOut.value = false;
 
+  await refreshAttempt();
+}
+
+/**
+ * @param {boolean} quiet A poll leaves what is on screen alone rather than
+ * flashing the whole page back to its skeleton every few seconds.
+ */
+async function refreshAttempt(quiet = false) {
   await getBookingAttempt(props.attemptId).then((response) => {
     attempt.value = HotelBooking.getInstance(response.data);
 
-    if (isConfirming.value) {
-      subscribeToConfirmation();
-    }
+    watchConfirmation();
   }).catch((error) => {
+    // A poll that fails is not worth tearing the page down for — the next one
+    // may well succeed, and the confirmation is running regardless.
+    if (quiet) {
+      watchConfirmation();
+
+      return;
+    }
+
     hasFailed.value = true;
     failReason.value = error.response?.status === 403 ? 'forbidden' : (error.response?.status === 404 ? 'notFound' : 'load');
   }).finally(() => {
@@ -92,41 +108,38 @@ const CONFIRMATION_TIMEOUT_MS = 150000;
 
 const timedOut = ref(false);
 let confirmationTimer = null;
-let subscribedAttemptId = null;
+let startedWaitingAt = null;
 
-function subscribeToConfirmation() {
-  if (!attempt.value || subscribedAttemptId === attempt.value.id) {
+/**
+ * The confirmation is asked for rather than announced. This page originally
+ * listened on a private booking-attempts channel for booking.confirmed and
+ * booking.failed, but no such broadcast exists anywhere on the backend and none
+ * ever fired — so the wait never ended on its own. Polling is the mechanism,
+ * not a fallback for it.
+ */
+function watchConfirmation() {
+  clearTimeout(confirmationTimer);
+  confirmationTimer = null;
+
+  if (!isConfirming.value) {
     return;
   }
 
-  subscribedAttemptId = attempt.value.id;
-
-  Echo.private(`booking-attempts.${subscribedAttemptId}`)
-      .listen('.booking.confirmed', (data) => {
-        attempt.value = HotelBooking.getInstance(data);
-        unsubscribeFromConfirmation();
-      })
-      .listen('.booking.failed', (data) => {
-        attempt.value = HotelBooking.getInstance(data);
-        unsubscribeFromConfirmation();
-      });
-
-  confirmationTimer = setTimeout(() => {
+  if (startedWaitingAt !== null && Date.now() - startedWaitingAt >= CONFIRMATION_TIMEOUT_MS) {
     timedOut.value = true;
-  }, CONFIRMATION_TIMEOUT_MS);
-}
-
-function unsubscribeFromConfirmation() {
-  if (subscribedAttemptId) {
-    Echo.leave(`booking-attempts.${subscribedAttemptId}`);
-    subscribedAttemptId = null;
   }
 
+  // Kept running past the timeout: the message changes to say it is taking
+  // longer than usual, but the answer is still worth catching when it lands.
+  confirmationTimer = setTimeout(() => refreshAttempt(true), CONFIRMATION_POLL_MS);
+}
+
+function stopWatchingConfirmation() {
   clearTimeout(confirmationTimer);
   confirmationTimer = null;
 }
 
-onUnmounted(unsubscribeFromConfirmation);
+onUnmounted(stopWatchingConfirmation);
 
 // The confirmation is already running on our end regardless of this tab, but
 // closing or refreshing mid-wait just makes the customer think it was lost.
@@ -151,7 +164,7 @@ onBeforeRouteLeave(() => {
   }
 });
 
-// Declared last so it can call subscribeToConfirmation/unsubscribeFromConfirmation
+// Declared last so it can call watchConfirmation/stopWatchingConfirmation
 // above, and run as an immediate watcher only once everything it touches exists.
 watch(() => props.attemptId, loadPage, {immediate: true});
 
