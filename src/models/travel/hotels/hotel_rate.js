@@ -1,4 +1,4 @@
-import Money from "@/models/travel/hotels/money.js";
+import Money from "@/models/travel/money.js";
 import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
 
 /**

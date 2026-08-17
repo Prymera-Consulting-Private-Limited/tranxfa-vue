@@ -1,4 +1,4 @@
-import Money from "@/models/travel/hotels/money.js";
+import Money from "@/models/travel/money.js";
 
 /**
  * Cancellation as the backend has already resolved it. The supplier states it as

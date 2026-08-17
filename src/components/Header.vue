@@ -33,7 +33,10 @@ const hasTravel = import.meta.env.VITE_TRAVEL_ENABLED !== 'false';
 const navigation = [
   { name: 'Home', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
   { name: 'Transfers', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
-  ...(hasTravel ? [{ name: 'Hotels', href: 'hotels', current: router.currentRoute.value.name === 'hotels' }] : []),
+  ...(hasTravel ? [
+    { name: 'Hotels', href: 'hotels', current: router.currentRoute.value.name === 'hotels' },
+    { name: 'Bookings', href: 'travelBookings', current: router.currentRoute.value.name === 'travelBookings' },
+  ] : []),
   { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
   { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
   { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },

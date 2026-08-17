@@ -120,6 +120,24 @@ const router = createRouter({
         description: '',
       },
     }, {
+      // Bookings a customer already holds, as opposed to an attempt in flight.
+      path: '/travel/bookings',
+      name: 'travelBookings',
+      component: () => import('@/views/Travel/Bookings/IndexView.vue'),
+      meta: {
+        title: 'Your Bookings',
+        description: '',
+      },
+    }, {
+      path: '/travel/booking/:id',
+      name: 'travelBooking',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/ItemView.vue'),
+      meta: {
+        title: 'Booking',
+        description: '',
+      },
+    }, {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
       props: route => ({ id: route.params.quoteId }),
