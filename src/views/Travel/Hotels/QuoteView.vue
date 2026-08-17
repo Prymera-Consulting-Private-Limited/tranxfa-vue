@@ -12,7 +12,7 @@ import HotelAvailability from "@/views/Travel/Hotels/Partials/HotelAvailability.
 import HotelAmenities from "@/views/Travel/Hotels/Partials/HotelAmenities.vue";
 import PriceChangeDialog from "@/views/Travel/Hotels/Partials/PriceChangeDialog.vue";
 import GuestDetailsForm from "@/views/Travel/Hotels/Partials/GuestDetailsForm.vue";
-import {formatAmount, getGuestBreakdown, prettifyLabel, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
+import {formatAmount, getGuestBreakdown, getPhotoUrl, PHOTO_SIZE, prettifyLabel, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import HotelQuote from "@/models/travel/hotels/hotel_quote.js";
 import HotelBooking from "@/models/travel/hotels/hotel_booking.js";
 import {CheckCircleIcon, ChevronLeftIcon, ClockIcon, ExclamationTriangleIcon, MapPinIcon, UsersIcon} from "@heroicons/vue/24/outline";
@@ -45,6 +45,19 @@ const {getHotelQuote, bookHotel, getBookingAttempt, saveBookingGuests} = useHote
  * @type {import('vue').Ref<HotelQuote|null>}
  */
 const quote = ref(null);
+
+// The gallery takes photos ready to request at each size, which is how the hotel
+// page now sends them. This endpoint still sends the supplier's {size} url, so it
+// is adapted here rather than the gallery carrying two shapes.
+const galleryPhotos = computed(() => {
+  return (quote.value?.hotel?.photos ?? []).map(photo => ({
+    thumbnail: getPhotoUrl(photo.url, PHOTO_SIZE.thumbnail),
+    card: getPhotoUrl(photo.url, PHOTO_SIZE.card),
+    large: getPhotoUrl(photo.url, PHOTO_SIZE.large),
+    xlarge: getPhotoUrl(photo.url, PHOTO_SIZE.large),
+  }));
+});
+
 
 const isLoading = ref(false);
 const hasFailed = ref(false);
@@ -531,7 +544,7 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
           <div class="mt-6 lg:grid lg:grid-cols-3 lg:items-start lg:gap-6">
             <!-- Gallery, then the booking attempt's own flow once it starts -->
             <div class="space-y-6 lg:col-span-2">
-              <HotelGallery v-if="quote.hotel" :photos="quote.hotel.photos" :name="quote.hotel.name" />
+              <HotelGallery v-if="quote.hotel" :photos="galleryPhotos" :name="quote.hotel.name" />
               <GuestDetailsForm
                   v-if="attemptStep === 'guestDetails'"
                   :rooms="attempt.rooms"

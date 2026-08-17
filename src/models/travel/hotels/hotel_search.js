@@ -33,6 +33,31 @@ class HotelSearch {
      */
     nights = null;
 
+    /**
+     * Only echoed by the hotel page, which sends the stay back so a page reached
+     * by the back button cannot describe a different one from the prices on it.
+     *
+     * @type {string|null}
+     */
+    residency = null;
+
+    /**
+     * @type {{rooms: Array<{adults: number, children_ages: number[]}>}|null}
+     */
+    occupancy = null;
+
+    /**
+     * The room-by-room shape the guest picker and the search criteria both use.
+     *
+     * @returns {Array<{adults: number, children: number[]}>}
+     */
+    get rooms() {
+        return (this.occupancy?.rooms ?? []).map(room => ({
+            adults: room.adults ?? 0,
+            children: room.children_ages ?? [],
+        }));
+    }
+
     static getInstance(data) {
         const search = new HotelSearch();
 
@@ -41,6 +66,8 @@ class HotelSearch {
         search.checkIn = data.check_in ?? null;
         search.checkOut = data.check_out ?? null;
         search.nights = data.nights ?? null;
+        search.residency = data.residency ?? null;
+        search.occupancy = data.occupancy ?? null;
 
         return search;
     }

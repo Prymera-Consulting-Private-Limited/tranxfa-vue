@@ -2,11 +2,13 @@
 import {computed, onUnmounted, ref, watch} from 'vue';
 import {Dialog, DialogPanel, DialogTitle} from '@headlessui/vue';
 import {BuildingOffice2Icon, ChevronLeftIcon, ChevronRightIcon, Squares2X2Icon, XMarkIcon} from '@heroicons/vue/24/outline';
-import {getPhotoUrl, PHOTO_SIZE} from '@/composables/travel/hotels/hotel_utils.js';
 
 const props = defineProps({
   /**
-   * @type {HotelPhoto[]}
+   * Ordered server-side and never sorted here — the order is the hotel's own
+   * idea of which photo leads. Each is ready to request at every size.
+   *
+   * @type {Array<{thumbnail: string, card: string, large: string, xlarge: string}>}
    */
   photos: {
     type: Array,
@@ -37,13 +39,6 @@ const lead = computed(() => props.photos[0] ?? null);
 const secondary = computed(() => props.photos.slice(1, 5));
 
 const current = computed(() => props.photos[index.value] ?? null);
-
-// The lightbox uses this too: the supplier serves one asset per photo at
-// whatever size is asked for, so there is no separate high-resolution url to
-// prefer — only a larger size to request.
-const hero = computed(() => getPhotoUrl(current.value?.url, PHOTO_SIZE.large));
-
-const caption = computed(() => current.value?.caption ?? null);
 
 /**
  * @param {number} amount
@@ -84,10 +79,6 @@ watch(isOpen, opened => {
 });
 
 onUnmounted(() => window.removeEventListener('keydown', onKeydown));
-
-function tile(photo, size = PHOTO_SIZE.card) {
-  return getPhotoUrl(photo.url, size);
-}
 </script>
 
 <template>
@@ -106,17 +97,17 @@ function tile(photo, size = PHOTO_SIZE.card) {
             class="group relative cursor-pointer overflow-hidden bg-gray-100 focus-visible:outline-0 sm:col-span-2 sm:row-span-2"
             aria-label="Open photo 1"
         >
-          <img :src="tile(lead, PHOTO_SIZE.large)" :alt="lead.caption ?? name" class="size-full object-cover transition duration-500 group-hover:scale-105">
+          <img :src="lead.large" :alt="name" class="size-full object-cover transition duration-500 group-hover:scale-105">
         </button>
         <button
             v-for="(photo, position) in secondary"
-            :key="photo.id"
+            :key="position"
             type="button"
             @click="open(position + 1)"
             class="group relative hidden cursor-pointer overflow-hidden bg-gray-100 focus-visible:outline-0 sm:block"
             :aria-label="`Open photo ${position + 2}`"
         >
-          <img :src="tile(photo)" :alt="photo.caption ?? ''" class="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
+          <img :src="photo.card" alt="" class="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
         </button>
       </div>
       <button
@@ -130,7 +121,7 @@ function tile(photo, size = PHOTO_SIZE.card) {
     </div>
     <!-- One frame, browsed in place -->
     <div v-else class="group relative h-72 overflow-hidden rounded-3xl bg-gray-100 sm:h-96">
-      <img v-if="hero" :src="hero" :alt="caption ?? name" class="size-full cursor-pointer object-cover" @click="isOpen = true">
+      <img v-if="current" :src="current.large" :alt="name" class="size-full cursor-pointer object-cover" @click="isOpen = true">
       <template v-if="photos.length > 1">
         <button
             type="button"
@@ -151,14 +142,14 @@ function tile(photo, size = PHOTO_SIZE.card) {
       </template>
       <span class="absolute bottom-4 left-4 rounded-lg bg-black/50 px-2.5 py-1 text-xs font-medium text-white tabular-nums backdrop-blur">{{ index + 1 }} / {{ photos.length }}</span>
     </div>
-    <!-- Lightbox -->
+    <!-- Lightbox, which is where xlarge earns its place -->
     <Dialog :open="isOpen" @close="isOpen = false" class="relative z-50">
       <div class="fixed inset-0 bg-gray-950/90 backdrop-blur-sm" aria-hidden="true" />
       <div class="fixed inset-0 flex flex-col items-center justify-center gap-4 p-4 sm:p-8">
         <DialogPanel class="flex w-full max-w-6xl flex-col items-center gap-4">
           <DialogTitle class="sr-only">{{ name }} photos</DialogTitle>
           <div class="relative w-full">
-            <img v-if="hero" :src="hero" :alt="caption ?? name" class="max-h-[70vh] w-full rounded-2xl object-contain">
+            <img v-if="current" :src="current.xlarge ?? current.large" :alt="name" class="max-h-[70vh] w-full rounded-2xl object-contain">
             <template v-if="photos.length > 1">
               <button
                   type="button"
@@ -178,15 +169,12 @@ function tile(photo, size = PHOTO_SIZE.card) {
               </button>
             </template>
           </div>
-          <div class="flex w-full items-center justify-between gap-4">
-            <p class="text-xs text-gray-400 tabular-nums">{{ index + 1 }} / {{ photos.length }}</p>
-            <p v-if="caption" class="min-w-0 truncate text-sm text-gray-300">{{ caption }}</p>
-          </div>
+          <p class="w-full text-xs text-gray-400 tabular-nums">{{ index + 1 }} / {{ photos.length }}</p>
           <!-- Filmstrip -->
           <div v-if="photos.length > 1" class="flex w-full gap-2 overflow-x-auto pb-1">
             <button
                 v-for="(photo, position) in photos"
-                :key="photo.id"
+                :key="position"
                 type="button"
                 @click="index = position"
                 :class="[
@@ -195,7 +183,7 @@ function tile(photo, size = PHOTO_SIZE.card) {
                 ]"
                 :aria-label="`Photo ${position + 1}`"
             >
-              <img :src="tile(photo, PHOTO_SIZE.thumbnail)" :alt="photo.caption ?? ''" class="size-full object-cover" loading="lazy">
+              <img :src="photo.thumbnail" alt="" class="size-full object-cover" loading="lazy">
             </button>
           </div>
         </DialogPanel>

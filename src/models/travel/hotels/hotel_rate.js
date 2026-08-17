@@ -8,6 +8,16 @@ import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
  */
 class HotelRate {
     /**
+     * The supplier's permission to proceed with this rate, issued on the hotel
+     * page and nowhere else. Null means this rate cannot be taken forward. It
+     * rotates at the next step, so it is what a quote is asked for rather than
+     * what a booking is made with.
+     *
+     * @type {string|null}
+     */
+    token = null;
+
+    /**
      * @type {string|null}
      */
     roomName = null;
@@ -71,6 +81,7 @@ class HotelRate {
     static getInstance(data) {
         const rate = new HotelRate();
 
+        rate.token = data.token ?? null;
         rate.roomName = data.room_name;
         rate.meal = data.meal ?? null;
         rate.allotment = data.allotment ?? null;

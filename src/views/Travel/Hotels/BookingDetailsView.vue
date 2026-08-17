@@ -12,7 +12,7 @@ import HotelAmenities from "@/views/Travel/Hotels/Partials/HotelAmenities.vue";
 import Processing from "@/components/Payment/State/Processing.vue";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
 import Failed from "@/components/Payment/State/Failed.vue";
-import {formatAmount, prettifyLabel, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
+import {formatAmount, getPhotoUrl, PHOTO_SIZE, prettifyLabel, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import {CONFIRMATION_POLL_MS} from "@/composables/travel/order_utils.js";
 import HotelBooking from "@/models/travel/hotels/hotel_booking.js";
 import {EnvelopeIcon, ExclamationTriangleIcon, MapPinIcon, UserIcon, UsersIcon} from "@heroicons/vue/24/outline";
@@ -94,6 +94,19 @@ async function refreshAttempt(quiet = false) {
 }
 
 const quote = computed(() => attempt.value?.quote ?? null);
+
+// The gallery takes photos ready to request at each size, which is how the hotel
+// page now sends them. This endpoint still sends the supplier's {size} url, so it
+// is adapted here rather than the gallery carrying two shapes.
+const galleryPhotos = computed(() => {
+  return (quote.value?.hotel?.photos ?? []).map(photo => ({
+    thumbnail: getPhotoUrl(photo.url, PHOTO_SIZE.thumbnail),
+    card: getPhotoUrl(photo.url, PHOTO_SIZE.card),
+    large: getPhotoUrl(photo.url, PHOTO_SIZE.large),
+    xlarge: getPhotoUrl(photo.url, PHOTO_SIZE.large),
+  }));
+});
+
 
 // Landing here means guest details are in and payment has gone through — the
 // hotel confirmation itself still runs on our end asynchronously, anywhere
@@ -328,7 +341,7 @@ function guestInitials(guest) {
           </div>
           <div class="mt-6 lg:grid lg:grid-cols-3 lg:items-start lg:gap-6">
             <div class="space-y-6 lg:col-span-2">
-              <HotelGallery v-if="quote?.hotel" :photos="quote.hotel.photos" :name="quote.hotel.name" />
+              <HotelGallery v-if="quote?.hotel" :photos="galleryPhotos" :name="quote.hotel.name" />
               <!-- Guests -->
               <section class="rounded-2xl bg-white p-5 ring-1 ring-gray-200 sm:p-6">
                 <div class="flex items-center gap-2">

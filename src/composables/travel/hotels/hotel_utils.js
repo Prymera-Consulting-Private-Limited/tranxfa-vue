@@ -93,19 +93,51 @@ export function getSearchPayload(criteria, residency) {
 }
 
 /**
- * The hotel page no longer derives its stay from the url — the hotel-view
- * response resolves it server-side instead, as a HotelSearch.
+ * The supplier returns one rate per room and board combination, so a hotel with
+ * three room types can come back as twenty rates. They are grouped the way a stay
+ * is actually chosen: pick the room, then pick how it is booked.
  *
- * @param {HotelSearch} search
- * @returns {object}
+ * Each rate keeps its own price, terms and token throughout — a group's "from"
+ * figure is the cheapest rate's own total and never travels with another rate's
+ * cancellation.
+ *
+ * @param {HotelRate[]} rates
+ * @returns {Array<{name: string, rates: HotelRate[], from: Money}>}
  */
-export function getCriteriaFromSearch(search) {
-    return {
-        region_id: search.region?.id ?? null,
-        checkin: search.checkin,
-        checkout: search.checkout,
-        guests: search.guests ?? [],
-    };
+export function getRateGroups(rates) {
+    const groups = new Map();
+
+    rates.forEach(rate => {
+        const name = rate.roomName || 'Room';
+
+        groups.set(name, [...(groups.get(name) ?? []), rate]);
+    });
+
+    return [...groups.entries()]
+        .map(([name, items]) => {
+            const sorted = [...items].sort((a, b) => a.total.amount - b.total.amount);
+
+            return {
+                name: name,
+                rates: sorted,
+                from: sorted[0].total,
+            };
+        })
+        .sort((a, b) => a.from.amount - b.from.amount);
+}
+
+/**
+ * @param {HotelRate[]} rates
+ * @returns {HotelRate|null}
+ */
+export function getCheapestRate(rates) {
+    const bookable = rates.filter(rate => rate.bookable && rate.token);
+
+    if (bookable.length === 0) {
+        return null;
+    }
+
+    return bookable.reduce((cheapest, rate) => (rate.total.amount < cheapest.total.amount ? rate : cheapest));
 }
 
 /**
@@ -323,81 +355,6 @@ export function formatMoney(amount, money) {
         minimumFractionDigits: places,
         maximumFractionDigits: places,
     }).format(Number(amount ?? 0) / 10 ** places);
-}
-
-/**
- * The hotel-view endpoint prices a selection rate as a single total rather
- * than per payment type, so it needs its own cheapest/amount/currency/key
- * helpers instead of the ones above, which read a supplier rate's payment
- * options.
- *
- * @param {CatalogHotel} hotel
- * @returns {HotelSelectionRate|null}
- */
-export function getCheapestSelectionRate(hotel) {
-    const priced = hotel.rates.filter(rate => rate.price?.amount != null);
-
-    if (priced.length === 0) {
-        return null;
-    }
-
-    return priced.reduce((cheapest, rate) => {
-        return getSelectionRateAmount(rate) < getSelectionRateAmount(cheapest) ? rate : cheapest;
-    });
-}
-
-/**
- * @param {HotelSelectionRate} rate
- * @returns {number}
- */
-export function getSelectionRateAmount(rate) {
-    return Number(rate.price?.amount ?? 0);
-}
-
-/**
- * @param {HotelSelectionRate} rate
- * @returns {string}
- */
-export function getSelectionRateCurrency(rate) {
-    return rate.price?.currency ?? '';
-}
-
-/**
- * @param {HotelSelectionRate} rate
- * @returns {string}
- */
-export function getSelectionRateKey(rate) {
-    return rate.id ?? '';
-}
-
-/**
- * Same room/board grouping as getRoomGroups, against the hotel-view endpoint's
- * own rate shape.
- *
- * @param {HotelSelectionRate[]} rates
- * @returns {Array<{name: string, rates: HotelSelectionRate[], amount: number, currency: string}>}
- */
-export function getSelectionRoomGroups(rates) {
-    const groups = new Map();
-
-    rates.forEach(rate => {
-        const name = rate.roomData?.mainRoomType || rate.roomName || 'Room';
-
-        groups.set(name, [...(groups.get(name) ?? []), rate]);
-    });
-
-    return [...groups.entries()]
-        .map(([name, items]) => {
-            const sorted = [...items].sort((a, b) => getSelectionRateAmount(a) - getSelectionRateAmount(b));
-
-            return {
-                name: name,
-                rates: sorted,
-                amount: getSelectionRateAmount(sorted[0]),
-                currency: getSelectionRateCurrency(sorted[0]),
-            };
-        })
-        .sort((a, b) => a.amount - b.amount);
 }
 
 /**
@@ -632,33 +589,6 @@ export function getPageFromQuery(query) {
     return Number.isInteger(page) && page > 0 ? page : 1;
 }
 
-/**
- * Facilities arrive as a flat list tagged with a group. The supplier leaves the
- * name null whenever it only knows the group, so the group is kept either way and
- * a group with nothing named is still worth showing as a category on its own.
- *
- * @param {HotelFacility[]} facilities
- * @returns {Array<{group: string, items: HotelFacility[]}>}
- */
-export function getFacilityGroups(facilities) {
-    const groups = new Map();
-
-    facilities.forEach(facility => {
-        const group = facility.group ?? 'General';
-
-        groups.set(group, [...(groups.get(group) ?? []), facility]);
-    });
-
-    return [...groups.entries()]
-        .map(([group, items]) => ({
-            group: group,
-            items: items
-                .filter(facility => facility.name)
-                .sort((a, b) => a.name.localeCompare(b.name)),
-        }))
-        .sort((a, b) => a.group.localeCompare(b.group));
-}
-
 function countValue(map, key) {
     map.set(key, (map.get(key) ?? 0) + 1);
 }
@@ -748,12 +678,30 @@ export function useHotelUtils() {
     }
 
     /**
-     * Reserves the chosen rate with the supplier ahead of checkout.
+     * Holds the chosen rate's price. The supplier is asked for this hotel again
+     * and the token is looked for in its current answer, so a room that has gone
+     * in the meantime comes back as a 409 — an ordinary answer rather than an
+     * error, since a room can sell out between reading about it and choosing it.
      *
-     * @param {string} rateId
+     * @param {string} searchId
+     * @param {string} hotelId
+     * @param {string} token From the rate on the hotel page, and nowhere else.
      */
-    async function prebookRate(rateId) {
-        return await axios.post(`/client/v1/travel/hotel/prebook/${rateId}`);
+    async function createQuote(searchId, hotelId, token) {
+        return await axios.post(`/client/v1/travel/hotel/quote/${searchId}/${hotelId}`, {
+            token: token,
+        });
+    }
+
+    /**
+     * Re-reads a held quote. Its cancellation terms are worked out again on every
+     * read, so this is called on opening rather than the response being cached.
+     * Past its expiry the answer is a 410 carrying a message to show.
+     *
+     * @param {string} quoteId
+     */
+    async function getQuote(quoteId) {
+        return await axios.get(`/client/v1/travel/quote/${quoteId}`);
     }
 
     /**
@@ -808,7 +756,8 @@ export function useHotelUtils() {
         guestBreakdown,
         search,
         getHotelView,
-        prebookRate,
+        createQuote,
+        getQuote,
         getHotelQuote,
         bookHotel,
         getBookingAttempt,

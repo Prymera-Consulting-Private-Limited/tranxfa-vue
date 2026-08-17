@@ -37,6 +37,15 @@ class RateCancellation {
      */
     changesAt = null;
 
+    /**
+     * What cancelling would give back. Only the quote states it — search and the
+     * hotel page price a rate rather than a booking, so there is nothing to
+     * refund yet.
+     *
+     * @type {Money|null}
+     */
+    refundNow = null;
+
     static getInstance(data) {
         const cancellation = new RateCancellation();
 
@@ -44,6 +53,7 @@ class RateCancellation {
         cancellation.costsNow = Money.getInstance(data, 'costs_now');
         cancellation.freeUntil = data.free_until ?? null;
         cancellation.changesAt = data.changes_at ?? null;
+        cancellation.refundNow = Money.getInstance(data, 'refund_now');
 
         return cancellation;
     }

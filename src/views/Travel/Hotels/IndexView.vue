@@ -367,7 +367,9 @@ function viewHotel(hotel) {
   router.push({
     name: 'viewHotel',
     params: {id: hotel.id, slug: hotel.slug},
-    query: {search: searchId.value ?? undefined},
+    // The criteria travel too, purely so the hotel page can offer a way back to
+    // these results. It reads the stay itself from the search it resolves.
+    query: {...getQuery(criteria.value), search: searchId.value ?? undefined},
   });
 }
 </script>

@@ -120,6 +120,16 @@ const router = createRouter({
         description: '',
       },
     }, {
+      // The price held against a chosen rate, and what a booking is created from.
+      path: '/travel/quote/:id',
+      name: 'travelQuote',
+      props: route => ({ quoteId: route.params.id }),
+      component: () => import('@/views/Travel/Hotels/HotelQuoteView.vue'),
+      meta: {
+        title: 'Your Price',
+        description: '',
+      },
+    }, {
       // Bookings a customer already holds, as opposed to an attempt in flight.
       path: '/travel/bookings',
       name: 'travelBookings',
