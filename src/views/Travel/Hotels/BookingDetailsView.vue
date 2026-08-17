@@ -124,11 +124,19 @@ let confirmationTimer = null;
 let startedWaitingAt = null;
 
 /**
- * The confirmation is asked for rather than announced. This page originally
- * listened on a private booking-attempts channel for booking.confirmed and
- * booking.failed, but no such broadcast exists anywhere on the backend and none
- * ever fired — so the wait never ended on its own. Polling is the mechanism,
- * not a fallback for it.
+ * The confirmation is asked for rather than announced, for now.
+ *
+ * This page originally listened on a private booking-attempts channel for
+ * booking.confirmed and booking.failed. Those events were real and were built to
+ * a real specification — what happened is that the hotels rewrite moved bookings
+ * onto the shared order spine and did not carry the broadcasts across, so
+ * nothing fires today. They are being restored against the new shape on a
+ * channel keyed on the order id, which means the old name is not coming back and
+ * is not worth waiting for.
+ *
+ * So polling is the interim mechanism rather than the design. When the new
+ * channel lands, this becomes a subscription again and the poll goes back to
+ * being what catches up a tab that was closed.
  */
 function watchConfirmation() {
   clearTimeout(confirmationTimer);

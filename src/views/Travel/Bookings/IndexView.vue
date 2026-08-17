@@ -36,8 +36,9 @@ const state = computed(() => {
 });
 
 // A booking is confirmed by the hotel answering our status check, which happens
-// after the booking call has already returned. There are no broadcast events, so
-// asking again is the only way to learn it happened.
+// after the booking call has already returned. Until the confirmation broadcast
+// lost in the hotels rewrite is restored, asking again is the only way to learn
+// it happened.
 let pollTimer = null;
 
 const isAwaitingConfirmation = computed(() => bookings.value.some(order => order.isAwaitingHotel));

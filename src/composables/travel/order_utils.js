@@ -26,9 +26,12 @@ export const ORDER_STATES = [
 ];
 
 /**
- * How long to wait before asking again whether the hotel has confirmed. There
- * are no broadcast events for this, so asking is the only way to find out — and
- * confirmation takes seconds to minutes, which is what this is paced against.
+ * How long to wait before asking again whether the hotel has confirmed.
+ *
+ * Confirmation broadcasts for this are absent rather than unplanned: they were
+ * lost when hotels moved onto the order spine and are being restored on an
+ * order-keyed channel. Until then asking is the only way to find out, paced
+ * against a confirmation that takes seconds to minutes.
  */
 export const CONFIRMATION_POLL_MS = 15000;
 
