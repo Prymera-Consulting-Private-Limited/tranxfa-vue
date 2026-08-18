@@ -1,13 +1,16 @@
 <script setup>
 import {computed, onUnmounted, ref, watch} from 'vue';
 import moment from 'moment';
+import {useRouter} from 'vue-router';
 import CustomerLayout from '@/components/CustomerLayout.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import HotelMealBadge from '@/views/Travel/Hotels/Partials/HotelMealBadge.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
+import GuestContactForm from '@/views/Travel/Hotels/Partials/GuestContactForm.vue';
 import TravelQuote from '@/models/travel/quote.js';
 import {getCustomerMessage} from '@/composables/api_utils.js';
 import {getGuestBreakdown, useHotelUtils} from '@/composables/travel/hotels/hotel_utils.js';
+import {useOrderUtils} from '@/composables/travel/order_utils.js';
 import {CalendarDaysIcon, ClockIcon, ExclamationTriangleIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -17,7 +20,10 @@ const props = defineProps({
   },
 });
 
+const router = useRouter();
+
 const {getQuote} = useHotelUtils();
+const {bookQuote} = useOrderUtils();
 
 /**
  * @type {import('vue').Ref<TravelQuote|null>}
@@ -91,6 +97,41 @@ async function load() {
     failureMessage.value = getCustomerMessage(error);
   }).finally(() => {
     isLoading.value = false;
+  });
+}
+
+const isBooking = ref(false);
+const bookingError = ref(null);
+const bookingValidation = ref(null);
+
+/**
+ * Turns the hold into a real booking. Payment is a separate step against the
+ * order this creates — the room is held either way, and a payment page that
+ * never opens should not cost the customer the booking.
+ *
+ * @param {object} payload
+ */
+async function book(payload) {
+  isBooking.value = true;
+  bookingError.value = null;
+  bookingValidation.value = null;
+
+  await bookQuote(props.quoteId, payload).then((response) => {
+    router.push({name: 'travelBookingPayment', params: {id: response.data.id}});
+  }).catch((error) => {
+    // A hold that ran out while the form was being filled in is an expiry, not
+    // a failure of anything the customer typed.
+    if (error.response?.status === 410) {
+      hasExpired.value = true;
+      failureMessage.value = getCustomerMessage(error);
+    } else if (error.response?.status === 422) {
+      bookingValidation.value = error.response?.data?.errors ?? null;
+      bookingError.value = getCustomerMessage(error);
+    } else {
+      bookingError.value = getCustomerMessage(error) ?? 'We could not book this room. Please try again in a moment.';
+    }
+
+    isBooking.value = false;
   });
 }
 
@@ -223,8 +264,15 @@ onUnmounted(() => clearInterval(clock));
             </dl>
             <p class="mt-3 text-xs text-gray-400">Worked out fresh each time this page is opened, since it changes as your stay approaches.</p>
           </section>
-          <!-- The funnel stops here: creating a booking from a quote has not been
-          specified, so there is no button rather than one that goes nowhere. -->
+          <!-- Who is staying, and how to reach them -->
+          <GuestContactForm
+              :rooms="quote.rooms"
+              :is-submitting="isBooking"
+              :submit-error="bookingError"
+              :validation-errors="bookingValidation"
+              @submit="book"
+              class="mt-4"
+          />
           <p v-if="quote.reference" class="mt-6 text-center text-xs text-gray-400">Reference {{ quote.reference }}</p>
         </template>
       </div>

@@ -28,9 +28,9 @@ export const ORDER_STATES = [
 /**
  * How long to wait before asking again whether the hotel has confirmed.
  *
- * Confirmation broadcasts for this are absent rather than unplanned: they were
- * lost when hotels moved onto the order spine and are being restored on an
- * order-keyed channel. Until then asking is the only way to find out, paced
+ * There is a broadcast for this now, but it only reaches whoever is still
+ * watching — a customer who closed the tab or lost signal missed it. So asking
+ * remains the source of truth and the socket only shortens the wait, paced
  * against a confirmation that takes seconds to minutes.
  */
 export const CONFIRMATION_POLL_MS = 15000;
@@ -74,13 +74,67 @@ export function useOrderUtils() {
         return await axios.get(`/client/v1/travel/order/${orderId}`);
     }
 
-    // GET /travel/order/{order}/cancellation is deliberately not wired: it still
-    // quotes a price for bookings that cannot be cancelled at all, which the
-    // cancel call then refuses with a 409. can_cancel_now and quote on the order
-    // itself already answer correctly.
+    /**
+     * Turns a held quote into a real booking. Names, an email and a phone number
+     * are all it wants — no document, no date of birth, and neither should be
+     * collected for this.
+     *
+     * Guests stay grouped in the rooms they were priced into, in the order the
+     * search was asked for them — the booking answers the same occupancy
+     * question, and the room count is checked against the quote.
+     *
+     * @param {string} quoteId
+     * @param {{email: string, phone: string|null, rooms: Array<{guests: Array<{first_name: string, last_name: string, is_child: boolean}>}>}} payload
+     */
+    async function bookQuote(quoteId, payload) {
+        return await axios.post(`/client/v1/travel/booking/${quoteId}`, payload);
+    }
+
+    /**
+     * Already filtered to what this customer may use — their country, their
+     * currency, and what the operator has said hotels accept — and in the same
+     * shape a transfer quote carries, so the existing picker reads it unchanged.
+     */
+    async function paymentMethods() {
+        return await axios.get('/client/v1/travel/payment-methods');
+    }
+
+    /**
+     * Opens the payment with the provider in the same request, answering with a
+     * payment_url wherever the provider uses one.
+     *
+     * @param {string} orderId
+     * @param {object} payload
+     */
+    async function createPayment(orderId, payload) {
+        return await axios.post(`/client/v1/travel/order/${orderId}/payment`, payload);
+    }
+
+    /**
+     * Asks the supplier to cancel. They can refuse, and an answer nobody can act
+     * on leaves it unresolved for a while without anything being wrong, so this
+     * settles nothing on its own — the order is re-read for the outcome.
+     *
+     * @param {string} orderId
+     */
+    async function cancelOrder(orderId) {
+        return await axios.post(`/client/v1/travel/order/${orderId}/cancellation`);
+    }
+
+    // GET /travel/order/{order}/cancellation is not wired, and no longer needs to
+    // be. It used to quote a price without checking whether the booking could
+    // still be cancelled, so it would price a stay that had already started and
+    // the POST would then refuse with a 409; that is fixed, and both it and the
+    // order are now computed from the same rule. The order already carries
+    // can_cancel_now and the quote, so there is nothing left for a second call
+    // to answer.
 
     return {
         orders,
         getOrder,
+        bookQuote,
+        paymentMethods,
+        createPayment,
+        cancelOrder,
     }
 }

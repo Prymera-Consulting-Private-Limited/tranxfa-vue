@@ -139,6 +139,17 @@ const router = createRouter({
         description: '',
       },
     }, {
+      // Reached once a quote becomes a real booking. The room is already held,
+      // so leaving this page loses the payment, never the booking.
+      path: '/travel/booking/:id/pay',
+      name: 'travelBookingPayment',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/PaymentView.vue'),
+      meta: {
+        title: 'Pay for Your Booking',
+        description: '',
+      },
+    }, {
       path: '/travel/booking/:id',
       name: 'travelBooking',
       props: route => ({ orderId: route.params.id }),
