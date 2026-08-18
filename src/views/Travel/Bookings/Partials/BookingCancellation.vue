@@ -1,6 +1,7 @@
 <script setup>
-import {computed} from 'vue';
+import {computed, ref} from 'vue';
 import moment from 'moment';
+import Spinner from '@/components/Spinner.vue';
 import {CheckCircleIcon, ClockIcon, ExclamationTriangleIcon, XCircleIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -11,7 +12,23 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+
+  isCancelling: {
+    type: Boolean,
+    default: false,
+  },
+
+  cancelError: {
+    type: String,
+    default: null,
+  },
 });
+
+const emit = defineEmits(['cancel']);
+
+// Cancelling is irreversible and costs money, so it is confirmed in place rather
+// than fired off the first click.
+const isConfirming = ref(false);
 
 const request = computed(() => props.cancellation?.request ?? null);
 
@@ -129,6 +146,39 @@ const requestedOn = computed(() => {
           </div>
         </dl>
         <p class="mt-3 text-xs text-gray-400">This changes as your stay approaches, so it is worked out fresh each time you open this page.</p>
+        <div v-if="cancelError" class="mt-4 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          <span>{{ cancelError }}</span>
+        </div>
+        <!-- The hotel has to agree, so this asks rather than announces. -->
+        <div v-if="isConfirming" class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <p class="text-sm text-gray-700">
+            We'll ask the hotel to cancel this booking. They can refuse, in which case your room stays as it is and nothing is charged.
+          </p>
+          <div class="mt-3 flex flex-col gap-2 sm:flex-row-reverse">
+            <button
+                type="button"
+                :disabled="isCancelling"
+                @click="emit('cancel')"
+                class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+            >
+              <Spinner v-if="isCancelling" class="size-4" />
+              {{ isCancelling ? 'Asking the hotel…' : 'Yes, cancel this booking' }}
+            </button>
+            <button
+                type="button"
+                :disabled="isCancelling"
+                @click="isConfirming = false"
+                class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:text-gray-900 focus-visible:outline-0"
+            >Keep my booking</button>
+          </div>
+        </div>
+        <button
+            v-else
+            type="button"
+            @click="isConfirming = true"
+            class="mt-4 cursor-pointer rounded-xl px-4 py-2.5 text-sm font-semibold text-red-600 ring-1 ring-red-200 transition hover:bg-red-50 focus-visible:outline-0"
+        >Cancel this booking</button>
       </template>
       <!-- Either cancelling is not possible or the cost could not be worked out.
       Both arrive as a missing quote, and neither of them means free. -->

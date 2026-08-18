@@ -19,7 +19,7 @@ const props = defineProps({
   },
 });
 
-const {getOrder} = useOrderUtils();
+const {getOrder, cancelOrder} = useOrderUtils();
 
 const order = ref(null);
 const isLoading = ref(true);
@@ -66,6 +66,37 @@ function schedulePoll() {
   pollTimer = setTimeout(() => load({quiet: true}), CONFIRMATION_POLL_MS);
 }
 
+// The broadcast is for whoever is watching. Anyone who closed the tab or lost
+// signal missed it, so the poll above stays as the source of truth and this only
+// shortens the wait for the customer who is actually looking at the screen.
+//
+// The event carries only what the wait needs, so it is treated as a signal to
+// re-read rather than as data to render — that way the socket can never become a
+// second version of the booking that disagrees with the endpoint.
+let subscribedOrderId = null;
+
+function subscribeToConfirmation() {
+  if (subscribedOrderId === props.orderId) {
+    return;
+  }
+
+  unsubscribeFromConfirmation();
+  subscribedOrderId = props.orderId;
+
+  Echo.private(`service-order.${subscribedOrderId}`)
+      .listen('.booking.confirmed', () => load({quiet: true}))
+      .listen('.booking.failed', () => load({quiet: true}));
+}
+
+function unsubscribeFromConfirmation() {
+  if (!subscribedOrderId) {
+    return;
+  }
+
+  Echo.leave(`service-order.${subscribedOrderId}`);
+  subscribedOrderId = null;
+}
+
 /**
  * The cancellation quote moves with the clock, so this is read fresh on every
  * open rather than cached — a booking free until midnight is not free at 00:01.
@@ -95,9 +126,41 @@ async function load({quiet = false} = {}) {
   });
 }
 
-watch(() => props.orderId, () => load(), {immediate: true});
+const isCancelling = ref(false);
+const cancelError = ref(null);
 
-onUnmounted(stopPolling);
+/**
+ * Asks the supplier to cancel. Nothing is settled by this call — they can refuse,
+ * and an answer nobody can act on leaves it unresolved — so the order is re-read
+ * for the outcome rather than assumed from a 2xx.
+ */
+async function cancel() {
+  isCancelling.value = true;
+  cancelError.value = null;
+
+  await cancelOrder(props.orderId).then(() => {
+    return load({quiet: true});
+  }).catch((error) => {
+    // A stay that has already started is refused rather than priced, which is an
+    // answer about this booking rather than a failure of the request.
+    cancelError.value = getCustomerMessage(error)
+        ?? (error.response?.status === 409
+            ? 'This booking can no longer be cancelled.'
+            : 'We could not ask the hotel to cancel this. Please try again in a moment.');
+  }).finally(() => {
+    isCancelling.value = false;
+  });
+}
+
+watch(() => props.orderId, () => {
+  subscribeToConfirmation();
+  load();
+}, {immediate: true});
+
+onUnmounted(() => {
+  stopPolling();
+  unsubscribeFromConfirmation();
+});
 </script>
 
 <template>
@@ -205,7 +268,12 @@ onUnmounted(stopPolling);
                 </div>
               </dl>
             </section>
-            <BookingCancellation :cancellation="order.cancellation" />
+            <BookingCancellation
+                :cancellation="order.cancellation"
+                :is-cancelling="isCancelling"
+                :cancel-error="cancelError"
+                @cancel="cancel"
+            />
             <BookingPayments :payments="order.payments" />
           </div>
         </template>
