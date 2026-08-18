@@ -31,7 +31,7 @@ import {
 import Hotel from "@/models/travel/hotels/hotel.js";
 import HotelSearch from "@/models/travel/hotels/hotel_search.js";
 import Region from "@/models/travel/region.js";
-import {getCustomerMessage} from "@/composables/api_utils.js";
+import {getCustomerMessage, getLabels} from "@/composables/api_utils.js";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const route = useRoute();
@@ -202,7 +202,7 @@ async function getHotels() {
       currency: response.data.currency ?? '',
       decimalPlaces: response.data.currency_decimal_places ?? 2,
     };
-    labels.value = response.data.labels ?? {};
+    labels.value = getLabels(response.data.labels);
     totalHotels.value = response.data.total_hotels ?? hotels.value.length;
 
     const resolved = response.data.search ? HotelSearch.getInstance(response.data.search) : null;
@@ -228,7 +228,7 @@ async function getHotels() {
  */
 function applyRegions(data) {
   regionOptions.value = Region.getCollection(data.regions ?? []);
-  regionLabels.value = data.labels ?? {};
+  regionLabels.value = getLabels(data.labels);
   regionsAreFeatured.value = data.is_featured ?? false;
   regionsError.value = null;
 }

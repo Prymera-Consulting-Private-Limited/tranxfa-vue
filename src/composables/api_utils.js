@@ -1,4 +1,21 @@
 /**
+ * A response's label dictionary, as a dictionary.
+ *
+ * PHP encodes an empty associative array as a JSON array, so an endpoint with no
+ * labels yet answers `[]` where every other answer is an object. Most of that was
+ * fixed at source, but one path still does it — the destinations early return on
+ * a deployment with no hotel provider — and the failure is silent either way: a
+ * lookup against an array returns undefined and falls through to our own wording,
+ * so nothing errors and codes quietly render as nothing.
+ *
+ * @param {*} value
+ * @returns {object}
+ */
+export function getLabels(value) {
+    return value && !Array.isArray(value) ? value : {};
+}
+
+/**
  * The message an api failure is safe to show a customer, or null.
  *
  * Most of our endpoints write their failures for a customer to read — an expired

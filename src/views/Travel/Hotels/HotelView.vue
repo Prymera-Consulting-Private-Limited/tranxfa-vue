@@ -13,7 +13,7 @@ import {getCheapestRate, useHotelUtils} from "@/composables/travel/hotels/hotel_
 import HotelDetail from "@/models/travel/hotels/hotel_detail.js";
 import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 import HotelSearch from "@/models/travel/hotels/hotel_search.js";
-import {getCustomerMessage} from "@/composables/api_utils.js";
+import {getCustomerMessage, getLabels} from "@/composables/api_utils.js";
 import {ChevronLeftIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -158,7 +158,7 @@ async function getHotelDetails({quiet = false} = {}) {
     hotel.value = HotelDetail.getInstance(response.data.hotel);
     rates.value = (response.data.rates ?? []).map(rate => HotelRate.getInstance(rate));
     resolvedSearch.value = response.data.search ? HotelSearch.getInstance(response.data.search) : null;
-    labels.value = response.data.labels ?? {};
+    labels.value = getLabels(response.data.labels);
 
     if (!quiet) {
       // The stay card should never sit on nothing when there is already a

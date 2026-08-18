@@ -1,4 +1,5 @@
 import Money from "@/models/travel/money.js";
+import {getLabels} from "@/composables/api_utils.js";
 import OrderHotel from "@/models/travel/orders/order_hotel.js";
 import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
 
@@ -168,7 +169,7 @@ class TravelQuote {
             quote.cancellation = RateCancellation.getInstance(data.cancellation);
         }
 
-        quote.labels = data.labels ?? {};
+        quote.labels = getLabels(data.labels);
 
         return quote;
     }
