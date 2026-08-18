@@ -126,7 +126,12 @@ async function book(payload) {
   bookingRefused.value = false;
 
   await bookQuote(props.quoteId, payload).then((response) => {
-    router.push({name: 'travelBookingPayment', params: {id: response.data.id}});
+    // The order, never the booking. Nothing in the client api takes a booking
+    // id — every call after this one, and the confirmation channel with them,
+    // keys on the order. The two are minted in the same instant so their uuids
+    // share a prefix and differ four groups in, which makes the wrong one
+    // impossible to spot by eye and a 404 the only way anyone finds out.
+    router.push({name: 'travelBookingPayment', params: {id: response.data.order.id}});
   }).catch((error) => {
     // A hold that ran out while the form was being filled in is an expiry, not
     // a failure of anything the customer typed.
