@@ -35,6 +35,18 @@ export const ORDER_STATES = [
  */
 export const CONFIRMATION_POLL_MS = 15000;
 
+/**
+ * How long to wait before asking again whether a payment has settled. Shorter
+ * than the confirmation poll because somebody is watching this one — they have
+ * just come back from their bank and want to know it worked.
+ *
+ * The transfer flow watches a payment over a broadcast instead. Travel has no
+ * documented channel for it, and a guessed one fails silently: the subscription
+ * is refused and the screen waits for ever. Asking is the honest mechanism until
+ * the channel is given to us.
+ */
+export const PAYMENT_POLL_MS = 5000;
+
 export function useOrderUtils() {
     /**
      * A customer's hotel bookings, newest first, in the same {data, pagination}

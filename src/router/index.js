@@ -139,6 +139,18 @@ const router = createRouter({
         description: '',
       },
     }, {
+      // Where a payment is watched until it settles. Reachable on its own so a
+      // provider can be pointed back at it, and so a customer who closed the tab
+      // has somewhere to return to.
+      path: '/travel/booking/:id/payment',
+      name: 'travelPaymentStatus',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/PaymentStatusView.vue'),
+      meta: {
+        title: 'Your Payment',
+        description: '',
+      },
+    }, {
       // Reached once a quote becomes a real booking. The room is already held,
       // so leaving this page loses the payment, never the booking.
       path: '/travel/booking/:id/pay',

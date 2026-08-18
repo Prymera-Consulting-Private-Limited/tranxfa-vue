@@ -40,6 +40,39 @@ class OrderPayment {
      */
     amount = null;
 
+    /**
+     * Nothing more will happen to this attempt on its own. A refund is a later
+     * event against a payment that already succeeded, so those count as settled
+     * too — the wait is over either way.
+     *
+     * @returns {boolean}
+     */
+    get isSettled() {
+        return [
+            'AUTHORIZED',
+            'CAPTURED',
+            'FAILED',
+            'TIMED-OUT',
+            'CANCELLED',
+            'PART-REFUNDED',
+            'REFUNDED',
+        ].includes(this.state);
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    get isSuccessful() {
+        return ['AUTHORIZED', 'CAPTURED', 'PART-REFUNDED', 'REFUNDED'].includes(this.state);
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    get hasFailed() {
+        return ['FAILED', 'TIMED-OUT', 'CANCELLED'].includes(this.state);
+    }
+
     static getInstance(data) {
         const payment = new OrderPayment();
 

@@ -135,6 +135,17 @@ class Order {
     payments = [];
 
     /**
+     * The attempt currently worth watching — the last one made, since a customer
+     * who was declined and paid again is waiting on the second, not the first.
+     * The api sends them oldest first.
+     *
+     * @returns {OrderPayment|null}
+     */
+    get latestPayment() {
+        return this.payments.length ? this.payments[this.payments.length - 1] : null;
+    }
+
+    /**
      * Nothing more will happen to these on their own, so there is no point
      * asking again.
      *

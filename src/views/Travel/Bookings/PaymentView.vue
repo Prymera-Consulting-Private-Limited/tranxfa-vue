@@ -31,33 +31,58 @@ const order = ref(null);
 const methods = ref([]);
 
 const isLoading = ref(true);
-const hasFailed = ref(false);
+const orderFailed = ref(false);
+const methodsFailed = ref(false);
 const failureMessage = ref(null);
+
+const hasFailed = computed(() => orderFailed.value || methodsFailed.value);
+
+// Naming which of the two went wrong, so nobody reads a booking that would not
+// load as a payment configuration problem.
+const failureTitle = computed(() => {
+  if (orderFailed.value && methodsFailed.value) {
+    return "We couldn't load this page";
+  }
+
+  return orderFailed.value ? "We couldn't load your booking" : "We couldn't load your payment options";
+});
 
 const selectedMethod = ref(null);
 const isPaying = ref(false);
 const paymentError = ref(null);
 
-// The room is already held against this order, so the list is only ever about
-// how it gets paid for — never about whether the booking survives.
+/**
+ * The room is already held against this order, so nothing here decides whether
+ * the booking survives — only how it gets paid for.
+ *
+ * The two calls fail for unrelated reasons and are reported separately. Rolling
+ * them together once sent somebody hunting through payment configuration for a
+ * fault that was not there: the methods call had answered 200 with a perfectly
+ * good method on it, and it was the order that could not be read.
+ */
 async function load() {
   isLoading.value = true;
-  hasFailed.value = false;
+  orderFailed.value = false;
+  methodsFailed.value = false;
   failureMessage.value = null;
 
   await Promise.all([
     getOrder(props.orderId).then((response) => {
       order.value = Order.getInstance(response.data);
+    }).catch((error) => {
+      orderFailed.value = true;
+      failureMessage.value = getCustomerMessage(error) ?? failureMessage.value;
     }),
     paymentMethods().then((response) => {
       // The same shape a transfer quote carries, already filtered to what this
       // customer may use.
-      methods.value = (response.data.payment_methods ?? response.data ?? []).map(method => PaymentMethod.getInstance(method));
+      methods.value = (response.data.data ?? response.data.payment_methods ?? response.data ?? [])
+          .map(method => PaymentMethod.getInstance(method));
+    }).catch((error) => {
+      methodsFailed.value = true;
+      failureMessage.value = getCustomerMessage(error) ?? failureMessage.value;
     }),
-  ]).catch((error) => {
-    hasFailed.value = true;
-    failureMessage.value = getCustomerMessage(error);
-  }).finally(() => {
+  ]).finally(() => {
     isLoading.value = false;
   });
 
@@ -87,8 +112,9 @@ async function pay() {
     }
 
     // Nothing to redirect to means the provider settles without a page of its
-    // own, so the booking is where the answer will show up.
-    router.push({name: 'travelBooking', params: {id: props.orderId}});
+    // own, so the wait happens here rather than the customer being dropped on a
+    // booking that does not yet show a payment.
+    router.push({name: 'travelPaymentStatus', params: {id: props.orderId}});
   }).catch((error) => {
     paymentError.value = getCustomerMessage(error) ?? 'We could not start this payment. Please try again in a moment.';
     isPaying.value = false;
@@ -98,6 +124,22 @@ async function pay() {
 watch(() => props.orderId, load, {immediate: true});
 
 const hasMethods = computed(() => methods.value.length > 0);
+
+/**
+ * The provider behind a method, named only when there is exactly one.
+ *
+ * Worth showing because these are redirect rails: the customer is about to land
+ * on a page branded by somebody they have never heard of, and an unfamiliar name
+ * at the moment money moves is where people stop. Naming several would imply a
+ * choice they do not have — the api takes a method and picks the provider — so
+ * where there is more than one this says nothing.
+ *
+ * @param {PaymentMethod} method
+ * @returns {string|null}
+ */
+function providerName(method) {
+  return method.providers?.length === 1 ? (method.providers[0].title ?? null) : null;
+}
 </script>
 
 <template>
@@ -114,7 +156,7 @@ const hasMethods = computed(() => methods.value.length > 0);
           <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
-          <h1 class="mt-6 text-base font-semibold text-gray-900">We couldn't load your payment options</h1>
+          <h1 class="mt-6 text-base font-semibold text-gray-900">{{ failureTitle }}</h1>
           <p v-if="failureMessage" class="mt-2 max-w-md text-sm text-gray-500">{{ failureMessage }}</p>
           <p v-else class="mt-2 max-w-md text-sm text-gray-500">Something went wrong on our side. Your room is still booked — please try again in a moment.</p>
           <button
@@ -154,7 +196,10 @@ const hasMethods = computed(() => methods.value.length > 0);
                     name="payment-method"
                 />
                 <span class="min-w-0">
-                  <span class="block text-sm font-medium text-gray-900">{{ method.title }}</span>
+                  <span class="block text-sm font-medium text-gray-900">
+                    {{ method.title }}
+                    <span v-if="providerName(method)" class="font-normal text-gray-500">· via {{ providerName(method) }}</span>
+                  </span>
                   <span v-if="method.description" class="mt-0.5 block text-xs text-gray-500">{{ method.description }}</span>
                 </span>
               </label>
