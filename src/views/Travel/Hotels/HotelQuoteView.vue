@@ -86,6 +86,7 @@ async function load() {
   isLoading.value = true;
   hasFailed.value = false;
   hasExpired.value = false;
+  bookingRefused.value = false;
   failureMessage.value = null;
 
   await getQuote(props.quoteId).then((response) => {
@@ -104,6 +105,13 @@ const isBooking = ref(false);
 const bookingError = ref(null);
 const bookingValidation = ref(null);
 
+// The supplier refused the booking on a price it would not stand behind — either
+// it opened the order without pricing it, or the price moved inside the booking
+// itself. Nothing was booked and nothing was charged, and the customer did
+// nothing wrong, so this reads like the price change it is rather than like a
+// failure of theirs.
+const bookingRefused = ref(false);
+
 /**
  * Turns the hold into a real booking. Payment is a separate step against the
  * order this creates — the room is held either way, and a payment page that
@@ -115,6 +123,7 @@ async function book(payload) {
   isBooking.value = true;
   bookingError.value = null;
   bookingValidation.value = null;
+  bookingRefused.value = false;
 
   await bookQuote(props.quoteId, payload).then((response) => {
     router.push({name: 'travelBookingPayment', params: {id: response.data.id}});
@@ -123,6 +132,9 @@ async function book(payload) {
     // a failure of anything the customer typed.
     if (error.response?.status === 410) {
       hasExpired.value = true;
+      failureMessage.value = getCustomerMessage(error);
+    } else if (error.response?.status === 409) {
+      bookingRefused.value = true;
       failureMessage.value = getCustomerMessage(error);
     } else if (error.response?.status === 422) {
       bookingValidation.value = error.response?.data?.errors ?? null;
@@ -155,11 +167,13 @@ onUnmounted(() => clearInterval(clock));
         </div>
         <!-- The hold ran out. Not an error the customer made, so it reads as an
         expiry with a way forward rather than as a failure. -->
-        <div v-else-if="hasExpired || !isHeld" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-amber-200">
+        <div v-else-if="hasExpired || bookingRefused || !isHeld" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-amber-200">
           <div class="flex size-14 items-center justify-center rounded-full bg-amber-50 text-amber-600">
             <ClockIcon class="size-7" aria-hidden="true" />
           </div>
-          <h1 class="mt-6 text-base font-semibold text-gray-900">This price is no longer held</h1>
+          <h1 class="mt-6 text-base font-semibold text-gray-900">
+            {{ bookingRefused ? "We couldn't complete this booking" : 'This price is no longer held' }}
+          </h1>
           <p class="mt-2 max-w-md text-sm text-gray-500">
             {{ failureMessage ?? 'We hold a price for 15 minutes. Search again to see what is available now.' }}
           </p>

@@ -77,15 +77,24 @@ watch(occupancy, () => {
 const email = ref('');
 const phone = ref('');
 
-// Names are capped server-side; the input says so rather than letting somebody
-// type past it and be told afterwards.
+// Capped server-side; the inputs say so rather than letting somebody type past
+// it and be told afterwards.
 const NAME_MAX = 120;
+const PHONE_MAX = 32;
 
-// Only the names and an email are required — a phone number is accepted but not
-// demanded, so nobody without one is stopped from booking.
+/**
+ * The supplier will not take a booking without a contact number, and only says
+ * so at the last step — after the room has been set aside. So a number missing
+ * here is not a field somebody can come back to, it is a held room nobody ever
+ * completes. Five characters is their floor, not a claim about phone numbers:
+ * what a real number looks like varies too much by country for us to decide.
+ */
+const PHONE_MIN = 5;
+
 const isComplete = computed(() => {
     return rooms.every(room => room.guests.every(guest => guest.firstName.trim() && guest.lastName.trim()))
-        && email.value.trim().length > 0;
+        && email.value.trim().length > 0
+        && phone.value.trim().length >= PHONE_MIN;
 });
 
 const showRoomNumbers = computed(() => props.rooms.length > 1);
@@ -110,7 +119,7 @@ function submit() {
 
     emit('submit', {
         email: email.value.trim(),
-        phone: phone.value.trim() || null,
+        phone: phone.value.trim(),
         rooms: rooms.map(room => ({
             guests: room.guests.map(guest => ({
                 first_name: guest.firstName.trim(),
@@ -168,7 +177,7 @@ function submit() {
       </div>
       <div class="border-t border-gray-100 pt-5">
         <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Where to reach you</p>
-        <p class="mt-1 text-xs text-gray-500">We'll send the confirmation to your email. A phone number is optional, and only used if the hotel needs to reach you.</p>
+        <p class="mt-1 text-xs text-gray-500">We'll send the confirmation to your email. The hotel needs a phone number for the booking, and will only use it if they have to reach you.</p>
         <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <input
@@ -188,7 +197,8 @@ function submit() {
                 v-model="phone"
                 type="tel"
                 autocomplete="tel"
-                placeholder="Phone number (optional)"
+                placeholder="Phone number"
+                :maxlength="PHONE_MAX"
                 :class="[
                   fieldError('phone') ? 'ring-red-300' : 'ring-gray-200',
                   'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-400 focus:ring-brand-400 focus:outline-0',
