@@ -13,6 +13,7 @@ import {getCheapestRate, useHotelUtils} from "@/composables/travel/hotels/hotel_
 import HotelDetail from "@/models/travel/hotels/hotel_detail.js";
 import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 import HotelSearch from "@/models/travel/hotels/hotel_search.js";
+import {getCustomerMessage} from "@/composables/api_utils.js";
 import {ChevronLeftIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -111,7 +112,7 @@ async function holdPrice() {
       // rather than left showing a room that cannot be had.
       getHotelDetails({quiet: true});
     } else {
-      holdFailureMessage.value = error.response?.data?.message ?? 'We could not hold this price. Please try again in a moment.';
+      holdFailureMessage.value = getCustomerMessage(error) ?? 'We could not hold this price. Please try again in a moment.';
     }
 
     isHolding.value = false;
@@ -170,7 +171,7 @@ async function getHotelDetails({quiet = false} = {}) {
     hasFailed.value = true;
     // A search past its half hour, a hotel we do not sell, or somebody else's
     // search all answer 404 with words written to be shown.
-    failureMessage.value = error.response?.data?.message ?? null;
+    failureMessage.value = getCustomerMessage(error);
   }).finally(() => {
     isLoading.value = false;
   });

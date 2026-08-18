@@ -7,6 +7,7 @@ import BookingCancellation from '@/views/Travel/Bookings/Partials/BookingCancell
 import BookingPayments from '@/views/Travel/Bookings/Partials/BookingPayments.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import Order from '@/models/travel/orders/order.js';
+import {getCustomerMessage} from '@/composables/api_utils.js';
 import {CONFIRMATION_POLL_MS, useOrderUtils} from '@/composables/travel/order_utils.js';
 import {getGuestBreakdown} from '@/composables/travel/hotels/hotel_utils.js';
 import {ChevronLeftIcon, ExclamationTriangleIcon, MapPinIcon} from '@heroicons/vue/24/outline';
@@ -86,7 +87,7 @@ async function load({quiet = false} = {}) {
     // A booking that is not this customer's answers 404 rather than 403, and so
     // does a deployment without the travel licence.
     hasFailed.value = true;
-    failureMessage.value = error.response?.data?.message
+    failureMessage.value = getCustomerMessage(error)
         ?? (error.response?.status === 404 ? "We couldn't find this booking." : null);
   }).finally(() => {
     isLoading.value = false;

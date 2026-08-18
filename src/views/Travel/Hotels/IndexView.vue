@@ -31,6 +31,7 @@ import {
 import Hotel from "@/models/travel/hotels/hotel.js";
 import HotelSearch from "@/models/travel/hotels/hotel_search.js";
 import Region from "@/models/travel/region.js";
+import {getCustomerMessage} from "@/composables/api_utils.js";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const route = useRoute();
@@ -214,7 +215,7 @@ async function getHotels() {
     hasFailed.value = true;
     // A 404 without a message is the licence being absent rather than anything
     // going wrong, so it must not read as an outage somebody could wait out.
-    failureMessage.value = error.response?.data?.message
+    failureMessage.value = getCustomerMessage(error)
         ?? (error.response?.status === 404 ? "Travel isn't available on this app." : null);
     searchId.value = null;
   }).finally(() => {

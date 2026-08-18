@@ -6,6 +6,7 @@ import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import HotelMealBadge from '@/views/Travel/Hotels/Partials/HotelMealBadge.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
 import TravelQuote from '@/models/travel/quote.js';
+import {getCustomerMessage} from '@/composables/api_utils.js';
 import {getGuestBreakdown, useHotelUtils} from '@/composables/travel/hotels/hotel_utils.js';
 import {CalendarDaysIcon, ClockIcon, ExclamationTriangleIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 
@@ -87,7 +88,7 @@ async function load() {
     quote.value = null;
     hasExpired.value = error.response?.status === 410;
     hasFailed.value = !hasExpired.value;
-    failureMessage.value = error.response?.data?.message ?? null;
+    failureMessage.value = getCustomerMessage(error);
   }).finally(() => {
     isLoading.value = false;
   });

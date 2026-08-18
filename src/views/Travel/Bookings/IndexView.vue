@@ -6,6 +6,7 @@ import Pagination from '@/components/Pagination.vue';
 import BookingCard from '@/views/Travel/Bookings/Partials/BookingCard.vue';
 import BookingSkeleton from '@/views/Travel/Bookings/Partials/BookingSkeleton.vue';
 import Order from '@/models/travel/orders/order.js';
+import {getCustomerMessage} from '@/composables/api_utils.js';
 import {CONFIRMATION_POLL_MS, ORDER_STATES, useOrderUtils} from '@/composables/travel/order_utils.js';
 import {BuildingOffice2Icon, ExclamationTriangleIcon} from '@heroicons/vue/24/outline';
 
@@ -79,7 +80,7 @@ async function getBookings({quiet = false} = {}) {
     bookings.value = [];
     pagination.value = null;
     hasFailed.value = true;
-    failureMessage.value = error.response?.data?.message
+    failureMessage.value = getCustomerMessage(error)
         ?? (error.response?.status === 404 ? "Travel isn't available on this app." : null);
   }).finally(() => {
     isLoading.value = false;
