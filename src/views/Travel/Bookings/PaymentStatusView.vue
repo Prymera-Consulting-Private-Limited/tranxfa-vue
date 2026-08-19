@@ -40,6 +40,13 @@ const status = computed(() => {
     return 'waiting';
   }
 
+  // Before the successful check, which counts a refunded payment as successful —
+  // it did succeed, and the money then went back. Telling somebody who cancelled
+  // that their payment has gone through is true and useless.
+  if (payment.value.isRefunded) {
+    return 'refunded';
+  }
+
   if (payment.value.isSuccessful) {
     return 'paid';
   }
@@ -53,6 +60,9 @@ const status = computed(() => {
 
 const heading = computed(() => {
   switch (status.value) {
+    case 'refunded':
+      return payment.value.isPartlyRefunded ? 'Part of your payment has been refunded' : 'Your payment has been refunded';
+
     case 'paid':
       return 'Your payment has gone through';
 
@@ -69,7 +79,20 @@ const heading = computed(() => {
 
 const note = computed(() => {
   switch (status.value) {
+    case 'refunded':
+      // What was kept is the hotel's rule rather than ours, and the booking screen
+      // is where the cancellation quote that explains it lives.
+      return payment.value.isPartlyRefunded
+          ? "This booking was cancelled and part of what you paid has been returned. The rest was kept under the hotel's cancellation policy. Your bank can take a few days to show it."
+          : 'This booking was cancelled and what you paid has been returned. Your bank can take a few days to show it.';
+
     case 'paid':
+      // A cancelled booking can still hold a captured payment for a while, since
+      // the refund is worked out and sent after the cancellation itself.
+      if (order.value?.isCancelled) {
+        return "This booking was cancelled. Any refund due follows the hotel's cancellation policy and is sent separately.";
+      }
+
       return 'Your room is booked and paid for. The hotel confirms it separately, which can take a minute or two.';
 
     case 'failed':
@@ -168,7 +191,7 @@ onUnmounted(stopPolling);
         <template v-else>
           <div class="flex flex-col items-center rounded-3xl bg-white px-8 pt-6 pb-10 text-center ring-1 ring-gray-200">
             <!-- The animations carry their own whitespace, which the crop removes. -->
-            <PaymentCompleted v-if="status === 'paid'" class="-my-12" />
+            <PaymentCompleted v-if="status === 'paid' || status === 'refunded'" class="-my-12" />
             <Failed v-else-if="status === 'failed'" class="-my-12" />
             <Processing v-else-if="status === 'processing'" class="-my-12" />
             <AwaitingPending v-else class="-my-12" />
