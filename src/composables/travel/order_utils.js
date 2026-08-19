@@ -40,11 +40,14 @@ export const CONFIRMATION_POLL_MS = 15000;
  * than the confirmation poll because somebody is watching this one — they have
  * just come back from their bank and want to know it worked.
  *
- * The transfer flow watches a payment over a broadcast instead, on
- * client-payment.{payment id} — which travel cannot copy even as a guess, since
- * the payment this api answers with carries no id to key a channel on. A guessed
- * channel fails silently anyway: the subscription is refused and the screen
- * waits for ever. Asking is the honest mechanism until both are given to us.
+ * Asking is the mechanism, not a placeholder for one. Travel publishes no
+ * broadcast and none is planned — the internal event never reaches a socket — so
+ * there is no channel to move to later.
+ *
+ * The transfer flow does watch a socket, on client-payment.{payment id}, and five
+ * of its nine providers have no fallback when that socket drops. Those customers
+ * wait on a screen that will never update itself. Polling costs a request every
+ * five seconds and cannot fail that way.
  */
 export const PAYMENT_POLL_MS = 5000;
 
