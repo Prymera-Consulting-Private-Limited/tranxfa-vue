@@ -170,6 +170,109 @@ describe('OrderPayment', () => {
         expect(payments).toHaveLength(2)
         expect(payments.map(payment => payment.state)).toEqual(['FAILED', 'CAPTURED'])
     })
+
+    // The body the create call answers with, which carries the three things the
+    // sdk hand-off needs and the listed attempts do not.
+    const created = () => ({
+        id: 'a288e998-0000-4000-8000-000000000001',
+        reference: 'VO-01M0BD0FSVNNJ51ESVC0TZ08WK-P001',
+        shared_reference: 'VO-01M0BD0FSVNNJ51ESVC0TZ08WK-P001',
+        state: 'PENDING',
+        amount: 19640,
+        amount_decimal: '196.40',
+        amount_formatted: '196.40',
+        amount_currency_prefixed: 'GBP 196.40',
+        payment_method: { code: 'OPEN-BANKING', title: 'Pay with Your Bank App' },
+        provider: { code: 'VOLUME-PAYMENTS', title: 'Volume' },
+        payment_url: null,
+        failure_reason: null,
+    })
+
+    it('maps the created payment, id and shared reference included', () => {
+        const payment = OrderPayment.getInstance(created())
+
+        expect(payment.id).toBe('a288e998-0000-4000-8000-000000000001')
+        expect(payment.sharedReference).toBe('VO-01M0BD0FSVNNJ51ESVC0TZ08WK-P001')
+        expect(payment.paymentUrl).toBeNull()
+        expect(payment.provider).toEqual({ code: 'VOLUME-PAYMENTS', title: 'Volume' })
+        expect(payment.isVolume).toBe(true)
+    })
+
+    it('reads the method from an object here and a string on a listed attempt', () => {
+        expect(OrderPayment.getInstance(created()).method).toBe('Pay with Your Bank App')
+        expect(OrderPayment.getInstance({ method: 'Debit Card' }).method).toBe('Debit Card')
+    })
+
+    // The states the transfer flow renders as a blank modal. Travel emits all of
+    // them: swept unpaid payments cancel, and cancelling a booking refunds.
+    it('treats a refund as its own outcome rather than as plain success', () => {
+        const at = state => OrderPayment.getInstance({ ...created(), state })
+
+        expect(at('REFUNDED').isRefunded).toBe(true)
+        expect(at('PART-REFUNDED').isRefunded).toBe(true)
+        expect(at('PART-REFUNDED').isPartlyRefunded).toBe(true)
+        expect(at('REFUNDED').isPartlyRefunded).toBe(false)
+        expect(at('CAPTURED').isRefunded).toBe(false)
+
+        // Still successful and still settled — the money arrived and then went
+        // back, and neither is a reason to keep asking.
+        expect(at('PART-REFUNDED').isSuccessful).toBe(true)
+        expect(at('PART-REFUNDED').isSettled).toBe(true)
+        expect(at('CANCELLED').hasFailed).toBe(true)
+        expect(at('CANCELLED').isSettled).toBe(true)
+    })
+
+    it('is ready to pay only at PENDING', () => {
+        const at = state => OrderPayment.getInstance({ ...created(), state }).isReadyToPay
+
+        expect(at('PENDING')).toBe(true)
+        expect(at('CREATED')).toBe(false)
+        expect(at('INITIALIZED')).toBe(false)
+        expect(at('REDIRECTED')).toBe(false)
+    })
+
+    describe('majorAmount', () => {
+        it('takes the figure the api sends rather than deriving one', () => {
+            expect(OrderPayment.getInstance(created()).majorAmount).toBe(196.40)
+        })
+
+        it('needs no decimal places to be right for any currency', () => {
+            const at = decimal => OrderPayment.getInstance({ ...created(), amount_decimal: decimal }).majorAmount
+
+            // A zero-decimal currency, a three-decimal one, and a large amount
+            expect(at('19640')).toBe(19640)
+            expect(at('19.640')).toBe(19.640)
+            expect(at('1234567.89')).toBe(1234567.89)
+        })
+
+        it('refuses rather than guessing when the figure is missing', () => {
+            const data = created()
+            delete data.amount_decimal
+
+            expect(OrderPayment.getInstance(data).majorAmount).toBeNull()
+            expect(OrderPayment.getInstance({ ...created(), amount_decimal: null }).majorAmount).toBeNull()
+            expect(OrderPayment.getInstance({ ...created(), amount_decimal: '' }).majorAmount).toBeNull()
+        })
+
+        // parseFloat("1,234,567.89") is 1. Number() gives NaN instead, which this
+        // turns into a refusal — so a separated value can never be sent as a
+        // smaller one. It would only bite above a thousand, which is the worst
+        // possible distribution for a money bug.
+        it('refuses a separated figure instead of truncating it to a smaller one', () => {
+            const payment = OrderPayment.getInstance({ ...created(), amount_decimal: '1,234,567.89' })
+
+            expect(payment.majorAmount).toBeNull()
+            expect(payment.majorAmount).not.toBe(1)
+        })
+
+        it('is null when there is no amount at all', () => {
+            const data = created()
+            delete data.amount
+            delete data.amount_decimal
+
+            expect(OrderPayment.getInstance(data).majorAmount).toBeNull()
+        })
+    })
 })
 
 describe('OrderConfirmation', () => {

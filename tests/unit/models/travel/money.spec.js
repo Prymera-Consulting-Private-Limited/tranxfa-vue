@@ -3,14 +3,16 @@ import { describe, it, expect } from 'vitest'
 import Money from '@/models/travel/money.js'
 
 describe('Money.getInstance', () => {
-    it('reads three sibling keys off one field name', () => {
+    it('reads four sibling keys off one field name', () => {
         const money = Money.getInstance({
             total: 23000,
+            total_decimal: '230.00',
             total_formatted: '230.00',
             total_currency_prefixed: 'USD 230.00',
         }, 'total')
 
         expect(money.amount).toBe(23000)
+        expect(money.decimal).toBe('230.00')
         expect(money.formatted).toBe('230.00')
         expect(money.currencyPrefixed).toBe('USD 230.00')
     })
@@ -65,5 +67,45 @@ describe('Money.getInstance', () => {
 
         expect(money.amount).toBe(1850)
         expect(typeof money.amount).toBe('number')
+    })
+})
+
+/**
+ * The number handed to anybody who wants money rather than minor units — today
+ * the Volume sdk. Everything here is about refusing rather than approximating,
+ * because the failures this guards against are silent and are all mispricings.
+ */
+describe('Money.major', () => {
+    const at = decimal => Money.getInstance({ amount: 19640, amount_decimal: decimal }, 'amount').major
+
+    it('is the api’s own figure, exactly', () => {
+        expect(at('196.40')).toBe(196.40)
+        expect(at('0.01')).toBe(0.01)
+        expect(at('1234567.89')).toBe(1234567.89)
+    })
+
+    it('needs no knowledge of the currency’s decimal places', () => {
+        // A zero-decimal currency and a three-decimal one, off the same key
+        expect(at('19640')).toBe(19640)
+        expect(at('19.640')).toBe(19.640)
+    })
+
+    // parseFloat("1,234,567.89") is 1 — a bug that only shows above a thousand
+    // and undercharges by six orders of magnitude when it does.
+    it('refuses a separated figure rather than truncating it', () => {
+        expect(at('1,234,567.89')).toBeNull()
+        expect(at('1,234.56')).toBeNull()
+    })
+
+    it('refuses anything that is not a number, rather than reading it as zero', () => {
+        expect(at('')).toBeNull()
+        expect(at(null)).toBeNull()
+        expect(at('GBP 196.40')).toBeNull()
+        expect(at('one hundred')).toBeNull()
+        expect(Money.getInstance({ amount: 19640 }, 'amount').major).toBeNull()
+    })
+
+    it('keeps a genuine zero, which is a real amount and not a missing one', () => {
+        expect(at('0.00')).toBe(0)
     })
 })

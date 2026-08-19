@@ -4,7 +4,9 @@ import {useRouter} from 'vue-router';
 import CustomerLayout from '@/components/CustomerLayout.vue';
 import Spinner from '@/components/Spinner.vue';
 import Order from '@/models/travel/orders/order.js';
+import OrderPayment from '@/models/travel/orders/order_payment.js';
 import PaymentMethod from '@/models/payment_method.js';
+import VolumePayment from '@/views/Travel/Bookings/Partials/VolumePayment.vue';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {useOrderUtils} from '@/composables/travel/order_utils.js';
 import {CheckCircleIcon, ExclamationTriangleIcon} from '@heroicons/vue/24/outline';
@@ -52,6 +54,15 @@ const isPaying = ref(false);
 const paymentError = ref(null);
 
 /**
+ * Set once a payment exists that the customer completes here rather than
+ * somewhere else. While it holds a payment the picker is gone — they have chosen,
+ * and offering the choice again would only invite a second payment.
+ *
+ * @type {import('vue').Ref<OrderPayment|null>}
+ */
+const activePayment = ref(null);
+
+/**
  * The room is already held against this order, so nothing here decides whether
  * the booking survives — only how it gets paid for.
  *
@@ -92,9 +103,13 @@ async function load() {
 }
 
 /**
- * Opens the payment with the provider and hands the customer over. Coming back
- * to a closed tab is the ordinary case — the payment settles either way — so
- * nothing here treats leaving as abandoning.
+ * Opens the payment with the provider. How the customer then pays depends on the
+ * provider and there is no flag for it — the code is the contract, the way the
+ * transfer flow has always read it.
+ *
+ * Coming back to a closed tab is the ordinary case, because the payment settles
+ * from the provider's webhook either way, so nothing here treats leaving as
+ * abandoning.
  */
 async function pay() {
   if (!selectedMethod.value || isPaying.value) {
@@ -105,33 +120,59 @@ async function pay() {
   paymentError.value = null;
 
   await createPayment(props.orderId, {payment_method_id: selectedMethod.value}).then((response) => {
-    const url = response.data.payment_url ?? null;
+    const payment = OrderPayment.getInstance(response.data);
 
-    if (url) {
-      window.location.href = url;
+    // A provider that hands the customer over. Volume never does, and a null url
+    // from it is correct rather than a failed initialise.
+    if (payment.paymentUrl) {
+      window.location.href = payment.paymentUrl;
 
       return;
     }
 
-    // A null payment_url is an ordinary answer, not a failed initialise, and it
-    // is permanent rather than pending: Volume is sdk driven, so there is no
-    // redirect for the api to give us and never was. The hand-off is a call into
-    // window.Volume that takes the customer to their bank from inside our own
-    // page — components/Payment/Volume.vue has done exactly that for money
-    // transfers all along.
-    //
-    // That call is deliberately not made here. It wants a merchantPaymentId and
-    // a paymentReference, and this response carries neither; both are missing on
-    // the api side and ticketed. Wiring it now would fail as though the response
-    // shape were wrong rather than the values absent.
-    //
-    // So this goes as far as the app can honestly get — the payment exists, and
-    // the screen that watches it says so.
+    // CREATED and INITIALIZED mean the provider has not answered yet, so there is
+    // nothing to put in front of the customer. The screen that waits owns it, and
+    // will show them the outcome whenever it arrives.
+    if (!payment.isReadyToPay) {
+      router.push({name: 'travelPaymentStatus', params: {id: props.orderId}});
+
+      return;
+    }
+
+    if (payment.isVolume) {
+      activePayment.value = payment;
+
+      return;
+    }
+
+    // A provider with no url, no sdk we know of, and nothing for us to render.
+    // Rather than leave the customer on a dead page, hand them to the screen that
+    // at least tells them the truth about where the payment got to.
     router.push({name: 'travelPaymentStatus', params: {id: props.orderId}});
   }).catch((error) => {
     paymentError.value = getCustomerMessage(error) ?? 'We could not start this payment. Please try again in a moment.';
     isPaying.value = false;
   });
+}
+
+/**
+ * The sdk has taken the customer to their bank. It settles from the provider's
+ * webhook from here, so this stops watching the widget and starts watching the
+ * payment.
+ */
+function paymentInitiated() {
+  router.push({name: 'travelPaymentStatus', params: {id: props.orderId}});
+}
+
+/**
+ * The widget could not be opened. The payment exists either way — it just has no
+ * way to be completed in this tab — so the picker comes back rather than the
+ * customer being told their booking is in trouble.
+ */
+function paymentFailed() {
+  activePayment.value = null;
+  isPaying.value = false;
+  paymentError.value = 'We could not open your bank list. Please try again in a moment.';
 }
 
 watch(() => props.orderId, load, {immediate: true});
@@ -187,7 +228,17 @@ function providerName(method) {
               <p class="mt-0.5 text-sm text-emerald-800">{{ order.hotel?.name }} — pay now to confirm it with the hotel.</p>
             </div>
           </div>
-          <section class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
+          <!-- Volume builds its bank picker in the page rather than sending the
+          customer anywhere, so it replaces the method list instead of following
+          it. -->
+          <VolumePayment
+              v-if="activePayment"
+              :payment="activePayment"
+              class="mt-4"
+              @initiated="paymentInitiated"
+              @failed="paymentFailed"
+          />
+          <section v-else class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
             <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-gray-100 px-5 py-4">
               <h1 class="text-sm font-semibold text-gray-900">How would you like to pay?</h1>
               <p class="text-base font-semibold text-gray-900 tabular-nums">{{ order.total.currencyPrefixed }}</p>
