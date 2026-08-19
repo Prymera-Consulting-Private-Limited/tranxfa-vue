@@ -80,6 +80,10 @@ const note = computed(() => {
       return "We're waiting for your bank to finish. You can leave this page open — it updates on its own.";
 
     default:
+      // True the moment the Volume hand-off is wired. Until then nothing takes
+      // the customer to their bank, so a Volume payment rests here for good.
+      // Left as it reads rather than rewritten for a gap that closes when the
+      // api starts sending what the sdk needs — see PaymentView's pay().
       return "This updates on its own once your payment settles. You don't need to do anything.";
   }
 });

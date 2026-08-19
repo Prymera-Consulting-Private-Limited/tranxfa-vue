@@ -113,14 +113,20 @@ async function pay() {
       return;
     }
 
-    // A null payment_url is an ordinary answer, not a failed initialise: Volume
-    // issues no redirect at this step by design, so it is what every open
-    // banking payment currently returns. Treating it as a fault would strand a
-    // customer on the one rail this deployment offers.
+    // A null payment_url is an ordinary answer, not a failed initialise, and it
+    // is permanent rather than pending: Volume is sdk driven, so there is no
+    // redirect for the api to give us and never was. The hand-off is a call into
+    // window.Volume that takes the customer to their bank from inside our own
+    // page — components/Payment/Volume.vue has done exactly that for money
+    // transfers all along.
     //
-    // What should actually happen next is an open question on the backend's
-    // side, so this goes as far as the app can honestly get — the payment
-    // exists, and the screen that watches it says so.
+    // That call is deliberately not made here. It wants a merchantPaymentId and
+    // a paymentReference, and this response carries neither; both are missing on
+    // the api side and ticketed. Wiring it now would fail as though the response
+    // shape were wrong rather than the values absent.
+    //
+    // So this goes as far as the app can honestly get — the payment exists, and
+    // the screen that watches it says so.
     router.push({name: 'travelPaymentStatus', params: {id: props.orderId}});
   }).catch((error) => {
     paymentError.value = getCustomerMessage(error) ?? 'We could not start this payment. Please try again in a moment.';

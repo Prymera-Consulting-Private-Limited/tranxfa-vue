@@ -40,10 +40,11 @@ export const CONFIRMATION_POLL_MS = 15000;
  * than the confirmation poll because somebody is watching this one — they have
  * just come back from their bank and want to know it worked.
  *
- * The transfer flow watches a payment over a broadcast instead. Travel has no
- * documented channel for it, and a guessed one fails silently: the subscription
- * is refused and the screen waits for ever. Asking is the honest mechanism until
- * the channel is given to us.
+ * The transfer flow watches a payment over a broadcast instead, on
+ * client-payment.{payment id} — which travel cannot copy even as a guess, since
+ * the payment this api answers with carries no id to key a channel on. A guessed
+ * channel fails silently anyway: the subscription is refused and the screen
+ * waits for ever. Asking is the honest mechanism until both are given to us.
  */
 export const PAYMENT_POLL_MS = 5000;
 
@@ -114,6 +115,12 @@ export function useOrderUtils() {
     /**
      * Opens the payment with the provider in the same request, answering with a
      * payment_url wherever the provider uses one.
+     *
+     * Volume, the only rail this deployment offers, uses none — it is sdk driven,
+     * so the url is null permanently and the hand-off is a call into
+     * window.Volume rather than a redirect. What that call needs is not on this
+     * response yet, so it is not wired; PaymentView's pay() records what is
+     * missing and why guessing at it would be worse than waiting.
      *
      * @param {string} orderId
      * @param {object} payload
