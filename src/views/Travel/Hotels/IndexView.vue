@@ -31,7 +31,7 @@ import {
 import Hotel from "@/models/travel/hotels/hotel.js";
 import HotelSearch from "@/models/travel/hotels/hotel_search.js";
 import Region from "@/models/travel/region.js";
-import {getCustomerMessage, getLabels} from "@/composables/api_utils.js";
+import {getCustomerMessage, getLabels, reportUnexpectedError} from "@/composables/api_utils.js";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const route = useRoute();
@@ -210,6 +210,7 @@ async function getHotels() {
     searchId.value = resolved?.id ?? null;
     nights.value = response.data.nights ?? resolved?.nights ?? 0;
   }).catch((error) => {
+    reportUnexpectedError(error, 'travel search');
     hotels.value = [];
     totalHotels.value = 0;
     hasFailed.value = true;

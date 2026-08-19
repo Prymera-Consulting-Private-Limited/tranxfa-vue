@@ -5,7 +5,7 @@ import CustomerLayout from '@/components/CustomerLayout.vue';
 import Spinner from '@/components/Spinner.vue';
 import Order from '@/models/travel/orders/order.js';
 import PaymentMethod from '@/models/payment_method.js';
-import {getCustomerMessage} from '@/composables/api_utils.js';
+import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {useOrderUtils} from '@/composables/travel/order_utils.js';
 import {CheckCircleIcon, ExclamationTriangleIcon} from '@heroicons/vue/24/outline';
 
@@ -70,6 +70,7 @@ async function load() {
     getOrder(props.orderId).then((response) => {
       order.value = Order.getInstance(response.data);
     }).catch((error) => {
+      reportUnexpectedError(error, 'travel payment: order');
       orderFailed.value = true;
       failureMessage.value = getCustomerMessage(error) ?? failureMessage.value;
     }),
@@ -79,6 +80,7 @@ async function load() {
       methods.value = (response.data.data ?? response.data.payment_methods ?? response.data ?? [])
           .map(method => PaymentMethod.getInstance(method));
     }).catch((error) => {
+      reportUnexpectedError(error, 'travel payment: methods');
       methodsFailed.value = true;
       failureMessage.value = getCustomerMessage(error) ?? failureMessage.value;
     }),
@@ -111,9 +113,14 @@ async function pay() {
       return;
     }
 
-    // Nothing to redirect to means the provider settles without a page of its
-    // own, so the wait happens here rather than the customer being dropped on a
-    // booking that does not yet show a payment.
+    // A null payment_url is an ordinary answer, not a failed initialise: Volume
+    // issues no redirect at this step by design, so it is what every open
+    // banking payment currently returns. Treating it as a fault would strand a
+    // customer on the one rail this deployment offers.
+    //
+    // What should actually happen next is an open question on the backend's
+    // side, so this goes as far as the app can honestly get — the payment
+    // exists, and the screen that watches it says so.
     router.push({name: 'travelPaymentStatus', params: {id: props.orderId}});
   }).catch((error) => {
     paymentError.value = getCustomerMessage(error) ?? 'We could not start this payment. Please try again in a moment.';

@@ -13,7 +13,7 @@ import {getCheapestRate, useHotelUtils} from "@/composables/travel/hotels/hotel_
 import HotelDetail from "@/models/travel/hotels/hotel_detail.js";
 import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 import HotelSearch from "@/models/travel/hotels/hotel_search.js";
-import {getCustomerMessage, getLabels} from "@/composables/api_utils.js";
+import {getCustomerMessage, getLabels, reportUnexpectedError} from "@/composables/api_utils.js";
 import {ChevronLeftIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
@@ -166,6 +166,7 @@ async function getHotelDetails({quiet = false} = {}) {
       selectedRate.value = getCheapestRate(rates.value);
     }
   }).catch((error) => {
+    reportUnexpectedError(error, 'travel hotel');
     hotel.value = null;
     rates.value = [];
     hasFailed.value = true;

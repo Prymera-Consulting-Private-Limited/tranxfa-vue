@@ -6,7 +6,7 @@ import PaymentCompleted from '@/components/Payment/State/PaymentCompleted.vue';
 import AwaitingPending from '@/components/Payment/State/AwaitingPending.vue';
 import Failed from '@/components/Payment/State/Failed.vue';
 import Order from '@/models/travel/orders/order.js';
-import {getCustomerMessage} from '@/composables/api_utils.js';
+import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {PAYMENT_POLL_MS, useOrderUtils} from '@/composables/travel/order_utils.js';
 import {ExclamationTriangleIcon} from '@heroicons/vue/24/outline';
 
@@ -120,6 +120,8 @@ async function load(quiet = false) {
   await getOrder(props.orderId).then((response) => {
     order.value = Order.getInstance(response.data);
   }).catch((error) => {
+    reportUnexpectedError(error, 'travel payment status');
+
     // A poll that fails is not worth tearing the page down for — the payment is
     // settling regardless of whether this tab can see it.
     if (quiet) {

@@ -1,4 +1,28 @@
 /**
+ * Surfaces a failure that is ours rather than the api's.
+ *
+ * A `.catch()` on a request catches everything after it too, so a model that
+ * throws while mapping a perfectly good 200 lands in the same branch as a
+ * network failure and renders as "something went wrong on our side" — true, but
+ * useless. It cost the backend an evening: the response was intact, the retry
+ * failed identically, and nothing reached the console because we had swallowed
+ * the exception on the way to the error state.
+ *
+ * An axios error carries `response` for anything the server answered, and
+ * `request` for anything that never got one. Neither means it came from us.
+ *
+ * @param {*} error
+ * @param {string} context Where it happened, since the stack will point at axios.
+ */
+export function reportUnexpectedError(error, context) {
+    if (error?.response || error?.request) {
+        return;
+    }
+
+    console.error(`[${context}] failed while handling the response, not while making the request:`, error);
+}
+
+/**
  * A response's label dictionary, as a dictionary.
  *
  * PHP encodes an empty associative array as a JSON array, so an endpoint with no
