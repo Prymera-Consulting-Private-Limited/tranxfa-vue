@@ -200,10 +200,7 @@ class Order {
             order.cancellation = OrderCancellation.getInstance(data.cancellation);
         }
 
-        order.guests = (data.guests ?? []).map(guest => ({
-            firstName: guest.first_name ?? null,
-            lastName: guest.last_name ?? null,
-        }));
+        order.guests = Order.getGuests(data.guests);
 
         order.contact = data.contact
             ? {email: data.contact.email ?? null, phone: data.contact.phone ?? null}
@@ -222,6 +219,36 @@ class Order {
         order.payments = OrderPayment.getCollection(data.payments ?? []);
 
         return order;
+    }
+
+    /**
+     * Guests arrive grouped into the rooms they were booked into — the same
+     * shape the booking request sends, which is the sensible answer to the same
+     * question. The response-shapes document described a flat array instead, so
+     * both are read: the flat form has been documented and the grouped one is
+     * what an order actually returns.
+     *
+     * They are flattened here because a booking shows who is staying, not who is
+     * in which room. The room a name sits in is still on the wire if that ever
+     * becomes worth showing.
+     *
+     * @param {{rooms: Array<{guests: Array}>}|Array|null} data
+     * @returns {Array<{firstName: string|null, lastName: string|null, isChild: boolean}>}
+     */
+    static getGuests(data) {
+        if (!data) {
+            return [];
+        }
+
+        const guests = Array.isArray(data)
+            ? data
+            : (data.rooms ?? []).flatMap(room => room.guests ?? []);
+
+        return guests.map(guest => ({
+            firstName: guest.first_name ?? null,
+            lastName: guest.last_name ?? null,
+            isChild: guest.is_child ?? false,
+        }));
     }
 
     /**

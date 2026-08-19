@@ -226,8 +226,8 @@ describe('Order.getInstance', () => {
         }))
 
         expect(order.guests).toEqual([
-            { firstName: 'Ada', lastName: 'Lovelace' },
-            { firstName: 'Grace', lastName: 'Hopper' },
+            { firstName: 'Ada', lastName: 'Lovelace', isChild: false },
+            { firstName: 'Grace', lastName: 'Hopper', isChild: false },
         ])
         expect(order.contact).toEqual({ email: 'guest@example.com', phone: '+441234567890' })
         expect(order.confirmation).toBeInstanceOf(OrderConfirmation)
@@ -295,5 +295,124 @@ describe('Order.getInstance', () => {
 
         expect(orders).toHaveLength(2)
         expect(orders[1].id).toBe('ord-2')
+    })
+})
+
+/**
+ * Captured off the wire on the first run where this endpoint ever answered 200.
+ * Until then it had 404'd on a wrong id, so nothing here had run against a real
+ * order — and it threw on the first one it met.
+ *
+ * Guests arrive grouped by room rather than as the flat array the response-shapes
+ * document described, so mapping them with Array.prototype.map threw a TypeError
+ * inside the request's catch, which rendered as "something went wrong on our
+ * side" on a perfectly good 200.
+ */
+const liveOrderPayload = () => ({
+    id: 'a288e958-b35a-4f9f-a29d-e18d62c822d9',
+    reference: 'VO-01M0BD0FSVNNJ51ESVC0TZ08WK',
+    state: 'CONFIRMED',
+    state_label: 'Order Confirmed',
+    state_description: 'Your order has been confirmed and is being prepared for delivery.',
+    booked_at: '2026-08-18T21:39:01+00:00',
+    hotel: {
+        id: 'a274fd38-0000-4000-8000-000000000000',
+        slug: 'petit-marais',
+        name: 'Petit Marais',
+        address: '10 rue Saint Paul, 4th arr., 75004 Paris, France',
+        star_rating: 3,
+    },
+    check_in: '2026-08-20',
+    check_out: '2026-08-21',
+    nights: 1,
+    room_name: 'Junior Suite',
+    meal: 'NO-MEAL',
+    occupancy: { rooms: [{ adults: 2, children_ages: [] }] },
+    guests: {
+        rooms: [{
+            guests: [
+                { is_child: false, last_name: 'Lovelace', first_name: 'Ada' },
+                { is_child: false, last_name: 'Hopper', first_name: 'Grace' },
+            ],
+        }],
+    },
+    contact: { email: 'sd849.final@example.test', phone: '+442071838750' },
+    is_confirmed: false,
+    confirmed_at: null,
+    confirmation: null,
+    breakdown: [
+        { key: 'room', label: 'Room', amount: 18597, amount_formatted: '185.97', amount_currency_prefixed: 'GBP 185.97' },
+        { key: 'taxes_and_fees', label: 'Taxes and fees', amount: 0, amount_formatted: '0.00', amount_currency_prefixed: 'GBP 0.00' },
+        { key: 'convenience_fee', label: 'Convenience fee', amount: 1043, amount_formatted: '10.43', amount_currency_prefixed: 'GBP 10.43' },
+    ],
+    payments: [],
+    cancellation: {
+        requested: null,
+        can_cancel_now: true,
+        quote: {
+            is_free: true,
+            is_inside_free_window: true,
+            costs_now: 0, costs_now_formatted: '0.00', costs_now_currency_prefixed: 'GBP 0.00',
+            refund_now: 19640, refund_now_formatted: '196.40', refund_now_currency_prefixed: 'GBP 196.40',
+        },
+    },
+    total: 19640, total_formatted: '196.40', total_currency_prefixed: 'GBP 196.40',
+})
+
+describe('Order.getInstance, against a real order', () => {
+    it('maps the body that broke it, without throwing', () => {
+        expect(() => Order.getInstance(liveOrderPayload())).not.toThrow()
+    })
+
+    it('reads guests out of the rooms they are grouped into', () => {
+        const order = Order.getInstance(liveOrderPayload())
+
+        expect(order.guests).toEqual([
+            { firstName: 'Ada', lastName: 'Lovelace', isChild: false },
+            { firstName: 'Grace', lastName: 'Hopper', isChild: false },
+        ])
+    })
+
+    it('still reads the flat array the document described', () => {
+        const order = Order.getInstance(orderPayload({
+            guests: [{ first_name: 'Ada', last_name: 'Lovelace' }],
+        }))
+
+        expect(order.guests).toEqual([{ firstName: 'Ada', lastName: 'Lovelace', isChild: false }])
+    })
+
+    it('carries a child through from either shape', () => {
+        const order = Order.getInstance(orderPayload({
+            guests: { rooms: [{ guests: [{ first_name: 'Byron', last_name: 'Lovelace', is_child: true }] }] },
+        }))
+
+        expect(order.guests[0].isChild).toBe(true)
+    })
+
+    /**
+     * The emptiest form of each is the main path on the payment screen, which
+     * opens in the window before the hotel confirms and before anything is paid.
+     */
+    it('survives the state a booking is in when it is about to be paid for', () => {
+        const order = Order.getInstance(liveOrderPayload())
+
+        expect(order.confirmation).toBeNull()
+        expect(order.confirmedAt).toBeNull()
+        expect(order.isConfirmed).toBe(false)
+        expect(order.payments).toEqual([])
+        expect(order.latestPayment).toBeNull()
+        expect(order.isAwaitingHotel).toBe(true)
+    })
+
+    it('maps the rest of that order as it stands', () => {
+        const order = Order.getInstance(liveOrderPayload())
+
+        expect(order.hotel.name).toBe('Petit Marais')
+        expect(order.total.currencyPrefixed).toBe('GBP 196.40')
+        expect(order.breakdown).toHaveLength(3)
+        expect(order.contact).toEqual({ email: 'sd849.final@example.test', phone: '+442071838750' })
+        expect(order.cancellation.canCancelNow).toBe(true)
+        expect(order.cancellation.quote.isFree).toBe(true)
+        expect(order.cancellation.isCancelled).toBe(false)
     })
 })
