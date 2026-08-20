@@ -111,6 +111,7 @@ async function closeSdk() {
                   v-if="documentType.api === 'DIDIT'"
                   v-on:sdkInitialized="isSdkInitialized = true"
                   v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                  v-on:sdkCancelled="closeSdk"
                   v-bind:documentType="documentType"
                   v-bind:documentCategory="documentCategory"
               />
