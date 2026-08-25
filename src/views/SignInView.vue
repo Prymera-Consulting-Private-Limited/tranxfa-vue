@@ -93,7 +93,7 @@ function updateIsdCode(updated) {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full min-h-screen md:h-screen bg-white overflow-y-auto">
         <div class="relative hidden md:block md:w-[60%] md:h-full shrink-0">
-          <img src="/images/backgrounds/login.webp" alt="Login Background" class="h-full w-full object-cover">
+          <img src="/images/backgrounds/login.png" alt="Login Background" class="h-full w-full object-cover">
         </div>
 
         <div class="absolute top-4 right-4 z-10 hidden md:block">

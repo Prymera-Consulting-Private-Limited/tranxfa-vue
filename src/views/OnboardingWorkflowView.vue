@@ -61,7 +61,7 @@ const editPersonalInformation = () => {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full min-h-screen md:h-screen bg-white overflow-y-auto">
         <div class="relative hidden md:block md:w-[60%] md:h-full shrink-0">
-          <img src="/images/backgrounds/signup.webp" alt="Login Background" class="h-full w-full object-cover">
+          <img src="/images/backgrounds/signup.png" alt="Login Background" class="h-full w-full object-cover">
         </div>
 
         <div class="flex shrink-0 items-center px-4 py-4 md:hidden">
