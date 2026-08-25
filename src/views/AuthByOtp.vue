@@ -84,18 +84,22 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <!-- Form Section -->
-  <div class="relative flex-1 flex items-center justify-center p-4 md:p-8">
+  <main>
+    <div class="relative flex min-h-screen flex-col bg-white overflow-y-auto">
+      <div class="flex shrink-0 items-center px-4 py-4 md:hidden">
+        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-h-10"></a>
+      </div>
+      <div class="relative flex min-h-0 flex-1 items-start justify-center p-4 md:items-center md:p-8">
     <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center bg-white/75 z-10">
       <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
     </div>
     <div v-show="! isLoading || isVerifying" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
-      <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:" class="mx-auto"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5 mx-auto"></a>
+      <div class="hidden md:block">
+        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-h-16 mb-5 -ml-2"></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">Secure Login</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-center">Secure Login</h2>
       <p class="text-md text-[#B7A3C1] mb-2 text-center">Enter the verification code sent to <span class="font-bold">+{{ otpData.country.callingCode }}{{ otpData.number }}</span></p>
       <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">The code may take a few seconds to arrive.</p>
       <!-- Form -->
@@ -149,8 +153,10 @@ onMounted(async () => {
           <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending OTP ...</div>
         </template>
       </form>
+      </div>
     </div>
   </div>
+  </main>
 </template>
 <style scoped>
 .otp-input::-webkit-inner-spin-button,

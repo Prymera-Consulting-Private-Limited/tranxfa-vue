@@ -30,17 +30,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="relative flex-1 flex items-center justify-center p-4 md:p-8">
+  <div class="relative flex min-h-0 flex-1 items-start justify-center overflow-y-auto p-4 md:items-center md:p-8">
     <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center bg-white/75 z-10">
       <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
     </div>
     <div v-show="! isLoading || isSaving" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
-      <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+      <div class="hidden md:block">
+        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-h-16 mb-5 -ml-2"></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left  mt-14 sm:mt-8">Where Do You Live?</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left">Where Do You Live?</h2>
       <p class="text-md text-[#B7A3C1] mb-8 text-left">To provide you with the best service, we need to know your country of residence. Please select your country to continue.</p>
       <ul v-if="countryUtils.sources.value?.length > 0" role="list" class="mt-3 grid grid-cols-1 gap-4 xl:grid-cols-2 sm:gap-5">
         <template v-for="country in countryUtils.sources.value" :key="country.id">

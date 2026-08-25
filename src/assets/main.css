@@ -8,18 +8,19 @@
 
 @layer theme {
     @theme {
-        --default-font-family: 'Inter', sans-serif;
-        --color-brand-50: theme('colors.sky.50');
-        --color-brand-100: theme('colors.sky.100');
-        --color-brand-200: theme('colors.sky.200');
-        --color-brand-300: theme('colors.sky.300');
-        --color-brand-400: theme('colors.sky.400');
-        --color-brand-500: theme('colors.sky.500');
-        --color-brand-600: theme('colors.sky.600');
-        --color-brand-700: theme('colors.sky.700');
-        --color-brand-800: theme('colors.sky.800');
-        --color-brand-900: theme('colors.sky.900');
-    }
+    --default-font-family: 'Inter', sans-serif;
+
+    --color-brand-50: #f0fdf4;
+    --color-brand-100: #dcfce7;
+    --color-brand-200: #bbf7d0;
+    --color-brand-300: #86efac;
+    --color-brand-400: #4ade80;
+    --color-brand-500: #28a745;
+    --color-brand-600: #218838;
+    --color-brand-700: #1e7e34;
+    --color-brand-800: #19692c;
+    --color-brand-900: #155724;
+}
 }
 
 .dp__theme_light {

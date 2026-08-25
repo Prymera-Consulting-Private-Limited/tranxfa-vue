@@ -55,18 +55,17 @@ function requiresAddressInformation() {
         !!customer?.addressInformationRequired?.();
 }
 
-function addressInformationCompleted() {
-    const customer = getCustomer();
-
-    return employmentInformationCompleted() &&
-        !customer?.addressInformationRequired?.();
-}
-
 function hasMobileNumber() {
     const customer = getCustomer();
 
-    return addressInformationCompleted() &&
+    // Address may be skipped during onboarding and collected later when sending money.
+    return employmentInformationCompleted() &&
         !!customer?.account?.mobileNumber;
+}
+
+function canEnterMobileNumber() {
+    return employmentInformationCompleted() &&
+        !hasMobileNumber();
 }
 
 export const onboardingNavigationMachine = createMachine({
@@ -77,17 +76,19 @@ export const onboardingNavigationMachine = createMachine({
         emailVerification: {
             on: {
                 PROCEED: [
+                    // Returning users who already finished (e.g. skipped address) go to dashboard.
                     {
                         target: 'onboardingComplete',
                         guard: hasMobileNumber,
                     },
-                    {
-                        target: 'mobileNumberInput',
-                        guard: addressInformationCompleted,
-                    },
+                    // First-time path: offer address (skippable) before mobile.
                     {
                         target: 'addressInformation',
                         guard: requiresAddressInformation,
+                    },
+                    {
+                        target: 'mobileNumberInput',
+                        guard: canEnterMobileNumber,
                     },
                     {
                         target: 'employmentInformation',
@@ -127,7 +128,11 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: addressInformationCompleted,
+                        guard: canEnterMobileNumber,
+                    },
+                    {
+                        target: 'onboardingComplete',
+                        guard: hasMobileNumber,
                     },
                 ],
 
@@ -146,7 +151,11 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: addressInformationCompleted,
+                        guard: canEnterMobileNumber,
+                    },
+                    {
+                        target: 'onboardingComplete',
+                        guard: hasMobileNumber,
                     },
                 ],
 
@@ -158,10 +167,17 @@ export const onboardingNavigationMachine = createMachine({
 
         addressInformation: {
             on: {
-                PROCEED: {
-                    target: 'mobileNumberInput',
-                    guard: addressInformationCompleted,
-                },
+                // Allow proceed even when address is skipped; send-money will collect it later.
+                PROCEED: [
+                    {
+                        target: 'mobileNumberInput',
+                        guard: canEnterMobileNumber,
+                    },
+                    {
+                        target: 'onboardingComplete',
+                        guard: hasMobileNumber,
+                    },
+                ],
 
                 EDIT_PERSONAL_INFORMATION: {
                     target: 'identityInformation',

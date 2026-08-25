@@ -28,7 +28,7 @@ const showLoading = computed(() => {
   return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
 })
 
-const emit = defineEmits(['addressUpdated', 'editPersonalInformationRequested'])
+const emit = defineEmits(['addressUpdated', 'editPersonalInformationRequested', 'skipAddressInformation'])
 
 const addressUpdated = () => {
   emit('addressUpdated')
@@ -37,32 +37,71 @@ const addressUpdated = () => {
 const editPersonalInformation = () => {
   emit('editPersonalInformationRequested');
 }
+
+const skip = () => {
+  emit('skipAddressInformation');
+}
 </script>
 <template>
-  <div class="relative flex-1 flex items-center justify-center p-4 md:p-8">
-    <div v-if="showLoading" class="absolute inset-0 flex items-center justify-center bg-white/75 z-10">
+  <div class="relative flex min-h-0 flex-1 items-start justify-center overflow-y-auto p-4 md:items-center md:p-8">
+    <div
+      v-if="showLoading"
+      class="absolute inset-0 z-10 flex items-center justify-center bg-white/75"
+    >
       <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
     </div>
-    <div v-show="! showLoading" class="w-full max-w-xl">
-      <!-- Logo at Top Left (Desktop)  -->
-      <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+
+    <div v-show="!showLoading" class="w-full max-w-xl">
+      <div class="hidden md:block">
+        <a href="javascript:">
+          <img
+            src="/images/logo.png"
+            alt="RemitSo Logo"
+            class="mb-5 max-h-16 -ml-2"
+          />
+        </a>
       </div>
+
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">Address Details</h2>
-      <p class="text-md text-[#B7A3C1] mb-8 text-left">
-        Please provide your full residential address in
-        <span class="font-semibold text-brand-700">{{ customer?.data?.country?.commonName }}</span>.
-        Accurate address information is required to comply with financial regulations.
-      </p>
+      <div class="mb-6">
+        <h2 class="mb-3 text-2xl font-semibold leading-tight text-black">
+          Address Details
+        </h2>
+
+        <p class="text-left text-sm leading-6 text-[#B7A3C1] sm:text-base">
+          Please provide your full residential address in
+          <span class="font-semibold text-brand-700">
+            {{ customer?.data?.country?.commonName }}
+          </span>.
+        </p>
+      </div>
+
       <!-- Form -->
       <CustomerAttributeForm
-          v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
-          v-bind:showLoading="showLoading"
-          v-on:customer:attribute_category:updated="addressUpdated"
+        :categories="`${CustomerAttributeCategory.ADDRESS}`"
+        :showLoading="showLoading"
+        @customer:attribute_category:updated="addressUpdated"
       />
-      <div class="text-center mt-12">
-        <a @click="editPersonalInformation" class="inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline" href="javascript:">Edit Personal Information</a>
+
+      <!-- Skip Button -->
+      <button
+        @click="skip"
+        :disabled="showLoading"
+        type="button"
+        class="mt-3 block w-full cursor-pointer rounded-full bg-gray-100 py-3.5 text-center text-base font-medium text-gray-600 transition-all duration-200 hover:bg-gray-200 hover:text-gray-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        Skip for now
+      </button>
+
+      <!-- Edit Personal Information -->
+      <div class="mt-8 text-center sm:mt-10">
+        <a
+          @click="editPersonalInformation"
+          class="inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
+          href="javascript:"
+        >
+          Edit Personal Information
+        </a>
       </div>
     </div>
   </div>
