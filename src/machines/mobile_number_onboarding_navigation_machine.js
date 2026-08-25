@@ -39,13 +39,6 @@ function requiresAddressInformation() {
         !!customer?.addressInformationRequired?.();
 }
 
-function addressInformationCompleted() {
-    const customer = getCustomer();
-
-    return employmentInformationCompleted() &&
-        !customer?.addressInformationRequired?.();
-}
-
 function hasEmail() {
     const customer = getCustomer();
 
@@ -55,8 +48,9 @@ function hasEmail() {
 function doesNotHaveEmail() {
     const customer = getCustomer();
 
-    return addressInformationCompleted() &&
-        ! (!!customer?.account?.email);
+    // Address may be skipped during onboarding and collected later when sending money.
+    return employmentInformationCompleted() &&
+        !customer?.account?.email;
 }
 
 function emailVerified() {
@@ -83,6 +77,11 @@ export const mobileAuthOnboardingMachine = createMachine({
                         target: 'employmentInformation',
                         guard: requiresEmploymentInformation,
                     },
+                    // Returning users who finished onboarding (e.g. skipped address) go to dashboard.
+                    {
+                        target: 'onboardingComplete',
+                        guard: () => employmentInformationCompleted() && emailVerified(),
+                    },
                     {
                         target: 'addressInformation',
                         guard: requiresAddressInformation,
@@ -106,6 +105,11 @@ export const mobileAuthOnboardingMachine = createMachine({
         employmentInformation: {
             on: {
                 PROCEED: [
+                    // Returning users who finished onboarding (e.g. skipped address) go to dashboard.
+                    {
+                        target: 'onboardingComplete',
+                        guard: () => employmentInformationCompleted() && emailVerified(),
+                    },
                     {
                         target: 'addressInformation',
                         guard: requiresAddressInformation,

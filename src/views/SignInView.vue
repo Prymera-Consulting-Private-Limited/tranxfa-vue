@@ -91,29 +91,30 @@ function updateIsdCode(updated) {
   <main>
     <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
-      <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
-        <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/login.webp" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
-          <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
-            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
-              <i class="pi pi-times"></i>
-            </a>
-          </div>
-          <div class="hidden md:block  absolute top-4 right-4">
-            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
-              <i class="pi pi-times"></i>
-            </a>
-          </div>
+      <div v-else class="relative flex flex-col md:flex-row w-full min-h-screen md:h-screen bg-white overflow-y-auto">
+        <div class="relative hidden md:block md:w-[60%] md:h-full shrink-0">
+          <img src="/images/backgrounds/login.webp" alt="Login Background" class="h-full w-full object-cover">
+        </div>
+
+        <div class="absolute top-4 right-4 z-10 hidden md:block">
+          <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <i class="pi pi-times"></i>
+          </a>
+        </div>
+
+        <div class="flex shrink-0 items-center justify-between px-4 py-4 md:hidden">
+          <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-h-10"></a>
+          <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500">
+            <i class="pi pi-times"></i>
+          </a>
         </div>
 
         <!-- Form Section -->
-        <div class="flex-1 flex items-center justify-center p-4 md:p-8">
+        <div class="flex min-h-0 flex-1 items-start justify-center p-4 md:items-center md:p-8">
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5 -ml-2"></a>
+              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-h-16 mb-5 -ml-2"></a>
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-2">Love to see you again</h2>

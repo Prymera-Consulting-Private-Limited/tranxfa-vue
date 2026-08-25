@@ -59,13 +59,13 @@ const editPersonalInformation = () => {
   <main>
     <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
-      <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
-        <div class="w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/signup.webp" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
-          <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
-          </div>
+      <div v-else class="relative flex flex-col md:flex-row w-full min-h-screen md:h-screen bg-white overflow-y-auto">
+        <div class="relative hidden md:block md:w-[60%] md:h-full shrink-0">
+          <img src="/images/backgrounds/signup.webp" alt="Login Background" class="h-full w-full object-cover">
+        </div>
+
+        <div class="flex shrink-0 items-center px-4 py-4 md:hidden">
+          <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-h-10"></a>
         </div>
         <EmailVerification v-if="snapshot?.value === 'emailVerification'" v-on:emailVerified="proceed" />
         <OriginCountrySelection
@@ -82,6 +82,7 @@ const editPersonalInformation = () => {
         <AddressInformation
             v-else-if="snapshot?.value === 'addressInformation'"
             v-on:addressUpdated="proceed"
+            v-on:skipAddressInformation="proceed"
             v-on:editPersonalInformationRequested="editPersonalInformation" />
         <MobileNumberInput
             v-else-if="snapshot?.value === 'mobileNumberInput'"

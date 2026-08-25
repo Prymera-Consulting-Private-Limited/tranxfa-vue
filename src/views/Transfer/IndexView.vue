@@ -166,6 +166,7 @@ const submitAndContinue = async () => {
 }
 
 const customerAttributeCategoryUpdated = async () => {
+  isAddressRequired.value = customerStore.customer.data.addressInformationRequired();
   await send({ type: 'PROCEED' });
   isStepProcessing.value = false;
 }
