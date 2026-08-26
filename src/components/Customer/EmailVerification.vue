@@ -104,18 +104,12 @@ onMounted(async () => {
       <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
       <!-- Form -->
       <form @submit.prevent="verifyEmailAddress" class="space-y-10">
-        <div v-if="otpError" class="rounded-md bg-red-50 p-4">
-          <div class="flex">
-            <div class="">
-              <div class="text-sm text-red-700">
-                {{ otpError }}
-              </div>
-            </div>
-          </div>
+        <div v-if="otpError" class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+          <p class="text-sm text-red-700">{{ otpError }}</p>
         </div>
         <v-otp-input
             class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"
-            input-classes="w-12 h-12 lg:w-16 lg:h-16 flex flex-col items-center justify-center text-center px-3 lg:px-5 border-b border border-gray-300 rounded-lg text-lg otp-input"
+            input-classes="w-12 h-12 lg:w-16 lg:h-16 flex flex-col items-center justify-center text-center px-3 lg:px-5 border border-gray-300 rounded-2xl text-lg otp-input transition-all focus:border-brand-700 focus:ring-4 focus:ring-brand-700/10"
             separator=""
             inputType="number"
             inputmode="numeric"
@@ -127,18 +121,34 @@ onMounted(async () => {
             @on-complete="verifyEmailAddress"
         />
         <div class="mt-6 max-w-md flex justify-between mx-auto">
-          <button :disabled="isLoading" :class="[{'opacity-70': isLoading}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
+          <button
+            :disabled="isLoading"
+            type="submit"
+            class="group relative block w-full overflow-hidden rounded-full bg-brand-700 py-3.5 text-center text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
+          >
             <template v-if="isVerifying">
-              <span class="flex items-center justify-center whitespace-nowrap">
-                <Spinner :class="'size-4 mr-2'" />
+              <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
+                <Spinner :class="'size-4'" />
                 Verifying Email ...
               </span>
             </template>
-            <template v-else>Verify Email</template>
+            <template v-else>
+              <span class="inline-flex items-center justify-center gap-2">
+                Verify Email
+                <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+              </span>
+            </template>
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
-          <div v-if="! isResendingToken" class="text-sm text-gray-500 text-center">Didn't receive verification code? <a @click="resend" class="text-brand-700 hover:text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a> <template v-else>Resend in {{ countdown }}s</template>
+          <div v-if="! isResendingToken" class="text-sm text-gray-500 text-center">
+            Didn't receive verification code?
+            <a
+              v-if="showResendButton"
+              @click="resend"
+              class="ml-1 inline-flex cursor-pointer items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
+            >Resend code</a>
+            <template v-else> Resend in {{ countdown }}s</template>
           </div>
           <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending verification code to your email {{ customer.data?.account?.email }} ...</div>
         </template>

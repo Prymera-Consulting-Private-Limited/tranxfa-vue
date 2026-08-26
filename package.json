@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@didit-protocol/sdk-web": "^0.2.1",
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@lottiefiles/dotlottie-vue": "^0.5.8",
