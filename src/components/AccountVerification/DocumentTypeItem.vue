@@ -11,6 +11,7 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import UpPass from "@/components/AccountVerification/Provider/UpPass.vue";
 import Persona from "@/components/AccountVerification/Provider/Persona.vue";
 import Shufti from "@/components/AccountVerification/Provider/Shufti.vue";
+import Didit from "@/components/AccountVerification/Provider/Didit.vue";
 
 const customerUtils = useCustomerUtils();
 
@@ -103,6 +104,14 @@ async function closeSdk() {
                   v-if="documentType.api === 'SHUFTI'"
                   v-on:sdkInitialized="isSdkInitialized = true"
                   v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                  v-bind:documentType="documentType"
+                  v-bind:documentCategory="documentCategory"
+              />
+              <Didit
+                  v-if="documentType.api === 'DIDIT'"
+                  v-on:sdkInitialized="isSdkInitialized = true"
+                  v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                  v-on:sdkCancelled="closeSdk"
                   v-bind:documentType="documentType"
                   v-bind:documentCategory="documentCategory"
               />

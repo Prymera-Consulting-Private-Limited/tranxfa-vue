@@ -40,6 +40,14 @@ const router = createRouter({
         description: 'Reset Password',
       },
     }, {
+      path: '/secure-login',
+      name: 'authByOtp',
+      component: () => import('@/views/AuthByOtp.vue'),
+      meta: {
+        title: 'Secure Login Verification',
+        description: 'Verify your identity with a one-time password to continue securely.',
+      },
+    }, {
       path: '/sign-up',
       name: 'signUp',
       component: SignUpView,
