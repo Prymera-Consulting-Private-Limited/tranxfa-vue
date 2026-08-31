@@ -1,5 +1,5 @@
 <script setup>
-import {ref, watch} from "vue";
+import {onUnmounted, ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import VOtpInput from "vue3-otp-input";
 import pTimeout from 'p-timeout';
@@ -44,16 +44,26 @@ const resendError = ref('');
 const showResendButton = ref(false);
 const countdown = ref(30);
 
+let countdownIntervalId = null;
+
+function clearCountdownInterval() {
+  if (countdownIntervalId) {
+    clearInterval(countdownIntervalId);
+    countdownIntervalId = null;
+  }
+}
+
 async function startResendOtpTimer() {
+  clearCountdownInterval();
   showResendButton.value = false;
   countdown.value = 30;
 
   try {
     const timer = new Promise((resolve) => {
-      const interval = setInterval(() => {
+      countdownIntervalId = setInterval(() => {
         countdown.value -= 1;
         if (countdown.value === 0) {
-          clearInterval(interval);
+          clearCountdownInterval();
           resolve();
         }
       }, 1000);
@@ -71,6 +81,8 @@ watch(() => props.open, (open) => {
     otp.value = '';
     resendError.value = '';
     startResendOtpTimer();
+  } else {
+    clearCountdownInterval();
   }
 });
 
@@ -79,6 +91,10 @@ watch(() => props.error, (error) => {
     otp.value = '';
     otpInput.value?.clearInput();
   }
+});
+
+onUnmounted(() => {
+  clearCountdownInterval();
 });
 
 function submit() {
