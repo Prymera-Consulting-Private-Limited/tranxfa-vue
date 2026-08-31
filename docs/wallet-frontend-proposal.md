@@ -12,19 +12,20 @@ contract questions → market notes → estimate & PR slicing.
 ## 1. Availability & state model
 
 Everything below hangs off one probe. On login (alongside `customerUtils.refresh()`
-in `CustomerLayout`), resolve wallet availability once and cache it in a new
-`wallet` Pinia store as a five-way state. **Verified against the API docs, the
-probe needs two legs**: `GET /wallet/subscription` answers 404 both when the
-deployment is unlicensed *and* when the customer simply isn't enrolled, so a 404
-falls through to `GET /wallet/terms` to tell those apart:
+in `CustomerLayout`), call `GET /wallet/subscription` once and cache the outcome in
+a new `wallet` Pinia store as a five-way state. **Single request** (updated per the
+backend's round-2 answers — the un-enrolled 404 body now carries a JSON `type` and
+`wallet_offered: true|false`, so the licence, the country, and enrolment all read
+from one answer):
 
-| state | source | UI consequence |
+| probe answer | state | UI consequence |
 |---|---|---|
-| `unavailable` | subscription 404 → terms 404 (no licence) or terms 412 `wallet_not_offered` / `wallet_terms_unavailable` | wallet does not exist anywhere in the UI |
-| `eligible` | subscription 404 → terms 200 | nav item + intro/enrol surfaces shown |
-| `active` | subscription 200, `reacceptance_required: false` | full feature |
-| `paused` | subscription 200, `reacceptance_required: true` | balance/statement visible; every money action routes to re-acceptance first |
-| `unknown` | probe not yet resolved | render nothing wallet-related (no flash of the feature) |
+| route 404, no JSON `type` in body | `unavailable` (unlicensed) | wallet does not exist anywhere in the UI |
+| 404 + `type` + `wallet_offered: false` | `unavailable` (country not offered / none on file) | same — hidden entirely |
+| 404 + `type` + `wallet_offered: true` | `eligible` | nav item + intro/enrol surfaces shown |
+| 200, `reacceptance_required: false` | `active` | full feature |
+| 200, `reacceptance_required: true` | `paused` | balance/statement visible; every money action routes to re-acceptance first |
+| — probe not yet resolved | `unknown` | render nothing wallet-related (no flash of the feature) |
 
 Notes:
 
@@ -35,8 +36,8 @@ Notes:
   "404 that is not an error" precedent (Check App Version). Nothing is hard-coded
   on: an unlicensed tenant deploys the same build and simply never shows the
   feature.
-- For enrolled customers the second leg never runs; for most customers on licensed
-  deployments the probe is one request, two only for the not-yet-enrolled.
+- `GET /wallet/terms` is the enrolment modal's fetch only — it plays no part in
+  availability detection.
 - The probe result is cached for the session and re-checked on wallet-page entry;
   balances themselves are **never** cached as truth — `GET /wallet` on every entry
   to the wallet screen, per the handout.
@@ -79,8 +80,11 @@ and statement stay fully visible, per the handout.
 ### 2.2 Enrolment & terms re-acceptance (one modal, two entry modes)
 
 `GET /wallet/terms` → scrollable terms in a HeadlessUI dialog (the brand-50
-note-banner + modal form pattern from `SettingsView`/`StatementRequestModal`),
-acceptance checkbox, then `POST /wallet/subscription` with `{terms_version_id}` —
+note-banner + modal form pattern from `SettingsView`/`StatementRequestModal`).
+The `content` is plain text published as-is (confirmed round 2): render with
+`white-space: pre-line`, no HTML/markdown parsing — the text is what acceptance
+binds to. Acceptance checkbox, then `POST /wallet/subscription` with
+`{terms_version_id}` —
 the uuid `id` from the terms response, not the human `version` number (verified).
 Success (201) carries `{wallet_number, status, enrolled_at, reacceptance_required}`;
 celebrate the wallet number ("Your wallet number — W48291736") with copy affordance
@@ -102,9 +106,10 @@ and takes just `{amount}` (verified; a simpler screen than first sketched). Subm
 - `wallet_topup_amount_collides` renders as a **guidance panel, not an error
   wall**: the API's message verbatim in the amber style, plus two inline actions —
   "adjust the amount" (refocus input) and "view pending top-ups" (jump to the
-  strip, where cancel lives). No red. (Docs say this refusal is a 412 where the
-  handout said 422 — we branch on the body's `type` for either status, so the
-  discrepancy costs nothing; flagged for the backend to reconcile the docs.)
+  strip, where cancel lives). No red. (Settled round 2: the status is **412** —
+  the handout's 422 was the backend's slip. The message is prose only, no
+  structured suggestions field; the panel-with-refocus is the intended treatment.
+  We branch on the body's `type` regardless of status.)
 
 **Step 2 — transfer instructions.** `GET /wallet/deposit-instructions`:
 
@@ -133,19 +138,26 @@ longer pending (verified) — refresh the strip and show the message.
 ### 2.4 Statement — `/wallet/statement`
 
 Clone of `Transaction/IndexView.vue`: white card, `ListShimmer`, `ul.divide-y`
-rows, numbered `Pagination.vue`, empty-state card. One adapter needed (verified):
-movements return the Laravel `{data, meta: {current_page, last_page, total}}`
-envelope, not the `{pagination: {total_pages, current_page, links}}` shape
-`Pagination.vue` expects — a five-line mapping in the wallet composable bridges it,
-no backend change required. Rows render `posted_at` (`niceTime`), the API's
-plain-language `description` verbatim (they're written for customers) with `memo`
-as the secondary line, credits in green with a `+`, debits neutral (amounts arrive
-signed — negative = debit). No client-side arithmetic or re-labelling.
+rows, numbered `Pagination.vue`, empty-state card. The envelope is the house shape
+(updated round 2 — the backend aligned it): `{data, pagination: {total, count,
+per_page, current_page, total_pages, links: {self, next, prev}}}`, byte-compatible
+with the transaction listing, so `Pagination.vue` drops in unchanged. Rows render
+`posted_at` (`niceTime`), the API's plain-language `description` verbatim (they're
+written for customers) with `memo` as the secondary line, credits in green with a
+`+`, debits neutral (amounts arrive signed — negative = debit). No client-side
+arithmetic or re-labelling.
 
 ### 2.5 Checkout — the wallet as a payment method
 
 The wallet arrives in `payment_methods[]` and renders as one more `RadioGroup`
 card (title-only today). Additions, all inside the existing extension points:
+
+The wallet arrives under **`code: "WALLET"`** (method), and wallet-funded
+transactions carry **`payment.payment_provider.code: "WALLET"`** (both confirmed
+round 2) — those literals drive the selected-method branch and the `PaymentView`
+switch. The method is present for un-enrolled customers too (confirmed: the list
+resolves with no enrolment filter, by design; the confirm 412 ladder is the gate),
+so the offer-enrolment-from-the-card UX stands.
 
 **On selection** (the `watch(paymentMethod)` hook + the per-method conditional slot
 at `Transfer/IndexView.vue:499`): fetch `GET /wallet`, pick the balances entry
@@ -180,13 +192,15 @@ non-card method is chosen).
 
 **Spend-confirmation modal** — clone of `Customer/EmailVerification.vue` (the
 embeddable, emit-based OTP variant): 6-digit `v-otp-input`, auto-submit on
-completion resubmits the confirm call with `wallet_otp`, resend link behind the
-house 30s `p-timeout` cooldown, "valid 10 minutes / check spam" copy. Verified:
-`POST /wallet/spend-otp` takes `{quote_id}`, answers `{status: "sent"}`, and the
-code is bound to that quote, dies on use, after ten minutes, and after five wrong
-guesses — the modal copy reflects exactly that. We do not pre-request the code on
-selection — the 412 ladder is the contract, and earlier refusals (balance, terms)
-shouldn't cost the customer an email.
+completion resubmits the confirm call with **`wallet_otp` as a top-level body
+param** (confirmed round 2 — never inside `payment_data`; devices likewise send
+`wallet_pin` + `wallet_pin_token` or `wallet_biometric_token` top-level), resend
+link behind the house 30s `p-timeout` cooldown, "valid 10 minutes / check spam"
+copy. Verified: `POST /wallet/spend-otp` takes `{quote_id}`, answers
+`{status: "sent"}`, and the code is bound to that quote, dies on use, after ten
+minutes, and after five wrong guesses — the modal copy reflects exactly that. We
+do not pre-request the code on selection — the 412 ladder is the contract, and
+earlier refusals (balance, terms) shouldn't cost the customer an email.
 
 **After confirmation** the response is a normal transaction. A thin
 `Payment/Wallet.vue` (cloned from the provider-component skeleton, minus redirect
@@ -248,48 +262,25 @@ Edits: `Header.vue` (computed nav), `SettingsView.vue` (card),
 refusals resolve in modals on the confirm step, matching their "fix and resubmit"
 character (machine states are for step-changing detours like address/KYC).
 
-## 5. Contract questions for the backend
+## 5. Contract record — all questions resolved
 
-Resolved by the API docs review (console sections: Wallet Enrolment, Wallet,
-Wallet Spending, Checkout & Confirmation, Error Handling): probe semantics (the
-two-leg probe in §1 — subscription 404 is ambiguous by design, terms disambiguates
-via `wallet_not_offered`), movements envelope (Laravel `meta` shape; client-side
-adapter, §2.4), the spend-OTP contract (quote-bound, single-use, 10 min, 5
-guesses), the declare-load contract (amount-only, reference returned), and the
-full 412 type inventory (five enrolment/load types beyond the handout's five
-checkout types).
+Two rounds: the API docs review resolved probe mechanics, the movements shape,
+the spend-OTP contract (quote-bound, single-use, 10 min, 5 guesses), the
+declare-load contract (amount-only, reference returned), and the full 412 type
+inventory. The backend's round-2 answers settled the rest — and improved the
+contract twice (both now in the codebase, docs render on next deploy; **build
+against these, not the docs snapshot**):
 
-Still open (answers shape the checkout slice):
-
-1. **Wallet method + provider `code` values** — the docs give the shapes but not
-   the wallet's concrete codes. What `payment_methods[].code` does the wallet
-   arrive under, and what `payment.payment_provider.code` do wallet-funded
-   transactions carry? Needed for the selected-method branch and the
-   `PaymentView` switch.
-2. **Where the wallet credentials ride on Confirm Quote** — the Wallet Spending
-   intro says confirm "carries `wallet_otp`" (and `wallet_pin` /
-   `wallet_biometric_token` on devices), but Confirm Quote's parameter table
-   doesn't list them yet. Top-level body params, or keys inside `payment_data`?
-   One-line answer; docs curation lag suspected.
-3. **`wallet_topup_amount_collides` status** — handout says 422, docs say 412. We
-   branch on the body `type` either way; please reconcile so QA tests the right
-   status.
-4. **Wallet in `payment_methods[]` for un-enrolled customers** — is it included
-   (so checkout can offer enrolment, per the `wallet_subscription_required`
-   refusal) or absent until enrolled? Either works; the UI differs.
-
-Nice-to-have (raise now, cheap while the paint is wet):
-
-5. **A wallet event on the websocket.** The app is Echo-driven everywhere
-   (payments, transactions, KYC all push). A broadcast on the existing
-   `client-customer.{id}` channel when a top-up settles / balance changes would
-   give the "money arrived" moment live on the instructions screen and wallet
-   home. Without it we fall back to fetch-on-entry only.
-6. **Structured collision hints** — the documented `wallet_topup_amount_collides`
-   body shows no suggested-amounts field; prose message only. If the backend can
-   add suggestions, we render one-tap options; otherwise the message stands.
-7. **Terms `content` format** — the docs show a string; confirm plain text vs
-   HTML/markdown so the modal renders it faithfully.
+| item | answer |
+|---|---|
+| Availability probe | one leg: the un-enrolled subscription 404 body carries `type` + `wallet_offered: true\|false` (§1); a route 404 with no JSON `type` means unlicensed |
+| Movements envelope | house `{data, pagination}` shape, byte-compatible with the transaction listing — `Pagination.vue` unchanged (§2.4) |
+| Wallet codes | method `code` and payment provider `code` are both the literal `WALLET` |
+| Credential placement | top-level body params on Confirm Quote — `wallet_otp`, or `wallet_pin` + `wallet_pin_token`, or `wallet_biometric_token`; never inside `payment_data`; nullable, read only for stored-value funding |
+| Collision status | **412** `wallet_topup_amount_collides` (handout's 422 was in error); prose message only, no structured suggestions |
+| Wallet for un-enrolled customers | present in `payment_methods[]` (no enrolment filter, by design); the confirm 412 ladder gates |
+| Websocket event | ticketed **SD-909**: broadcast on `client-customer.{id}` after every balance-changing posting (load received, spend settled, refund, operator return); names currency and movement kind, carries no balance figure — the client refetches. Build fetch-on-entry now; the listener is a pure addition later |
+| Terms format | plain text as published; render with `white-space: pre-line` |
 
 Known v1 boundaries we'll design around (market context, not requests): no split
 funding (balance + card top-off — PayPal's backup-funding behaviour is the market
@@ -337,7 +328,8 @@ Each PR ships dark on unlicensed tenants by construction (the probe), so merging
 to main is safe throughout — no tenant-branch divergence needed.
 
 Verified against the console API documentation (Wallet Enrolment, Wallet, Wallet
-Spending, Checkout & Confirmation, Error Handling groups) on 2026-08-31. Endpoint
-paths, request/response shapes, refusal types, and status-code behaviour quoted
-above reflect the docs; the four open items in §5 are the only contract points the
-docs left unanswered.
+Spending, Checkout & Confirmation, Error Handling groups) and the backend's
+round-2 answers, both 2026-08-31. §5 records the final contract, including two
+round-2 improvements not yet rendered in the docs snapshot (one-leg probe body,
+house movements envelope). All five build slices are unblocked; SD-909 tracks the
+websocket nice-to-have.
