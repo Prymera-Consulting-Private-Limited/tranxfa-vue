@@ -73,6 +73,11 @@ onMounted(async () => {
               },
               -1,
           )
+        })
+        .listen('WalletBalanceChanged', () => {
+          if (walletStore.isEnrolled) {
+            walletUtils.getWallet().catch(() => {});
+          }
         });
   }
 })

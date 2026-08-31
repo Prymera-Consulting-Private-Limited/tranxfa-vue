@@ -52,26 +52,63 @@ Models: `wallet`, `wallet_balance`, `wallet_subscription`, `wallet_terms`,
    (`Pagination.vue` unchanged); renders `description` and `memo` verbatim;
    credit/debit styling from the amount's sign only.
 
-## QA checklist (needs a wallet-licensed environment + test customer)
+## Verified in the backend-driven e2e (2026-09-01)
 
-- [ ] Unlicensed tenant: no Wallet nav/settings/dashboard trace; `/wallet` URL redirects to dashboard.
-- [ ] Eligible country: intro face → terms → enrol → wallet number shown and copyable.
+The full happy path was driven through this build against the local platform:
+enrolment → deposit-account provisioning (202 face, ~20s) → declared load →
+bank arrival → balance on the books → wallet-funded transfer through checkout
+(method card, balance panel, "Pay with Wallet", 412 ladder requesting and
+collecting the emailed code, auto-submit resubmitting with `wallet_otp`) →
+settlement → statement (signed amounts, verbatim descriptions, house
+pagination). Availability gating and the dashboard balance card tracked the
+licence and live balance correctly; the unlicensed face (feature hidden,
+`/wallet` redirects) was verified separately before the licence was issued.
+
+Facts QA should know:
+
+- **Testing accounts always receive the spend code `000000`** — accounts
+  flagged `is_testing_account` get a fixed code by platform convention (same
+  rule as the PIN system). Six zeroes in a test run is correct; in production
+  it's an incident.
+- **The spend-code email's language and branding follow deployment config**
+  (customer-communication locale and company identity), not the customer's UI
+  language.
+- **After a wallet spend the payment rests at Authorized** and the transfer
+  proceeds through the normal pipeline — nothing special on transaction views.
+- **First-time deposit provisioning took ~20s** before 202 became 200 — the 5s
+  retry with the patient wait state is the intended treatment.
+- **The money-arrival moment cannot be faked locally** by posting a bank
+  webhook (signature verification refuses it silently, by design). Ask the
+  backend team for the below-the-gate driver script, or use a real small
+  deposit on staging.
+
+## Remaining for QA (designed and built, not yet driven)
+
+- [ ] Insufficient balance at checkout: server message panel + Add money (checkout state survives the modal) / switch method.
+- [ ] Colliding top-up amount: amber guidance, no error wall; nudged amount succeeds.
+- [ ] Wrong/expired spend code: message shown, inputs cleared, 5-attempt ladder respected; resend works after the 30s cooldown.
+- [ ] Paused on new mandatory terms: banner on home, money actions gate to re-acceptance, checkout panel prompts; accepting restores everything.
+- [ ] Cancel of a pending load — and of an already-received one (API message surfaces gracefully).
+- [ ] Close wallet: refused with balance (message inline); succeeds at zero; nav/settings flip to eligible.
+- [ ] Refund of a wallet-funded transfer: movement appears, balance rises (live via `WalletBalanceChanged`, or on entry).
 - [ ] Non-offered country: wallet hidden even though other endpoints work.
-- [ ] Top-up declare → instructions (fresh account: provisioning face first) → pending strip with expiry countdown → cancel (and cancel of an already-received load surfaces the API message gracefully).
-- [ ] Colliding amount: amber guidance, no error wall; nudged amount succeeds.
-- [ ] Checkout: wallet selected → balance vs total panel; short balance → server message + Add money (checkout state survives the modal); sufficient → "Pay with Wallet" → emailed code → confirm → processing → success screen → transaction view.
-- [ ] Wrong/expired code: message shown, inputs cleared, 5-attempt ladder respected; resend works after the 30s cooldown.
-- [ ] Publish new mandatory terms: paused banner on home, money actions gate to re-acceptance, checkout panel prompts; accepting restores everything.
-- [ ] Close wallet: refused with balance (message inline); succeeds at zero; nav/settings flip to eligible state.
-- [ ] Refund of a wallet-funded transfer: movement appears, balance rises (fetch on entry).
+
+## Live balance updates (SD-909 — shipped)
+
+`CustomerLayout.vue` listens for **`WalletBalanceChanged`** (`{currency, kind}`,
+kind ∈ load/spend/refund/return/adjustment) on the customer channel beside the
+existing document events, and refetches `GET /wallet` — the event carries no
+balance figure and none is read from it; the books stay the only truth. The
+wallet home watches the store and refreshes its movements and pending-loads
+lists when the balance object is replaced, so a load arriving while the customer
+looks at the instructions shows up live.
+
+Payment success auto-redirects to the transaction view after 4 seconds (the ✕
+still exits immediately) — including when settlement completed before the
+payment screen subscribed, which is the common wallet case.
 
 ## Follow-ups (not in this branch)
 
-- **SD-909** — when the balance-change broadcast lands on
-  `client-customer.{id}`, add a listener in `CustomerLayout.vue` beside the
-  existing document events that calls `walletUtils.getWallet()` and refreshes
-  movements/top-ups on the wallet views. The store refetches; no balance figure
-  is read from the event.
 - Native apps (PIN/biometric confirmation) are out of scope for this repo; the
   confirm call already carries the credential params server-side.
 - No split funding / auto top-up / self-service withdrawal in v1, per contract.

@@ -1,6 +1,6 @@
 <script setup>
 import Transaction from "@/models/transaction.js";
-import {computed, onMounted, onUnmounted} from "vue";
+import {computed, onMounted, onUnmounted, watch} from "vue";
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentState from "@/enums/payment_state.js";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
@@ -26,37 +26,11 @@ const getTransaction = async () => {
   transactionUtils.getTransaction(props.transaction.id).then((response) => {
     const transaction = Transaction.getInstance(response.data);
     props.transaction.payment = transaction.payment;
-    if (status.value === 'completed' || status.value === 'failed') {
-      clearPullInterval();
-    }
   });
 }
 
 let intervalId = null;
-
-onMounted(async () => {
-  Echo.channel(`client-payment.${props.transaction.payment.id}`)
-      .listen('PaymentTransactionStateUpdated', (e) => {
-        props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
-        props.transaction.payment.sharedReference = e.shared_reference;
-        if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
-          clearPullInterval();
-          setTimeout(() => {
-            router.push({
-              name: 'viewTransaction',
-              params: {
-                transactionId: props.transaction.id
-              }
-            });
-          }, 1500)
-        } else if (props.transaction.payment.state.code === PaymentState.FAILED) {
-          clearPullInterval();
-        }
-      });
-  if (status.value !== 'completed' && status.value !== 'failed') {
-    intervalId = setInterval(getTransaction, 5000);
-  }
-})
+let redirectTimeoutId = null;
 
 const clearPullInterval = async () => {
   if (intervalId) {
@@ -65,9 +39,24 @@ const clearPullInterval = async () => {
   }
 }
 
+onMounted(async () => {
+  Echo.channel(`client-payment.${props.transaction.payment.id}`)
+      .listen('PaymentTransactionStateUpdated', (e) => {
+        props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
+        props.transaction.payment.sharedReference = e.shared_reference;
+      });
+  if (status.value !== 'completed' && status.value !== 'failed') {
+    intervalId = setInterval(getTransaction, 5000);
+  }
+})
+
 onUnmounted(async () => {
   Echo.leaveChannel(`client-payment.${props.transaction.payment.id}`);
   await clearPullInterval();
+  if (redirectTimeoutId) {
+    clearTimeout(redirectTimeoutId);
+    redirectTimeoutId = null;
+  }
 })
 
 const status = computed(() => {
@@ -78,6 +67,24 @@ const status = computed(() => {
   }
   return 'pending';
 })
+
+watch(status, (value) => {
+  if (value === 'completed') {
+    clearPullInterval();
+    if (! redirectTimeoutId) {
+      redirectTimeoutId = setTimeout(() => {
+        router.push({
+          name: 'viewTransaction',
+          params: {
+            transactionId: props.transaction.id
+          }
+        });
+      }, 4000);
+    }
+  } else if (value === 'failed') {
+    clearPullInterval();
+  }
+}, {immediate: true});
 </script>
 
 <template>
@@ -90,7 +97,8 @@ const status = computed(() => {
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
     <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
-    <p class="text-lg text-gray-600 mb-6">Paid from your wallet. Your transfer is on its way.</p>
+    <p class="text-lg text-gray-600 mb-2">Paid from your wallet. Your transfer is on its way.</p>
+    <p class="text-sm text-gray-400 mb-6">Taking you to your transfer&hellip;</p>
   </template>
 
   <template v-else-if="status === 'failed'">

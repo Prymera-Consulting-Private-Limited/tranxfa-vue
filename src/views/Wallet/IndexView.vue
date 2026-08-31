@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {
   ArrowPathIcon,
   BanknotesIcon,
@@ -71,6 +71,13 @@ async function refreshMovements() {
     movementsData.value = response.data;
   }).catch(() => {});
 }
+
+watch(() => walletStore.wallet.data, () => {
+  if (! isLoadingWallet.value && walletStore.isEnrolled) {
+    refreshTopups();
+    refreshMovements();
+  }
+});
 
 const isResolving = computed(() => {
   return walletStore.availability === WalletAvailability.UNKNOWN
