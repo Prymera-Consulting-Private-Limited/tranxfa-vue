@@ -25,6 +25,12 @@ import {createPopper} from "@popperjs/core";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
 import QuotePendingDocument from "@/models/quote_pending_document.js";
 import DocumentCategory from "@/models/document_category.js";
+import SpendOtpModal from "@/components/Wallet/SpendOtpModal.vue";
+import TermsModal from "@/components/Wallet/TermsModal.vue";
+import TopUpFlow from "@/components/Wallet/TopUpFlow.vue";
+import WalletRefusalType from "@/enums/wallet_refusal_type.js";
+import {useWalletStore} from "@/stores/wallet.js";
+import {useWalletUtils} from "@/composables/wallet_utils.js";
 
 const thirdPartyDeclaration = import.meta.env.VITE_THIRD_PARTY_TRANSACTION_DECLARATION;
 const thirdPartyDeclarationAccepted = ref(false);
@@ -55,6 +61,16 @@ const purpose = ref(null);
 const paymentMethod = ref(null);
 const isAddressRequired = ref(false);
 const selectedUploadDocumentCategory = ref(null);
+
+const walletStore = useWalletStore();
+const walletUtils = useWalletUtils();
+const walletOtp = ref('');
+const isSpendOtpModalOpen = ref(false);
+const spendOtpError = ref('');
+const isWalletTermsModalOpen = ref(false);
+const walletTermsMode = ref('enrol');
+const isWalletTopUpOpen = ref(false);
+const walletShortMessage = ref('');
 
 onMounted(async () => {
   if (customerStore.isLoaded === false) {
@@ -120,9 +136,10 @@ const confirmQuote = async () => {
         paymentDataAttributes[paymentDataAttribute[0]] = paymentDataAttribute[1].value;
       }
     }
-    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes, thirdPartyDeclarationAccepted.value);
+    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes, thirdPartyDeclarationAccepted.value, walletOtp.value || null);
     const transaction = response.data;
     isStepProcessing.value = false;
+    isSpendOtpModalOpen.value = false;
     await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
   } catch (error) {
     if (error.response.status === 412) {
@@ -141,6 +158,25 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "poi_info_check_failed") {
         isStepProcessing.value = false;
         await send({ type: 'POI_INFO_CHECK_FAILED' });
+      } else if (error.response.data.type === WalletRefusalType.SUBSCRIPTION_REQUIRED) {
+        isStepProcessing.value = false;
+        walletTermsMode.value = 'enrol';
+        isWalletTermsModalOpen.value = true;
+      } else if (error.response.data.type === WalletRefusalType.TERMS_REACCEPTANCE_REQUIRED) {
+        isStepProcessing.value = false;
+        walletTermsMode.value = 'reaccept';
+        isWalletTermsModalOpen.value = true;
+      } else if (error.response.data.type === WalletRefusalType.INSUFFICIENT_BALANCE) {
+        isStepProcessing.value = false;
+        isSpendOtpModalOpen.value = false;
+        walletShortMessage.value = error.response.data.message;
+        walletUtils.getWallet().catch(() => {});
+      } else if (error.response.data.type === WalletRefusalType.AUTHORIZATION_REQUIRED) {
+        await requestWalletSpendCode();
+      } else if (error.response.data.type === WalletRefusalType.AUTHORIZATION_INVALID) {
+        isStepProcessing.value = false;
+        spendOtpError.value = error.response.data.message;
+        isSpendOtpModalOpen.value = true;
       } else if (error.response.data.type === "duplicate_transaction" || error.response.data.type === "active_transfer_disable_rule") {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message;
@@ -300,8 +336,53 @@ watch(paymentMethod, (newValue) => {
         paymentData.data[attribute.attribute] = attribute;
       });
     }
+    walletOtp.value = '';
+    walletShortMessage.value = '';
+    if (newValue.code === 'WALLET' && walletStore.isEnrolled) {
+      walletUtils.getWallet().catch(() => {});
+    }
   }
 });
+
+const walletCheckoutBalance = computed(() => {
+  return walletStore.wallet.data?.balanceFor(quote.data?.paymentCurrency?.code) ?? null;
+});
+
+watch(() => walletStore.isEnrolled, (enrolled) => {
+  if (enrolled && paymentMethod.value?.code === 'WALLET') {
+    walletUtils.getWallet().catch(() => {});
+  }
+});
+
+const requestWalletSpendCode = async () => {
+  spendOtpError.value = '';
+  walletOtp.value = '';
+  await walletUtils.requestSpendOtp(quote.data.id).then(() => {
+    isStepProcessing.value = false;
+    isSpendOtpModalOpen.value = true;
+  }).catch((error) => {
+    isStepProcessing.value = false;
+    preconditionFailedMessage.value = error.response?.data?.message ?? 'Something went wrong. Please try again.';
+  });
+}
+
+const walletOtpEntered = async (otp) => {
+  walletOtp.value = otp;
+  spendOtpError.value = '';
+  isStepProcessing.value = true;
+  await confirmQuote();
+}
+
+const walletTermsAccepted = async () => {
+  isWalletTermsModalOpen.value = false;
+  isStepProcessing.value = true;
+  await confirmQuote();
+}
+
+const walletTopUpClosed = () => {
+  isWalletTopUpOpen.value = false;
+  walletUtils.getWallet().catch(() => {});
+}
 
 const canContinue = computed(() => {
   if (snapshot.value?.value === 'confirm') {
@@ -509,6 +590,39 @@ const canContinue = computed(() => {
                       </template>
                     </template>
 
+                    <template v-if="paymentMethod?.code === 'WALLET'">
+                      <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                        <template v-if="walletStore.isEnrolled">
+                          <div class="flex items-center justify-between text-sm text-gray-600">
+                            <span>Wallet balance</span>
+                            <span class="font-semibold text-gray-900">{{ walletCheckoutBalance?.amountFormatted ?? '—' }}</span>
+                          </div>
+                          <div class="mt-1 flex items-center justify-between text-sm text-gray-600">
+                            <span>This transfer</span>
+                            <span class="font-semibold text-gray-900">{{ quote.data.totalAmountCurrencyPrefixed }}</span>
+                          </div>
+                          <template v-if="walletStore.requiresReacceptance">
+                            <div class="mt-3 border-l-4 border-yellow-400 bg-yellow-50 p-3">
+                              <p class="text-sm text-yellow-700">We've updated the wallet terms — accept the new version to pay with your wallet.</p>
+                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm font-semibold text-yellow-800 hover:text-yellow-900 cursor-pointer">Review and accept &rarr;</button>
+                            </div>
+                          </template>
+                          <p v-else class="mt-2 text-xs text-gray-500">You'll confirm this payment with a code we email you.</p>
+                          <div v-if="walletShortMessage" class="mt-3 border-l-4 border-yellow-400 bg-yellow-50 p-3">
+                            <p class="text-sm text-yellow-700">{{ walletShortMessage }}</p>
+                            <div class="mt-2 flex items-center gap-x-4">
+                              <button type="button" @click="isWalletTopUpOpen = true" class="text-sm font-semibold text-yellow-800 hover:text-yellow-900 cursor-pointer">Add money &rarr;</button>
+                              <span class="text-xs text-yellow-700">or choose another way to pay above</span>
+                            </div>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <p class="text-sm text-gray-600">Activate your wallet to pay this way — read and accept the terms, then load money by bank transfer.</p>
+                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm font-semibold text-brand-600 hover:text-brand-500 cursor-pointer">Activate wallet &rarr;</button>
+                        </template>
+                      </div>
+                    </template>
+
                     <!-- Checkbox -->
                     <div v-if="thirdPartyDeclaration" class="flex items-start space-x-2">
                       <input type="checkbox" id="third-party-declaration-accepted" v-model="thirdPartyDeclarationAccepted" class="mt-1.5 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
@@ -524,7 +638,7 @@ const canContinue = computed(() => {
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>Saving...</span>
                   </span>
-                  <span v-else>Continue</span>
+                  <span v-else>{{ snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? 'Pay with Wallet' : 'Continue' }}</span>
                 </button>
               </div>
             </section>
@@ -613,6 +727,9 @@ const canContinue = computed(() => {
           </Dialog>
         </TransitionRoot>
       </template>
+      <SpendOtpModal :open="isSpendOtpModalOpen" :quoteId="quote.data?.id" :error="spendOtpError" :isSubmitting="isStepProcessing" @close="isSpendOtpModalOpen = false" @complete="walletOtpEntered" />
+      <TermsModal :open="isWalletTermsModalOpen" :mode="walletTermsMode" @close="isWalletTermsModalOpen = false" @accepted="walletTermsAccepted" />
+      <TopUpFlow :open="isWalletTopUpOpen" @close="walletTopUpClosed" />
     </main>
   </CustomerLayout>
 </template>

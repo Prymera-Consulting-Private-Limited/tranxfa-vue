@@ -198,12 +198,12 @@ async function addRecipient() {
 }
 
 const isLookingUp = ref(false);
+const nameLookupRequirements = computed(() => {
+  return props.payoutChannel.configuration?.nameLookupRequirements ?? [];
+});
 const nameLookup = computed(() => {
-  let requirements = props.payoutChannel.configuration?.nameLookupRequirements;
-  if (requirements?.length === 0) {
-    requirements = props.payoutChannel.configuration?.nameValidationRequirements;
-  }
-  if (requirements?.length > 0) {
+  const requirements = nameLookupRequirements.value;
+  if (requirements.length > 0) {
     return {
       attributes: requirements.map((attribute => {
         return {
@@ -284,6 +284,9 @@ const debouncedLookup = debounce(() => {
 }, 1000);
 
 watch(nameLookup, function (newValue) {
+  if (nameLookupRequirements.value.length === 0) {
+    return;
+  }
   const nameAttribute = props.payoutChannel.attributes.find((attribute) => {
     return attribute.type === RecipientDataType.NAME;
   });
@@ -348,7 +351,7 @@ watchEffect(() => {
           </label>
           <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
           <component
-              v-bind:disableNameInput="payoutChannel.configuration?.nameLookupRequirements?.length > 0"
+              v-bind:disableNameInput="nameLookupRequirements.length > 0"
               v-bind:isLookingUp="isLookingUp"
               v-bind:input="input.data"
               v-on:recipient:input:updated="updateRecipientInput"
