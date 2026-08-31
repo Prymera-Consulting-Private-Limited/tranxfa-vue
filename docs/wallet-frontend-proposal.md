@@ -12,15 +12,18 @@ contract questions → market notes → estimate & PR slicing.
 ## 1. Availability & state model
 
 Everything below hangs off one probe. On login (alongside `customerUtils.refresh()`
-in `CustomerLayout`), call `GET /wallet/subscription` once and cache the outcome in
-a new `wallet` Pinia store as a five-way state:
+in `CustomerLayout`), resolve wallet availability once and cache it in a new
+`wallet` Pinia store as a five-way state. **Verified against the API docs, the
+probe needs two legs**: `GET /wallet/subscription` answers 404 both when the
+deployment is unlicensed *and* when the customer simply isn't enrolled, so a 404
+falls through to `GET /wallet/terms` to tell those apart:
 
 | state | source | UI consequence |
 |---|---|---|
-| `unavailable` | 404 (no licence) or country not offered | wallet does not exist anywhere in the UI |
-| `eligible` | endpoint answers, not enrolled | nav item + intro/enrol surfaces shown |
-| `active` | enrolled, terms current | full feature |
-| `paused` | enrolled, new mandatory terms pending | balance/statement visible; every money action routes to re-acceptance first |
+| `unavailable` | subscription 404 → terms 404 (no licence) or terms 412 `wallet_not_offered` / `wallet_terms_unavailable` | wallet does not exist anywhere in the UI |
+| `eligible` | subscription 404 → terms 200 | nav item + intro/enrol surfaces shown |
+| `active` | subscription 200, `reacceptance_required: false` | full feature |
+| `paused` | subscription 200, `reacceptance_required: true` | balance/statement visible; every money action routes to re-acceptance first |
 | `unknown` | probe not yet resolved | render nothing wallet-related (no flash of the feature) |
 
 Notes:
@@ -28,8 +31,12 @@ Notes:
 - **404-as-absence is a new pattern in this app** (nothing does capability detection
   today; gating is env vars, tenant branches, and customer flags). It composes from
   existing pieces — a per-request axios config flag like the existing
-  `skipAuthRedirect` keeps the 404 quiet. Nothing is hard-coded on: an unlicensed
-  tenant deploys the same build and simply never shows the feature.
+  `skipAuthRedirect` keeps the 404 quiet — and the API already has a documented
+  "404 that is not an error" precedent (Check App Version). Nothing is hard-coded
+  on: an unlicensed tenant deploys the same build and simply never shows the
+  feature.
+- For enrolled customers the second leg never runs; for most customers on licensed
+  deployments the probe is one request, two only for the not-yet-enrolled.
 - The probe result is cached for the session and re-checked on wallet-page entry;
   balances themselves are **never** cached as truth — `GET /wallet` on every entry
   to the wallet screen, per the handout.
@@ -50,7 +57,9 @@ the terms modal (§2.2).
 
 **Active — the main face.** Top to bottom:
 
-1. **Balance card(s)** — one per currency from `GET /wallet`, `*_formatted` values
+1. **Balance card(s)** — `GET /wallet` returns everything the header needs in one
+   call: `{wallet_number, reacceptance_required, balances: [{currency, amount,
+   amount_formatted}]}` (verified). One card per balances entry, `amount_formatted`
    only. Wallet number displayed under the balance like an account number with the
    house copy-button block (`UseClipboard` idiom from `ClientPaymentAccount.vue`).
    Primary action **Add money**, secondary **Send money** (→ dashboard calculator).
@@ -71,48 +80,67 @@ and statement stay fully visible, per the handout.
 
 `GET /wallet/terms` → scrollable terms in a HeadlessUI dialog (the brand-50
 note-banner + modal form pattern from `SettingsView`/`StatementRequestModal`),
-acceptance checkbox, then `POST /wallet/subscription` with the version shown.
-Success state celebrates the wallet number ("Your wallet number — W12345678") with
-copy affordance and an "Add money" shortcut. The same modal serves re-acceptance
-(`paused` state and the `wallet_terms_reacceptance_required` refusal at checkout);
-only the heading and CTA copy change.
+acceptance checkbox, then `POST /wallet/subscription` with `{terms_version_id}` —
+the uuid `id` from the terms response, not the human `version` number (verified).
+Success (201) carries `{wallet_number, status, enrolled_at, reacceptance_required}`;
+celebrate the wallet number ("Your wallet number — W48291736") with copy affordance
+and an "Add money" shortcut. The same modal serves re-acceptance (`paused` state
+and the `wallet_terms_reacceptance_required` refusal at checkout); only the heading
+and CTA copy change. Refusals to handle: 412 `wallet_terms_outdated` (terms changed
+while the modal was open — refetch and re-render) and `wallet_already_subscribed`
+(treat as success, refresh the store).
 
 ### 2.3 Add money (top-up)
 
 Two steps in one modal flow from any "Add money" CTA:
 
-**Step 1 — declare.** Amount input (existing `MoneyInput`) + currency (from wallet
-balances). Submit → `POST /wallet/topups`.
+**Step 1 — declare.** Amount input only (existing `MoneyInput`) — **there is no
+currency picker**: the API fixes the load currency to the customer's own country's
+and takes just `{amount}` (verified; a simpler screen than first sketched). Submit
+→ `POST /wallet/topups`.
 
-- `422 wallet_topup_amount_collides` renders as a **guidance panel, not an error
+- `wallet_topup_amount_collides` renders as a **guidance panel, not an error
   wall**: the API's message verbatim in the amber style, plus two inline actions —
   "adjust the amount" (refocus input) and "view pending top-ups" (jump to the
-  strip, where cancel lives). No red.
+  strip, where cancel lives). No red. (Docs say this refusal is a 412 where the
+  handout said 422 — we branch on the body's `type` for either status, so the
+  discrepancy costs nothing; flagged for the backend to reconcile the docs.)
 
 **Step 2 — transfer instructions.** `GET /wallet/deposit-instructions`:
 
-- **200** → render with **`ClientPaymentAccount.vue` unchanged** (the API returns
-  the identical `{attributes, payment_reference}` shape — confirmed against the
-  component's contract), above it the declared amount in a copyable field
-  (`ManualPayment` amount block — copies the bank-safe unprefixed value), and the
-  **Monoova exact-amount warning banner**: "Transfer exactly **{amount}** — this is
-  how we match your deposit to your wallet." Expiry shown as both absolute time and
-  countdown.
+- **200** → render with **`ClientPaymentAccount.vue` unchanged** (docs confirm:
+  "the same client payment account object transfers already use"), above it two
+  copyable fields from the declaration: the **amount** (`ManualPayment` amount
+  block — copies the bank-safe unprefixed value) and the **load reference**
+  (verified: Declare Load returns `reference`, e.g. `WTA1B2C3D4`, "to carry on the
+  bank transfer"). The **Monoova exact-amount warning banner** sits between them:
+  "Transfer exactly **{amount_formatted}** and quote reference **{reference}** —
+  this is how we match your deposit to your wallet." Expiry shown as both absolute
+  time and countdown (`expires_at`, verified).
 - **202 provisioning** → "Getting your account ready" wait state: Lottie animation
-  + retry every 5s (the `ManualPayment` provisioning idiom) until 200.
+  + retry every 5s (the `ManualPayment` provisioning idiom) until 200. Verified:
+  202 body is `{status: "provisioning"}`.
 
-The declared amount is the matching key, so the UI treats it as sacred: rendered
-large, copy-only interaction encouraged, warning banner adjacent. After step 2 the
-declaration appears in the pending strip with its expiry; expiry or wrong-amount
-outcomes surface as movements/support states, not client-side logic.
+The declared amount is the matching key (the reference is best-effort corroboration),
+so the UI treats the amount as sacred: rendered large, copy-only interaction
+encouraged, warning banner adjacent. Reassurance copy straight from the docs' model:
+a deposit meant for a transfer always matches the transfer first, and a declaration
+that expires moves no money. After step 2 the declaration appears in the pending
+strip (`GET /wallet/topups` is a plain newest-first array — no pagination to
+handle); cancel refusals answer 412 `wallet_topup_not_open` once a load is no
+longer pending (verified) — refresh the strip and show the message.
 
 ### 2.4 Statement — `/wallet/statement`
 
 Clone of `Transaction/IndexView.vue`: white card, `ListShimmer`, `ul.divide-y`
-rows, numbered `Pagination.vue`, empty-state card. Rows render the API's
-plain-language `description` verbatim (they're written for customers), credits in
-green with a `+`, debits neutral, `niceTime` dates. No client-side arithmetic or
-re-labelling.
+rows, numbered `Pagination.vue`, empty-state card. One adapter needed (verified):
+movements return the Laravel `{data, meta: {current_page, last_page, total}}`
+envelope, not the `{pagination: {total_pages, current_page, links}}` shape
+`Pagination.vue` expects — a five-line mapping in the wallet composable bridges it,
+no backend change required. Rows render `posted_at` (`niceTime`), the API's
+plain-language `description` verbatim (they're written for customers) with `memo`
+as the secondary line, credits in green with a `+`, debits neutral (amounts arrive
+signed — negative = debit). No client-side arithmetic or re-labelling.
 
 ### 2.5 Checkout — the wallet as a payment method
 
@@ -120,11 +148,13 @@ The wallet arrives in `payment_methods[]` and renders as one more `RadioGroup`
 card (title-only today). Additions, all inside the existing extension points:
 
 **On selection** (the `watch(paymentMethod)` hook + the per-method conditional slot
-at `Transfer/IndexView.vue:499`): fetch `GET /wallet`, show a compact panel under
-the card —
+at `Transfer/IndexView.vue:499`): fetch `GET /wallet`, pick the balances entry
+whose `currency` matches the quote's payment currency, and show a compact panel
+under the card —
 
-- *Sufficient*: "Wallet balance: **{balance}** · This transfer: **{total}**" with a
-  reassuring check.
+- *Sufficient*: "Wallet balance: **{amount_formatted}** · This transfer:
+  **{total_amount_currency_prefixed}**" (the docs call that field "the number to
+  show on the pay button") with a reassuring check.
 - *Short*: balance vs total side by side, shortfall named, two actions: **Add
   money** (opens the §2.3 flow in a modal — checkout state survives) and **choose
   another way to pay** (scrolls back to the methods). This is the client-side
@@ -151,9 +181,12 @@ non-card method is chosen).
 **Spend-confirmation modal** — clone of `Customer/EmailVerification.vue` (the
 embeddable, emit-based OTP variant): 6-digit `v-otp-input`, auto-submit on
 completion resubmits the confirm call with `wallet_otp`, resend link behind the
-house 30s `p-timeout` cooldown, "valid 10 minutes / check spam" copy. We do not
-pre-request the code on selection — the 412 ladder is the contract, and earlier
-refusals (balance, terms) shouldn't cost the customer an email.
+house 30s `p-timeout` cooldown, "valid 10 minutes / check spam" copy. Verified:
+`POST /wallet/spend-otp` takes `{quote_id}`, answers `{status: "sent"}`, and the
+code is bound to that quote, dies on use, after ten minutes, and after five wrong
+guesses — the modal copy reflects exactly that. We do not pre-request the code on
+selection — the 412 ladder is the contract, and earlier refusals (balance, terms)
+shouldn't cost the customer an email.
 
 **After confirmation** the response is a normal transaction. A thin
 `Payment/Wallet.vue` (cloned from the provider-component skeleton, minus redirect
@@ -166,7 +199,9 @@ retry affordance) — a failed wallet payment is just a failed payment.
 - **Settings card** in the `SettingsView` grid (`v-if` on availability): enrolment
   status line, wallet number with copy, link to `/wallet`, and — enrolled only —
   **Close wallet** behind the destructive-confirm dialog; the zero-balance rule is
-  explained in the dialog, and a refusal renders the API message inline.
+  explained in the dialog (refusal: 412 `wallet_balance_must_be_zero`, message
+  rendered inline), along with the verified permanence detail: the wallet number is
+  retired and never reissued — re-enrolling later mints a new one.
 - **Dashboard**: a slim balance card above the calculator in the right column
   (the payvel budget-card slot), showing formatted balance + "Add money", gated on
   `active`/`paused`. Cheap, and it makes the wallet feel lived-in.
@@ -215,20 +250,33 @@ character (machine states are for step-changing detours like address/KYC).
 
 ## 5. Contract questions for the backend
 
-Blocking-ish (answers shape the build):
+Resolved by the API docs review (console sections: Wallet Enrolment, Wallet,
+Wallet Spending, Checkout & Confirmation, Error Handling): probe semantics (the
+two-leg probe in §1 — subscription 404 is ambiguous by design, terms disambiguates
+via `wallet_not_offered`), movements envelope (Laravel `meta` shape; client-side
+adapter, §2.4), the spend-OTP contract (quote-bound, single-use, 10 min, 5
+guesses), the declare-load contract (amount-only, reference returned), and the
+full 412 type inventory (five enrolment/load types beyond the handout's five
+checkout types).
 
-1. **Wallet payment provider `code`** — what does `payment.payment_provider.code`
-   carry on a wallet-funded transaction? Needed for the `PaymentView` switch.
-2. **Movements pagination envelope** — please confirm `GET /wallet/movements`
-   returns the house `{data: [...], pagination: {total_pages, current_page,
-   links: {prev, next}}}` shape so `Pagination.vue` drops in unchanged.
-3. **Probe semantics** — for a customer in a non-offered country, what does
-   `GET /wallet/subscription` return (vs. the unlicensed 404)? We want the probe
-   alone to decide *hide entirely* vs *offer enrolment* without also calling
-   `GET /wallet/terms`.
+Still open (answers shape the checkout slice):
+
+1. **Wallet method + provider `code` values** — the docs give the shapes but not
+   the wallet's concrete codes. What `payment_methods[].code` does the wallet
+   arrive under, and what `payment.payment_provider.code` do wallet-funded
+   transactions carry? Needed for the selected-method branch and the
+   `PaymentView` switch.
+2. **Where the wallet credentials ride on Confirm Quote** — the Wallet Spending
+   intro says confirm "carries `wallet_otp`" (and `wallet_pin` /
+   `wallet_biometric_token` on devices), but Confirm Quote's parameter table
+   doesn't list them yet. Top-level body params, or keys inside `payment_data`?
+   One-line answer; docs curation lag suspected.
+3. **`wallet_topup_amount_collides` status** — handout says 422, docs say 412. We
+   branch on the body `type` either way; please reconcile so QA tests the right
+   status.
 4. **Wallet in `payment_methods[]` for un-enrolled customers** — is it included
-   (so checkout can offer enrolment) or absent until enrolled? Either works; the
-   UI differs.
+   (so checkout can offer enrolment, per the `wallet_subscription_required`
+   refusal) or absent until enrolled? Either works; the UI differs.
 
 Nice-to-have (raise now, cheap while the paint is wet):
 
@@ -237,14 +285,11 @@ Nice-to-have (raise now, cheap while the paint is wet):
    `client-customer.{id}` channel when a top-up settles / balance changes would
    give the "money arrived" moment live on the instructions screen and wallet
    home. Without it we fall back to fetch-on-entry only.
-6. **Structured collision hints** — does the `wallet_topup_amount_collides` body
-   carry suggested alternative amounts, or prose only? Structured suggestions
-   would render as one-tap options.
-7. **Balance on the quote** — optionally include the wallet's spendable balance
-   (payment currency) on the quote's wallet method entry, saving the extra
-   `GET /wallet` at checkout and guaranteeing the courtesy check uses the same
-   figure the server will.
-8. **Terms format** — HTML, markdown, or plain text? Affects the modal renderer.
+6. **Structured collision hints** — the documented `wallet_topup_amount_collides`
+   body shows no suggested-amounts field; prose message only. If the backend can
+   add suggestions, we render one-tap options; otherwise the message stands.
+7. **Terms `content` format** — the docs show a string; confirm plain text vs
+   HTML/markdown so the modal renders it faithfully.
 
 Known v1 boundaries we'll design around (market context, not requests): no split
 funding (balance + card top-off — PayPal's backup-funding behaviour is the market
@@ -291,6 +336,8 @@ this codebase, assuming contract questions 1–4 answered before the checkout sl
 Each PR ships dark on unlicensed tenants by construction (the probe), so merging
 to main is safe throughout — no tenant-branch divergence needed.
 
-Verification pending: endpoint shapes above follow the handout; request/response
-details to be checked against console API docs sections 170–172 when the link
-lands.
+Verified against the console API documentation (Wallet Enrolment, Wallet, Wallet
+Spending, Checkout & Confirmation, Error Handling groups) on 2026-08-31. Endpoint
+paths, request/response shapes, refusal types, and status-code behaviour quoted
+above reflect the docs; the four open items in §5 are the only contract points the
+docs left unanswered.
