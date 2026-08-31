@@ -165,6 +165,22 @@ const router = createRouter({
         title: 'Devices',
         description: '',
       },
+    }, {
+      path: '/wallet',
+      name: 'wallet',
+      component: () => import('@/views/Wallet/IndexView.vue'),
+      meta: {
+        title: 'Wallet',
+        description: '',
+      },
+    }, {
+      path: '/wallet/statement',
+      name: 'walletStatement',
+      component: () => import('@/views/Wallet/StatementView.vue'),
+      meta: {
+        title: 'Wallet Statement',
+        description: '',
+      },
     },
   ],
 })
