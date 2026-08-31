@@ -82,11 +82,27 @@ Facts QA should know:
   backend team for the below-the-gate driver script, or use a real small
   deposit on staging.
 
+## Verified by frontend-driven browser test (2026-09-01)
+
+- **Wrong spend code**: sixth digit auto-submits; the confirm's 412
+  `wallet_authorization_invalid` message renders verbatim in the modal; inputs
+  clear for retry; the correct code then succeeds and the payment screen
+  auto-redirects to the transaction view after ~4s — including the
+  mount-already-settled case the redirect fix targets. The resend cooldown
+  counts down correctly on every modal opening (fixed this run: the countdown
+  interval leaked across open/close cycles and showed the resend link early).
+- **Insufficient balance**: the confirm refuses with
+  `insufficient_wallet_balance` *before* any spend code is requested (verified:
+  no `/wallet/spend-otp` call, no wasted email); the server's message renders
+  in the amber guidance panel with both recovery paths; "Add money" opens the
+  top-up flow over checkout and closing it leaves purpose, method, declaration,
+  and the guidance intact; the panel's balance figure refetches after the
+  refusal.
+
 ## Remaining for QA (designed and built, not yet driven)
 
-- [ ] Insufficient balance at checkout: server message panel + Add money (checkout state survives the modal) / switch method.
 - [ ] Colliding top-up amount: amber guidance, no error wall; nudged amount succeeds.
-- [ ] Wrong/expired spend code: message shown, inputs cleared, 5-attempt ladder respected; resend works after the 30s cooldown.
+- [ ] Expired spend code and the 5-attempt lockout end of the ladder (wrong-code handling verified above).
 - [ ] Paused on new mandatory terms: banner on home, money actions gate to re-acceptance, checkout panel prompts; accepting restores everything.
 - [ ] Cancel of a pending load — and of an already-received one (API message surfaces gracefully).
 - [ ] Close wallet: refused with balance (message inline); succeeds at zero; nav/settings flip to eligible.
