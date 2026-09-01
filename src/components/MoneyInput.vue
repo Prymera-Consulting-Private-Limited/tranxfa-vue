@@ -44,6 +44,7 @@ const maskaOptions = reactive({
 });
 
 const unmaskedValue = ref(null);
+const input = ref(null);
 
 const onMaska = (event) => {
   unmaskedValue.value = event.detail.unmasked;
@@ -59,21 +60,39 @@ function selectOption(option) {
     emit('option:updated', option);
   }
 }
+function parseAmount(value) {
+  const raw = value?.replace(/,/g, '');
+  const parsed = parseFloat(raw);
+  if (isNaN(parsed)) {
+    return null;
+  }
+  return Number(parsed.toFixed(props.currency.decimalPlaces));
+}
+
 function amountUpdated(event) {
-  const raw = event.target.value?.replace(/,/g, '');
-  const newValue = parseFloat(raw);
-  if (!isNaN(newValue)) {
-    const fixedValue = Number(newValue.toFixed(props.currency.decimalPlaces));
-    if (fixedValue !== props.amount) {
-      emit('update:amount', fixedValue);
-    }
+  const newValue = parseAmount(event.target.value);
+  if (newValue !== null && newValue !== props.amount) {
+    emit('update:amount', newValue);
   }
 }
+
+// The typed value when it differs from the quoted amount — blur has not fired yet.
+function pendingAmount() {
+  const newValue = parseAmount(input.value?.value);
+  if (newValue === null || newValue === props.amount) {
+    return null;
+  }
+  return newValue;
+}
+
+defineExpose({
+  pendingAmount,
+});
 </script>
 <template>
   <div class="flex items-center rounded-md bg-white pl-3 outline-2 -outline-offset-1 outline-brand-700 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-brand-700">
     <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6">{{ currency.iconUnicode }}</div>
-    <input inputmode="decimal" :id="inputId" @blur="amountUpdated" v-maska="maskaOptions" @maska="onMaska" type="text" v-model="amountModel" class="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" placeholder="0.00" />
+    <input ref="input" inputmode="decimal" :id="inputId" @blur="amountUpdated" v-maska="maskaOptions" @maska="onMaska" type="text" v-model="amountModel" class="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" placeholder="0.00" />
     <div class="grid shrink-0 grid-cols-1 focus-within:relative bg-white">
       <Menu as="div" class="relative inline-block text-left">
         <div>
