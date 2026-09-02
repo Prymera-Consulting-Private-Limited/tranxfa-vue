@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {ArrowLongLeftIcon} from "@heroicons/vue/20/solid/index.js";
 import {BanknotesIcon} from "@heroicons/vue/24/outline/index.js";
 import ListShimmer from "@/components/Transaction/ListShimmer.vue";
@@ -9,9 +9,11 @@ import MovementListItem from "@/components/Wallet/MovementListItem.vue";
 import WalletMovement from "@/models/wallet_movement.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 import {useTimeUtils} from "@/composables/time_utils.js";
+import {useWalletStore} from "@/stores/wallet.js";
 
 const walletUtils = useWalletUtils();
 const timeUtils = useTimeUtils();
+const walletStore = useWalletStore();
 
 const data = ref(null);
 const isLoading = ref(true);
@@ -27,6 +29,20 @@ async function getMovements(page = 1) {
 
 onMounted(async () => {
   getMovements();
+});
+
+async function refreshMovements() {
+  await walletUtils.getMovements(data.value?.pagination?.current_page ?? 1).then((response) => {
+    data.value = response.data;
+  }).catch(() => {});
+}
+
+// CustomerLayout refetches the wallet when WalletBalanceChanged arrives —
+// a replaced balance object means a new movement is on the books.
+watch(() => walletStore.wallet.data, () => {
+  if (! isLoading.value) {
+    refreshMovements();
+  }
 });
 
 const movements = computed(() => {
