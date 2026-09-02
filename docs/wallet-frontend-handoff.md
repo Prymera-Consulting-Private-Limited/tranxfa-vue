@@ -49,8 +49,11 @@ Models: `wallet`, `wallet_balance`, `wallet_subscription`, `wallet_terms`,
    `payment.payment_provider.code === 'WALLET'` and listens on
    `client-payment.{id}` as every provider does.
 5. **Statement** — expects the house `{data, pagination}` envelope
-   (`Pagination.vue` unchanged); renders `description` and `memo` verbatim;
-   credit/debit styling from the amount's sign only.
+   (`Pagination.vue` unchanged); renders `description` verbatim as the row's
+   label (`memo` is no longer read — removed by SD-924); icon and bubble colour
+   switch on `kind` (`load`/`refund` inflow-green, `spend`/`return`
+   outflow-grey, `adjustment` and any unknown kind fall back to the amount's
+   sign); the amount's own colour still follows its sign.
 
 ## Verified in the backend-driven e2e (2026-09-01)
 
@@ -108,6 +111,25 @@ Facts QA should know:
 - [ ] Close wallet: refused with balance (message inline); succeeds at zero; nav/settings flip to eligible.
 - [ ] Refund of a wallet-funded transfer: movement appears, balance rises (live via `WalletBalanceChanged`, or on entry).
 - [ ] Non-offered country: wallet hidden even though other endpoints work.
+
+## Statement copy and `kind` (SD-924 — shipped)
+
+The movements response now carries customer-facing, server-localised
+`description`, a stable `kind` (`load`/`spend`/`refund`/`return`/`adjustment` —
+enum `wallet_movement_kind.js`), and no `memo`. As implemented:
+
+- `memo` is gone from the model and the row; the row shows `description` with
+  the time underneath, rendered exactly as the server sends it (no client-side
+  mapping of the strings — they're localised).
+- The row's icon and colour switch on `kind`, never on `description`:
+  down-left arrow for `load`, u-turn-left for `refund` (inflow, green);
+  up-right for `spend`, u-turn-right for `return` (outflow, grey);
+  up-down arrows for `adjustment` with colour from the amount's sign, which is
+  also the fallback for any future kind the client doesn't know.
+- The statement now refreshes live: `WalletBalanceChanged` → `CustomerLayout`
+  refetches the wallet → the open statement silently refetches its current
+  page, so the new row appears without a shimmer or losing the reader's place
+  (same trigger the wallet home already uses).
 
 ## Live balance updates (SD-909 — shipped)
 
