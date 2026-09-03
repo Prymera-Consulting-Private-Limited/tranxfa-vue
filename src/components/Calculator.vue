@@ -49,6 +49,9 @@ const props = defineProps({
 const isFetchingQuote = ref(true);
 const isSavingQuote = ref(false);
 
+const sendMoneyInput = ref(null);
+const receiveMoneyInput = ref(null);
+
 const quoteUtil = useQuoteUtils();
 const recipientUtil = useRecipientUtils();
 
@@ -158,8 +161,26 @@ const selectedPayoutMethod = computed({
 
 onMounted(getQuote)
 
-function saveQuote() {
+async function saveQuote() {
   isSavingQuote.value = true;
+
+  // An amount typed without leaving the field has not refreshed the quote yet
+  // (blur never fires on Enter-key submission) — re-quote it before saving.
+  const pendingSendAmount = sendMoneyInput.value?.pendingAmount() ?? null;
+  const pendingReceiveAmount = receiveMoneyInput.value?.pendingAmount() ?? null;
+  let requoted = false;
+  if (pendingSendAmount !== null) {
+    await sentAmountUpdated(pendingSendAmount);
+    requoted = true;
+  } else if (pendingReceiveAmount !== null) {
+    await receiveAmountUpdated(pendingReceiveAmount);
+    requoted = true;
+  }
+  if (requoted && (quoteErrors.payment.length > 0 || quoteErrors.payout.length > 0 || quoteFailureReason.value || quoteUtil.quote.data?.transferDisableReason)) {
+    isSavingQuote.value = false;
+    return;
+  }
+
   if (props.recipient) {
     recipientUtil.getQuote(props.recipient, quoteUtil.quote.data).then((response) => {
       const quote = TransactionQuote.getInstance(response.data);
@@ -211,6 +232,7 @@ function saveQuote() {
                     <div class="mt-2">
                       <MoneyInput
                           v-if="! isFetchingQuote"
+                          ref="sendMoneyInput"
                           v-bind:country="quoteUtil.quote.data.paymentCountry"
                           v-bind:currency="quoteUtil.quote.data.paymentCurrency"
                           v-bind:options="quoteUtil.quote.data.sources"
@@ -291,6 +313,7 @@ function saveQuote() {
                     <div class="mt-4">
                       <MoneyInput
                           v-if="! isFetchingQuote"
+                          ref="receiveMoneyInput"
                           v-bind:country="quoteUtil.quote.data.payoutCountry"
                           v-bind:currency="quoteUtil.quote.data.payoutCurrency"
                           v-bind:options="quoteUtil.quote.data.targets"

@@ -4,12 +4,17 @@ import Header from "@/components/Header.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {onMounted, onUnmounted} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
+import {useWalletStore} from "@/stores/wallet.js";
+import {useWalletUtils} from "@/composables/wallet_utils.js";
+import WalletAvailability from "@/enums/wallet_availability.js";
 import {NotificationGroup, Notification, notify} from 'notiwind';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
 import { XMarkIcon } from '@heroicons/vue/20/solid'
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
+const walletStore = useWalletStore();
+const walletUtils = useWalletUtils();
 
 /**
  * @type {{data: Customer | null}}
@@ -19,6 +24,9 @@ const customer = customerStore.customer;
 onMounted(async () => {
   if (customerStore.isLoaded === false) {
     await customerUtils.refresh();
+  }
+  if (walletStore.availability === WalletAvailability.UNKNOWN) {
+    walletUtils.probe();
   }
   if (customer.data?.id) {
     Echo.channel(`client-customer.${customer.data?.id}`)
@@ -65,6 +73,11 @@ onMounted(async () => {
               },
               -1,
           )
+        })
+        .listen('WalletBalanceChanged', () => {
+          if (walletStore.isEnrolled) {
+            walletUtils.getWallet().catch(() => {});
+          }
         });
   }
 })
