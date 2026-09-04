@@ -24,11 +24,19 @@ const props = defineProps({
 
 const transactionUtils = useTransactionUtils();
 
+const terminalStates = [PaymentState.TIMED_OUT, PaymentState.CANCELLED, PaymentState.REFUNDED, PaymentState.PART_REFUNDED];
+
+// PENDING alone is not payable — the hosted payment URL can arrive later than
+// the state, so keep polling until both are here.
+const isReadyToPay = () => {
+  return props.transaction.payment.state.code === PaymentState.PENDING && !! props.transaction.payment.paymentUrl;
+}
+
 const getTransaction = async () => {
   transactionUtils.getTransaction(props.transaction.id).then((response) => {
     const transaction = Transaction.getInstance(response.data);
     props.transaction.payment = transaction.payment;
-    if (props.transaction.payment.state.code === PaymentState.PENDING) {
+    if (isReadyToPay() || terminalStates.includes(props.transaction.payment.state.code)) {
       clearPullInterval();
     }
   });
@@ -42,7 +50,7 @@ onMounted(async () => {
         props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
         props.transaction.payment.sharedReference = e.shared_reference;
         props.transaction.payment.paymentUrl = e.payment_url;
-        if (props.transaction.payment.state.code === PaymentState.PENDING) {
+        if (isReadyToPay() || terminalStates.includes(props.transaction.payment.state.code)) {
           clearPullInterval();
         } else if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
           setTimeout(() => {
@@ -55,7 +63,7 @@ onMounted(async () => {
           }, 1500)
         }
       });
-  if (props.transaction.payment.state.code !== PaymentState.PENDING) {
+  if (! isReadyToPay() && ! terminalStates.includes(props.transaction.payment.state.code)) {
     intervalId = setInterval(getTransaction, 10000);
   }
 })
@@ -87,6 +95,10 @@ const status = computed(() => {
     return 'completed';
   } else if (props.transaction.payment.state.code === PaymentState.FAILED) {
     return 'failed';
+  } else if (props.transaction.payment.state.code === PaymentState.TIMED_OUT || props.transaction.payment.state.code === PaymentState.CANCELLED) {
+    return 'cancelled';
+  } else if (props.transaction.payment.state.code === PaymentState.REFUNDED || props.transaction.payment.state.code === PaymentState.PART_REFUNDED) {
+    return 'refunded';
   }
 })
 
@@ -98,7 +110,7 @@ const retryPayment = async () => {
 </script>
 
 <template>
-  <template v-if="transaction.payment.state.code === PaymentState.PENDING">
+  <template v-if="transaction.payment.state.code === PaymentState.PENDING && transaction.payment.paymentUrl">
     <div class="-m-5 -mt-10">
       <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Payment</h2>
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
@@ -135,5 +147,22 @@ const retryPayment = async () => {
     <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
     <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
     <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
+  </template>
+
+  <template v-else-if="status === 'cancelled'">
+    <Failed class="-mt-20" />
+    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
+    <p class="text-base text-gray-600 mb-6">No money has moved. You can start the transfer again whenever you're ready.</p>
+    <div class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
+    </div>
+  </template>
+
+  <template v-else-if="status === 'refunded'">
+    <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment Refunded</h2>
+    <p class="text-base text-gray-600 mb-6">This payment was returned to you. Check the transaction for details.</p>
+    <div class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
+    </div>
   </template>
 </template>

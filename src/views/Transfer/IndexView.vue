@@ -142,7 +142,7 @@ const confirmQuote = async () => {
     isSpendOtpModalOpen.value = false;
     await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
   } catch (error) {
-    if (error.response.status === 412) {
+    if (error.response?.status === 412) {
       if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
@@ -180,10 +180,16 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "duplicate_transaction" || error.response.data.type === "active_transfer_disable_rule") {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message;
+      } else {
+        isStepProcessing.value = false;
+        preconditionFailedMessage.value = error.response.data.message || 'We could not confirm this transfer. Please try again.';
       }
-    } else if (error.response.status === 422) {
+    } else if (error.response?.status === 422) {
       confirmFormErrors.value = error.response.data.errors;
       isStepProcessing.value = false;
+    } else {
+      isStepProcessing.value = false;
+      preconditionFailedMessage.value = 'We could not confirm this transfer. Please check your connection and try again.';
     }
   }
 }

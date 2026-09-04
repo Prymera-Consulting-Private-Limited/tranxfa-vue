@@ -30,14 +30,21 @@ const props = defineProps({
 const transaction = ref(null);
 
 const isLoading = ref(true);
+const loadFailed = ref(false);
 
-onMounted(async () => {
+const loadTransaction = async () => {
+  isLoading.value = true;
+  loadFailed.value = false;
   transactionUtils.getTransaction(props.id).then((response) => {
     transaction.value = Transaction.getInstance(response.data);
+  }).catch(() => {
+    loadFailed.value = true;
   }).finally(() => {
     isLoading.value = false;
   });
-})
+}
+
+onMounted(loadTransaction)
 
 
 const paymentAttempt = ref(1);
@@ -50,7 +57,7 @@ const retryPaymentErrors = ref([]);
 
 const retryPayment = async (paymentData = null) => {
   paymentAttempt.value++;
-  if (canAttemptPayment === false) {
+  if (! canAttemptPayment.value) {
     return;
   }
   isLoading.value = true;
@@ -116,6 +123,11 @@ function closePaymentModal() {
                     <Fincode v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'FINCODE'" v-bind:transaction="transaction"  />
                     <CinetPay v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'CINET_PAY'" v-bind:transaction="transaction"  />
                     <WalletPayment v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'WALLET'" v-bind:transaction="transaction"  />
+                  </div>
+                  <div v-else-if="loadFailed" class="text-center">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">We couldn't load your payment</h2>
+                    <p class="text-base text-gray-600 mb-6">Please check your connection and try again.</p>
+                    <button @click="loadTransaction" class="mt-2 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Try again</button>
                   </div>
                 </div>
               </div>

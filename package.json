@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@didit-protocol/sdk-web": "^0.2.1",
@@ -42,9 +43,12 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.5.0",
+    "jsdom": "^25.0.1",
     "laravel-echo": "^2.0.2",
     "pusher-js": "^8.4.0",
     "vite": "^6.1.0",
-    "vite-plugin-vue-devtools": "^7.7.2"
+    "vite-plugin-vue-devtools": "^7.7.2",
+    "vitest": "^5.0.0"
   }
 }
