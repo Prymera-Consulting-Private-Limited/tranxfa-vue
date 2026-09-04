@@ -60,17 +60,15 @@ describe.each([
         expect(anchor.text()).toContain('Pay AUD 100.00');
     });
 
-    it('characterizes: PENDING with no URL renders a dead pay link with no href', () => {
+    it('shows the waiting face instead of a dead pay link when PENDING has no URL yet', () => {
         const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: null});
-        const anchor = wrapper.find('a');
-        expect(anchor.exists()).toBe(true);
-        expect(anchor.attributes('href')).toBeUndefined();
-        expect(anchor.text()).toContain('Pay AUD 100.00');
+        expect(wrapper.find('a').exists()).toBe(false);
+        expect(wrapper.text()).toContain('Please wait while we are setting up the payment.');
     });
 
-    it('characterizes: no poll is scheduled when mounted at PENDING without a URL', () => {
+    it('keeps the poll scheduled when mounted at PENDING without a URL', () => {
         mountWith({stateCode: 'PENDING', paymentUrl: null});
-        expect(scheduledPolls()).toHaveLength(0);
+        expect(scheduledPolls()).toHaveLength(1);
     });
 
     it('shows the waiting face and polls while the payment is being set up', async () => {
@@ -87,14 +85,27 @@ describe.each([
         expect(scheduledPolls()).toHaveLength(0);
     });
 
-    it('characterizes: TIMED_OUT renders an empty modal', () => {
+    it('shows the expiry face when the payment TIMED_OUT', () => {
         const {wrapper} = mountWith({stateCode: 'TIMED_OUT'});
-        expect(wrapper.text().trim()).toBe('');
+        expect(wrapper.text()).toContain('This payment has expired');
+        expect(wrapper.text()).toContain('View Transaction');
     });
 
-    it('characterizes: CANCELLED renders an empty modal', () => {
+    it('shows the cancelled face when the payment is CANCELLED', () => {
         const {wrapper} = mountWith({stateCode: 'CANCELLED'});
-        expect(wrapper.text().trim()).toBe('');
+        expect(wrapper.text()).toContain('This payment was cancelled');
+        expect(wrapper.text()).toContain('View Transaction');
+    });
+
+    it('shows the refunded face when the payment is REFUNDED', () => {
+        const {wrapper} = mountWith({stateCode: 'REFUNDED'});
+        expect(wrapper.text()).toContain('Payment Refunded');
+        expect(wrapper.text()).toContain('View Transaction');
+    });
+
+    it('does not schedule a poll for a terminal payment', () => {
+        mountWith({stateCode: 'TIMED_OUT'});
+        expect(scheduledPolls()).toHaveLength(0);
     });
 
     it('routes to the transaction after an AUTHORIZED websocket event', async () => {
