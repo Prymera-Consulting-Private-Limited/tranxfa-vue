@@ -248,6 +248,49 @@ scope until you settle it with Fincode.
 
 ---
 
+## Backend answers (round 2, 2026-09-04) — and the payout audit
+
+The backend verified all six sections against their code and answered the
+contract asks. Resolutions, superseding the table above where they differ:
+
+- **No new transfer state exists or is planned.** A Fincode transfer awaiting
+  the customer's money sits in `PENDING-PAYMENT` like every other provider —
+  the icon-map fallback this review called "genuinely required" is therefore
+  not required for Fincode (still a reasonable hardening, no longer urgent).
+  The real difference: **`transaction.payout` is populated (state `QUEUED`)
+  during `PENDING-PAYMENT`** for Fincode, where every other provider has no
+  payout row until the money clears.
+- **Payout-presence audit (requested by backend): clean.** Nothing in the app
+  reads `payout.state`, and nothing infers "payout started" from the payout
+  object existing. The single payout-object read in any template is the
+  collection-PIN row (`Transaction/ItemView.vue:201`), which behaves correctly
+  for a present-but-unfunded payout — PIN visibility is server-driven via
+  `collection_pin_available`. It did dereference `payout` unguarded, a crash
+  risk for the *absent*-payout case every other provider hits pre-clearing;
+  fixed with an optional chain alongside this note.
+- **Return URLs stay backend-owned** (`routes/transport.php:42`, transaction id
+  substituted into the path, not the query string). The callback view reading
+  zero query params is correct and stays.
+- **Terms text: field only, no event.** Fincode returns the terms in the same
+  response as the payment URL — present at setup or not at all. Backend ships
+  `payment_terms` on the payment resource (small, ticketed).
+- **`expires_at`: absolute ISO-8601, nullable — and `null` means "never
+  expires"** (manual payment and cash never expire by design), not "unknown".
+  No countdown and no urgency state may render when it's absent. (Small,
+  ticketed.)
+- **Blocked reason is cross-provider and large.** Every provider writes
+  internal text into `failure_reason`; the backend wants one properly-typed,
+  customer-facing design rather than a Fincode-shaped patch, and the copy is a
+  compliance question. To be scoped live; nothing frontend-buildable yet.
+- The "Blazing Fast, Instant Transfers" calculator promise was pulled as its
+  own change per the backend's request (PR #84).
+
+Frontend work that becomes buildable when the two small backend tickets land:
+the terms slot beside the Pay button, and the expiry line (wallet top-up
+countdown pattern, rendering nothing when `expires_at` is null).
+
+---
+
 ## Appendix: pre-existing defects found in passing
 
 None of these block Fincode; all predate it. Listed for whenever housekeeping
