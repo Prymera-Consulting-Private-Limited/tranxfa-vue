@@ -308,6 +308,30 @@ way: `PART-REFUNDED`. The app's enum had both underscored, which would have
 silently un-matched the terminal faces shipped in PR #83. Both values now
 match the wire, with fixtures asserting the hyphenated forms.
 
+### Round 4 (2026-09-05): backend shipped, exactly as contracted
+
+`payment_terms` and `expires_at` are merged on the backend's `develop`,
+unchanged from the confirmed contract — both on the payment object beside
+`payment_url`, terms guaranteed plain text server-side (no sanitiser needed),
+`expires_at` informational with the state deciding. Staging runs an older
+build; the backend will ping the day it deploys, and we verify against real
+payloads then rather than polling for it.
+
+Facts QA should know when that day comes:
+
+- **A null `payment_terms` on staging is expected, not a bug** — no partner
+  has ever populated the field (Fincode's `create-transaction` call is still
+  failing on their side). The backend will arrange a populated payment on
+  request when we want to exercise the rendering against a real value.
+- The two corrections they re-flagged are both already handled here: no new
+  transfer state exists (nothing to add to the icon map), and the
+  payout-presence audit was done in PR #85 — nothing reads `payout.state`,
+  and the one existence-read (collection PIN) is guarded.
+
+Last open item on their side: the cross-provider customer-facing refusal
+reason (§2) — approach agreed internally, queued; they'll return with a shape
+to confirm, same flow as these two fields.
+
 ---
 
 ## Appendix: pre-existing defects found in passing
