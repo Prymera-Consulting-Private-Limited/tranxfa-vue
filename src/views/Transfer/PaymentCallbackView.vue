@@ -24,40 +24,85 @@ const props = defineProps({
 const transaction = ref(null);
 
 const isLoading = ref(true);
+const loadFailed = ref(false);
+
+// The state at return is not necessarily final — the provider confirms to us
+// separately. The websocket is the fast path; the poll is the floor under it.
+const settledStates = [
+  PaymentState.AUTHORIZED,
+  PaymentState.CAPTURED,
+  PaymentState.FAILED,
+  PaymentState.TIMED_OUT,
+  PaymentState.CANCELLED,
+  PaymentState.REFUNDED,
+  PaymentState.PART_REFUNDED,
+];
+
+let intervalId = null;
+
+const clearPullInterval = () => {
+  if (intervalId) {
+    clearInterval(intervalId);
+    intervalId = null;
+  }
+}
+
+const refreshTransaction = async () => {
+  transactionUtils.getTransaction(props.id).then((response) => {
+    const fresh = Transaction.getInstance(response.data);
+    transaction.value.payment = fresh.payment;
+    if (settledStates.includes(transaction.value.payment.state.code)) {
+      clearPullInterval();
+    }
+  }).catch(() => {});
+}
 
 onMounted(async () => {
   await transactionUtils.getTransaction(props.id).then((response) => {
     transaction.value = Transaction.getInstance(response.data);
-    if (transaction.value.payment.state.code === PaymentState.AUTHORIZED || transaction.value.payment.state.code === PaymentState.CAPTURED) {
-      setTimeout(async () => {
-        await router.push({ name: 'viewTransaction', params: { transactionId: transaction.value.id } });
-      }, 1500);
-    }
+  }).catch(() => {
+    loadFailed.value = true;
   }).finally(() => {
     isLoading.value = false;
   });
+
+  if (! transaction.value) {
+    return;
+  }
 
   Echo.channel(`client-payment.${transaction.value.payment.id}`)
       .listen('PaymentTransactionStateUpdated', (e) => {
         transaction.value.payment.state = PaymentTransactionState.getInstance(e.state);
         transaction.value.payment.sharedReference = e.shared_reference;
+        transaction.value.payment.paymentUrl = e.payment_url;
+        if (settledStates.includes(transaction.value.payment.state.code)) {
+          clearPullInterval();
+        }
       });
+
+  if (! settledStates.includes(transaction.value.payment.state.code)) {
+    intervalId = setInterval(refreshTransaction, 10000);
+  }
 })
+
+let redirectTimeoutId = null;
 
 watchEffect(() => {
   if (transaction.value) {
-    if (transaction.value.payment.state.code === PaymentState.FAILED) {
-      transaction.value.payment.state.code = PaymentState.FAILED;
-    }
     if (transaction.value.payment.state.code === PaymentState.AUTHORIZED ||  transaction.value.payment.state.code === PaymentState.CAPTURED) {
-      setTimeout(async () => {
-        await router.push({ name: 'viewTransaction', params: { transactionId: transaction.value.id } });
-      }, 1500);
+      if (! redirectTimeoutId) {
+        redirectTimeoutId = setTimeout(async () => {
+          await router.push({ name: 'viewTransaction', params: { transactionId: transaction.value.id } });
+        }, 1500);
+      }
     }
   }
 })
 
 const status = computed(() => {
+  if (! transaction.value) {
+    return undefined;
+  }
   if (transaction.value.payment.state.code === PaymentState.PENDING || transaction.value.payment.state.code === PaymentState.INITIALIZED || transaction.value.payment.state.code === PaymentState.CREATED) {
     return 'pending';
   } else if (transaction.value.payment.state.code === PaymentState.REDIRECTED) {
@@ -66,11 +111,22 @@ const status = computed(() => {
     return 'completed';
   } else if (transaction.value.payment.state.code === PaymentState.FAILED) {
     return 'failed';
+  } else if (transaction.value.payment.state.code === PaymentState.TIMED_OUT || transaction.value.payment.state.code === PaymentState.CANCELLED) {
+    return 'cancelled';
+  } else if (transaction.value.payment.state.code === PaymentState.REFUNDED || transaction.value.payment.state.code === PaymentState.PART_REFUNDED) {
+    return 'refunded';
   }
 })
 
 onUnmounted(async () => {
-  Echo.leaveChannel(`client-payment.${transaction.value.payment.id}`);
+  if (transaction.value?.payment?.id) {
+    Echo.leaveChannel(`client-payment.${transaction.value.payment.id}`);
+  }
+  clearPullInterval();
+  if (redirectTimeoutId) {
+    clearTimeout(redirectTimeoutId);
+    redirectTimeoutId = null;
+  }
 })
 
 const retryPayment = async () => {
@@ -132,6 +188,23 @@ function closePaymentModal() {
                     <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
                     <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
                     <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
+                  </template>
+
+                  <template v-else-if="status === 'cancelled'">
+                    <Failed class="-mt-20" />
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
+                    <p class="text-base text-gray-600 mb-6">No money has moved. You can start the transfer again whenever you're ready.</p>
+                  </template>
+
+                  <template v-else-if="status === 'refunded'">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment Refunded</h2>
+                    <p class="text-base text-gray-600 mb-6">This payment was returned to you. Check the transaction for details.</p>
+                  </template>
+
+                  <template v-else-if="loadFailed">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">We couldn't check your payment</h2>
+                    <p class="text-base text-gray-600 mb-6">Please check your connection and try again.</p>
+                    <button @click="router.go(0)" class="mt-2 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Try again</button>
                   </template>
                 </div>
               </div>

@@ -98,25 +98,3 @@ export const stateFaceStubs = {
     Failed: true,
     RouterLink: {name: 'RouterLink', template: '<a><slot /></a>'},
 };
-
-/**
- * Runs a block with the process's unhandledRejection listeners swapped out,
- * collecting every rejection that escapes. Lets a test characterize a floating
- * rejection as an explicit assertion instead of failing the run.
- */
-export async function withUnhandledRejections(run) {
-    const prior = process.listeners('unhandledRejection');
-    process.removeAllListeners('unhandledRejection');
-    const seen = [];
-    const capture = (reason) => {
-        seen.push(reason);
-    };
-    process.on('unhandledRejection', capture);
-    try {
-        await run(seen);
-    } finally {
-        process.off('unhandledRejection', capture);
-        prior.forEach((listener) => process.on('unhandledRejection', listener));
-    }
-    return seen;
-}

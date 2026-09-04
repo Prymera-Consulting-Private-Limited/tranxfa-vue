@@ -3,7 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import axios from "axios";
 import PaymentView from "@/views/Transfer/PaymentView.vue";
 import router from "@/router/index.js";
-import {installFakeEcho, makeTransactionPayload, modalStubs, withUnhandledRejections} from "./helpers.js";
+import {installFakeEcho, makeTransactionPayload, modalStubs} from "./helpers.js";
 
 vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn()}}));
 vi.mock('@/router/index.js', () => ({default: {push: vi.fn()}}));
@@ -43,19 +43,26 @@ describe('PaymentView', () => {
         expect(wrapper.html()).not.toContain('pay-cross-stub');
     });
 
-    it('characterizes: a failed transaction fetch opens the modal empty, with no message', async () => {
+    it('shows an error face with a retry when the transaction cannot be loaded', async () => {
         axios.get.mockRejectedValue(Object.assign(new Error('boom'), {response: {status: 500, data: {}}}));
-        let wrapper;
-        const escaped = await withUnhandledRejections(async () => {
-            wrapper = mountView();
-            await flushPromises();
-            await flushPromises();
-        });
+        const wrapper = mountView();
+        await flushPromises();
         expect(wrapper.vm.isLoading).toBe(false);
         expect(wrapper.vm.transaction).toBe(null);
-        expect(wrapper.html()).not.toContain('fincode-stub');
-        expect(wrapper.text()).not.toMatch(/wrong|failed|try again/i);
-        expect(escaped).toHaveLength(1);
+        expect(wrapper.text()).toContain("We couldn't load your payment");
+        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'FINCODE'})});
+        await wrapper.find('button').trigger('click');
+        await flushPromises();
+        expect(wrapper.html()).toContain('fincode-stub');
+    });
+
+    it('does not send a retry past the attempt cap', async () => {
+        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'FINCODE'})});
+        const wrapper = mountView();
+        await flushPromises();
+        wrapper.vm.paymentAttempt = 3;
+        await wrapper.vm.retryPayment();
+        expect(axios.post).not.toHaveBeenCalled();
     });
 
     it('replaces the payment on retry and counts the attempt', async () => {

@@ -3,7 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import axios from "axios";
 import PaymentCallbackView from "@/views/Transfer/PaymentCallbackView.vue";
 import router from "@/router/index.js";
-import {installFakeEcho, makeTransactionPayload, modalStubs, stateFaceStubs, withUnhandledRejections} from "./helpers.js";
+import {installFakeEcho, makeTransactionPayload, modalStubs, stateFaceStubs} from "./helpers.js";
 
 vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn()}}));
 vi.mock('@/router/index.js', () => ({default: {push: vi.fn()}}));
@@ -46,8 +46,19 @@ describe('PaymentCallbackView', () => {
         expect(wrapper.text()).toContain('Awaiting Payment Update');
     });
 
-    it('characterizes: no polling backs up the websocket while awaiting the result', async () => {
+    it('polls beside the websocket while the result is not final', async () => {
         axios.get.mockResolvedValue({data: makeTransactionPayload({stateCode: 'REDIRECTED'})});
+        mountView();
+        await flushPromises();
+        const polls = setIntervalSpy.mock.calls.filter(([, delay]) => delay === 10000);
+        expect(polls).toHaveLength(1);
+        polls[0][0]();
+        await flushPromises();
+        expect(axios.get).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not poll when the payment arrives already settled', async () => {
+        axios.get.mockResolvedValue({data: makeTransactionPayload({stateCode: 'AUTHORIZED'})});
         mountView();
         await flushPromises();
         expect(setIntervalSpy).not.toHaveBeenCalled();
@@ -70,32 +81,26 @@ describe('PaymentCallbackView', () => {
         expect(router.push).toHaveBeenCalledWith({name: 'viewTransaction', params: {transactionId: 'trx-1'}});
     });
 
-    it('characterizes: arriving already-settled schedules the redirect twice', async () => {
+    it('schedules the redirect once when arriving already settled', async () => {
         axios.get.mockResolvedValue({data: makeTransactionPayload({stateCode: 'AUTHORIZED'})});
         mountView();
         await flushPromises();
-        expect(scheduledRedirects()).toHaveLength(2);
+        expect(scheduledRedirects()).toHaveLength(1);
     });
 
-    it('characterizes: TIMED_OUT renders none of the known faces', async () => {
+    it('shows the expiry face when the payment TIMED_OUT', async () => {
         axios.get.mockResolvedValue({data: makeTransactionPayload({stateCode: 'TIMED_OUT'})});
         const wrapper = mountView();
         await flushPromises();
-        expect(wrapper.text()).not.toContain('Awaiting Payment Update');
-        expect(wrapper.text()).not.toContain('Payment Successful');
-        expect(wrapper.text()).not.toContain('Payment Failed');
+        expect(wrapper.text()).toContain('This payment has expired');
     });
 
-    it('characterizes: a failed fetch leaves no transaction and no message', async () => {
+    it('shows an error face when the transaction cannot be loaded', async () => {
         axios.get.mockRejectedValue(Object.assign(new Error('boom'), {response: {status: 500, data: {}}}));
-        let wrapper;
-        const escaped = await withUnhandledRejections(async () => {
-            wrapper = mountView();
-            await flushPromises();
-            await flushPromises();
-        });
+        const wrapper = mountView();
+        await flushPromises();
         expect(wrapper.vm.transaction).toBe(null);
         expect(wrapper.vm.isLoading).toBe(false);
-        expect(escaped.length).toBeGreaterThan(0);
+        expect(wrapper.text()).toContain("We couldn't check your payment");
     });
 });
