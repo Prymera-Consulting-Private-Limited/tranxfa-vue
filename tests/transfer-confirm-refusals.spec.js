@@ -91,29 +91,39 @@ describe('Transfer wizard confirm refusals', () => {
         expect(wrapper.vm.confirmFormErrors).toEqual({purpose_id: ['Required.']});
     });
 
-    it('characterizes: a 412 with an unrecognised type leaves the spinner on with no message', async () => {
+    it('shows the server message for a 412 type it does not recognise and stops processing', async () => {
         const wrapper = await mountWizard();
         wrapper.vm.isStepProcessing = true;
         axios.post.mockRejectedValue({response: {status: 412, data: {type: 'partner_onboarding_incomplete', message: 'Fincode needs more information before this transfer.'}}});
         await wrapper.vm.confirmQuote();
-        expect(wrapper.vm.isStepProcessing).toBe(true);
-        expect(wrapper.vm.preconditionFailedMessage).toBe('');
+        expect(wrapper.vm.isStepProcessing).toBe(false);
+        expect(wrapper.vm.preconditionFailedMessage).toBe('Fincode needs more information before this transfer.');
     });
 
-    it('characterizes: a non-412/422 failure leaves the spinner on with no message', async () => {
+    it('falls back to generic copy for an unrecognised 412 without a message', async () => {
+        const wrapper = await mountWizard();
+        wrapper.vm.isStepProcessing = true;
+        axios.post.mockRejectedValue({response: {status: 412, data: {type: 'partner_onboarding_incomplete'}}});
+        await wrapper.vm.confirmQuote();
+        expect(wrapper.vm.isStepProcessing).toBe(false);
+        expect(wrapper.vm.preconditionFailedMessage).toBe('We could not confirm this transfer. Please try again.');
+    });
+
+    it('shows generic copy for a non-412/422 failure and stops processing', async () => {
         const wrapper = await mountWizard();
         wrapper.vm.isStepProcessing = true;
         axios.post.mockRejectedValue({response: {status: 503, data: {message: 'Service unavailable.'}}});
         await wrapper.vm.confirmQuote();
-        expect(wrapper.vm.isStepProcessing).toBe(true);
-        expect(wrapper.vm.preconditionFailedMessage).toBe('');
+        expect(wrapper.vm.isStepProcessing).toBe(false);
+        expect(wrapper.vm.preconditionFailedMessage).toBe('We could not confirm this transfer. Please check your connection and try again.');
     });
 
-    it('characterizes: a network error throws inside the catch', async () => {
+    it('handles a network error without throwing and stops processing', async () => {
         const wrapper = await mountWizard();
         wrapper.vm.isStepProcessing = true;
         axios.post.mockRejectedValue(new Error('Network Error'));
-        await expect(wrapper.vm.confirmQuote()).rejects.toThrow(TypeError);
-        expect(wrapper.vm.isStepProcessing).toBe(true);
+        await wrapper.vm.confirmQuote();
+        expect(wrapper.vm.isStepProcessing).toBe(false);
+        expect(wrapper.vm.preconditionFailedMessage).toBe('We could not confirm this transfer. Please check your connection and try again.');
     });
 });
