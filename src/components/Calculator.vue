@@ -437,7 +437,7 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-brand-700 font-semibold tracking-wider">Blazing Fast, Instant Transfers</p>
+                  <p v-if="! isFetchingQuote" class="text-sm text-brand-700 font-semibold tracking-wider">Fast, Secure Transfers</p>
                   <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
