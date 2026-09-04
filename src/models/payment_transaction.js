@@ -46,6 +46,20 @@ class PaymentTransaction {
     paymentUrl = null;
 
     /**
+     * Partner payment terms, normalised to plain text server-side; render
+     * verbatim or not at all.
+     * @type {String|null}
+     */
+    paymentTerms = null;
+
+    /**
+     * Absolute ISO-8601 expiry; null means the payment never expires, not
+     * unknown — render no countdown and no urgency when absent.
+     * @type {String|null}
+     */
+    expiresAt = null;
+
+    /**
      * @type {String|null}
      */
     totalPaymentAmount = null;
@@ -86,6 +100,8 @@ class PaymentTransaction {
         paymentTransaction.paymentProvider = PaymentProvider.getInstance(data.payment_provider);
         paymentTransaction.sharedReference = data.shared_reference;
         paymentTransaction.paymentUrl = data.payment_url;
+        paymentTransaction.paymentTerms = data.payment_terms;
+        paymentTransaction.expiresAt = data.expires_at;
         paymentTransaction.totalPaymentAmount = data.total_payment_amount;
         paymentTransaction.totalPaymentAmountFormatted = data.total_payment_amount_formatted;
         paymentTransaction.totalPaymentAmountCurrencyPrefixed = data.total_payment_amount_currency_prefixed;

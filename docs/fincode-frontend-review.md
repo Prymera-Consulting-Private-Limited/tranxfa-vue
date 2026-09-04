@@ -289,6 +289,25 @@ Frontend work that becomes buildable when the two small backend tickets land:
 the terms slot beside the Pay button, and the expiry line (wallet top-up
 countdown pattern, rendering nothing when `expires_at` is null).
 
+### Round 3 (2026-09-05): contract confirmed, surfaces built
+
+The backend confirmed the verbal contract for both fields — `payment_terms`
+(guaranteed plain text server-side, no event, same presence conditions as
+`payment_url`) and `expires_at` (payment `created_at` + provider window; a
+retried payment gets a fresh window; null = never expires). Both surfaces are
+now built into the redirect providers' payable face, presence-gated, so they
+render nothing until the backend ships and need no deploy coordination. The
+expiry gap behaves as agreed on the record: when the clock passes while the
+payment still reads `PENDING`, the line flips to "the payment window has
+passed — checking…" and the Pay button stays live until the state retires the
+screen.
+
+Their reply also corrected a wire spelling — `TIMED-OUT`, hyphenated — and
+our verification of `PaymentTransactionState.php` caught a second the same
+way: `PART-REFUNDED`. The app's enum had both underscored, which would have
+silently un-matched the terminal faces shipped in PR #83. Both values now
+match the wire, with fixtures asserting the hyphenated forms.
+
 ---
 
 ## Appendix: pre-existing defects found in passing
