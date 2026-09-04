@@ -86,7 +86,7 @@ describe.each([
     });
 
     it('shows the expiry face when the payment TIMED_OUT', () => {
-        const {wrapper} = mountWith({stateCode: 'TIMED_OUT'});
+        const {wrapper} = mountWith({stateCode: 'TIMED-OUT'});
         expect(wrapper.text()).toContain('This payment has expired');
         expect(wrapper.text()).toContain('View Transaction');
     });
@@ -103,8 +103,13 @@ describe.each([
         expect(wrapper.text()).toContain('View Transaction');
     });
 
+    it('shows the refunded face when the payment is PART-REFUNDED', () => {
+        const {wrapper} = mountWith({stateCode: 'PART-REFUNDED'});
+        expect(wrapper.text()).toContain('Payment Refunded');
+    });
+
     it('does not schedule a poll for a terminal payment', () => {
-        mountWith({stateCode: 'TIMED_OUT'});
+        mountWith({stateCode: 'TIMED-OUT'});
         expect(scheduledPolls()).toHaveLength(0);
     });
 

@@ -89,7 +89,7 @@ describe('PaymentCallbackView', () => {
     });
 
     it('shows the expiry face when the payment TIMED_OUT', async () => {
-        axios.get.mockResolvedValue({data: makeTransactionPayload({stateCode: 'TIMED_OUT'})});
+        axios.get.mockResolvedValue({data: makeTransactionPayload({stateCode: 'TIMED-OUT'})});
         const wrapper = mountView();
         await flushPromises();
         expect(wrapper.text()).toContain('This payment has expired');
