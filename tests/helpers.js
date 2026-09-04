@@ -6,7 +6,7 @@ import PaymentTransactionState from "@/models/payment_transaction_state.js";
 /**
  * A Transaction instance shaped the way the payment components read it.
  */
-export function makeTransaction({stateCode, paymentUrl = null, providerCode = 'FINCODE', clientPaymentAccount = null} = {}) {
+export function makeTransaction({stateCode, paymentUrl = null, providerCode = 'FINCODE', clientPaymentAccount = null, paymentTerms = null, expiresAt = null} = {}) {
     const transaction = new Transaction();
     transaction.id = 'trx-1';
 
@@ -18,6 +18,8 @@ export function makeTransaction({stateCode, paymentUrl = null, providerCode = 'F
     payment.totalPaymentAmountCurrencyPrefixed = 'AUD 100.00';
     payment.sharedReference = 'REF-1';
     payment.clientPaymentAccount = clientPaymentAccount;
+    payment.paymentTerms = paymentTerms;
+    payment.expiresAt = expiresAt;
     transaction.payment = payment;
 
     return transaction;

@@ -1,6 +1,7 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import {reactive} from "vue";
+import moment from "moment";
 import axios from "axios";
 import Fincode from "@/components/Payment/Fincode.vue";
 import PayCross from "@/components/Payment/PayCross.vue";
@@ -86,7 +87,7 @@ describe.each([
     });
 
     it('shows the expiry face when the payment TIMED_OUT', () => {
-        const {wrapper} = mountWith({stateCode: 'TIMED_OUT'});
+        const {wrapper} = mountWith({stateCode: 'TIMED-OUT'});
         expect(wrapper.text()).toContain('This payment has expired');
         expect(wrapper.text()).toContain('View Transaction');
     });
@@ -103,9 +104,44 @@ describe.each([
         expect(wrapper.text()).toContain('View Transaction');
     });
 
+    it('shows the refunded face when the payment is PART-REFUNDED', () => {
+        const {wrapper} = mountWith({stateCode: 'PART-REFUNDED'});
+        expect(wrapper.text()).toContain('Payment Refunded');
+    });
+
     it('does not schedule a poll for a terminal payment', () => {
-        mountWith({stateCode: 'TIMED_OUT'});
+        mountWith({stateCode: 'TIMED-OUT'});
         expect(scheduledPolls()).toHaveLength(0);
+    });
+
+    it('renders the partner terms verbatim beside the pay link', () => {
+        const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: 'https://pay.example/session', paymentTerms: 'Line one of the partner terms.\nLine two, verbatim.'});
+        expect(wrapper.text()).toContain('Line one of the partner terms.');
+        expect(wrapper.text()).toContain('Line two, verbatim.');
+        expect(wrapper.find('.whitespace-pre-line').exists()).toBe(true);
+    });
+
+    it('renders no terms block when the partner sent none', () => {
+        const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: 'https://pay.example/session'});
+        expect(wrapper.find('.whitespace-pre-line').exists()).toBe(false);
+    });
+
+    it('shows a calm payable-until line when the payment expires later', () => {
+        const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: 'https://pay.example/session', expiresAt: moment().add(6, 'hours').toISOString()});
+        expect(wrapper.text()).toContain('Payable for another');
+        expect(wrapper.text()).not.toContain('window has passed');
+    });
+
+    it('keeps the pay link live when expiry has passed but the state has not', () => {
+        const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: 'https://pay.example/session', expiresAt: moment().subtract(5, 'minutes').toISOString()});
+        expect(wrapper.text()).toContain('The payment window has passed');
+        expect(wrapper.find('a[href="https://pay.example/session"]').exists()).toBe(true);
+    });
+
+    it('renders no expiry line when expires_at is null', () => {
+        const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: 'https://pay.example/session'});
+        expect(wrapper.text()).not.toContain('Payable for another');
+        expect(wrapper.text()).not.toContain('window has passed');
     });
 
     it('routes to the transaction after an AUTHORIZED websocket event', async () => {

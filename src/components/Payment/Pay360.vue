@@ -1,6 +1,7 @@
 <script setup>
 import Transaction from "@/models/transaction.js";
-import {computed, onMounted, onUnmounted} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
+import moment from "moment";
 import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentState from "@/enums/payment_state.js";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
@@ -25,6 +26,25 @@ const props = defineProps({
 const transactionUtils = useTransactionUtils();
 
 const terminalStates = [PaymentState.TIMED_OUT, PaymentState.CANCELLED, PaymentState.REFUNDED, PaymentState.PART_REFUNDED];
+
+// 30-second tick so the expiry line re-renders as time passes. The clock only
+// informs the copy — the Pay button is ruled by the payment state alone.
+const tick = ref(0);
+let tickIntervalId = null;
+
+const isExpiryPassed = computed(() => {
+  tick.value;
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).isSameOrBefore(moment()) : false;
+});
+
+const expiresIn = computed(() => {
+  tick.value;
+  return moment(props.transaction.payment.expiresAt).fromNow(true);
+});
+
+const expiresAtFormatted = computed(() => {
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('MMM D, YYYY h:mm A') : '';
+});
 
 // PENDING alone is not payable — the hosted payment URL can arrive later than
 // the state, so keep polling until both are here.
@@ -66,6 +86,9 @@ onMounted(async () => {
   if (! isReadyToPay() && ! terminalStates.includes(props.transaction.payment.state.code)) {
     intervalId = setInterval(getTransaction, 10000);
   }
+  tickIntervalId = setInterval(() => {
+    tick.value++;
+  }, 30000);
 })
 
 const clearPullInterval = async () => {
@@ -78,6 +101,10 @@ const clearPullInterval = async () => {
 onUnmounted(async () => {
   Echo.leaveChannel(`client-payment.${props.transaction.payment.id}`);
   await clearPullInterval();
+  if (tickIntervalId) {
+    clearInterval(tickIntervalId);
+    tickIntervalId = null;
+  }
 })
 
 const status = computed(() => {
@@ -118,6 +145,11 @@ const retryPayment = async () => {
       </p>
       <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the secure site to finalize your payment.</p>
+      <p v-if="transaction.payment.expiresAt" class="mt-3 text-xs text-gray-500 text-left">
+        <template v-if="! isExpiryPassed">Payable for another {{ expiresIn }} · {{ expiresAtFormatted }}</template>
+        <template v-else>The payment window has passed — checking with the payment provider…</template>
+      </p>
+      <p v-if="transaction.payment.paymentTerms" class="mt-4 text-xs text-gray-500 text-left whitespace-pre-line">{{ transaction.payment.paymentTerms }}</p>
     </div>
   </template>
 
