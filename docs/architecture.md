@@ -329,6 +329,16 @@ and the `rebrand-tenant` skill.
 
 Recorded so they are not rediscovered:
 
+- **`SignUpView` discards most 422 field errors.** It copies only
+  `errors.email`, `errors.password` and `errors.confirm_password` into the
+  form. Any other field error — `third_party_declaration_accepted` is the one
+  you hit in practice — is dropped, and the user gets a Continue button that
+  appears to do nothing. Confirmed against a live backend. The wizard's
+  `confirmQuote` has a catch-all fallback for exactly this reason; signup does
+  not.
+- Server messages are rendered verbatim, so an unresolved backend translation
+  key reaches the user as-is (e.g. a wrong email OTP shows
+  `validation.customer.email_verification_code.incorrect`).
 - Payment provider components are heavily duplicated (see above).
 - `AwsRekognitionLivenessCheck.vue` is dead code with unsatisfied imports
   (`@tensorflow/tfjs-core`, `@tensorflow/tfjs-backend-webgl` are absent from

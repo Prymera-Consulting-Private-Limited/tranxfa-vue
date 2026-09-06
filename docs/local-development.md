@@ -16,7 +16,7 @@ useful message. Get the hosts right and everything else is ordinary Vite.
 macOS resolves any `*.localhost` name to `127.0.0.1` automatically, so no
 `/etc/hosts` edits are needed.
 
-Two failure modes worth recognising:
+Failure modes worth recognising:
 
 - `{"message":"Unauthorized"}` on every `/client/v1/*` call, including
   unauthenticated ones like `/password-policy` — your `Origin` is not in
@@ -24,6 +24,30 @@ Two failure modes worth recognising:
 - `{"message":"No query results for model [App\\Models\\PlatformApp]"}` — the
   Origin matched, but the backend database has no `platform_apps` row named
   `web`. The database needs seeding.
+- The route 404s entirely — you are calling the app host rather than
+  `API_HOST`. `/client/v1/*` is bound to `api.moneytransfer.app.localhost`;
+  `/sanctum/csrf-cookie` is not, which is why the CSRF call can succeed while
+  every API call 404s.
+
+### Signup appears to do nothing
+
+Clicking Continue on the sign-up form leaves you on the sign-up form, with no
+error and nothing in the console.
+
+The backend requires `third_party_declaration_accepted` to be `true`. The SPA
+only renders that checkbox when `VITE_THIRD_PARTY_SIGNUP_DECLARATION` is set,
+so with the variable unset it posts `false` and the backend answers `422`. But
+`SignUpView.vue` only copies `errors.email`, `errors.password` and
+`errors.confirm_password` into the form — **any other field error in a 422 is
+silently discarded**, so the user sees nothing at all.
+
+Set the variable locally. The underlying bug is worth fixing: the 422 handler
+should surface unmapped field errors rather than dropping them.
+
+A related rough edge: an incorrect email-verification OTP renders the raw
+translation key `validation.customer.email_verification_code.incorrect`
+instead of a message. The SPA displays `e.response.data.message` verbatim, so
+an unresolved key on the backend reaches the user unchanged.
 
 ## Backend
 
@@ -44,13 +68,34 @@ resolve to `127.0.0.1:8000`, and Laravel routes on the `Host` header.
 First-time database setup (PostgreSQL):
 
 ```sh
-php artisan migrate
-php artisan db:seed          # required — the SPA is unusable without reference data
+php artisan migrate:fresh --seed     # local only
 ```
 
 Seeding is not optional. Countries, currencies, payout channels, payment
 interfaces, document types and the `web` platform app all come from seeders; an
 unseeded database returns `Unauthorized` or empty lists everywhere.
+
+Three things to know:
+
+- **The seeders are not idempotent.** Re-running `db:seed` on an already-seeded
+  database fails in `UserSeeder` with a duplicate-username unique violation.
+  Use `migrate:fresh --seed`, or run individual seeders with `--class=`.
+- **`CompanySeeder` aborts the whole run if the seed fixtures disagree.** It
+  does `firstOrFail()` for every payout channel named in
+  `storage/app/seeder/companies.json`, so a corridor that
+  `storage/app/seeder/payout_channels.json` does not create kills the seed —
+  and everything after `CompanySeeder` (source countries, AML, exchange rates,
+  option lists) silently never runs. The symptom is `countries/source`
+  returning `{"data":[]}` while other endpoints look fine. These fixture files
+  are untracked local data, so mismatches vary per machine; compare the
+  `(country, currency, payout_method)` triples in the two files.
+- **Emails are queued.** `MAIL_MAILER=log` with `QUEUE_CONNECTION=redis`, so
+  nothing is written to `storage/logs/laravel.log` until a worker runs. Start
+  `php artisan queue:work`, or flush once with
+  `php artisan queue:work --stop-when-empty`.
+
+In local, OTPs (email verification, MFA) are fixed at **`111111`** — you do not
+need to dig the real code out of the log.
 
 ## Frontend
 
@@ -82,6 +127,10 @@ VITE_REVERB_AUTH_URL=http://api.moneytransfer.app.localhost:8000/broadcasting/au
 
 `VITE_APP_ENV=local` is what selects Reverb over Pusher in `main.js`. Without
 it the app tries to reach Pusher's cloud and no realtime event ever arrives.
+
+**If your backend requires the third-party declaration, you must also set
+`VITE_THIRD_PARTY_SIGNUP_DECLARATION`** — otherwise signup silently does
+nothing. See "Signup appears to do nothing" below.
 
 Then serve on the host and port the backend expects. `vite.config.js` has no
 `server` block, so pass it on the command line:
