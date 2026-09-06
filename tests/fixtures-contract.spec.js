@@ -6,6 +6,9 @@ import TransactionQuote from "@/models/transaction_quote.js";
 import PayoutChannel from "@/models/payout_channel.js";
 import Recipient from "@/models/recipient.js";
 import Country from "@/models/country.js";
+import Transaction from "@/models/transaction.js";
+import TransactionState from "@/models/transaction_state.js";
+import PaymentTransaction from "@/models/payment_transaction.js";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import RecipientDataType from "@/enums/recipient_data_type.js";
 
@@ -202,5 +205,77 @@ describe('Error envelopes the SPA branches on', () => {
         // holds no wallet licence, as opposed to the customer being eligible.
         expect(body.type).toBeUndefined();
         expect(body.wallet_offered).toBeUndefined();
+    });
+});
+
+describe('Transaction mapper against a real confirmed transfer', () => {
+    // Captured after a POI was approved in the console, which is what turns the
+    // confirm 412 into a 200. See tests/fixtures/README.md.
+    it('maps the transaction returned by a successful confirm', () => {
+        const transaction = Transaction.getInstance(fixture('confirm-quote-success'));
+
+        expect(transaction.id).toBeTruthy();
+        // transaction_number is a STRING like "TP7402166", despite the model's
+        // JSDoc saying {number|null} and Volume.vue coercing it with `+ ''`.
+        expect(transaction.transactionNumber).toBeTypeOf('string');
+        expect(transaction.transactionNumber).toMatch(/^[A-Z]+\d+$/);
+        expect(transaction.state).toBeInstanceOf(TransactionState);
+        expect(transaction.state.code).toBe('CREATED');
+        expect(transaction.payment).toBeInstanceOf(PaymentTransaction);
+    });
+
+    it('maps the transaction detail, including its payment envelope', () => {
+        const transaction = Transaction.getInstance(fixture('transaction-detail'));
+
+        expect(transaction.recipient.wholeName).toBe('Grace Hopper');
+        expect(transaction.state.progress).toBeGreaterThan(0);
+        expect(transaction.state.colorScheme).toBeTruthy();
+
+        const payment = transaction.payment;
+        expect(payment.paymentProvider.code).toBeTruthy();
+        expect(payment.paymentMethod.code).toBeTruthy();
+        expect(payment.state.code).toBeTruthy();
+        // Money is always rendered pre-formatted.
+        expect(payment.totalPaymentAmountCurrencyPrefixed).toMatch(/\d/);
+    });
+
+    it('maps the paginated transactions list', () => {
+        const body = fixture('transactions-list');
+
+        expect(body.data.length).toBeGreaterThan(0);
+        expect(body.pagination).toMatchObject({
+            current_page: expect.any(Number),
+            per_page: expect.any(Number),
+            total: expect.any(Number),
+            total_pages: expect.any(Number),
+        });
+        for (const row of body.data) {
+            expect(Transaction.getInstance(row).id).toBeTruthy();
+        }
+    });
+
+    // Documents the gap rather than asserting it is fine: the API sends these
+    // and the SPA reads none of them. If a feature needs one, map it first.
+    it('records the transaction fields the mappers currently ignore', () => {
+        const payload = fixture('transaction-detail');
+        const unmapped = ['timeline', 'documents', 'coupon_discount_amount', 'exchange_rate_before_coupon'];
+
+        for (const key of unmapped) {
+            expect(payload, `${key} vanished from the API`).toHaveProperty(key);
+        }
+
+        // Transaction declares a `documents` field but getInstance never fills
+        // it, so it stays empty even though the payload carries the key.
+        const transaction = Transaction.getInstance(payload);
+        expect(transaction.documents).toEqual([]);
+        expect(transaction.timeline).toBeUndefined();
+    });
+
+    it('profile-06 shows POI cleared once approved', () => {
+        const before = Customer.getInstance(fixture('profile-05-onboarded'));
+        const after = Customer.getInstance(fixture('profile-06-kyc-approved'));
+
+        expect(before.pendingDocuments.map(d => d.code)).toContain('POI');
+        expect(after.pendingDocuments.map(d => d.code)).not.toContain('POI');
     });
 });

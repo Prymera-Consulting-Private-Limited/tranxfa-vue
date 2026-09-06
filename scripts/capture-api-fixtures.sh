@@ -136,3 +136,7 @@ echo
 python3 "$ROOT/scripts/sanitise-fixtures.py" "$OUT"
 echo
 echo "Captured as $EMAIL — review 'git diff tests/fixtures' before committing."
+
+# Note: confirm-quote-success, transaction-detail, transactions-list, payment-retry
+# and profile-06-kyc-approved are NOT regenerated here — they need a POI approved in
+# the console first. See tests/fixtures/README.md.

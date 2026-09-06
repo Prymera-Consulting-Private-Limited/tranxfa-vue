@@ -1,6 +1,6 @@
 # API fixtures
 
-50 **real** responses captured from a freshly seeded local `console.remitso`,
+55 **real** responses captured from a freshly seeded local `console.remitso`,
 not hand-written mocks. They exist so tests fail when the backend changes a
 field the SPA reads — the model mappers ignore unknown keys, so nothing else
 catches that drift.
@@ -44,6 +44,29 @@ they are the cheapest way to test navigation without standing up a backend.
 `quote-default` → `quote-send-100` → `quote-saved` →
 `transaction-quote-no-recipient` → `recipient-added` → `quote-set-recipient` →
 `transaction-quote-with-recipient` → `confirm-quote` (a 412).
+
+### Past the 412
+
+`confirm-quote` is a 412 because a fresh customer always has a pending POI.
+To get a real transaction the POI must be **approved in the console**
+(AML & Compliance → the customer → Upload Proof of Identity → Approve), with
+the name and date of birth matching the profile so the POI check passes.
+
+These five were captured that way and **the re-capture script cannot
+regenerate them** — it makes a new customer, who has no approved document:
+
+| Fixture | What it is |
+| ------- | ---------- |
+| `profile-06-kyc-approved` | Same customer with POI cleared; `pending_documents` is now `POA`, `SOF` |
+| `confirm-quote-success` | The 200 a confirm returns once KYC passes — a `Transaction` |
+| `transaction-detail` | `GET /transaction/{id}` with its payment envelope (MONOOVA / BANK-TRANSFER, state `CREATED`) |
+| `transactions-list` | The paginated list, with the `pagination` block |
+| `payment-retry` | `POST /transaction/payment/{id}` |
+
+Provider-specific payment screens (PENDING with a `payment_url`, REDIRECTED,
+AUTHORIZED) are **not** capturable locally — the gateways need real
+credentials. Keep using `makeTransaction({stateCode, providerCode})` from
+`tests/helpers.js` for those.
 
 ## Error envelopes
 
@@ -116,8 +139,16 @@ is always large. Read it for **shape** changes — a renamed or vanished field �
 and ignore the identifier noise. Assertions here should key off structure and
 enum values, never a specific id.
 
-Two behaviours to keep in mind when writing assertions:
+Behaviours to keep in mind when writing assertions:
 
 - The generated address is `remitso.fixture+<epoch>@gmail.com`, and the profile
   endpoint masks it. Match a pattern, not a literal.
 - A 422 does **not** always carry `errors` (see the table above).
+- `transaction_number` is a **string** (`"TP7402166"`), even though
+  `models/transaction.js` documents it as `{number|null}` and `Volume.vue`
+  coerces it with `+ ''`.
+- The transaction payload carries `timeline`, `documents`,
+  `coupon_discount_amount` and `exchange_rate_before_coupon`, and the mappers
+  read **none** of them. `Transaction` even declares a `documents` field that
+  `getInstance` never fills. A contract test pins this so the gap stays
+  visible rather than being rediscovered.
