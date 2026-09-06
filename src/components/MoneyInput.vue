@@ -99,7 +99,7 @@ defineExpose({
           <MenuButton as="div" :class="{'cursor-pointer': options.length > 1 && ! disableSelection}" class="inline-flex w-full items-center justify-center rounded-r-md bg-brand-700 px-4 py-4 text-sm font-medium text-white">
             <FlagIcon :class="['ring-2 ring-white']" :code="country.iso2Alpha.toLowerCase()" circle />
             <strong class="text-sm tracking-wider ml-2">{{ currency.code }}</strong>
-            <ChevronDownIcon v-if="options.length > 1 && !disableSelection" class="-mr-1 ml-2 h-5 w-5 text-violet-200 hover:text-violet-100" aria-hidden="true"/>
+            <ChevronDownIcon v-if="options.length > 1 && !disableSelection" class="-mr-1 ml-2 h-5 w-5 text-brand-200 hover:text-brand-100" aria-hidden="true"/>
           </MenuButton>
         </div>
         <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
