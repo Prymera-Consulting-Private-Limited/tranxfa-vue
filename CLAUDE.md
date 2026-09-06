@@ -14,8 +14,30 @@ long-lived fork for one deployment. Read `docs/tenant-branches.md` before
 merging, cherry-picking, or "just fixing it on staging".
 
 Architecture lives in `docs/architecture.md`. The API surface the SPA actually
-uses is enumerated in `docs/api-surface.md`. Local end-to-end setup is in
-`docs/local-development.md`.
+uses is enumerated in `docs/api-surface.md` (the API *itself* is documented in
+the console's API Documentation page, which is authoritative). Local end-to-end
+setup is in `docs/local-development.md`. Deployment is `DEPLOY.md`.
+
+## Working conventions
+
+Carried over from `console.remitso`, where they were learned the hard way:
+
+- **PRs target `main`.** Never open an ordinary PR against `staging` or a brand
+  branch. `staging` is the Tranxfa brand branch, not an integration branch.
+- **No `Co-Authored-By` or generated-with trailers**, in commits or PR bodies.
+- Short imperative commit subject, reasoning in the body: why the change
+  exists, not what the diff shows. Plain hyphens, no em-dashes.
+- **Stage the change and stop** for review before committing. Group into
+  logical commits, one concern each.
+- Change only what the task needs. Spotting an unrelated problem is not
+  permission to fix it - mention it, or raise it separately. If the task
+  genuinely cannot be done without a surrounding change, say so in one
+  sentence, then do it.
+- **Never silently drop something worth doing.** If you decide against
+  something the work needs, say so at the moment you decide. A silent omission
+  looks like a finished feature.
+- A push to a brand branch **is a deploy** (Amplify builds on push). Verify
+  before pushing, not after.
 
 ## Layering (do not short-circuit it)
 

@@ -3,6 +3,24 @@
 Every endpoint this SPA calls, and the composable that owns it. All paths are
 relative to `VITE_APP_BASE_URL` and sit under the backend's API host.
 
+> **The API itself is documented elsewhere, and that copy is authoritative.**
+> The console has an **API Documentation** page (left menu) covering every
+> `/client/v1` endpoint: parameters, response fields with their types, whether
+> each value is programmable or free-text, examples, and a dedicated error-code
+> page. Its endpoint list is generated from the live route table, so it cannot
+> drift out of existence the way a hand-written list can.
+>
+> Read that page for request and response *shapes*. This document exists for
+> what it does not cover: **which composable owns each call**, and which
+> responses this SPA branches on. Do not grow it into a second API reference -
+> maintaining two is how they disagree.
+>
+> The backend keeps its side in sync through its `api-docs-sync` skill, which
+> cites this repo's `src/composables/*.js` and `src/models/*.js` as the
+> authority for what clients actually send. So a change here can oblige a
+> change there: if you add, drop or reshape a call, say so in the PR's
+> **Backend contract** section.
+
 Generated from source; to refresh:
 
 ```sh
