@@ -102,7 +102,7 @@ onMounted(async () => {
         <!-- Menu button -->
         <div class="absolute right-0 shrink-0 lg:hidden  print:hidden">
           <!-- Mobile menu button -->
-          <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-transparent p-2 text-indigo-200 hover:bg-white/10 hover:text-white outline-none focus:ring-0 focus:ring-white focus:outline-hidden">
+          <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-transparent p-2 text-brand-200 hover:bg-white/10 hover:text-white outline-none focus:ring-0 focus:ring-white focus:outline-hidden">
             <span class="absolute -inset-0.5" />
             <span class="sr-only">Open main menu</span>
             <Bars3Icon v-if="!open" class="block size-6" aria-hidden="true" />
@@ -114,7 +114,7 @@ onMounted(async () => {
         <div class="grid grid-cols-3 items-center gap-8">
           <div class="col-span-2">
             <nav class="flex space-x-4">
-              <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-indigo-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
+              <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-brand-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
             </nav>
           </div>
         </div>
