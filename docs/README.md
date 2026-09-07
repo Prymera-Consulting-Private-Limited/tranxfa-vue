@@ -30,10 +30,13 @@ the documents above.
 
 | Skill | Covers |
 | ----- | ------ |
+| `vue-conventions` | House style: where a file goes, models, composables, emits, styling |
+| `write-tests` | vitest patterns, fixtures, Echo/axios mocking, what is worth pinning |
 | `port-to-tenant-branches` | Moving a fix from `main` onto brand branches |
 | `rebrand-tenant` | Creating a new brand branch, or re-skinning one |
 | `add-payment-provider` | New PSP screen + wiring into `PaymentView` |
 | `add-kyc-provider` | New IDV vendor, and changing the XState flow machines |
+| `hotel-search` | The travel hotels search, criteria, rates and supplier rules |
 
 ## Tooling
 

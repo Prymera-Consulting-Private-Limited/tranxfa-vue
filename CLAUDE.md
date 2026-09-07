@@ -172,9 +172,13 @@ Every `Echo.channel(...)` in `onMounted` **must** have a matching
 - `client-payment.{paymentId}` — `PaymentTransactionStateUpdated`
 - `client-transaction.{transactionId}` — transaction state updates
 
-Websockets are treated as an optimisation, never the only path: payment
-components also poll `getTransaction` on an interval. Keep both, and clear the
-interval on unmount and on reaching a terminal state.
+Websockets should be an optimisation, never the only path. All ten payment
+components pair `channel` with `leaveChannel`, but only five also poll
+`getTransaction` — `Fincode`, `Pay360`, `PayCross`, `ManualPayment`, `Wallet`.
+`Apaylo`, `CinetPay`, `Monoova`, `PagaPayment` and `Volume` trust the socket
+alone, so a customer whose socket never connects waits on a screen that never
+advances. Write new providers with both, and clear the interval on unmount and
+on reaching a terminal state.
 
 ## Conventions
 
@@ -182,8 +186,11 @@ interval on unmount and on reaching a terminal state.
   (`composables/wallet_utils.js`, `models/wallet_*.js`) is the reference for
   the standard the codebase is moving toward — match it in new code.
 - Props are declared with full `type:`/`required:` and passed `v-bind:foo="…"`.
-- Child→parent uses `defineEmits` with namespaced names
-  (`recipient:add:failed`, `customer:attribute_category:updated`).
+- Child→parent uses `defineEmits`. Two naming populations, both current: colon-
+  namespaced (`recipient:add:failed`, `customer:attribute:updated`) in the
+  attribute-input families under `components/Recipient/**` and
+  `components/CustomerAttribute/**`; plain camelCase (`retryPayment`,
+  `emailVerified`) everywhere else. Match the file you are in.
 - Brand colour is **always** `brand-*` (`bg-brand-700`), never a literal
   palette name. `--color-brand-*` is remapped per tenant in `assets/main.css`.
   A hardcoded `purple-700` will not re-skin and is a bug.
@@ -194,6 +201,8 @@ interval on unmount and on reaching a terminal state.
   stubs, `tests/fixtures.js` loads captured API responses — use them rather than
   hand-rolling. `tests/axios-contract.spec.js` is the one spec that does **not**
   mock axios; it pins the rejection shape the rest of the app branches on.
+  Use the `write-tests` skill — it covers the Pinia-before-import rule, the
+  axios mock shape, and which silent failures are worth pinning.
 
 ## Error handling contract
 
@@ -237,3 +246,29 @@ forever on an unknown error — do not reintroduce that shape.
 - `index.html` hardcodes third-party tags (Google Analytics ID, MS Clarity
   tag, Tawk.to widget, `js.volumepay.io`). These are **per-tenant** and are a
   standard source of merge conflicts.
+- **KYC `sdkError` and `sdkStepCompleted` go nowhere.** All six provider
+  components declare them; `grep -rn "v-on:sdkError" src` returns nothing. A
+  vendor that fails after mount leaves the customer on a spinner in a modal
+  whose only exit is the backdrop. This is the concrete case behind "the button
+  does nothing" in the bug template.
+- `Sumsub.vue` emits `sdkApplicantStatusChanged` **only on a GREEN review**, so
+  a RED review emits nothing and the modal just sits there.
+- `Persona.vue` and `Sumsub.vue` have **no `onUnmounted`**, so their SDK
+  instances outlive the modal. `Didit`, `Shufti` and `UpPass` clean up properly
+  — copy those.
+- `src/enums/review_answer.js` declares `class ReviewAnswer` with **no `export`
+  statement** and is imported by nothing. Dead file; it was meant to serve the
+  GREEN/RED handling above.
+- `src/enums/transaction_state_icon.js` maps `RISK-ASSESSMENT` **twice** (lines
+  31 and 33). The later `ShieldCheckIcon` wins; the first is dead.
+- `stores/password_policy.js` `setLoaded(flag)` does `flag || true`, so it can
+  never set `false`. The spec name claims it "accepts an explicit flag" but only
+  ever calls it with none.
+- `machines/transaction_navigation_machine.js` uses the **XState v4** entry
+  signature `(context, event)` on its two final states. Under v5 actions take a
+  single object, so `event` is `undefined` and both `console.error` calls always
+  log `undefined`.
+- Background images are **not** centralised the way logos now are: five
+  hardcoded paths across four auth views, mixed `.webp`/`.png`. A brand that
+  ships `login.png` while the view asks for `login.webp` silently renders the
+  previous brand's background.

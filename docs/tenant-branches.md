@@ -43,7 +43,7 @@ with `main` — i.e. what each brand deliberately customised:
 | --------------------------------------- | ------------------ |
 | `src/assets/main.css`                   | 14 / 14            |
 | `public/images/logo.png`                | 14 / 14            |
-| `public/images/backgrounds/{login,signup}.png` | 13 / 14     |
+| `public/images/backgrounds/{login,signup}.*` | 13 / 14     |
 | `src/components/Header.vue`             | 13 / 14            |
 | `src/views/ForgotPasswordView.vue`      | 13 / 14            |
 | `src/views/ResetPasswordView.vue`       | 13 / 14            |
@@ -59,10 +59,17 @@ and the third-party tags in `index.html` (Google Analytics ID, MS Clarity tag,
 Tawk.to widget). These *should* differ per brand.
 
 **Accidental surface** — the auth and onboarding views appear only because they
-hardcode `src="/images/logo.png"`, wrap copy in brand-specific wording, or were
-re-laid-out per brand. Every one of these is a permanent merge conflict on
-every port. Reducing this surface (a `<BrandLogo>` component, copy behind env
-vars) is the highest-value structural cleanup available.
+hardcode asset paths, wrap copy in brand-specific wording, or were re-laid-out
+per brand. Every one of these is a permanent merge conflict on every port.
+
+The logo half of this is **done**: `src/components/BrandLogo.vue` now serves all
+16 call sites and no logo path is hardcoded anywhere on `main`. What remains is
+backgrounds — five `<img src>` paths across four auth views, and note the
+extensions differ (`login.webp`, `signup.webp`, `resetpassword.png`) while most
+brand branches carry `.png`. A brand that drops in `login.png` without editing
+`SignInView.vue` silently keeps the previous brand's background: nothing errors,
+the build is green. A `<BrandBackground>` component is the next cleanup, and
+would remove five per-brand conflicts.
 
 Anything hardcoding a palette colour (`bg-purple-700` rather than
 `bg-brand-700`) also breaks re-skinning and will show the wrong brand.
