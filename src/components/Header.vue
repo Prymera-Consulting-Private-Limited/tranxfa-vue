@@ -13,6 +13,7 @@ import {
 } from "@headlessui/vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
+import {travelEnabled} from '@/feature_flags.js';
 import {useWalletStore} from "@/stores/wallet.js";
 import {computed, onMounted, ref} from "vue";
 import router from "@/router/index.js";
@@ -25,13 +26,7 @@ const walletStore = useWalletStore();
  */
 const customer = customerStore.customer;
 
-/**
- * Travel is licensed per deployment, and there is nothing on the customer saying
- * whether this one has it - every travel route simply answers 404 without the
- * licence. A build flag is the honest stand-in until app and domain scoping lands
- * and supplies a real field, at which point this comes out.
- */
-const hasTravel = import.meta.env.VITE_TRAVEL_ENABLED !== 'false';
+const hasTravel = travelEnabled();
 
 const navigation = computed(() => [
   { name: 'Home', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
