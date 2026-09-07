@@ -102,9 +102,10 @@ The two flows:
   and verifies the email. The number is already proven by the signup OTP, so
   there is deliberately no mobile verification step here.
 
-`src/onboarding_config.js` owns both flags. Read them through it rather than
-`import.meta.env`: Vite hands every variable over as a **string**, so a bare
-`import.meta.env.X` is truthy for `"false"`.
+`src/onboarding_config.js` owns both flags, parsing them with the shared `flag()`
+from `src/feature_flags.js`. Read any boolean deployment flag through one of
+those rather than `import.meta.env`: Vite hands every variable over as a
+**string**, so a bare `import.meta.env.X` is truthy for `"false"`, `0` and `off`.
 
 Two rules when adding an optional step:
 
@@ -114,6 +115,28 @@ Two rules when adding an optional step:
 - **Optional in onboarding is not optional everywhere.** Turning off address
   collection only skips the onboarding step - the transfer wizard still asks
   when the backend answers `412 incomplete_customer_address`.
+
+## Travel is a licensed second product
+
+Hotels sit alongside transfers: nine routes under `/travel/*`, `src/views/Travel/**`,
+`src/models/travel/**`, `src/composables/travel/**`. It shares the customer, the
+auth session and the payment layer, and nothing else.
+
+**It is licensed per deployment and nothing on the customer says so.** Without
+the licence every travel route answers 404. `travelEnabled()` in
+`src/feature_flags.js` reads `VITE_TRAVEL_ENABLED` and gates the Hotels and
+Bookings entries in `Header.vue`. It defaults **on**, so a brand that does not
+sell travel must set it to `false` or its customers see tabs leading to 404s.
+The flag is a stand-in until app and domain scoping supplies a real field.
+
+Travel takes payment through Volume, configured by
+`VITE_VOLUME_PAYMENT_MERCHANT_ID` and `VITE_VOLUME_PAYMENT_ENVIRONMENT`
+(`SANDBOX` when unset, so a deployment that forgets it takes no money rather
+than the wrong money). The transfer components still hardcode `SANDBOX`; only
+travel reads the variable.
+
+Booking confirmation is **polled**, not broadcast — the event the flow
+originally waited on never fires. See the `hotel-search` skill.
 
 ## Provider registries
 
@@ -164,9 +187,13 @@ interval on unmount and on reaching a terminal state.
 - Brand colour is **always** `brand-*` (`bg-brand-700`), never a literal
   palette name. `--color-brand-*` is remapped per tenant in `assets/main.css`.
   A hardcoded `purple-700` will not re-skin and is a bug.
-- Tests are `tests/*.spec.js` (vitest + jsdom). `npm test`. `tests/helpers.js`
-  has `installFakeEcho()`, `makeTransaction()` and the modal stubs — use them
-  rather than hand-rolling.
+- Tests are `tests/*.spec.js` (vitest + jsdom), **flat** — no directory tree,
+  kebab-case, named after what they cover, with a feature prefix where the bare
+  name would be ambiguous (`travel-order-models`, `customer-model`). `npm test`.
+  `tests/helpers.js` has `installFakeEcho()`, `makeTransaction()` and the modal
+  stubs, `tests/fixtures.js` loads captured API responses — use them rather than
+  hand-rolling. `tests/axios-contract.spec.js` is the one spec that does **not**
+  mock axios; it pins the rejection shape the rest of the app branches on.
 
 ## Error handling contract
 

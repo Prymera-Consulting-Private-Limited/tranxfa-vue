@@ -13,6 +13,7 @@ import {
 } from "@headlessui/vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
+import {travelEnabled} from '@/feature_flags.js';
 import {useWalletStore} from "@/stores/wallet.js";
 import {computed, onMounted, ref} from "vue";
 import router from "@/router/index.js";
@@ -25,12 +26,18 @@ const walletStore = useWalletStore();
  */
 const customer = customerStore.customer;
 
+const hasTravel = travelEnabled();
+
 const navigation = computed(() => [
   { name: 'Home', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
   ...(walletStore.isAvailable ? [
     { name: 'Wallet', href: 'wallet', current: router.currentRoute.value.name === 'wallet' },
   ] : []),
-  { name: 'Transactions', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
+  { name: 'Transfers', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
+  ...(hasTravel ? [
+    { name: 'Hotels', href: 'hotels', current: router.currentRoute.value.name === 'hotels' },
+    { name: 'Bookings', href: 'travelBookings', current: router.currentRoute.value.name === 'travelBookings' },
+  ] : []),
   { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
   { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
   { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },

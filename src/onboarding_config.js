@@ -8,21 +8,7 @@
  * Defaults preserve today's behaviour: address is collected, mobile number is
  * not verified. A brand opts in or out rather than inheriting a change.
  */
-
-/**
- * Vite gives every env var as a string, so "false" is truthy without this.
- *
- * @param {*} value
- * @param {boolean} fallback
- * @returns {boolean}
- */
-function flag(value, fallback) {
-    if (value === undefined || value === null || value === '') {
-        return fallback;
-    }
-
-    return ['1', 'true', 'yes', 'on'].includes(String(value).trim().toLowerCase());
-}
+import {flag} from '@/feature_flags.js';
 
 /**
  * Collect the customer's residential address during onboarding.

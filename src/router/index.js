@@ -72,6 +72,105 @@ const router = createRouter({
         description: '',
       },
     }, {
+      path: '/travel/hotels',
+      name: 'hotels',
+      component: () => import('@/views/Travel/Hotels/IndexView.vue'),
+      meta: {
+        title: 'Hotels',
+        description: '',
+      },
+    }, {
+      path: '/travel/hotel/:id/:slug',
+      name: 'viewHotel',
+      props: route => ({ id: route.params.id, slug: route.params.slug, search: route.query.search }),
+      component: () => import('@/views/Travel/Hotels/HotelView.vue'),
+      meta: {
+        title: 'View Hotel',
+        description: '',
+      },
+    }, {
+      path: '/travel/hotel/quote/:id',
+      name: 'hotelQuote',
+      props: route => ({ quoteId: route.params.id, search: route.query.search }),
+      component: () => import('@/views/Travel/Hotels/QuoteView.vue'),
+      meta: {
+        title: 'Booking Summary',
+        description: '',
+      },
+    }, {
+      // Reached once "book" succeeds — its own id, not the quote's, so a
+      // refresh here re-fetches the attempt instead of restarting the booking.
+      path: '/travel/hotel/book/:id',
+      name: 'hotelBooking',
+      props: route => ({ attemptId: route.params.id, search: route.query.search }),
+      component: () => import('@/views/Travel/Hotels/QuoteView.vue'),
+      meta: {
+        title: 'Complete Booking',
+        description: '',
+      },
+    }, {
+      // Reached once guest details are saved — a read-only recap of the
+      // attempt, since there's no further submit step built yet.
+      path: '/travel/hotel/booking/:id',
+      name: 'hotelBookingDetails',
+      props: route => ({ attemptId: route.params.id }),
+      component: () => import('@/views/Travel/Hotels/BookingDetailsView.vue'),
+      meta: {
+        title: 'Booking Details',
+        description: '',
+      },
+    }, {
+      // The price held against a chosen rate, and what a booking is created from.
+      path: '/travel/quote/:id',
+      name: 'travelQuote',
+      props: route => ({ quoteId: route.params.id }),
+      component: () => import('@/views/Travel/Hotels/HotelQuoteView.vue'),
+      meta: {
+        title: 'Your Price',
+        description: '',
+      },
+    }, {
+      // Bookings a customer already holds, as opposed to an attempt in flight.
+      path: '/travel/bookings',
+      name: 'travelBookings',
+      component: () => import('@/views/Travel/Bookings/IndexView.vue'),
+      meta: {
+        title: 'Your Bookings',
+        description: '',
+      },
+    }, {
+      // Where a payment is watched until it settles. Reachable on its own so a
+      // provider can be pointed back at it, and so a customer who closed the tab
+      // has somewhere to return to.
+      path: '/travel/booking/:id/payment',
+      name: 'travelPaymentStatus',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/PaymentStatusView.vue'),
+      meta: {
+        title: 'Your Payment',
+        description: '',
+      },
+    }, {
+      // Reached once a quote becomes a real booking. The room is already held,
+      // so leaving this page loses the payment, never the booking.
+      path: '/travel/booking/:id/pay',
+      name: 'travelBookingPayment',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/PaymentView.vue'),
+      meta: {
+        title: 'Pay for Your Booking',
+        description: '',
+      },
+    }, {
+      path: '/travel/booking/:id',
+      name: 'travelBooking',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/ItemView.vue'),
+      meta: {
+        title: 'Booking',
+        description: '',
+      },
+    }, {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
       props: route => ({ id: route.params.quoteId }),
