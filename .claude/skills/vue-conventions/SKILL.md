@@ -5,8 +5,15 @@ description: House conventions for this Vue 3 + Tailwind client app — how to w
 
 # Conventions for this codebase
 
-Vue 3 `<script setup>`, Vite, Tailwind v4, Pinia, axios, moment, lodash. No TypeScript,
-no test suite. Indentation: **4 spaces in `.js`, 2 spaces in `.vue`**.
+Vue 3 `<script setup>`, Vite, Tailwind v4, Pinia, axios, moment, lodash. No TypeScript.
+Indentation: **4 spaces in `.js`, 2 spaces in `.vue`**.
+
+There is a test suite: vitest + jsdom, run with `npm test`. Specs live **flat** in
+`tests/` as `kebab-name.spec.js` - no directory tree, even for a deep feature. Name the
+file after what it covers and prefix a feature area where the bare name would be
+ambiguous (`travel-order-models.spec.js`, `customer-model.spec.js`). `tests/helpers.js`
+and `tests/fixtures.js` hold the shared stubs and the captured API responses; reach for
+those before hand-rolling a fixture.
 
 ## Where things go
 

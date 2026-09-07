@@ -63,6 +63,9 @@ per brand:
 | `VITE_AUTH_CHANNEL` | `EMAIL` \| `MOBILE_NUMBER` \| `BOTH` - picks the onboarding flow. `BOTH` resolves per customer from whether they have an email |
 | `VITE_ONBOARDING_COLLECT_ADDRESS` | Default true. Turning it off skips the onboarding address step; the transfer wizard still asks when the backend answers 412 |
 | `VITE_ONBOARDING_VERIFY_MOBILE_NUMBER` | Default false. Email-first only - a mobile-first signup has already proven the number |
+| `VITE_TRAVEL_ENABLED` | **Default true.** Set `false` on any deployment without the travel licence, or customers get Hotels and Bookings tabs leading to 404s |
+| `VITE_VOLUME_PAYMENT_MERCHANT_ID` | Travel payments only. Unset means travel cannot take payment |
+| `VITE_VOLUME_PAYMENT_ENVIRONMENT` | `SANDBOX` \| `PRODUCTION`, `SANDBOX` when unset - a deployment that forgets it takes no money rather than the wrong money |
 | `VITE_PUSHER_APP_KEY` + host/cluster/scheme | Realtime. `VITE_APP_ENV` must **not** be `local`. |
 | `VITE_THIRD_PARTY_SIGNUP_DECLARATION` | Only if that brand's backend requires it - see below |
 | `VITE_THIRD_PARTY_TRANSACTION_DECLARATION` | Same, on transfer confirm |

@@ -5,8 +5,15 @@ description: How the travel hotels search is wired — URL-driven criteria, regi
 
 # Hotels search
 
-Feature branch: `feature/travel_hotels`. Backend is a client API in front of an Emerging Travel
-Group style supplier, so most odd rules below come from the supplier, not from us.
+Merged into `main`. Backend is a client API in front of an Emerging Travel Group style
+supplier, so most odd rules below come from the supplier, not from us.
+
+Travel is licensed per deployment. `travelEnabled()` in `src/feature_flags.js` reads
+`VITE_TRAVEL_ENABLED` (default on) and gates the Hotels and Bookings entries in
+`Header.vue`. Read it through that helper, never `import.meta.env` directly - Vite hands
+env vars over as strings, so a bare read treats `"false"` and `0` as on. Without the
+licence every travel route answers 404, so a deployment that does not sell travel must
+set the flag off or its customers get tabs leading nowhere.
 
 ## Files
 
