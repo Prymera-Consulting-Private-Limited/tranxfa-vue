@@ -1,5 +1,5 @@
 <script setup>
-import {IdentificationIcon} from "@heroicons/vue/24/outline";
+import {ExclamationTriangleIcon, IdentificationIcon} from "@heroicons/vue/24/outline";
 import DocumentType from "@/models/document_type.js";
 import {ref} from "vue";
 import System from "@/components/AccountVerification/Provider/System.vue";
@@ -12,6 +12,7 @@ import UpPass from "@/components/AccountVerification/Provider/UpPass.vue";
 import Persona from "@/components/AccountVerification/Provider/Persona.vue";
 import Shufti from "@/components/AccountVerification/Provider/Shufti.vue";
 import Didit from "@/components/AccountVerification/Provider/Didit.vue";
+import {getCustomerMessage} from "@/composables/api_utils.js";
 
 const customerUtils = useCustomerUtils();
 
@@ -33,9 +34,34 @@ const props = defineProps({
 
 const openSdk = ref(false)
 const isSdkInitialized = ref(false)
+const sdkErrorMessage = ref('')
 
 async function openAccountVerificationModal () {
+  sdkErrorMessage.value = '';
   openSdk.value = true;
+}
+
+/**
+ * Every provider emits sdkError, and until now nothing listened. A vendor that
+ * failed - or, far more often, a token endpoint that answered 500 - left the
+ * spinner turning with no message and no way out but the backdrop, which is
+ * the "the button does nothing" report.
+ *
+ * The message comes from getCustomerMessage so a refusal the API wrote for a
+ * customer ("this document type is not available") is shown as-is; a vendor
+ * SDK error object carries no such message and falls back to our own wording.
+ */
+function sdkFailed(error) {
+  sdkErrorMessage.value = getCustomerMessage(error)
+      || 'We could not start your verification. Please try again.';
+  isSdkInitialized.value = false;
+}
+
+// Clearing the message re-enters the v-if chain, so the provider is mounted
+// afresh and asks for a new token. That is the whole retry.
+function retrySdk() {
+  isSdkInitialized.value = false;
+  sdkErrorMessage.value = '';
 }
 
 const emit = defineEmits([
@@ -50,6 +76,7 @@ async function sdkFinalStateReached () {
 async function closeSdk() {
   openSdk.value = false;
   isSdkInitialized.value = false;
+  sdkErrorMessage.value = '';
 }
 
 </script>
@@ -79,54 +106,71 @@ async function closeSdk() {
           <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
             <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all min-w-sm sm:my-8 sm:w-full lg:min-w-md sm:max-w-sm lg:max-w-md lg:w-md">
               <button class="sr-only"></button>
-              <div v-show="! isSdkInitialized" role="status" class="p-10">
-                <Spinner class="size-16 mx-auto" />
-                <span class="sr-only">Loading...</span>
+              <div v-if="sdkErrorMessage" role="alert" class="p-10 text-center">
+                <ExclamationTriangleIcon class="mx-auto size-12 text-red-500" />
+                <h3 class="mt-4 text-sm font-medium text-gray-900">Verification could not start</h3>
+                <p class="mt-2 text-sm text-gray-500">{{ sdkErrorMessage }}</p>
+                <div class="mt-6 flex justify-center gap-3">
+                  <button v-on:click="retrySdk" type="button" class="rounded-[10px] bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try again</button>
+                  <button v-on:click="closeSdk" type="button" class="rounded-[10px] border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
+                </div>
               </div>
-              <Sumsub
-                  v-if="SUMSUB_APIS.includes(documentType.api)"
+              <template v-else>
+                <div v-show="! isSdkInitialized" role="status" class="p-10">
+                  <Spinner class="size-16 mx-auto" />
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <Sumsub
+                    v-if="SUMSUB_APIS.includes(documentType.api)"
+                    v-on:sdkInitialized="isSdkInitialized = true"
+                    v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                    v-on:sdkError="sdkFailed"
+                    v-bind:documentType="documentType"
+                    v-bind:documentCategory="documentCategory"
+                />
+                <UpPass
+                  v-if="documentType.api === 'UPPASS'"
                   v-on:sdkInitialized="isSdkInitialized = true"
                   v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                  v-on:sdkError="sdkFailed"
                   v-bind:documentType="documentType"
                   v-bind:documentCategory="documentCategory"
-              />
-              <UpPass
-                v-if="documentType.api === 'UPPASS'"
-                v-on:sdkInitialized="isSdkInitialized = true"
-                v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
-                v-bind:documentType="documentType"
-                v-bind:documentCategory="documentCategory"
-              />
-              <Persona
-                  v-if="documentType.api === 'CYBRID'"
-                  v-on:sdkInitialized="isSdkInitialized = true"
-                  v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
-                  v-on:sdkCancelled="closeSdk"
-                  v-bind:documentType="documentType"
-                  v-bind:documentCategory="documentCategory"
-              />
-              <Shufti
-                  v-if="documentType.api === 'SHUFTI'"
-                  v-on:sdkInitialized="isSdkInitialized = true"
-                  v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
-                  v-bind:documentType="documentType"
-                  v-bind:documentCategory="documentCategory"
-              />
-              <Didit
-                  v-if="documentType.api === 'DIDIT'"
-                  v-on:sdkInitialized="isSdkInitialized = true"
-                  v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
-                  v-on:sdkCancelled="closeSdk"
-                  v-bind:documentType="documentType"
-                  v-bind:documentCategory="documentCategory"
-              />
-              <System
-                  v-if="documentType.api === 'SYSTEM'"
-                  v-on:sdkInitialized="isSdkInitialized = true"
-                  v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
-                  v-bind:documentType="documentType"
-                  v-bind:documentCategory="documentCategory"
-              />
+                />
+                <Persona
+                    v-if="documentType.api === 'CYBRID'"
+                    v-on:sdkInitialized="isSdkInitialized = true"
+                    v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                    v-on:sdkError="sdkFailed"
+                    v-on:sdkCancelled="closeSdk"
+                    v-bind:documentType="documentType"
+                    v-bind:documentCategory="documentCategory"
+                />
+                <Shufti
+                    v-if="documentType.api === 'SHUFTI'"
+                    v-on:sdkInitialized="isSdkInitialized = true"
+                    v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                    v-on:sdkError="sdkFailed"
+                    v-bind:documentType="documentType"
+                    v-bind:documentCategory="documentCategory"
+                />
+                <Didit
+                    v-if="documentType.api === 'DIDIT'"
+                    v-on:sdkInitialized="isSdkInitialized = true"
+                    v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                    v-on:sdkError="sdkFailed"
+                    v-on:sdkCancelled="closeSdk"
+                    v-bind:documentType="documentType"
+                    v-bind:documentCategory="documentCategory"
+                />
+                <System
+                    v-if="documentType.api === 'SYSTEM'"
+                    v-on:sdkInitialized="isSdkInitialized = true"
+                    v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
+                    v-on:sdkError="sdkFailed"
+                    v-bind:documentType="documentType"
+                    v-bind:documentCategory="documentCategory"
+                />
+              </template>
             </DialogPanel>
           </TransitionChild>
         </div>
