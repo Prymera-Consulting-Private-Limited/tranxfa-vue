@@ -1,4 +1,5 @@
 <script setup>
+import BrandLogo from "@/components/BrandLogo.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {computed, onMounted, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -46,7 +47,7 @@ const editPersonalInformation = () => {
     <div v-show="! showLoading" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
       <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+        <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">Address Details</h2>
