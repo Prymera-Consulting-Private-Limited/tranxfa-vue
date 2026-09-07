@@ -161,25 +161,43 @@ describe('transfer wizard navigation machine', () => {
         });
     });
 
-    // Documents current behaviour rather than endorsing it: the opening guard
-    // calls customer.data.addressInformationRequired() with no null check, so
-    // an unloaded store throws instead of holding the customer on a step.
-    it('errors the actor if the customer is not loaded when the wizard starts', () => {
-        const store = useCustomerStore(pinia);
-        store.customer.data = null;
+    // Regression guard. The address guard used to read
+    // customer.data.addressInformationRequired() with no null check, so a
+    // machine started before the profile loaded threw inside the guard and
+    // errored the actor instead of navigating.
+    describe('when the profile has not loaded yet', () => {
+        beforeEach(() => {
+            const store = useCustomerStore(pinia);
+            store.isLoaded = false;
+            store.customer.data = null;
+        });
 
-        // XState reports a guard fault to the actor rather than throwing at the
-        // send() call site, so subscribe instead of expecting a throw.
-        const errors = [];
-        const actor = createActor(transactionNavigationMachine);
-        actor.subscribe({error: (e) => errors.push(e)});
-        actor.start();
-        actor.send({type: 'SET_CONTEXT', quote: quoteWithRecipient()});
-        actor.send({type: 'PROCEED'});
+        it('navigates instead of erroring the actor', () => {
+            const errors = [];
+            const actor = createActor(transactionNavigationMachine);
+            actor.subscribe({error: (e) => errors.push(e)});
+            actor.start();
+            actor.send({type: 'SET_CONTEXT', quote: quoteWithRecipient()});
+            actor.send({type: 'PROCEED'});
 
-        expect(errors).toHaveLength(1);
-        expect(String(errors[0])).toMatch(/addressInformationRequired/);
-        // IndexView avoids this by awaiting customerUtils.refresh() before it
-        // sends the first PROCEED. Anything else driving this machine must too.
+            expect(errors).toEqual([]);
+            expect(actor.getSnapshot().status).not.toBe('error');
+        });
+
+        // It falls through rather than claiming an address is owed it cannot
+        // check. If one really is missing, POST /quote/confirm answers 412
+        // incomplete_customer_address and ADDRESS_REQUIRED brings the customer
+        // back - the server is the authority, the machine is the fast path.
+        it('falls through to confirm rather than guessing the address is needed', () => {
+            const actor = startWith(quoteWithRecipient());
+
+            expect(actor.getSnapshot().value).toBe('confirm');
+        });
+
+        it('still reaches the document step when the quote reports pending ones', () => {
+            const quote = TransactionQuote.getInstance(fixture('transaction-quote-with-recipient'));
+
+            expect(startWith(quote).getSnapshot().value).toBe('accountVerification');
+        });
     });
 });

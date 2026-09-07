@@ -59,15 +59,25 @@ function doesNotHaveEmail() {
         ! (!!customer?.account?.email);
 }
 
+// Both terminal guards assert the whole prefix, like every other guard here.
+// Without that, a customer with a verified email fell past every earlier target
+// and reached onboardingComplete with their identity details still incomplete.
 function emailVerified() {
     const customer = getCustomer();
 
-    return !!customer?.account?.isEmailVerified;
+    return addressInformationCompleted() &&
+        !!customer?.account?.isEmailVerified;
 }
 
+// Written out rather than reusing !emailVerified(): now that emailVerified()
+// carries the prefix, negating it would read as true whenever the address is
+// outstanding and send the customer to verification instead of the address.
 function emailVerificationRequired() {
-    return hasEmail() &&
-        !emailVerified();
+    const customer = getCustomer();
+
+    return addressInformationCompleted() &&
+        hasEmail() &&
+        !customer?.account?.isEmailVerified;
 }
 
 export const mobileAuthOnboardingMachine = createMachine({

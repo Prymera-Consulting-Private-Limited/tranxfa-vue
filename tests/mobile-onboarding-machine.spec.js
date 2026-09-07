@@ -41,27 +41,36 @@ describe('mobile-first onboarding machine', () => {
         expect(withCustomer()).toBe('onboardingComplete');
     });
 
-    // CHARACTERIZATION - this asserts a defect, not intended behaviour.
-    //
-    // Every other guard in this family is cumulative: it re-asserts the steps
-    // before it. `emailVerified()` is not - it reads only
-    // account.isEmailVerified. So a customer whose identity information is
-    // still incomplete, but whose email is verified, falls past every earlier
-    // target and lands on onboardingComplete, which routes to the dashboard.
-    //
-    // The email-first machine does not have this hole; its equivalent guards
-    // chain the whole prefix. Fixing it means making emailVerified() (and
-    // emailVerificationRequired(), which is built on it) assert
-    // addressInformationCompleted() the way doesNotHaveEmail() already does.
-    //
-    // Left as-is deliberately: this machine gates KYC capture for any brand
-    // running VITE_AUTH_CHANNEL=MOBILE_NUMBER, and changing it is a decision
-    // rather than a tidy-up. The backend's 412 still blocks the transfer
-    // itself, so this skips collection, not compliance.
-    it('lets a verified email skip incomplete identity information (known defect)', () => {
+    // Regression guard. This previously landed on onboardingComplete:
+    // emailVerified() read only account.isEmailVerified, so a verified email
+    // fell past every earlier target and the customer reached the dashboard
+    // with their identity details still incomplete. Both terminal guards now
+    // assert the whole prefix, as the rest of the file already did.
+    it('holds a verified email on identity while identity is incomplete', () => {
         expect(withCustomer((c) => {
             c.identityInformationRequired = () => true;
-        })).toBe('onboardingComplete');
+        })).toBe('identityInformation');
+    });
+
+    it('holds on identity even when employment and address also look complete', () => {
+        // The three guards after identity all chain through
+        // requiresIdentityInformation(), so none of them can fire first.
+        expect(withCustomer((c) => {
+            c.identityInformationRequired = () => true;
+            c.employmentInformationRequired = () => false;
+            c.addressInformationRequired = () => false;
+        })).toBe('identityInformation');
+    });
+
+    it('does not send an unfinished profile to email verification either', () => {
+        // The matching half of the fix: emailVerificationRequired() no longer
+        // inverts emailVerified(), so an outstanding address cannot route here.
+        expect(withCustomer((c) => {
+            c.identityInformationRequired = () => false;
+            c.employmentInformationRequired = () => false;
+            c.addressInformationRequired = () => true;
+            c.account.isEmailVerified = false;
+        })).toBe('addressInformation');
     });
 
     it('collects employment when the profile requires it', () => {
