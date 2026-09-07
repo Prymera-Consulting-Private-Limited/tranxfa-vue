@@ -1,5 +1,6 @@
 import { createMachine } from 'xstate';
 import { useCustomerStore } from '@/stores/customer.js';
+import { collectsAddress } from '@/onboarding_config.js';
 
 const customerStore = useCustomerStore();
 
@@ -35,12 +36,20 @@ function employmentInformationCompleted() {
 function requiresAddressInformation() {
     const customer = getCustomer();
 
-    return employmentInformationCompleted() &&
+    return collectsAddress() &&
+        employmentInformationCompleted() &&
         !!customer?.addressInformationRequired?.();
 }
 
+// Reads "nothing further is owed for the address", so a deployment that does
+// not collect one is complete by definition - otherwise the email steps after
+// it, which all chain through this, would be unreachable.
 function addressInformationCompleted() {
     const customer = getCustomer();
+
+    if (! collectsAddress()) {
+        return employmentInformationCompleted();
+    }
 
     return employmentInformationCompleted() &&
         !customer?.addressInformationRequired?.();

@@ -128,6 +128,18 @@ export function useCustomerUtils() {
         })
     }
 
+    async function resendMobileVerification() {
+        await axios.post('/client/v1/resend-mobile-verification', {})
+    }
+
+    async function verifyMobileNumber(otp) {
+        await axios.post('/client/v1/verify-mobile-number', {
+            otp: otp,
+        }).then((response) => {
+            updateStore(response.data);
+        })
+    }
+
     async function updateMobileNumber(country, number) {
         await axios.post('/client/v1/update-mobile-number', {
             mobile_number_country_id: country,
@@ -231,6 +243,8 @@ export function useCustomerUtils() {
         updateCountry,
         updateProfileAttribute,
         updateMobileNumber,
+        resendMobileVerification,
+        verifyMobileNumber,
         updateEmailAddress,
         logout,
         getAccountVerificationToken,

@@ -140,9 +140,10 @@ describe('mobile-first onboarding machine', () => {
         const mobileFirst = new Set(Object.keys(mobileAuthOnboardingMachine.config.states));
 
         // Known, deliberate differences.
-        emailFirst.delete('sourceCountrySelection'); // country comes from the phone's ISD
-        emailFirst.delete('mobileNumberInput');      // already collected at signup
-        mobileFirst.delete('emailInput');            // email is not collected at signup
+        emailFirst.delete('sourceCountrySelection');   // country comes from the phone's ISD
+        emailFirst.delete('mobileNumberInput');        // already collected at signup
+        emailFirst.delete('mobileNumberVerification'); // the number is proven by the signup OTP
+        mobileFirst.delete('emailInput');              // email is not collected at signup
 
         expect([...mobileFirst].sort()).toEqual([...emailFirst].sort());
     });

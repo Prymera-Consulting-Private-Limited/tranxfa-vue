@@ -10,6 +10,7 @@ import EmailVerification from "@/components/Customer/EmailVerification.vue";
 import OriginCountrySelection from "@/components/Customer/OriginCountrySelection.vue";
 import IdentityInformation from "@/components/Customer/IdentityInformation.vue";
 import MobileNumberInput from "@/components/Customer/MobileNumberInput.vue";
+import MobileNumberVerification from "@/components/Customer/MobileNumberVerification.vue";
 import router from "@/router/index.js";
 import EmploymentInformation from "@/components/Customer/EmploymentInformation.vue";
 import AddressInformation from "@/components/Customer/AddressInformation.vue";
@@ -51,6 +52,9 @@ const changeCountry = () => {
 const proceed = () => {
   send({type: 'PROCEED'});
 }
+const editMobileNumber = () => {
+  send({type: 'EDIT_MOBILE_NUMBER'});
+}
 const editPersonalInformation = () => {
   send({type: 'EDIT_PERSONAL_INFORMATION'});
 }
@@ -88,6 +92,11 @@ const editPersonalInformation = () => {
             v-else-if="snapshot?.value === 'mobileNumberInput'"
             v-on:mobileNumberUpdated="proceed"
             v-on:editPersonalInformationRequested="editPersonalInformation"
+        />
+        <MobileNumberVerification
+            v-else-if="snapshot?.value === 'mobileNumberVerification'"
+            v-on:mobileNumberVerified="proceed"
+            v-on:editMobileNumberRequested="editMobileNumber"
         />
         <EmailInput
             v-else-if="snapshot?.value === 'emailInput'"
