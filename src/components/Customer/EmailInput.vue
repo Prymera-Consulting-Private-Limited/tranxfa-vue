@@ -1,4 +1,5 @@
 <script setup>
+import BrandLogo from "@/components/BrandLogo.vue";
 import {computed, onMounted, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCountriesStore} from "@/stores/countries.js";
@@ -65,7 +66,7 @@ onMounted( async () => {
     </div>
     <div v-show="! showLoading || isSaving" class="w-full max-w-xl">
       <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+        <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
       <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Enter Your Email</h2>
       <p class="text-md text-gray-900 mb-8 text-left">Please provide your email address to continue.</p>
