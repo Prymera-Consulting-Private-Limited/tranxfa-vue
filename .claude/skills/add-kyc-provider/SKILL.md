@@ -14,8 +14,16 @@ Two related jobs. Read the half you need.
 `components/AccountVerification/DocumentTypeItem.vue` picks a provider
 component from a `v-if` chain on `documentType.api`.
 
-Currently wired: `SUMSUB`, `UPPASS`, `CYBRID` (→ `Persona.vue` — the name
-genuinely does not match the file), `SHUFTI`, `DIDIT`, `SYSTEM`.
+Currently wired: `SUMSUB`, `SUMSUB-VIA-FINCODE`, `UPPASS`, `CYBRID` (→
+`Persona.vue` — the name genuinely does not match the file), `SHUFTI`,
+`DIDIT`, `SYSTEM`.
+
+If the new code is an existing vendor reached through a different integrator —
+as `SUMSUB-VIA-FINCODE` is Sumsub through Fincode — it needs **no new
+component**. Add the code to the existing branch's list (`SUMSUB_APIS`) and
+cover it in `tests/kyc-provider-dispatch.spec.js`. Check first that the SDK,
+the token endpoint and the event payloads really are identical; if any differ,
+write a separate component instead.
 
 ### The event contract
 
@@ -69,7 +77,8 @@ const returnUrl = window.location.origin + route.fullPath;
 
 This is the decision that matters.
 
-**In-page SDK** (`SUMSUB`, `CYBRID`/Persona, `DIDIT`) — the SDK's own callback
+**In-page SDK** (`SUMSUB`, `SUMSUB-VIA-FINCODE`, `CYBRID`/Persona, `DIDIT`) —
+the SDK's own callback
 is authoritative. Copy `Didit.vue`, which is the most carefully written:
 
 - it registers callbacks on a **singleton** (`DiditSdk.shared`), so

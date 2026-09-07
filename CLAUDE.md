@@ -124,8 +124,13 @@ adding a provider means editing the chain, there is no registry object:
   `MANUAL-PAYMENT`, `PAGA`, `MONOOVA`, `VOLUME-PAYMENTS`, `APAYLO`, `PAY360`,
   `CINET_PAY`, `FINCODE`, `PAY-CROSS`, `WALLET`.
 - `components/AccountVerification/DocumentTypeItem.vue` on `documentType.api`:
-  `SUMSUB`, `UPPASS`, `CYBRID` (→ `Persona.vue`, the name really does not
-  match), `SHUFTI`, `DIDIT`, `SYSTEM`.
+  `SUMSUB` and `SUMSUB-VIA-FINCODE` (both → `Sumsub.vue`, listed in
+  `SUMSUB_APIS`), `UPPASS`, `CYBRID` (→ `Persona.vue`, the name really does
+  not match), `SHUFTI`, `DIDIT`, `SYSTEM`.
+
+Neither chain has a fallback branch, so an unrecognised code renders nothing
+and leaves the customer on a spinner. `tests/kyc-provider-dispatch.spec.js`
+pins the KYC chain.
 
 Use the `add-payment-provider` / `add-kyc-provider` skills — they encode the
 event contract and the lifecycle traps.

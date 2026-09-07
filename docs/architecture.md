@@ -263,7 +263,8 @@ one event contract:
 
 Two mechanisms report completion, depending on the provider:
 
-- **In-page SDK** (`SUMSUB`, `CYBRID`→Persona, `DIDIT`) — the SDK's own
+- **In-page SDK** (`SUMSUB`, `SUMSUB-VIA-FINCODE`, `CYBRID`→Persona,
+  `DIDIT`) — the SDK's own
   callback fires the event.
 - **Hosted redirect** (`UPPASS`, `SHUFTI`) — the SPA cannot observe the hosted
   page, so it subscribes to `client-customer.{id}` and treats the
