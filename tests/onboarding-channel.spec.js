@@ -144,6 +144,32 @@ describe('OnboardingWorkflowView', () => {
 
         expect(useCustomerStore(pinia).isLoaded).toBe(false);
         expect(wrapper.findComponent({name: 'OnboardingFlow'}).exists()).toBe(false);
+        // Not a spinner forever: the customer is told, and offered a way out.
+        expect(wrapper.text()).toContain('could not load your details');
+        expect(wrapper.find('button').exists()).toBe(true);
+    });
+
+    it('recovers when the retry succeeds', async () => {
+        const axios = (await import('axios')).default;
+        axios.get.mockRejectedValueOnce(Object.assign(new Error('boom'), {
+            status: 500,
+            response: {status: 500, data: {}},
+        }));
+
+        const wrapper = mountView();
+        await flushPromises();
+        expect(wrapper.findComponent({name: 'OnboardingFlow'}).exists()).toBe(false);
+
+        // The store is what refresh() populates on success.
+        axios.get.mockImplementation(() => {
+            loadStore(customer());
+
+            return Promise.resolve({status: 200, data: fixture('profile-05-onboarded')});
+        });
+        await wrapper.get('button').trigger('click');
+        await flushPromises();
+
+        expect(wrapper.findComponent({name: 'OnboardingFlow'}).exists()).toBe(true);
     });
 
     it.each([
