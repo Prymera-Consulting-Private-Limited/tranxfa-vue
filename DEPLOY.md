@@ -60,7 +60,9 @@ per brand:
 | `VITE_APP_URL` | The brand's marketing site |
 | `VITE_APP_NAME` | Brand name in copy |
 | `VITE_USER_AGREEMENT_URL`, `VITE_PRIVACY_POLICY_URL` | Signup links |
-| `VITE_AUTH_CHANNEL` | `EMAIL` \| `MOBILE_NUMBER` \| `BOTH` - picks the onboarding machine |
+| `VITE_AUTH_CHANNEL` | `EMAIL` \| `MOBILE_NUMBER` \| `BOTH` - picks the onboarding flow. `BOTH` resolves per customer from whether they have an email |
+| `VITE_ONBOARDING_COLLECT_ADDRESS` | Default true. Turning it off skips the onboarding address step; the transfer wizard still asks when the backend answers 412 |
+| `VITE_ONBOARDING_VERIFY_MOBILE_NUMBER` | Default false. Email-first only - a mobile-first signup has already proven the number |
 | `VITE_PUSHER_APP_KEY` + host/cluster/scheme | Realtime. `VITE_APP_ENV` must **not** be `local`. |
 | `VITE_THIRD_PARTY_SIGNUP_DECLARATION` | Only if that brand's backend requires it - see below |
 | `VITE_THIRD_PARTY_TRANSACTION_DECLARATION` | Same, on transfer confirm |

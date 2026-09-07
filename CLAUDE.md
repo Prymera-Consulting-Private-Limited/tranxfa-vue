@@ -81,6 +81,40 @@ describes it:
 Dotted attribute names (`employment.occupation_id`) are un-flattened into
 nested request objects by `updateProfileAttribute()`. Keep that convention.
 
+## Onboarding is configurable per brand
+
+`VITE_AUTH_CHANNEL` picks which machine drives `/workflow/onboarding`, and each
+one collects the contact detail the signup channel did not.
+
+**`BOTH` is not a third flow.** It means the brand accepts either signup, so the
+machine is resolved per customer from what they already have: no email address
+means they arrived by phone. `resolveOnboardingChannel()` owns that decision,
+and `OnboardingWorkflowView` therefore loads the profile *before* mounting
+`OnboardingFlow` - `useMachine` runs once at setup, so the choice cannot be
+revisited. Handing the email-first machine a mobile-only customer strands them
+on a screen asking them to verify an email they never gave.
+
+The two flows:
+
+- **email-first** (`onboarding_navigation_machine`) - collects the mobile
+  number, and verifies it when `VITE_ONBOARDING_VERIFY_MOBILE_NUMBER` is on.
+- **mobile-first** (`mobile_number_onboarding_navigation_machine`) - collects
+  and verifies the email. The number is already proven by the signup OTP, so
+  there is deliberately no mobile verification step here.
+
+`src/onboarding_config.js` owns both flags. Read them through it rather than
+`import.meta.env`: Vite hands every variable over as a **string**, so a bare
+`import.meta.env.X` is truthy for `"false"`.
+
+Two rules when adding an optional step:
+
+- **Gate both halves of the guard pair.** `requiresX()` decides whether to ask;
+  `xCompleted()` is the prefix every later guard chains through. Gating only
+  the first makes every subsequent step unreachable.
+- **Optional in onboarding is not optional everywhere.** Turning off address
+  collection only skips the onboarding step - the transfer wizard still asks
+  when the backend answers `412 incomplete_customer_address`.
+
 ## Provider registries
 
 Two places dispatch on a backend string code. Both are plain `v-if` chains —
