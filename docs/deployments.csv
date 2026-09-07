@@ -42,3 +42,4 @@ date,brand,environment,branch,commit,deployed_by,notes
 -,waya,staging,waya_staging,41aeb03,-,last commit 2025-11-05; not confirmed in Amplify
 -,ypay,unknown,ypay,25eb976,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2025-09-08; not confirmed in Amplify
 -,tranxfa,unknown,staging,d12f816,-,brand branch despite the name; last commit 2025-10-24; not confirmed in Amplify
+2026-09-07,selamsend,staging,selamsend_staging,0eccf1c,PB-TommyShelby,merged main (375a78b) and repointed the brand backgrounds; pushed but Amplify build NOT verified
