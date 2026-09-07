@@ -158,7 +158,7 @@ Read by the code; those marked ✗ are absent from `.env.example`:
 | `VITE_APP_ENV` | ✗ | `local` selects Reverb; anything else selects Pusher |
 | `VITE_APP_NAME` | ✗ | brand name in copy |
 | `VITE_APP_URL` | ✗ | marketing site; the "close" links on auth screens |
-| `VITE_AUTH_CHANNEL` | ✓ | `EMAIL` \| `MOBILE_NUMBER` \| `BOTH` — picks the onboarding machine |
+| `VITE_AUTH_CHANNEL` | ✓ | `EMAIL` \| `MOBILE_NUMBER` \| `BOTH` — picks the onboarding flow. `BOTH` resolves per customer from whether they have an email |
 | `VITE_ONBOARDING_COLLECT_ADDRESS` | ✗ | default **true**. Ask for a residential address during onboarding |
 | `VITE_ONBOARDING_VERIFY_MOBILE_NUMBER` | ✗ | default **false**. Email-first only; verify the number with an OTP |
 | `VITE_USER_AGREEMENT_URL` | ✗ | signup terms link |

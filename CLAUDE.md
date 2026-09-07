@@ -84,7 +84,17 @@ nested request objects by `updateProfileAttribute()`. Keep that convention.
 ## Onboarding is configurable per brand
 
 `VITE_AUTH_CHANNEL` picks which machine drives `/workflow/onboarding`, and each
-one collects the contact detail the signup channel did not:
+one collects the contact detail the signup channel did not.
+
+**`BOTH` is not a third flow.** It means the brand accepts either signup, so the
+machine is resolved per customer from what they already have: no email address
+means they arrived by phone. `resolveOnboardingChannel()` owns that decision,
+and `OnboardingWorkflowView` therefore loads the profile *before* mounting
+`OnboardingFlow` - `useMachine` runs once at setup, so the choice cannot be
+revisited. Handing the email-first machine a mobile-only customer strands them
+on a screen asking them to verify an email they never gave.
+
+The two flows:
 
 - **email-first** (`onboarding_navigation_machine`) - collects the mobile
   number, and verifies it when `VITE_ONBOARDING_VERIFY_MOBILE_NUMBER` is on.

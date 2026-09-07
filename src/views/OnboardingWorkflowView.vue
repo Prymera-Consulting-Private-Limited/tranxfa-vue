@@ -1,24 +1,13 @@
 <script setup>
 import BrandLogo from "@/components/BrandLogo.vue";
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {useMachine} from "@xstate/vue";
-import {onboardingNavigationMachine} from "@/machines/onboarding_navigation_machine.js";
-import {mobileAuthOnboardingMachine} from "@/machines/mobile_number_onboarding_navigation_machine.js";
-import EmailVerification from "@/components/Customer/EmailVerification.vue";
-import OriginCountrySelection from "@/components/Customer/OriginCountrySelection.vue";
-import IdentityInformation from "@/components/Customer/IdentityInformation.vue";
-import MobileNumberInput from "@/components/Customer/MobileNumberInput.vue";
-import MobileNumberVerification from "@/components/Customer/MobileNumberVerification.vue";
-import router from "@/router/index.js";
-import EmploymentInformation from "@/components/Customer/EmploymentInformation.vue";
-import AddressInformation from "@/components/Customer/AddressInformation.vue";
-import EmailInput from "@/components/Customer/EmailInput.vue";
+import {resolveOnboardingChannel} from "@/onboarding_config.js";
+import OnboardingFlow from "@/components/Customer/OnboardingFlow.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
-const authChannel = import.meta.env.VITE_AUTH_CHANNEL ??  'EMAIL';
 
 /**
  * @type {{data: Customer | null}}
@@ -26,44 +15,27 @@ const authChannel = import.meta.env.VITE_AUTH_CHANNEL ??  'EMAIL';
 const customer = customerStore.customer;
 const isLoading = ref(false);
 
+// On a BOTH deployment the flow depends on how this customer signed up, so the
+// profile has to be in hand before the machine is chosen. OnboardingFlow calls
+// useMachine at its own setup, which is why it is mounted only once ready
+// rather than being handed a channel that could still change.
+const isReady = computed(() => ! isLoading.value && customerStore.isLoaded);
+const channel = computed(() => resolveOnboardingChannel(customer.data));
+
 onMounted(async () => {
   if (! customerStore.isLoaded) {
     isLoading.value = true;
-    await customerUtils.refresh();
-    isLoading.value = false;
+    await customerUtils.refresh().finally(() => {
+      isLoading.value = false;
+    });
   }
-  proceed();
 });
-const machine = authChannel === 'MOBILE_NUMBER'
-    ? mobileAuthOnboardingMachine
-    : onboardingNavigationMachine;
-
-const { snapshot, send } = useMachine(machine);
-
-watch(() => snapshot.value, (newSnapshot) => {
-  if (newSnapshot?.value === 'onboardingComplete') {
-    router.push({name: 'dashboard'});
-  }
-}, { deep: true });
-
-const changeCountry = () => {
-  send({type: 'CHANGE_COUNTRY'});
-}
-const proceed = () => {
-  send({type: 'PROCEED'});
-}
-const editMobileNumber = () => {
-  send({type: 'EDIT_MOBILE_NUMBER'});
-}
-const editPersonalInformation = () => {
-  send({type: 'EDIT_PERSONAL_INFORMATION'});
-}
 </script>
 
 <template>
   <main>
     <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
-      <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
+      <i v-if="! isReady" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class="w-[60%] md:w-[60%] h-auto md:h-full">
           <img src="/images/backgrounds/signup.webp" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
@@ -72,38 +44,7 @@ const editPersonalInformation = () => {
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
           </div>
         </div>
-        <EmailVerification v-if="snapshot?.value === 'emailVerification'" v-on:emailVerified="proceed" />
-        <OriginCountrySelection
-            v-else-if="snapshot?.value === 'sourceCountrySelection'"
-            v-on:countryUpdated="proceed" />
-        <IdentityInformation
-            v-else-if="snapshot?.value === 'identityInformation'"
-            v-on:identityUpdated="proceed"
-            v-on:changeCountry="changeCountry" />
-        <EmploymentInformation
-            v-else-if="snapshot?.value === 'employmentInformation'"
-            v-on:employmentUpdated="proceed"
-            v-on:editPersonalInformationRequested="editPersonalInformation" />
-        <AddressInformation
-            v-else-if="snapshot?.value === 'addressInformation'"
-            v-on:addressUpdated="proceed"
-            v-on:editPersonalInformationRequested="editPersonalInformation" />
-        <MobileNumberInput
-            v-else-if="snapshot?.value === 'mobileNumberInput'"
-            v-on:mobileNumberUpdated="proceed"
-            v-on:editPersonalInformationRequested="editPersonalInformation"
-        />
-        <MobileNumberVerification
-            v-else-if="snapshot?.value === 'mobileNumberVerification'"
-            v-on:mobileNumberVerified="proceed"
-            v-on:editMobileNumberRequested="editMobileNumber"
-        />
-        <EmailInput
-            v-else-if="snapshot?.value === 'emailInput'"
-            v-on:editPersonalInformationRequested="editPersonalInformation"
-            v-on:skipEmailInput="proceed"
-            v-on:emailUpdated="proceed"
-        />
+        <OnboardingFlow v-bind:channel="channel" />
       </div>
     </div>
   </main>

@@ -54,3 +54,41 @@ export function collectsAddress() {
 export function verifiesMobileNumber() {
     return flag(import.meta.env.VITE_ONBOARDING_VERIFY_MOBILE_NUMBER, false);
 }
+
+/**
+ * The deployment's sign-up channel, normalised.
+ *
+ * @returns {'EMAIL'|'MOBILE_NUMBER'|'BOTH'}
+ */
+export function authChannel() {
+    const raw = String(import.meta.env.VITE_AUTH_CHANNEL ?? 'EMAIL').trim().toUpperCase();
+
+    return ['EMAIL', 'MOBILE_NUMBER', 'BOTH'].includes(raw) ? raw : 'EMAIL';
+}
+
+/**
+ * Which onboarding flow a given customer needs.
+ *
+ * EMAIL and MOBILE_NUMBER are fixed by the deployment. BOTH is not a third
+ * flow: the brand lets people sign up either way, so the answer depends on the
+ * customer in front of you, and the only reliable signal is what they already
+ * have. A customer with no email address arrived by phone and still owes an
+ * email; anyone else is on the email-first path.
+ *
+ * Getting this wrong is not cosmetic. The email-first machine opens on
+ * emailVerification, whose guard reads account.isEmailVerified - so handing it
+ * a mobile-only customer leaves every PROCEED target failing and strands them
+ * on a screen asking them to verify an email they do not have.
+ *
+ * @param {Customer|null} customer
+ * @returns {'EMAIL'|'MOBILE_NUMBER'}
+ */
+export function resolveOnboardingChannel(customer) {
+    const channel = authChannel();
+
+    if (channel !== 'BOTH') {
+        return channel;
+    }
+
+    return customer?.account?.email ? 'EMAIL' : 'MOBILE_NUMBER';
+}
