@@ -53,8 +53,18 @@ async function getNewAccessToken() {
 
 const accessToken = ref('');
 
+// getNewAccessToken() rethrows, and this used to let that reject unhandled -
+// so the most likely failure of all, a token endpoint answering 500, emitted
+// nothing and left the parent's spinner turning forever. It still rethrows,
+// because Sumsub also uses it as the SDK's token-refresh callback where
+// throwing is the contract; the catch belongs here instead.
 onMounted(async () => {
-  accessToken.value = await getNewAccessToken();
+  try {
+    accessToken.value = await getNewAccessToken();
+  } catch (e) {
+    emit('sdkError', e);
+    return;
+  }
   sdkInitialized();
   Echo.channel(`client-customer.${customer.data?.id}`)
       .listen('CustomerDocumentUploaded', () => {
