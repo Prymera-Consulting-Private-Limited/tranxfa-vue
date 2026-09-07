@@ -15,6 +15,11 @@ import Didit from "@/components/AccountVerification/Provider/Didit.vue";
 
 const customerUtils = useCustomerUtils();
 
+// Provider codes the backend sends as `api` that are all served by the Sumsub
+// web SDK. SUMSUB-VIA-FINCODE is Sumsub reached through Fincode: same SDK, same
+// token endpoint, so it renders the same component.
+const SUMSUB_APIS = ['SUMSUB', 'SUMSUB-VIA-FINCODE'];
+
 const props = defineProps({
   documentCategory: {
     type: Object(DocumentCategory),
@@ -79,7 +84,7 @@ async function closeSdk() {
                 <span class="sr-only">Loading...</span>
               </div>
               <Sumsub
-                  v-if="documentType.api === 'SUMSUB'"
+                  v-if="SUMSUB_APIS.includes(documentType.api)"
                   v-on:sdkInitialized="isSdkInitialized = true"
                   v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                   v-bind:documentType="documentType"
