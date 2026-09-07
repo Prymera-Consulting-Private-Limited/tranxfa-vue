@@ -10,7 +10,11 @@ vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn()}}));
 
 // The real provider components each boot a third-party SDK on mount. This spec
 // is about which one the chain picks, so they are replaced by markers.
-const marker = (name) => ({[`default`]: {name, template: `<div />`}});
+const marker = (name) => ({[`default`]: {
+    name,
+    emits: ['sdkInitialized', 'sdkError', 'sdkStepCompleted', 'sdkApplicantStatusChanged', 'sdkCancelled'],
+    template: `<div />`,
+}});
 vi.mock('@/components/AccountVerification/Provider/Sumsub.vue', () => marker('Sumsub'));
 vi.mock('@/components/AccountVerification/Provider/UpPass.vue', () => marker('UpPass'));
 vi.mock('@/components/AccountVerification/Provider/Persona.vue', () => marker('Persona'));
@@ -91,5 +95,86 @@ describe('DocumentTypeItem provider dispatch', () => {
 
         expect(rendered(wrapper)).toEqual([]);
         expect(wrapper.find('[role="status"]').exists()).toBe(true);
+    });
+});
+
+// Every provider declares sdkError and, until this was wired, nothing listened
+// to it. A vendor failure - or a token endpoint answering 500, which is the
+// common case - left the spinner turning with no message and no exit but the
+// backdrop. These pin the whole path: the spinner goes, a message arrives, and
+// there is a way out.
+describe('DocumentTypeItem sdk failures', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    it.each([
+        ['SUMSUB', 'Sumsub'],
+        ['UPPASS', 'UpPass'],
+        ['CYBRID', 'Persona'],
+        ['SHUFTI', 'Shufti'],
+        ['DIDIT', 'Didit'],
+        ['SYSTEM', 'System'],
+    ])('surfaces sdkError from %s instead of spinning forever', async (api, component) => {
+        const wrapper = await openFor(api);
+        expect(wrapper.find('[role="status"]').exists()).toBe(true);
+
+        await wrapper.findComponent({name: component}).vm.$emit('sdkError', new Error('vendor exploded'));
+
+        expect(wrapper.find('[role="status"]').exists()).toBe(false);
+        expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+        expect(wrapper.get('[role="alert"]').text()).toContain('could not start your verification');
+    });
+
+    // getCustomerMessage's job: an API refusal written for a customer to read
+    // beats anything we could invent, but a framework debug body must not leak.
+    it('prefers the api message when it was written for a customer', async () => {
+        const wrapper = await openFor('SUMSUB');
+
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkError', {
+            response: {status: 422, data: {message: 'This document type is not available in your country.'}},
+        });
+
+        expect(wrapper.get('[role="alert"]').text()).toContain('not available in your country');
+    });
+
+    it('falls back to our wording rather than showing a framework trace', async () => {
+        const wrapper = await openFor('SUMSUB');
+
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkError', {
+            response: {status: 500, data: {
+                message: 'No query results for model [App\\Models\\DocumentType] 0000',
+                exception: 'Illuminate\\Database\\Eloquent\\ModelNotFoundException',
+            }},
+        });
+
+        const text = wrapper.get('[role="alert"]').text();
+        expect(text).toContain('could not start your verification');
+        expect(text).not.toContain('No query results');
+    });
+
+    // The provider is unmounted while the error shows, so clearing it mounts a
+    // fresh one that asks for a new token - which is what makes retry real
+    // rather than cosmetic.
+    it('remounts the provider on retry', async () => {
+        const wrapper = await openFor('SUMSUB');
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkError', new Error('nope'));
+        expect(rendered(wrapper)).toEqual([]);
+
+        await wrapper.get('[role="alert"] button').trigger('click');
+
+        expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+        expect(rendered(wrapper)).toEqual(['Sumsub']);
+        expect(wrapper.find('[role="status"]').exists()).toBe(true);
+    });
+
+    it('clears the error when the modal is closed and reopened', async () => {
+        const wrapper = await openFor('SUMSUB');
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkError', new Error('nope'));
+
+        const buttons = wrapper.findAll('[role="alert"] button');
+        await buttons[buttons.length - 1].trigger('click');
+        await wrapper.get('a').trigger('click');
+
+        expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+        expect(rendered(wrapper)).toEqual(['Sumsub']);
     });
 });

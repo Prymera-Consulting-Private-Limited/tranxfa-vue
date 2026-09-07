@@ -36,22 +36,43 @@ integration.
 | `sdkInitialized` | vendor UI is up | hides the spinner |
 | `sdkApplicantStatusChanged` | **terminal success** | refreshes the customer, closes the modal, routes onward |
 | `sdkCancelled` | user backed out | closes the modal - **bound only for `Persona` and `Didit`** |
-| `sdkError` | vendor error | **nothing. No listener exists anywhere in `src/`.** |
+| `sdkError` | vendor error, **or a failed token request** | replaces the spinner with a message and a Try again / Close pair |
 | `sdkStepCompleted` | intermediate step | **nothing. No listener exists anywhere in `src/`.** |
 
-That table is the real wiring, not the intended one. Verify it before trusting
-it:
+That table is the real wiring, not the intended one - `sdkStepCompleted` is
+declared by all six providers and bound by none. Verify rather than assume:
 
 ```sh
-grep -rn "v-on:sdkError\|@sdkError" src/     # returns nothing
+grep -rn "v-on:sdkStepCompleted" src/     # returns nothing
 ```
 
-**This is a live gap, and it is the cause of the "the button does nothing"
-report.** A vendor that fails after mount emits `sdkError`, nobody listens,
-`isSdkInitialized` stays false, and the customer is left on a spinner inside a
-modal whose only exit is the backdrop. If you are adding a provider, still
-emit `sdkError` - and if you have licence to fix the parent, bind it to
-something that shows a message and closes the modal. Say which you did.
+**`sdkError` is the one that has to work, and it has two sources.** The vendor
+failing after mount is the obvious one. The commoner one is the token request:
+`getNewAccessToken()` rethrows, so an `onMounted` that awaits it without a
+catch lets the rejection escape unhandled and emits *nothing at all* - which
+left the spinner turning with nothing in the console. Wrap it:
+
+```js
+onMounted(async () => {
+  try {
+    const accessToken = await getNewAccessToken();
+    await launchVendorSdk(accessToken);
+  } catch (e) {
+    emit('sdkError', e);
+  }
+})
+```
+
+Keep `getNewAccessToken()` throwing. Sumsub also passes it to the SDK as the
+token-refresh callback, where throwing is the contract; returning `null`
+instead would hand the SDK a null token on refresh.
+
+For a hosted-redirect provider, `return` after emitting so it does not go on to
+emit `sdkInitialized` and subscribe to Echo - announcing itself ready on a
+failed token trades a hang for an empty modal with a dead Continue link.
+
+`tests/kyc-token-failure.spec.js` pins the emit for all five token-fetching
+providers; `tests/kyc-provider-dispatch.spec.js` pins the parent's handling.
 
 Two related traps in the existing set:
 

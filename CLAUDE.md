@@ -246,11 +246,11 @@ forever on an unknown error — do not reintroduce that shape.
 - `index.html` hardcodes third-party tags (Google Analytics ID, MS Clarity
   tag, Tawk.to widget, `js.volumepay.io`). These are **per-tenant** and are a
   standard source of merge conflicts.
-- **KYC `sdkError` and `sdkStepCompleted` go nowhere.** All six provider
-  components declare them; `grep -rn "v-on:sdkError" src` returns nothing. A
-  vendor that fails after mount leaves the customer on a spinner in a modal
-  whose only exit is the backdrop. This is the concrete case behind "the button
-  does nothing" in the bug template.
+- **`sdkStepCompleted` still goes nowhere.** All six providers declare it and
+  nothing binds it. Harmless today (it is informational), but do not assume an
+  emit is wired just because it is declared. `sdkError` *is* now handled -
+  `DocumentTypeItem` renders an error with a retry, and the five token-fetching
+  providers emit it rather than letting the rejection escape `onMounted`.
 - `Sumsub.vue` emits `sdkApplicantStatusChanged` **only on a GREEN review**, so
   a RED review emits nothing and the modal just sits there.
 - `Persona.vue` and `Sumsub.vue` have **no `onUnmounted`**, so their SDK
