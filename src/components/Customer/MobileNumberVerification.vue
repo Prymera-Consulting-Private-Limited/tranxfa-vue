@@ -115,8 +115,8 @@ onMounted(async () => {
       </p>
 
       <form @submit.prevent="verifyMobileNumber" class="space-y-10">
-        <div v-if="otpError" class="rounded-md bg-red-50 p-4">
-          <div class="text-sm text-red-700">{{ otpError }}</div>
+        <div v-if="otpError" class="rounded-md bg-danger-50 p-4">
+          <div class="text-sm text-danger-700">{{ otpError }}</div>
         </div>
         <v-otp-input
             class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"

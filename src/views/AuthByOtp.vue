@@ -101,8 +101,8 @@ onMounted(async () => {
       <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">The code may take a few seconds to arrive.</p>
       <!-- Form -->
       <form @submit.prevent="authenticate" class="space-y-10">
-        <div v-if="otpError" class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-          <p class="text-sm text-red-700">{{ otpError }}</p>
+        <div v-if="otpError" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
+          <p class="text-sm text-danger-700">{{ otpError }}</p>
         </div>
         <v-otp-input
             class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"

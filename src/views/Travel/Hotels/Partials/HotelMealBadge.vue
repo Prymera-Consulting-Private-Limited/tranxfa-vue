@@ -51,7 +51,7 @@ const isRoomOnly = computed(() => {
 const classes = computed(() => {
   return isRoomOnly.value
       ? 'bg-gray-50 text-gray-600 ring-gray-200'
-      : 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+      : 'bg-success-50 text-success-700 ring-success-200';
 });
 </script>
 

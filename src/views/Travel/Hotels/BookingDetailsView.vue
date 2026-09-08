@@ -269,8 +269,8 @@ function guestInitials(guest) {
           <Spinner class="size-12" />
         </div>
         <!-- Failed -->
-        <div v-else-if="hasFailed" class="mt-3 flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-red-200">
-          <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <div v-else-if="hasFailed" class="mt-3 flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-danger-200">
+          <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
           <h2 class="mt-6 text-base font-semibold text-gray-900">{{ failMessage.title }}</h2>
@@ -304,10 +304,10 @@ function guestInitials(guest) {
                 <span class="size-1.5 animate-bounce rounded-full bg-brand-600 [animation-delay:0.15s]" />
                 <span class="size-1.5 animate-bounce rounded-full bg-brand-600 [animation-delay:0.3s]" />
               </div>
-              <p class="mt-5 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
+              <p class="mt-5 inline-flex items-center gap-2 rounded-full bg-warning-50 px-4 py-1.5 text-xs font-medium text-warning-700 ring-1 ring-inset ring-warning-200">
                 <span class="relative flex size-2" aria-hidden="true">
-                  <span class="absolute inline-flex size-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                  <span class="relative inline-flex size-2 rounded-full bg-amber-500" />
+                  <span class="absolute inline-flex size-full animate-ping rounded-full bg-warning-400 opacity-75" />
+                  <span class="relative inline-flex size-2 rounded-full bg-warning-500" />
                 </span>
                 Please keep this page open
               </p>
@@ -336,7 +336,7 @@ function guestInitials(guest) {
           </div>
           <!-- Failed — a real possible outcome once availability/pricing has -->
           <!-- shifted since search, not a bug to apologise for. -->
-          <div v-else-if="attemptStatus === 'failed'" class="mt-3 flex flex-col items-center rounded-3xl bg-white px-8 pb-10 pt-6 text-center ring-1 ring-red-200">
+          <div v-else-if="attemptStatus === 'failed'" class="mt-3 flex flex-col items-center rounded-3xl bg-white px-8 pb-10 pt-6 text-center ring-1 ring-danger-200">
             <Failed class="-my-12" />
             <h2 class="text-xl font-semibold tracking-tight text-gray-900">We couldn't confirm this booking</h2>
             <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-gray-500">
@@ -380,7 +380,7 @@ function guestInitials(guest) {
             <!-- Hotel, room -->
             <aside class="mt-6 space-y-4 lg:col-span-1 lg:mt-0 lg:sticky lg:top-6">
               <div v-if="quote?.hotel" class="rounded-2xl bg-white p-5 ring-1 ring-gray-200">
-                <span v-if="quote.hotel.starRating" class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 ring-1 ring-amber-100 ring-inset">
+                <span v-if="quote.hotel.starRating" class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 ring-1 ring-warning-100 ring-inset">
                   <HotelRating :stars="quote.hotel.starRating" />
                 </span>
                 <h1 class="mt-2 text-base font-semibold tracking-tight text-gray-900">{{ quote.hotel.name }}</h1>

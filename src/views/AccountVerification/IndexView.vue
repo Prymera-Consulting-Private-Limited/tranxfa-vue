@@ -42,30 +42,30 @@ onMounted(async () => {
                     <template v-if="customer.data?.documents.length > 0">
                       <template v-for="document in customer.data.documents" :key="document.id">
                         <li :class="{
-                          'bg-emerald-400/5  border-emerald-300': document.statusCode === KycDocumentStatus.APPROVED,
+                          'bg-success-400/5  border-success-300': document.statusCode === KycDocumentStatus.APPROVED,
                           'bg-blue-400/5 border-blue-300': document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED,
-                          'bg-red-400/5 border-red-300': document.statusCode === KycDocumentStatus.REJECTED
+                          'bg-danger-400/5 border-danger-300': document.statusCode === KycDocumentStatus.REJECTED
                         }" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg border text-center">
                           <div class="flex flex-1 flex-col p-8">
                             <IdentificationIcon :class="{
-                            'text-emerald-700': document.statusCode === KycDocumentStatus.APPROVED,
+                            'text-success-700': document.statusCode === KycDocumentStatus.APPROVED,
                             'text-blue-700': document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED,
-                            'text-red-700': document.statusCode === KycDocumentStatus.REJECTED
+                            'text-danger-700': document.statusCode === KycDocumentStatus.REJECTED
                           }" class="mx-auto size-16 shrink-0 rounded-full" />
                             <h3 :class="{
-                            'text-emerald-700': document.statusCode === KycDocumentStatus.APPROVED,
+                            'text-success-700': document.statusCode === KycDocumentStatus.APPROVED,
                             'text-blue-700': document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED,
-                            'text-red-700': document.statusCode === KycDocumentStatus.REJECTED
+                            'text-danger-700': document.statusCode === KycDocumentStatus.REJECTED
                           }" class="mt-6 text-sm font-medium">{{ document.documentCategory.title }}</h3>
                             <dl v-if="document.documentCategory.description" class="mt-1 flex grow flex-col justify-between">
                               <template v-if="document.statusCode === KycDocumentStatus.APPROVED">
                                 <dt class="sr-only">Information</dt>
-                                <dd class="mt-3 text-sm text-emerald-700">
+                                <dd class="mt-3 text-sm text-success-700">
                                   <p>Your {{ document.documentType.title }} has been successfully verified.</p>
                                 </dd>
                                 <dt class="sr-only">Verified</dt>
                                 <dd class="mt-3 text-sm">
-                                  <a class="text-emerald-700 font-semibold">Verified</a>
+                                  <a class="text-success-700 font-semibold">Verified</a>
                                 </dd>
                               </template>
                               <template v-else-if="document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED">
@@ -80,12 +80,12 @@ onMounted(async () => {
                               </template>
                               <template v-else-if="document.statusCode === KycDocumentStatus.REJECTED">
                                 <dt class="sr-only">Information</dt>
-                                <dd class="mt-3 text-sm text-red-700">
+                                <dd class="mt-3 text-sm text-danger-700">
                                   <p>We were unable to verify your document <span class="font-semibold">{{ document.documentType.title }}</span>.</p>
                                 </dd>
                                 <dt class="sr-only">Failed</dt>
                                 <dd class="mt-3 text-sm">
-                                  <a class="text-red-700 font-semibold">Failed</a>
+                                  <a class="text-danger-700 font-semibold">Failed</a>
                                 </dd>
                               </template>
                             </dl>

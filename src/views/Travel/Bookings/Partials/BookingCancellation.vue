@@ -73,10 +73,10 @@ const requestClasses = computed(() => {
       return 'border-gray-200 bg-gray-50 text-gray-500';
 
     case 'REFUSED':
-      return 'border-red-200 bg-red-50 text-red-600';
+      return 'border-danger-200 bg-danger-50 text-danger-600';
 
     default:
-      return 'border-amber-200 bg-amber-50 text-amber-600';
+      return 'border-warning-200 bg-warning-50 text-warning-700';
   }
 });
 
@@ -118,7 +118,7 @@ const requestedOn = computed(() => {
       </dl>
       <!-- Owed and sent are different questions, and the second is the one a
       customer is actually asking. -->
-      <p v-if="isOwedMoney && request.refundSent" class="mt-3 flex items-start gap-1.5 text-sm text-emerald-700">
+      <p v-if="isOwedMoney && request.refundSent" class="mt-3 flex items-start gap-1.5 text-sm text-success-700">
         <CheckCircleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
         Your refund has been sent.
       </p>
@@ -130,7 +130,7 @@ const requestedOn = computed(() => {
     <!-- Nobody has asked. -->
     <div v-else class="p-5">
       <template v-if="cancellation.canCancelNow && quote">
-        <p v-if="quote.isFree" class="flex items-start gap-1.5 text-sm text-emerald-700">
+        <p v-if="quote.isFree" class="flex items-start gap-1.5 text-sm text-success-700">
           <CheckCircleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           This booking can be cancelled free of charge right now.
         </p>
@@ -146,7 +146,7 @@ const requestedOn = computed(() => {
           </div>
         </dl>
         <p class="mt-3 text-xs text-gray-500">This changes as your stay approaches, so it is worked out fresh each time you open this page.</p>
-        <div v-if="cancelError" class="mt-4 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div v-if="cancelError" class="mt-4 flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm text-danger-700">
           <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <span>{{ cancelError }}</span>
         </div>
@@ -160,7 +160,7 @@ const requestedOn = computed(() => {
                 type="button"
                 :disabled="isCancelling"
                 @click="emit('cancel')"
-                class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-danger-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-danger-700 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
             >
               <Spinner v-if="isCancelling" class="size-4" />
               {{ isCancelling ? 'Asking the hotel…' : 'Yes, cancel this booking' }}
@@ -177,7 +177,7 @@ const requestedOn = computed(() => {
             v-else
             type="button"
             @click="isConfirming = true"
-            class="mt-4 cursor-pointer rounded-xl px-4 py-2.5 text-sm font-semibold text-red-600 ring-1 ring-red-200 transition hover:bg-red-50 focus-visible:outline-0"
+            class="mt-4 cursor-pointer rounded-xl px-4 py-2.5 text-sm font-semibold text-danger-600 ring-1 ring-danger-200 transition hover:bg-danger-50 focus-visible:outline-0"
         >Cancel this booking</button>
       </template>
       <!-- Either cancelling is not possible or the cost could not be worked out.

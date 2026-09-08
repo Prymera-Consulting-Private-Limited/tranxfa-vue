@@ -111,8 +111,8 @@ onUnmounted(async () => {
               <div class="p-4 w-full">
                 <div class="flex items-start">
                   <div class="shrink-0">
-                    <CheckCircleIcon v-if="notification.type === 'success'" class="size-6 text-green-400" aria-hidden="true" />
-                    <ExclamationTriangleIcon v-else-if="notification.type === 'danger'" class="size-6 text-red-400" aria-hidden="true" />
+                    <CheckCircleIcon v-if="notification.type === 'success'" class="size-6 text-success-400" aria-hidden="true" />
+                    <ExclamationTriangleIcon v-else-if="notification.type === 'danger'" class="size-6 text-danger-400" aria-hidden="true" />
                     <InformationCircleIcon v-else class="size-6 text-gray-400" aria-hidden="true" />
                   </div>
                   <div class="ml-3 w-0 flex-1 pt-0.5">

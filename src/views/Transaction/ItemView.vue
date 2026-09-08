@@ -112,22 +112,22 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <div class="flex">
                   <div class="shrink-0">
                     <component :style="{
-                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
                        }" :is="TransactionStateIcon[transaction.data.state.code]" class="size-5 mt-1" />
                   </div>
                   <div class="ml-3">
                     <p v-if="transaction.data.payment.customerConfirmedPayment" :style="{
-                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
                        }" class="text-sm leading-6">
                       {{ transaction.data.payment.clientPaymentAccount.waitTimeMessage }}
                     </p>
                     <p v-else :style="{
-                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
                        }" class="text-sm leading-6">
                       {{ transaction.data.state.description }}
                     </p>
                     <div :style="{
-                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
                        }" class="text-sm leading-6 mt-2">
                       <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm hover:underline">View Our {{ transaction.data.payment.paymentMethod.title }} Account</a>
                     </div>
@@ -143,12 +143,12 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <div class="flex">
                   <div class="shrink-0">
                     <component :style="{
-                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
                        }" :is="TransactionStateIcon[transaction.data.state.code]" class="size-5" />
                   </div>
                   <div class="ml-3">
                     <p :style="{
-                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 600),
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
                        }" class="text-sm">
                       {{ transaction.data.state.description }}
                     </p>
@@ -160,12 +160,12 @@ const isShowPaymentAccountModalOpen = ref(false);
               <ul role="list" class="mt-4 grid grid-cols-1 gap-5">
                 <template v-for="document in transaction.data.pendingDocuments" :key="document.id">
                   <li @click="router.push({name: 'categoryView', params: {category: document.documentCategory.id}, query: {'_rtr': 'viewTransaction', '_rti': transaction.data.id}})" class="col-span-1 flex rounded-md shadow-xs cursor-pointer">
-                    <div class="flex flex-1 items-center justify-between rounded-l-md rounded-r-md border border-yellow-200 bg-yellow-50">
+                    <div class="flex flex-1 items-center justify-between rounded-l-md rounded-r-md border border-warning-200 bg-warning-50">
                       <div class="flex-1 px-4 py-2 text-sm">
-                        <p class="font-medium text-yellow-700">{{ document.documentCategory.title }}</p>
-                        <p class="text-yellow-600 leading-6">Upload your {{ document.documentCategory.title.toLowerCase() }} to process the transaction</p>
+                        <p class="font-medium text-warning-700">{{ document.documentCategory.title }}</p>
+                        <p class="text-warning-700 leading-6">Upload your {{ document.documentCategory.title.toLowerCase() }} to process the transaction</p>
                       </div>
-                      <div class="shrink-0 px-3 text-yellow-700">
+                      <div class="shrink-0 px-3 text-warning-700">
                         <ArrowUpTrayIcon class="size-5" aria-hidden="true" />
                       </div>
                     </div>
@@ -198,7 +198,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <span class="font-medium text-gray-900">{{ transaction.data.recipient.wholeName }}</span>
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
                   <span class="">{{ transaction.data.payoutMethod.title }}</span>
-                  <span v-if="transaction.data.payout?.collectionPin" :class="transaction.data.payout.collectionPinAvailable ? 'text-gray-900 font-semibold' : 'text-yellow-700 text-xs mt-1'" class="">
+                  <span v-if="transaction.data.payout?.collectionPin" :class="transaction.data.payout.collectionPinAvailable ? 'text-gray-900 font-semibold' : 'text-warning-700 text-xs mt-1'" class="">
                     <template v-if="transaction.data.payout.collectionPinAvailable">Collection PIN: </template>
                     {{ transaction.data.payout.collectionPin }}
                   </span>
@@ -266,9 +266,9 @@ const isShowPaymentAccountModalOpen = ref(false);
                 </div>
                 <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-yellow-600/20 ring-inset">Pending</dd>
-                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-red-600/20 ring-inset">Failed</dd>
-                  <dd v-else class="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 ring-1 ring-green-600/20 ring-inset">Paid</dd>
+                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-warning-50 px-2 py-1 text-xs font-medium text-warning-700 ring-1 ring-warning-600/20 ring-inset">Pending</dd>
+                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-danger-50 px-2 py-1 text-xs font-medium text-danger-600 ring-1 ring-danger-600/20 ring-inset">Failed</dd>
+                  <dd v-else class="rounded-md bg-success-50 px-2 py-1 text-xs font-medium text-success-700 ring-1 ring-success-600/20 ring-inset">Paid</dd>
                 </div>
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">

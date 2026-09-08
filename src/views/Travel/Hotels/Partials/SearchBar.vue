@@ -409,7 +409,7 @@ function search() {
           <!-- open by the time the click lands. -->
           <li v-else-if="regionsError === 'failed'" class="px-4 py-3">
             <p class="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-              <ExclamationTriangleIcon class="size-4 shrink-0 text-amber-500" aria-hidden="true" />
+              <ExclamationTriangleIcon class="size-4 shrink-0 text-warning-500" aria-hidden="true" />
               We couldn't load destinations
             </p>
             <p class="mt-1 text-xs text-gray-500">Something went wrong reaching our travel partner. Your search is fine — please try again.</p>
@@ -486,7 +486,7 @@ function search() {
                     v-if="guests.length > 1"
                     type="button"
                     @click="removeRoom(index)"
-                    class="cursor-pointer text-xs font-medium text-red-600 transition hover:text-red-700"
+                    class="cursor-pointer text-xs font-medium text-danger-600 transition hover:text-danger-700"
                 >Remove</button>
               </header>
               <!-- Counters -->
@@ -547,7 +547,7 @@ function search() {
                   </div>
                 </div>
               </div>
-              <p v-if="roomWarning(room)" class="mt-2 text-xs font-medium text-red-600">{{ roomWarning(room) }}</p>
+              <p v-if="roomWarning(room)" class="mt-2 text-xs font-medium text-danger-600">{{ roomWarning(room) }}</p>
             </section>
           </div>
           <!-- Actions -->

@@ -86,7 +86,7 @@ const bestToken = computed(() => {
                 <HotelCancellationBadge :cancellation="rate.cancellation" />
                 <HotelAvailability :allotment="rate.allotment" />
               </div>
-              <p v-if="rate.payableAtProperty.isStated" class="text-xs text-amber-700">Plus {{ rate.payableAtProperty.currencyPrefixed }} payable at the property</p>
+              <p v-if="rate.payableAtProperty.isStated" class="text-xs text-warning-700">Plus {{ rate.payableAtProperty.currencyPrefixed }} payable at the property</p>
             </div>
             <!-- Price rail, so every row lines up on the number and the button. -->
             <div class="flex shrink-0 items-end justify-between gap-4 sm:w-48 sm:flex-col sm:items-stretch sm:gap-3 sm:border-l sm:border-gray-100 sm:pl-6">

@@ -76,7 +76,7 @@ onMounted( async () => {
           <label for="email" class="mb-2 block font-medium text-brand-700">Email</label>
           <div
             class="relative rounded-2xl border bg-white transition-all duration-200"
-            :class="errors.length > 0 ? 'border-red-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
+            :class="errors.length > 0 ? 'border-danger-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
           >
             <input
               type="email"
@@ -92,7 +92,7 @@ onMounted( async () => {
               <i class="pi pi-envelope transition-colors" :class="emailFocused ? 'text-brand-700' : 'text-gray-400'"></i>
             </span>
           </div>
-          <p v-if="errors.length > 0" class="mt-2 text-sm text-red-600">{{ errors[0] }}</p>
+          <p v-if="errors.length > 0" class="mt-2 text-sm text-danger-600">{{ errors[0] }}</p>
         </div>
         <button
           :disabled="showLoading || isSaving"

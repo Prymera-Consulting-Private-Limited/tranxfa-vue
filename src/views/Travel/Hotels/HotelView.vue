@@ -198,8 +198,8 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
             <!-- Loading -->
             <HotelDetailSkeleton v-if="isLoading" />
             <!-- Failed -->
-            <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-red-200">
-              <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-danger-200">
+              <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
                 <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
               </div>
               <h2 class="mt-6 text-base font-semibold text-gray-900">We couldn't load this hotel</h2>

@@ -98,7 +98,7 @@ const removeFile = () => {
        :class="{
       'border-brand-500 bg-brand-50': isDragging,
       'border-gray-300 bg-white': !isDragging && !error,
-      'border-red-500 bg-red-50': error,
+      'border-danger-500 bg-danger-50': error,
       'px-6 py-4': !filePreview
     }"
        @dragover.prevent="isDragging = true"
@@ -125,7 +125,7 @@ const removeFile = () => {
       <DocumentTextIcon v-else class="text-gray-400 size-10 mx-auto" />
       <div>
         <p class="text-sm text-gray-600">{{ `Click or drag file here to upload ${page} page` }}</p>
-        <p v-if="error" class="text-xs text-red-500 mt-1">{{ error }}</p>
+        <p v-if="error" class="text-xs text-danger-600 mt-1">{{ error }}</p>
       </div>
     </div>
 

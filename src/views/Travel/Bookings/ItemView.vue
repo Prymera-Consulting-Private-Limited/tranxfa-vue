@@ -182,8 +182,8 @@ onUnmounted(() => {
           <div class="h-48 rounded-2xl border border-gray-200 bg-white" />
         </div>
         <!-- Failed -->
-        <div v-else-if="hasFailed" class="mt-6 flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-white px-8 py-16 text-center">
-          <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <div v-else-if="hasFailed" class="mt-6 flex flex-col items-center justify-center rounded-2xl border border-danger-200 bg-white px-8 py-16 text-center">
+          <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">We couldn't load this booking</h1>

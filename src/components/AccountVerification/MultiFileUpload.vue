@@ -146,21 +146,21 @@ async function save() {
       <div v-for="(file, index) in files" :key="index"
            class="flex items-center justify-between p-3 rounded-lg transition-all duration-300 relative"
            :class="{
-             'bg-yellow-100 animate-pulse': (file.status === 'pending' || file.status === 'preparing'),
+             'bg-warning-100 animate-pulse': (file.status === 'pending' || file.status === 'preparing'),
              'bg-brand-700/20': file.status === 'uploading',
-             'bg-emerald-100': file.status === 'completed',
-             'bg-red-100': file.status === 'failed'
+             'bg-success-100': file.status === 'completed',
+             'bg-danger-100': file.status === 'failed'
            }">
         <div class="flex items-center space-x-3">
-          <ArrowPathIcon v-if="file.status === 'pending' || file.status === 'preparing'" class="w-5 h-5 mr-2 text-yellow-700 animate-spin" />
+          <ArrowPathIcon v-if="file.status === 'pending' || file.status === 'preparing'" class="w-5 h-5 mr-2 text-warning-700 animate-spin" />
           <Spinner v-if="file.status === 'uploading'" class="w-5 h-5 mr-2" />
-          <CheckCircleIcon v-else-if="file.status === 'completed'" class="text-emerald-700 w-5 h-5 mr-2" />
-          <XCircleIcon v-else-if="file.status === 'failed'" class="text-red-700 w-5 h-5 mr-2" />
+          <CheckCircleIcon v-else-if="file.status === 'completed'" class="text-success-700 w-5 h-5 mr-2" />
+          <XCircleIcon v-else-if="file.status === 'failed'" class="text-danger-700 w-5 h-5 mr-2" />
           <span :class="{
-            'text-yellow-700': file.status === 'pending',
+            'text-warning-700': file.status === 'pending',
             'text-brand-700': file.status === 'uploading',
-            'text-emerald-700': file.status === 'completed',
-            'text-red-700': file.status === 'failed'
+            'text-success-700': file.status === 'completed',
+            'text-danger-700': file.status === 'failed'
           }" class="truncate text-sm max-w-xs">{{ file.name }}</span>
         </div>
         <button @click="removeFile(index)" class="text-gray-500 text-sm hover:text-gray-700 cursor-pointer">

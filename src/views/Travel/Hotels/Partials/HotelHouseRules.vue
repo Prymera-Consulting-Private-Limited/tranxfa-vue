@@ -53,7 +53,7 @@ function description(charge) {
 function classes(charge) {
   switch (charge.inclusion) {
     case 'INCLUDED':
-      return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+      return 'bg-success-50 text-success-700 ring-success-200';
 
     case 'NOT-AVAILABLE':
       return 'bg-gray-100 text-gray-600 ring-gray-300';
@@ -62,7 +62,7 @@ function classes(charge) {
       return 'bg-gray-50 text-gray-500 ring-gray-200';
 
     default:
-      return 'bg-amber-50 text-amber-700 ring-amber-200';
+      return 'bg-warning-50 text-warning-700 ring-warning-200';
   }
 }
 

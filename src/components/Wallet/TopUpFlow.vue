@@ -141,24 +141,24 @@ function close() {
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Add money to your wallet</DialogTitle>
                 <p class="mt-1 text-sm text-gray-500">Declare the amount first, then transfer exactly that amount from your bank. The match is made on the amount, so it has to be spot on.</p>
 
-                <div v-if="generalError" class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">{{ generalError }}</div>
+                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm text-danger-600">{{ generalError }}</div>
 
-                <div v-if="collisionMessage" class="mt-4 border-l-4 border-yellow-400 bg-yellow-50 p-4">
+                <div v-if="collisionMessage" class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <div class="flex">
                     <div class="shrink-0">
-                      <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+                      <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                     </div>
                     <div class="ml-3">
-                      <p class="text-sm text-yellow-700">{{ collisionMessage }}</p>
+                      <p class="text-sm text-warning-700">{{ collisionMessage }}</p>
                     </div>
                   </div>
                 </div>
 
                 <form @submit.prevent="declare" class="mt-4">
-                  <label for="topup-amount" :class="[amountErrors.length > 0 ? 'text-red-600' : 'text-gray-900']" class="block text-sm/6 font-semibold">Amount <span class="text-red-500">*</span></label>
+                  <label for="topup-amount" :class="[amountErrors.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="block text-sm/6 font-semibold">Amount <span class="text-danger-600">*</span></label>
                   <input v-model="amount" id="topup-amount" type="text" inputmode="decimal" placeholder="0.00" class="mt-2 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm text-base text-gray-900 focus:outline-none" />
                   <template v-for="(message, i) in amountErrors" :key="`amount-error-${i}`">
-                    <p class="mt-2 text-sm text-red-600">{{ message }}</p>
+                    <p class="mt-2 text-sm text-danger-600">{{ message }}</p>
                   </template>
                   <button type="submit" :disabled="isSubmitting || ! amount" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
@@ -182,15 +182,15 @@ function close() {
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Make your bank transfer</DialogTitle>
                 <p v-if="account?.instruction" class="mt-1 text-sm text-gray-600 leading-6">{{ account.instruction }}</p>
 
-                <div v-if="generalError" class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">{{ generalError }}</div>
+                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm text-danger-600">{{ generalError }}</div>
 
-                <div class="mt-4 border-l-4 border-yellow-400 bg-yellow-50 p-4">
+                <div class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <div class="flex">
                     <div class="shrink-0">
-                      <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+                      <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                     </div>
                     <div class="ml-3">
-                      <p class="text-sm text-yellow-700">Transfer exactly <strong>{{ declaration?.amountFormatted }}</strong> — this is how we match your deposit to your wallet. A different amount will not be credited automatically.</p>
+                      <p class="text-sm text-warning-700">Transfer exactly <strong>{{ declaration?.amountFormatted }}</strong> — this is how we match your deposit to your wallet. A different amount will not be credited automatically.</p>
                     </div>
                   </div>
                 </div>
@@ -206,7 +206,7 @@ function close() {
                         <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
                       </button>
                     </div>
-                    <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Transfer Amount has been copied!</p>
+                    <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Transfer Amount has been copied!</p>
                   </UseClipboard>
                 </div>
 

@@ -49,11 +49,11 @@ function classes(payment) {
   switch (payment.state) {
     case 'CAPTURED':
     case 'AUTHORIZED':
-      return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+      return 'bg-success-50 text-success-700 ring-success-200';
 
     case 'FAILED':
     case 'TIMED-OUT':
-      return 'bg-red-50 text-red-700 ring-red-200';
+      return 'bg-danger-50 text-danger-700 ring-danger-200';
 
     case 'REFUNDED':
     case 'PART-REFUNDED':
@@ -63,7 +63,7 @@ function classes(payment) {
       return 'bg-gray-100 text-gray-600 ring-gray-300';
 
     default:
-      return 'bg-amber-50 text-amber-700 ring-amber-200';
+      return 'bg-warning-50 text-warning-700 ring-warning-200';
   }
 }
 </script>

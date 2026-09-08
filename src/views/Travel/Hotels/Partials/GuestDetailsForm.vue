@@ -311,9 +311,9 @@ const topErrors = computed(() => {
     </div>
     <!-- Right under the info box, not buried at the bottom of the form, since
     the button that triggers it lives in the sidebar and won't scroll this into view. -->
-    <div v-if="topErrors.length" class="mt-3 flex items-start gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-inset ring-red-200">
-      <ExclamationTriangleIcon class="mt-0.5 size-5 shrink-0 text-red-600" aria-hidden="true" />
-      <ul class="space-y-1 text-sm text-red-800">
+    <div v-if="topErrors.length" class="mt-3 flex items-start gap-3 rounded-xl bg-danger-50 p-4 ring-1 ring-inset ring-danger-200">
+      <ExclamationTriangleIcon class="mt-0.5 size-5 shrink-0 text-danger-600" aria-hidden="true" />
+      <ul class="space-y-1 text-sm text-danger-800">
         <li v-for="(message, index) in topErrors" :key="index">{{ message }}</li>
       </ul>
     </div>
@@ -333,18 +333,18 @@ const topErrors = computed(() => {
               <span class="text-xs font-medium text-gray-600">{{ guest.label }}</span>
               <span
                   v-if="guestStatus(guest) === 'named'"
-                  class="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700"
+                  class="rounded-full bg-success-50 px-2 py-0.5 text-[11px] font-medium text-success-700"
               >Included</span>
               <span
                   v-else-if="guestStatus(guest) === 'partial'"
-                  class="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700"
+                  class="rounded-full bg-warning-50 px-2 py-0.5 text-[11px] font-medium text-warning-700"
               >Missing a name</span>
               <span
                   v-else
                   class="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-500"
               >No details yet</span>
             </div>
-            <p v-for="(message, index) in otherGuestErrors(guest)" :key="index" class="mt-1 text-xs font-medium text-red-600">{{ message }}</p>
+            <p v-for="(message, index) in otherGuestErrors(guest)" :key="index" class="mt-1 text-xs font-medium text-danger-600">{{ message }}</p>
             <div :class="['mt-3 grid grid-cols-1 gap-3', guest.isChild ? 'sm:grid-cols-3' : 'sm:grid-cols-2']">
               <div>
                 <label class="block text-xs font-medium text-gray-700">First name</label>
@@ -355,7 +355,7 @@ const topErrors = computed(() => {
                     autocomplete="given-name"
                     class="mt-1 block w-full rounded-lg border-0 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600"
                 />
-                <p v-if="fieldError(guest, 'first_name')" class="mt-1 text-xs text-red-600">{{ fieldError(guest, 'first_name') }}</p>
+                <p v-if="fieldError(guest, 'first_name')" class="mt-1 text-xs text-danger-600">{{ fieldError(guest, 'first_name') }}</p>
               </div>
               <div>
                 <label class="block text-xs font-medium text-gray-700">Last name</label>
@@ -366,7 +366,7 @@ const topErrors = computed(() => {
                     autocomplete="family-name"
                     class="mt-1 block w-full rounded-lg border-0 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600"
                 />
-                <p v-if="fieldError(guest, 'last_name')" class="mt-1 text-xs text-red-600">{{ fieldError(guest, 'last_name') }}</p>
+                <p v-if="fieldError(guest, 'last_name')" class="mt-1 text-xs text-danger-600">{{ fieldError(guest, 'last_name') }}</p>
               </div>
               <!-- Age is only collected for children — the supplier rejects it
               for adults outright, since it's meant for child-pricing/eligibility
@@ -385,7 +385,7 @@ const topErrors = computed(() => {
                   />
                   <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-gray-500">years</span>
                 </div>
-                <p v-if="fieldError(guest, 'age')" class="mt-1 text-xs text-red-600">{{ fieldError(guest, 'age') }}</p>
+                <p v-if="fieldError(guest, 'age')" class="mt-1 text-xs text-danger-600">{{ fieldError(guest, 'age') }}</p>
                 <p v-else class="mt-1 text-xs text-gray-500">From your search — change only to correct it.</p>
               </div>
             </div>
@@ -401,16 +401,16 @@ const topErrors = computed(() => {
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
-              <p v-if="fieldError(guest, 'gender')" class="mt-1 text-xs text-red-600">{{ fieldError(guest, 'gender') }}</p>
+              <p v-if="fieldError(guest, 'gender')" class="mt-1 text-xs text-danger-600">{{ fieldError(guest, 'gender') }}</p>
             </div>
           </div>
         </div>
         <!-- The backend's own message, when there is one for this room, is more -->
         <!-- authoritative than the plain client-side reminder. -->
         <template v-if="formErrorsByRoom[roomIndex]?.length">
-          <p v-for="(message, index) in formErrorsByRoom[roomIndex]" :key="index" class="mt-3 text-xs font-medium text-red-600">{{ message }}</p>
+          <p v-for="(message, index) in formErrorsByRoom[roomIndex]" :key="index" class="mt-3 text-xs font-medium text-danger-600">{{ message }}</p>
         </template>
-        <p v-else-if="!roomHasNamedAdult(room.guests)" class="mt-3 text-xs font-medium text-amber-600">
+        <p v-else-if="!roomHasNamedAdult(room.guests)" class="mt-3 text-xs font-medium text-warning-700">
           Add a name for at least one adult in this room before continuing.
         </p>
       </div>

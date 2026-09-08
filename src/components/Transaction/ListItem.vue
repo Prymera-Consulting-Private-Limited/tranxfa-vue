@@ -25,7 +25,7 @@ const props = defineProps({
        borderColor: colorUtils.getStyleValue(transaction.state.colorScheme, 600),
      }">
         <component :style="{
-         color: colorUtils.getStyleValue(transaction.state.colorScheme, 600),
+         color: colorUtils.getStyleValue(transaction.state.colorScheme, 700),
        }" :is="TransactionStateIcon[transaction.state.code]" class="size-6" />
     </span>
     <div class="min-w-0 flex-auto">
@@ -41,14 +41,14 @@ const props = defineProps({
   <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
     <div class="mt-1 flex items-center gap-x-1.5">
       <p :style="{
-         color: colorUtils.getStyleValue(transaction.state.colorScheme, 600),
+         color: colorUtils.getStyleValue(transaction.state.colorScheme, 700),
        }" class="text-xs/5">
         <span :style="{
              backgroundColor: colorUtils.getStyleValue(transaction.state.colorScheme, 50),
              '--tw-ring-color': colorUtils.getStyleValue(transaction.state.colorScheme, 200),
            }" class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
           <svg :style="{
-             fill: colorUtils.getStyleValue(transaction.state.colorScheme, 600),
+             fill: colorUtils.getStyleValue(transaction.state.colorScheme, 700),
            }" class="size-1.5" viewBox="0 0 6 6" aria-hidden="true">
             <circle cx="3" cy="3" r="3" />
           </svg>

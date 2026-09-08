@@ -116,15 +116,15 @@ const retryPayment = async () => {
               <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
             </button>
           </div>
-          <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Payment Amount has been copied!</p>
+          <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Payment Amount has been copied!</p>
         </UseClipboard>
-        <div class="border-l-4 my-5 border-yellow-400 bg-yellow-50 p-4">
+        <div class="border-l-4 my-5 border-warning-400 bg-warning-50 p-4">
           <div class="flex">
             <div class="shrink-0">
-              <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+              <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
             </div>
             <div class="ml-3">
-              <p class="text-sm text-yellow-700">Ensure you pay the exact amount of <strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong>. Payments with incorrect amounts will be automatically refunded within 30–60 minutes.</p>
+              <p class="text-sm text-warning-700">Ensure you pay the exact amount of <strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong>. Payments with incorrect amounts will be automatically refunded within 30–60 minutes.</p>
             </div>
           </div>
         </div>
@@ -153,14 +153,14 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
+    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment Successful</h2>
     <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
-    <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
+    <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment Failed</h2>
+    <p class="text-base text-danger-600">Your payment has been failed. Please try again</p>
     <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Retry Payment</button>
   </template>
 </template>

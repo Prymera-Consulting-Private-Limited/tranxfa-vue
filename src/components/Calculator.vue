@@ -282,13 +282,13 @@ async function saveQuote() {
 
 </script>
 <template>
-  <div v-if="quoteFailureReason" class="rounded-b-md bg-red-50 px-8 py-12">
+  <div v-if="quoteFailureReason" class="rounded-b-md bg-danger-50 px-8 py-12">
     <div class="flex-col text-center">
       <div class="mx-auto">
-        <ExclamationTriangleIcon class="size-8 mt-0.5 text-red-700 mx-auto" aria-hidden="true" />
+        <ExclamationTriangleIcon class="size-8 mt-0.5 text-danger-700 mx-auto" aria-hidden="true" />
       </div>
       <div class="mt-3">
-        <div class="text-sm text-red-700">
+        <div class="text-sm text-danger-700">
           <p>{{ quoteFailureReason }}</p>
         </div>
       </div>
@@ -366,7 +366,7 @@ async function saveQuote() {
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
                   <p v-if="! isFetchingQuote" class="text-sm tracking-wider">
-                    <span class="text-emerald-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
+                    <span class="text-success-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
                     <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
                   </p>
                   <p v-else class="text-sm bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
@@ -493,13 +493,13 @@ async function saveQuote() {
             <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
             <div class="relative flex space-x-3">
               <div>
-              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-lime-700' : 'bg-gray-300']">
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-success-700' : 'bg-gray-300']">
                   <PercentBadgeIcon class="size-5 text-white"/>
               </span>
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-xs text-lime-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
+                  <p v-if="! isFetchingQuote" class="text-xs text-success-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
                   <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
@@ -528,13 +528,13 @@ async function saveQuote() {
       </ul>
       <template v-if="(customer.data?.isBlockedForSending || false) === false">
         <template v-if="quoteUtil.quote?.data?.transferDisableReason">
-          <div class="rounded-b-md bg-yellow-50 p-4 mt-12 -mx-5 -mb-8">
+          <div class="rounded-b-md bg-warning-50 p-4 mt-12 -mx-5 -mb-8">
             <div class="flex">
               <div class="shrink-0">
-                <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
+                <ExclamationTriangleIcon class="size-5 mt-0.5 text-warning-400" aria-hidden="true" />
               </div>
               <div class="ml-3">
-                <div class="text-sm text-yellow-700">
+                <div class="text-sm text-warning-700">
                   <p>{{ quoteUtil.quote?.data?.transferDisableReason }}</p>
                 </div>
               </div>
@@ -552,14 +552,14 @@ async function saveQuote() {
           </template>
         </button>
       </template>
-      <div v-else class="rounded-b-md bg-yellow-50 p-4 mt-12 -mx-5 -mb-8">
+      <div v-else class="rounded-b-md bg-warning-50 p-4 mt-12 -mx-5 -mb-8">
         <div class="flex">
           <div class="shrink-0">
-            <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
+            <ExclamationTriangleIcon class="size-5 mt-0.5 text-warning-400" aria-hidden="true" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-yellow-800">Your ability to send money is temporarily restricted.</h3>
-            <div class="mt-2 text-sm text-yellow-700">
+            <h3 class="text-sm font-medium text-warning-800">Your ability to send money is temporarily restricted.</h3>
+            <div class="mt-2 text-sm text-warning-700">
               <p>Please reach out to our customer support team for assistance or to understand the reason behind this restriction.</p>
             </div>
           </div>

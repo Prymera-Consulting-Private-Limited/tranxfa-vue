@@ -179,14 +179,14 @@ async function termsAccepted() {
           <div class="grid gap-8 lg:grid-cols-3">
             <div class="flex flex-col gap-4 lg:col-span-2">
 
-              <div v-if="walletStore.requiresReacceptance" class="border-l-4 border-yellow-400 bg-yellow-50 p-4 rounded-r-lg">
+              <div v-if="walletStore.requiresReacceptance" class="border-l-4 border-warning-400 bg-warning-50 p-4 rounded-r-lg">
                 <div class="flex items-start">
                   <div class="shrink-0">
-                    <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+                    <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm text-yellow-700">We've updated the wallet terms. Your balance is safe and visible, but adding and spending money is paused until you accept the new version.</p>
-                    <button type="button" @click="reviewNewTerms" class="mt-2 text-sm font-semibold text-yellow-800 hover:text-yellow-900 cursor-pointer">Review and accept &rarr;</button>
+                    <p class="text-sm text-warning-700">We've updated the wallet terms. Your balance is safe and visible, but adding and spending money is paused until you accept the new version.</p>
+                    <button type="button" @click="reviewNewTerms" class="mt-2 text-sm font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Review and accept &rarr;</button>
                   </div>
                 </div>
               </div>
@@ -205,7 +205,7 @@ async function termsAccepted() {
                         <button @click="copy()" type="button" class="cursor-pointer text-gray-500 hover:text-gray-600" aria-label="Copy wallet number">
                           <ClipboardIcon class="size-4" aria-hidden="true" />
                         </button>
-                        <span v-if="copied" class="text-xs text-green-600">Copied!</span>
+                        <span v-if="copied" class="text-xs text-success-700">Copied!</span>
                       </p>
                     </UseClipboard>
                   </div>

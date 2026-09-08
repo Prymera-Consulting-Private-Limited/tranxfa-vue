@@ -173,8 +173,8 @@ onUnmounted(() => clearInterval(clock));
         </div>
         <!-- The hold ran out. Not an error the customer made, so it reads as an
         expiry with a way forward rather than as a failure. -->
-        <div v-else-if="hasExpired || bookingRefused || !isHeld" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-amber-200">
-          <div class="flex size-14 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+        <div v-else-if="hasExpired || bookingRefused || !isHeld" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-warning-200">
+          <div class="flex size-14 items-center justify-center rounded-full bg-warning-50 text-warning-700">
             <ClockIcon class="size-7" aria-hidden="true" />
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">
@@ -189,8 +189,8 @@ onUnmounted(() => clearInterval(clock));
           >Search again</RouterLink>
         </div>
         <!-- Failed -->
-        <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-red-200">
-          <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-danger-200">
+          <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">We couldn't load this price</h1>
@@ -205,7 +205,7 @@ onUnmounted(() => clearInterval(clock));
         <template v-else-if="quote">
           <!-- Countdown -->
           <div :class="[
-            isRunningOut ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-gray-200 bg-white text-gray-600',
+            isRunningOut ? 'border-warning-200 bg-warning-50 text-warning-800' : 'border-gray-200 bg-white text-gray-600',
             'flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-2xl border px-5 py-3',
           ]">
             <p class="flex items-center gap-2 text-sm font-medium">
@@ -265,7 +265,7 @@ onUnmounted(() => clearInterval(clock));
               </div>
             </dl>
             <!-- Not part of the total: the hotel collects this on arrival. -->
-            <p v-if="quote.payableAtProperty.isStated" class="border-t border-gray-100 px-5 py-3 text-sm text-amber-700">
+            <p v-if="quote.payableAtProperty.isStated" class="border-t border-gray-100 px-5 py-3 text-sm text-warning-700">
               Plus {{ quote.payableAtProperty.currencyPrefixed }} payable at the property
             </p>
           </section>

@@ -34,7 +34,7 @@ const times = computed(() => {
 <template>
   <header>
     <div class="flex flex-wrap items-center gap-2">
-      <span v-if="hotel.starRating" class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 ring-1 ring-amber-100 ring-inset">
+      <span v-if="hotel.starRating" class="inline-flex items-center rounded-full bg-warning-50 px-2.5 py-1 ring-1 ring-warning-100 ring-inset">
         <HotelRating :stars="hotel.starRating" />
       </span>
     </div>

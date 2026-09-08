@@ -16,13 +16,13 @@ const props = defineProps({
 const classes = computed(() => {
   switch (props.order.state) {
     case 'FULFILLED':
-      return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+      return 'bg-success-50 text-success-700 ring-success-200';
 
     case 'CONFIRMED':
       return 'bg-brand-50 text-brand-800 ring-brand-200';
 
     case 'FAILED':
-      return 'bg-red-50 text-red-700 ring-red-200';
+      return 'bg-danger-50 text-danger-700 ring-danger-200';
 
     case 'CANCELLED':
       return 'bg-gray-100 text-gray-600 ring-gray-300';
@@ -38,10 +38,10 @@ const classes = computed(() => {
     <span :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium ring-1 ring-inset']">{{ order.stateLabel ?? order.state }}</span>
     <!-- The hotel answers separately and later, so this is the ordinary state of
     a new booking rather than anything having gone wrong. -->
-    <span v-if="order.isAwaitingHotel" class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-200 ring-inset">
+    <span v-if="order.isAwaitingHotel" class="inline-flex items-center gap-1.5 rounded-lg bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700 ring-1 ring-warning-200 ring-inset">
       <span class="relative flex size-1.5">
-        <span class="absolute inline-flex size-full animate-ping rounded-full bg-amber-500 opacity-75" />
-        <span class="relative inline-flex size-1.5 rounded-full bg-amber-500" />
+        <span class="absolute inline-flex size-full animate-ping rounded-full bg-warning-500 opacity-75" />
+        <span class="relative inline-flex size-1.5 rounded-full bg-warning-500" />
       </span>
       Confirming with the hotel
     </span>

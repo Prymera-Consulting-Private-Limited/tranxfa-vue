@@ -123,7 +123,7 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
         Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your Interac e-Transfer.
       </p>
-      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
+      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-success-600 text-white text-center py-3 rounded-md font-medium hover:bg-success-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the Interac platform to finalize your payment.</p>
     </div>
   </template>
@@ -145,27 +145,27 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
+    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment Successful</h2>
     <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-red-500 mb-3 -mt-15">Payment Failed</h2>
-    <p class="text-base text-red-600 mb-5">Your payment could not be completed.</p>
+    <h2 class="text-2xl font-semibold text-danger-600 mb-3 -mt-15">Payment Failed</h2>
+    <p class="text-base text-danger-600 mb-5">Your payment could not be completed.</p>
     <template v-if="transaction.payment.paymentProvider.paymentDataAttributes?.length > 0">
       <p class="text-sm text-gray-600 mb-2 text-left">Please review or update the information below and double-check that everything is correct, then try again.</p>
       <template v-for="attribute in transaction.payment.paymentProvider.paymentDataAttributes">
         <div class="mb-3 text-left">
-          <label :class="[retryFormErrors[`${attribute.attribute}`]?.length > 0 ? 'text-red-600' : 'text-gray-900']" :for="`payment-data-${attribute.attribute}`" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-red-500" v-if="attribute.isRequired">*</span></label>
+          <label :class="[retryFormErrors[`${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" :for="`payment-data-${attribute.attribute}`" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
           <p v-if="attribute.info" class="mb-4 text-sm text-gray-500">{{ attribute.info }}</p>
           <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
           <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
-          <p v-if="retryFormErrors[`${attribute.attribute}`]?.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ retryFormErrors[`${attribute.attribute}`][0] }}</p>
+          <p v-if="retryFormErrors[`${attribute.attribute}`]?.length > 0" class="mt-2 text-sm text-danger-600">{{ retryFormErrors[`${attribute.attribute}`][0] }}</p>
         </div>
       </template>
     </template>
     <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-600 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition cursor-pointer text-sm outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Retry Payment</button>
-    <p class="text-base text-red-600 mt-5 text-sm">If the issue continues, please contact our support team. We'll be happy to assist you!</p>
+    <p class="text-base text-danger-600 mt-5 text-sm">If the issue continues, please contact our support team. We'll be happy to assist you!</p>
   </template>
 </template>

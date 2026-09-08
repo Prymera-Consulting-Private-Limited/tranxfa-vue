@@ -136,7 +136,7 @@ async function closeSdk() {
             <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all min-w-sm sm:my-8 sm:w-full lg:min-w-md sm:max-w-sm lg:max-w-md lg:w-md">
               <button class="sr-only"></button>
               <div v-if="sdkRejected" role="alert" class="p-10 text-center">
-                <ExclamationTriangleIcon class="mx-auto size-12 text-amber-500" />
+                <ExclamationTriangleIcon class="mx-auto size-12 text-warning-500" />
                 <h3 class="mt-4 text-sm font-medium text-gray-900">This document was not accepted</h3>
                 <p class="mt-2 text-sm text-gray-500">{{ sdkRejectionReason || 'The check did not pass. You can try again with a clearer photo, or a different document.' }}</p>
                 <div class="mt-6 flex justify-center gap-3">
@@ -145,7 +145,7 @@ async function closeSdk() {
                 </div>
               </div>
               <div v-else-if="sdkErrorMessage" role="alert" class="p-10 text-center">
-                <ExclamationTriangleIcon class="mx-auto size-12 text-red-500" />
+                <ExclamationTriangleIcon class="mx-auto size-12 text-danger-500" />
                 <h3 class="mt-4 text-sm font-medium text-gray-900">Verification could not start</h3>
                 <p class="mt-2 text-sm text-gray-500">{{ sdkErrorMessage }}</p>
                 <div class="mt-6 flex justify-center gap-3">

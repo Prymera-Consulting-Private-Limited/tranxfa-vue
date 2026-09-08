@@ -60,10 +60,10 @@ defineEmits(['confirm', 'cancel']);
             <DialogPanel class="relative w-full transform overflow-hidden rounded-3xl bg-white text-center shadow-2xl transition-all sm:my-8 sm:max-w-md">
               <!-- A soft amber wash behind the icon, so the "heads up" tone reads
               before a single word does without shouting error-red. -->
-              <div class="bg-gradient-to-b from-amber-50 to-white px-6 pt-8">
+              <div class="bg-gradient-to-b from-warning-50 to-white px-6 pt-8">
                 <div class="relative mx-auto size-14">
-                  <span class="absolute inset-0 animate-ping rounded-full bg-amber-200/60 [animation-duration:2.5s]" aria-hidden="true" />
-                  <span class="relative flex size-14 items-center justify-center rounded-full bg-white text-amber-500 shadow-sm ring-1 ring-amber-200">
+                  <span class="absolute inset-0 animate-ping rounded-full bg-warning-200/60 [animation-duration:2.5s]" aria-hidden="true" />
+                  <span class="relative flex size-14 items-center justify-center rounded-full bg-white text-warning-700 shadow-sm ring-1 ring-warning-200">
                     <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
                   </span>
                 </div>

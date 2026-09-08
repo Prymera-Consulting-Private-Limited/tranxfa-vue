@@ -121,7 +121,7 @@ function close() {
 
               <template v-if="enrolled">
                 <div class="text-center py-4">
-                  <CheckCircleIcon class="mx-auto size-12 text-green-500" aria-hidden="true" />
+                  <CheckCircleIcon class="mx-auto size-12 text-success-500" aria-hidden="true" />
                   <DialogTitle as="h3" class="mt-3 text-lg font-semibold text-gray-900">Your wallet is active</DialogTitle>
                   <p class="mt-2 text-sm text-gray-500">Here is your wallet number — you'll see it on your wallet screen and statements.</p>
                   <div class="mt-4 max-w-xs mx-auto text-left">
@@ -134,7 +134,7 @@ function close() {
                           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
                         </button>
                       </div>
-                      <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Wallet number has been copied!</p>
+                      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Wallet number has been copied!</p>
                     </UseClipboard>
                   </div>
                   <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
@@ -148,8 +148,8 @@ function close() {
                 <p v-if="mode === 'reaccept'" class="mt-2 rounded-md bg-brand-50 px-4 py-3 text-sm text-brand-800">We've updated the wallet terms. Review and accept the new version to keep using your wallet — your balance is safe either way.</p>
                 <p v-else class="mt-1 text-sm text-gray-500">Please read and accept the terms to activate your wallet.</p>
 
-                <div v-if="generalError" class="mt-4 border-l-4 border-yellow-400 bg-yellow-50 p-4">
-                  <p class="text-sm text-yellow-700">{{ generalError }}</p>
+                <div v-if="generalError" class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
+                  <p class="text-sm text-warning-700">{{ generalError }}</p>
                 </div>
 
                 <div v-if="isLoadingTerms" class="mt-4 space-y-2 animate-pulse">

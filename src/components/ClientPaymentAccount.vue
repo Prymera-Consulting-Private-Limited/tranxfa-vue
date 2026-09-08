@@ -20,7 +20,7 @@ defineProps({
           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
         </button>
       </div>
-      <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">{{ accountAttribute.key }} has been copied!</p>
+      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">{{ accountAttribute.key }} has been copied!</p>
     </UseClipboard>
   </div>
   <div class="text-left my-3">
@@ -34,7 +34,7 @@ defineProps({
           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
         </button>
       </div>
-      <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Payment Reference has been copied!</p>
+      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Payment Reference has been copied!</p>
     </UseClipboard>
   </div>
 </template>

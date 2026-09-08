@@ -163,7 +163,7 @@ function formatPrice(amount) {
                 class="size-4 shrink-0 cursor-pointer rounded border-gray-300 accent-brand-700"
             />
             <span class="flex items-center gap-0.5">
-              <StarIcon v-for="index in star.value" :key="index" class="size-3.5 text-amber-400" aria-hidden="true" />
+              <StarIcon v-for="index in star.value" :key="index" class="size-3.5 text-warning-400" aria-hidden="true" />
             </span>
             <span class="ml-auto text-xs text-gray-500 tabular-nums">{{ star.count }}</span>
           </label>

@@ -150,8 +150,8 @@ const isFiltered = computed(() => upcoming.value || state.value !== null);
             <BookingSkeleton v-for="index in 3" :key="index" />
           </template>
           <!-- Failed -->
-          <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-white px-8 py-16 text-center">
-            <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+          <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-2xl border border-danger-200 bg-white px-8 py-16 text-center">
+            <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
               <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
             </div>
             <h2 class="mt-6 text-base font-semibold text-gray-900">We couldn't load your bookings</h2>

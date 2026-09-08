@@ -57,8 +57,8 @@ const isInflow = computed(() => {
 
 <template>
   <div class="flex min-w-0 gap-x-4">
-    <div :class="[isInflow ? 'bg-green-100' : 'bg-gray-100', 'flex size-10 shrink-0 items-center justify-center rounded-full']">
-      <component :is="kindIcon" :class="[isInflow ? 'text-green-600' : 'text-gray-500']" class="size-5" aria-hidden="true" />
+    <div :class="[isInflow ? 'bg-success-100' : 'bg-gray-100', 'flex size-10 shrink-0 items-center justify-center rounded-full']">
+      <component :is="kindIcon" :class="[isInflow ? 'text-success-600' : 'text-gray-500']" class="size-5" aria-hidden="true" />
     </div>
     <div class="min-w-0 flex-auto">
       <p class="text-sm font-medium text-gray-900">{{ movement.description }}</p>
@@ -66,6 +66,6 @@ const isInflow = computed(() => {
     </div>
   </div>
   <div class="flex shrink-0 items-center">
-    <p :class="[movement.isCredit() ? 'text-green-600' : 'text-gray-900', 'text-sm font-semibold']">{{ movement.amountFormatted }}</p>
+    <p :class="[movement.isCredit() ? 'text-success-700' : 'text-gray-900', 'text-sm font-semibold']">{{ movement.amountFormatted }}</p>
   </div>
 </template>

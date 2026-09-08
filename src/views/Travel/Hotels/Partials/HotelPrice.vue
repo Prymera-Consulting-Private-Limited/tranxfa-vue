@@ -48,6 +48,6 @@ const showBreakdown = computed(() => lines.value.length > 1);
       </div>
     </dl>
     <!-- Not part of the total: the hotel collects this on arrival -->
-    <p v-if="rate.payableAtProperty.isStated" class="mt-2 text-xs text-amber-700">Plus {{ rate.payableAtProperty.currencyPrefixed }} payable at the property</p>
+    <p v-if="rate.payableAtProperty.isStated" class="mt-2 text-xs text-warning-700">Plus {{ rate.payableAtProperty.currencyPrefixed }} payable at the property</p>
   </div>
 </template>

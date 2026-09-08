@@ -138,11 +138,11 @@ function close() {
               <p class="mt-1 text-sm text-gray-500">We've emailed you a 6-digit code for this payment. It's valid for 10 minutes. It may take a minute to arrive — check your spam folder too.</p>
 
               <form @submit.prevent="submit" class="mt-5">
-                <div v-if="error" class="mb-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-                  <p class="text-sm text-red-700">{{ error }}</p>
+                <div v-if="error" class="mb-4 rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
+                  <p class="text-sm text-danger-700">{{ error }}</p>
                 </div>
-                <div v-if="resendError" class="mb-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-                  <p class="text-sm text-red-700">{{ resendError }}</p>
+                <div v-if="resendError" class="mb-4 rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
+                  <p class="text-sm text-danger-700">{{ resendError }}</p>
                 </div>
                 <v-otp-input
                     ref="otpInput"

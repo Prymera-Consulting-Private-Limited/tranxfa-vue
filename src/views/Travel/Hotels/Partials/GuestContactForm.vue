@@ -152,11 +152,11 @@ function submit() {
                   :maxlength="NAME_MAX"
                   placeholder="First name"
                   :class="[
-                    fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`) ? 'ring-red-300' : 'ring-gray-200',
+                    fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`) ? 'ring-danger-300' : 'ring-gray-200',
                     'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
                   ]"
               />
-              <p v-if="fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`)" class="mt-1 text-xs text-red-600">{{ fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`) }}</p>
+              <p v-if="fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`)" class="mt-1 text-xs text-danger-600">{{ fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`) }}</p>
             </div>
             <div>
               <input
@@ -166,11 +166,11 @@ function submit() {
                   :maxlength="NAME_MAX"
                   placeholder="Last name"
                   :class="[
-                    fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`) ? 'ring-red-300' : 'ring-gray-200',
+                    fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`) ? 'ring-danger-300' : 'ring-gray-200',
                     'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
                   ]"
               />
-              <p v-if="fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`)" class="mt-1 text-xs text-red-600">{{ fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`) }}</p>
+              <p v-if="fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`)" class="mt-1 text-xs text-danger-600">{{ fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`) }}</p>
             </div>
           </div>
         </div>
@@ -186,11 +186,11 @@ function submit() {
                 autocomplete="email"
                 placeholder="Email address"
                 :class="[
-                  fieldError('email') ? 'ring-red-300' : 'ring-gray-200',
+                  fieldError('email') ? 'ring-danger-300' : 'ring-gray-200',
                   'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
                 ]"
             />
-            <p v-if="fieldError('email')" class="mt-1 text-xs text-red-600">{{ fieldError('email') }}</p>
+            <p v-if="fieldError('email')" class="mt-1 text-xs text-danger-600">{{ fieldError('email') }}</p>
           </div>
           <div>
             <input
@@ -200,15 +200,15 @@ function submit() {
                 placeholder="Phone number"
                 :maxlength="PHONE_MAX"
                 :class="[
-                  fieldError('phone') ? 'ring-red-300' : 'ring-gray-200',
+                  fieldError('phone') ? 'ring-danger-300' : 'ring-gray-200',
                   'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
                 ]"
             />
-            <p v-if="fieldError('phone')" class="mt-1 text-xs text-red-600">{{ fieldError('phone') }}</p>
+            <p v-if="fieldError('phone')" class="mt-1 text-xs text-danger-600">{{ fieldError('phone') }}</p>
           </div>
         </div>
       </div>
-      <div v-if="submitError" class="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      <div v-if="submitError" class="flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm text-danger-700">
         <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
         <span>{{ submitError }}</span>
       </div>

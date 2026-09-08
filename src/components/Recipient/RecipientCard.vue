@@ -48,7 +48,7 @@ onMounted(() => {
       <template v-if="recipient?.channel?.payoutMethod">
         <dt class="sr-only">Payout Method</dt>
         <dd class="mt-3">
-          <span class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">{{ recipient.channel.payoutMethod.title }}</span>
+          <span class="inline-flex items-center rounded-full bg-success-50 px-2 py-1 text-xs font-medium text-success-700 ring-1 ring-success-600/20 ring-inset">{{ recipient.channel.payoutMethod.title }}</span>
         </dd>
       </template>
       <slot />

@@ -27,8 +27,8 @@ const label = computed(() => {
 
 const classes = computed(() => {
   return props.allotment <= 0
-      ? 'bg-red-50 text-red-700 ring-red-200'
-      : 'bg-amber-50 text-amber-700 ring-amber-200';
+      ? 'bg-danger-50 text-danger-700 ring-danger-200'
+      : 'bg-warning-50 text-warning-700 ring-warning-200';
 });
 </script>
 

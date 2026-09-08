@@ -91,11 +91,11 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
     </div>
     <!-- A room selling out between reading about it and choosing it is ordinary,
     so it is answered in place rather than as an error the customer must dismiss. -->
-    <div v-if="roomGone" class="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+    <div v-if="roomGone" class="flex items-start gap-2 rounded-xl border border-warning-200 bg-warning-50 p-3 text-sm text-warning-800">
       <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <span>That room has just gone. Choose another from the list.</span>
     </div>
-    <div v-else-if="failureMessage" class="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+    <div v-else-if="failureMessage" class="flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm text-danger-700">
       <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <span>{{ failureMessage }}</span>
     </div>

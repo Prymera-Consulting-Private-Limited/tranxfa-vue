@@ -206,8 +206,8 @@ function providerName(method) {
           <div class="h-56 rounded-3xl bg-white ring-1 ring-gray-200" />
         </div>
         <!-- Failed -->
-        <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-red-200">
-          <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-danger-200">
+          <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">{{ failureTitle }}</h1>
@@ -221,11 +221,11 @@ function providerName(method) {
         </div>
         <template v-else-if="order">
           <!-- The room is booked; this is only about paying for it. -->
-          <div class="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4">
-            <CheckCircleIcon class="mt-0.5 size-5 shrink-0 text-emerald-600" aria-hidden="true" />
+          <div class="flex items-start gap-3 rounded-2xl border border-success-200 bg-success-50 px-5 py-4">
+            <CheckCircleIcon class="mt-0.5 size-5 shrink-0 text-success-600" aria-hidden="true" />
             <div>
-              <p class="text-sm font-medium text-emerald-900">Your room is booked</p>
-              <p class="mt-0.5 text-sm text-emerald-800">{{ order.hotel?.name }} — pay now to confirm it with the hotel.</p>
+              <p class="text-sm font-medium text-success-900">Your room is booked</p>
+              <p class="mt-0.5 text-sm text-success-800">{{ order.hotel?.name }} — pay now to confirm it with the hotel.</p>
             </div>
           </div>
           <!-- Volume builds its bank picker in the page rather than sending the
@@ -275,7 +275,7 @@ function providerName(method) {
               There are no payment methods available for this booking. Please get in touch and we'll sort it out.
             </p>
             <div v-if="hasMethods" class="border-t border-gray-100 px-5 py-5">
-              <div v-if="paymentError" class="mb-3 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <div v-if="paymentError" class="mb-3 flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm text-danger-700">
                 <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <span>{{ paymentError }}</span>
               </div>

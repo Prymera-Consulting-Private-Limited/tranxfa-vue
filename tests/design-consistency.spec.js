@@ -138,3 +138,56 @@ describe('accessibility', () => {
             expect(fors.filter(x => !ids.has(x)), 'label points at no such field').toEqual([]);
         });
 });
+
+// Utility classes, not inline styles: the status-colour spec guards the badge
+// var() path, this guards the 500-odd `text-danger-500`-shaped classes. Icons are
+// excluded on purpose - WCAG asks 3:1 of a non-text glyph, and darkening a star
+// rating to body-text contrast only makes it muddy.
+describe('status text contrast', () => {
+    const css = fs.readFileSync(path.join(SRC, 'assets', 'main.css'), 'utf8');
+    const tokens = Object.fromEntries(
+        [...css.matchAll(/--color-([a-z]+)-(\d+):\s*(#[0-9a-f]{6})/gi)].map(m => [`${m[1]}-${m[2]}`, m[3]])
+    );
+
+    const onWhite = hex => {
+        const channels = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+            .map(c => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+        const l = 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+
+        return 1.05 / (l + 0.05);
+    };
+
+    const isIcon = line => /<i |pi-|Icon|<svg|svg |aria-hidden/.test(line);
+
+    it('never sets body text to a status step below AA', () => {
+        const failures = [];
+        for (const f of vueFiles()) {
+            lines(f).forEach((line, i) => {
+                if (isIcon(line)) return;
+                for (const m of line.matchAll(/text-(success|warning|danger|info|neutral)-(\d{2,3})\b/g)) {
+                    const hex = tokens[`${m[1]}-${m[2]}`];
+                    if (!hex) return failures.push(`${rel(f)}:${i + 1} ${m[0]} - no such token`);
+                    const ratio = onWhite(hex);
+                    if (ratio < 4.5) failures.push(`${rel(f)}:${i + 1} ${m[0]} is ${ratio.toFixed(2)}:1`);
+                }
+            });
+        }
+
+        expect(failures).toEqual([]);
+    });
+
+    // A class Tailwind cannot generate is inert: the element renders in whatever
+    // it inherited. Five of these were already shipped, at -900 steps no ramp
+    // defined.
+    it('only uses semantic steps the ramps define', () => {
+        const missing = new Set();
+        for (const f of vueFiles()) {
+            for (const m of fs.readFileSync(f, 'utf8')
+                .matchAll(/-(success|warning|danger|info|neutral)-(\d{2,3})\b/g)) {
+                if (!tokens[`${m[1]}-${m[2]}`]) missing.add(`--color-${m[1]}-${m[2]}`);
+            }
+        }
+
+        expect([...missing]).toEqual([]);
+    });
+});

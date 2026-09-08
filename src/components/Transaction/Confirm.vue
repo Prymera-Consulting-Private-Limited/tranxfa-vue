@@ -89,8 +89,8 @@ if (props.quote.payoutMethod.promo) {
     icon: PercentBadgeIcon,
     label: null,
     value: props.quote.payoutMethod.promo,
-    color: 'bg-lime-50 border-lime-400 ',
-    textColor: 'text-lime-700',
+    color: 'bg-success-50 border-success-400 ',
+    textColor: 'text-success-700',
   });
 }
 reviewItems.push({

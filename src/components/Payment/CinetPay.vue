@@ -79,7 +79,7 @@ const retryPayment = async () => {
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
         Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your payment.
       </p>
-      <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
+      <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-success-600 text-white text-center py-3 rounded-md font-medium hover:bg-success-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the secure site to finalize your payment.</p>
     </div>
   </template>
@@ -101,14 +101,14 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
+    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment Successful</h2>
     <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
-    <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
+    <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment Failed</h2>
+    <p class="text-base text-danger-600">Your payment has been failed. Please try again</p>
     <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Retry Payment</button>
   </template>
 </template>

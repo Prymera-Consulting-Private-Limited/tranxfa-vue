@@ -121,9 +121,9 @@ function updateIsdCode(updated) {
             <p class="text-sm text-[#B7A3C1] mb-6 ">Send your money transfer easy and Fun!</p>
             <!-- Form -->
             <form @submit.prevent="login" class="space-y-5">
-              <div v-if="loginError" class="rounded-2xl bg-red-50 border border-red-100 px-4 py-3">
-                <h3 class="text-sm font-medium text-red-800">Login failed</h3>
-                <p class="mt-1 text-sm text-red-700">{{ loginError }}</p>
+              <div v-if="loginError" class="rounded-2xl bg-danger-50 border border-danger-100 px-4 py-3">
+                <h3 class="text-sm font-medium text-danger-800">Login failed</h3>
+                <p class="mt-1 text-sm text-danger-700">{{ loginError }}</p>
               </div>
               <div v-if="router.currentRoute.value.query?.referer" class="rounded-2xl bg-blue-50 border border-blue-100 px-4 py-3">
                 <p v-if="router.currentRoute.value.query.referer === 'change-password'" class="text-sm text-blue-700">

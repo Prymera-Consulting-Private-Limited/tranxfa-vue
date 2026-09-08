@@ -256,7 +256,7 @@ async function submit() {
               <form class="mt-6 space-y-5" @submit.prevent="submit">
                 <p
                   v-if="formErrors.general"
-                  class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
+                  class="rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700"
                 >
                   {{ formErrors.general }}
                 </p>
@@ -281,7 +281,7 @@ async function submit() {
                     <p
                       v-for="(msg, i) in formErrors.start_date"
                       :key="`start-${i}`"
-                      class="mt-1 text-sm text-red-600"
+                      class="mt-1 text-sm text-danger-600"
                     >
                       {{ msg }}
                     </p>
@@ -305,7 +305,7 @@ async function submit() {
                     <p
                       v-for="(msg, i) in formErrors.end_date"
                       :key="`end-${i}`"
-                      class="mt-1 text-sm text-red-600"
+                      class="mt-1 text-sm text-danger-600"
                     >
                       {{ msg }}
                     </p>
@@ -337,7 +337,7 @@ async function submit() {
                   <p
                     v-for="(msg, i) in formErrors.type"
                     :key="`type-${i}`"
-                    class="mt-1 text-sm text-red-600"
+                    class="mt-1 text-sm text-danger-600"
                   >
                     {{ msg }}
                   </p>
@@ -361,7 +361,7 @@ async function submit() {
                   <p
                     v-for="(msg, i) in formErrors.currency"
                     :key="`currency-${i}`"
-                    class="mt-1 text-sm text-red-600"
+                    class="mt-1 text-sm text-danger-600"
                   >
                     {{ msg }}
                   </p>
@@ -382,7 +382,7 @@ async function submit() {
                   <p
                     v-for="(msg, i) in formErrors.email"
                     :key="`email-${i}`"
-                    class="mt-1 text-sm text-red-600"
+                    class="mt-1 text-sm text-danger-600"
                   >
                     {{ msg }}
                   </p>

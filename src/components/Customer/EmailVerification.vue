@@ -105,8 +105,8 @@ onMounted(async () => {
       <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
       <!-- Form -->
       <form @submit.prevent="verifyEmailAddress" class="space-y-10">
-        <div v-if="otpError" class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-          <p class="text-sm text-red-700">{{ otpError }}</p>
+        <div v-if="otpError" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
+          <p class="text-sm text-danger-700">{{ otpError }}</p>
         </div>
         <v-otp-input
             class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"

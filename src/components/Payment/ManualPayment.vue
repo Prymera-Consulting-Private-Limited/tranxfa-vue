@@ -126,7 +126,7 @@ const status = computed(() => {
               <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
             </button>
           </div>
-          <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Payment Amount has been copied!</p>
+          <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Payment Amount has been copied!</p>
         </UseClipboard>
       </div>
         <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
@@ -156,13 +156,13 @@ const status = computed(() => {
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
+    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment Successful</h2>
     <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Payment Failed</h2>
-    <p class="text-base text-red-600">Your payment has been failed. Please try again</p>
+    <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment Failed</h2>
+    <p class="text-base text-danger-600">Your payment has been failed. Please try again</p>
   </template>
 </template>
