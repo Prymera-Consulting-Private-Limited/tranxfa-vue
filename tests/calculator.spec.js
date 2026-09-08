@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import {createPinia, setActivePinia} from "pinia";
 import axios from "axios";
@@ -54,10 +54,28 @@ async function mountCalculator(quoteFixture = 'quote-send-100') {
 const errorsOn = (wrapper, id) =>
     JSON.parse(wrapper.get(`[data-id="${id}"]`).attributes('data-errors') || '[]');
 
+/**
+ * Type into one of the amount fields and let the debounce elapse.
+ *
+ * Amount edits are debounced by 300ms, so emitting alone no longer produces a
+ * request - which is the point of the debounce and the reason every test that
+ * types has to go through here rather than awaiting flushPromises on its own.
+ */
+async function typeAmount(input, amount) {
+    input.vm.$emit('update:amount', amount);
+    await vi.advanceTimersByTimeAsync(300);
+    await flushPromises();
+}
+
 describe('Calculator', () => {
     beforeEach(() => {
+        vi.useFakeTimers();
         vi.clearAllMocks();
         loadCustomer();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('quotes on mount and renders both money inputs', async () => {
@@ -75,8 +93,7 @@ describe('Calculator', () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
 
-        await wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '250');
-        await flushPromises();
+        await typeAmount(wrapper.getComponent({name: 'MoneyInput'}), '250');
 
         const params = axios.get.mock.calls.at(-1)[1].params;
         expect(params.amount_type).toBe('send');
@@ -88,8 +105,7 @@ describe('Calculator', () => {
         axios.get.mockClear();
 
         const inputs = wrapper.findAllComponents({name: 'MoneyInput'});
-        await inputs[1].vm.$emit('update:amount', '900');
-        await flushPromises();
+        await typeAmount(inputs[1], '900');
 
         const params = axios.get.mock.calls.at(-1)[1].params;
         expect(params.amount_type).toBe('receive');
@@ -110,8 +126,7 @@ describe('Calculator', () => {
         expect(errorsOn(wrapper, 'send-money-input')).toHaveLength(1);
 
         axios.get.mockResolvedValue(fixtureResponse('quote-send-100'));
-        await wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '100');
-        await flushPromises();
+        await typeAmount(wrapper.getComponent({name: 'MoneyInput'}), '100');
 
         expect(errorsOn(wrapper, 'send-money-input')).toEqual([]);
     });
@@ -127,8 +142,7 @@ describe('Calculator', () => {
                 }),
             );
 
-            await wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '1');
-            await flushPromises();
+            await typeAmount(wrapper.getComponent({name: 'MoneyInput'}), '1');
 
             expect(errorsOn(wrapper, 'send-money-input')).toEqual(['Too small.']);
             expect(errorsOn(wrapper, 'receive-money-input')).toEqual([]);
@@ -143,8 +157,7 @@ describe('Calculator', () => {
             );
 
             const inputs = wrapper.findAllComponents({name: 'MoneyInput'});
-            await inputs[1].vm.$emit('update:amount', '1');
-            await flushPromises();
+            await typeAmount(inputs[1], '1');
 
             expect(errorsOn(wrapper, 'receive-money-input')).toEqual(['Too small.']);
             expect(errorsOn(wrapper, 'send-money-input')).toEqual([]);
@@ -212,5 +225,129 @@ describe('Calculator', () => {
 
         expect(wrapper.find('button[type="submit"]').exists()).toBe(false);
         expect(wrapper.text()).toMatch(/temporarily restricted/i);
+    });
+});
+
+describe('Calculator quote debounce', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.clearAllMocks();
+        loadCustomer();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    // The reason this exists: every character used to fire its own /quote, so
+    // typing "1000" was four requests against a rate provider and three of them
+    // were thrown away before anyone saw them.
+    it('makes one request for a burst of typing, not one per character', async () => {
+        const wrapper = await mountCalculator();
+        axios.get.mockClear();
+        const input = wrapper.getComponent({name: 'MoneyInput'});
+
+        for (const amount of ['1', '10', '100', '1000']) {
+            input.vm.$emit('update:amount', amount);
+            await vi.advanceTimersByTimeAsync(50);
+        }
+        await vi.advanceTimersByTimeAsync(300);
+        await flushPromises();
+
+        expect(axios.get).toHaveBeenCalledTimes(1);
+        expect(axios.get.mock.calls[0][1].params.amount).toBe('1000');
+    });
+
+    it('does not price until the typing stops', async () => {
+        const wrapper = await mountCalculator();
+        axios.get.mockClear();
+
+        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '250');
+        await vi.advanceTimersByTimeAsync(299);
+        expect(axios.get).not.toHaveBeenCalled();
+
+        await vi.advanceTimersByTimeAsync(1);
+        await flushPromises();
+        expect(axios.get).toHaveBeenCalledTimes(1);
+    });
+
+    // The counterpart of the comment in sentAmountUpdated: the field must stay
+    // mounted while the customer types, so the shimmer does not take the caret.
+    it('keeps the amount field mounted while typing', async () => {
+        const wrapper = await mountCalculator();
+
+        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '250');
+        await flushPromises();
+
+        expect(wrapper.findComponent({name: 'MoneyInput'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'MoneyInputShimmer'}).exists()).toBe(false);
+    });
+
+    // A currency change is one deliberate act, not a stream. Waiting 300ms to
+    // act on a dropdown is latency with nothing bought for it.
+    it('prices a currency change immediately', async () => {
+        const wrapper = await mountCalculator();
+        axios.get.mockClear();
+        const quote = fixture('quote-send-100');
+
+        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('option:updated', {
+            country: quote.payment_country, currency: quote.payment_currency,
+        });
+        await flushPromises();
+
+        expect(axios.get).toHaveBeenCalledTimes(1);
+    });
+
+    // The keystroke would otherwise land after the selection, pricing against
+    // the currency the customer has just moved away from.
+    it('drops a pending keystroke when a currency is chosen', async () => {
+        const wrapper = await mountCalculator();
+        axios.get.mockClear();
+        const quote = fixture('quote-send-100');
+        const input = wrapper.getComponent({name: 'MoneyInput'});
+
+        input.vm.$emit('update:amount', '250');
+        await vi.advanceTimersByTimeAsync(100);
+        input.vm.$emit('option:updated', {country: quote.payment_country, currency: quote.payment_currency});
+        await flushPromises();
+        await vi.advanceTimersByTimeAsync(300);
+        await flushPromises();
+
+        expect(axios.get, 'the cancelled keystroke must not fire afterwards').toHaveBeenCalledTimes(1);
+    });
+
+    // Worth recording why there is no test here for two quotes overlapping:
+    // they cannot. Every control that triggers one - both amount fields and the
+    // delivery-method listbox - sits behind v-if="! isFetchingQuote", so while
+    // a request is in flight none of them exist to fire another. An attempt at
+    // request-sequencing was written and then removed once that was checked.
+    //
+    // If any of those controls is ever left mounted during a fetch, that stops
+    // being true and the sequencing has to come back.
+    it('leaves nothing mounted that could start a second quote mid-flight', async () => {
+        const wrapper = await mountCalculator();
+        axios.get.mockClear();
+        axios.get.mockImplementation(() => new Promise(() => {}));   // never settles
+
+        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('option:updated', {
+            country: fixture('quote-send-100').payment_country,
+            currency: fixture('quote-send-100').payment_currency,
+        });
+        await flushPromises();
+
+        expect(wrapper.findComponent({name: 'MoneyInput'}).exists(), 'amount fields').toBe(false);
+        expect(wrapper.findComponent({name: 'Listbox'}).exists(), 'delivery method').toBe(false);
+    });
+
+    it('cancels a pending request when the calculator goes away', async () => {
+        const wrapper = await mountCalculator();
+        axios.get.mockClear();
+
+        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '250');
+        wrapper.unmount();
+        await vi.advanceTimersByTimeAsync(300);
+        await flushPromises();
+
+        expect(axios.get).not.toHaveBeenCalled();
     });
 });
