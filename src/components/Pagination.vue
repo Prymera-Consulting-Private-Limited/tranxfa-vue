@@ -33,38 +33,57 @@ async function pageNumber(page) {
 }
 </script>
 <template>
-  <nav class="flex items-center justify-between border-t border-gray-200">
+  <!-- Buttons, not anchors. Every control here used to be an anchor whose href
+       was an inline-script URL, which is three problems at once: it is not a
+       link, so a screen reader offers a destination that does not exist; the
+       inactive prev/next carried no disabled state at all, so "Previous" on page
+       one was announced as an available link; and an inline-script href is
+       blocked by a CSP the moment it stops being report-only. This repo's
+       script-src has no 'unsafe-inline', so that is not hypothetical.
+
+       The page control emits an event. That is a button. -->
+  <nav aria-label="Pagination" class="flex items-center justify-between border-t border-gray-200">
     <div class="-mt-px flex w-0 flex-1">
-      <a v-if="pagination.links.prev" href="javascript:" @click="pageNumber(props.pagination.current_page - 1)" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm/6 font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
-        <ArrowLongLeftIcon class="mr-3 size-5 text-gray-400" aria-hidden="true" />
+      <button
+        type="button"
+        :disabled="! pagination.links.prev"
+        @click="pageNumber(props.pagination.current_page - 1)"
+        class="inline-flex cursor-pointer items-center border-t-2 border-transparent pt-4 pr-1 text-sm/6 font-medium text-gray-500 transition hover:border-gray-300 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-default disabled:border-transparent disabled:text-gray-300 disabled:hover:text-gray-300"
+      >
+        <ArrowLongLeftIcon :class="[pagination.links.prev ? 'text-gray-400' : 'text-gray-300']" class="mr-3 size-5" aria-hidden="true" />
         Previous
-      </a>
-      <a v-else href="javascript:" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm/6 font-medium text-gray-300 cursor-default">
-        <ArrowLongLeftIcon class="mr-3 size-5 text-gray-300" aria-hidden="true" />
-        Previous
-      </a>
+      </button>
     </div>
     <div class="hidden md:-mt-px md:flex">
-      <template v-for="page in pages" :key="page">
-        <template v-if="page === '...'">
-          <span class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm/6 font-medium text-gray-500">...</span>
-        </template>
-        <template v-else>
-          <a v-if="page === pagination.current_page" href="javascript:" class="inline-flex items-center border-t-2 border-brand-500 px-4 pt-4 text-sm/6 font-medium text-brand-700" aria-current="page">{{ page }}</a>
-          <a v-else href="javascript:" @click="pageNumber(page)" class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm/6 font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">{{ page }}</a>
-        </template>
-
+      <template v-for="(page, index) in pages" :key="`${page}-${index}`">
+        <!-- A gap in the sequence, not a page. Nothing to announce. -->
+        <span v-if="page === '...'" aria-hidden="true" class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm/6 font-medium text-gray-500">...</span>
+        <button
+          v-else
+          type="button"
+          :aria-current="page === pagination.current_page ? 'page' : undefined"
+          :aria-label="`Page ${page}`"
+          :disabled="page === pagination.current_page"
+          @click="pageNumber(page)"
+          :class="[
+            page === pagination.current_page
+              ? 'cursor-default border-brand-500 text-brand-700'
+              : 'cursor-pointer border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+          ]"
+          class="inline-flex items-center border-t-2 px-4 pt-4 text-sm/6 font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+        >{{ page }}</button>
       </template>
     </div>
     <div class="-mt-px flex w-0 flex-1 justify-end">
-      <a v-if="pagination.links.next" href="javascript:"  @click="pageNumber(props.pagination.current_page + 1)" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm/6 font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
+      <button
+        type="button"
+        :disabled="! pagination.links.next"
+        @click="pageNumber(props.pagination.current_page + 1)"
+        class="inline-flex cursor-pointer items-center border-t-2 border-transparent pt-4 pl-1 text-sm/6 font-medium text-gray-500 transition hover:border-gray-300 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-default disabled:border-transparent disabled:text-gray-300 disabled:hover:text-gray-300"
+      >
         Next
-        <ArrowLongRightIcon class="ml-3 size-5 text-gray-400" aria-hidden="true" />
-      </a>
-      <a v-else href="#" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm/6 font-medium text-gray-300">
-        Next
-        <ArrowLongRightIcon class="ml-3 size-5 text-gray-300" aria-hidden="true" />
-      </a>
+        <ArrowLongRightIcon :class="[pagination.links.next ? 'text-gray-400' : 'text-gray-300']" class="ml-3 size-5" aria-hidden="true" />
+      </button>
     </div>
   </nav>
 </template>
