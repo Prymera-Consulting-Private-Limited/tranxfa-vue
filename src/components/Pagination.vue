@@ -50,7 +50,7 @@ async function pageNumber(page) {
           <span class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500">...</span>
         </template>
         <template v-else>
-          <a v-if="page === pagination.current_page" href="javascript:" class="inline-flex items-center border-t-2 border-brand-500 px-4 pt-4 text-sm font-medium text-brand-600" aria-current="page">{{ page }}</a>
+          <a v-if="page === pagination.current_page" href="javascript:" class="inline-flex items-center border-t-2 border-brand-500 px-4 pt-4 text-sm font-medium text-brand-700" aria-current="page">{{ page }}</a>
           <a v-else href="javascript:" @click="pageNumber(page)" class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">{{ page }}</a>
         </template>
 

@@ -137,7 +137,7 @@ function close() {
                       <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Wallet number has been copied!</p>
                     </UseClipboard>
                   </div>
-                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-600 cursor-pointer">Done</button>
+                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
                 </div>
               </template>
 
@@ -159,12 +159,12 @@ function close() {
                 </div>
                 <template v-else-if="terms">
                   <div class="mt-4 max-h-64 overflow-y-auto whitespace-pre-line rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">{{ terms.content }}</div>
-                  <p class="mt-2 text-xs text-gray-400">Version {{ terms.version }}</p>
+                  <p class="mt-2 text-xs text-gray-500">Version {{ terms.version }}</p>
                   <div class="mt-4 flex items-start space-x-2">
                     <input type="checkbox" id="wallet-terms-accepted" v-model="accepted" class="mt-1 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
                     <label for="wallet-terms-accepted" class="text-sm/6 text-gray-700">I have read and accept the wallet terms.</label>
                   </div>
-                  <button type="button" @click="accept" :disabled="! accepted || isSubmitting" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-600 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                  <button type="button" @click="accept" :disabled="! accepted || isSubmitting" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>Saving ...</span>

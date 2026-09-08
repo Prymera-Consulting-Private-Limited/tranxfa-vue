@@ -161,14 +161,14 @@ watch(
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a href="javascript:" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
           <!-- Logo at Top Left (Desktop) -->
           <!-- Cross Mark at Form Right Corner (Desktop) -->
           <div class="hidden md:block  absolute top-4 right-4">
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 ">
+            <a href="javascript:" class="text-gray-500 text-3xl hover:text-gray-500 ">
               <i class="pi pi-times"></i>
             </a>
           </div>
@@ -203,13 +203,13 @@ watch(
                       id="password"
                       v-model="form.password"
                       placeholder="••••••••"
-                      class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-400"
+                      class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                       @focus="passwordFocused = true"
                       @blur="passwordFocused = false"
                     >
                     <button
                       type="button"
-                      class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-700 cursor-pointer"
+                      class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
                       :aria-label="showPassword ? 'Hide password' : 'Show password'"
                       @click="showPassword = !showPassword"
                     >
@@ -285,13 +285,13 @@ watch(
                     id="confirm_password"
                     v-model="form.confirm_password"
                     placeholder="••••••••"
-                    class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-400"
+                    class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                     @focus="confirmPasswordFocused = true"
                     @blur="confirmPasswordFocused = false"
                   >
                   <button
                     type="button"
-                    class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-700 cursor-pointer"
+                    class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
                     :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
                     @click="showConfirmPassword = !showConfirmPassword"
                   >

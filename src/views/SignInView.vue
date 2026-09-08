@@ -98,12 +98,12 @@ function updateIsdCode(updated) {
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
-            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a :href="appUrl" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
           <div class="hidden md:block  absolute top-4 right-4">
-            <a :href="appUrl" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a :href="appUrl" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
@@ -147,7 +147,7 @@ function updateIsdCode(updated) {
                         id="mobile-number"
                         type="tel"
                         v-model="form.mobile_number"
-                        class="w-full rounded-2xl border-0 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400"
+                        class="w-full rounded-2xl border-0 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-500"
                         placeholder="Mobile Number"
                         @focus="mobileFocused = true"
                         @blur="mobileFocused = false"
@@ -168,7 +168,7 @@ function updateIsdCode(updated) {
                       id="email"
                       v-model="form.email"
                       placeholder="example@email.com"
-                      class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-400"
+                      class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                       @focus="emailFocused = true"
                       @blur="emailFocused = false"
                     >
@@ -190,13 +190,13 @@ function updateIsdCode(updated) {
                       id="password"
                       v-model="form.password"
                       placeholder="••••••••"
-                      class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-400"
+                      class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                       @focus="passwordFocused = true"
                       @blur="passwordFocused = false"
                     >
                     <button
                       type="button"
-                      class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-700 cursor-pointer"
+                      class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
                       :aria-label="showPassword ? 'Hide password' : 'Show password'"
                       @click="showPassword = !showPassword"
                     >
@@ -209,7 +209,7 @@ function updateIsdCode(updated) {
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <label
                     for="remember-me"
-                    class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
+                    class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:border-brand-200 hover:bg-brand-50 hover:text-brand-800"
                     :class="rememberMe ? 'border-brand-200 bg-brand-50 text-brand-700' : ''"
                   >
                     <input

@@ -74,13 +74,13 @@ defineEmits(['confirm', 'cancel']);
               </div>
               <div class="px-6 pt-6">
                 <div class="rounded-2xl bg-gray-50 px-5 py-4 ring-1 ring-inset ring-gray-100">
-                  <p class="text-[11px] font-semibold tracking-wide text-gray-400 uppercase">New total price</p>
+                  <p class="text-[11px] font-semibold tracking-wide text-gray-500 uppercase">New total price</p>
                   <p class="mt-1 flex items-baseline justify-center gap-1.5">
                     <span class="text-sm font-medium text-gray-500">{{ currency }}</span>
                     <span class="text-4xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
                   </p>
                 </div>
-                <p class="mt-3 text-xs text-gray-400">Continuing books at this price. Cancelling releases the room, so you can pick another.</p>
+                <p class="mt-3 text-xs text-gray-500">Continuing books at this price. Cancelling releases the room, so you can pick another.</p>
               </div>
               <div class="flex flex-col gap-2.5 px-6 pb-6 pt-5">
                 <button

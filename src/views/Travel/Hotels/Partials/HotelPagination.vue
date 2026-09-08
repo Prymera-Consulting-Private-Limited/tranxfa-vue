@@ -88,7 +88,7 @@ function go(page) {
         <ChevronLeftIcon class="size-4" aria-hidden="true" />
       </button>
       <template v-for="item in pages" :key="item">
-        <span v-if="typeof item === 'string'" class="px-1 text-sm text-gray-400" aria-hidden="true">…</span>
+        <span v-if="typeof item === 'string'" class="px-1 text-sm text-gray-500" aria-hidden="true">…</span>
         <button
             v-else
             type="button"

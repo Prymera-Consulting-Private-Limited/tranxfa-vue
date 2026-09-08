@@ -229,7 +229,7 @@ onUnmounted(() => clearInterval(clock));
                 <CalendarDaysIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
                 <span>
                   {{ stay }}
-                  <span v-if="quote.nights" class="text-gray-400">· {{ quote.nights }} night{{ quote.nights === 1 ? '' : 's' }}</span>
+                  <span v-if="quote.nights" class="text-gray-500">· {{ quote.nights }} night{{ quote.nights === 1 ? '' : 's' }}</span>
                 </span>
               </p>
               <p v-if="guests.length" class="flex items-start gap-2 text-gray-700">
@@ -238,7 +238,7 @@ onUnmounted(() => clearInterval(clock));
               </p>
             </div>
             <div v-if="quote.room" class="mt-4 border-t border-gray-100 pt-4">
-              <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Your room</p>
+              <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Your room</p>
               <p class="mt-1 text-sm font-medium text-gray-900">{{ quote.room.roomName }}</p>
               <div class="mt-2 flex flex-wrap items-center gap-2">
                 <HotelMealBadge :meal="quote.room.meal" :labels="quote.labels" />
@@ -282,7 +282,7 @@ onUnmounted(() => clearInterval(clock));
                 <dd class="font-medium text-gray-900 tabular-nums">{{ quote.cancellation.refundNow.currencyPrefixed }}</dd>
               </div>
             </dl>
-            <p class="mt-3 text-xs text-gray-400">Worked out fresh each time this page is opened, since it changes as your stay approaches.</p>
+            <p class="mt-3 text-xs text-gray-500">Worked out fresh each time this page is opened, since it changes as your stay approaches.</p>
           </section>
           <!-- Who is staying, and how to reach them -->
           <GuestContactForm
@@ -293,7 +293,7 @@ onUnmounted(() => clearInterval(clock));
               @submit="book"
               class="mt-4"
           />
-          <p v-if="quote.reference" class="mt-6 text-center text-xs text-gray-400">Reference {{ quote.reference }}</p>
+          <p v-if="quote.reference" class="mt-6 text-center text-xs text-gray-500">Reference {{ quote.reference }}</p>
         </template>
       </div>
     </main>

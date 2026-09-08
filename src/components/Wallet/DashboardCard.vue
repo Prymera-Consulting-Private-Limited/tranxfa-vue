@@ -39,7 +39,7 @@ watch(() => walletStore.isEnrolled, (enrolled) => {
           <p v-else class="text-lg font-bold tracking-tight text-gray-900">&mdash;</p>
         </div>
       </div>
-      <router-link :to="{name: 'wallet'}" class="shrink-0 text-sm font-semibold text-brand-600 hover:text-brand-500">Manage &rarr;</router-link>
+      <router-link :to="{name: 'wallet'}" class="shrink-0 text-sm font-semibold text-brand-700 hover:text-brand-800">Manage &rarr;</router-link>
     </div>
   </div>
 </template>

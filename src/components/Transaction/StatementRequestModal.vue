@@ -377,7 +377,7 @@ async function submit() {
                     type="email"
                     autocomplete="email"
                     placeholder="name@example.com"
-                    class="mt-2 block w-full rounded-xl border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm"
+                    class="mt-2 block w-full rounded-xl border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm"
                   />
                   <p
                     v-for="(msg, i) in formErrors.email"
@@ -399,7 +399,7 @@ async function submit() {
                   </button>
                   <button
                     type="submit"
-                    class="inline-flex justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="inline-flex justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
                     :disabled="isSubmitting || isLoadingCurrencies"
                   >
                     <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2" aria-hidden="true" />

@@ -546,7 +546,7 @@ const canContinue = computed(() => {
                     <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="title">
                       <template v-slot:no-options="{ search, searching }">
                         <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
-                        <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
+                        <em class="text-sm text-gray-500 opacity-50" v-else>Start typing to search ...</em>
                       </template>
                       <template #selected-option-container="{ option, deselect, multiple, disabled }">
                         <div class="vs__selected">
@@ -623,7 +623,7 @@ const canContinue = computed(() => {
                         </template>
                         <template v-else>
                           <p class="text-sm text-gray-600">Activate your wallet to pay this way — read and accept the terms, then load money by bank transfer.</p>
-                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm font-semibold text-brand-600 hover:text-brand-500 cursor-pointer">Activate wallet &rarr;</button>
+                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">Activate wallet &rarr;</button>
                         </template>
                       </div>
                     </template>
@@ -638,7 +638,7 @@ const canContinue = computed(() => {
                 </template>
               </template>
               <div class="py-4 px-3 sm:px-0">
-                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
                   <span v-if="isStepProcessing" class="flex justify-center items-center">
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>Saving...</span>

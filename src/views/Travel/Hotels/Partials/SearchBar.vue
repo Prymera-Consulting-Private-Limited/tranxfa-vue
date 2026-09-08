@@ -388,7 +388,7 @@ function search() {
           <div class="min-w-0 flex-1">
             <ComboboxLabel class="block text-xs text-gray-500">Destination</ComboboxLabel>
             <ComboboxInput
-                class="w-full truncate border-0 p-0 text-sm font-medium text-gray-900 placeholder:font-normal placeholder:text-gray-400 focus:outline-0"
+                class="w-full truncate border-0 p-0 text-sm font-medium text-gray-900 placeholder:font-normal placeholder:text-gray-500 focus:outline-0"
                 :placeholder="region ?? 'Where to?'"
                 :display-value="option => option?.name ?? region ?? ''"
                 autocomplete="off"
@@ -422,7 +422,7 @@ function search() {
           </li>
           <li v-else-if="showTypePrompt" class="px-4 py-3 text-sm text-gray-500">Type at least {{ REGION_QUERY_MIN }} characters to find a destination</li>
           <li v-else-if="regions.length === 0" class="px-4 py-3 text-sm text-gray-500">No destinations found</li>
-          <li v-else-if="regionsFeatured" class="px-4 pt-1 pb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">Popular destinations</li>
+          <li v-else-if="regionsFeatured" class="px-4 pt-1 pb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Popular destinations</li>
           <ComboboxOption v-for="option in regions" :key="option.id" :value="option" as="template" v-slot="{active, selected}">
             <li :class="[active ? 'bg-gray-50' : '', 'flex cursor-pointer items-center justify-between gap-3 px-4 py-2']">
               <div class="min-w-0">
@@ -481,7 +481,7 @@ function search() {
           <div class="flex-1 divide-y divide-dashed divide-gray-200 overflow-y-auto px-4">
             <section v-for="(room, index) in guests" :key="index" class="py-3">
               <header class="flex items-baseline justify-between gap-3">
-                <h4 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Room {{ index + 1 }}</h4>
+                <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Room {{ index + 1 }}</h4>
                 <button
                     v-if="guests.length > 1"
                     type="button"
@@ -493,7 +493,7 @@ function search() {
               <div v-for="item in OCCUPANCY" :key="item.key" class="mt-2 flex items-center justify-between gap-3">
                 <p class="truncate text-sm text-gray-700">
                   {{ item.label }}
-                  <span class="ml-0.5 text-xs text-gray-400">{{ item.hint }}</span>
+                  <span class="ml-0.5 text-xs text-gray-500">{{ item.hint }}</span>
                 </p>
                 <div class="flex shrink-0 items-center gap-2.5">
                   <button
@@ -522,7 +522,7 @@ function search() {
                 <div v-for="(childAge, childIndex) in room.children" :key="childIndex" class="flex items-center justify-between gap-3">
                   <p class="truncate text-sm text-gray-500">
                     Child {{ childIndex + 1 }}
-                    <span class="ml-0.5 text-xs text-gray-400">age</span>
+                    <span class="ml-0.5 text-xs text-gray-500">age</span>
                   </p>
                   <div class="flex shrink-0 items-center gap-2.5">
                     <button
@@ -558,7 +558,7 @@ function search() {
                   type="button"
                   :disabled="guests.length >= MAX_ROOMS"
                   @click="addRoom"
-                  class="flex cursor-pointer items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800 disabled:cursor-not-allowed disabled:text-gray-400"
+                  class="flex cursor-pointer items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800 disabled:cursor-not-allowed disabled:text-gray-500"
               >
                 <PlusIcon class="size-4" aria-hidden="true" />
                 Add room

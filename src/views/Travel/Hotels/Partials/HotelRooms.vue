@@ -63,7 +63,7 @@ const bestToken = computed(() => {
           <h3 class="min-w-0 text-base font-semibold tracking-tight text-gray-900">{{ group.name }}</h3>
           <!-- A single rate already shows its own price, so this would only repeat it. -->
           <p v-if="group.rates.length > 1" class="shrink-0 text-right">
-            <span class="block text-xs text-gray-400">from</span>
+            <span class="block text-xs text-gray-500">from</span>
             <span class="text-base font-semibold tracking-tight text-gray-900 tabular-nums">{{ group.from.currencyPrefixed }}</span>
           </p>
         </header>

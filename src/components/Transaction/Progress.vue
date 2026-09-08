@@ -175,7 +175,7 @@ const stepCommandExecuted = async (e) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium text-brand-600 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
+                <div class="text-sm font-medium text-brand-700 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
                 <p class="text-sm text-gray-500"></p>
               </div>
             </div>

@@ -142,7 +142,7 @@ function submit() {
       <div v-for="(room, roomIndex) in rooms" :key="roomIndex" class="space-y-4">
         <p v-if="showRoomNumbers" class="text-sm font-semibold text-gray-900">Room {{ room.number }}</p>
         <div v-for="(guest, guestIndex) in room.guests" :key="guestIndex">
-          <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">{{ guest.label }}</p>
+          <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">{{ guest.label }}</p>
           <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <input
@@ -153,7 +153,7 @@ function submit() {
                   placeholder="First name"
                   :class="[
                     fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`) ? 'ring-red-300' : 'ring-gray-200',
-                    'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-400 focus:ring-brand-400 focus:outline-0',
+                    'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
                   ]"
               />
               <p v-if="fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`)" class="mt-1 text-xs text-red-600">{{ fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`) }}</p>
@@ -167,7 +167,7 @@ function submit() {
                   placeholder="Last name"
                   :class="[
                     fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`) ? 'ring-red-300' : 'ring-gray-200',
-                    'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-400 focus:ring-brand-400 focus:outline-0',
+                    'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
                   ]"
               />
               <p v-if="fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`)" class="mt-1 text-xs text-red-600">{{ fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`) }}</p>
@@ -176,7 +176,7 @@ function submit() {
         </div>
       </div>
       <div class="border-t border-gray-100 pt-5">
-        <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Where to reach you</p>
+        <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Where to reach you</p>
         <p class="mt-1 text-xs text-gray-500">We'll send the confirmation to your email. The hotel needs a phone number for the booking, and will only use it if they have to reach you.</p>
         <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
@@ -187,7 +187,7 @@ function submit() {
                 placeholder="Email address"
                 :class="[
                   fieldError('email') ? 'ring-red-300' : 'ring-gray-200',
-                  'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-400 focus:ring-brand-400 focus:outline-0',
+                  'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
                 ]"
             />
             <p v-if="fieldError('email')" class="mt-1 text-xs text-red-600">{{ fieldError('email') }}</p>
@@ -201,7 +201,7 @@ function submit() {
                 :maxlength="PHONE_MAX"
                 :class="[
                   fieldError('phone') ? 'ring-red-300' : 'ring-gray-200',
-                  'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-400 focus:ring-brand-400 focus:outline-0',
+                  'w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
                 ]"
             />
             <p v-if="fieldError('phone')" class="mt-1 text-xs text-red-600">{{ fieldError('phone') }}</p>
@@ -215,7 +215,7 @@ function submit() {
       <button
           type="submit"
           :disabled="!isComplete || isSubmitting"
-          class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+          class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
       >
         <Spinner v-if="isSubmitting" class="size-4" />
         {{ isSubmitting ? 'Booking your room…' : 'Book and continue to payment' }}

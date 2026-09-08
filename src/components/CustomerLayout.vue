@@ -120,7 +120,7 @@ onUnmounted(async () => {
                     <p class="mt-1 text-sm text-gray-500">{{ notification.text }}</p>
                   </div>
                   <div class="ml-4 flex shrink-0">
-                    <button type="button" @click="close(notification.id)" class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-0 focus:outline-hidden">
+                    <button type="button" @click="close(notification.id)" class="inline-flex rounded-md bg-white text-gray-500 hover:text-gray-500 focus:ring-0 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
                       <span class="sr-only">Close</span>
                       <XMarkIcon class="size-5" aria-hidden="true" />
                     </button>

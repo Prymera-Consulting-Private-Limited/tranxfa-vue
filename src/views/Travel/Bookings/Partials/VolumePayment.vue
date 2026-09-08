@@ -103,7 +103,7 @@ onMounted(() => {
       </div>
       <!-- The sdk builds its own ui in here -->
       <div :id="CONTAINER_ID"></div>
-      <p class="mt-4 text-center text-xs text-gray-400">You'll approve this in your own banking app. We never see your bank details.</p>
+      <p class="mt-4 text-center text-xs text-gray-500">You'll approve this in your own banking app. We never see your bank details.</p>
     </div>
   </section>
 </template>

@@ -69,7 +69,7 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
         <CalendarDaysIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
         <span>
           {{ stay }}
-          <span v-if="search?.nights" class="text-gray-400">· {{ search.nights }} night{{ search.nights === 1 ? '' : 's' }}</span>
+          <span v-if="search?.nights" class="text-gray-500">· {{ search.nights }} night{{ search.nights === 1 ? '' : 's' }}</span>
         </span>
       </p>
       <p v-if="guests.length" class="flex items-start gap-2 text-gray-700">
@@ -79,7 +79,7 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
     </div>
     <div class="border-t border-gray-100 pt-4">
       <template v-if="selected">
-        <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Your room</p>
+        <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Your room</p>
         <p class="mt-1 text-sm font-medium text-gray-900">{{ selected.roomName }}</p>
         <p class="mt-3 text-2xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ selected.total.currencyPrefixed }}</p>
         <p v-if="selected.perNight.isStated" class="mt-0.5 text-xs text-gray-500">{{ selected.perNight.currencyPrefixed }} / night</p>
@@ -103,11 +103,11 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
         type="button"
         :disabled="!selected || isHolding"
         @click="emit('hold')"
-        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
     >
       <Spinner v-if="isHolding" class="size-4" />
       {{ isHolding ? 'Holding this price…' : 'Continue' }}
     </button>
-    <p class="text-center text-xs text-gray-400">We'll hold this price for 15 minutes while you check the details.</p>
+    <p class="text-center text-xs text-gray-500">We'll hold this price for 15 minutes while you check the details.</p>
   </div>
 </template>

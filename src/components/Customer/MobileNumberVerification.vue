@@ -110,7 +110,7 @@ onMounted(async () => {
         Please enter the one time password we have sent to
         <span class="font-semibold text-brand-700">{{ customer.data?.account?.mobileNumber }}</span>.
       </p>
-      <p class="text-sm text-gray-400 mb-8 text-center lg:px-12">
+      <p class="text-sm text-gray-500 mb-8 text-center lg:px-12">
         It can take up to a minute to arrive.
       </p>
 
@@ -132,7 +132,7 @@ onMounted(async () => {
             @on-complete="verifyMobileNumber"
         />
         <div class="mt-6 max-w-md flex justify-between mx-auto">
-          <button :disabled="isLoading" :class="[{'opacity-70': isLoading}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
+          <button :disabled="isLoading" :class="[{'opacity-70': isLoading}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer">
             <template v-if="isVerifying">
               <span class="flex items-center justify-center whitespace-nowrap">
                 <Spinner :class="'size-4 mr-2'" />

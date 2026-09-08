@@ -88,7 +88,7 @@ onUnmounted(() => {
         Cancel
       </button>
       <a :href="accessToken" target="_blank"
-         class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-700 text-sm">
+         class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-800 text-sm">
         Continue
       </a>
     </div>

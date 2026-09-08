@@ -162,14 +162,14 @@ onUnmounted(() => {
     <div v-show="isInitialized" class="w-full flex flex-col items-center justify-center">
       <h2 class="text-lg font-semibold mb-4">Liveliness Test</h2>
       <p class="leading-6 text-gray-500 mb-3 text-center">To verify your identity, we kindly request you to record a short video. Please ensure your face is clearly visible in the frame.</p>
-      <p v-if="liveCheckMessage" class="leading-6 text-gray-400 mb-3 text-center">{{ liveCheckMessage }}</p>
+      <p v-if="liveCheckMessage" class="leading-6 text-gray-500 mb-3 text-center">{{ liveCheckMessage }}</p>
       <p v-if="liveCheckSuccess" class="leading-6 text-emerald-500 font-semibold mb-3 text-center">{{ liveCheckSuccess }}</p>
       <p v-if="liveCheckError" class="leading-6 text-red-500 mb-3 text-center animate-pulse">{{ liveCheckError }}</p>
       <p v-if="liveCheckWarning" class="leading-6 text-yellow-500 mb-3 text-center">{{ liveCheckWarning }}</p>
       <div class="relative h-72 w-72 bg-black rounded-full overflow-hidden border-6 p-4 border-gray-300">
         <video ref="video" autoplay playsinline class="w-full h-full transform scale-160"></video>
       </div>
-      <p class="leading-6 text-gray-400 text-xs mt-3 text-center">All data is processed in accordance with our privacy policy.</p>
+      <p class="leading-6 text-gray-500 text-xs mt-3 text-center">All data is processed in accordance with our privacy policy.</p>
     </div>
   </div>
 </template>

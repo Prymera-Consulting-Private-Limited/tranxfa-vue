@@ -61,7 +61,7 @@ onMounted(() => {
       </template>
       <template v-else>
         <dt class="sr-only">You've never sent money to {{ recipient.wholeName }}</dt>
-        <dd class="text-gray-400 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
+        <dd class="text-gray-500 text-xs leading-4 flex-col items-center mx-auto gap-x-2 mt-2">
           <p>You've never sent money to</p>
           <p>{{ recipient.wholeName }}</p>
         </dd>

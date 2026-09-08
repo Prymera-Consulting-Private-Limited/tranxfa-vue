@@ -166,6 +166,6 @@ const changePassword = async () => {
             <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ formErrors.confirm_password[0] }}</p>
         </div>
         <!-- Submit Button -->
-        <button :class="[isLoading ? 'opacity-60 cursor-not-allowed' : '']" type="submit" class="block w-full bg-brand-700 text-center py-2.5 font-medium text-white rounded-md hover:bg-brand-800 transition cursor-pointer">Change Password</button>
+        <button :disabled="isLoading" type="submit" class="block w-full bg-brand-700 text-center py-2.5 font-medium text-white rounded-md transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">Change Password</button>
     </form>
 </template>

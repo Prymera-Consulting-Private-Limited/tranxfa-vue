@@ -170,8 +170,8 @@ async function termsAccepted() {
                 <p class="mt-2 text-sm font-medium text-gray-900">Refunds return straight to your wallet</p>
               </div>
             </div>
-            <button type="button" @click="startEnrolment" class="mt-8 inline-flex items-center justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 cursor-pointer">Read terms &amp; activate</button>
-            <p class="mt-3 text-xs text-gray-400">Your wallet is activated once you accept its terms.</p>
+            <button type="button" @click="startEnrolment" class="mt-8 inline-flex items-center justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-800 cursor-pointer">Read terms &amp; activate</button>
+            <p class="mt-3 text-xs text-gray-500">Your wallet is activated once you accept its terms.</p>
           </div>
         </template>
 
@@ -202,7 +202,7 @@ async function termsAccepted() {
                     <UseClipboard v-slot="{ copy, copied }" :source="walletStore.wallet.data?.walletNumber ?? walletStore.subscription.data?.walletNumber">
                       <p class="mt-2 flex items-center gap-x-1.5 text-sm text-gray-500">
                         <span class="tracking-widest">{{ walletStore.wallet.data?.walletNumber ?? walletStore.subscription.data?.walletNumber }}</span>
-                        <button @click="copy()" type="button" class="cursor-pointer text-gray-400 hover:text-gray-600" aria-label="Copy wallet number">
+                        <button @click="copy()" type="button" class="cursor-pointer text-gray-500 hover:text-gray-600" aria-label="Copy wallet number">
                           <ClipboardIcon class="size-4" aria-hidden="true" />
                         </button>
                         <span v-if="copied" class="text-xs text-green-600">Copied!</span>
@@ -210,7 +210,7 @@ async function termsAccepted() {
                     </UseClipboard>
                   </div>
                   <div class="flex shrink-0 flex-col gap-2 sm:items-end">
-                    <button type="button" @click="addMoney" class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 cursor-pointer">
+                    <button type="button" @click="addMoney" class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-800 cursor-pointer">
                       <PlusIcon class="size-5" aria-hidden="true" />
                       Add money
                     </button>
@@ -224,7 +224,7 @@ async function termsAccepted() {
               <div class="rounded-lg bg-white border border-gray-100 px-4 py-4 sm:px-6">
                 <div class="flex items-center justify-between">
                   <h2 class="text-base font-semibold text-gray-900">Recent movements</h2>
-                  <router-link :to="{name: 'walletStatement'}" class="text-sm font-semibold text-brand-600 hover:text-brand-500">View statement &rarr;</router-link>
+                  <router-link :to="{name: 'walletStatement'}" class="text-sm font-semibold text-brand-700 hover:text-brand-800">View statement &rarr;</router-link>
                 </div>
                 <template v-if="recentMovements.length > 0">
                   <ul role="list" class="mt-2 divide-y divide-gray-100">
@@ -256,7 +256,7 @@ async function termsAccepted() {
                     <span>The money lands in your wallet, ready to spend.</span>
                   </li>
                 </ol>
-                <p class="mt-4 text-xs text-gray-400">A declaration stays open for 72 hours. A deposit that arrives late or with a different amount isn't lost — our support team takes care of it.</p>
+                <p class="mt-4 text-xs text-gray-500">A declaration stays open for 72 hours. A deposit that arrives late or with a different amount isn't lost — our support team takes care of it.</p>
               </div>
             </div>
           </div>

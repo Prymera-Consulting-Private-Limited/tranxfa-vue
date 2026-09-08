@@ -55,7 +55,7 @@ const guests = computed(() => {
           <span v-if="stay" class="inline-flex items-center gap-1.5">
             <CalendarDaysIcon class="size-4 shrink-0 text-gray-400" aria-hidden="true" />
             {{ stay }}
-            <span v-if="order.nights" class="text-gray-400">· {{ order.nights }} night{{ order.nights === 1 ? '' : 's' }}</span>
+            <span v-if="order.nights" class="text-gray-500">· {{ order.nights }} night{{ order.nights === 1 ? '' : 's' }}</span>
           </span>
           <span v-if="guests" class="inline-flex items-center gap-1.5">
             <UserGroupIcon class="size-4 shrink-0 text-gray-400" aria-hidden="true" />
@@ -70,9 +70,9 @@ const guests = computed(() => {
         <p v-if="order.stateDescription" class="mt-2 text-xs text-gray-500">{{ order.stateDescription }}</p>
       </div>
       <div class="shrink-0 sm:text-right">
-        <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Total</p>
+        <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Total</p>
         <p class="mt-1 text-xl font-semibold tracking-tight text-gray-900">{{ order.total.currencyPrefixed }}</p>
-        <p v-if="order.reference" class="mt-1 text-xs text-gray-400">{{ order.reference }}</p>
+        <p v-if="order.reference" class="mt-1 text-xs text-gray-500">{{ order.reference }}</p>
       </div>
     </div>
   </RouterLink>

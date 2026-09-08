@@ -283,12 +283,12 @@ function providerName(method) {
                   type="button"
                   :disabled="!selectedMethod || isPaying"
                   @click="pay"
-                  class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                  class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
               >
                 <Spinner v-if="isPaying" class="size-4" />
                 {{ isPaying ? 'Taking you to pay…' : `Pay ${order.total.currencyPrefixed}` }}
               </button>
-              <p class="mt-3 text-center text-xs text-gray-400">You can close the payment page once it's done — we'll pick the result up either way.</p>
+              <p class="mt-3 text-center text-xs text-gray-500">You can close the payment page once it's done — we'll pick the result up either way.</p>
             </div>
           </section>
           <RouterLink

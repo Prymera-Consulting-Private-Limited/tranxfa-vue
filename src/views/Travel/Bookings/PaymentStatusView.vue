@@ -199,7 +199,7 @@ onUnmounted(stopPolling);
             <p class="mt-2 max-w-md text-sm text-gray-500">{{ note }}</p>
             <p v-if="payment" class="mt-4 text-sm text-gray-700">
               <span class="font-medium">{{ payment.amount.currencyPrefixed }}</span>
-              <span v-if="payment.method" class="text-gray-400"> · {{ payment.method }}</span>
+              <span v-if="payment.method" class="text-gray-500"> · {{ payment.method }}</span>
             </p>
             <div class="mt-8 flex flex-col gap-2 sm:flex-row-reverse">
               <RouterLink
