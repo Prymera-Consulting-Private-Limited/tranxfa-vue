@@ -29,6 +29,7 @@ import TransactionQuote from "@/models/transaction_quote.js";
 import {useRecipientUtils} from "@/composables/recipient_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {debounce} from "lodash";
+import axios from "axios";
 
 const customerStore = useCustomerStore();
 
@@ -88,13 +89,32 @@ const quoteFailureReason = ref('');
  */
 const QUOTE_DEBOUNCE_MS = 300;
 
+/**
+ * The in-flight quote, so one that has been overtaken can be abandoned.
+ *
+ * The amount fields stay mounted across a re-quote now, which is what lets the
+ * price follow the typing - and it also means a customer can carry on typing,
+ * or change the currency, while a request is still out. Whichever reply lands
+ * second would win, and on this screen that means a rate and a total for a
+ * figure they are no longer looking at.
+ *
+ * Aborted rather than ignored on arrival, because ignoring is not available:
+ * quote_utils assigns quote.data inside its own `then` and the template renders
+ * straight from there, so by the time this component could check anything the
+ * stale quote is already on screen.
+ */
+let inFlightQuote = null;
+
 
 async function getQuote() {
+  inFlightQuote?.abort();
+  const controller = new AbortController();
+  inFlightQuote = controller;
   isFetchingQuote.value = true;
   quoteErrors.payment = [];
   quoteErrors.payout = [];
   quoteFailureReason.value = '';
-  await quoteUtil.getQuote(query).then(() => {
+  await quoteUtil.getQuote(query, {signal: controller.signal}).then(() => {
     query.amountType = quoteUtil.quote.data?.amountType;
     query.amount = quoteUtil.quote.data?.amount;
     query.paymentCountry = quoteUtil.quote.data?.paymentCountry;
@@ -112,6 +132,11 @@ async function getQuote() {
       quoteErrors.payout.push(quoteUtil.quote.data.alerts.payout_amount);
     }
   }).catch((e) => {
+    // An abort is this component superseding itself, not a failure. Surfacing it
+    // would flash an error for a quote nobody is waiting on any more.
+    if (axios.isCancel?.(e) || e?.code === 'ERR_CANCELED' || e?.name === 'CanceledError') {
+      return;
+    }
     // Optional chaining because a request that never got a response has no
     // `response` at all. Reading through it threw inside this catch, and now
     // that getQuote can be called from a timer there is no caller left to
@@ -146,6 +171,12 @@ async function getQuote() {
       console.error(e);
     }
   }).finally(() => {
+    // A superseded request must not clear the spinner - the newer one that
+    // replaced it is still running.
+    if (inFlightQuote !== controller) {
+      return;
+    }
+    inFlightQuote = null;
     isFetchingQuote.value = false;
   });
 }
@@ -207,6 +238,8 @@ onUnmounted(() => {
   // pricing a screen nobody is looking at and writing into a store it no longer
   // renders from.
   debouncedGetQuote.cancel();
+  inFlightQuote?.abort();
+  inFlightQuote = null;
 })
 
 async function saveQuote() {
@@ -279,7 +312,7 @@ async function saveQuote() {
                     </div>
                     <div class="mt-2">
                       <MoneyInput
-                          v-if="! isFetchingQuote"
+                          v-if="quoteUtil.quote.data?.paymentCurrency"
                           ref="sendMoneyInput"
                           v-bind:country="quoteUtil.quote.data.paymentCountry"
                           v-bind:currency="quoteUtil.quote.data.paymentCurrency"
@@ -360,7 +393,7 @@ async function saveQuote() {
                     </div>
                     <div class="mt-4">
                       <MoneyInput
-                          v-if="! isFetchingQuote"
+                          v-if="quoteUtil.quote.data?.payoutCurrency"
                           ref="receiveMoneyInput"
                           v-bind:country="quoteUtil.quote.data.payoutCountry"
                           v-bind:currency="quoteUtil.quote.data.payoutCurrency"
