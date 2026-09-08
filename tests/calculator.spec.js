@@ -14,17 +14,15 @@ setActivePinia(pinia);
 const {default: Calculator} = await import("@/components/Calculator.vue");
 const router = (await import("@/router/index.js")).default;
 
+/**
+ * MoneyInput is deliberately NOT stubbed.
+ *
+ * It used to be, and the stub emitted update:amount on demand - which modelled a
+ * component that reports every keystroke. The real one only did so on blur, so a
+ * debounce was written, tested and merged against behaviour that did not exist.
+ * These tests type into the real field for that reason.
+ */
 const stubs = {
-    MoneyInput: {
-        name: 'MoneyInput',
-        props: ['amount', 'errors', 'inputId', 'options', 'country', 'currency'],
-        // saveQuote() reaches through a template ref for this. The real
-        // component returns an amount typed but not yet blurred, or null.
-        methods: {
-            pendingAmount: () => null,
-        },
-        template: '<div class="money-input" :data-id="inputId" :data-errors="JSON.stringify(errors)" />',
-    },
     MoneyInputShimmer: true,
     Spinner: true,
     Listbox: true,
@@ -51,18 +49,50 @@ async function mountCalculator(quoteFixture = 'quote-send-100') {
     return wrapper;
 }
 
-const errorsOn = (wrapper, id) =>
-    JSON.parse(wrapper.get(`[data-id="${id}"]`).attributes('data-errors') || '[]');
+/**
+ * The errors the calculator handed to one of the money fields.
+ *
+ * Read from the prop rather than the rendered markup: that is the contract
+ * between these two components, and it does not move when the error styling
+ * does.
+ */
+const errorsOn = (wrapper, id) => {
+    const field = wrapper.findAllComponents({name: 'MoneyInput'})
+        .find(c => c.props('inputId') === id);
+
+    return field ? field.props('errors') : [];
+};
+
+/** The real <input> behind one of the money fields. */
+const amountField = (wrapper, id) => wrapper.get(`#${id}`);
 
 /**
- * Type into one of the amount fields and let the debounce elapse.
+ * Type a value into a real amount field, one keystroke at a time.
  *
- * Amount edits are debounced by 300ms, so emitting alone no longer produces a
- * request - which is the point of the debounce and the reason every test that
- * types has to go through here rather than awaiting flushPromises on its own.
+ * Sets the value through the native setter and dispatches `input`, which is what
+ * maska listens to - the same path a person's typing takes. Nothing here reaches
+ * for update:amount directly, so a component that stopped emitting while typing
+ * would fail these rather than pass them.
  */
-async function typeAmount(input, amount) {
-    input.vm.$emit('update:amount', amount);
+async function type(field, value, {perKeystrokeMs = 40} = {}) {
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    for (let i = 1; i <= value.length; i++) {
+        setter.call(field.element, value.slice(0, i));
+        await field.trigger('input');
+        await vi.advanceTimersByTimeAsync(perKeystrokeMs);
+    }
+}
+
+/**
+ * Type, then let the debounce elapse and the request settle.
+ *
+ * Note what the digits mean. The mask is `reversed` with the currency's decimal
+ * places, so digits fill from the right the way a till does: typing 2-5-0 is
+ * 2.50, not 250. Tests pass the keystrokes and say what they add up to, because
+ * that is the thing a person would get wrong.
+ */
+async function typeAmount(wrapper, id, keystrokes) {
+    await type(amountField(wrapper, id), keystrokes);
     await vi.advanceTimersByTimeAsync(300);
     await flushPromises();
 }
@@ -82,8 +112,8 @@ describe('Calculator', () => {
         const wrapper = await mountCalculator();
 
         expect(axios.get).toHaveBeenCalledWith('/client/v1/quote', expect.anything());
-        expect(wrapper.find('[data-id="send-money-input"]').exists()).toBe(true);
-        expect(wrapper.find('[data-id="receive-money-input"]').exists()).toBe(true);
+        expect(wrapper.find('#send-money-input').exists()).toBe(true);
+        expect(wrapper.find('#receive-money-input').exists()).toBe(true);
     });
 
     // The backend restates every field on each quote, and the Calculator copies
@@ -93,23 +123,22 @@ describe('Calculator', () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
 
-        await typeAmount(wrapper.getComponent({name: 'MoneyInput'}), '250');
+        await typeAmount(wrapper, 'send-money-input', '25000');   // 250.00
 
         const params = axios.get.mock.calls.at(-1)[1].params;
         expect(params.amount_type).toBe('send');
-        expect(params.amount).toBe('250');
+        expect(params.amount).toBe(250);
     });
 
     it('re-quotes with amount_type=receive when the payout field changes', async () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
 
-        const inputs = wrapper.findAllComponents({name: 'MoneyInput'});
-        await typeAmount(inputs[1], '900');
+        await typeAmount(wrapper, 'receive-money-input', '90000');   // 900.00
 
         const params = axios.get.mock.calls.at(-1)[1].params;
         expect(params.amount_type).toBe('receive');
-        expect(params.amount).toBe('900');
+        expect(params.amount).toBe(900);
     });
 
     // An over-limit amount is a 200 carrying alerts, not an error response.
@@ -126,7 +155,7 @@ describe('Calculator', () => {
         expect(errorsOn(wrapper, 'send-money-input')).toHaveLength(1);
 
         axios.get.mockResolvedValue(fixtureResponse('quote-send-100'));
-        await typeAmount(wrapper.getComponent({name: 'MoneyInput'}), '100');
+        await typeAmount(wrapper, 'send-money-input', '10000');   // 100.00
 
         expect(errorsOn(wrapper, 'send-money-input')).toEqual([]);
     });
@@ -142,7 +171,7 @@ describe('Calculator', () => {
                 }),
             );
 
-            await typeAmount(wrapper.getComponent({name: 'MoneyInput'}), '1');
+            await typeAmount(wrapper, 'send-money-input', '100');   // 1.00
 
             expect(errorsOn(wrapper, 'send-money-input')).toEqual(['Too small.']);
             expect(errorsOn(wrapper, 'receive-money-input')).toEqual([]);
@@ -156,8 +185,7 @@ describe('Calculator', () => {
                 }),
             );
 
-            const inputs = wrapper.findAllComponents({name: 'MoneyInput'});
-            await typeAmount(inputs[1], '1');
+            await typeAmount(wrapper, 'receive-money-input', '100');   // 1.00
 
             expect(errorsOn(wrapper, 'receive-money-input')).toEqual(['Too small.']);
             expect(errorsOn(wrapper, 'send-money-input')).toEqual([]);
@@ -245,28 +273,24 @@ describe('Calculator quote debounce', () => {
     it('makes one request for a burst of typing, not one per character', async () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
-        const input = wrapper.getComponent({name: 'MoneyInput'});
-
-        for (const amount of ['1', '10', '100', '1000']) {
-            input.vm.$emit('update:amount', amount);
-            await vi.advanceTimersByTimeAsync(50);
-        }
-        await vi.advanceTimersByTimeAsync(300);
-        await flushPromises();
+        await typeAmount(wrapper, 'send-money-input', '100000');   // 1000.00
 
         expect(axios.get).toHaveBeenCalledTimes(1);
-        expect(axios.get.mock.calls[0][1].params.amount).toBe('1000');
+        expect(axios.get.mock.calls[0][1].params.amount).toBe(1000);
     });
 
     it('does not price until the typing stops', async () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
 
-        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '250');
-        await vi.advanceTimersByTimeAsync(299);
+        // type() already advances 40ms after the last keystroke, so the clock
+        // stands at 40 of the 300 when it returns.
+        await type(amountField(wrapper, 'send-money-input'), '25000');
+
+        await vi.advanceTimersByTimeAsync(250);          // 290 total - still waiting
         expect(axios.get).not.toHaveBeenCalled();
 
-        await vi.advanceTimersByTimeAsync(1);
+        await vi.advanceTimersByTimeAsync(20);           // 310 total - past it
         await flushPromises();
         expect(axios.get).toHaveBeenCalledTimes(1);
     });
@@ -276,7 +300,7 @@ describe('Calculator quote debounce', () => {
     it('keeps the amount field mounted while typing', async () => {
         const wrapper = await mountCalculator();
 
-        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '250');
+        await type(amountField(wrapper, 'send-money-input'), '25000');
         await flushPromises();
 
         expect(wrapper.findComponent({name: 'MoneyInput'}).exists()).toBe(true);
@@ -316,34 +340,43 @@ describe('Calculator quote debounce', () => {
         expect(axios.get, 'the cancelled keystroke must not fire afterwards').toHaveBeenCalledTimes(1);
     });
 
-    // Worth recording why there is no test here for two quotes overlapping:
-    // they cannot. Every control that triggers one - both amount fields and the
-    // delivery-method listbox - sits behind v-if="! isFetchingQuote", so while
-    // a request is in flight none of them exist to fire another. An attempt at
-    // request-sequencing was written and then removed once that was checked.
-    //
-    // If any of those controls is ever left mounted during a fetch, that stops
-    // being true and the sequencing has to come back.
-    it('leaves nothing mounted that could start a second quote mid-flight', async () => {
+    // The fields stay mounted across a re-quote now, so a customer can keep
+    // typing while a request is out and two can overlap. Whichever reply landed
+    // second would win, and on this screen that is a rate and a total for an
+    // amount they are no longer looking at. The overtaken one is aborted.
+    it('abandons a quote that a newer one has overtaken', async () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
-        axios.get.mockImplementation(() => new Promise(() => {}));   // never settles
 
-        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('option:updated', {
-            country: fixture('quote-send-100').payment_country,
-            currency: fixture('quote-send-100').payment_currency,
-        });
+        let settleOvertaken;
+        const aborted = vi.fn();
+        axios.get
+            .mockImplementationOnce((url, config) => new Promise((resolve, reject) => {
+                config?.signal?.addEventListener('abort', () => {
+                    aborted();
+                    reject(Object.assign(new Error('canceled'), {name: 'CanceledError', code: 'ERR_CANCELED'}));
+                });
+                settleOvertaken = () => resolve(fixtureResponse('quote-send-100'));
+            }))
+            .mockImplementationOnce(() => Promise.resolve(fixtureResponse('quote-send-100')));
+
+        await typeAmount(wrapper, 'send-money-input', '10000');   // 100.00
+        await typeAmount(wrapper, 'send-money-input', '99900');   // 999.00
+
+        expect(aborted, 'the overtaken request was left running').toHaveBeenCalled();
+
+        // Settling it afterwards must be a no-op rather than an error surfacing
+        // for a quote nobody is waiting on.
+        settleOvertaken();
         await flushPromises();
-
-        expect(wrapper.findComponent({name: 'MoneyInput'}).exists(), 'amount fields').toBe(false);
-        expect(wrapper.findComponent({name: 'Listbox'}).exists(), 'delivery method').toBe(false);
+        expect(wrapper.text()).not.toContain('could not price');
     });
 
     it('cancels a pending request when the calculator goes away', async () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
 
-        wrapper.getComponent({name: 'MoneyInput'}).vm.$emit('update:amount', '250');
+        await type(amountField(wrapper, 'send-money-input'), '25000');
         wrapper.unmount();
         await vi.advanceTimersByTimeAsync(300);
         await flushPromises();

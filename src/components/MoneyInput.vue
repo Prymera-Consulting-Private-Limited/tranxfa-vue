@@ -48,6 +48,15 @@ const input = ref(null);
 
 const onMaska = (event) => {
   unmaskedValue.value = event.detail.unmasked;
+  // Emit while typing, not only on blur. The calculator debounces this, so a
+  // burst of keystrokes still produces one quote - but the customer sees the
+  // price follow what they type instead of having to leave the field first.
+  //
+  // Read the masked value rather than event.detail.unmasked: unmasked drops the
+  // decimal point, so "12.34" arrives as "1234" and would quote a hundred times
+  // the amount. parseAmount already handles the displayed form, and it is the
+  // same path blur takes.
+  emitAmount(event.target.value);
 }
 
 const amountModel = computed({
@@ -69,11 +78,18 @@ function parseAmount(value) {
   return Number(parsed.toFixed(props.currency.decimalPlaces));
 }
 
-function amountUpdated(event) {
-  const newValue = parseAmount(event.target.value);
+function emitAmount(value) {
+  const newValue = parseAmount(value);
   if (newValue !== null && newValue !== props.amount) {
     emit('update:amount', newValue);
   }
+}
+
+// Blur still emits. Typing covers the ordinary case, but maska can settle on a
+// different value when the field loses focus - a trailing separator dropped, a
+// half-typed decimal completed - and that correction has to reach the quote.
+function amountUpdated(event) {
+  emitAmount(event.target.value);
 }
 
 // The typed value when it differs from the quoted amount — blur has not fired yet.
