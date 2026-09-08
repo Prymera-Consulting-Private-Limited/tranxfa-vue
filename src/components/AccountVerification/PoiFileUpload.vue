@@ -96,7 +96,7 @@ const canSave = computed(() => {
       />
     </div>
     <form @submit.prevent="save">
-      <button :disabled="!canSave" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">
+      <button :disabled="!canSave" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3.5 rounded-xl font-medium transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
             <Spinner class="size-4 mr-2" />

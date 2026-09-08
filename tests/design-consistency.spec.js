@@ -191,3 +191,99 @@ describe('status text contrast', () => {
         expect([...missing]).toEqual([]);
     });
 });
+
+describe('type scale and target size', () => {
+    const EL = /<(?:button|a|RouterLink|router-link)\b[^>]*?class="([^"]*)"/gis;
+
+    // The house style is 14px on 24 and 12px on 20. Tailwind's bare text-sm and
+    // text-xs are 20 and 16, so a bare one is not "the default", it is a
+    // different line height from every neighbour.
+    it('always writes a line height on text-sm and text-xs', () => {
+        const offenders = [];
+        for (const f of vueFiles()) {
+            lines(f).forEach((line, i) => {
+                for (const m of line.matchAll(/\btext-(sm|xs)(\/(\d+))?\b/g)) {
+                    const want = m[1] === 'sm' ? '6' : '5';
+                    if (m[3] !== want) offenders.push(`${rel(f)}:${i + 1} ${m[0]} should be text-${m[1]}/${want}`);
+                }
+            });
+        }
+
+        expect(offenders).toEqual([]);
+    });
+
+    // text-sm/6 and leading-5 on one element are two line heights fighting, and
+    // leading-* is emitted later, so the sized form loses.
+    it('never sets a line height twice on one element', () => {
+        const offenders = [];
+        for (const f of vueFiles()) {
+            lines(f).forEach((line, i) => {
+                for (const m of line.matchAll(/class="([^"]*)"/g)) {
+                    if (/text-(?:xs|sm|base|lg|xl|\dxl)\/\d+/.test(m[1]) && /\bleading-\S+/.test(m[1])) {
+                        offenders.push(`${rel(f)}:${i + 1}`);
+                    }
+                }
+            });
+        }
+
+        expect(offenders).toEqual([]);
+    });
+
+    // WCAG 2.2 SC 2.5.8. The mobile step indicator's dots were 10px.
+    it('gives every pointer target at least 24px', () => {
+        const size = token => {
+            const m = token.match(/^(?:size|h|w)-([\d.]+)$/);
+
+            return m ? Number(m[1]) * 4 : null;
+        };
+
+        const offenders = [];
+        for (const f of vueFiles()) {
+            const src = fs.readFileSync(f, 'utf8');
+            for (const m of src.matchAll(EL)) {
+                const pad = m[1].match(/\bp-([\d.]+)\b/);
+                const grown = pad ? Number(pad[1]) * 8 : 0;
+                const dims = m[1].split(/\s+/).map(size).filter(d => d !== null);
+                if (dims.some(d => d + grown < 24)) {
+                    offenders.push(`${rel(f)} ${Math.min(...dims) + grown}px`);
+                }
+            }
+        }
+
+        expect(offenders).toEqual([]);
+    });
+
+    // A button that is a pill on one screen and a soft rectangle two screens
+    // later is the inconsistency. One radius, one type size, for all of them.
+    it('gives every primary button the same radius and type size', () => {
+        const radii = new Map(), sizes = new Map();
+        for (const f of vueFiles()) {
+            const src = fs.readFileSync(f, 'utf8');
+            for (const m of src.matchAll(EL)) {
+                if (!m[1].includes('bg-brand-7')) continue;
+                const radius = m[1].match(/\brounded-\S+/);
+                const text = m[1].match(/\btext-(?:xs|sm|base|lg|xl)(?:\/\d+)?\b/);
+                if (radius) radii.set(radius[0], (radii.get(radius[0]) ?? 0) + 1);
+                if (text) sizes.set(text[0], (sizes.get(text[0]) ?? 0) + 1);
+            }
+        }
+
+        expect(radii.size, `radii in use: ${[...radii.keys()].join(', ')}`).toBe(1);
+        expect(sizes.size, `type sizes in use: ${[...sizes.keys()].join(', ')}`).toBe(1);
+    });
+
+    // Two elements with the same id is invalid, and when one is the target of an
+    // aria-labelledby the wrong name gets announced.
+    it('never repeats a static id within a file', () => {
+        const offenders = [];
+        for (const f of vueFiles()) {
+            const seen = new Map();
+            for (const m of fs.readFileSync(f, 'utf8').matchAll(/(?<![:\w-])id="([^"{]+)"/g)) {
+                seen.set(m[1], (seen.get(m[1]) ?? 0) + 1);
+            }
+            for (const [id, count] of seen) if (count > 1) offenders.push(`${rel(f)} id="${id}" x${count}`);
+        }
+
+        expect(offenders).toEqual([]);
+    });
+});

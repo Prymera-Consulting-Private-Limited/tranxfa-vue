@@ -103,7 +103,7 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
         type="button"
         :disabled="!selected || isHolding"
         @click="emit('hold')"
-        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3 text-sm/6 font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3.5 text-sm/6 font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
     >
       <Spinner v-if="isHolding" class="size-4" />
       {{ isHolding ? 'Holding this price…' : 'Continue' }}

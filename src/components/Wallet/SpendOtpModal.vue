@@ -158,7 +158,7 @@ function close() {
                     :placeholder="['*', '*', '*', '*', '*', '*']"
                     @on-complete="submit"
                 />
-                <button type="submit" :disabled="isSubmitting || otp.length !== 6" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                <button type="submit" :disabled="isSubmitting || otp.length !== 6" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                   <span v-if="isSubmitting" class="flex justify-center items-center">
                     <Spinner :class="'w-4 h-4 mr-2'" />
                     <span>Confirming ...</span>

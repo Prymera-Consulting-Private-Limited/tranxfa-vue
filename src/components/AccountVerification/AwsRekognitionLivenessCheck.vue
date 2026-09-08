@@ -155,7 +155,7 @@ onUnmounted(() => {
   <div :class="{'min-h-128': !isInitialized}" class="flex flex-col items-center justify-center bg-gray-50 text-gray-800 p-6">
     <div v-if="!cameraAccess" class="text-center">
       <p class="text-lg font-semibold mb-4">We Need Camera Access</p>
-      <button @click="startCamera" class="bg-brand-700 text-white px-6 py-2 rounded-lg shadow-lg transition cursor-pointer">
+      <button @click="startCamera" class="bg-brand-700 text-white px-6 py-2.5 rounded-xl shadow-lg transition cursor-pointer">
         Grant Access
       </button>
     </div>

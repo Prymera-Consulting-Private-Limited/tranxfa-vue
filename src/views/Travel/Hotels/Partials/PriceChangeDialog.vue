@@ -86,7 +86,7 @@ defineEmits(['confirm', 'cancel']);
                 <button
                     type="button"
                     :disabled="isBooking"
-                    class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-3 text-sm/6 font-semibold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-3.5 text-sm/6 font-semibold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
                     @click="$emit('confirm')"
                 >
                   <svg v-if="isBooking" class="size-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">

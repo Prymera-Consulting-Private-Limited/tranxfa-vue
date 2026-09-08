@@ -98,7 +98,7 @@ function go(page) {
               item === page
                 ? 'border-brand-700 bg-brand-700 text-white'
                 : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:text-gray-900',
-              'flex size-8 cursor-pointer items-center justify-center rounded-lg border text-sm/6 font-medium tabular-nums transition',
+              'flex size-8 cursor-pointer items-center justify-center rounded-xl border text-sm/6 font-medium tabular-nums transition',
             ]"
         >{{ item }}</button>
       </template>

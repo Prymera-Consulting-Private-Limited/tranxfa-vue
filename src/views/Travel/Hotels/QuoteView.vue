@@ -630,7 +630,7 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                       type="button"
                       :disabled="isExpired || !priceChangeConfirmed || isBooking"
                       @click="startBooking"
-                      class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+                      class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-3.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
                   >{{ isExpired ? 'Reservation expired' : (isBooking ? 'Starting booking…' : 'Continue Booking') }}</button>
                   <!-- Submits GuestDetailsForm from here via its form id. -->
                   <template v-else-if="attemptStep === 'guestDetails'">
@@ -638,7 +638,7 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                         type="submit"
                         form="guest-details-form"
                         :disabled="isSavingGuests || !allRoomsHaveNamedAdult"
-                        class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+                        class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-3.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
                     >{{ isSavingGuests ? 'Saving…' : 'Continue' }}</button>
                     <!-- Right where the action is, since a validation message left only -->
                     <!-- at the top of a long form is easy to miss from down here. -->

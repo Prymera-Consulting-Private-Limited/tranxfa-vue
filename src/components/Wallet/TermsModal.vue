@@ -137,7 +137,7 @@ function close() {
                       <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Wallet number has been copied!</p>
                     </UseClipboard>
                   </div>
-                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
+                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
                 </div>
               </template>
 
@@ -164,7 +164,7 @@ function close() {
                     <input type="checkbox" id="wallet-terms-accepted" v-model="accepted" class="mt-1 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
                     <label for="wallet-terms-accepted" class="text-sm/6 text-gray-700">I have read and accept the wallet terms.</label>
                   </div>
-                  <button type="button" @click="accept" :disabled="! accepted || isSubmitting" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                  <button type="button" @click="accept" :disabled="! accepted || isSubmitting" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>Saving ...</span>

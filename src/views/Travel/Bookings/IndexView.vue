@@ -172,7 +172,7 @@ const isFiltered = computed(() => upcoming.value || state.value !== null);
             <RouterLink
                 v-if="!isFiltered"
                 :to="{name: 'hotels'}"
-                class="mt-6 cursor-pointer rounded-lg bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0"
+                class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0"
             >Find a hotel</RouterLink>
           </div>
           <!-- Results -->

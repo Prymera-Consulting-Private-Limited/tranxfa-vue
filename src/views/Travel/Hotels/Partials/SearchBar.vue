@@ -566,7 +566,7 @@ function search() {
               <button
                   type="button"
                   @click="close()"
-                  class="cursor-pointer rounded-lg bg-brand-700 px-4 py-1.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+                  class="cursor-pointer rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
               >Done</button>
             </div>
           </div>
@@ -574,7 +574,7 @@ function search() {
       </Popover>
       <!-- Search -->
       <div :class="[stacked ? '' : 'p-2 lg:pl-4', 'flex items-center']">
-        <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? 'shadow-sm' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
+        <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? 'shadow-sm' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
           <MagnifyingGlassIcon class="size-4" aria-hidden="true" />
           Search
         </button>

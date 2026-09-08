@@ -160,7 +160,7 @@ function close() {
                   <template v-for="(message, i) in amountErrors" :key="`amount-error-${i}`">
                     <p class="mt-2 text-sm/6 text-danger-600">{{ message }}</p>
                   </template>
-                  <button type="submit" :disabled="isSubmitting || ! amount" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                  <button type="submit" :disabled="isSubmitting || ! amount" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>Saving ...</span>
@@ -216,7 +216,7 @@ function close() {
 
                 <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">This declaration expires {{ moment(declaration.expiresAt).fromNow() }} ({{ moment(declaration.expiresAt).format('MMMM D, YYYY h:mm A') }}). A declaration that expires moves no money.</p>
 
-                <button type="button" @click="close" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
+                <button type="button" @click="close" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
               </template>
             </DialogPanel>
           </TransitionChild>
