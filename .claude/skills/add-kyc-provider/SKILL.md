@@ -74,16 +74,27 @@ failed token trades a hang for an empty modal with a dead Continue link.
 `tests/kyc-token-failure.spec.js` pins the emit for all five token-fetching
 providers; `tests/kyc-provider-dispatch.spec.js` pins the parent's handling.
 
-Two related traps in the existing set:
+**A refusal is an outcome, not an error.** A review that completes and comes
+back refused emits `sdkApplicantRejected`, which the parent renders as "this
+document was not accepted" with the vendor's reason where there is one. Do not
+route it through `sdkApplicantStatusChanged`: that one refreshes the profile and
+sends the customer onward as verified, and the transfer wizard then waits for
+the document to leave `pendingDocuments`, which a rejected one never does.
 
-- **Sumsub only emits on GREEN.** Its `idCheck.onApplicantStatusChanged`
-  handler filters to `reviewStatus === 'completed' && reviewAnswer === 'GREEN'`,
-  so a RED review emits nothing at all and the modal simply sits there. The
-  unused `src/enums/review_answer.js` (which has no `export` statement, so it
-  cannot even be imported) is the vestige of the intent to handle RED.
-- **`Persona.vue` and `Sumsub.vue` have no `onUnmounted` at all**, so their SDK
-  instances outlive the modal. `Didit`, `Shufti` and `UpPass` do clean up. Do
-  not copy the first two for lifecycle.
+Two rules that fall out of it, both pinned in `tests/kyc-review-answer.spec.js`:
+
+- **Only a completed review is terminal.** `pending`, `queued`, `init` and
+  `onHold` are the applicant still working through the flow, and reporting one
+  sends them onward mid-verification.
+- **Anything that is not explicitly `GREEN` is a refusal.** Compare against
+  `ReviewAnswer.GREEN` and let everything else fall to the rejected branch, so a
+  vendor value nobody has seen yet cannot be read as an approval.
+
+**Tear the vendor down in `onUnmounted`.** All six do now. Sumsub keeps its
+built instance at module scope so it can be destroyed; Persona's client owns a
+modal it appends outside the component's tree, so unmounting the component alone
+leaves the overlay behind. Guard both calls - the instance does not exist if the
+token request failed before the SDK was built.
 
 Emit `sdkApplicantStatusChanged` **only on a genuine terminal success**. It
 triggers a profile refresh and navigation; firing it on an intermediate step

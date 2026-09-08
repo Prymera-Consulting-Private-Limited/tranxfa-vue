@@ -35,9 +35,13 @@ const props = defineProps({
 const openSdk = ref(false)
 const isSdkInitialized = ref(false)
 const sdkErrorMessage = ref('')
+const sdkRejected = ref(false)
+const sdkRejectionReason = ref('')
 
 async function openAccountVerificationModal () {
   sdkErrorMessage.value = '';
+  sdkRejected.value = false;
+  sdkRejectionReason.value = '';
   openSdk.value = true;
 }
 
@@ -57,11 +61,34 @@ function sdkFailed(error) {
   isSdkInitialized.value = false;
 }
 
+/**
+ * A review that completed and came back refused.
+ *
+ * Distinct from sdkError on purpose. sdkError means the verification could not
+ * be started - a vendor failure or a token endpoint that would not answer, and
+ * trying again is reasonable. This means the vendor looked at the document and
+ * said no, so the customer is told that plainly and the modal closes rather
+ * than inviting them to press the same button again.
+ *
+ * The profile is refreshed because the document's status has changed; the
+ * verification screen behind this reads it from the customer.
+ */
+async function sdkApplicantRejected(payload) {
+  sdkRejectionReason.value = payload?.reviewResult?.moderationComment
+      || payload?.reviewResult?.clientComment
+      || '';
+  sdkRejected.value = true;
+  isSdkInitialized.value = false;
+  await customerUtils.refresh().catch(() => {});
+}
+
 // Clearing the message re-enters the v-if chain, so the provider is mounted
 // afresh and asks for a new token. That is the whole retry.
 function retrySdk() {
   isSdkInitialized.value = false;
   sdkErrorMessage.value = '';
+  sdkRejected.value = false;
+  sdkRejectionReason.value = '';
 }
 
 const emit = defineEmits([
@@ -77,6 +104,8 @@ async function closeSdk() {
   openSdk.value = false;
   isSdkInitialized.value = false;
   sdkErrorMessage.value = '';
+  sdkRejected.value = false;
+  sdkRejectionReason.value = '';
 }
 
 </script>
@@ -106,7 +135,16 @@ async function closeSdk() {
           <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
             <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all min-w-sm sm:my-8 sm:w-full lg:min-w-md sm:max-w-sm lg:max-w-md lg:w-md">
               <button class="sr-only"></button>
-              <div v-if="sdkErrorMessage" role="alert" class="p-10 text-center">
+              <div v-if="sdkRejected" role="alert" class="p-10 text-center">
+                <ExclamationTriangleIcon class="mx-auto size-12 text-amber-500" />
+                <h3 class="mt-4 text-sm font-medium text-gray-900">This document was not accepted</h3>
+                <p class="mt-2 text-sm text-gray-500">{{ sdkRejectionReason || 'The check did not pass. You can try again with a clearer photo, or a different document.' }}</p>
+                <div class="mt-6 flex justify-center gap-3">
+                  <button v-on:click="retrySdk" type="button" class="rounded-[10px] bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try another document</button>
+                  <button v-on:click="closeSdk" type="button" class="rounded-[10px] border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
+                </div>
+              </div>
+              <div v-else-if="sdkErrorMessage" role="alert" class="p-10 text-center">
                 <ExclamationTriangleIcon class="mx-auto size-12 text-red-500" />
                 <h3 class="mt-4 text-sm font-medium text-gray-900">Verification could not start</h3>
                 <p class="mt-2 text-sm text-gray-500">{{ sdkErrorMessage }}</p>
@@ -125,6 +163,7 @@ async function closeSdk() {
                     v-on:sdkInitialized="isSdkInitialized = true"
                     v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                     v-on:sdkError="sdkFailed"
+                    v-on:sdkApplicantRejected="sdkApplicantRejected"
                     v-bind:documentType="documentType"
                     v-bind:documentCategory="documentCategory"
                 />
@@ -133,6 +172,7 @@ async function closeSdk() {
                   v-on:sdkInitialized="isSdkInitialized = true"
                   v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                   v-on:sdkError="sdkFailed"
+                  v-on:sdkApplicantRejected="sdkApplicantRejected"
                   v-bind:documentType="documentType"
                   v-bind:documentCategory="documentCategory"
                 />
@@ -141,6 +181,7 @@ async function closeSdk() {
                     v-on:sdkInitialized="isSdkInitialized = true"
                     v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                     v-on:sdkError="sdkFailed"
+                    v-on:sdkApplicantRejected="sdkApplicantRejected"
                     v-on:sdkCancelled="closeSdk"
                     v-bind:documentType="documentType"
                     v-bind:documentCategory="documentCategory"
@@ -150,6 +191,7 @@ async function closeSdk() {
                     v-on:sdkInitialized="isSdkInitialized = true"
                     v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                     v-on:sdkError="sdkFailed"
+                    v-on:sdkApplicantRejected="sdkApplicantRejected"
                     v-bind:documentType="documentType"
                     v-bind:documentCategory="documentCategory"
                 />
@@ -158,6 +200,7 @@ async function closeSdk() {
                     v-on:sdkInitialized="isSdkInitialized = true"
                     v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                     v-on:sdkError="sdkFailed"
+                    v-on:sdkApplicantRejected="sdkApplicantRejected"
                     v-on:sdkCancelled="closeSdk"
                     v-bind:documentType="documentType"
                     v-bind:documentCategory="documentCategory"
@@ -167,6 +210,7 @@ async function closeSdk() {
                     v-on:sdkInitialized="isSdkInitialized = true"
                     v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                     v-on:sdkError="sdkFailed"
+                    v-on:sdkApplicantRejected="sdkApplicantRejected"
                     v-bind:documentType="documentType"
                     v-bind:documentCategory="documentCategory"
                 />
