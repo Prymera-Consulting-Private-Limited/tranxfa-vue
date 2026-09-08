@@ -14,6 +14,8 @@ import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, Tr
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import UpdateAttributeCollection from "@/components/Recipient/UpdateAttributeCollection.vue";
 import {notify} from "notiwind";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
+import {getCustomerMessage} from "@/composables/api_utils.js";
 
 const recipientUtils = useRecipientUtils();
 const isLoading = ref(true);
@@ -21,6 +23,7 @@ const props = defineProps({
   id: String,
 })
 const recipient = ref(null);
+const failure = ref(null);
 
 const isConfirmDeleteModalOpen = ref(false);
 const isDeleting = ref(false);
@@ -38,6 +41,8 @@ let intervalId;
 onMounted(async () => {
   await recipientUtils.getRecipient(props.id).then((response) => {
     recipient.value = Recipient.getInstance(response.data);
+  }).catch((error) => {
+    failure.value = getCustomerMessage(error) ?? true;
   }).finally(() => {
     isLoading.value = false;
   })
@@ -64,8 +69,15 @@ const handleDelete = async () => {
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Your Recipients</h1>
+        <LoadFailurePanel
+          v-if="failure"
+          title="We couldn't load this recipient"
+          :message="typeof failure === 'string' ? failure : null"
+          :backTo="{name: 'recipients'}"
+          backLabel="All recipients"
+        />
         <!-- Main 3 column grid -->
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-t-lg p-5 shadow-lg">
+        <div v-else class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-t-lg p-5 shadow-lg">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">
@@ -101,13 +113,13 @@ const handleDelete = async () => {
                     <div class="py-6 sm:flex">
                       <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Relation</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                        <div class="text-gray-900">{{ recipient.relationship?.title }}</div>
+                        <div class="text-gray-900">{{ recipient?.relationship?.title }}</div>
                       </dd>
                     </div>
-                    <div class="py-6 sm:flex" v-if="recipient.email">
+                    <div class="py-6 sm:flex" v-if="recipient?.email">
                       <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Email</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                        <div class="text-gray-900">{{ recipient.email }}</div>
+                        <div class="text-gray-900">{{ recipient?.email }}</div>
                       </dd>
                     </div>
                     <div class="py-6 sm:flex">

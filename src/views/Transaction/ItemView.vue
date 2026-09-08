@@ -17,6 +17,8 @@ import RecipientDataType from "@/enums/recipient_data_type.js";
 import PaymentState from "@/enums/payment_state.js";
 import TransactionState from "@/enums/transaction_state.js";
 import router from "@/router/index.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
+import {getCustomerMessage} from "@/composables/api_utils.js";
 import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
 import PagaPayment from "@/components/Payment/PagaPayment.vue";
@@ -41,17 +43,28 @@ const isLoading = ref(false);
 const transaction = reactive({
   data: null
 });
+const failure = ref(null);
 
 const getTransaction = async () => {
   isLoading.value = true;
-  await transactionUtils.getTransaction(props.id).then((response) => {
+  try {
+    const response = await transactionUtils.getTransaction(props.id);
     transaction.data = Transaction.getInstance(response.data);
-  })
-  isLoading.value = false;
+    failure.value = null;
+  } catch (error) {
+    failure.value = getCustomerMessage(error) ?? true;
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 onMounted(async () => {
   await getTransaction()
+  // No transaction, no channel to listen on. Reading .id here was what turned a
+  // stale link into a permanent shimmer.
+  if (! transaction.data) {
+    return;
+  }
   Echo.channel(`client-transaction.${transaction.data.id}`)
       .listen('TransactionStateUpdated', (e) => {
         getTransaction();
@@ -59,6 +72,9 @@ onMounted(async () => {
 });
 
 onUnmounted(async () => {
+  if (! transaction.data) {
+    return;
+  }
   Echo.leaveChannel(`client-transaction.${transaction.data.id}`);
 })
 
@@ -100,7 +116,14 @@ const isShowPaymentAccountModalOpen = ref(false);
             </div>
           </div>
         </template>
-        <div v-else class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3" v-if="transaction.data">
+        <LoadFailurePanel
+          v-else-if="failure"
+          title="We couldn't load this transaction"
+          :message="typeof failure === 'string' ? failure : null"
+          :backTo="{name: 'transactions'}"
+          backLabel="All transactions"
+        />
+        <div v-else-if="transaction.data" class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           <!-- Invoice -->
           <div class="-mx-4 px-4 py-8 print:px-0 print:py-4 print:ring-0 print:shadow-none ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20">
             <h2 class="text-base font-semibold text-gray-900">Transaction #{{ transaction.data.transactionNumber }}</h2>

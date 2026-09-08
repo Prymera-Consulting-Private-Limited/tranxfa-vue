@@ -54,9 +54,20 @@ export function getLabels(value) {
  * class alongside the message, which no written message ever does. Validation
  * errors are unaffected, since they carry `errors` and a real sentence.
  *
+ * The `exception` key alone is not enough, though, and staging proved it: with
+ * debug off the framework omits that key and answers with the bare message, so
+ * "No query results for model [App\\Models\\VasOrder] a0000000-..." reached a
+ * customer looking at a booking that did not exist. A namespaced class name in
+ * square brackets is the framework's fingerprint - nothing anyone wrote for a
+ * customer to read contains one - so the shape of the message is checked too.
+ *
  * @param {object} error An axios error.
  * @returns {string|null}
  */
+
+// `[App\Models\VasOrder]`, `[Illuminate\Auth\Access\AuthorizationException]`.
+const FRAMEWORK_MESSAGE = /\[[A-Za-z_][\w]*(?:\\[A-Za-z_][\w]*)+]|^(?:No query results for model|Route \[|Target class|Call to (?:a member function|undefined)|Undefined (?:variable|property|array key)|SQLSTATE)/;
+
 export function getCustomerMessage(error) {
     const data = error?.response?.data;
 
@@ -64,5 +75,9 @@ export function getCustomerMessage(error) {
         return null;
     }
 
-    return typeof data.message === 'string' && data.message.length ? data.message : null;
+    if (typeof data.message !== 'string' || data.message.length === 0) {
+        return null;
+    }
+
+    return FRAMEWORK_MESSAGE.test(data.message) ? null : data.message;
 }

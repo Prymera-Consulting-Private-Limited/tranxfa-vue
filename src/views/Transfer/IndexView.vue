@@ -14,6 +14,8 @@ import Progress from "@/components/Transaction/Progress.vue";
 import RecipientCardShimmer from "@/components/Recipient/RecipientCardShimmer.vue";
 import vSelect from 'vue-select';
 import router from "@/router/index.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
+import {getCustomerMessage} from "@/composables/api_utils.js";
 import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import {useCustomerStore} from "@/stores/customer.js";
@@ -55,6 +57,7 @@ const quote = reactive({
   data: null
 });
 const isLoading = ref(false);
+const quoteFailure = ref(null);
 const isStepProcessing = ref(false);
 const isSubComponentLoading = ref(false);
 const purpose = ref(null);
@@ -80,11 +83,19 @@ onMounted(async () => {
   isAddressRequired.value = customerStore.customer.data.addressInformationRequired();
   if (! quote.data) {
     isLoading.value = true;
-    await quoteUtils.getTransferQuote(props.id).then((response) => {
+    // Without this the rejection escaped onMounted before isLoading could be
+    // cleared, so a quote that had expired or never existed left the customer
+    // watching a spinner with no way to know it would never finish.
+    try {
+      const response = await quoteUtils.getTransferQuote(props.id);
       quote.data = TransactionQuote.getInstance(response.data);
       send({ type: 'SET_CONTEXT', quote: quote.data });
       send({ type: 'PROCEED' });
-    });
+    } catch (error) {
+      quoteFailure.value = getCustomerMessage(error) ?? true;
+      isLoading.value = false;
+      return;
+    }
   }
   if (quote.data.paymentMethods.length === 1) {
     paymentMethod.value = quote.data.paymentMethods[0];
@@ -433,6 +444,13 @@ const canContinue = computed(() => {
                     <Spinner class="size-16 mx-auto" />
                     <span class="sr-only">Loading...</span>
                   </div>
+                  <LoadFailurePanel
+                    v-else-if="quoteFailure"
+                    title="We couldn't load this transfer"
+                    :message="typeof quoteFailure === 'string' ? quoteFailure : null"
+                    :backTo="{name: 'dashboard'}"
+                    backLabel="Start a new transfer"
+                  />
                   <template v-else>
                     <div v-if="preconditionFailedMessage" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
                       <div class="flex">
