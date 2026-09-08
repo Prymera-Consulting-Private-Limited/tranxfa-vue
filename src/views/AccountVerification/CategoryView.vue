@@ -59,7 +59,7 @@ const finalStateReached = async () => {
               <div>
                 <h2 class="text-base font-semibold text-gray-900">{{ selectedCategory.data?.title }}</h2>
                 <div class="mt-1" v-if="selectedCategory.data"><CategoryDescription v-bind:category="selectedCategory.data" /></div>
-                <p v-else class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
+                <p v-else class="mt-1 text-sm/6 text-gray-500">Get started by completing the following steps.</p>
                 <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
                   <template v-if="customerStore.isLoaded">
                     <ul v-if="selectedCategory.data?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

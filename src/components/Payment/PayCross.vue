@@ -143,13 +143,13 @@ const retryPayment = async () => {
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
         Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your payment.
       </p>
-      <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-success-600 text-white text-center py-3 rounded-md font-medium hover:bg-success-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
+      <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-success-600 text-white text-center py-3 rounded-md font-medium hover:bg-success-700 transition cursor-pointer text-sm/6 outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the secure site to finalize your payment.</p>
-      <p v-if="transaction.payment.expiresAt" class="mt-3 text-xs text-gray-500 text-left">
+      <p v-if="transaction.payment.expiresAt" class="mt-3 text-xs/5 text-gray-500 text-left">
         <template v-if="! isExpiryPassed">Payable for another {{ expiresIn }} · {{ expiresAtFormatted }}</template>
         <template v-else>The payment window has passed — checking with the payment provider…</template>
       </p>
-      <p v-if="transaction.payment.paymentTerms" class="mt-4 text-xs text-gray-500 text-left whitespace-pre-line">{{ transaction.payment.paymentTerms }}</p>
+      <p v-if="transaction.payment.paymentTerms" class="mt-4 text-xs/5 text-gray-500 text-left whitespace-pre-line">{{ transaction.payment.paymentTerms }}</p>
     </div>
   </template>
 
@@ -163,7 +163,7 @@ const retryPayment = async () => {
     <Processing class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
     <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage }}</p>
-    <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm">
+    <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
     </div>
   </template>
@@ -178,14 +178,14 @@ const retryPayment = async () => {
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment Failed</h2>
     <p class="text-base text-danger-600">Your payment has been failed. Please try again</p>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Retry Payment</button>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Retry Payment</button>
   </template>
 
   <template v-else-if="status === 'cancelled'">
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
     <p class="text-base text-gray-600 mb-6">No money has moved. You can start the transfer again whenever you're ready.</p>
-    <div class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm">
+    <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
     </div>
   </template>
@@ -193,7 +193,7 @@ const retryPayment = async () => {
   <template v-else-if="status === 'refunded'">
     <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment Refunded</h2>
     <p class="text-base text-gray-600 mb-6">This payment was returned to you. Check the transaction for details.</p>
-    <div class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm">
+    <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
     </div>
   </template>

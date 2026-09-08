@@ -118,18 +118,18 @@ function updateIsdCode(updated) {
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-2">Love to see you again</h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Send your money transfer easy and Fun!</p>
+            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">Send your money transfer easy and Fun!</p>
             <!-- Form -->
             <form @submit.prevent="login" class="space-y-5">
               <div v-if="loginError" class="rounded-2xl bg-danger-50 border border-danger-100 px-4 py-3">
-                <h3 class="text-sm font-medium text-danger-800">Login failed</h3>
-                <p class="mt-1 text-sm text-danger-700">{{ loginError }}</p>
+                <h3 class="text-sm/6 font-medium text-danger-800">Login failed</h3>
+                <p class="mt-1 text-sm/6 text-danger-700">{{ loginError }}</p>
               </div>
               <div v-if="router.currentRoute.value.query?.referer" class="rounded-2xl bg-blue-50 border border-blue-100 px-4 py-3">
-                <p v-if="router.currentRoute.value.query.referer === 'change-password'" class="text-sm text-blue-700">
+                <p v-if="router.currentRoute.value.query.referer === 'change-password'" class="text-sm/6 text-blue-700">
                   Your password has been successfully changed. Please log in using your new password.
                 </p>
-                <p v-if="router.currentRoute.value.query.referer === 'reset-password'" class="text-sm text-blue-700">
+                <p v-if="router.currentRoute.value.query.referer === 'reset-password'" class="text-sm/6 text-blue-700">
                   Your password has been successfully reset. Please log in using your new password.
                 </p>
               </div>
@@ -209,7 +209,7 @@ function updateIsdCode(updated) {
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <label
                     for="remember-me"
-                    class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:border-brand-200 hover:bg-brand-50 hover:text-brand-800"
+                    class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm/6 text-gray-600 transition-colors hover:border-brand-200 hover:bg-brand-50 hover:text-brand-800"
                     :class="rememberMe ? 'border-brand-200 bg-brand-50 text-brand-700' : ''"
                   >
                     <input
@@ -222,7 +222,7 @@ function updateIsdCode(updated) {
                   </label>
                   <router-link
                     :to="{name: 'forgotPassword'}"
-                    class="inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50"
+                    class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50"
                   >
                     Forgot password?
                   </router-link>
@@ -236,14 +236,14 @@ function updateIsdCode(updated) {
                 class="group relative block w-full overflow-hidden rounded-full bg-brand-700 py-3.5 text-center text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
               >
                 <span class="inline-flex items-center justify-center gap-2">
-                  <i v-if="isLoading" class="pi pi-spin pi-spinner text-sm"></i>
+                  <i v-if="isLoading" class="pi pi-spin pi-spinner text-sm/6"></i>
                   {{ authChannel === 'MOBILE_NUMBER' ? 'Get Code' : 'Continue' }}
-                  <i v-if="!isLoading" class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+                  <i v-if="!isLoading" class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
 
               <!-- Sign Up Link -->
-              <p class="mt-2 text-center text-sm text-gray-600">
+              <p class="mt-2 text-center text-sm/6 text-gray-600">
                 Don’t have an account?
                 <router-link
                   :to="{name: 'signUp'}"

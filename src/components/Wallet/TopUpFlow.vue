@@ -139,9 +139,9 @@ function close() {
 
               <template v-if="step === 'declare'">
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Add money to your wallet</DialogTitle>
-                <p class="mt-1 text-sm text-gray-500">Declare the amount first, then transfer exactly that amount from your bank. The match is made on the amount, so it has to be spot on.</p>
+                <p class="mt-1 text-sm/6 text-gray-500">Declare the amount first, then transfer exactly that amount from your bank. The match is made on the amount, so it has to be spot on.</p>
 
-                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm text-danger-600">{{ generalError }}</div>
+                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }}</div>
 
                 <div v-if="collisionMessage" class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <div class="flex">
@@ -149,7 +149,7 @@ function close() {
                       <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                     </div>
                     <div class="ml-3">
-                      <p class="text-sm text-warning-700">{{ collisionMessage }}</p>
+                      <p class="text-sm/6 text-warning-700">{{ collisionMessage }}</p>
                     </div>
                   </div>
                 </div>
@@ -158,9 +158,9 @@ function close() {
                   <label for="topup-amount" :class="[amountErrors.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="block text-sm/6 font-semibold">Amount <span class="text-danger-600">*</span></label>
                   <input v-model="amount" id="topup-amount" type="text" inputmode="decimal" placeholder="0.00" class="mt-2 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm text-base text-gray-900 focus:outline-none" />
                   <template v-for="(message, i) in amountErrors" :key="`amount-error-${i}`">
-                    <p class="mt-2 text-sm text-danger-600">{{ message }}</p>
+                    <p class="mt-2 text-sm/6 text-danger-600">{{ message }}</p>
                   </template>
-                  <button type="submit" :disabled="isSubmitting || ! amount" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                  <button type="submit" :disabled="isSubmitting || ! amount" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>Saving ...</span>
@@ -174,15 +174,15 @@ function close() {
                 <div class="text-center">
                   <AwaitingPending class="-mt-6" />
                   <h3 class="text-lg font-semibold text-gray-900 -mt-8">Getting your account ready</h3>
-                  <p class="mt-2 mb-4 text-sm text-gray-500">We're opening your personal deposit account. This usually takes a moment — your transfer details will appear automatically.</p>
+                  <p class="mt-2 mb-4 text-sm/6 text-gray-500">We're opening your personal deposit account. This usually takes a moment — your transfer details will appear automatically.</p>
                 </div>
               </template>
 
               <template v-else-if="step === 'instructions'">
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Make your bank transfer</DialogTitle>
-                <p v-if="account?.instruction" class="mt-1 text-sm text-gray-600 leading-6">{{ account.instruction }}</p>
+                <p v-if="account?.instruction" class="mt-1 text-sm/6 text-gray-600">{{ account.instruction }}</p>
 
-                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm text-danger-600">{{ generalError }}</div>
+                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }}</div>
 
                 <div class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <div class="flex">
@@ -190,7 +190,7 @@ function close() {
                       <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                     </div>
                     <div class="ml-3">
-                      <p class="text-sm text-warning-700">Transfer exactly <strong>{{ declaration?.amountFormatted }}</strong> — this is how we match your deposit to your wallet. A different amount will not be credited automatically.</p>
+                      <p class="text-sm/6 text-warning-700">Transfer exactly <strong>{{ declaration?.amountFormatted }}</strong> — this is how we match your deposit to your wallet. A different amount will not be credited automatically.</p>
                     </div>
                   </div>
                 </div>
@@ -202,11 +202,11 @@ function close() {
                       <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
                         <input type="text" readonly :value="declaration?.amountFormatted" id="topup-declared-amount" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6" />
                       </div>
-                      <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 cursor-pointer">
+                      <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm/6 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 cursor-pointer">
                         <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
                       </button>
                     </div>
-                    <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Transfer Amount has been copied!</p>
+                    <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Transfer Amount has been copied!</p>
                   </UseClipboard>
                 </div>
 
@@ -214,9 +214,9 @@ function close() {
                   <ClientPaymentAccount v-bind:account="account" />
                 </template>
 
-                <p v-if="declaration?.expiresAt" class="mt-4 text-xs text-gray-500">This declaration expires {{ moment(declaration.expiresAt).fromNow() }} ({{ moment(declaration.expiresAt).format('MMMM D, YYYY h:mm A') }}). A declaration that expires moves no money.</p>
+                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">This declaration expires {{ moment(declaration.expiresAt).fromNow() }} ({{ moment(declaration.expiresAt).format('MMMM D, YYYY h:mm A') }}). A declaration that expires moves no money.</p>
 
-                <button type="button" @click="close" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
+                <button type="button" @click="close" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
               </template>
             </DialogPanel>
           </TransitionChild>

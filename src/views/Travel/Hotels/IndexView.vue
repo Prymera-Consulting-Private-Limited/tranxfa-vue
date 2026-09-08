@@ -402,7 +402,7 @@ function viewHotel(hotel) {
               <template v-else-if="filteredResults.length">{{ filteredResults.length }} hotel{{ filteredResults.length === 1 ? '' : 's' }} available<template v-if="region"> in {{ region }}</template></template>
               <template v-else>No results</template>
             </h2>
-            <p class="mt-1 text-sm text-gray-500">
+            <p class="mt-1 text-sm/6 text-gray-500">
               <template v-if="!hasDestination">Pick a destination, your dates and who is travelling to see live prices.</template>
               <template v-else-if="isFiltered">Filtered from {{ results.length }} hotel{{ results.length === 1 ? '' : 's' }} the supplier had for your dates.</template>
               <!-- The count above is what we could price, which is not always
@@ -445,8 +445,8 @@ function viewHotel(hotel) {
                 <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
               </div>
               <h3 class="mt-6 text-base font-semibold text-gray-900">We couldn't load hotels</h3>
-              <p v-if="failureMessage" class="mt-2 max-w-md text-sm text-gray-500">{{ failureMessage }}</p>
-              <p v-else class="mt-2 max-w-md text-sm text-gray-500">Something went wrong while contacting our travel partner. Please try your search again in a moment.</p>
+              <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
+              <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong while contacting our travel partner. Please try your search again in a moment.</p>
             </div>
             <!-- Empty -->
             <EmptyHotels v-else-if="results.length === 0" />

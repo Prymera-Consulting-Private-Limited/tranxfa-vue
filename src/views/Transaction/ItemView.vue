@@ -118,18 +118,18 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <div class="ml-3">
                     <p v-if="transaction.data.payment.customerConfirmedPayment" :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
-                       }" class="text-sm leading-6">
+                       }" class="text-sm/6">
                       {{ transaction.data.payment.clientPaymentAccount.waitTimeMessage }}
                     </p>
                     <p v-else :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
-                       }" class="text-sm leading-6">
+                       }" class="text-sm/6">
                       {{ transaction.data.state.description }}
                     </p>
                     <div :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
-                       }" class="text-sm leading-6 mt-2">
-                      <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm hover:underline">View Our {{ transaction.data.payment.paymentMethod.title }} Account</a>
+                       }" class="text-sm/6 mt-2">
+                      <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm/6 hover:underline">View Our {{ transaction.data.payment.paymentMethod.title }} Account</a>
                     </div>
                   </div>
                 </div>
@@ -149,7 +149,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <div class="ml-3">
                     <p :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
-                       }" class="text-sm">
+                       }" class="text-sm/6">
                       {{ transaction.data.state.description }}
                     </p>
                   </div>
@@ -161,7 +161,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <template v-for="document in transaction.data.pendingDocuments" :key="document.id">
                   <li @click="router.push({name: 'categoryView', params: {category: document.documentCategory.id}, query: {'_rtr': 'viewTransaction', '_rti': transaction.data.id}})" class="col-span-1 flex rounded-md shadow-xs cursor-pointer">
                     <div class="flex flex-1 items-center justify-between rounded-l-md rounded-r-md border border-warning-200 bg-warning-50">
-                      <div class="flex-1 px-4 py-2 text-sm">
+                      <div class="flex-1 px-4 py-2 text-sm/6">
                         <p class="font-medium text-warning-700">{{ document.documentCategory.title }}</p>
                         <p class="text-warning-700 leading-6">Upload your {{ document.documentCategory.title.toLowerCase() }} to process the transaction</p>
                       </div>
@@ -198,7 +198,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <span class="font-medium text-gray-900">{{ transaction.data.recipient.wholeName }}</span>
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
                   <span class="">{{ transaction.data.payoutMethod.title }}</span>
-                  <span v-if="transaction.data.payout?.collectionPin" :class="transaction.data.payout.collectionPinAvailable ? 'text-gray-900 font-semibold' : 'text-warning-700 text-xs mt-1'" class="">
+                  <span v-if="transaction.data.payout?.collectionPin" :class="transaction.data.payout.collectionPinAvailable ? 'text-gray-900 font-semibold' : 'text-warning-700 text-xs/5 mt-1'" class="">
                     <template v-if="transaction.data.payout.collectionPinAvailable">Collection PIN: </template>
                     {{ transaction.data.payout.collectionPin }}
                   </span>
@@ -206,27 +206,27 @@ const isShowPaymentAccountModalOpen = ref(false);
               </div>
               <div class="col-span-2 mt-8 sm:mt-6 border-t border-gray-900/5">
                 <div class="py-6">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Recipient Information</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ transaction.data.payoutMethod.title }} in {{ transaction.data.payoutCountry.commonName }}</p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">Recipient Information</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">{{ transaction.data.payoutMethod.title }} in {{ transaction.data.payoutCountry.commonName }}</p>
                 </div>
                 <div class="">
                   <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                     <div class="sm:col-span-1">
-                      <dt class="text-sm font-medium text-gray-500">Name</dt>
-                      <dd class="mt-1 text-sm text-gray-900">{{ transaction.data.recipient.wholeName }}</dd>
+                      <dt class="text-sm/6 font-medium text-gray-500">Name</dt>
+                      <dd class="mt-1 text-sm/6 text-gray-900">{{ transaction.data.recipient.wholeName }}</dd>
                     </div>
                     <div class="sm:col-span-1">
-                      <dt class="text-sm font-medium text-gray-500">Relation</dt>
-                      <dd class="mt-1 text-sm text-gray-900">{{ transaction.data.recipient.relationship.title }}</dd>
+                      <dt class="text-sm/6 font-medium text-gray-500">Relation</dt>
+                      <dd class="mt-1 text-sm/6 text-gray-900">{{ transaction.data.recipient.relationship.title }}</dd>
                     </div>
                     <template v-for="attribute in transaction.data.recipient.attributes">
                       <div class="sm:col-span-1" v-if="[RecipientDataType.NAME, RecipientDataType.SECOND_NAME, RecipientDataType.THIRD_NAME].includes(attribute.type) === false">
-                        <dt class="text-sm font-medium text-gray-500">{{ attribute.label }}</dt>
-                        <dd v-if="attribute.type === RecipientDataType.MOBILE_NUMBER" class="mt-1 text-sm text-gray-900">+{{ attribute.value?.country?.callingCode }} {{  attribute.value?.number }}</dd>
-                        <dd v-else-if="attribute.type === RecipientDataType.DELIVERY_OPTION" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
-                        <dd v-else-if="attribute.type === RecipientDataType.SUB_DELIVERY_OPTION" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
-                        <dd v-else-if="attribute.type === RecipientDataType.SELECT" class="mt-1 text-sm text-gray-900">{{  attribute.value?.title }}</dd>
-                        <dd v-else class="mt-1 text-sm text-gray-900">{{ attribute.value }}</dd>
+                        <dt class="text-sm/6 font-medium text-gray-500">{{ attribute.label }}</dt>
+                        <dd v-if="attribute.type === RecipientDataType.MOBILE_NUMBER" class="mt-1 text-sm/6 text-gray-900">+{{ attribute.value?.country?.callingCode }} {{  attribute.value?.number }}</dd>
+                        <dd v-else-if="attribute.type === RecipientDataType.DELIVERY_OPTION" class="mt-1 text-sm/6 text-gray-900">{{  attribute.value?.title }}</dd>
+                        <dd v-else-if="attribute.type === RecipientDataType.SUB_DELIVERY_OPTION" class="mt-1 text-sm/6 text-gray-900">{{  attribute.value?.title }}</dd>
+                        <dd v-else-if="attribute.type === RecipientDataType.SELECT" class="mt-1 text-sm/6 text-gray-900">{{  attribute.value?.title }}</dd>
+                        <dd v-else class="mt-1 text-sm/6 text-gray-900">{{ attribute.value }}</dd>
                       </div>
                     </template>
                   </dl>
@@ -234,23 +234,23 @@ const isShowPaymentAccountModalOpen = ref(false);
               </div>
               <div class="col-span-2 print:grid grid-cols-2 mt-8 sm:mt-6 border-t border-gray-900/5 hidden py-3">
                 <div class="py-3">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Sent Amount</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">Sent Amount</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Fee</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">Fee</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
-                  <h2 id="applicant-information-title" class="text-small font-medium text-gray-900">Total Amount</h2>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">Total Amount</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
                 </div>
                 <div class="py-3">
-                  <h2 v-if="false" id="applicant-information-title" class="text-small font-medium text-gray-900">Payment Status</h2>
-                  <p v-if="false" class="mt-1 max-w-2xl text-sm text-gray-500">
-                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm font-medium">Pending</span>
-                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm font-medium">Failed</span>
-                    <span v-else class="text-sm font-medium">Paid</span>
+                  <h2 v-if="false" class="text-sm/6 font-medium text-gray-900">Payment Status</h2>
+                  <p v-if="false" class="mt-1 max-w-2xl text-sm/6 text-gray-500">
+                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm/6 font-medium">Pending</span>
+                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm/6 font-medium">Failed</span>
+                    <span v-else class="text-sm/6 font-medium">Paid</span>
                   </p>
                 </div>
               </div>
@@ -266,9 +266,9 @@ const isShowPaymentAccountModalOpen = ref(false);
                 </div>
                 <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">Status</dt>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-warning-50 px-2 py-1 text-xs font-medium text-warning-700 ring-1 ring-warning-600/20 ring-inset">Pending</dd>
-                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-danger-50 px-2 py-1 text-xs font-medium text-danger-600 ring-1 ring-danger-600/20 ring-inset">Failed</dd>
-                  <dd v-else class="rounded-md bg-success-50 px-2 py-1 text-xs font-medium text-success-700 ring-1 ring-success-600/20 ring-inset">Paid</dd>
+                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-warning-50 px-2 py-1 text-xs/5 font-medium text-warning-700 ring-1 ring-warning-600/20 ring-inset">Pending</dd>
+                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-danger-50 px-2 py-1 text-xs/5 font-medium text-danger-600 ring-1 ring-danger-600/20 ring-inset">Failed</dd>
+                  <dd v-else class="rounded-md bg-success-50 px-2 py-1 text-xs/5 font-medium text-success-700 ring-1 ring-success-600/20 ring-inset">Paid</dd>
                 </div>
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">

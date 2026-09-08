@@ -76,13 +76,13 @@ const handleDelete = async () => {
                 <div v-else class="flex items-center justify-between w-full">
                   <div class="flex-1">
                     <h2 class="text-base font-semibold text-gray-900">{{ recipient?.wholeName }}</h2>
-                    <p class="mt-1 text-sm text-gray-500">
+                    <p class="mt-1 text-sm/6 text-gray-500">
                       {{ recipient?.channel?.payoutMethod?.title }} in
                       {{ recipient?.channel?.country?.commonName }} for receiving {{ recipient?.channel?.currency?.isoAlpha }}
                     </p>
                   </div>
                   <div class="flex-none mt-3">
-                    <button @click="isConfirmDeleteModalOpen = true" type="button" class="ml-3 rounded-sm px-5 py-2 font-medium text-sm text-white shadow-xs ring-1 ring-danger-600 ring-inset bg-danger-600 hover:bg-danger-500 cursor-pointer">Delete</button>
+                    <button @click="isConfirmDeleteModalOpen = true" type="button" class="ml-3 rounded-sm px-5 py-2 font-medium text-sm/6 text-white shadow-xs ring-1 ring-danger-600 ring-inset bg-danger-600 hover:bg-danger-500 cursor-pointer">Delete</button>
                   </div>
                 </div>
               </div>
@@ -179,7 +179,7 @@ const handleDelete = async () => {
                   <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                     <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Delete Recipient?</DialogTitle>
                     <div class="mt-2">
-                      <DialogDescription class="text-sm text-gray-500">
+                      <DialogDescription class="text-sm/6 text-gray-500">
                         Are you sure, you want to delete this recipient?
                       </DialogDescription>
                     </div>
@@ -188,7 +188,7 @@ const handleDelete = async () => {
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
                   <button
                       type="button"
-                      class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer"
+                      class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer"
                       @click="handleDelete"
                       :disabled="isDeleting"
                   >
@@ -196,7 +196,7 @@ const handleDelete = async () => {
                   </button>
                   <button
                       type="button"
-                      class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer"
+                      class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer"
                       @click="isConfirmDeleteModalOpen = false"
                       :disabled="isDeleting"
                   >

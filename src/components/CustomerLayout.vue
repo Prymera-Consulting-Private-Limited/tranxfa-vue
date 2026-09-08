@@ -116,8 +116,8 @@ onUnmounted(async () => {
                     <InformationCircleIcon v-else class="size-6 text-gray-400" aria-hidden="true" />
                   </div>
                   <div class="ml-3 w-0 flex-1 pt-0.5">
-                    <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-                    <p class="mt-1 text-sm text-gray-500">{{ notification.text }}</p>
+                    <p class="text-sm/6 font-medium text-gray-900">{{ notification.title }}</p>
+                    <p class="mt-1 text-sm/6 text-gray-500">{{ notification.text }}</p>
                   </div>
                   <div class="ml-4 flex shrink-0">
                     <button type="button" @click="close(notification.id)" class="inline-flex rounded-md bg-white text-gray-500 hover:text-gray-500 focus:ring-0 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">

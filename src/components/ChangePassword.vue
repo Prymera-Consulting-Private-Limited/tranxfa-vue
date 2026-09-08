@@ -100,7 +100,7 @@ const changePassword = async () => {
                 <span @click="showCurrentPassword = !showCurrentPassword" v-else class="pi pi-eye w-5 h-5 text-gray-400"></span>
                 </button>
             </div>
-            <p v-if="formErrors.current_password.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.current_password[0] }}</p>
+            <p v-if="formErrors.current_password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.current_password[0] }}</p>
         </div>
 
         <!-- Password Field -->
@@ -114,7 +114,7 @@ const changePassword = async () => {
                     <span @click="showPassword = !showPassword" v-else class="pi pi-eye w-5 h-5 text-gray-400"></span>
                 </button>
                 </div>
-                <p v-if="formErrors.password.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.password[0] }}</p>
+                <p v-if="formErrors.password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.password[0] }}</p>
             </div>
         </div>
         <ul role="list" class="space-y-2">
@@ -127,7 +127,7 @@ const changePassword = async () => {
                     </span>
                     </div>
                     <div>
-                    <p class="text-sm text-success-700">{{ validatedPasswordPolicyRule.message }}</p>
+                    <p class="text-sm/6 text-success-700">{{ validatedPasswordPolicyRule.message }}</p>
                     </div>
                 </div>
                 <div v-else-if="(validatedPasswordPolicyRule?.outcome || true) === false" class="relative flex items-center space-x-3">
@@ -137,7 +137,7 @@ const changePassword = async () => {
                     </span>
                     </div>
                     <div>
-                    <p class="text-sm text-danger-600">{{ validatedPasswordPolicyRule.message }}</p>
+                    <p class="text-sm/6 text-danger-600">{{ validatedPasswordPolicyRule.message }}</p>
                     </div>
                 </div>
                 <div v-else class="relative flex items-center space-x-3">
@@ -147,7 +147,7 @@ const changePassword = async () => {
                     </span>
                     </div>
                     <div>
-                    <p class="text-sm text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
+                    <p class="text-sm/6 text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
                     </div>
                 </div>
                 </div>
@@ -163,7 +163,7 @@ const changePassword = async () => {
                 <span @click="showConfirmPassword = !showConfirmPassword" v-else class="pi pi-eye w-5 h-5 text-gray-400"></span>
                 </button>
             </div>
-            <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.confirm_password[0] }}</p>
+            <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.confirm_password[0] }}</p>
         </div>
         <!-- Submit Button -->
         <button :disabled="isLoading" type="submit" class="block w-full bg-brand-700 text-center py-2.5 font-medium text-white rounded-md transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">Change Password</button>

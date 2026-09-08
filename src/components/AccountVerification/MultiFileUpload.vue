@@ -127,7 +127,7 @@ async function save() {
 <template>
   <div class="max-w-xl mx-auto p-6 bg-white">
     <h2 class="text-lg font-semibold text-gray-900 mb-2">Upload {{ documentType.title }}</h2>
-    <p class="text-sm text-gray-500 mb-4">Please upload clear images of your <span class="text-brand-700">{{ documentType.title }}</span>.</p>
+    <p class="text-sm/6 text-gray-500 mb-4">Please upload clear images of your <span class="text-brand-700">{{ documentType.title }}</span>.</p>
 
     <div
         :class="{
@@ -161,9 +161,9 @@ async function save() {
             'text-brand-700': file.status === 'uploading',
             'text-success-700': file.status === 'completed',
             'text-danger-700': file.status === 'failed'
-          }" class="truncate text-sm max-w-xs">{{ file.name }}</span>
+          }" class="truncate text-sm/6 max-w-xs">{{ file.name }}</span>
         </div>
-        <button @click="removeFile(index)" class="text-gray-500 text-sm hover:text-gray-700 cursor-pointer">
+        <button @click="removeFile(index)" class="text-gray-500 text-sm/6 hover:text-gray-700 cursor-pointer">
           <TrashIcon class="w-4 h-4" />
         </button>
         <div v-if="file.status === 'uploading'" class="absolute bottom-0 left-0 h-1 bg-brand-700 transition-all" :style="{ width: file.progress + '%' }"></div>

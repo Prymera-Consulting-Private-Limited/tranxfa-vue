@@ -103,11 +103,11 @@ onMounted(async () => {
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">More authentication needed</h2>
       <p class="text-md text-[#B7A3C1] mb-2 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
-      <p class="text-sm text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
+      <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
       <!-- Form -->
       <form @submit.prevent="authenticate" class="space-y-10">
         <div v-if="otpError" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
-          <p class="text-sm text-danger-700">{{ otpError }}</p>
+          <p class="text-sm/6 text-danger-700">{{ otpError }}</p>
         </div>
         <v-otp-input
             class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"
@@ -137,13 +137,13 @@ onMounted(async () => {
             <template v-else>
               <span class="inline-flex items-center justify-center gap-2">
                 Login
-                <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+                <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
               </span>
             </template>
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
-          <div v-if="! isResendingOtp" class="text-sm text-gray-500 text-center">
+          <div v-if="! isResendingOtp" class="text-sm/6 text-gray-500 text-center">
             Didn't receive OTP?
             <a
               v-if="showResendButton"
@@ -152,7 +152,7 @@ onMounted(async () => {
             >Resend code</a>
             <template v-else> Resend in {{ countdown }}s</template>
           </div>
-          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending one time password to your email {{ customer.data?.account?.email }} ...</div>
+          <div v-else class="text-sm/6 text-gray-500 text-center animate-pulse">Resending one time password to your email {{ customer.data?.account?.email }} ...</div>
         </template>
       </form>
     </div>

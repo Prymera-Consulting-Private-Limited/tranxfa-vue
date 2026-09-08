@@ -123,21 +123,21 @@ function close() {
                 <div class="text-center py-4">
                   <CheckCircleIcon class="mx-auto size-12 text-success-500" aria-hidden="true" />
                   <DialogTitle as="h3" class="mt-3 text-lg font-semibold text-gray-900">Your wallet is active</DialogTitle>
-                  <p class="mt-2 text-sm text-gray-500">Here is your wallet number — you'll see it on your wallet screen and statements.</p>
+                  <p class="mt-2 text-sm/6 text-gray-500">Here is your wallet number — you'll see it on your wallet screen and statements.</p>
                   <div class="mt-4 max-w-xs mx-auto text-left">
                     <UseClipboard v-slot="{ copy, copied }" :source="walletStore.subscription.data?.walletNumber">
                       <div class="flex">
                         <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
                           <input type="text" readonly :value="walletStore.subscription.data?.walletNumber" id="wallet-number" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base font-semibold tracking-widest text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6" />
                         </div>
-                        <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 cursor-pointer">
+                        <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm/6 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 cursor-pointer">
                           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
                         </button>
                       </div>
-                      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Wallet number has been copied!</p>
+                      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Wallet number has been copied!</p>
                     </UseClipboard>
                   </div>
-                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
+                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
                 </div>
               </template>
 
@@ -145,11 +145,11 @@ function close() {
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">
                   {{ mode === 'reaccept' ? 'Updated wallet terms' : 'Wallet terms' }}
                 </DialogTitle>
-                <p v-if="mode === 'reaccept'" class="mt-2 rounded-md bg-brand-50 px-4 py-3 text-sm text-brand-800">We've updated the wallet terms. Review and accept the new version to keep using your wallet — your balance is safe either way.</p>
-                <p v-else class="mt-1 text-sm text-gray-500">Please read and accept the terms to activate your wallet.</p>
+                <p v-if="mode === 'reaccept'" class="mt-2 rounded-md bg-brand-50 px-4 py-3 text-sm/6 text-brand-800">We've updated the wallet terms. Review and accept the new version to keep using your wallet — your balance is safe either way.</p>
+                <p v-else class="mt-1 text-sm/6 text-gray-500">Please read and accept the terms to activate your wallet.</p>
 
                 <div v-if="generalError" class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
-                  <p class="text-sm text-warning-700">{{ generalError }}</p>
+                  <p class="text-sm/6 text-warning-700">{{ generalError }}</p>
                 </div>
 
                 <div v-if="isLoadingTerms" class="mt-4 space-y-2 animate-pulse">
@@ -158,13 +158,13 @@ function close() {
                   <div class="h-3 w-2/3 rounded bg-gray-200"></div>
                 </div>
                 <template v-else-if="terms">
-                  <div class="mt-4 max-h-64 overflow-y-auto whitespace-pre-line rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">{{ terms.content }}</div>
-                  <p class="mt-2 text-xs text-gray-500">Version {{ terms.version }}</p>
+                  <div class="mt-4 max-h-64 overflow-y-auto whitespace-pre-line rounded-md border border-gray-200 bg-gray-50 p-4 text-sm/6 text-gray-700">{{ terms.content }}</div>
+                  <p class="mt-2 text-xs/5 text-gray-500">Version {{ terms.version }}</p>
                   <div class="mt-4 flex items-start space-x-2">
                     <input type="checkbox" id="wallet-terms-accepted" v-model="accepted" class="mt-1 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
                     <label for="wallet-terms-accepted" class="text-sm/6 text-gray-700">I have read and accept the wallet terms.</label>
                   </div>
-                  <button type="button" @click="accept" :disabled="! accepted || isSubmitting" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                  <button type="button" @click="accept" :disabled="! accepted || isSubmitting" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>Saving ...</span>

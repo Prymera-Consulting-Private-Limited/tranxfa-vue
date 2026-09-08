@@ -35,10 +35,10 @@ const classes = computed(() => {
 
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <span :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium ring-1 ring-inset']">{{ order.stateLabel ?? order.state }}</span>
+    <span :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ order.stateLabel ?? order.state }}</span>
     <!-- The hotel answers separately and later, so this is the ordinary state of
     a new booking rather than anything having gone wrong. -->
-    <span v-if="order.isAwaitingHotel" class="inline-flex items-center gap-1.5 rounded-lg bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700 ring-1 ring-warning-200 ring-inset">
+    <span v-if="order.isAwaitingHotel" class="inline-flex items-center gap-1.5 rounded-lg bg-warning-50 px-2.5 py-1 text-xs/5 font-medium text-warning-700 ring-1 ring-warning-200 ring-inset">
       <span class="relative flex size-1.5">
         <span class="absolute inline-flex size-full animate-ping rounded-full bg-warning-500 opacity-75" />
         <span class="relative inline-flex size-1.5 rounded-full bg-warning-500" />

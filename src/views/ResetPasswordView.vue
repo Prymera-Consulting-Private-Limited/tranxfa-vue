@@ -187,7 +187,7 @@ watch(
             <!-- Form -->
             <form @submit.prevent="resetPassword" class="space-y-5">
               <div v-if="resetPasswordFailureMessage" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
-                <p class="text-sm text-danger-700">{{ resetPasswordFailureMessage }}</p>
+                <p class="text-sm/6 text-danger-700">{{ resetPasswordFailureMessage }}</p>
               </div>
 
               <!-- Password Field -->
@@ -216,7 +216,7 @@ watch(
                       <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                     </button>
                   </div>
-                  <p v-if="formErrors.password.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.password[0] }}</p>
+                  <p v-if="formErrors.password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.password[0] }}</p>
                 </div>
 
                 <div
@@ -226,7 +226,7 @@ watch(
                 >
                   <button
                     type="button"
-                    class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors"
+                    class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2.5 text-left text-sm/6 transition-colors"
                     :class="passwordRequirementsHeaderClass"
                     :aria-expanded="passwordRequirementsOpen"
                     @click="togglePasswordRequirements"
@@ -234,7 +234,7 @@ watch(
                     <span class="flex min-w-0 items-center gap-2">
                       <i
                         v-if="form.password"
-                        class="pi shrink-0 text-sm"
+                        class="pi shrink-0 text-sm/6"
                         :class="allPasswordRulesMet ? 'pi-check-circle' : 'pi-times-circle'"
                       />
                       <span class="truncate">{{ passwordRequirementsSummary }}</span>
@@ -254,19 +254,19 @@ watch(
                         <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
                           <i class="pi pi-check-circle text-success-500"></i>
                         </span>
-                        <p class="min-w-0 text-sm text-success-700">{{ validatedPasswordPolicyRule.message }}</p>
+                        <p class="min-w-0 text-sm/6 text-success-700">{{ validatedPasswordPolicyRule.message }}</p>
                       </div>
                       <div v-else-if="form.password && getRuleOutcome(validatedPasswordPolicyRule) === false" class="relative flex items-center space-x-3">
                         <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
                           <i class="pi pi-times-circle text-danger-500"></i>
                         </span>
-                        <p class="min-w-0 text-sm text-danger-600">{{ validatedPasswordPolicyRule.message }}</p>
+                        <p class="min-w-0 text-sm/6 text-danger-600">{{ validatedPasswordPolicyRule.message }}</p>
                       </div>
                       <div v-else class="relative flex items-center space-x-3">
                         <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
                           <i class="pi pi-check-circle text-gray-500"></i>
                         </span>
-                        <p class="min-w-0 text-sm text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
+                        <p class="min-w-0 text-sm/6 text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
                       </div>
                     </li>
                   </ul>
@@ -298,7 +298,7 @@ watch(
                     <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                   </button>
                 </div>
-                <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.confirm_password[0] }}</p>
+                <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.confirm_password[0] }}</p>
               </div>
 
               <button
@@ -308,7 +308,7 @@ watch(
               >
                 <span class="inline-flex items-center justify-center gap-2">
                   Continue
-                  <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+                  <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
             </form>

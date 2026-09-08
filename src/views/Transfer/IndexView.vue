@@ -440,7 +440,7 @@ const canContinue = computed(() => {
                           <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                         </div>
                         <div class="ml-3">
-                          <p class="text-sm text-warning-700">
+                          <p class="text-sm/6 text-warning-700">
                             {{ preconditionFailedMessage }}
                           </p>
                         </div>
@@ -470,11 +470,11 @@ const canContinue = computed(() => {
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
                       <h3 class="text-gray-900 mb-4 font-semibold">Provide Your Address</h3>
-                      <p class="text-gray-500 text-sm mb-3 -mt-2">
+                      <p class="text-gray-500 text-sm/6 mb-3 -mt-2">
                         Please provide your full residential address in
                         <span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span>.
                       </p>
-                      <p class="text-gray-500 text-sm mb-6 -mt-2 leading-5">
+                      <p class="text-gray-500 text-sm/6 mb-6 -mt-2">
                         <span>Accurate address information is required to comply with financial regulations and ensure secure transfers.</span>
                       </p>
 
@@ -502,20 +502,20 @@ const canContinue = computed(() => {
                         </ul>
                       </template>
                       <template v-else>
-                        <p class="text-gray-500 text-sm mb-6">
+                        <p class="text-gray-500 text-sm/6 mb-6">
                           We need to verify your account in order to process with this transaction. For processing please documents in each category provided below.
                         </p>
                         <ul v-if="quote.data.pendingDocuments[0].documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6">
                           <li v-for="pendingCategory in quote.data?.pendingDocuments" :key="pendingCategory.id" class="col-span-1 flex rounded-lg bg-white items-start border-1 border-gray-200 hover:shadow-sm transition-transform transform hover:scale-105 px-6 py-3">
                             <div class="text-left pl-3 py-3">
-                              <h3 class="text-sm font-medium text-gray-900">{{ pendingCategory.title }}</h3>
+                              <h3 class="text-sm/6 font-medium text-gray-900">{{ pendingCategory.title }}</h3>
                               <dl v-if="pendingCategory.description" class="mt-0 flex grow flex-col justify-between">
                                 <dt class="sr-only">Information</dt>
-                                <dd class="mt-1 text-sm text-gray-500">
+                                <dd class="mt-1 text-sm/6 text-gray-500">
                                   <CategoryDescription v-bind:category="pendingCategory" />
                                 </dd>
                                 <dt class="sr-only">Start Verification</dt>
-                                <dd class="text-sm text-gray-500">
+                                <dd class="text-sm/6 text-gray-500">
                                   <a href="javascript:" @click="startVerification(pendingCategory)" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
                                 </dd>
                               </dl>
@@ -542,23 +542,23 @@ const canContinue = computed(() => {
                 <template v-else>
                   <div class="px-3 sm:px-0">
                     <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Select a purpose <span class="text-danger-600">*</span></label>
-                    <p class="mb-4 text-sm text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
+                    <p class="mb-4 text-sm/6 text-gray-500">Please provide the purpose of your transfer to the recipient.</p>
                     <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" label="title">
                       <template v-slot:no-options="{ search, searching }">
-                        <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
-                        <em class="text-sm text-gray-500 opacity-50" v-else>Start typing to search ...</em>
+                        <template class="text-sm/6 text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
+                        <em class="text-sm/6 text-gray-500 opacity-50" v-else>Start typing to search ...</em>
                       </template>
                       <template #selected-option-container="{ option, deselect, multiple, disabled }">
                         <div class="vs__selected">
                           <div class="flex items-center w-auto">
-                            <div class="text-sm flex items-center w-full gap-x-2">
+                            <div class="text-sm/6 flex items-center w-full gap-x-2">
                               <span class="lg:max-w-sm xl:max-w-md truncate">{{ option.title }}</span>
                             </div>
                           </div>
                         </div>
                       </template>
                       <template #option="option">
-                        <div class="text-sm flex items-center w-full gap-x-3 truncate">
+                        <div class="text-sm/6 flex items-center w-full gap-x-3 truncate">
                           <span class="truncate">{{ option.title }}</span>
                         </div>
                       </template>
@@ -566,14 +566,14 @@ const canContinue = computed(() => {
 
                     <fieldset aria-label="Payment Method" class="mt-6 mb-4">
                       <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-danger-600">*</span></label>
-                      <p class="mb-4 text-sm text-gray-500">Please select how would you like to pay</p>
+                      <p class="mb-4 text-sm/6 text-gray-500">Please select how would you like to pay</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
                           <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
                           <span class="flex flex-1">
                             <span class="flex flex-col">
-                              <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
-                              <!--<span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
+                              <span class="block text-sm/6 font-medium text-gray-900">{{ paymentMethod.title }}</span>
+                              <!--<span class="mt-1 flex items-center text-sm/6 text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
                             <CheckCircleIcon v-if="checked" :class="[!checked ? 'text-gray-400' : 'text-brand-600', 'size-5']" aria-hidden="true" />
@@ -587,10 +587,10 @@ const canContinue = computed(() => {
                       <template v-for="attribute in paymentMethod?.providers[0].paymentDataAttributes">
                         <div class="mb-4">
                           <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
-                          <p v-if="attribute.info" class="mb-4 text-sm text-gray-500">{{ attribute.info }}</p>
+                          <p v-if="attribute.info" class="mb-4 text-sm/6 text-gray-500">{{ attribute.info }}</p>
                           <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
                           <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
-                          <p v-if="confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0" class="mt-2 text-sm text-danger-600">{{ confirmFormErrors[`payment_data.${attribute.attribute}`][0] }}</p>
+                          <p v-if="confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ confirmFormErrors[`payment_data.${attribute.attribute}`][0] }}</p>
                         </div>
                       </template>
                     </template>
@@ -598,32 +598,32 @@ const canContinue = computed(() => {
                     <template v-if="paymentMethod?.code === 'WALLET'">
                       <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
                         <template v-if="walletStore.isEnrolled">
-                          <div class="flex items-center justify-between text-sm text-gray-600">
+                          <div class="flex items-center justify-between text-sm/6 text-gray-600">
                             <span>Wallet balance</span>
                             <span class="font-semibold text-gray-900">{{ walletCheckoutBalance?.amountFormatted ?? '—' }}</span>
                           </div>
-                          <div class="mt-1 flex items-center justify-between text-sm text-gray-600">
+                          <div class="mt-1 flex items-center justify-between text-sm/6 text-gray-600">
                             <span>This transfer</span>
                             <span class="font-semibold text-gray-900">{{ quote.data.totalAmountCurrencyPrefixed }}</span>
                           </div>
                           <template v-if="walletStore.requiresReacceptance">
                             <div class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
-                              <p class="text-sm text-warning-700">We've updated the wallet terms — accept the new version to pay with your wallet.</p>
-                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Review and accept &rarr;</button>
+                              <p class="text-sm/6 text-warning-700">We've updated the wallet terms — accept the new version to pay with your wallet.</p>
+                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Review and accept &rarr;</button>
                             </div>
                           </template>
-                          <p v-else class="mt-2 text-xs text-gray-500">You'll confirm this payment with a code we email you.</p>
+                          <p v-else class="mt-2 text-xs/5 text-gray-500">You'll confirm this payment with a code we email you.</p>
                           <div v-if="walletShortMessage" class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
-                            <p class="text-sm text-warning-700">{{ walletShortMessage }}</p>
+                            <p class="text-sm/6 text-warning-700">{{ walletShortMessage }}</p>
                             <div class="mt-2 flex items-center gap-x-4">
-                              <button type="button" @click="isWalletTopUpOpen = true" class="text-sm font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Add money &rarr;</button>
-                              <span class="text-xs text-warning-700">or choose another way to pay above</span>
+                              <button type="button" @click="isWalletTopUpOpen = true" class="text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Add money &rarr;</button>
+                              <span class="text-xs/5 text-warning-700">or choose another way to pay above</span>
                             </div>
                           </div>
                         </template>
                         <template v-else>
-                          <p class="text-sm text-gray-600">Activate your wallet to pay this way — read and accept the terms, then load money by bank transfer.</p>
-                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">Activate wallet &rarr;</button>
+                          <p class="text-sm/6 text-gray-600">Activate your wallet to pay this way — read and accept the terms, then load money by bank transfer.</p>
+                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">Activate wallet &rarr;</button>
                         </template>
                       </div>
                     </template>
@@ -638,7 +638,7 @@ const canContinue = computed(() => {
                 </template>
               </template>
               <div class="py-4 px-3 sm:px-0">
-                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6">
                   <span v-if="isStepProcessing" class="flex justify-center items-center">
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>Saving...</span>
@@ -672,7 +672,7 @@ const canContinue = computed(() => {
                     <div class="">
                       <div class="text-left">
                         <h3 class="font-semibold text-danger-600">Identity Mismatch Detected</h3>
-                        <p class="leading-5 font-normal text-sm/8 text-danger-600 mt-3">
+                        <p class="font-normal text-sm/6 text-danger-600 mt-3">
                           We’ve detected a discrepancy between your profile and your submitted identity document. To continue with the verification process, please choose one of the following options:
                         </p>
                         <ul role="list" class="mt-6 divide-y divide-gray-200" :class="isApplyingInfoFromPoiDocument ? 'opacity:70 animate animate-pulse' : ''">
@@ -684,13 +684,13 @@ const canContinue = computed(() => {
                                 </span>
                               </div>
                               <div class="min-w-0 flex-1 px-2.5">
-                                <div class="text-sm font-medium text-gray-900">
+                                <div class="text-sm/6 font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
                                     Upload Another Document
                                   </div>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-1 leading-5">
+                                <p class="text-sm/6 text-gray-500 mt-1">
                                   I’ll provide a different document that matches my profile.
                                 </p>
                               </div>
@@ -707,13 +707,13 @@ const canContinue = computed(() => {
                                 </span>
                               </div>
                               <div class="min-w-0 flex-1 px-2.5">
-                                <div class="text-sm font-medium text-gray-900">
+                                <div class="text-sm/6 font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
                                     Use Document Details
                                   </div>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-1 leading-5">
+                                <p class="text-sm/6 text-gray-500 mt-1">
                                   Update my profile with the info from this document.
                                 </p>
                               </div>

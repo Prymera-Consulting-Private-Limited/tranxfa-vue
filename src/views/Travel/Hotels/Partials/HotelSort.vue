@@ -17,7 +17,7 @@ const emit = defineEmits([
 
 <template>
   <Menu as="div" class="relative shrink-0 text-left">
-    <MenuButton class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-xs transition hover:border-gray-300 focus-visible:outline-0">
+    <MenuButton class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm/6 font-medium text-gray-700 shadow-xs transition hover:border-gray-300 focus-visible:outline-0">
       <span class="text-gray-500">Sort:</span>
       {{ SORT_OPTIONS.find(option => option.value === modelValue)?.label }}
       <ChevronDownIcon class="size-4 text-gray-400" aria-hidden="true" />
@@ -28,7 +28,7 @@ const emit = defineEmits([
           <button
               type="button"
               @click="emit('update:modelValue', option.value)"
-              :class="[active ? 'bg-gray-100' : '', 'flex w-full cursor-pointer items-center justify-between gap-2 px-4 py-2 text-left text-sm text-gray-700']"
+              :class="[active ? 'bg-gray-100' : '', 'flex w-full cursor-pointer items-center justify-between gap-2 px-4 py-2 text-left text-sm/6 text-gray-700']"
           >
             {{ option.label }}
             <CheckIcon v-if="option.value === modelValue" class="size-4 text-brand-700" aria-hidden="true" />

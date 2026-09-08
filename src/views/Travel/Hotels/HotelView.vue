@@ -188,7 +188,7 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
     <main class="-mt-24 pb-12 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <!-- Back to results -->
-        <RouterLink :to="resultsLink" class="inline-flex items-center gap-1 text-sm font-medium text-gray-500 transition hover:text-gray-900">
+        <RouterLink :to="resultsLink" class="inline-flex items-center gap-1 text-sm/6 font-medium text-gray-500 transition hover:text-gray-900">
           <ChevronLeftIcon class="size-4" aria-hidden="true" />
           Back to results
         </RouterLink>
@@ -203,11 +203,11 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
                 <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
               </div>
               <h2 class="mt-6 text-base font-semibold text-gray-900">We couldn't load this hotel</h2>
-              <p v-if="failureMessage" class="mt-2 max-w-md text-sm text-gray-500">{{ failureMessage }}</p>
-              <p v-else class="mt-2 max-w-md text-sm text-gray-500">Something went wrong while contacting our travel partner. Please try again in a moment.</p>
+              <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
+              <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong while contacting our travel partner. Please try again in a moment.</p>
               <RouterLink
                   :to="resultsLink"
-                  class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+                  class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
               >Back to results</RouterLink>
             </div>
             <!-- Hotel -->

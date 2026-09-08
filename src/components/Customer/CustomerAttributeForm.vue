@@ -144,7 +144,7 @@ watchEffect(() => {
       <template v-else>
         <span class="inline-flex items-center justify-center gap-2">
           {{ saveBtnText }}
-          <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+          <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
         </span>
       </template>
     </button>

@@ -169,7 +169,7 @@ onUnmounted(() => {
       <div class="relative h-72 w-72 bg-black rounded-full overflow-hidden border-6 p-4 border-gray-300">
         <video ref="video" autoplay playsinline class="w-full h-full transform scale-160"></video>
       </div>
-      <p class="leading-6 text-gray-500 text-xs mt-3 text-center">All data is processed in accordance with our privacy policy.</p>
+      <p class="text-gray-500 text-xs/5 mt-3 text-center">All data is processed in accordance with our privacy policy.</p>
     </div>
   </div>
 </template>

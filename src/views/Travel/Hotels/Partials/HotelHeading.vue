@@ -39,7 +39,7 @@ const times = computed(() => {
       </span>
     </div>
     <h1 class="mt-3 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">{{ hotel.name }}</h1>
-    <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-gray-500">
+    <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm/6 text-gray-500">
       <p v-if="location" class="flex items-start gap-1.5">
         <MapPinIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
         <span>{{ location }}</span>
@@ -55,7 +55,7 @@ const times = computed(() => {
         <ArrowTopRightOnSquareIcon class="size-3.5" aria-hidden="true" />
       </a>
     </div>
-    <p v-if="times" class="mt-1.5 flex items-start gap-1.5 text-sm text-gray-500">
+    <p v-if="times" class="mt-1.5 flex items-start gap-1.5 text-sm/6 text-gray-500">
       <ClockIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
       <span>{{ times }}</span>
     </p>

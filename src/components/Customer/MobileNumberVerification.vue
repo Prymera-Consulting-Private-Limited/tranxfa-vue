@@ -110,13 +110,13 @@ onMounted(async () => {
         Please enter the one time password we have sent to
         <span class="font-semibold text-brand-700">{{ customer.data?.account?.mobileNumber }}</span>.
       </p>
-      <p class="text-sm text-gray-500 mb-8 text-center lg:px-12">
+      <p class="text-sm/6 text-gray-500 mb-8 text-center lg:px-12">
         It can take up to a minute to arrive.
       </p>
 
       <form @submit.prevent="verifyMobileNumber" class="space-y-10">
         <div v-if="otpError" class="rounded-md bg-danger-50 p-4">
-          <div class="text-sm text-danger-700">{{ otpError }}</div>
+          <div class="text-sm/6 text-danger-700">{{ otpError }}</div>
         </div>
         <v-otp-input
             class="flex flex-row items-center justify-between w-full max-w-md space-x-3 mx-auto"
@@ -143,13 +143,13 @@ onMounted(async () => {
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
-          <div v-if="! isResendingToken" class="text-sm text-gray-500 text-center">
+          <div v-if="! isResendingToken" class="text-sm/6 text-gray-500 text-center">
             Didn't receive the code?
             <a @click="resend" class="text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a>
             <template v-else>Resend in {{ countdown }}s</template>
           </div>
-          <div v-else class="text-sm text-gray-500 text-center animate-pulse">Resending the code ...</div>
-          <div class="text-sm text-gray-500 text-center">
+          <div v-else class="text-sm/6 text-gray-500 text-center animate-pulse">Resending the code ...</div>
+          <div class="text-sm/6 text-gray-500 text-center">
             Wrong number?
             <a @click="emit('editMobileNumberRequested')" class="text-brand-700 hover:underline cursor-pointer">Change it</a>
           </div>

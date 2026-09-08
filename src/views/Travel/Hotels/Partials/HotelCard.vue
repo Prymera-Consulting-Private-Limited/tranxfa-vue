@@ -63,7 +63,7 @@ const rate = computed(() => props.hotel.cheapestRate);
             <h3 class="text-lg font-semibold text-gray-900 transition group-hover:text-brand-800">{{ hotel.name }}</h3>
             <HotelRating :stars="hotel.starRating" />
           </div>
-          <p class="mt-1.5 flex items-start gap-1 text-sm text-gray-500">
+          <p class="mt-1.5 flex items-start gap-1 text-sm/6 text-gray-500">
             <MapPinIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
             <span>{{ hotel.address || hotel.region }}</span>
           </p>

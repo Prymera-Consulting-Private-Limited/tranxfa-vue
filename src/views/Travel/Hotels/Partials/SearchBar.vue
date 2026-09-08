@@ -374,7 +374,7 @@ function search() {
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-gray-500 ring-1 ring-gray-200">
         <PencilSquareIcon class="size-4" aria-hidden="true" />
       </span>
-      <p class="text-sm font-semibold text-gray-900">Edit your search</p>
+      <p class="text-sm/6 font-semibold text-gray-900">Edit your search</p>
     </div>
     <!-- Stacked, the hairlines between cells become gaps between white chips on a tinted band. -->
     <div :class="[stacked ? 'gap-2.5 border-t border-gray-100 bg-gray-50/70 p-3' : 'divide-y divide-gray-200 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0', 'flex flex-col']">
@@ -386,9 +386,9 @@ function search() {
           </span>
           <MapPinIcon v-else class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
-            <ComboboxLabel class="block text-xs text-gray-500">Destination</ComboboxLabel>
+            <ComboboxLabel class="block text-xs/5 text-gray-500">Destination</ComboboxLabel>
             <ComboboxInput
-                class="w-full truncate border-0 p-0 text-sm font-medium text-gray-900 placeholder:font-normal placeholder:text-gray-500 focus:outline-0"
+                class="w-full truncate border-0 p-0 text-sm/6 font-medium text-gray-900 placeholder:font-normal placeholder:text-gray-500 focus:outline-0"
                 :placeholder="region ?? 'Where to?'"
                 :display-value="option => option?.name ?? region ?? ''"
                 autocomplete="off"
@@ -401,34 +401,34 @@ function search() {
           </ComboboxButton>
         </div>
         <ComboboxOptions class="absolute top-full left-0 z-20 mt-2 max-h-80 w-full min-w-72 overflow-y-auto rounded-xl border border-gray-200 bg-white py-2 shadow-lg focus-visible:outline-0">
-          <li v-if="isSearchingRegions" class="px-4 py-3 text-sm text-gray-500">Searching destinations…</li>
+          <li v-if="isSearchingRegions" class="px-4 py-3 text-sm/6 text-gray-500">Searching destinations…</li>
           <!-- Travel is simply not part of this product, which must not be -->
           <!-- dressed up as an outage the customer could wait out. -->
-          <li v-else-if="regionsError === 'unavailable'" class="px-4 py-3 text-sm text-gray-500">Travel isn't available on this app.</li>
+          <li v-else-if="regionsError === 'unavailable'" class="px-4 py-3 text-sm/6 text-gray-500">Travel isn't available on this app.</li>
           <!-- mousedown.prevent keeps the input focused, so the list is still -->
           <!-- open by the time the click lands. -->
           <li v-else-if="regionsError === 'failed'" class="px-4 py-3">
-            <p class="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+            <p class="flex items-center gap-1.5 text-sm/6 font-medium text-gray-900">
               <ExclamationTriangleIcon class="size-4 shrink-0 text-warning-500" aria-hidden="true" />
               We couldn't load destinations
             </p>
-            <p class="mt-1 text-xs text-gray-500">Something went wrong reaching our travel partner. Your search is fine — please try again.</p>
+            <p class="mt-1 text-xs/5 text-gray-500">Something went wrong reaching our travel partner. Your search is fine — please try again.</p>
             <button
                 type="button"
                 @mousedown.prevent
                 @click="retryRegions"
-                class="mt-2 cursor-pointer text-xs font-medium text-brand-700 transition hover:text-brand-800"
+                class="mt-2 cursor-pointer text-xs/5 font-medium text-brand-700 transition hover:text-brand-800"
             >Try again</button>
           </li>
-          <li v-else-if="showTypePrompt" class="px-4 py-3 text-sm text-gray-500">Type at least {{ REGION_QUERY_MIN }} characters to find a destination</li>
-          <li v-else-if="regions.length === 0" class="px-4 py-3 text-sm text-gray-500">No destinations found</li>
-          <li v-else-if="regionsFeatured" class="px-4 pt-1 pb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Popular destinations</li>
+          <li v-else-if="showTypePrompt" class="px-4 py-3 text-sm/6 text-gray-500">Type at least {{ REGION_QUERY_MIN }} characters to find a destination</li>
+          <li v-else-if="regions.length === 0" class="px-4 py-3 text-sm/6 text-gray-500">No destinations found</li>
+          <li v-else-if="regionsFeatured" class="px-4 pt-1 pb-2 text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Popular destinations</li>
           <ComboboxOption v-for="option in regions" :key="option.id" :value="option" as="template" v-slot="{active, selected}">
             <li :class="[active ? 'bg-gray-50' : '', 'flex cursor-pointer items-center justify-between gap-3 px-4 py-2']">
               <div class="min-w-0">
-                <p :class="[selected ? 'font-semibold' : 'font-medium', 'truncate text-sm text-gray-900']">{{ option.name }}</p>
+                <p :class="[selected ? 'font-semibold' : 'font-medium', 'truncate text-sm/6 text-gray-900']">{{ option.name }}</p>
                 <!-- The operator's own line wins, since it says something the kind and country cannot. -->
-                <p class="truncate text-xs text-gray-500">{{ option.about || regionDescription(option) }}</p>
+                <p class="truncate text-xs/5 text-gray-500">{{ option.about || regionDescription(option) }}</p>
               </div>
             </li>
           </ComboboxOption>
@@ -443,8 +443,8 @@ function search() {
           </span>
           <CalendarDaysIcon v-else class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
-            <p class="text-xs text-gray-500">{{ nights ? `${nights} night${nights === 1 ? '' : 's'}` : 'Stay' }}</p>
-            <p class="truncate text-sm font-medium text-gray-900">{{ stayLabel }}</p>
+            <p class="text-xs/5 text-gray-500">{{ nights ? `${nights} night${nights === 1 ? '' : 's'}` : 'Stay' }}</p>
+            <p class="truncate text-sm/6 font-medium text-gray-900">{{ stayLabel }}</p>
           </div>
         </PopoverButton>
         <PopoverPanel v-slot="{ close }" class="stay-calendar absolute top-full left-0 z-20 mt-2 rounded-xl border border-gray-200 bg-white shadow-lg">
@@ -471,8 +471,8 @@ function search() {
           </span>
           <UserGroupIcon v-else class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
-            <p class="text-xs text-gray-500">Guests</p>
-            <p class="truncate text-sm font-medium text-gray-900">{{ occupancyLabel }}</p>
+            <p class="text-xs/5 text-gray-500">Guests</p>
+            <p class="truncate text-sm/6 font-medium text-gray-900">{{ occupancyLabel }}</p>
           </div>
           <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'size-4 shrink-0 text-gray-400 transition']" aria-hidden="true" />
         </PopoverButton>
@@ -481,19 +481,19 @@ function search() {
           <div class="flex-1 divide-y divide-dashed divide-gray-200 overflow-y-auto px-4">
             <section v-for="(room, index) in guests" :key="index" class="py-3">
               <header class="flex items-baseline justify-between gap-3">
-                <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Room {{ index + 1 }}</h4>
+                <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Room {{ index + 1 }}</h4>
                 <button
                     v-if="guests.length > 1"
                     type="button"
                     @click="removeRoom(index)"
-                    class="cursor-pointer text-xs font-medium text-danger-600 transition hover:text-danger-700"
+                    class="cursor-pointer text-xs/5 font-medium text-danger-600 transition hover:text-danger-700"
                 >Remove</button>
               </header>
               <!-- Counters -->
               <div v-for="item in OCCUPANCY" :key="item.key" class="mt-2 flex items-center justify-between gap-3">
-                <p class="truncate text-sm text-gray-700">
+                <p class="truncate text-sm/6 text-gray-700">
                   {{ item.label }}
-                  <span class="ml-0.5 text-xs text-gray-500">{{ item.hint }}</span>
+                  <span class="ml-0.5 text-xs/5 text-gray-500">{{ item.hint }}</span>
                 </p>
                 <div class="flex shrink-0 items-center gap-2.5">
                   <button
@@ -505,7 +505,7 @@ function search() {
                   >
                     <MinusIcon class="size-3" aria-hidden="true" />
                   </button>
-                  <span class="w-4 text-center text-sm font-medium tabular-nums">{{ countOf(room, item.key) }}</span>
+                  <span class="w-4 text-center text-sm/6 font-medium tabular-nums">{{ countOf(room, item.key) }}</span>
                   <button
                       type="button"
                       :disabled="!canIncrease(room, item.key)"
@@ -520,9 +520,9 @@ function search() {
               <!-- Ages step like the counters above. -->
               <div v-if="room.children.length" class="mt-2 space-y-2">
                 <div v-for="(childAge, childIndex) in room.children" :key="childIndex" class="flex items-center justify-between gap-3">
-                  <p class="truncate text-sm text-gray-500">
+                  <p class="truncate text-sm/6 text-gray-500">
                     Child {{ childIndex + 1 }}
-                    <span class="ml-0.5 text-xs text-gray-500">age</span>
+                    <span class="ml-0.5 text-xs/5 text-gray-500">age</span>
                   </p>
                   <div class="flex shrink-0 items-center gap-2.5">
                     <button
@@ -534,7 +534,7 @@ function search() {
                     >
                       <MinusIcon class="size-3" aria-hidden="true" />
                     </button>
-                    <span class="w-6 text-center text-sm font-medium tabular-nums">{{ childAge === 0 ? '<1' : childAge }}</span>
+                    <span class="w-6 text-center text-sm/6 font-medium tabular-nums">{{ childAge === 0 ? '<1' : childAge }}</span>
                     <button
                         type="button"
                         :disabled="childAge >= MAX_CHILD_AGE"
@@ -547,18 +547,18 @@ function search() {
                   </div>
                 </div>
               </div>
-              <p v-if="roomWarning(room)" class="mt-2 text-xs font-medium text-danger-600">{{ roomWarning(room) }}</p>
+              <p v-if="roomWarning(room)" class="mt-2 text-xs/5 font-medium text-danger-600">{{ roomWarning(room) }}</p>
             </section>
           </div>
           <!-- Actions -->
           <div class="border-t border-gray-200 px-4 py-3">
-            <p v-if="hasUnevenRooms" class="mb-2.5 text-xs text-gray-500">For best results with multiple rooms, use the same number of guests per room.</p>
+            <p v-if="hasUnevenRooms" class="mb-2.5 text-xs/5 text-gray-500">For best results with multiple rooms, use the same number of guests per room.</p>
             <div class="flex items-center justify-between gap-3">
               <button
                   type="button"
                   :disabled="guests.length >= MAX_ROOMS"
                   @click="addRoom"
-                  class="flex cursor-pointer items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800 disabled:cursor-not-allowed disabled:text-gray-500"
+                  class="flex cursor-pointer items-center gap-1 text-sm/6 font-medium text-brand-700 transition hover:text-brand-800 disabled:cursor-not-allowed disabled:text-gray-500"
               >
                 <PlusIcon class="size-4" aria-hidden="true" />
                 Add room
@@ -566,7 +566,7 @@ function search() {
               <button
                   type="button"
                   @click="close()"
-                  class="cursor-pointer rounded-lg bg-brand-700 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+                  class="cursor-pointer rounded-lg bg-brand-700 px-4 py-1.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
               >Done</button>
             </div>
           </div>
@@ -574,7 +574,7 @@ function search() {
       </Popover>
       <!-- Search -->
       <div :class="[stacked ? '' : 'p-2 lg:pl-4', 'flex items-center']">
-        <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? 'shadow-sm' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
+        <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? 'shadow-sm' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
           <MagnifyingGlassIcon class="size-4" aria-hidden="true" />
           Search
         </button>

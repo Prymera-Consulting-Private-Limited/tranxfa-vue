@@ -128,7 +128,7 @@ const stepCommandExecuted = async (e) => {
 </script>
 <template>
   <nav class="flex items-center justify-between space-x-8 sm:hidden py-3 px-4" aria-label="Progress">
-    <p class="text-sm font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
+    <p class="text-sm/6 font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
     <ol role="list" class="flex items-center space-x-5">
       <li v-for="step in progress" :key="step.name">
         <a v-if="step.status === 'complete'" @click="stepCommandExecuted(step.stepCommand)" class="block size-2.5 rounded-full bg-brand-600 hover:bg-brand-900">
@@ -161,8 +161,8 @@ const stepCommandExecuted = async (e) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
-                <p class="mt-1 text-sm text-gray-500"></p>
+                <div class="text-sm/6 font-medium mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="mt-1 text-sm/6 text-gray-500"></p>
               </div>
             </div>
           </template>
@@ -175,8 +175,8 @@ const stepCommandExecuted = async (e) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium text-brand-700 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
-                <p class="text-sm text-gray-500"></p>
+                <div class="text-sm/6 font-medium text-brand-700 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="text-sm/6 text-gray-500"></p>
               </div>
             </div>
           </template>
@@ -189,8 +189,8 @@ const stepCommandExecuted = async (e) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col mt-2">
-                <div class="text-sm font-medium text-gray-500">{{stepIdx + 1}}. {{ step.name }}</div>
-                <p class="text-sm text-gray-500"></p>
+                <div class="text-sm/6 font-medium text-gray-500">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="text-sm/6 text-gray-500"></p>
               </div>
             </div>
           </template>

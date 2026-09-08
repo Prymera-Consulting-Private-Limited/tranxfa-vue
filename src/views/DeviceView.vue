@@ -33,7 +33,7 @@ const refreshDevices = async () => {
             <h1 class="sr-only" id="section-2-title">Devices</h1>
             <div class="mb-6">
               <h2 class="text-base font-semibold text-gray-900">Your Devices</h2>
-              <p class="mt-1 text-sm text-gray-500">View and manage all devices where you're signed in. You can sign out of any device that's not currently in use.</p>
+              <p class="mt-1 text-sm/6 text-gray-500">View and manage all devices where you're signed in. You can sign out of any device that's not currently in use.</p>
             </div>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-4xl">
               <template v-if="isLoading">

@@ -180,12 +180,12 @@ onUnmounted(stopPolling);
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">We couldn't check your payment</h1>
-          <p v-if="failureMessage" class="mt-2 max-w-md text-sm text-gray-500">{{ failureMessage }}</p>
-          <p v-else class="mt-2 max-w-md text-sm text-gray-500">Your booking and any payment you made are unaffected. Please try again in a moment.</p>
+          <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
+          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Your booking and any payment you made are unaffected. Please try again in a moment.</p>
           <button
               type="button"
               @click="load()"
-              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >Try again</button>
         </div>
         <template v-else>
@@ -196,20 +196,20 @@ onUnmounted(stopPolling);
             <Processing v-else-if="status === 'processing'" class="-my-12" />
             <AwaitingPending v-else class="-my-12" />
             <h1 class="mt-6 text-lg font-semibold tracking-tight text-gray-900">{{ heading }}</h1>
-            <p class="mt-2 max-w-md text-sm text-gray-500">{{ note }}</p>
-            <p v-if="payment" class="mt-4 text-sm text-gray-700">
+            <p class="mt-2 max-w-md text-sm/6 text-gray-500">{{ note }}</p>
+            <p v-if="payment" class="mt-4 text-sm/6 text-gray-700">
               <span class="font-medium">{{ payment.amount.currencyPrefixed }}</span>
               <span v-if="payment.method" class="text-gray-500"> · {{ payment.method }}</span>
             </p>
             <div class="mt-8 flex flex-col gap-2 sm:flex-row-reverse">
               <RouterLink
                   :to="{name: 'travelBooking', params: {id: orderId}}"
-                  class="cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+                  class="cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
               >View your booking</RouterLink>
               <RouterLink
                   v-if="status === 'failed'"
                   :to="{name: 'travelBookingPayment', params: {id: orderId}}"
-                  class="cursor-pointer rounded-xl px-5 py-2.5 text-sm font-medium text-gray-600 ring-1 ring-gray-200 transition hover:text-gray-900 focus-visible:outline-0"
+                  class="cursor-pointer rounded-xl px-5 py-2.5 text-sm/6 font-medium text-gray-600 ring-1 ring-gray-200 transition hover:text-gray-900 focus-visible:outline-0"
               >Try paying again</RouterLink>
             </div>
           </div>

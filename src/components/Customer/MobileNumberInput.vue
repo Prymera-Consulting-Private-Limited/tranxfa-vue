@@ -86,7 +86,7 @@ const editPersonalInformation = () => {
           <template v-else>
             <span class="inline-flex items-center justify-center gap-2">
               Continue
-              <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+              <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
             </span>
           </template>
         </button>
@@ -94,7 +94,7 @@ const editPersonalInformation = () => {
       <div class="mt-12 text-center">
         <a
           @click="editPersonalInformation"
-          class="inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
+          class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
           href="javascript:"
         >Edit Personal Information</a>
       </div>

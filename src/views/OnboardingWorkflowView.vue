@@ -49,8 +49,8 @@ onMounted(loadProfile);
     <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
       <div v-if="loadFailed" class="text-center px-6">
         <p class="text-lg font-semibold text-gray-900 mb-2">We could not load your details</p>
-        <p class="text-sm text-gray-500 mb-6">Please check your connection and try again.</p>
-        <button @click="loadProfile" type="button" class="rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-800 cursor-pointer">Try again</button>
+        <p class="text-sm/6 text-gray-500 mb-6">Please check your connection and try again.</p>
+        <button @click="loadProfile" type="button" class="rounded-md bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white hover:bg-brand-800 cursor-pointer">Try again</button>
       </div>
       <i v-else-if="! isReady" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">

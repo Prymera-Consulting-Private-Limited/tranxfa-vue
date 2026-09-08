@@ -19,6 +19,6 @@ const rating = computed(() => Math.round(props.stars ?? 0));
     <div class="flex items-center gap-0.5">
       <StarIcon v-for="star in rating" :key="star" class="size-3.5 text-warning-400" aria-hidden="true" />
     </div>
-    <span class="text-xs font-medium text-gray-500">{{ rating }}-star</span>
+    <span class="text-xs/5 font-medium text-gray-500">{{ rating }}-star</span>
   </div>
 </template>

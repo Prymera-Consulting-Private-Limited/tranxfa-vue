@@ -32,14 +32,14 @@ watch(() => walletStore.isEnrolled, (enrolled) => {
           <WalletIcon class="size-5 text-brand-700" aria-hidden="true" />
         </div>
         <div>
-          <p class="text-xs font-medium text-gray-500">Wallet balance</p>
+          <p class="text-xs/5 font-medium text-gray-500">Wallet balance</p>
           <template v-if="walletStore.wallet.data?.balances?.length > 0">
             <p v-for="balance in walletStore.wallet.data.balances" :key="balance.currency" class="text-lg font-bold tracking-tight text-gray-900">{{ balance.amountFormatted }}</p>
           </template>
           <p v-else class="text-lg font-bold tracking-tight text-gray-900">&mdash;</p>
         </div>
       </div>
-      <router-link :to="{name: 'wallet'}" class="shrink-0 text-sm font-semibold text-brand-700 hover:text-brand-800">Manage &rarr;</router-link>
+      <router-link :to="{name: 'wallet'}" class="shrink-0 text-sm/6 font-semibold text-brand-700 hover:text-brand-800">Manage &rarr;</router-link>
     </div>
   </div>
 </template>

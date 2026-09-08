@@ -46,7 +46,7 @@ const props = defineProps({
         <span :style="{
              backgroundColor: colorUtils.getStyleValue(transaction.state.colorScheme, 50),
              '--tw-ring-color': colorUtils.getStyleValue(transaction.state.colorScheme, 200),
-           }" class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
+           }" class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs/5 font-medium ring-1 ring-inset">
           <svg :style="{
              fill: colorUtils.getStyleValue(transaction.state.colorScheme, 700),
            }" class="size-1.5" viewBox="0 0 6 6" aria-hidden="true">

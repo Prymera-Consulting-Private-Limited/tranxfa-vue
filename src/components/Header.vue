@@ -82,7 +82,7 @@ onMounted(async () => {
           <!-- Profile dropdown -->
           <Menu as="div" class="relative ml-4 shrink-0">
             <div>
-              <MenuButton class="relative flex rounded-full bg-white text-sm ring-2 ring-white/20 focus:ring-white focus:outline-hidden cursor-pointer">
+              <MenuButton class="relative flex rounded-full bg-white text-sm/6 ring-2 ring-white/20 focus:ring-white focus:outline-hidden cursor-pointer">
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
                 <div class="bg-gray-200 text-gray-500 size-8 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
@@ -98,8 +98,8 @@ onMounted(async () => {
             <transition leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
               <MenuItems class="absolute -right-2 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden tracking-wider">
                 <MenuItem as="div" v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                  <a v-if="item.action" href="javascript:" @click="item.action" class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</a>
-                  <router-link v-else :to="{name: item.href}" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</router-link>
+                  <a v-if="item.action" href="javascript:" @click="item.action" class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm/6 text-gray-700']">{{ item.name }}</a>
+                  <router-link v-else :to="{name: item.href}" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm/6 text-gray-700']">{{ item.name }}</router-link>
                 </MenuItem>
               </MenuItems>
             </transition>
@@ -121,7 +121,7 @@ onMounted(async () => {
         <div class="grid grid-cols-3 items-center gap-8">
           <div class="col-span-2">
             <nav class="flex space-x-4">
-              <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-brand-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
+              <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-brand-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm/6 font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
             </nav>
           </div>
         </div>
@@ -163,7 +163,7 @@ onMounted(async () => {
                   </div>
                   <div class="ml-3 min-w-0 flex-1">
                     <div class="truncate text-base font-medium text-gray-800 tracking-wider">{{ customer.data?.wholeName }}</div>
-                    <div class="truncate text-sm font-medium text-gray-500 tracking-wider">{{ customer.data?.account?.email }}</div>
+                    <div class="truncate text-sm/6 font-medium text-gray-500 tracking-wider">{{ customer.data?.account?.email }}</div>
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">

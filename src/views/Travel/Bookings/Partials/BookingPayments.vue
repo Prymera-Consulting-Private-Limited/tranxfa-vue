@@ -71,22 +71,22 @@ function classes(payment) {
 <template>
   <section v-if="payments.length" class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
     <header class="border-b border-gray-100 px-5 py-4">
-      <h2 class="text-sm font-semibold text-gray-900">Payments</h2>
+      <h2 class="text-sm/6 font-semibold text-gray-900">Payments</h2>
       <!-- Failed attempts are listed too: somebody declined once who paid on the
       second try should see both rather than wonder if they paid twice. -->
-      <p class="mt-0.5 text-xs text-gray-500">Every attempt on this booking, including any that didn't go through.</p>
+      <p class="mt-0.5 text-xs/5 text-gray-500">Every attempt on this booking, including any that didn't go through.</p>
     </header>
     <ul class="divide-y divide-gray-100">
       <li v-for="payment in payments" :key="payment.reference" class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 py-4">
         <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-2">
-            <span :class="[classes(payment), 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium ring-1 ring-inset']">{{ payment.stateLabel ?? payment.state }}</span>
-            <span v-if="payment.method" class="text-sm text-gray-600">{{ payment.method }}</span>
+            <span :class="[classes(payment), 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ payment.stateLabel ?? payment.state }}</span>
+            <span v-if="payment.method" class="text-sm/6 text-gray-600">{{ payment.method }}</span>
           </div>
-          <p v-if="note(payment)" class="mt-1.5 text-xs text-gray-500">{{ note(payment) }}</p>
-          <p v-if="payment.attemptedAt" class="mt-1 text-xs text-gray-500">{{ moment(payment.attemptedAt).format('D MMM YYYY, HH:mm') }}</p>
+          <p v-if="note(payment)" class="mt-1.5 text-xs/5 text-gray-500">{{ note(payment) }}</p>
+          <p v-if="payment.attemptedAt" class="mt-1 text-xs/5 text-gray-500">{{ moment(payment.attemptedAt).format('D MMM YYYY, HH:mm') }}</p>
         </div>
-        <p class="shrink-0 text-sm font-medium text-gray-900 tabular-nums">{{ payment.amount.currencyPrefixed }}</p>
+        <p class="shrink-0 text-sm/6 font-medium text-gray-900 tabular-nums">{{ payment.amount.currencyPrefixed }}</p>
       </li>
     </ul>
   </section>

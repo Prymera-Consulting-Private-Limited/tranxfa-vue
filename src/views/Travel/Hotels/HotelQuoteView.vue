@@ -180,12 +180,12 @@ onUnmounted(() => clearInterval(clock));
           <h1 class="mt-6 text-base font-semibold text-gray-900">
             {{ bookingRefused ? "We couldn't complete this booking" : 'This price is no longer held' }}
           </h1>
-          <p class="mt-2 max-w-md text-sm text-gray-500">
+          <p class="mt-2 max-w-md text-sm/6 text-gray-500">
             {{ failureMessage ?? 'We hold a price for 15 minutes. Search again to see what is available now.' }}
           </p>
           <RouterLink
               :to="{name: 'hotels'}"
-              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >Search again</RouterLink>
         </div>
         <!-- Failed -->
@@ -194,12 +194,12 @@ onUnmounted(() => clearInterval(clock));
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">We couldn't load this price</h1>
-          <p v-if="failureMessage" class="mt-2 max-w-md text-sm text-gray-500">{{ failureMessage }}</p>
-          <p v-else class="mt-2 max-w-md text-sm text-gray-500">Something went wrong on our side. Please try again in a moment.</p>
+          <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
+          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong on our side. Please try again in a moment.</p>
           <button
               type="button"
               @click="load"
-              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >Try again</button>
         </div>
         <template v-else-if="quote">
@@ -208,11 +208,11 @@ onUnmounted(() => clearInterval(clock));
             isRunningOut ? 'border-warning-200 bg-warning-50 text-warning-800' : 'border-gray-200 bg-white text-gray-600',
             'flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-2xl border px-5 py-3',
           ]">
-            <p class="flex items-center gap-2 text-sm font-medium">
+            <p class="flex items-center gap-2 text-sm/6 font-medium">
               <ClockIcon class="size-4 shrink-0" aria-hidden="true" />
               This price is held for you
             </p>
-            <p v-if="countdown" class="text-sm font-semibold tabular-nums">{{ countdown }} left</p>
+            <p v-if="countdown" class="text-sm/6 font-semibold tabular-nums">{{ countdown }} left</p>
           </div>
           <!-- Hotel -->
           <header class="mt-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
@@ -220,11 +220,11 @@ onUnmounted(() => clearInterval(clock));
               <h1 class="text-xl font-semibold tracking-tight text-gray-900">{{ quote.hotel?.name }}</h1>
               <HotelRating :stars="quote.hotel?.starRating" />
             </div>
-            <p v-if="quote.hotel?.address" class="mt-1.5 flex items-start gap-1.5 text-sm text-gray-500">
+            <p v-if="quote.hotel?.address" class="mt-1.5 flex items-start gap-1.5 text-sm/6 text-gray-500">
               <MapPinIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
               <span>{{ quote.hotel.address }}</span>
             </p>
-            <div class="mt-4 space-y-2 border-t border-gray-100 pt-4 text-sm">
+            <div class="mt-4 space-y-2 border-t border-gray-100 pt-4 text-sm/6">
               <p v-if="stay" class="flex items-start gap-2 text-gray-700">
                 <CalendarDaysIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
                 <span>
@@ -238,8 +238,8 @@ onUnmounted(() => clearInterval(clock));
               </p>
             </div>
             <div v-if="quote.room" class="mt-4 border-t border-gray-100 pt-4">
-              <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Your room</p>
-              <p class="mt-1 text-sm font-medium text-gray-900">{{ quote.room.roomName }}</p>
+              <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">Your room</p>
+              <p class="mt-1 text-sm/6 font-medium text-gray-900">{{ quote.room.roomName }}</p>
               <div class="mt-2 flex flex-wrap items-center gap-2">
                 <HotelMealBadge :meal="quote.room.meal" :labels="quote.labels" />
                 <HotelCancellationBadge :cancellation="quote.cancellation" />
@@ -249,30 +249,30 @@ onUnmounted(() => clearInterval(clock));
           <!-- Price -->
           <section class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
             <header class="border-b border-gray-100 px-5 py-4">
-              <h2 class="text-sm font-semibold text-gray-900">Your price</h2>
+              <h2 class="text-sm/6 font-semibold text-gray-900">Your price</h2>
             </header>
             <dl class="divide-y divide-gray-100">
               <div v-for="line in quote.breakdown" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
-                <dt class="min-w-0 text-sm text-gray-500">{{ line.label }}</dt>
-                <dd class="shrink-0 text-sm text-gray-900 tabular-nums">{{ line.amount.currencyPrefixed }}</dd>
+                <dt class="min-w-0 text-sm/6 text-gray-500">{{ line.label }}</dt>
+                <dd class="shrink-0 text-sm/6 text-gray-900 tabular-nums">{{ line.amount.currencyPrefixed }}</dd>
               </div>
               <div class="flex items-baseline justify-between gap-4 bg-gray-50/70 px-5 py-3">
-                <dt class="text-sm font-semibold text-gray-900">Total</dt>
+                <dt class="text-sm/6 font-semibold text-gray-900">Total</dt>
                 <dd class="text-right">
                   <span class="block text-base font-semibold text-gray-900 tabular-nums">{{ quote.total.currencyPrefixed }}</span>
-                  <span v-if="quote.perNight.isStated" class="mt-0.5 block text-xs font-normal text-gray-500">{{ quote.perNight.currencyPrefixed }} / night</span>
+                  <span v-if="quote.perNight.isStated" class="mt-0.5 block text-xs/5 font-normal text-gray-500">{{ quote.perNight.currencyPrefixed }} / night</span>
                 </dd>
               </div>
             </dl>
             <!-- Not part of the total: the hotel collects this on arrival. -->
-            <p v-if="quote.payableAtProperty.isStated" class="border-t border-gray-100 px-5 py-3 text-sm text-warning-700">
+            <p v-if="quote.payableAtProperty.isStated" class="border-t border-gray-100 px-5 py-3 text-sm/6 text-warning-700">
               Plus {{ quote.payableAtProperty.currencyPrefixed }} payable at the property
             </p>
           </section>
           <!-- What cancelling would give back, while the terms still say so. -->
           <section v-if="quote.cancellation?.refundNow?.isStated" class="mt-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900">If you cancel</h2>
-            <dl class="mt-3 space-y-2 text-sm">
+            <h2 class="text-sm/6 font-semibold text-gray-900">If you cancel</h2>
+            <dl class="mt-3 space-y-2 text-sm/6">
               <div class="flex items-baseline justify-between gap-3">
                 <dt class="text-gray-500">Cancelling now would cost</dt>
                 <dd class="font-medium text-gray-900 tabular-nums">{{ quote.cancellation.costsNow.currencyPrefixed }}</dd>
@@ -282,7 +282,7 @@ onUnmounted(() => clearInterval(clock));
                 <dd class="font-medium text-gray-900 tabular-nums">{{ quote.cancellation.refundNow.currencyPrefixed }}</dd>
               </div>
             </dl>
-            <p class="mt-3 text-xs text-gray-500">Worked out fresh each time this page is opened, since it changes as your stay approaches.</p>
+            <p class="mt-3 text-xs/5 text-gray-500">Worked out fresh each time this page is opened, since it changes as your stay approaches.</p>
           </section>
           <!-- Who is staying, and how to reach them -->
           <GuestContactForm
@@ -293,7 +293,7 @@ onUnmounted(() => clearInterval(clock));
               @submit="book"
               class="mt-4"
           />
-          <p v-if="quote.reference" class="mt-6 text-center text-xs text-gray-500">Reference {{ quote.reference }}</p>
+          <p v-if="quote.reference" class="mt-6 text-center text-xs/5 text-gray-500">Reference {{ quote.reference }}</p>
         </template>
       </div>
     </main>

@@ -113,8 +113,8 @@ const removeFile = () => {
     <div v-if="filePreview" class="flex items-center justify-start w-full gap-x-6">
       <div class="relative mx-auto">
         <img :src="filePreview" class="w-48 h-48 object-cover rounded-md mx-auto" :alt="page" />
-        <button class="absolute top-0 right-0 text-white p-1 rounded-full text-xs" @click.stop="removeFile">
-          <i class="pi pi-close text-xs"></i>
+        <button class="absolute top-0 right-0 text-white p-1 rounded-full text-xs/5" @click.stop="removeFile">
+          <i class="pi pi-close text-xs/5"></i>
         </button>
       </div>
     </div>
@@ -124,8 +124,8 @@ const removeFile = () => {
       <IdentificationIcon v-if="page === 'photo'" class="text-gray-400 size-10 mx-auto" />
       <DocumentTextIcon v-else class="text-gray-400 size-10 mx-auto" />
       <div>
-        <p class="text-sm text-gray-600">{{ `Click or drag file here to upload ${page} page` }}</p>
-        <p v-if="error" class="text-xs text-danger-600 mt-1">{{ error }}</p>
+        <p class="text-sm/6 text-gray-600">{{ `Click or drag file here to upload ${page} page` }}</p>
+        <p v-if="error" class="text-xs/5 text-danger-600 mt-1">{{ error }}</p>
       </div>
     </div>
 

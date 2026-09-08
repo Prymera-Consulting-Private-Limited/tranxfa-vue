@@ -16,11 +16,11 @@ defineProps({
         <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
           <input type="text" readonly :value="accountAttribute.value" :id="`account-attribute-${index}`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6" />
         </div>
-        <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
+        <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm/6 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
         </button>
       </div>
-      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">{{ accountAttribute.key }} has been copied!</p>
+      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">{{ accountAttribute.key }} has been copied!</p>
     </UseClipboard>
   </div>
   <div class="text-left my-3">
@@ -30,11 +30,11 @@ defineProps({
         <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
           <input type="text" readonly :value="account.paymentReference" :id="`payment-reference`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6" />
         </div>
-        <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
+        <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm/6 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
         </button>
       </div>
-      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Payment Reference has been copied!</p>
+      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Payment Reference has been copied!</p>
     </UseClipboard>
   </div>
 </template>

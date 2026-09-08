@@ -57,11 +57,11 @@ async function requestResetPassword() {
             </div>
             <!-- Form Header -->
             <h2 class="text-2xl font-bold text-black mb-2">Forgot Password</h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Forgot your password? No problem. Enter the email linked to your account and click "Send Reset Link." We'll email you a secure link to reset your password.</p>
+            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">Forgot your password? No problem. Enter the email linked to your account and click "Send Reset Link." We'll email you a secure link to reset your password.</p>
             <!-- Form -->
             <form @submit.prevent="requestResetPassword" class="space-y-5">
               <div v-if="forgotPasswordMessage" class="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
-                <p class="text-sm text-blue-700">{{ forgotPasswordMessage }}</p>
+                <p class="text-sm/6 text-blue-700">{{ forgotPasswordMessage }}</p>
               </div>
 
               <div>
@@ -91,13 +91,13 @@ async function requestResetPassword() {
                 class="group relative block w-full overflow-hidden rounded-full bg-brand-700 py-3.5 text-center text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
               >
                 <span class="inline-flex items-center justify-center gap-2">
-                  <i v-if="isLoading" class="pi pi-spin pi-spinner text-sm"></i>
+                  <i v-if="isLoading" class="pi pi-spin pi-spinner text-sm/6"></i>
                   Send Reset Link
-                  <i v-if="!isLoading" class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+                  <i v-if="!isLoading" class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
 
-              <p class="mt-2 text-center text-sm text-gray-600">
+              <p class="mt-2 text-center text-sm/6 text-gray-600">
                 Changed mind?
                 <router-link
                   :to="{name: 'signIn'}"

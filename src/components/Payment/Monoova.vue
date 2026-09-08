@@ -102,7 +102,7 @@ const retryPayment = async () => {
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div class="-m-5">
       <h2 class="text-lg font-semibold text-gray-900 mb-3 text-left">Complete Your Payment</h2>
-      <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-3 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
+      <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm/6 text-gray-600 mb-3 text-left">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
       <template v-if="transaction.payment.clientPaymentAccount">
         <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" />
         <div class="text-left space-y-3 my-3">
@@ -112,11 +112,11 @@ const retryPayment = async () => {
             <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
               <input type="text" readonly :value="transaction.payment.totalPaymentAmountCurrencyPrefixed" :id="`payment-amount`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6" />
             </div>
-            <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
+            <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm/6 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
               <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
             </button>
           </div>
-          <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs">Payment Amount has been copied!</p>
+          <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Payment Amount has been copied!</p>
         </UseClipboard>
         <div class="border-l-4 my-5 border-warning-400 bg-warning-50 p-4">
           <div class="flex">
@@ -124,13 +124,13 @@ const retryPayment = async () => {
               <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
             </div>
             <div class="ml-3">
-              <p class="text-sm text-warning-700">Ensure you pay the exact amount of <strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong>. Payments with incorrect amounts will be automatically refunded within 30–60 minutes.</p>
+              <p class="text-sm/6 text-warning-700">Ensure you pay the exact amount of <strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong>. Payments with incorrect amounts will be automatically refunded within 30–60 minutes.</p>
             </div>
           </div>
         </div>
       </div>
         <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
-          <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 cursor-pointer">I've made payment</button>
+          <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-brand-600 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 cursor-pointer">I've made payment</button>
         </div>
       </template>
     </div>
@@ -146,7 +146,7 @@ const retryPayment = async () => {
     <Processing class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Awaiting Payment Update</h2>
     <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage }}</p>
-    <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm">
+    <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
     </div>
   </template>
@@ -161,6 +161,6 @@ const retryPayment = async () => {
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment Failed</h2>
     <p class="text-base text-danger-600">Your payment has been failed. Please try again</p>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Retry Payment</button>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Retry Payment</button>
   </template>
 </template>

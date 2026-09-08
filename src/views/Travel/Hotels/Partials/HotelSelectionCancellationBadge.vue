@@ -33,5 +33,5 @@ const classes = computed(() => {
 </script>
 
 <template>
-  <span :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium ring-1 ring-inset']">{{ label }}</span>
+  <span :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ label }}</span>
 </template>

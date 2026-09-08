@@ -43,7 +43,7 @@ defineProps({
             <DialogPanel class="relative w-full max-w-sm transform overflow-hidden rounded-2xl bg-white px-6 py-8 text-center shadow-xl transition-all">
               <Spinner class="mx-auto size-10" />
               <DialogTitle class="mt-4 text-base font-semibold text-gray-900">Confirming your booking</DialogTitle>
-              <p class="mt-2 text-sm text-gray-500">This can take a moment while we finalise everything with the hotel. Please don't close or refresh this page.</p>
+              <p class="mt-2 text-sm/6 text-gray-500">This can take a moment while we finalise everything with the hotel. Please don't close or refresh this page.</p>
             </DialogPanel>
           </TransitionChild>
         </div>

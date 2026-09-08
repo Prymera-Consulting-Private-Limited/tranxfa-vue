@@ -258,7 +258,7 @@ watch(
               Adventure starts here
               <img src="/images/rocket.gif" alt="Verified" class="w-8 h-8 inline-block">
             </h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Make your money transfer easy and Fun!</p>
+            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">Make your money transfer easy and Fun!</p>
 
             <!-- Form -->
             <form @submit.prevent="register" class="space-y-5">
@@ -282,8 +282,8 @@ watch(
                       />
                     </div>
                   </div>
-                  <p v-if="formErrors.country.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.country[0] }}</p>
-                  <p v-if="formErrors.mobile_number.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.mobile_number[0] }}</p>
+                  <p v-if="formErrors.country.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.country[0] }}</p>
+                  <p v-if="formErrors.mobile_number.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.mobile_number[0] }}</p>
                 </div>
               </template>
               <template v-else-if="authChannel === 'EMAIL'">
@@ -307,7 +307,7 @@ watch(
                       <i class="pi pi-envelope transition-colors" :class="emailFocused ? 'text-brand-700' : 'text-gray-400'"></i>
                     </span>
                   </div>
-                  <p v-if="formErrors.email.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.email[0] }}</p>
+                  <p v-if="formErrors.email.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.email[0] }}</p>
                 </div>
 
                 <!-- Password Field -->
@@ -336,7 +336,7 @@ watch(
                         <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                       </button>
                     </div>
-                    <p v-if="formErrors.password.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.password[0] }}</p>
+                    <p v-if="formErrors.password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.password[0] }}</p>
                   </div>
                   <div
                     v-if="validatedPasswordPolicies.rules.length"
@@ -345,7 +345,7 @@ watch(
                   >
                     <button
                       type="button"
-                      class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors"
+                      class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2.5 text-left text-sm/6 transition-colors"
                       :class="passwordRequirementsHeaderClass"
                       :aria-expanded="passwordRequirementsOpen"
                       @click="togglePasswordRequirements"
@@ -353,7 +353,7 @@ watch(
                       <span class="flex min-w-0 items-center gap-2">
                         <i
                           v-if="form.password"
-                          class="pi shrink-0 text-sm"
+                          class="pi shrink-0 text-sm/6"
                           :class="allPasswordRulesMet ? 'pi-check-circle' : 'pi-times-circle'"
                         />
                         <span class="truncate">{{ passwordRequirementsSummary }}</span>
@@ -377,7 +377,7 @@ watch(
                               </span>
                             </div>
                             <div class="min-w-0">
-                              <p class="text-sm text-success-700">{{ validatedPasswordPolicyRule.message }}</p>
+                              <p class="text-sm/6 text-success-700">{{ validatedPasswordPolicyRule.message }}</p>
                             </div>
                           </div>
                           <div v-else-if="form.password && getRuleOutcome(validatedPasswordPolicyRule) === false" class="relative flex items-center space-x-3">
@@ -387,7 +387,7 @@ watch(
                               </span>
                             </div>
                             <div class="min-w-0">
-                              <p class="text-sm text-danger-600">{{ validatedPasswordPolicyRule.message }}</p>
+                              <p class="text-sm/6 text-danger-600">{{ validatedPasswordPolicyRule.message }}</p>
                             </div>
                           </div>
                           <div v-else class="relative flex items-center space-x-3">
@@ -397,7 +397,7 @@ watch(
                               </span>
                             </div>
                             <div class="min-w-0">
-                              <p class="text-sm text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
+                              <p class="text-sm/6 text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
                             </div>
                           </div>
                         </div>
@@ -430,7 +430,7 @@ watch(
                       <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                     </button>
                   </div>
-                  <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-danger-600">{{ formErrors.confirm_password[0] }}</p>
+                  <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.confirm_password[0] }}</p>
                 </div>
               </template>
 
@@ -441,7 +441,7 @@ watch(
                 :class="termsAccepted ? 'border-brand-200 bg-brand-50' : ''"
               >
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="mt-0.5 h-4 w-4 min-w-4 min-h-4 rounded border-gray-300 text-brand-700 accent-brand-700 outline-none focus:ring-0" />
-                <span class="text-sm/6 text-gray-700 leading-snug">I agree to <a :href="privacyPolicyUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>privacy policy</a> & <a :href="userAgreementUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>terms of service</a>.</span>
+                <span class="text-sm/6 text-gray-700">I agree to <a :href="privacyPolicyUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>privacy policy</a> & <a :href="userAgreementUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>terms of service</a>.</span>
               </label>
 
               <!-- Checkbox -->
@@ -462,12 +462,12 @@ watch(
               >
                 <span class="inline-flex items-center justify-center gap-2">
                   {{ authChannel === 'MOBILE_NUMBER' ? 'Get Code' : 'Continue' }}
-                  <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+                  <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
             </form>
 
-            <p class="mt-8 text-center text-sm text-gray-500">
+            <p class="mt-8 text-center text-sm/6 text-gray-500">
               Already have an account?
               <router-link
                 class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"

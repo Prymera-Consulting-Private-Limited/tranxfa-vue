@@ -92,16 +92,16 @@ async function cancelTopup() {
 <template>
   <div class="rounded-lg bg-white border border-gray-100 px-4 py-4 sm:px-6">
     <h2 class="text-base font-semibold text-gray-900">Pending top-ups</h2>
-    <p class="mt-0.5 text-sm text-gray-500">Waiting for your bank transfer to arrive — remember, the amount must match exactly.</p>
+    <p class="mt-0.5 text-sm/6 text-gray-500">Waiting for your bank transfer to arrive — remember, the amount must match exactly.</p>
     <ul role="list" class="mt-2 divide-y divide-gray-100">
       <li v-for="topup in topups" :key="topup.id" class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
-          <p class="text-sm font-semibold text-gray-900">{{ topup.amountFormatted }} <span class="ml-2 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium tracking-wider text-gray-600">{{ topup.reference }}</span></p>
-          <p class="mt-1 text-xs text-gray-500">Expires {{ expiresIn(topup) }} &middot; {{ moment(topup.expiresAt).format('MMM D, YYYY h:mm A') }}</p>
+          <p class="text-sm/6 font-semibold text-gray-900">{{ topup.amountFormatted }} <span class="ml-2 rounded-md bg-gray-100 px-2 py-0.5 text-xs/5 font-medium tracking-wider text-gray-600">{{ topup.reference }}</span></p>
+          <p class="mt-1 text-xs/5 text-gray-500">Expires {{ expiresIn(topup) }} &middot; {{ moment(topup.expiresAt).format('MMM D, YYYY h:mm A') }}</p>
         </div>
         <div class="flex shrink-0 items-center gap-x-4">
-          <a href="javascript:" @click="emit('view', topup)" class="text-sm font-semibold text-brand-700 hover:text-brand-800">View details</a>
-          <a href="javascript:" @click="openCancelModal(topup)" class="text-sm font-medium text-danger-600 hover:text-danger-600">Cancel</a>
+          <a href="javascript:" @click="emit('view', topup)" class="text-sm/6 font-semibold text-brand-700 hover:text-brand-800">View details</a>
+          <a href="javascript:" @click="openCancelModal(topup)" class="text-sm/6 font-medium text-danger-600 hover:text-danger-600">Cancel</a>
         </div>
       </li>
     </ul>
@@ -123,18 +123,18 @@ async function cancelTopup() {
                 <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                   <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Cancel this top-up</DialogTitle>
                   <div class="mt-2">
-                    <DialogDescription class="text-sm text-gray-500">
+                    <DialogDescription class="text-sm/6 text-gray-500">
                       This withdraws your declaration of {{ topupToCancel?.amountFormatted }}. If you've already made the bank transfer, don't cancel — the money is on its way and will be matched when it arrives.
                     </DialogDescription>
                   </div>
-                  <p v-if="cancelError" class="mt-2 text-sm text-danger-600">{{ cancelError }}</p>
+                  <p v-if="cancelError" class="mt-2 text-sm/6 text-danger-600">{{ cancelError }}</p>
                 </div>
               </div>
               <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
-                <button type="button" class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer" @click="cancelTopup" :disabled="isCancelling">
+                <button type="button" class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer" @click="cancelTopup" :disabled="isCancelling">
                   {{ isCancelling ? 'Cancelling...' : 'Cancel top-up' }}
                 </button>
-                <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="topupToCancel = null" :disabled="isCancelling">
+                <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="topupToCancel = null" :disabled="isCancelling">
                   Keep it
                 </button>
               </div>

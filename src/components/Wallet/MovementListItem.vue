@@ -61,11 +61,11 @@ const isInflow = computed(() => {
       <component :is="kindIcon" :class="[isInflow ? 'text-success-600' : 'text-gray-500']" class="size-5" aria-hidden="true" />
     </div>
     <div class="min-w-0 flex-auto">
-      <p class="text-sm font-medium text-gray-900">{{ movement.description }}</p>
-      <p class="mt-1 truncate text-xs text-gray-500">{{ niceTime }}</p>
+      <p class="text-sm/6 font-medium text-gray-900">{{ movement.description }}</p>
+      <p class="mt-1 truncate text-xs/5 text-gray-500">{{ niceTime }}</p>
     </div>
   </div>
   <div class="flex shrink-0 items-center">
-    <p :class="[movement.isCredit() ? 'text-success-700' : 'text-gray-900', 'text-sm font-semibold']">{{ movement.amountFormatted }}</p>
+    <p :class="[movement.isCredit() ? 'text-success-700' : 'text-gray-900', 'text-sm/6 font-semibold']">{{ movement.amountFormatted }}</p>
   </div>
 </template>
