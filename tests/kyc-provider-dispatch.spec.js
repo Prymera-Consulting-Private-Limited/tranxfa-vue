@@ -12,7 +12,7 @@ vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn()}}));
 // is about which one the chain picks, so they are replaced by markers.
 const marker = (name) => ({[`default`]: {
     name,
-    emits: ['sdkInitialized', 'sdkError', 'sdkStepCompleted', 'sdkApplicantStatusChanged', 'sdkCancelled'],
+    emits: ['sdkInitialized', 'sdkError', 'sdkStepCompleted', 'sdkApplicantStatusChanged', 'sdkApplicantRejected', 'sdkCancelled'],
     template: `<div />`,
 }});
 vi.mock('@/components/AccountVerification/Provider/Sumsub.vue', () => marker('Sumsub'));
@@ -176,5 +176,79 @@ describe('DocumentTypeItem sdk failures', () => {
 
         expect(wrapper.find('[role="alert"]').exists()).toBe(false);
         expect(rendered(wrapper)).toEqual(['Sumsub']);
+    });
+});
+
+// A completed-but-refused review is an answer, not a failure. Until this was
+// wired, Sumsub emitted nothing at all for one - so a rejected customer saw
+// precisely what a hung SDK looks like, and the two are worth telling apart.
+describe('DocumentTypeItem rejected reviews', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    it('tells the customer the document was refused', async () => {
+        const wrapper = await openFor('SUMSUB');
+
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkApplicantRejected', {
+            reviewStatus: 'completed',
+            reviewResult: {reviewAnswer: 'RED', moderationComment: 'The photo was too blurred to read.'},
+        });
+
+        expect(wrapper.find('[role="status"]').exists()).toBe(false);
+        const text = wrapper.get('[role="alert"]').text();
+        expect(text).toContain('not accepted');
+        expect(text).toContain('too blurred');
+    });
+
+    // Not every refusal carries a comment, and "undefined" on screen is worse
+    // than saying nothing useful in our own words.
+    it('falls back to our wording when the vendor gives no reason', async () => {
+        const wrapper = await openFor('SUMSUB');
+
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkApplicantRejected', {
+            reviewStatus: 'completed',
+            reviewResult: {reviewAnswer: 'RED'},
+        });
+
+        const text = wrapper.get('[role="alert"]').text();
+        expect(text).toContain('did not pass');
+        expect(text).not.toContain('undefined');
+    });
+
+    // A refusal must not be mistaken for the success path: that one refreshes
+    // the profile and routes the customer onward as though they were verified.
+    it('does not report a refusal as a completed verification', async () => {
+        const wrapper = await openFor('SUMSUB');
+
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkApplicantRejected', {
+            reviewStatus: 'completed', reviewResult: {reviewAnswer: 'RED'},
+        });
+
+        expect(wrapper.emitted('sdkFinalStateReached')).toBeFalsy();
+    });
+
+    it('offers a way out of a refusal', async () => {
+        const wrapper = await openFor('SUMSUB');
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkApplicantRejected', {
+            reviewStatus: 'completed', reviewResult: {reviewAnswer: 'RED'},
+        });
+
+        const buttons = wrapper.findAll('[role="alert"] button');
+        expect(buttons.length).toBe(2);
+
+        await buttons[0].trigger('click');
+        expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+        expect(rendered(wrapper)).toEqual(['Sumsub']);
+    });
+
+    it.each([
+        ['SUMSUB', 'Sumsub'], ['UPPASS', 'UpPass'], ['CYBRID', 'Persona'],
+        ['SHUFTI', 'Shufti'], ['DIDIT', 'Didit'], ['SYSTEM', 'System'],
+    ])('binds the rejection on %s', async (api, component) => {
+        const wrapper = await openFor(api);
+        await wrapper.findComponent({name: component}).vm.$emit('sdkApplicantRejected', {
+            reviewStatus: 'completed', reviewResult: {reviewAnswer: 'RED'},
+        });
+
+        expect(wrapper.find('[role="alert"]').exists(), api).toBe(true);
     });
 });

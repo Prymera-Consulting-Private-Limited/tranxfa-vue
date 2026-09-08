@@ -251,14 +251,12 @@ forever on an unknown error — do not reintroduce that shape.
   emit is wired just because it is declared. `sdkError` *is* now handled -
   `DocumentTypeItem` renders an error with a retry, and the five token-fetching
   providers emit it rather than letting the rejection escape `onMounted`.
-- `Sumsub.vue` emits `sdkApplicantStatusChanged` **only on a GREEN review**, so
-  a RED review emits nothing and the modal just sits there.
-- `Persona.vue` and `Sumsub.vue` have **no `onUnmounted`**, so their SDK
-  instances outlive the modal. `Didit`, `Shufti` and `UpPass` clean up properly
-  — copy those.
-- `src/enums/review_answer.js` declares `class ReviewAnswer` with **no `export`
-  statement** and is imported by nothing. Dead file; it was meant to serve the
-  GREEN/RED handling above.
+- A completed-but-refused review emits `sdkApplicantRejected`, not
+  `sdkApplicantStatusChanged`. Keep them apart: the success event refreshes the
+  profile and routes the customer onward, and the transfer wizard waits for the
+  document to leave `pendingDocuments`, which a rejected one never does.
+  Anything that is not explicitly `GREEN` falls to the refusal side, so a new
+  vendor answer cannot be mistaken for an approval.
 - `src/enums/transaction_state_icon.js` maps `RISK-ASSESSMENT` **twice** (lines
   31 and 33). The later `ShieldCheckIcon` wins; the first is dead.
 - `stores/password_policy.js` `setLoaded(flag)` does `flag || true`, so it can
