@@ -17,7 +17,7 @@ import {
   ListboxOptions,
 
 } from "@headlessui/vue";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 import { useQuoteUtils } from "@/composables/quote_utils.js";
 import MoneyInput from "@/components/MoneyInput.vue";
 import MoneyInputShimmer from "@/components/MoneyInputShimmer.vue";
@@ -28,6 +28,7 @@ import router from "@/router/index.js";
 import TransactionQuote from "@/models/transaction_quote.js";
 import {useRecipientUtils} from "@/composables/recipient_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import {debounce} from "lodash";
 
 const customerStore = useCustomerStore();
 
@@ -73,6 +74,21 @@ const quoteErrors = reactive({
 
 const quoteFailureReason = ref('');
 
+/**
+ * How long the calculator waits after a keystroke before it prices.
+ *
+ * Every character typed into an amount fired its own /quote request, so "1000"
+ * was four calls and only the last one was ever wanted. Each of those hits a
+ * rate provider, and the three that are thrown away still cost a round trip and
+ * still count against whatever the provider meters.
+ *
+ * 300ms is the same figure the recipient name lookup uses. It is long enough to
+ * swallow ordinary typing and short enough that pausing feels like the answer
+ * arriving rather than a wait.
+ */
+const QUOTE_DEBOUNCE_MS = 300;
+
+
 async function getQuote() {
   isFetchingQuote.value = true;
   quoteErrors.payment = [];
@@ -96,7 +112,11 @@ async function getQuote() {
       quoteErrors.payout.push(quoteUtil.quote.data.alerts.payout_amount);
     }
   }).catch((e) => {
-    if (e.response.status === 422) {
+    // Optional chaining because a request that never got a response has no
+    // `response` at all. Reading through it threw inside this catch, and now
+    // that getQuote can be called from a timer there is no caller left to
+    // notice - it would surface as an unhandled rejection and nothing else.
+    if (e.response?.status === 422) {
       const errors = e.response.data.errors;
       if (errors?.amount?.length > 0) {
         if ((query?.amountType || AmountType.SEND) === AmountType.SEND) {
@@ -117,9 +137,12 @@ async function getQuote() {
           quoteErrors.payout.push(error);
         }
       }
-    } else if (e.response.status === 503) {
+    } else if (e.response?.status === 503) {
       quoteFailureReason.value = e.response.data.message;
     } else {
+      // Says something rather than leaving the last good quote on screen
+      // looking current.
+      quoteFailureReason.value = 'We could not price this transfer just now. Please check your connection and try again.';
       console.error(e);
     }
   }).finally(() => {
@@ -127,27 +150,44 @@ async function getQuote() {
   });
 }
 
+const debouncedGetQuote = debounce(getQuote, QUOTE_DEBOUNCE_MS);
+
+/**
+ * Typing an amount. Debounced, and deliberately without touching
+ * isFetchingQuote here.
+ *
+ * Setting it on the keystroke looks like the right thing - it would stop the
+ * calculator showing the previous total beside a newly typed figure for the
+ * length of the debounce. But that flag drives `v-if="! isFetchingQuote"` on
+ * the MoneyInput itself, so raising it early unmounts the field the customer is
+ * typing into and replaces it with the shimmer. They lose the caret mid-number.
+ *
+ * A 300ms stale total is the smaller problem, so the loading state stays where
+ * it was: raised by getQuote when the request actually goes out.
+ */
 async function sentAmountUpdated(amount) {
   query.amountType = AmountType.SEND;
   query.amount = amount;
-  await getQuote();
+  debouncedGetQuote();
 }
 
 async function sourceUpdated(option) {
   query.paymentCountry = option.country;
   query.paymentCurrency = option.currency;
+  debouncedGetQuote.cancel();
   await getQuote();
 }
 
 async function receiveAmountUpdated(amount) {
   query.amountType = AmountType.RECEIVE;
   query.amount = amount;
-  await getQuote();
+  debouncedGetQuote();
 }
 
 async function targetUpdated(option) {
   query.payoutCountry = option.country;
   query.payoutCurrency = option.currency;
+  debouncedGetQuote.cancel();
   await getQuote();
 }
 
@@ -155,11 +195,19 @@ const selectedPayoutMethod = computed({
   get: () => quoteUtil.quote.data?.payoutMethod,
   set: (value) => {
     query.payoutMethod = value;
+    debouncedGetQuote.cancel();
     getQuote();
   }
 })
 
 onMounted(getQuote)
+
+onUnmounted(() => {
+  // A keystroke still waiting would otherwise fire after the component is gone,
+  // pricing a screen nobody is looking at and writing into a store it no longer
+  // renders from.
+  debouncedGetQuote.cancel();
+})
 
 async function saveQuote() {
   isSavingQuote.value = true;
