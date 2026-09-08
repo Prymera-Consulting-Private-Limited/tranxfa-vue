@@ -100,7 +100,7 @@ async function cancelTopup() {
           <p class="mt-1 text-xs text-gray-500">Expires {{ expiresIn(topup) }} &middot; {{ moment(topup.expiresAt).format('MMM D, YYYY h:mm A') }}</p>
         </div>
         <div class="flex shrink-0 items-center gap-x-4">
-          <a href="javascript:" @click="emit('view', topup)" class="text-sm font-semibold text-brand-600 hover:text-brand-500">View details</a>
+          <a href="javascript:" @click="emit('view', topup)" class="text-sm font-semibold text-brand-700 hover:text-brand-800">View details</a>
           <a href="javascript:" @click="openCancelModal(topup)" class="text-sm font-medium text-red-600 hover:text-red-500">Cancel</a>
         </div>
       </li>

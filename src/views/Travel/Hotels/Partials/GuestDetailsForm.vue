@@ -383,10 +383,10 @@ const topErrors = computed(() => {
                       autocomplete="off"
                       class="block w-full rounded-lg border-0 bg-white py-2 pl-3 pr-14 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600"
                   />
-                  <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-gray-400">years</span>
+                  <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-gray-500">years</span>
                 </div>
                 <p v-if="fieldError(guest, 'age')" class="mt-1 text-xs text-red-600">{{ fieldError(guest, 'age') }}</p>
-                <p v-else class="mt-1 text-xs text-gray-400">From your search — change only to correct it.</p>
+                <p v-else class="mt-1 text-xs text-gray-500">From your search — change only to correct it.</p>
               </div>
             </div>
             <div v-if="genderRequired" class="mt-3 sm:max-w-[calc((100%-1.5rem)/3)]">

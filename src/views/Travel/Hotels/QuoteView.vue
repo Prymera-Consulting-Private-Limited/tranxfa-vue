@@ -584,7 +584,7 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
               </div>
               <!-- Room, price and next step -->
               <section class="rounded-2xl bg-white p-5 ring-1 ring-gray-200">
-                <h2 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Your room</h2>
+                <h2 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Your room</h2>
                 <h3 v-if="roomName" class="mt-1 text-sm font-semibold tracking-tight text-gray-900">{{ roomName }}</h3>
                 <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
                   <span v-if="capacity" class="inline-flex items-center gap-1">
@@ -602,21 +602,21 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                   <HotelAvailability :allotment="quote.rate?.allotment" />
                 </div>
                 <HotelAmenities v-if="quote.rate?.amenities?.length" :amenities="quote.rate.amenities" class="mt-3" />
-                <p v-if="roomNote" class="mt-3 text-xs text-gray-400">{{ prettifyLabel(roomNote) }}</p>
+                <p v-if="roomNote" class="mt-3 text-xs text-gray-500">{{ prettifyLabel(roomNote) }}</p>
                 <!-- Guests -->
                 <div v-if="guestDisplayRooms.length" class="mt-4 border-t border-gray-100 pt-4">
-                  <p class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Guests</p>
+                  <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Guests</p>
                   <div class="mt-1.5 space-y-1.5">
                     <div v-for="(room, index) in guestDisplayRooms" :key="index">
-                      <p v-if="guestDisplayRooms.length > 1" class="text-xs text-gray-400">Room {{ index + 1 }}</p>
+                      <p v-if="guestDisplayRooms.length > 1" class="text-xs text-gray-500">Room {{ index + 1 }}</p>
                       <p class="text-sm font-medium text-gray-900">{{ room.names ?? room.summary }}</p>
-                      <p v-if="room.unnamed > 0" class="text-xs text-gray-400">+{{ room.unnamed }} guest{{ room.unnamed === 1 ? '' : 's' }} without details yet</p>
+                      <p v-if="room.unnamed > 0" class="text-xs text-gray-500">+{{ room.unnamed }} guest{{ room.unnamed === 1 ? '' : 's' }} without details yet</p>
                     </div>
                   </div>
                 </div>
                 <!-- Price -->
                 <div class="mt-4 border-t border-gray-100 pt-4">
-                  <p class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Total price</p>
+                  <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Total price</p>
                   <p class="mt-1.5 flex items-baseline gap-1.5">
                     <span class="text-sm font-medium text-gray-500">{{ quote.price.currency }}</span>
                     <span class="text-3xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>

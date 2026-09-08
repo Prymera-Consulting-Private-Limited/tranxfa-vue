@@ -205,14 +205,14 @@ onUnmounted(() => {
                 </p>
               </div>
               <div class="shrink-0 text-right">
-                <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Total paid</p>
+                <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Total paid</p>
                 <p class="mt-1 text-2xl font-semibold tracking-tight text-gray-900">{{ order.total.currencyPrefixed }}</p>
               </div>
             </div>
             <div class="mt-4">
               <BookingStateBadge :order="order" />
             </div>
-            <p v-if="order.reference" class="mt-3 text-xs text-gray-400">Reference {{ order.reference }}</p>
+            <p v-if="order.reference" class="mt-3 text-xs text-gray-500">Reference {{ order.reference }}</p>
           </header>
           <div class="mt-4 space-y-4">
             <!-- Stay -->
@@ -225,7 +225,7 @@ onUnmounted(() => {
                   <dt class="text-sm text-gray-500">Dates</dt>
                   <dd class="text-sm font-medium text-gray-900">
                     {{ stay }}
-                    <span v-if="order.nights" class="font-normal text-gray-400">· {{ order.nights }} night{{ order.nights === 1 ? '' : 's' }}</span>
+                    <span v-if="order.nights" class="font-normal text-gray-500">· {{ order.nights }} night{{ order.nights === 1 ? '' : 's' }}</span>
                   </dd>
                 </div>
                 <div v-if="order.roomName" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">

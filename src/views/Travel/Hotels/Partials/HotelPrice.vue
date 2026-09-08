@@ -34,7 +34,7 @@ const showBreakdown = computed(() => lines.value.length > 1);
 
 <template>
   <div>
-    <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Total</p>
+    <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Total</p>
     <p class="mt-1 flex items-baseline gap-1.5">
       <span class="text-sm font-medium text-gray-500">{{ money.currency }}</span>
       <span class="text-2xl font-semibold tracking-tight text-gray-900">{{ rate.total.formatted }}</span>

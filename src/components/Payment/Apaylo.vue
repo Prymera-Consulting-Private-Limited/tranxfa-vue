@@ -123,7 +123,7 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
         Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your Interac e-Transfer.
       </p>
-      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
+      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the Interac platform to finalize your payment.</p>
     </div>
   </template>
@@ -165,7 +165,7 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
         </div>
       </template>
     </template>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-600 text-white text-center py-3 rounded-md font-medium hover:bg-brand-700 transition cursor-pointer text-sm outline-none ring-0">Retry Payment</button>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-600 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition cursor-pointer text-sm outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Retry Payment</button>
     <p class="text-base text-red-600 mt-5 text-sm">If the issue continues, please contact our support team. We'll be happy to assist you!</p>
   </template>
 </template>

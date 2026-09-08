@@ -132,7 +132,7 @@ function formatPrice(amount) {
       <!-- Price -->
       <section v-if="hasPriceRange" class="px-4 py-3">
         <div class="flex items-baseline justify-between gap-2">
-          <h4 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Total price</h4>
+          <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Total price</h4>
           <p class="text-xs font-medium text-gray-900">
             up to {{ facets.price.currency }} {{ formatPrice(maxPrice) }}
           </p>
@@ -146,14 +146,14 @@ function formatPrice(amount) {
             class="mt-3 w-full cursor-pointer accent-brand-700"
             aria-label="Maximum total price"
         />
-        <div class="mt-1 flex justify-between text-xs text-gray-400">
+        <div class="mt-1 flex justify-between text-xs text-gray-500">
           <span>{{ formatPrice(facets.price.min) }}</span>
           <span>{{ formatPrice(facets.price.max) }}</span>
         </div>
       </section>
       <!-- Star rating -->
       <section v-if="facets.stars.length" class="px-4 py-3">
-        <h4 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Star rating</h4>
+        <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Star rating</h4>
         <div class="mt-2 space-y-1.5">
           <label v-for="star in facets.stars" :key="star.value" class="flex cursor-pointer items-center gap-2.5">
             <input
@@ -165,13 +165,13 @@ function formatPrice(amount) {
             <span class="flex items-center gap-0.5">
               <StarIcon v-for="index in star.value" :key="index" class="size-3.5 text-amber-400" aria-hidden="true" />
             </span>
-            <span class="ml-auto text-xs text-gray-400 tabular-nums">{{ star.count }}</span>
+            <span class="ml-auto text-xs text-gray-500 tabular-nums">{{ star.count }}</span>
           </label>
         </div>
       </section>
       <!-- Photos, only worth offering when the results are mixed -->
       <section v-if="facets.photos.with > 0 && facets.photos.without > 0" class="px-4 py-3">
-        <h4 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Photos</h4>
+        <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Photos</h4>
         <div class="mt-2 grid grid-cols-2 gap-2">
           <button
               v-for="option in PHOTO_OPTIONS"
@@ -186,13 +186,13 @@ function formatPrice(amount) {
               ]"
           >
             {{ option.label }}
-            <span class="ml-0.5 font-normal text-gray-400 tabular-nums">{{ facets.photos[option.value] }}</span>
+            <span class="ml-0.5 font-normal text-gray-500 tabular-nums">{{ facets.photos[option.value] }}</span>
           </button>
         </div>
       </section>
       <!-- Amenities -->
       <section v-if="facets.amenities.length" class="px-4 py-3">
-        <h4 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Amenities</h4>
+        <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Amenities</h4>
         <div class="mt-2 space-y-1.5">
           <label v-for="amenity in amenities" :key="amenity.value" class="flex cursor-pointer items-center gap-2.5">
             <input
@@ -202,7 +202,7 @@ function formatPrice(amount) {
                 class="size-4 shrink-0 cursor-pointer rounded border-gray-300 accent-brand-700"
             />
             <span class="min-w-0 truncate text-sm text-gray-700">{{ amenity.label }}</span>
-            <span class="ml-auto text-xs text-gray-400 tabular-nums">{{ amenity.count }}</span>
+            <span class="ml-auto text-xs text-gray-500 tabular-nums">{{ amenity.count }}</span>
           </label>
         </div>
         <button

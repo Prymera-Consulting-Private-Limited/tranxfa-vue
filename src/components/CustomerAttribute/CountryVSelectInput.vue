@@ -98,7 +98,7 @@ function withPopper(dropdownList, component, { width }) {
   <v-select v-model="selectedCountry" append-to-body :calculate-position="withPopper" :options="countries" :placeholder="`Please select`" key-by="id" label="demonym">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
-      <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
+      <em class="text-sm text-gray-500 opacity-50" v-else>Start typing to search ...</em>
     </template>
     <template #selected-option-container="{ option, deselect, multiple, disabled }">
       <div class="vs__selected">

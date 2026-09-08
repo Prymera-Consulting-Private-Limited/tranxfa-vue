@@ -84,7 +84,7 @@ onMounted( async () => {
               required
               v-model="email"
               placeholder="enter your email"
-              class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-400"
+              class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
               @focus="emailFocused = true"
               @blur="emailFocused = false"
             >

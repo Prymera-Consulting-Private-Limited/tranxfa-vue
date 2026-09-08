@@ -123,31 +123,31 @@ const passwordChanged = async () => {
                 <UserIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Personal Details</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">View and update your name, email address, and other personal information.</p>
-                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Modify &rarr;</a>
+                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800">Modify &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <HomeIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Address</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Ensure your billing and shipping address details are up-to-date.</p>
-                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Modify &rarr;</a>
+                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800">Modify &rarr;</a>
               </div>
               <div v-if="false" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <PhoneIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Mobile Number</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Update your phone number for account recovery and notifications.</p>
-                <a href="#" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Update &rarr;</a>
+                <a href="#" class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800">Update &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <LockClosedIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Password</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Change your password to keep your account secure.</p>
-                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">Change Password &rarr;</a>
+                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800">Change Password &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <DevicePhoneMobileIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Devices</h3>
                 <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Manage devices that have access to your account.</p>
-                <router-link class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500 cursor-pointer" :to="{name: 'devices'}">Manage Devices &rarr;</router-link>
+                <router-link class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'devices'}">Manage Devices &rarr;</router-link>
               </div>
               <div v-if="walletStore.isAvailable" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <WalletIcon class="h-6 w-6 text-brand-600 mb-2" />
@@ -155,7 +155,7 @@ const passwordChanged = async () => {
                 <p v-if="walletStore.isEnrolled" class="mt-2 text-sm text-gray-500 flex-grow mb-3">Your wallet number is <span class="font-medium tracking-wider text-gray-900">{{ walletStore.subscription.data?.walletNumber }}</span>.<template v-if="walletStore.requiresReacceptance"> New terms are awaiting your acceptance.</template></p>
                 <p v-else class="mt-2 text-sm text-gray-500 flex-grow mb-3">Store money on your account and pay for transfers instantly.</p>
                 <div class="mt-auto flex items-center gap-x-4">
-                  <router-link class="text-sm inline-block font-semibold text-brand-600 hover:text-brand-500 cursor-pointer" :to="{name: 'wallet'}">{{ walletStore.isEnrolled ? 'Manage Wallet' : 'Get Started' }} &rarr;</router-link>
+                  <router-link class="text-sm inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'wallet'}">{{ walletStore.isEnrolled ? 'Manage Wallet' : 'Get Started' }} &rarr;</router-link>
                   <a v-if="walletStore.isEnrolled" href="javascript:" @click="closeWalletError = ''; isCloseWalletModalOpen = true" class="text-sm inline-block font-medium text-red-600 hover:text-red-500">Close Wallet</a>
                 </div>
               </div>

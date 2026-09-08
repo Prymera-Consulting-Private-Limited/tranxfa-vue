@@ -103,7 +103,7 @@ const requestedOn = computed(() => {
         <div class="min-w-0">
           <p class="text-sm font-medium text-gray-900">{{ request.stateLabel ?? request.state }}</p>
           <p class="mt-1 text-sm text-gray-600">{{ requestNote }}</p>
-          <p v-if="requestedOn" class="mt-1.5 text-xs text-gray-400">Requested {{ requestedOn }}</p>
+          <p v-if="requestedOn" class="mt-1.5 text-xs text-gray-500">Requested {{ requestedOn }}</p>
         </div>
       </div>
       <dl v-if="isCancelled" class="mt-4 space-y-2 text-sm">
@@ -145,7 +145,7 @@ const requestedOn = computed(() => {
             <dd class="font-medium text-gray-900 tabular-nums">{{ quote.refundNow.currencyPrefixed }}</dd>
           </div>
         </dl>
-        <p class="mt-3 text-xs text-gray-400">This changes as your stay approaches, so it is worked out fresh each time you open this page.</p>
+        <p class="mt-3 text-xs text-gray-500">This changes as your stay approaches, so it is worked out fresh each time you open this page.</p>
         <div v-if="cancelError" class="mt-4 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <span>{{ cancelError }}</span>
@@ -160,7 +160,7 @@ const requestedOn = computed(() => {
                 type="button"
                 :disabled="isCancelling"
                 @click="emit('cancel')"
-                class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
             >
               <Spinner v-if="isCancelling" class="size-4" />
               {{ isCancelling ? 'Asking the hotel…' : 'Yes, cancel this booking' }}

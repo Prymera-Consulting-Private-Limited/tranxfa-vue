@@ -42,7 +42,7 @@ const emit = defineEmits([
           </div>
           <div class="tracking-wider">
             <h3 class="text-sm font-medium text-gray-900">
-              <a href="#" class="focus:outline-hidden">
+              <a href="#" class="focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
                 <span class="absolute inset-0" aria-hidden="true" />
                 <span>Individual</span>
               </a>
@@ -60,7 +60,7 @@ const emit = defineEmits([
           </div>
           <div class="tracking-wider">
             <h3 class="text-sm font-medium text-gray-900">
-              <a href="#" class="focus:outline-hidden">
+              <a href="#" class="focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
                 <span class="absolute inset-0" aria-hidden="true" />
                 <span>Business</span>
               </a>

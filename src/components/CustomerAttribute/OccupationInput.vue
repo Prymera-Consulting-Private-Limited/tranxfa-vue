@@ -88,7 +88,7 @@ function withPopper(dropdownList, component, { width }) {
   <v-select v-model="selectedOccupation" append-to-body :calculate-position="withPopper" :options="occupations" :placeholder="`Please select`" key-by="id" :label="attr.label">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
-      <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
+      <em class="text-sm text-gray-500 opacity-50" v-else>Start typing to search ...</em>
     </template>
     <template #selected-option-container="{ option, deselect, multiple, disabled }">
       <div class="vs__selected">
@@ -107,7 +107,7 @@ function withPopper(dropdownList, component, { width }) {
   </v-select>
 
   <template v-if="selectedOccupation?.code === 'OTHER'">
-    <p :class="[otherOccupationError ? 'text-red-700' : 'text-gray-400']" class="my-3 text-sm">Please enter your occupation in input below</p>
+    <p :class="[otherOccupationError ? 'text-red-700' : 'text-gray-500']" class="my-3 text-sm">Please enter your occupation in input below</p>
     <input :id="attr.attribute" :name="'other_occupation'" type="text" v-model="otherOccupation" :class="['block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none']" />
     <p v-if="otherOccupationError?.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ otherOccupationError[0] }}</p>
   </template>

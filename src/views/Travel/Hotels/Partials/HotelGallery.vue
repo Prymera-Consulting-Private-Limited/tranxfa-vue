@@ -169,7 +169,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown));
               </button>
             </template>
           </div>
-          <p class="w-full text-xs text-gray-400 tabular-nums">{{ index + 1 }} / {{ photos.length }}</p>
+          <p class="w-full text-xs text-gray-500 tabular-nums">{{ index + 1 }} / {{ photos.length }}</p>
           <!-- Filmstrip -->
           <div v-if="photos.length > 1" class="flex w-full gap-2 overflow-x-auto pb-1">
             <button

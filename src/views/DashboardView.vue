@@ -225,7 +225,7 @@ const recipientCreated = (recipient) => {
                           </div>
                           <div>
                             <h3 class="text-sm font-medium text-gray-900 mb-3">
-                              <a href="#" class="focus:outline-hidden">
+                              <a href="#" class="focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
                                 <span class="absolute inset-0" aria-hidden="true" />
                                 <div class="h-3 block pulse bg-gray-300 w-full w-64"></div>
                               </a>

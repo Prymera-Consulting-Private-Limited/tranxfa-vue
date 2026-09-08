@@ -369,7 +369,7 @@ function guestInitials(guest) {
                         </span>
                         <span class="min-w-0">
                           <span class="block truncate text-sm font-medium text-gray-900">{{ guestLabel(guest, guestIndex) }}</span>
-                          <span class="block text-xs text-gray-400">{{ guest.isChild ? (guest.age !== null ? `Child · ${guest.age} years` : 'Child') : 'Adult' }}</span>
+                          <span class="block text-xs text-gray-500">{{ guest.isChild ? (guest.age !== null ? `Child · ${guest.age} years` : 'Child') : 'Adult' }}</span>
                         </span>
                       </li>
                     </ul>
@@ -390,7 +390,7 @@ function guestInitials(guest) {
                 </p>
               </div>
               <section class="rounded-2xl bg-white p-5 ring-1 ring-gray-200">
-                <h2 class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Your room</h2>
+                <h2 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Your room</h2>
                 <h3 v-if="roomName" class="mt-1 text-sm font-semibold tracking-tight text-gray-900">{{ roomName }}</h3>
                 <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
                   <span v-if="capacity" class="inline-flex items-center gap-1">
@@ -408,9 +408,9 @@ function guestInitials(guest) {
                   <HotelAvailability :allotment="quote?.rate?.allotment" />
                 </div>
                 <HotelAmenities v-if="quote?.rate?.amenities?.length" :amenities="quote.rate.amenities" class="mt-3" />
-                <p v-if="roomNote" class="mt-3 text-xs text-gray-400">{{ prettifyLabel(roomNote) }}</p>
+                <p v-if="roomNote" class="mt-3 text-xs text-gray-500">{{ prettifyLabel(roomNote) }}</p>
                 <div class="mt-4 border-t border-gray-100 pt-4">
-                  <p class="text-xs font-semibold tracking-wide text-gray-400 uppercase">Total price</p>
+                  <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Total price</p>
                   <p class="mt-1.5 flex items-baseline gap-1.5">
                     <span class="text-sm font-medium text-gray-500">{{ quote?.price?.currency }}</span>
                     <span class="text-3xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>

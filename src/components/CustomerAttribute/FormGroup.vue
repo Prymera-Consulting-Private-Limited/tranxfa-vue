@@ -44,7 +44,7 @@ const notifyOccupationUpdated = (attr, value) => {
     <span>{{ attr.label }}</span>
     <span v-if="attr.isRequired === true" class="ml-0.5 text-red-500">*</span>
   </label>
-  <p class="mt-2 mb-3 text-gray-400 text-xs">{{ attr.infoText }}</p>
+  <p class="mt-2 mb-3 text-gray-500 text-xs">{{ attr.infoText }}</p>
   <NameInput
       v-if="attr.attribute === 'name'"
       v-bind:attr="attr"

@@ -98,7 +98,7 @@ watch(status, (value) => {
     <PaymentCompleted class="-mt-10" />
     <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Payment Successful</h2>
     <p class="text-lg text-gray-600 mb-2">Paid from your wallet. Your transfer is on its way.</p>
-    <p class="text-sm text-gray-400 mb-6">Taking you to your transfer&hellip;</p>
+    <p class="text-sm text-gray-500 mb-6">Taking you to your transfer&hellip;</p>
   </template>
 
   <template v-else-if="status === 'failed'">

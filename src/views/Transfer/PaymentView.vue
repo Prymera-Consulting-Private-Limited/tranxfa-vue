@@ -127,7 +127,7 @@ function closePaymentModal() {
                   <div v-else-if="loadFailed" class="text-center">
                     <h2 class="text-xl font-semibold text-gray-900 mb-5">We couldn't load your payment</h2>
                     <p class="text-base text-gray-600 mb-6">Please check your connection and try again.</p>
-                    <button @click="loadTransaction" class="mt-2 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0">Try again</button>
+                    <button @click="loadTransaction" class="mt-2 px-4 md:px-6 lg:px-8 bg-blue-600 text-white text-center py-3 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer text-sm outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Try again</button>
                   </div>
                 </div>
               </div>
