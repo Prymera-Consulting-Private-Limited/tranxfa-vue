@@ -39,7 +39,7 @@
       </li>
     </ul>
     <div class="mt-8">
-      <button class="w-full bg-brand-700 text-white py-2 px-4 rounded-2xl hover:bg-brand-800">Send Money</button>
+      <button class="w-full bg-brand-700 text-white py-3.5 px-4 rounded-xl hover:bg-brand-800">Send Money</button>
     </div>
   </aside>
 </template>

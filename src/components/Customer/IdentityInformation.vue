@@ -52,7 +52,7 @@ const identityUpdated = () => {
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">Personal Details</h2>
-      <div class="text-sm text-gray-900 mb-8 flex items-center justify-start gap-x-1">
+      <div class="text-sm/6 text-gray-900 mb-8 flex items-center justify-start gap-x-1">
         You've signed up from <FlagIcon v-if="customer?.data?.country" :class="['text-xl border border-gray-100']" :code="customer?.data?.country?.iso2Alpha.toLowerCase()" circle  /> <span class="font-semibold">{{ customer?.data?.country?.commonName }}</span>
         <a class="text-brand-700 hover:underline" @click="changeCountry" href="javascript:">Change</a></div>
       <!-- Form -->

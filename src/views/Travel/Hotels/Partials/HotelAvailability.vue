@@ -27,13 +27,13 @@ const label = computed(() => {
 
 const classes = computed(() => {
   return props.allotment <= 0
-      ? 'bg-red-50 text-red-700 ring-red-200'
-      : 'bg-amber-50 text-amber-700 ring-amber-200';
+      ? 'bg-danger-50 text-danger-700 ring-danger-200'
+      : 'bg-warning-50 text-warning-700 ring-warning-200';
 });
 </script>
 
 <template>
-  <span v-if="label" :class="[classes, 'inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium ring-1 ring-inset']">
+  <span v-if="label" :class="[classes, 'inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">
     <ExclamationTriangleIcon class="size-3.5" aria-hidden="true" />
     {{ label }}
   </span>

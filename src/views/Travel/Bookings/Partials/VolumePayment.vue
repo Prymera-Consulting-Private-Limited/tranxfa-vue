@@ -93,17 +93,17 @@ onMounted(() => {
 <template>
   <section class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
     <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-gray-100 px-5 py-4">
-      <h1 class="text-sm font-semibold text-gray-900">Choose your bank</h1>
+      <h1 class="text-sm/6 font-semibold text-gray-900">Choose your bank</h1>
       <p class="text-base font-semibold text-gray-900 tabular-nums">{{ payment.amount.currencyPrefixed }}</p>
     </header>
     <div class="px-5 py-5">
-      <div v-if="isOpening" class="flex items-center justify-center gap-2 py-8 text-sm text-gray-500">
+      <div v-if="isOpening" class="flex items-center justify-center gap-2 py-8 text-sm/6 text-gray-500">
         <Spinner class="size-4" />
         Opening your bank list…
       </div>
       <!-- The sdk builds its own ui in here -->
       <div :id="CONTAINER_ID"></div>
-      <p class="mt-4 text-center text-xs text-gray-500">You'll approve this in your own banking app. We never see your bank details.</p>
+      <p class="mt-4 text-center text-xs/5 text-gray-500">You'll approve this in your own banking app. We never see your bank details.</p>
     </div>
   </section>
 </template>

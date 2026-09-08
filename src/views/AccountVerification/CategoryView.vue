@@ -1,11 +1,12 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
-import {onMounted, reactive} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
 import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.vue";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -26,14 +27,19 @@ const selectedCategory = reactive({
   data: null,
 })
 
+// The route's :category is a pending-document id. Once the customer has loaded
+// and no category matches it - a completed step, a stale bookmark, a link
+// shared from another account - there is nothing to choose a document type for,
+// and the page was rendering "Select document type for your" with nothing after
+// it above an empty list.
+const isResolved = ref(false);
+
 onMounted(async () => {
   if (! customerStore.isLoaded) {
-    customerUtils.refresh().then(() => {
-      selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === props.id);
-    });
-  } else {
-    selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === props.id);
+    await customerUtils.refresh();
   }
+  selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === props.id) ?? null;
+  isResolved.value = true;
 });
 
 const finalStateReached = async () => {
@@ -50,8 +56,15 @@ const finalStateReached = async () => {
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Select document type for your {{ selectedCategory.data?.title }}</h1>
+        <LoadFailurePanel
+          v-if="isResolved && ! selectedCategory.data"
+          title="There is nothing to upload here"
+          message="This document category is no longer waiting on you. It may already be complete."
+          :backTo="{name: 'accountVerification'}"
+          backLabel="Account verification"
+        />
         <!-- Main 3 column grid -->
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
+        <div v-else class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">
@@ -59,7 +72,7 @@ const finalStateReached = async () => {
               <div>
                 <h2 class="text-base font-semibold text-gray-900">{{ selectedCategory.data?.title }}</h2>
                 <div class="mt-1" v-if="selectedCategory.data"><CategoryDescription v-bind:category="selectedCategory.data" /></div>
-                <p v-else class="mt-1 text-sm text-gray-500">Get started by completing the following steps.</p>
+                <p v-else class="mt-1 text-sm/6 text-gray-500">Get started by completing the following steps.</p>
                 <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
                   <template v-if="customerStore.isLoaded">
                     <ul v-if="selectedCategory.data?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

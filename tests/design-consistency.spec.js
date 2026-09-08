@@ -138,3 +138,152 @@ describe('accessibility', () => {
             expect(fors.filter(x => !ids.has(x)), 'label points at no such field').toEqual([]);
         });
 });
+
+// Utility classes, not inline styles: the status-colour spec guards the badge
+// var() path, this guards the 500-odd `text-danger-500`-shaped classes. Icons are
+// excluded on purpose - WCAG asks 3:1 of a non-text glyph, and darkening a star
+// rating to body-text contrast only makes it muddy.
+describe('status text contrast', () => {
+    const css = fs.readFileSync(path.join(SRC, 'assets', 'main.css'), 'utf8');
+    const tokens = Object.fromEntries(
+        [...css.matchAll(/--color-([a-z]+)-(\d+):\s*(#[0-9a-f]{6})/gi)].map(m => [`${m[1]}-${m[2]}`, m[3]])
+    );
+
+    const onWhite = hex => {
+        const channels = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+            .map(c => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+        const l = 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+
+        return 1.05 / (l + 0.05);
+    };
+
+    const isIcon = line => /<i |pi-|Icon|<svg|svg |aria-hidden/.test(line);
+
+    it('never sets body text to a status step below AA', () => {
+        const failures = [];
+        for (const f of vueFiles()) {
+            lines(f).forEach((line, i) => {
+                if (isIcon(line)) return;
+                for (const m of line.matchAll(/text-(success|warning|danger|info|neutral)-(\d{2,3})\b/g)) {
+                    const hex = tokens[`${m[1]}-${m[2]}`];
+                    if (!hex) return failures.push(`${rel(f)}:${i + 1} ${m[0]} - no such token`);
+                    const ratio = onWhite(hex);
+                    if (ratio < 4.5) failures.push(`${rel(f)}:${i + 1} ${m[0]} is ${ratio.toFixed(2)}:1`);
+                }
+            });
+        }
+
+        expect(failures).toEqual([]);
+    });
+
+    // A class Tailwind cannot generate is inert: the element renders in whatever
+    // it inherited. Five of these were already shipped, at -900 steps no ramp
+    // defined.
+    it('only uses semantic steps the ramps define', () => {
+        const missing = new Set();
+        for (const f of vueFiles()) {
+            for (const m of fs.readFileSync(f, 'utf8')
+                .matchAll(/-(success|warning|danger|info|neutral)-(\d{2,3})\b/g)) {
+                if (!tokens[`${m[1]}-${m[2]}`]) missing.add(`--color-${m[1]}-${m[2]}`);
+            }
+        }
+
+        expect([...missing]).toEqual([]);
+    });
+});
+
+describe('type scale and target size', () => {
+    const EL = /<(?:button|a|RouterLink|router-link)\b[^>]*?class="([^"]*)"/gis;
+
+    // The house style is 14px on 24 and 12px on 20. Tailwind's bare text-sm and
+    // text-xs are 20 and 16, so a bare one is not "the default", it is a
+    // different line height from every neighbour.
+    it('always writes a line height on text-sm and text-xs', () => {
+        const offenders = [];
+        for (const f of vueFiles()) {
+            lines(f).forEach((line, i) => {
+                for (const m of line.matchAll(/\btext-(sm|xs)(\/(\d+))?\b/g)) {
+                    const want = m[1] === 'sm' ? '6' : '5';
+                    if (m[3] !== want) offenders.push(`${rel(f)}:${i + 1} ${m[0]} should be text-${m[1]}/${want}`);
+                }
+            });
+        }
+
+        expect(offenders).toEqual([]);
+    });
+
+    // text-sm/6 and leading-5 on one element are two line heights fighting, and
+    // leading-* is emitted later, so the sized form loses.
+    it('never sets a line height twice on one element', () => {
+        const offenders = [];
+        for (const f of vueFiles()) {
+            lines(f).forEach((line, i) => {
+                for (const m of line.matchAll(/class="([^"]*)"/g)) {
+                    if (/text-(?:xs|sm|base|lg|xl|\dxl)\/\d+/.test(m[1]) && /\bleading-\S+/.test(m[1])) {
+                        offenders.push(`${rel(f)}:${i + 1}`);
+                    }
+                }
+            });
+        }
+
+        expect(offenders).toEqual([]);
+    });
+
+    // WCAG 2.2 SC 2.5.8. The mobile step indicator's dots were 10px.
+    it('gives every pointer target at least 24px', () => {
+        const size = token => {
+            const m = token.match(/^(?:size|h|w)-([\d.]+)$/);
+
+            return m ? Number(m[1]) * 4 : null;
+        };
+
+        const offenders = [];
+        for (const f of vueFiles()) {
+            const src = fs.readFileSync(f, 'utf8');
+            for (const m of src.matchAll(EL)) {
+                const pad = m[1].match(/\bp-([\d.]+)\b/);
+                const grown = pad ? Number(pad[1]) * 8 : 0;
+                const dims = m[1].split(/\s+/).map(size).filter(d => d !== null);
+                if (dims.some(d => d + grown < 24)) {
+                    offenders.push(`${rel(f)} ${Math.min(...dims) + grown}px`);
+                }
+            }
+        }
+
+        expect(offenders).toEqual([]);
+    });
+
+    // A button that is a pill on one screen and a soft rectangle two screens
+    // later is the inconsistency. One radius, one type size, for all of them.
+    it('gives every primary button the same radius and type size', () => {
+        const radii = new Map(), sizes = new Map();
+        for (const f of vueFiles()) {
+            const src = fs.readFileSync(f, 'utf8');
+            for (const m of src.matchAll(EL)) {
+                if (!m[1].includes('bg-brand-7')) continue;
+                const radius = m[1].match(/\brounded-\S+/);
+                const text = m[1].match(/\btext-(?:xs|sm|base|lg|xl)(?:\/\d+)?\b/);
+                if (radius) radii.set(radius[0], (radii.get(radius[0]) ?? 0) + 1);
+                if (text) sizes.set(text[0], (sizes.get(text[0]) ?? 0) + 1);
+            }
+        }
+
+        expect(radii.size, `radii in use: ${[...radii.keys()].join(', ')}`).toBe(1);
+        expect(sizes.size, `type sizes in use: ${[...sizes.keys()].join(', ')}`).toBe(1);
+    });
+
+    // Two elements with the same id is invalid, and when one is the target of an
+    // aria-labelledby the wrong name gets announced.
+    it('never repeats a static id within a file', () => {
+        const offenders = [];
+        for (const f of vueFiles()) {
+            const seen = new Map();
+            for (const m of fs.readFileSync(f, 'utf8').matchAll(/(?<![:\w-])id="([^"{]+)"/g)) {
+                seen.set(m[1], (seen.get(m[1]) ?? 0) + 1);
+            }
+            for (const [id, count] of seen) if (count > 1) offenders.push(`${rel(f)} id="${id}" x${count}`);
+        }
+
+        expect(offenders).toEqual([]);
+    });
+});

@@ -113,14 +113,14 @@ async function closeSdk() {
 <template>
   <div class="flex flex-1 flex-col p-8">
     <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-brand-700" />
-    <h3 class="mt-6 text-sm font-medium text-gray-900">{{ documentType.title }}</h3>
+    <h3 class="mt-6 text-sm/6 font-medium text-gray-900">{{ documentType.title }}</h3>
     <dl v-if="documentType.description" class="mt-1 flex grow flex-col justify-between">
       <dt class="sr-only">Information</dt>
-      <dd class="mt-3 text-sm text-gray-500">
+      <dd class="mt-3 text-sm/6 text-gray-500">
         <p>{{ documentType.description }}</p>
       </dd>
       <dt class="sr-only">Start Verification</dt>
-      <dd class="mt-3 text-sm text-gray-500">
+      <dd class="mt-3 text-sm/6 text-gray-500">
         <a @click="openAccountVerificationModal(documentType)" href="javascript:" class="text-brand-700 font-semibold hover:underline">Start Verification</a>
       </dd>
     </dl>
@@ -136,21 +136,21 @@ async function closeSdk() {
             <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all min-w-sm sm:my-8 sm:w-full lg:min-w-md sm:max-w-sm lg:max-w-md lg:w-md">
               <button class="sr-only"></button>
               <div v-if="sdkRejected" role="alert" class="p-10 text-center">
-                <ExclamationTriangleIcon class="mx-auto size-12 text-amber-500" />
-                <h3 class="mt-4 text-sm font-medium text-gray-900">This document was not accepted</h3>
-                <p class="mt-2 text-sm text-gray-500">{{ sdkRejectionReason || 'The check did not pass. You can try again with a clearer photo, or a different document.' }}</p>
+                <ExclamationTriangleIcon class="mx-auto size-12 text-warning-500" />
+                <h3 class="mt-4 text-sm/6 font-medium text-gray-900">This document was not accepted</h3>
+                <p class="mt-2 text-sm/6 text-gray-500">{{ sdkRejectionReason || 'The check did not pass. You can try again with a clearer photo, or a different document.' }}</p>
                 <div class="mt-6 flex justify-center gap-3">
-                  <button v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try another document</button>
-                  <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
+                  <button v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try another document</button>
+                  <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm/6 font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
                 </div>
               </div>
               <div v-else-if="sdkErrorMessage" role="alert" class="p-10 text-center">
-                <ExclamationTriangleIcon class="mx-auto size-12 text-red-500" />
-                <h3 class="mt-4 text-sm font-medium text-gray-900">Verification could not start</h3>
-                <p class="mt-2 text-sm text-gray-500">{{ sdkErrorMessage }}</p>
+                <ExclamationTriangleIcon class="mx-auto size-12 text-danger-500" />
+                <h3 class="mt-4 text-sm/6 font-medium text-gray-900">Verification could not start</h3>
+                <p class="mt-2 text-sm/6 text-gray-500">{{ sdkErrorMessage }}</p>
                 <div class="mt-6 flex justify-center gap-3">
-                  <button v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try again</button>
-                  <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
+                  <button v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try again</button>
+                  <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm/6 font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
                 </div>
               </div>
               <template v-else>

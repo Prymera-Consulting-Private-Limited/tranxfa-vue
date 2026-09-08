@@ -82,16 +82,16 @@ onUnmounted(() => {
 
 <template>
   <div class="px-6 py-6" v-if="accessToken">
-    <p class="text-gray-600 text-sm mb-6">
+    <p class="text-gray-600 text-sm/6 mb-6">
       To continue, you'll be redirected to our trusted verification partner.
       Please complete the process to verify your identity securely.
     </p>
     <div class="flex justify-end gap-3">
-      <button @click="sdkFinalStateReached" class="px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm">
+      <button @click="sdkFinalStateReached" class="px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm/6">
         Cancel
       </button>
       <a :href="accessToken"
-         class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-800 text-sm">
+         class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-800 text-sm/6">
         Continue
       </a>
     </div>

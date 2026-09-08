@@ -53,10 +53,10 @@ const label = computed(() => {
 const classes = computed(() => {
   switch (status.value) {
     case CANCELLATION_STATUS.free:
-      return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+      return 'bg-success-50 text-success-700 ring-success-200';
 
     case CANCELLATION_STATUS.partial:
-      return 'bg-amber-50 text-amber-700 ring-amber-200';
+      return 'bg-warning-50 text-warning-700 ring-warning-200';
 
     default:
       return 'bg-gray-50 text-gray-600 ring-gray-200';
@@ -65,5 +65,5 @@ const classes = computed(() => {
 </script>
 
 <template>
-  <span v-if="label" :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium ring-1 ring-inset']">{{ label }}</span>
+  <span v-if="label" :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ label }}</span>
 </template>

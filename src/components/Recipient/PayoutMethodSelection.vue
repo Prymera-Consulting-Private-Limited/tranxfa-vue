@@ -28,7 +28,7 @@ const payoutMethodSelected = (payoutMethod) => {
 
 <template>
   <h2 class="text-base font-semibold text-gray-900">Select a Payout Method</h2>
-  <p class="mt-1 text-sm text-gray-500">For your recipient in {{ country.commonName }} to receive {{ currency.isoAlpha }}</p>
+  <p class="mt-1 text-sm/6 text-gray-500">For your recipient in {{ country.commonName }} to receive {{ currency.isoAlpha }}</p>
   <ul role="list" class="mt-0 grid grid-cols-1 gap-6 py-6 sm:grid-cols-2">
     <li class="flow-root" v-for="(payoutMethod, index) in payoutMethods" :key="index">
       <a href="javascript:" @click="payoutMethodSelected(payoutMethod)" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-0 hover:bg-gray-50">
@@ -36,13 +36,13 @@ const payoutMethodSelected = (payoutMethod) => {
           <span class="text-3xl">{{ payoutMethod.title.charAt(0).toUpperCase() }}</span>
         </div>
         <div class="tracking-wider">
-          <h3 class="text-sm font-medium text-gray-900">
+          <h3 class="text-sm/6 font-medium text-gray-900">
             <a href="#" class="focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
               <span class="absolute inset-0" aria-hidden="true" />
               <span>{{ payoutMethod.title }}</span>
             </a>
           </h3>
-          <p class="mt-0 text-sm text-gray-500">
+          <p class="mt-0 text-sm/6 text-gray-500">
             {{ payoutMethod.description }}
           </p>
         </div>

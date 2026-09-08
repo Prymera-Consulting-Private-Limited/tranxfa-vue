@@ -169,3 +169,49 @@ Written down so they are not rediscovered:
   it is. The backend stamps a version and records it; this app cannot answer
   "what is production running?" without checking Amplify by hand.
 - **No per-brand deploy record before this file.** Ledger history starts now.
+
+## Porting a main fix onto the brand branches
+
+The brand branches are ~180 commits behind main and each carries a handful of
+its own: a logo, a palette, a translation. `git cherry-pick` fails on all of
+them, because main's parent is newer than the branch.
+
+`scripts/port-kyc-fix.sh` ports the KYC review/teardown fix (fb22246, 8a82289,
+638c21d). It is worth reading before writing the next one of these, because two
+things about it are not obvious.
+
+**Three-way merge, never a copy.** A first version took main's files wholesale.
+On salvtech - a Spanish deployment, on a *production* branch - that turned
+"Continuar" back into "Continue" and `lang: "es"` back into `"en"`. The brands
+do carry their own edits in these files; they are just small enough to miss on
+a skim. Verify by grepping for something brand-specific after the port, not by
+reading the file count.
+
+**The merge base has to be stripped to match the branch.** `DocumentTypeItem.vue`
+conflicts on every branch, not because the brands edited it but because they
+predate two main-only features: the Didit provider, and the `SUMSUB_APIS`
+constant that routes `SUMSUB-VIA-FINCODE` to the Sumsub component. Removing
+those from *both* sides of the merge gives a base the branch matches, and the
+merge then sees only the fix.
+
+Usage, from a scratch worktree with `origin` fetched:
+
+```sh
+BASE=$(git rev-parse fb22246^) FIX=$(git rev-parse 638c21d)
+scripts/port-kyc-fix.sh <branch> "$FIX" "$BASE" /tmp/work
+```
+
+It leaves the working tree dirty for review. It does not commit and it does not
+push, which matters here: **a push to a brand branch is a deploy.** Eight of
+these branches are production.
+
+Current state, against every brand branch:
+
+| | |
+|---|---|
+| ports cleanly | 27 branches |
+| conflicts in `DocumentTypeItem.vue` | compliant_msb_staging, quiqsend-staging, selamsend_staging, velox_staging, velox_production |
+
+The five that conflict are the ones that already have Didit or `SUMSUB_APIS`, so
+the strip does not apply and their file differs for some other reason. They need
+a person.

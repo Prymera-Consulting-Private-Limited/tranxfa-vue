@@ -14,6 +14,8 @@ import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, Tr
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import UpdateAttributeCollection from "@/components/Recipient/UpdateAttributeCollection.vue";
 import {notify} from "notiwind";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
+import {getCustomerMessage} from "@/composables/api_utils.js";
 
 const recipientUtils = useRecipientUtils();
 const isLoading = ref(true);
@@ -21,6 +23,7 @@ const props = defineProps({
   id: String,
 })
 const recipient = ref(null);
+const failure = ref(null);
 
 const isConfirmDeleteModalOpen = ref(false);
 const isDeleting = ref(false);
@@ -38,6 +41,8 @@ let intervalId;
 onMounted(async () => {
   await recipientUtils.getRecipient(props.id).then((response) => {
     recipient.value = Recipient.getInstance(response.data);
+  }).catch((error) => {
+    failure.value = getCustomerMessage(error) ?? true;
   }).finally(() => {
     isLoading.value = false;
   })
@@ -64,8 +69,15 @@ const handleDelete = async () => {
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Your Recipients</h1>
+        <LoadFailurePanel
+          v-if="failure"
+          title="We couldn't load this recipient"
+          :message="typeof failure === 'string' ? failure : null"
+          :backTo="{name: 'recipients'}"
+          backLabel="All recipients"
+        />
         <!-- Main 3 column grid -->
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-t-lg p-5 shadow-lg">
+        <div v-else class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-t-lg p-5 shadow-lg">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">
@@ -76,13 +88,13 @@ const handleDelete = async () => {
                 <div v-else class="flex items-center justify-between w-full">
                   <div class="flex-1">
                     <h2 class="text-base font-semibold text-gray-900">{{ recipient?.wholeName }}</h2>
-                    <p class="mt-1 text-sm text-gray-500">
+                    <p class="mt-1 text-sm/6 text-gray-500">
                       {{ recipient?.channel?.payoutMethod?.title }} in
                       {{ recipient?.channel?.country?.commonName }} for receiving {{ recipient?.channel?.currency?.isoAlpha }}
                     </p>
                   </div>
                   <div class="flex-none mt-3">
-                    <button @click="isConfirmDeleteModalOpen = true" type="button" class="ml-3 rounded-sm px-5 py-2 font-medium text-sm text-white shadow-xs ring-1 ring-red-600 ring-inset bg-red-600 hover:bg-red-500 cursor-pointer">Delete</button>
+                    <button @click="isConfirmDeleteModalOpen = true" type="button" class="ml-3 rounded-sm px-5 py-2 font-medium text-sm/6 text-white shadow-xs ring-1 ring-danger-600 ring-inset bg-danger-600 hover:bg-danger-500 cursor-pointer">Delete</button>
                   </div>
                 </div>
               </div>
@@ -101,13 +113,13 @@ const handleDelete = async () => {
                     <div class="py-6 sm:flex">
                       <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Relation</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                        <div class="text-gray-900">{{ recipient.relationship?.title }}</div>
+                        <div class="text-gray-900">{{ recipient?.relationship?.title }}</div>
                       </dd>
                     </div>
-                    <div class="py-6 sm:flex" v-if="recipient.email">
+                    <div class="py-6 sm:flex" v-if="recipient?.email">
                       <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Email</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                        <div class="text-gray-900">{{ recipient.email }}</div>
+                        <div class="text-gray-900">{{ recipient?.email }}</div>
                       </dd>
                     </div>
                     <div class="py-6 sm:flex">
@@ -173,13 +185,13 @@ const handleDelete = async () => {
             <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div class="sm:flex sm:items-start">
-                  <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <ExclamationTriangleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
+                  <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-danger-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <ExclamationTriangleIcon class="h-6 w-6 text-danger-600" aria-hidden="true" />
                   </div>
                   <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                     <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Delete Recipient?</DialogTitle>
                     <div class="mt-2">
-                      <DialogDescription class="text-sm text-gray-500">
+                      <DialogDescription class="text-sm/6 text-gray-500">
                         Are you sure, you want to delete this recipient?
                       </DialogDescription>
                     </div>
@@ -188,7 +200,7 @@ const handleDelete = async () => {
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
                   <button
                       type="button"
-                      class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:mr-3 sm:w-auto cursor-pointer"
+                      class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer"
                       @click="handleDelete"
                       :disabled="isDeleting"
                   >
@@ -196,7 +208,7 @@ const handleDelete = async () => {
                   </button>
                   <button
                       type="button"
-                      class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer"
+                      class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer"
                       @click="isConfirmDeleteModalOpen = false"
                       :disabled="isDeleting"
                   >

@@ -60,15 +60,15 @@ defineEmits(['confirm', 'cancel']);
             <DialogPanel class="relative w-full transform overflow-hidden rounded-3xl bg-white text-center shadow-2xl transition-all sm:my-8 sm:max-w-md">
               <!-- A soft amber wash behind the icon, so the "heads up" tone reads
               before a single word does without shouting error-red. -->
-              <div class="bg-gradient-to-b from-amber-50 to-white px-6 pt-8">
+              <div class="bg-gradient-to-b from-warning-50 to-white px-6 pt-8">
                 <div class="relative mx-auto size-14">
-                  <span class="absolute inset-0 animate-ping rounded-full bg-amber-200/60 [animation-duration:2.5s]" aria-hidden="true" />
-                  <span class="relative flex size-14 items-center justify-center rounded-full bg-white text-amber-500 shadow-sm ring-1 ring-amber-200">
+                  <span class="absolute inset-0 animate-ping rounded-full bg-warning-200/60 [animation-duration:2.5s]" aria-hidden="true" />
+                  <span class="relative flex size-14 items-center justify-center rounded-full bg-white text-warning-700 shadow-sm ring-1 ring-warning-200">
                     <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
                   </span>
                 </div>
                 <DialogTitle class="mt-5 text-xl font-semibold tracking-tight text-gray-900">The price has changed</DialogTitle>
-                <p class="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-gray-500">
+                <p class="mx-auto mt-2 max-w-xs text-sm/6 text-gray-500">
                   Our travel partner confirmed availability at a different rate than you were shown.
                 </p>
               </div>
@@ -76,17 +76,17 @@ defineEmits(['confirm', 'cancel']);
                 <div class="rounded-2xl bg-gray-50 px-5 py-4 ring-1 ring-inset ring-gray-100">
                   <p class="text-[11px] font-semibold tracking-wide text-gray-500 uppercase">New total price</p>
                   <p class="mt-1 flex items-baseline justify-center gap-1.5">
-                    <span class="text-sm font-medium text-gray-500">{{ currency }}</span>
+                    <span class="text-sm/6 font-medium text-gray-500">{{ currency }}</span>
                     <span class="text-4xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
                   </p>
                 </div>
-                <p class="mt-3 text-xs text-gray-500">Continuing books at this price. Cancelling releases the room, so you can pick another.</p>
+                <p class="mt-3 text-xs/5 text-gray-500">Continuing books at this price. Cancelling releases the room, so you can pick another.</p>
               </div>
               <div class="flex flex-col gap-2.5 px-6 pb-6 pt-5">
                 <button
                     type="button"
                     :disabled="isBooking"
-                    class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-3.5 text-sm/6 font-semibold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
                     @click="$emit('confirm')"
                 >
                   <svg v-if="isBooking" class="size-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -98,7 +98,7 @@ defineEmits(['confirm', 'cancel']);
                 <button
                     type="button"
                     :disabled="isBooking"
-                    class="inline-flex w-full cursor-pointer items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-500 transition hover:bg-gray-50 hover:text-gray-700 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="inline-flex w-full cursor-pointer items-center justify-center rounded-xl px-4 py-2.5 text-sm/6 font-semibold text-gray-500 transition hover:bg-gray-50 hover:text-gray-700 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
                     @click="$emit('cancel')"
                 >Cancel booking</button>
               </div>

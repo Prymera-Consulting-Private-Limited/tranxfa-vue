@@ -62,12 +62,12 @@ const movements = computed(() => {
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 flex flex-col gap-4">
         <h1 class="sr-only">Wallet Statement</h1>
         <div class="rounded-lg border border-gray-100 bg-white px-4 py-4 sm:px-6">
-          <router-link :to="{name: 'wallet'}" class="inline-flex items-center gap-x-1.5 text-sm font-medium text-gray-500 hover:text-gray-700">
+          <router-link :to="{name: 'wallet'}" class="inline-flex items-center gap-x-1.5 text-sm/6 font-medium text-gray-500 hover:text-gray-700">
             <ArrowLongLeftIcon class="size-5" aria-hidden="true" />
             Back to wallet
           </router-link>
           <h2 class="mt-2 text-base font-semibold text-gray-900">Wallet statement</h2>
-          <p class="mt-0.5 text-sm text-gray-500">Every movement on your wallet, newest first.</p>
+          <p class="mt-0.5 text-sm/6 text-gray-500">Every movement on your wallet, newest first.</p>
         </div>
 
         <template v-if="isLoading">
@@ -99,7 +99,7 @@ const movements = computed(() => {
               <div>
                 <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
                 <span class="mt-4 block text-lg font-semibold text-gray-900">No Movements Yet</span>
-                <p class="mt-2 text-sm text-gray-600 max-w-sm">Add money to your wallet and every load, spend, and refund will appear here.</p>
+                <p class="mt-2 text-sm/6 text-gray-600 max-w-sm">Add money to your wallet and every load, spend, and refund will appear here.</p>
               </div>
             </div>
           </template>

@@ -53,7 +53,7 @@ onMounted(async () => {
               <FlagIcon :class="['text-2xl']" :code="country.iso2Alpha.toLowerCase()" circle  />
             </div>
             <div class="flex min-w-0 flex-1 items-center justify-between truncate py-3 pr-4">
-              <div class="min-w-0 flex-1 truncate text-sm">
+              <div class="min-w-0 flex-1 truncate text-sm/6">
                 <p class="truncate font-medium text-gray-900">{{ country.commonName }}</p>
                 <p class="truncate text-gray-500">{{ country.endonym ?? country.officialName }}</p>
               </div>
@@ -68,7 +68,7 @@ onMounted(async () => {
               <span class="size-10 animate-pulse rounded-full bg-gray-200"></span>
             </div>
             <div class="flex min-w-0 flex-1 items-center justify-between truncate bg-white py-3 pr-4">
-              <div class="min-w-0 flex-1 truncate text-sm">
+              <div class="min-w-0 flex-1 truncate text-sm/6">
                 <div class="h-4 w-24 animate-pulse bg-gray-200"></div>
                 <div class="mt-2 h-2 w-16 animate-pulse bg-gray-200"></div>
               </div>

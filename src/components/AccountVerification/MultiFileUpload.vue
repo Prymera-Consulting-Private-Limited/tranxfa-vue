@@ -127,7 +127,7 @@ async function save() {
 <template>
   <div class="max-w-xl mx-auto p-6 bg-white">
     <h2 class="text-lg font-semibold text-gray-900 mb-2">Upload {{ documentType.title }}</h2>
-    <p class="text-sm text-gray-500 mb-4">Please upload clear images of your <span class="text-brand-700">{{ documentType.title }}</span>.</p>
+    <p class="text-sm/6 text-gray-500 mb-4">Please upload clear images of your <span class="text-brand-700">{{ documentType.title }}</span>.</p>
 
     <div
         :class="{
@@ -146,31 +146,31 @@ async function save() {
       <div v-for="(file, index) in files" :key="index"
            class="flex items-center justify-between p-3 rounded-lg transition-all duration-300 relative"
            :class="{
-             'bg-yellow-100 animate-pulse': (file.status === 'pending' || file.status === 'preparing'),
+             'bg-warning-100 animate-pulse': (file.status === 'pending' || file.status === 'preparing'),
              'bg-brand-700/20': file.status === 'uploading',
-             'bg-emerald-100': file.status === 'completed',
-             'bg-red-100': file.status === 'failed'
+             'bg-success-100': file.status === 'completed',
+             'bg-danger-100': file.status === 'failed'
            }">
         <div class="flex items-center space-x-3">
-          <ArrowPathIcon v-if="file.status === 'pending' || file.status === 'preparing'" class="w-5 h-5 mr-2 text-yellow-700 animate-spin" />
+          <ArrowPathIcon v-if="file.status === 'pending' || file.status === 'preparing'" class="w-5 h-5 mr-2 text-warning-700 animate-spin" />
           <Spinner v-if="file.status === 'uploading'" class="w-5 h-5 mr-2" />
-          <CheckCircleIcon v-else-if="file.status === 'completed'" class="text-emerald-700 w-5 h-5 mr-2" />
-          <XCircleIcon v-else-if="file.status === 'failed'" class="text-red-700 w-5 h-5 mr-2" />
+          <CheckCircleIcon v-else-if="file.status === 'completed'" class="text-success-700 w-5 h-5 mr-2" />
+          <XCircleIcon v-else-if="file.status === 'failed'" class="text-danger-700 w-5 h-5 mr-2" />
           <span :class="{
-            'text-yellow-700': file.status === 'pending',
+            'text-warning-700': file.status === 'pending',
             'text-brand-700': file.status === 'uploading',
-            'text-emerald-700': file.status === 'completed',
-            'text-red-700': file.status === 'failed'
-          }" class="truncate text-sm max-w-xs">{{ file.name }}</span>
+            'text-success-700': file.status === 'completed',
+            'text-danger-700': file.status === 'failed'
+          }" class="truncate text-sm/6 max-w-xs">{{ file.name }}</span>
         </div>
-        <button @click="removeFile(index)" class="text-gray-500 text-sm hover:text-gray-700 cursor-pointer">
+        <button @click="removeFile(index)" class="text-gray-500 text-sm/6 hover:text-gray-700 cursor-pointer">
           <TrashIcon class="w-4 h-4" />
         </button>
         <div v-if="file.status === 'uploading'" class="absolute bottom-0 left-0 h-1 bg-brand-700 transition-all" :style="{ width: file.progress + '%' }"></div>
       </div>
     </div>
     <form @submit.prevent="save">
-      <button :disabled="isUploading || isSaving || !files.length" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3 rounded-xl font-medium transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">
+      <button :disabled="isUploading || isSaving || !files.length" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3.5 rounded-xl font-medium transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
             <Spinner class="size-4 mr-2" />

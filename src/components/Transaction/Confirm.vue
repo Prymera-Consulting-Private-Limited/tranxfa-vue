@@ -89,8 +89,8 @@ if (props.quote.payoutMethod.promo) {
     icon: PercentBadgeIcon,
     label: null,
     value: props.quote.payoutMethod.promo,
-    color: 'bg-lime-50 border-lime-400 ',
-    textColor: 'text-lime-700',
+    color: 'bg-success-50 border-success-400 ',
+    textColor: 'text-success-700',
   });
 }
 reviewItems.push({
@@ -119,7 +119,7 @@ reviewItems.push({
             reviewItem.color ? reviewItem.color : 'bg-blue-50 border-blue-400 text-blue-700'
           ]" class="py-2 px-0 sm:px-5 flex space-x-6 flex-col sm:flex-row">
           <dt v-if="reviewItem.label" class="font-medium text-gray-900 sm:w-64 sm:flex-none">
-            <div class="flex justify-start items-center gap-4 text-sm/7">
+            <div class="flex justify-start items-center gap-4 text-sm/6">
               <component :is="reviewItem.icon" class="h-4.5 w-4.5 text-gray-600" />
               {{ reviewItem.label }}
             </div>

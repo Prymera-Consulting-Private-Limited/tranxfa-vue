@@ -37,11 +37,11 @@ const nameUpdated = (value) => {
   <TextInput v-if="! disableNameInput" v-on:recipient:input:updated="nameUpdated" :id="id" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
   <div v-else :class="{
     'bg-gray-50 text-gray-500 border border-gray-300': isLookingUp || !input[attribute.attribute],
-    'bg-green-50 text-green-700 border border-green-700': (input[attribute.attribute] && !  isLookingUp),
+    'bg-success-50 text-success-700 border border-success-700': (input[attribute.attribute] && !  isLookingUp),
   }" class="block w-full px-3 py-2 rounded-md tracking-wider min-h-10">
     <template v-if="isLookingUp">
       <div class="flex gap-2 items-center justify-start animate-pulse text-gray-700">
-        <i class="pi pi-spin pi-spinner mt-0.5 text-sm"></i>
+        <i class="pi pi-spin pi-spinner mt-0.5 text-sm/6"></i>
         <span>Please wait...</span>
       </div>
     </template>

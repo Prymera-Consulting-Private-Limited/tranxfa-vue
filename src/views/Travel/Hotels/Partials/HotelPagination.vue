@@ -76,7 +76,7 @@ function go(page) {
 
 <template>
   <nav v-if="pageCount > 1" class="flex flex-col items-center justify-between gap-3 sm:flex-row" aria-label="Hotel results">
-    <p class="text-xs text-gray-500">Showing {{ from }}–{{ to }} of {{ total }} hotel{{ total === 1 ? '' : 's' }}</p>
+    <p class="text-xs/5 text-gray-500">Showing {{ from }}–{{ to }} of {{ total }} hotel{{ total === 1 ? '' : 's' }}</p>
     <div class="flex items-center gap-1">
       <button
           type="button"
@@ -88,7 +88,7 @@ function go(page) {
         <ChevronLeftIcon class="size-4" aria-hidden="true" />
       </button>
       <template v-for="item in pages" :key="item">
-        <span v-if="typeof item === 'string'" class="px-1 text-sm text-gray-500" aria-hidden="true">…</span>
+        <span v-if="typeof item === 'string'" class="px-1 text-sm/6 text-gray-500" aria-hidden="true">…</span>
         <button
             v-else
             type="button"
@@ -98,7 +98,7 @@ function go(page) {
               item === page
                 ? 'border-brand-700 bg-brand-700 text-white'
                 : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:text-gray-900',
-              'flex size-8 cursor-pointer items-center justify-center rounded-lg border text-sm font-medium tabular-nums transition',
+              'flex size-8 cursor-pointer items-center justify-center rounded-xl border text-sm/6 font-medium tabular-nums transition',
             ]"
         >{{ item }}</button>
       </template>

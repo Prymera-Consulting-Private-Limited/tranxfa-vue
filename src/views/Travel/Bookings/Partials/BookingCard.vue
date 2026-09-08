@@ -47,11 +47,11 @@ const guests = computed(() => {
           <h3 class="text-base font-semibold text-gray-900 transition group-hover:text-brand-800">{{ order.hotel?.name }}</h3>
           <HotelRating :stars="order.hotel?.starRating" />
         </div>
-        <p v-if="order.hotel?.address" class="mt-1.5 flex items-start gap-1 text-sm text-gray-500">
+        <p v-if="order.hotel?.address" class="mt-1.5 flex items-start gap-1 text-sm/6 text-gray-500">
           <MapPinIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
           <span class="min-w-0 truncate">{{ order.hotel.address }}</span>
         </p>
-        <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-gray-600">
+        <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm/6 text-gray-600">
           <span v-if="stay" class="inline-flex items-center gap-1.5">
             <CalendarDaysIcon class="size-4 shrink-0 text-gray-400" aria-hidden="true" />
             {{ stay }}
@@ -62,17 +62,17 @@ const guests = computed(() => {
             {{ guests }}
           </span>
         </div>
-        <p v-if="order.roomName" class="mt-1.5 text-sm text-gray-500">{{ order.roomName }}</p>
+        <p v-if="order.roomName" class="mt-1.5 text-sm/6 text-gray-500">{{ order.roomName }}</p>
         <div class="mt-3">
           <BookingStateBadge :order="order" />
         </div>
         <!-- Only the list carries this, and it says in words what the state means. -->
-        <p v-if="order.stateDescription" class="mt-2 text-xs text-gray-500">{{ order.stateDescription }}</p>
+        <p v-if="order.stateDescription" class="mt-2 text-xs/5 text-gray-500">{{ order.stateDescription }}</p>
       </div>
       <div class="shrink-0 sm:text-right">
-        <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">Total</p>
+        <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">Total</p>
         <p class="mt-1 text-xl font-semibold tracking-tight text-gray-900">{{ order.total.currencyPrefixed }}</p>
-        <p v-if="order.reference" class="mt-1 text-xs text-gray-500">{{ order.reference }}</p>
+        <p v-if="order.reference" class="mt-1 text-xs/5 text-gray-500">{{ order.reference }}</p>
       </div>
     </div>
   </RouterLink>

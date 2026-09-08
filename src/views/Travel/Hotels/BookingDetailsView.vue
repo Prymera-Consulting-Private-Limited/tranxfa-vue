@@ -269,22 +269,22 @@ function guestInitials(guest) {
           <Spinner class="size-12" />
         </div>
         <!-- Failed -->
-        <div v-else-if="hasFailed" class="mt-3 flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-red-200">
-          <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <div v-else-if="hasFailed" class="mt-3 flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-danger-200">
+          <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
           <h2 class="mt-6 text-base font-semibold text-gray-900">{{ failMessage.title }}</h2>
-          <p class="mt-2 max-w-md text-sm text-gray-500">{{ failMessage.description }}</p>
+          <p class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failMessage.description }}</p>
           <button
               v-if="failReason === 'load'"
               type="button"
               @click="loadPage"
-              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >Try again</button>
           <RouterLink
               v-else
               :to="{name: 'hotels'}"
-              class="mt-6 inline-flex cursor-pointer items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+              class="mt-6 inline-flex cursor-pointer items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >Back to search</RouterLink>
         </div>
         <!-- Booking -->
@@ -296,7 +296,7 @@ function guestInitials(guest) {
             <Processing class="-my-12" />
             <h2 class="text-xl font-semibold tracking-tight text-gray-900">Confirming your booking</h2>
             <template v-if="!timedOut">
-              <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-gray-500">
+              <p class="mx-auto mt-2 max-w-md text-sm/6 text-gray-500">
                 We're finalising your reservation{{ quote?.hotel ? ` with ${quote.hotel.name}` : '' }} — this usually takes a few seconds, occasionally a couple of minutes.
               </p>
               <div class="mt-5 flex items-center gap-1.5" aria-hidden="true">
@@ -304,19 +304,19 @@ function guestInitials(guest) {
                 <span class="size-1.5 animate-bounce rounded-full bg-brand-600 [animation-delay:0.15s]" />
                 <span class="size-1.5 animate-bounce rounded-full bg-brand-600 [animation-delay:0.3s]" />
               </div>
-              <p class="mt-5 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
+              <p class="mt-5 inline-flex items-center gap-2 rounded-full bg-warning-50 px-4 py-1.5 text-xs/5 font-medium text-warning-700 ring-1 ring-inset ring-warning-200">
                 <span class="relative flex size-2" aria-hidden="true">
-                  <span class="absolute inline-flex size-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                  <span class="relative inline-flex size-2 rounded-full bg-amber-500" />
+                  <span class="absolute inline-flex size-full animate-ping rounded-full bg-warning-400 opacity-75" />
+                  <span class="relative inline-flex size-2 rounded-full bg-warning-500" />
                 </span>
                 Please keep this page open
               </p>
             </template>
             <template v-else>
-              <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-gray-500">
+              <p class="mx-auto mt-2 max-w-md text-sm/6 text-gray-500">
                 This is taking longer than expected, but your booking is still being confirmed in the background.
               </p>
-              <p class="mt-5 inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-1.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-200">
+              <p class="mt-5 inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-1.5 text-xs/5 font-medium text-gray-600 ring-1 ring-inset ring-gray-200">
                 <EnvelopeIcon class="size-3.5" aria-hidden="true" />
                 We'll update you here or by email — it's safe to leave this page.
               </p>
@@ -326,25 +326,25 @@ function guestInitials(guest) {
           <div v-else-if="attemptStatus === 'confirmed'" class="mt-3 flex flex-col items-center rounded-3xl bg-white px-8 pb-10 pt-6 text-center ring-1 ring-gray-200">
             <PaymentCompleted class="-my-12" />
             <h2 class="text-xl font-semibold tracking-tight text-gray-900">Booking confirmed</h2>
-            <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-gray-500">
+            <p class="mx-auto mt-2 max-w-md text-sm/6 text-gray-500">
               {{ quote?.hotel ? `${quote.hotel.name} has` : 'The hotel has' }} confirmed your reservation. A confirmation email is on its way to you.
             </p>
             <RouterLink
                 :to="{name: 'hotels'}"
-                class="mt-6 inline-flex cursor-pointer items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+                class="mt-6 inline-flex cursor-pointer items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
             >Book another stay</RouterLink>
           </div>
           <!-- Failed — a real possible outcome once availability/pricing has -->
           <!-- shifted since search, not a bug to apologise for. -->
-          <div v-else-if="attemptStatus === 'failed'" class="mt-3 flex flex-col items-center rounded-3xl bg-white px-8 pb-10 pt-6 text-center ring-1 ring-red-200">
+          <div v-else-if="attemptStatus === 'failed'" class="mt-3 flex flex-col items-center rounded-3xl bg-white px-8 pb-10 pt-6 text-center ring-1 ring-danger-200">
             <Failed class="-my-12" />
             <h2 class="text-xl font-semibold tracking-tight text-gray-900">We couldn't confirm this booking</h2>
-            <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-gray-500">
+            <p class="mx-auto mt-2 max-w-md text-sm/6 text-gray-500">
               The hotel couldn't confirm this reservation, most likely because availability or pricing changed. You haven't been charged — search again for a fresh quote.
             </p>
             <RouterLink
                 :to="{name: 'hotels'}"
-                class="mt-6 inline-flex cursor-pointer items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+                class="mt-6 inline-flex cursor-pointer items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
             >Search again</RouterLink>
           </div>
           <div class="mt-6 lg:grid lg:grid-cols-3 lg:items-start lg:gap-6">
@@ -360,16 +360,16 @@ function guestInitials(guest) {
                 </div>
                 <div class="mt-4 divide-y divide-gray-100">
                   <div v-for="(room, roomIndex) in attempt.rooms" :key="room.id" :class="[roomIndex ? 'pt-5' : '', 'pb-5']">
-                    <h3 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Room {{ roomIndex + 1 }}</h3>
+                    <h3 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Room {{ roomIndex + 1 }}</h3>
                     <ul class="mt-3 space-y-2.5">
                       <li v-for="(guest, guestIndex) in room.guests" :key="guest.id" class="flex items-center gap-3">
-                        <span v-if="guestInitials(guest)" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">{{ guestInitials(guest) }}</span>
+                        <span v-if="guestInitials(guest)" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs/5 font-semibold text-brand-700">{{ guestInitials(guest) }}</span>
                         <span v-else class="flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-400">
                           <UserIcon class="size-4" aria-hidden="true" />
                         </span>
                         <span class="min-w-0">
-                          <span class="block truncate text-sm font-medium text-gray-900">{{ guestLabel(guest, guestIndex) }}</span>
-                          <span class="block text-xs text-gray-500">{{ guest.isChild ? (guest.age !== null ? `Child · ${guest.age} years` : 'Child') : 'Adult' }}</span>
+                          <span class="block truncate text-sm/6 font-medium text-gray-900">{{ guestLabel(guest, guestIndex) }}</span>
+                          <span class="block text-xs/5 text-gray-500">{{ guest.isChild ? (guest.age !== null ? `Child · ${guest.age} years` : 'Child') : 'Adult' }}</span>
                         </span>
                       </li>
                     </ul>
@@ -380,19 +380,19 @@ function guestInitials(guest) {
             <!-- Hotel, room -->
             <aside class="mt-6 space-y-4 lg:col-span-1 lg:mt-0 lg:sticky lg:top-6">
               <div v-if="quote?.hotel" class="rounded-2xl bg-white p-5 ring-1 ring-gray-200">
-                <span v-if="quote.hotel.starRating" class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 ring-1 ring-amber-100 ring-inset">
+                <span v-if="quote.hotel.starRating" class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 ring-1 ring-warning-100 ring-inset">
                   <HotelRating :stars="quote.hotel.starRating" />
                 </span>
                 <h1 class="mt-2 text-base font-semibold tracking-tight text-gray-900">{{ quote.hotel.name }}</h1>
-                <p v-if="hotelLocation" class="mt-1 flex items-start gap-1 text-xs text-gray-500">
+                <p v-if="hotelLocation" class="mt-1 flex items-start gap-1 text-xs/5 text-gray-500">
                   <MapPinIcon class="mt-0.5 size-3.5 shrink-0 text-gray-400" aria-hidden="true" />
                   <span>{{ hotelLocation }}</span>
                 </p>
               </div>
               <section class="rounded-2xl bg-white p-5 ring-1 ring-gray-200">
-                <h2 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Your room</h2>
-                <h3 v-if="roomName" class="mt-1 text-sm font-semibold tracking-tight text-gray-900">{{ roomName }}</h3>
-                <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
+                <h2 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Your room</h2>
+                <h3 v-if="roomName" class="mt-1 text-sm/6 font-semibold tracking-tight text-gray-900">{{ roomName }}</h3>
+                <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs/5 text-gray-500">
                   <span v-if="capacity" class="inline-flex items-center gap-1">
                     <UsersIcon class="size-3.5 text-gray-400" aria-hidden="true" />
                     Sleeps {{ capacity }}
@@ -408,11 +408,11 @@ function guestInitials(guest) {
                   <HotelAvailability :allotment="quote?.rate?.allotment" />
                 </div>
                 <HotelAmenities v-if="quote?.rate?.amenities?.length" :amenities="quote.rate.amenities" class="mt-3" />
-                <p v-if="roomNote" class="mt-3 text-xs text-gray-500">{{ prettifyLabel(roomNote) }}</p>
+                <p v-if="roomNote" class="mt-3 text-xs/5 text-gray-500">{{ prettifyLabel(roomNote) }}</p>
                 <div class="mt-4 border-t border-gray-100 pt-4">
-                  <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Total price</p>
+                  <p class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Total price</p>
                   <p class="mt-1.5 flex items-baseline gap-1.5">
-                    <span class="text-sm font-medium text-gray-500">{{ quote?.price?.currency }}</span>
+                    <span class="text-sm/6 font-medium text-gray-500">{{ quote?.price?.currency }}</span>
                     <span class="text-3xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
                   </p>
                 </div>

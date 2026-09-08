@@ -202,9 +202,9 @@ const passwordRequirementsHeaderClass = computed(() => {
     return 'text-gray-700';
   }
   if (allPasswordRulesMet.value) {
-    return 'text-emerald-500';
+    return 'text-success-700';
   }
-  return 'text-red-500';
+  return 'text-danger-600';
 });
 
 function togglePasswordRequirements() {
@@ -258,18 +258,18 @@ watch(
               Adventure starts here
               <img src="/images/rocket.gif" alt="Verified" class="w-8 h-8 inline-block">
             </h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Make your money transfer easy and Fun!</p>
+            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">Make your money transfer easy and Fun!</p>
 
             <!-- Form -->
             <form @submit.prevent="register" class="space-y-5">
               <template v-if="authChannel === 'MOBILE_NUMBER'">
                 <div v-if="! isLoading" class="space-y-3">
-                  <label :class="[(formErrors.mobile_number.length > 0 || formErrors.country.length > 0) ? 'text-red-700' : 'text-brand-700']" for="mobile-number" class="block mb-1 text-base font-medium">Mobile Number</label>
+                  <label :class="[(formErrors.mobile_number.length > 0 || formErrors.country.length > 0) ? 'text-danger-700' : 'text-brand-700']" for="mobile-number" class="block mb-1 text-base font-medium">Mobile Number</label>
                   <div class="space-y-3">
                     <IsdCodeInput v-bind:countries="countries" v-bind:fetchCountries="false" :class="['min-w-36 sm:min-w-40']" v-bind:modelValue="form.country" v-bind:itemLabelGenerator="itemLabelGenerator" v-on:update:modelValue="updateIsdCode" />
                     <div
                       class="relative rounded-2xl border bg-white transition-all duration-200"
-                      :class="formErrors.mobile_number.length > 0 ? 'border-red-500' : (mobileFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
+                      :class="formErrors.mobile_number.length > 0 ? 'border-danger-500' : (mobileFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
                     >
                       <input
                         id="mobile-number"
@@ -282,17 +282,17 @@ watch(
                       />
                     </div>
                   </div>
-                  <p v-if="formErrors.country.length > 0" class="mt-2 text-sm text-red-600">{{ formErrors.country[0] }}</p>
-                  <p v-if="formErrors.mobile_number.length > 0" class="mt-2 text-sm text-red-600">{{ formErrors.mobile_number[0] }}</p>
+                  <p v-if="formErrors.country.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.country[0] }}</p>
+                  <p v-if="formErrors.mobile_number.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.mobile_number[0] }}</p>
                 </div>
               </template>
               <template v-else-if="authChannel === 'EMAIL'">
                 <!-- Email Field -->
                 <div>
-                  <label :class="[formErrors.email.length > 0 ? 'text-red-700' : 'text-brand-700']" for="email" class="block mb-2 text-base font-medium">Email</label>
+                  <label :class="[formErrors.email.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="email" class="block mb-2 text-base font-medium">Email</label>
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
-                    :class="formErrors.email.length > 0 ? 'border-red-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
+                    :class="formErrors.email.length > 0 ? 'border-danger-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
                   >
                     <input
                       type="email"
@@ -307,16 +307,16 @@ watch(
                       <i class="pi pi-envelope transition-colors" :class="emailFocused ? 'text-brand-700' : 'text-gray-400'"></i>
                     </span>
                   </div>
-                  <p v-if="formErrors.email.length > 0" class="mt-2 text-sm text-red-600">{{ formErrors.email[0] }}</p>
+                  <p v-if="formErrors.email.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.email[0] }}</p>
                 </div>
 
                 <!-- Password Field -->
                 <div>
-                  <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="block mb-2 text-base font-medium">Password</label>
+                  <label :class="[formErrors.password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="password" class="block mb-2 text-base font-medium">Password</label>
                   <div class="mb-3">
                     <div
                       class="relative rounded-2xl border bg-white transition-all duration-200"
-                      :class="formErrors.password.length > 0 ? 'border-red-500' : (passwordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
+                      :class="formErrors.password.length > 0 ? 'border-danger-500' : (passwordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
                     >
                       <input
                         :type="showPassword ? 'text' : 'password'"
@@ -336,16 +336,16 @@ watch(
                         <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                       </button>
                     </div>
-                    <p v-if="formErrors.password.length > 0" class="mt-2 text-sm text-red-600">{{ formErrors.password[0] }}</p>
+                    <p v-if="formErrors.password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.password[0] }}</p>
                   </div>
                   <div
                     v-if="validatedPasswordPolicies.rules.length"
                     class="rounded-2xl border bg-gray-50"
-                    :class="form.password ? (allPasswordRulesMet ? 'border-emerald-200' : 'border-red-200') : 'border-gray-200'"
+                    :class="form.password ? (allPasswordRulesMet ? 'border-success-200' : 'border-danger-200') : 'border-gray-200'"
                   >
                     <button
                       type="button"
-                      class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors"
+                      class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2.5 text-left text-sm/6 transition-colors"
                       :class="passwordRequirementsHeaderClass"
                       :aria-expanded="passwordRequirementsOpen"
                       @click="togglePasswordRequirements"
@@ -353,7 +353,7 @@ watch(
                       <span class="flex min-w-0 items-center gap-2">
                         <i
                           v-if="form.password"
-                          class="pi shrink-0 text-sm"
+                          class="pi shrink-0 text-sm/6"
                           :class="allPasswordRulesMet ? 'pi-check-circle' : 'pi-times-circle'"
                         />
                         <span class="truncate">{{ passwordRequirementsSummary }}</span>
@@ -373,21 +373,21 @@ watch(
                           <div v-if="getRuleOutcome(validatedPasswordPolicyRule) === true" class="relative flex items-center space-x-3">
                             <div>
                               <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
-                                <i class="pi pi-check-circle text-emerald-500"></i>
+                                <i class="pi pi-check-circle text-success-500"></i>
                               </span>
                             </div>
                             <div class="min-w-0">
-                              <p class="text-sm text-emerald-500">{{ validatedPasswordPolicyRule.message }}</p>
+                              <p class="text-sm/6 text-success-700">{{ validatedPasswordPolicyRule.message }}</p>
                             </div>
                           </div>
                           <div v-else-if="form.password && getRuleOutcome(validatedPasswordPolicyRule) === false" class="relative flex items-center space-x-3">
                             <div>
                               <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
-                                <i class="pi pi-times-circle text-red-500"></i>
+                                <i class="pi pi-times-circle text-danger-500"></i>
                               </span>
                             </div>
                             <div class="min-w-0">
-                              <p class="text-sm text-red-500">{{ validatedPasswordPolicyRule.message }}</p>
+                              <p class="text-sm/6 text-danger-600">{{ validatedPasswordPolicyRule.message }}</p>
                             </div>
                           </div>
                           <div v-else class="relative flex items-center space-x-3">
@@ -397,7 +397,7 @@ watch(
                               </span>
                             </div>
                             <div class="min-w-0">
-                              <p class="text-sm text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
+                              <p class="text-sm/6 text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
                             </div>
                           </div>
                         </div>
@@ -407,10 +407,10 @@ watch(
                 </div>
                 <!-- Confirm Password -->
                 <div>
-                  <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="block mb-2 text-base font-medium">Confirm Password</label>
+                  <label :class="[formErrors.confirm_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="confirm_password" class="block mb-2 text-base font-medium">Confirm Password</label>
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
-                    :class="formErrors.confirm_password.length > 0 ? 'border-red-500' : (confirmPasswordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
+                    :class="formErrors.confirm_password.length > 0 ? 'border-danger-500' : (confirmPasswordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
                   >
                     <input
                       :type="showConfirmPassword ? 'text' : 'password'"
@@ -430,7 +430,7 @@ watch(
                       <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                     </button>
                   </div>
-                  <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-red-600">{{ formErrors.confirm_password[0] }}</p>
+                  <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.confirm_password[0] }}</p>
                 </div>
               </template>
 
@@ -441,7 +441,7 @@ watch(
                 :class="termsAccepted ? 'border-brand-200 bg-brand-50' : ''"
               >
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="mt-0.5 h-4 w-4 min-w-4 min-h-4 rounded border-gray-300 text-brand-700 accent-brand-700 outline-none focus:ring-0" />
-                <span class="text-sm/6 text-gray-700 leading-snug">I agree to <a :href="privacyPolicyUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>privacy policy</a> & <a :href="userAgreementUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>terms of service</a>.</span>
+                <span class="text-sm/6 text-gray-700">I agree to <a :href="privacyPolicyUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>privacy policy</a> & <a :href="userAgreementUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>terms of service</a>.</span>
               </label>
 
               <!-- Checkbox -->
@@ -458,16 +458,16 @@ watch(
               <button
                 :disabled="!canContinue"
                 type="submit"
-                class="group relative block w-full overflow-hidden rounded-full bg-brand-700 py-3.5 text-center text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span class="inline-flex items-center justify-center gap-2">
                   {{ authChannel === 'MOBILE_NUMBER' ? 'Get Code' : 'Continue' }}
-                  <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+                  <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
             </form>
 
-            <p class="mt-8 text-center text-sm text-gray-500">
+            <p class="mt-8 text-center text-sm/6 text-gray-500">
               Already have an account?
               <router-link
                 class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"

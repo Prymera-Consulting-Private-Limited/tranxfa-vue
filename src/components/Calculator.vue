@@ -282,13 +282,13 @@ async function saveQuote() {
 
 </script>
 <template>
-  <div v-if="quoteFailureReason" class="rounded-b-md bg-red-50 px-8 py-12">
+  <div v-if="quoteFailureReason" class="rounded-b-md bg-danger-50 px-8 py-12">
     <div class="flex-col text-center">
       <div class="mx-auto">
-        <ExclamationTriangleIcon class="size-8 mt-0.5 text-red-700 mx-auto" aria-hidden="true" />
+        <ExclamationTriangleIcon class="size-8 mt-0.5 text-danger-700 mx-auto" aria-hidden="true" />
       </div>
       <div class="mt-3">
-        <div class="text-sm text-red-700">
+        <div class="text-sm/6 text-danger-700">
           <p>{{ quoteFailureReason }}</p>
         </div>
       </div>
@@ -344,10 +344,10 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRateFormatted }}</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRateFormatted }}</p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
                 </div>
-                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
+                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm/6 whitespace-nowrap font-semibold tracking-wider">
                   <span>Our Rate</span>
                 </div>
               </div>
@@ -365,13 +365,13 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm tracking-wider">
-                    <span class="text-emerald-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 tracking-wider">
+                    <span class="text-success-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
                     <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
                   </p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
                 </div>
-                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
+                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm/6 whitespace-nowrap font-semibold tracking-wider">
                   <span>Fees</span>
                 </div>
               </div>
@@ -434,7 +434,7 @@ async function saveQuote() {
                             <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
                               <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
                                 <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                                <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
+                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
                               </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
                                 <span class="sr-only">Select or Change Delivery Method</span>
@@ -446,7 +446,7 @@ async function saveQuote() {
                           <transition v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
                             <ListboxOptions class="absolute right-0 z-10 mt-2 w-72 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden">
                               <ListboxOption as="template" v-for="payoutMethod in quoteUtil.quote?.data?.payoutMethods" :key="payoutMethod.id" :value="payoutMethod" v-slot="{ active, selectedPayoutMethod }">
-                                <li :class="[active ? 'bg-brand-700 text-white' : 'text-gray-900', 'cursor-default p-4 text-sm select-none']">
+                                <li :class="[active ? 'bg-brand-700 text-white' : 'text-gray-900', 'cursor-default p-4 text-sm/6 select-none']">
                                   <div class="flex flex-col">
                                     <div class="flex justify-between">
                                       <p :class="selectedPayoutMethod?.id === payoutMethod.id ? 'font-semibold' : 'font-normal'">{{ payoutMethod.title }}</p>
@@ -481,8 +481,8 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-xs text-gray-900 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.instructions }}</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                  <p v-if="! isFetchingQuote" class="text-xs/5 text-gray-900 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.instructions }}</p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
             </div>
@@ -493,14 +493,14 @@ async function saveQuote() {
             <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
             <div class="relative flex space-x-3">
               <div>
-              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-lime-700' : 'bg-gray-300']">
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-success-700' : 'bg-gray-300']">
                   <PercentBadgeIcon class="size-5 text-white"/>
               </span>
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-xs text-lime-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                  <p v-if="! isFetchingQuote" class="text-xs/5 text-success-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
             </div>
@@ -518,8 +518,8 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-brand-700 font-semibold tracking-wider">Fast, Secure Transfers</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 text-brand-700 font-semibold tracking-wider">Fast, Secure Transfers</p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
             </div>
@@ -528,20 +528,20 @@ async function saveQuote() {
       </ul>
       <template v-if="(customer.data?.isBlockedForSending || false) === false">
         <template v-if="quoteUtil.quote?.data?.transferDisableReason">
-          <div class="rounded-b-md bg-yellow-50 p-4 mt-12 -mx-5 -mb-8">
+          <div class="rounded-b-md bg-warning-50 p-4 mt-12 -mx-5 -mb-8">
             <div class="flex">
               <div class="shrink-0">
-                <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
+                <ExclamationTriangleIcon class="size-5 mt-0.5 text-warning-400" aria-hidden="true" />
               </div>
               <div class="ml-3">
-                <div class="text-sm text-yellow-700">
+                <div class="text-sm/6 text-warning-700">
                   <p>{{ quoteUtil.quote?.data?.transferDisableReason }}</p>
                 </div>
               </div>
             </div>
           </div>
         </template>
-        <button v-else :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
+        <button v-else :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
           <template v-if="isSavingQuote">
             <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
             Saving ...
@@ -552,14 +552,14 @@ async function saveQuote() {
           </template>
         </button>
       </template>
-      <div v-else class="rounded-b-md bg-yellow-50 p-4 mt-12 -mx-5 -mb-8">
+      <div v-else class="rounded-b-md bg-warning-50 p-4 mt-12 -mx-5 -mb-8">
         <div class="flex">
           <div class="shrink-0">
-            <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
+            <ExclamationTriangleIcon class="size-5 mt-0.5 text-warning-400" aria-hidden="true" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-yellow-800">Your ability to send money is temporarily restricted.</h3>
-            <div class="mt-2 text-sm text-yellow-700">
+            <h3 class="text-sm/6 font-medium text-warning-800">Your ability to send money is temporarily restricted.</h3>
+            <div class="mt-2 text-sm/6 text-warning-700">
               <p>Please reach out to our customer support team for assistance or to understand the reason behind this restriction.</p>
             </div>
           </div>

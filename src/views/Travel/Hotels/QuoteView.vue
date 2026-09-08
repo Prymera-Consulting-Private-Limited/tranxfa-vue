@@ -341,10 +341,10 @@ const HOLD_ALERT_THRESHOLDS = [
 ];
 
 const HOLD_ALERT_STYLES = {
-  green: {wrap: 'bg-emerald-50 text-emerald-800 ring-emerald-200', iconWrap: 'bg-emerald-100 text-emerald-600', icon: ClockIcon},
+  green: {wrap: 'bg-success-50 text-success-800 ring-success-200', iconWrap: 'bg-success-100 text-success-600', icon: ClockIcon},
   blue: {wrap: 'bg-blue-50 text-blue-800 ring-blue-200', iconWrap: 'bg-blue-100 text-blue-600', icon: ClockIcon},
-  yellow: {wrap: 'bg-amber-50 text-amber-800 ring-amber-200', iconWrap: 'bg-amber-100 text-amber-600', icon: ExclamationTriangleIcon},
-  red: {wrap: 'bg-red-50 text-red-800 ring-red-200', iconWrap: 'bg-red-100 text-red-600', icon: ExclamationTriangleIcon},
+  yellow: {wrap: 'bg-warning-50 text-warning-800 ring-warning-200', iconWrap: 'bg-warning-100 text-warning-600', icon: ExclamationTriangleIcon},
+  red: {wrap: 'bg-danger-50 text-danger-800 ring-danger-200', iconWrap: 'bg-danger-100 text-danger-600', icon: ExclamationTriangleIcon},
 };
 
 const holdAlertLevel = computed(() => {
@@ -499,7 +499,7 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
   <CustomerLayout>
     <main class="-mt-24 pb-12 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <RouterLink :to="backLink" class="inline-flex items-center gap-1 text-sm font-medium text-gray-500 transition hover:text-gray-900">
+        <RouterLink :to="backLink" class="inline-flex items-center gap-1 text-sm/6 font-medium text-gray-500 transition hover:text-gray-900">
           <ChevronLeftIcon class="size-4" aria-hidden="true" />
           {{ backLabel }}
         </RouterLink>
@@ -508,22 +508,22 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
           <Spinner class="size-12" />
         </div>
         <!-- Failed -->
-        <div v-else-if="hasFailed" class="mt-3 flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-red-200">
-          <div class="flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <div v-else-if="hasFailed" class="mt-3 flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-danger-200">
+          <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
           <h2 class="mt-6 text-base font-semibold text-gray-900">{{ failMessage.title }}</h2>
-          <p class="mt-2 max-w-md text-sm text-gray-500">{{ failMessage.description }}</p>
+          <p class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failMessage.description }}</p>
           <button
               v-if="failReason === 'load'"
               type="button"
               @click="loadPage"
-              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >Try again</button>
           <RouterLink
               v-else
               :to="{name: 'hotels'}"
-              class="mt-6 inline-flex cursor-pointer items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+              class="mt-6 inline-flex cursor-pointer items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >Back to search</RouterLink>
         </div>
         <!-- Quote -->
@@ -535,8 +535,8 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                 <component :is="holdAlertStyle.icon" class="size-5" aria-hidden="true" />
               </span>
               <div>
-                <p class="text-sm font-semibold">{{ holdAlertMessage.title }}</p>
-                <p class="text-xs opacity-80">{{ holdAlertMessage.description }}</p>
+                <p class="text-sm/6 font-semibold">{{ holdAlertMessage.title }}</p>
+                <p class="text-xs/5 opacity-80">{{ holdAlertMessage.description }}</p>
               </div>
             </div>
             <p v-if="countdownLabel" class="text-xl font-semibold tabular-nums">{{ countdownLabel }}</p>
@@ -555,38 +555,38 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                   @update="onGuestDetailsUpdate"
               />
               <div v-else-if="attemptStep === 'confirmed'" class="rounded-2xl bg-white p-8 text-center ring-1 ring-gray-200">
-                <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-success-50 text-success-700">
                   <CheckCircleIcon class="size-7" aria-hidden="true" />
                 </div>
                 <h2 class="mt-6 text-base font-semibold text-gray-900">Booking confirmed</h2>
-                <p class="mt-2 text-sm text-gray-500">Your reservation is confirmed. A confirmation will be sent to the email you provided.</p>
+                <p class="mt-2 text-sm/6 text-gray-500">Your reservation is confirmed. A confirmation will be sent to the email you provided.</p>
               </div>
-              <div v-else-if="attemptStep === 'failed'" class="rounded-2xl bg-white p-8 text-center ring-1 ring-red-200">
-                <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+              <div v-else-if="attemptStep === 'failed'" class="rounded-2xl bg-white p-8 text-center ring-1 ring-danger-200">
+                <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
                   <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
                 </div>
                 <h2 class="mt-6 text-base font-semibold text-gray-900">We couldn't confirm this booking</h2>
-                <p class="mt-2 text-sm text-gray-500">Something went wrong finishing your booking with the hotel. Please go back and try again.</p>
+                <p class="mt-2 text-sm/6 text-gray-500">Something went wrong finishing your booking with the hotel. Please go back and try again.</p>
               </div>
             </div>
             <!-- Hotel, room -->
             <aside class="mt-6 space-y-4 lg:col-span-1 lg:mt-0 lg:sticky lg:top-6">
               <!-- Hotel -->
               <div v-if="quote.hotel" class="rounded-2xl bg-white p-5 ring-1 ring-gray-200">
-                <span v-if="quote.hotel.starRating" class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 ring-1 ring-amber-100 ring-inset">
+                <span v-if="quote.hotel.starRating" class="inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 ring-1 ring-warning-100 ring-inset">
                   <HotelRating :stars="quote.hotel.starRating" />
                 </span>
                 <h1 class="mt-2 text-base font-semibold tracking-tight text-gray-900">{{ quote.hotel.name }}</h1>
-                <p v-if="hotelLocation" class="mt-1 flex items-start gap-1 text-xs text-gray-500">
+                <p v-if="hotelLocation" class="mt-1 flex items-start gap-1 text-xs/5 text-gray-500">
                   <MapPinIcon class="mt-0.5 size-3.5 shrink-0 text-gray-400" aria-hidden="true" />
                   <span>{{ hotelLocation }}</span>
                 </p>
               </div>
               <!-- Room, price and next step -->
               <section class="rounded-2xl bg-white p-5 ring-1 ring-gray-200">
-                <h2 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Your room</h2>
-                <h3 v-if="roomName" class="mt-1 text-sm font-semibold tracking-tight text-gray-900">{{ roomName }}</h3>
-                <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
+                <h2 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Your room</h2>
+                <h3 v-if="roomName" class="mt-1 text-sm/6 font-semibold tracking-tight text-gray-900">{{ roomName }}</h3>
+                <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs/5 text-gray-500">
                   <span v-if="capacity" class="inline-flex items-center gap-1">
                     <UsersIcon class="size-3.5 text-gray-400" aria-hidden="true" />
                     Sleeps {{ capacity }}
@@ -602,27 +602,27 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                   <HotelAvailability :allotment="quote.rate?.allotment" />
                 </div>
                 <HotelAmenities v-if="quote.rate?.amenities?.length" :amenities="quote.rate.amenities" class="mt-3" />
-                <p v-if="roomNote" class="mt-3 text-xs text-gray-500">{{ prettifyLabel(roomNote) }}</p>
+                <p v-if="roomNote" class="mt-3 text-xs/5 text-gray-500">{{ prettifyLabel(roomNote) }}</p>
                 <!-- Guests -->
                 <div v-if="guestDisplayRooms.length" class="mt-4 border-t border-gray-100 pt-4">
-                  <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Guests</p>
+                  <p class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Guests</p>
                   <div class="mt-1.5 space-y-1.5">
                     <div v-for="(room, index) in guestDisplayRooms" :key="index">
-                      <p v-if="guestDisplayRooms.length > 1" class="text-xs text-gray-500">Room {{ index + 1 }}</p>
-                      <p class="text-sm font-medium text-gray-900">{{ room.names ?? room.summary }}</p>
-                      <p v-if="room.unnamed > 0" class="text-xs text-gray-500">+{{ room.unnamed }} guest{{ room.unnamed === 1 ? '' : 's' }} without details yet</p>
+                      <p v-if="guestDisplayRooms.length > 1" class="text-xs/5 text-gray-500">Room {{ index + 1 }}</p>
+                      <p class="text-sm/6 font-medium text-gray-900">{{ room.names ?? room.summary }}</p>
+                      <p v-if="room.unnamed > 0" class="text-xs/5 text-gray-500">+{{ room.unnamed }} guest{{ room.unnamed === 1 ? '' : 's' }} without details yet</p>
                     </div>
                   </div>
                 </div>
                 <!-- Price -->
                 <div class="mt-4 border-t border-gray-100 pt-4">
-                  <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Total price</p>
+                  <p class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Total price</p>
                   <p class="mt-1.5 flex items-baseline gap-1.5">
-                    <span class="text-sm font-medium text-gray-500">{{ quote.price.currency }}</span>
+                    <span class="text-sm/6 font-medium text-gray-500">{{ quote.price.currency }}</span>
                     <span class="text-3xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
                   </p>
-                  <p v-if="quote.priceChanged && priceChangeConfirmed" class="mt-2 text-xs text-amber-600">You confirmed this updated price.</p>
-                  <p v-if="bookingFailed" class="mt-3 text-xs text-red-600">Something went wrong starting your booking. Please try again.</p>
+                  <p v-if="quote.priceChanged && priceChangeConfirmed" class="mt-2 text-xs/5 text-warning-700">You confirmed this updated price.</p>
+                  <p v-if="bookingFailed" class="mt-3 text-xs/5 text-danger-600">Something went wrong starting your booking. Please try again.</p>
                   <!-- Always the last thing in the sidebar, so the customer sees the -->
                   <!-- full price before being asked to act on it. -->
                   <button
@@ -630,7 +630,7 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                       type="button"
                       :disabled="isExpired || !priceChangeConfirmed || isBooking"
                       @click="startBooking"
-                      class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+                      class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-3.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
                   >{{ isExpired ? 'Reservation expired' : (isBooking ? 'Starting booking…' : 'Continue Booking') }}</button>
                   <!-- Submits GuestDetailsForm from here via its form id. -->
                   <template v-else-if="attemptStep === 'guestDetails'">
@@ -638,13 +638,13 @@ const backLabel = computed(() => (quote.value?.hotel ? 'Change room' : 'Back to 
                         type="submit"
                         form="guest-details-form"
                         :disabled="isSavingGuests || !allRoomsHaveNamedAdult"
-                        class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+                        class="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-4 py-3.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
                     >{{ isSavingGuests ? 'Saving…' : 'Continue' }}</button>
                     <!-- Right where the action is, since a validation message left only -->
                     <!-- at the top of a long form is easy to miss from down here. -->
-                    <p v-if="!allRoomsHaveNamedAdult" class="mt-2 text-xs text-gray-500">Add a name for at least one adult in every room to continue.</p>
-                    <p v-else-if="validationErrors" class="mt-2 text-xs font-medium text-red-600">Some guest details need attention above.</p>
-                    <p v-else-if="saveGuestsError" class="mt-2 text-xs font-medium text-red-600">{{ saveGuestsError }}</p>
+                    <p v-if="!allRoomsHaveNamedAdult" class="mt-2 text-xs/5 text-gray-500">Add a name for at least one adult in every room to continue.</p>
+                    <p v-else-if="validationErrors" class="mt-2 text-xs/5 font-medium text-danger-600">Some guest details need attention above.</p>
+                    <p v-else-if="saveGuestsError" class="mt-2 text-xs/5 font-medium text-danger-600">{{ saveGuestsError }}</p>
                   </template>
                 </div>
               </section>

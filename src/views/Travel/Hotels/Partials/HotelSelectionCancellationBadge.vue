@@ -27,11 +27,11 @@ const label = computed(() => {
 
 const classes = computed(() => {
   return props.cancellation?.freeCancellation
-      ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+      ? 'bg-success-50 text-success-700 ring-success-200'
       : 'bg-gray-50 text-gray-600 ring-gray-200';
 });
 </script>
 
 <template>
-  <span :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium ring-1 ring-inset']">{{ label }}</span>
+  <span :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ label }}</span>
 </template>

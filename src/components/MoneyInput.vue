@@ -112,9 +112,9 @@ defineExpose({
     <div class="grid shrink-0 grid-cols-1 focus-within:relative bg-white">
       <Menu as="div" class="relative inline-block text-left">
         <div>
-          <MenuButton as="div" :class="{'cursor-pointer': options.length > 1 && ! disableSelection}" class="inline-flex w-full items-center justify-center rounded-r-md bg-brand-700 px-4 py-4 text-sm font-medium text-white">
+          <MenuButton as="div" :class="{'cursor-pointer': options.length > 1 && ! disableSelection}" class="inline-flex w-full items-center justify-center rounded-r-md bg-brand-700 px-4 py-4 text-sm/6 font-medium text-white">
             <FlagIcon :class="['ring-2 ring-white']" :code="country.iso2Alpha.toLowerCase()" circle />
-            <strong class="text-sm tracking-wider ml-2">{{ currency.code }}</strong>
+            <strong class="text-sm/6 tracking-wider ml-2">{{ currency.code }}</strong>
             <ChevronDownIcon v-if="options.length > 1 && !disableSelection" class="-mr-1 ml-2 h-5 w-5 text-brand-200 hover:text-brand-100" aria-hidden="true"/>
           </MenuButton>
         </div>
@@ -123,13 +123,13 @@ defineExpose({
             <MenuItem as="div" v-for="(option, index) in options" v-slot="{ active }">
               <button @click="selectOption(option)" :class="[
                 active ? 'text-brand-900' : 'text-gray-900',
-                'group flex w-full items-center px-4 py-4 text-sm tracking-wider gap-x-2 cursor-pointer',
+                'group flex w-full items-center px-4 py-4 text-sm/6 tracking-wider gap-x-2 cursor-pointer',
                 index === 0 ? 'rounded-t-md' : '',
                 index === options.length - 1 ? 'rounded-b-md' : ''
               ]">
                 <FlagIcon :class="['ring-2 ring-white']" :code="option.country.iso2Alpha.toLowerCase()" circle />
-                <strong class="text-sm">{{ option.currency.code }}</strong>
-                <span class="text-sm">{{ option.country.commonName }}</span>
+                <strong class="text-sm/6">{{ option.currency.code }}</strong>
+                <span class="text-sm/6">{{ option.country.commonName }}</span>
               </button>
             </MenuItem>
           </MenuItems>
@@ -137,5 +137,5 @@ defineExpose({
       </Menu>
     </div>
   </div>
-  <p v-if="errors.length > 0" class="mt-3 ml-6 text-xs text-red-600">{{ errors[0] }}</p>
+  <p v-if="errors.length > 0" class="mt-3 ml-6 text-xs/5 text-danger-600">{{ errors[0] }}</p>
 </template>

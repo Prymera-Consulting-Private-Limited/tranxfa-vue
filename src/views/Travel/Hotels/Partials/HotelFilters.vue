@@ -109,31 +109,31 @@ function formatPrice(amount) {
         @click="isOpen = !isOpen"
         class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-xs transition hover:border-gray-300 lg:hidden"
     >
-      <span class="flex items-center gap-2 text-sm font-semibold text-gray-900">
+      <span class="flex items-center gap-2 text-sm/6 font-semibold text-gray-900">
         <AdjustmentsHorizontalIcon class="size-5 text-gray-400" aria-hidden="true" />
         Filters
       </span>
-      <span class="text-xs text-gray-500">{{ matchCount }} of {{ totalCount }}</span>
+      <span class="text-xs/5 text-gray-500">{{ matchCount }} of {{ totalCount }}</span>
     </button>
     <div :class="[isOpen ? 'mt-3 block' : 'hidden', 'divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white shadow-xs lg:sticky lg:top-6 lg:mt-0 lg:block']">
       <!-- Heading -->
       <header class="flex items-baseline justify-between gap-3 px-4 py-3">
         <div>
-          <h3 class="text-sm font-semibold text-gray-900">Filters</h3>
-          <p class="mt-0.5 text-xs text-gray-500">{{ matchCount }} of {{ totalCount }} hotel{{ totalCount === 1 ? '' : 's' }}</p>
+          <h3 class="text-sm/6 font-semibold text-gray-900">Filters</h3>
+          <p class="mt-0.5 text-xs/5 text-gray-500">{{ matchCount }} of {{ totalCount }} hotel{{ totalCount === 1 ? '' : 's' }}</p>
         </div>
         <button
             v-if="isActive"
             type="button"
             @click="clear"
-            class="cursor-pointer text-xs font-medium text-brand-700 transition hover:text-brand-800"
+            class="cursor-pointer text-xs/5 font-medium text-brand-700 transition hover:text-brand-800"
         >Clear all</button>
       </header>
       <!-- Price -->
       <section v-if="hasPriceRange" class="px-4 py-3">
         <div class="flex items-baseline justify-between gap-2">
-          <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Total price</h4>
-          <p class="text-xs font-medium text-gray-900">
+          <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Total price</h4>
+          <p class="text-xs/5 font-medium text-gray-900">
             up to {{ facets.price.currency }} {{ formatPrice(maxPrice) }}
           </p>
         </div>
@@ -146,14 +146,14 @@ function formatPrice(amount) {
             class="mt-3 w-full cursor-pointer accent-brand-700"
             aria-label="Maximum total price"
         />
-        <div class="mt-1 flex justify-between text-xs text-gray-500">
+        <div class="mt-1 flex justify-between text-xs/5 text-gray-500">
           <span>{{ formatPrice(facets.price.min) }}</span>
           <span>{{ formatPrice(facets.price.max) }}</span>
         </div>
       </section>
       <!-- Star rating -->
       <section v-if="facets.stars.length" class="px-4 py-3">
-        <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Star rating</h4>
+        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Star rating</h4>
         <div class="mt-2 space-y-1.5">
           <label v-for="star in facets.stars" :key="star.value" class="flex cursor-pointer items-center gap-2.5">
             <input
@@ -163,15 +163,15 @@ function formatPrice(amount) {
                 class="size-4 shrink-0 cursor-pointer rounded border-gray-300 accent-brand-700"
             />
             <span class="flex items-center gap-0.5">
-              <StarIcon v-for="index in star.value" :key="index" class="size-3.5 text-amber-400" aria-hidden="true" />
+              <StarIcon v-for="index in star.value" :key="index" class="size-3.5 text-warning-400" aria-hidden="true" />
             </span>
-            <span class="ml-auto text-xs text-gray-500 tabular-nums">{{ star.count }}</span>
+            <span class="ml-auto text-xs/5 text-gray-500 tabular-nums">{{ star.count }}</span>
           </label>
         </div>
       </section>
       <!-- Photos, only worth offering when the results are mixed -->
       <section v-if="facets.photos.with > 0 && facets.photos.without > 0" class="px-4 py-3">
-        <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Photos</h4>
+        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Photos</h4>
         <div class="mt-2 grid grid-cols-2 gap-2">
           <button
               v-for="option in PHOTO_OPTIONS"
@@ -182,7 +182,7 @@ function formatPrice(amount) {
                 filters.photos === option.value
                   ? 'border-brand-700 bg-brand-50 text-brand-800'
                   : 'border-gray-200 text-gray-700 hover:border-gray-300',
-                'cursor-pointer rounded-lg border px-2 py-1.5 text-xs font-medium transition',
+                'cursor-pointer rounded-lg border px-2 py-1.5 text-xs/5 font-medium transition',
               ]"
           >
             {{ option.label }}
@@ -192,7 +192,7 @@ function formatPrice(amount) {
       </section>
       <!-- Amenities -->
       <section v-if="facets.amenities.length" class="px-4 py-3">
-        <h4 class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Amenities</h4>
+        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Amenities</h4>
         <div class="mt-2 space-y-1.5">
           <label v-for="amenity in amenities" :key="amenity.value" class="flex cursor-pointer items-center gap-2.5">
             <input
@@ -201,15 +201,15 @@ function formatPrice(amount) {
                 @change="toggle('amenities', amenity.value)"
                 class="size-4 shrink-0 cursor-pointer rounded border-gray-300 accent-brand-700"
             />
-            <span class="min-w-0 truncate text-sm text-gray-700">{{ amenity.label }}</span>
-            <span class="ml-auto text-xs text-gray-500 tabular-nums">{{ amenity.count }}</span>
+            <span class="min-w-0 truncate text-sm/6 text-gray-700">{{ amenity.label }}</span>
+            <span class="ml-auto text-xs/5 text-gray-500 tabular-nums">{{ amenity.count }}</span>
           </label>
         </div>
         <button
             v-if="facets.amenities.length > AMENITY_LIMIT"
             type="button"
             @click="showAllAmenities = !showAllAmenities"
-            class="mt-2 cursor-pointer text-xs font-medium text-brand-700 transition hover:text-brand-800"
+            class="mt-2 cursor-pointer text-xs/5 font-medium text-brand-700 transition hover:text-brand-800"
         >{{ showAllAmenities ? 'Show less' : `Show all ${facets.amenities.length}` }}</button>
       </section>
     </div>

@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RemitSo</title>
     <script src="https://js.volumepay.io"></script>
+      <!-- Loaded here rather than @import-ed from main.css: an @import inside the
+         bundled stylesheet serialises the fetches - main.css must be parsed
+         before the font request even starts. A link in the head runs both in
+         parallel, and preconnect opens the TLS session while that happens. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
   </head>
   <body class="min-h-screen">
     <div id="app" class="min-h-screen"></div>

@@ -36,12 +36,35 @@ jobs:
 
       # The brand theme is a build-time concern: a hardcoded palette colour
       # compiles fine and then ships the wrong brand. Cheap to catch here.
-      - name: No hardcoded palette colours
+      #
+      # Two groups are blocked, for different reasons.
+      #
+      # sky is this brand's own hue, and the rest of that group are its
+      # neighbours. Written literally they look right on RemitSo and silently
+      # survive a re-skin onto a brand that is not blue.
+      #
+      # red, green, emerald, yellow, amber, rose, orange and lime all have
+      # semantic tokens now - success, warning, danger. Reaching past those puts
+      # an outcome colour outside the palette, where nothing checks its contrast:
+      # that is how 59 form validation messages came to be text-red-500 at
+      # 3.76:1, on exactly the text a customer most needs to read.
+      - name: No hardcoded brand or status colours
         run: |
           # grep -r, not git grep: git grep skips untracked files, so a newly
           # added component would sail through. Proven by deliberately breaking it.
-          if grep -rnE '\b(bg|text|ring|border|from|to|via)-(purple|indigo|violet|fuchsia|sky|teal|cyan)-[0-9]{2,3}\b' src; then
-            echo "::error::Hardcoded palette colour found. Use brand-* so the brand branches can re-skin."
+          if grep -rnE '\b(bg|text|ring|border|from|to|via|divide|accent|fill|stroke)-(purple|indigo|violet|fuchsia|sky|teal|cyan|red|green|emerald|yellow|amber|rose|orange|lime)-[0-9]{2,3}\b' src; then
+            echo "::error::Hardcoded colour found. Use brand-* or a status token (success/warning/danger/info/neutral)."
+            exit 1
+          fi
+          echo "clean"
+
+      # There is no dark mode here. A stray dark: utility only ever fires on a
+      # device set to dark, rendering a colour nobody has looked at. All nine
+      # that existed were `dark:text-danger-600` beside `text-danger-600`.
+      - name: No orphan dark-mode utilities
+        run: |
+          if grep -rnE '\bdark:' src --include='*.vue'; then
+            echo "::error::dark: utility in an app with no dark mode."
             exit 1
           fi
           echo "clean"

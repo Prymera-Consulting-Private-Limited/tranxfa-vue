@@ -54,12 +54,12 @@ const transactions = computed(() => {
             class="flex flex-col gap-3 rounded-lg border border-gray-100 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div>
               <h2 class="text-base font-semibold text-gray-900">Your transactions</h2>
-              <p class="mt-0.5 text-sm text-gray-500">
+              <p class="mt-0.5 text-sm/6 text-gray-500">
                 Request a statement by email for any date range.
               </p>
             </div>
             <button type="button"
-              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
               @click="isStatementModalOpen = true">
               <ArrowDownTrayIcon class="size-5" aria-hidden="true" />
               Download statement
@@ -105,7 +105,7 @@ const transactions = computed(() => {
                 <div>
                   <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
                   <span class="mt-4 block text-lg font-semibold text-gray-900">No Transactions Yet</span>
-                  <p class="mt-2 text-sm text-gray-600 max-w-sm">
+                  <p class="mt-2 text-sm/6 text-gray-600 max-w-sm">
                     Ready to send money? Your first transfer is just a few clicks away! Start now and experience fast,
                     secure, and hassle-free transactions.
                   </p>

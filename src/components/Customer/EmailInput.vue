@@ -76,7 +76,7 @@ onMounted( async () => {
           <label for="email" class="mb-2 block font-medium text-brand-700">Email</label>
           <div
             class="relative rounded-2xl border bg-white transition-all duration-200"
-            :class="errors.length > 0 ? 'border-red-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
+            :class="errors.length > 0 ? 'border-danger-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
           >
             <input
               type="email"
@@ -92,12 +92,12 @@ onMounted( async () => {
               <i class="pi pi-envelope transition-colors" :class="emailFocused ? 'text-brand-700' : 'text-gray-400'"></i>
             </span>
           </div>
-          <p v-if="errors.length > 0" class="mt-2 text-sm text-red-600">{{ errors[0] }}</p>
+          <p v-if="errors.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ errors[0] }}</p>
         </div>
         <button
           :disabled="showLoading || isSaving"
           type="submit"
-          class="group relative block w-full overflow-hidden rounded-full bg-brand-700 py-3.5 text-center text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
+          class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
         >
           <template v-if="isSaving">
             <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
@@ -108,7 +108,7 @@ onMounted( async () => {
           <template v-else>
             <span class="inline-flex items-center justify-center gap-2">
               Continue
-              <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+              <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
             </span>
           </template>
         </button>
@@ -124,7 +124,7 @@ onMounted( async () => {
       <div class="mt-12 text-center">
         <a
           @click="editPersonalInformation"
-          class="inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
+          class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
           href="javascript:"
         >Edit Personal Information</a>
       </div>

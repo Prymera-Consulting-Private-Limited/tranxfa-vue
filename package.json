@@ -4,11 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-flag-assets.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/generate-flag-assets.mjs",
     "build": "vite build",
+    "prepreview": "node scripts/generate-flag-assets.mjs",
     "preview": "vite preview",
+    "pretest": "node scripts/generate-flag-assets.mjs",
     "test": "vitest run",
+    "pretest:watch": "node scripts/generate-flag-assets.mjs",
     "test:watch": "vitest",
+    "pretest:coverage": "node scripts/generate-flag-assets.mjs",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {

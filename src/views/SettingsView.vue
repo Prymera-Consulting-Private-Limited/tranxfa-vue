@@ -116,47 +116,47 @@ const passwordChanged = async () => {
             <h1 class="sr-only" id="section-2-title">Account Settings</h1>
             <div class="mb-6">
               <h2 class="text-base font-semibold text-gray-900">Account Settings</h2>
-              <p class="mt-1 text-sm text-gray-500">Manage your personal details, security settings, and connected devices all in one place.</p>
+              <p class="mt-1 text-sm/6 text-gray-500">Manage your personal details, security settings, and connected devices all in one place.</p>
             </div>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 lg:gap-8 max-w-2xl">
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <UserIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Personal Details</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">View and update your name, email address, and other personal information.</p>
-                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800">Modify &rarr;</a>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">View and update your name, email address, and other personal information.</p>
+                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">Modify &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <HomeIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Address</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Ensure your billing and shipping address details are up-to-date.</p>
-                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800">Modify &rarr;</a>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Ensure your billing and shipping address details are up-to-date.</p>
+                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">Modify &rarr;</a>
               </div>
               <div v-if="false" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <PhoneIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Mobile Number</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Update your phone number for account recovery and notifications.</p>
-                <a href="#" class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800">Update &rarr;</a>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Update your phone number for account recovery and notifications.</p>
+                <a href="#" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">Update &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <LockClosedIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Password</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Change your password to keep your account secure.</p>
-                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800">Change Password &rarr;</a>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Change your password to keep your account secure.</p>
+                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">Change Password &rarr;</a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <DevicePhoneMobileIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Devices</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">Manage devices that have access to your account.</p>
-                <router-link class="mt-auto text-sm inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'devices'}">Manage Devices &rarr;</router-link>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Manage devices that have access to your account.</p>
+                <router-link class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'devices'}">Manage Devices &rarr;</router-link>
               </div>
               <div v-if="walletStore.isAvailable" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <WalletIcon class="h-6 w-6 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">Wallet</h3>
-                <p v-if="walletStore.isEnrolled" class="mt-2 text-sm text-gray-500 flex-grow mb-3">Your wallet number is <span class="font-medium tracking-wider text-gray-900">{{ walletStore.subscription.data?.walletNumber }}</span>.<template v-if="walletStore.requiresReacceptance"> New terms are awaiting your acceptance.</template></p>
-                <p v-else class="mt-2 text-sm text-gray-500 flex-grow mb-3">Store money on your account and pay for transfers instantly.</p>
+                <p v-if="walletStore.isEnrolled" class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Your wallet number is <span class="font-medium tracking-wider text-gray-900">{{ walletStore.subscription.data?.walletNumber }}</span>.<template v-if="walletStore.requiresReacceptance"> New terms are awaiting your acceptance.</template></p>
+                <p v-else class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Store money on your account and pay for transfers instantly.</p>
                 <div class="mt-auto flex items-center gap-x-4">
-                  <router-link class="text-sm inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'wallet'}">{{ walletStore.isEnrolled ? 'Manage Wallet' : 'Get Started' }} &rarr;</router-link>
-                  <a v-if="walletStore.isEnrolled" href="javascript:" @click="closeWalletError = ''; isCloseWalletModalOpen = true" class="text-sm inline-block font-medium text-red-600 hover:text-red-500">Close Wallet</a>
+                  <router-link class="text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'wallet'}">{{ walletStore.isEnrolled ? 'Manage Wallet' : 'Get Started' }} &rarr;</router-link>
+                  <a v-if="walletStore.isEnrolled" href="javascript:" @click="closeWalletError = ''; isCloseWalletModalOpen = true" class="text-sm/6 inline-block font-medium text-danger-600 hover:text-danger-600">Close Wallet</a>
                 </div>
               </div>
             </div>
@@ -194,7 +194,7 @@ const passwordChanged = async () => {
                 <div class="rounded-t-md bg-brand-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
-                      <p class="text-xs text-brand-700 max-w-sm">Updating verified personal details may require re-verification of your identity to ensure accuracy and compliance. Please review changes carefully before proceeding.</p>
+                      <p class="text-xs/5 text-brand-700 max-w-sm">Updating verified personal details may require re-verification of your identity to ensure accuracy and compliance. Please review changes carefully before proceeding.</p>
                     </div>
                   </div>
                 </div>
@@ -225,7 +225,7 @@ const passwordChanged = async () => {
                 <div class="rounded-t-md bg-brand-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
-                      <p class="text-xs text-brand-700 max-w-sm">Updating your address may require re-verification of your address to ensure accuracy and compliance. Please review your changes carefully before proceeding.</p>
+                      <p class="text-xs/5 text-brand-700 max-w-sm">Updating your address may require re-verification of your address to ensure accuracy and compliance. Please review your changes carefully before proceeding.</p>
                     </div>
                   </div>
                 </div>
@@ -254,24 +254,24 @@ const passwordChanged = async () => {
             <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div class="sm:flex sm:items-start">
-                  <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <ExclamationTriangleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
+                  <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-danger-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <ExclamationTriangleIcon class="h-6 w-6 text-danger-600" aria-hidden="true" />
                   </div>
                   <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                     <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Close your wallet</DialogTitle>
                     <div class="mt-2">
-                      <DialogDescription class="text-sm text-gray-500">
+                      <DialogDescription class="text-sm/6 text-gray-500">
                         Closing is only possible on a zero balance — spend what's left or contact support to have it returned first. Your wallet number is retired permanently; if you enrol again later you'll receive a new one.
                       </DialogDescription>
                     </div>
-                    <p v-if="closeWalletError" class="mt-2 text-sm text-red-600">{{ closeWalletError }}</p>
+                    <p v-if="closeWalletError" class="mt-2 text-sm/6 text-danger-600">{{ closeWalletError }}</p>
                   </div>
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
-                  <button type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:mr-3 sm:w-auto cursor-pointer" @click="closeWallet" :disabled="isClosingWallet">
+                  <button type="button" class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer" @click="closeWallet" :disabled="isClosingWallet">
                     {{ isClosingWallet ? 'Closing...' : 'Close Wallet' }}
                   </button>
-                  <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="isCloseWalletModalOpen = false" :disabled="isClosingWallet">
+                  <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="isCloseWalletModalOpen = false" :disabled="isClosingWallet">
                     Keep Wallet
                   </button>
                 </div>

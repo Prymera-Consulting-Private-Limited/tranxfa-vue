@@ -128,22 +128,24 @@ const stepCommandExecuted = async (e) => {
 </script>
 <template>
   <nav class="flex items-center justify-between space-x-8 sm:hidden py-3 px-4" aria-label="Progress">
-    <p class="text-sm font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
+    <p class="text-sm/6 font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
     <ol role="list" class="flex items-center space-x-5">
       <li v-for="step in progress" :key="step.name">
-        <a v-if="step.status === 'complete'" @click="stepCommandExecuted(step.stepCommand)" class="block size-2.5 rounded-full bg-brand-600 hover:bg-brand-900">
+        <button v-if="step.status === 'complete'" type="button" @click="stepCommandExecuted(step.stepCommand)" class="group flex size-6 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
+          <span class="block size-2.5 rounded-full bg-brand-600 transition group-hover:bg-brand-900" aria-hidden="true" />
           <span class="sr-only">{{ step.name }}</span>
-        </a>
-        <a v-else-if="step.status === 'current'" class="relative flex items-center justify-center" aria-current="step">
+        </button>
+        <span v-else-if="step.status === 'current'" class="relative flex size-6 items-center justify-center" aria-current="step">
           <span class="absolute flex size-5 p-px" aria-hidden="true">
             <span class="size-full rounded-full bg-brand-200" />
           </span>
           <span class="relative block size-2.5 rounded-full bg-brand-600" aria-hidden="true" />
           <span class="sr-only">{{ step.name }}</span>
-        </a>
-        <a v-else class="block size-2.5 rounded-full bg-gray-200 hover:bg-gray-400">
+        </span>
+        <span v-else class="flex size-6 items-center justify-center">
+          <span class="block size-2.5 rounded-full bg-gray-200" aria-hidden="true" />
           <span class="sr-only">{{ step.name }}</span>
-        </a>
+        </span>
       </li>
     </ol>
   </nav>
@@ -161,8 +163,8 @@ const stepCommandExecuted = async (e) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
-                <p class="mt-1 text-sm text-gray-500"></p>
+                <div class="text-sm/6 font-medium mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="mt-1 text-sm/6 text-gray-500"></p>
               </div>
             </div>
           </template>
@@ -175,8 +177,8 @@ const stepCommandExecuted = async (e) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col">
-                <div class="text-sm font-medium text-brand-700 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
-                <p class="text-sm text-gray-500"></p>
+                <div class="text-sm/6 font-medium text-brand-700 mt-2">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="text-sm/6 text-gray-500"></p>
               </div>
             </div>
           </template>
@@ -189,8 +191,8 @@ const stepCommandExecuted = async (e) => {
                 </div>
               </div>
               <div class="ml-4 flex min-w-0 flex-col mt-2">
-                <div class="text-sm font-medium text-gray-500">{{stepIdx + 1}}. {{ step.name }}</div>
-                <p class="text-sm text-gray-500"></p>
+                <div class="text-sm/6 font-medium text-gray-500">{{stepIdx + 1}}. {{ step.name }}</div>
+                <p class="text-sm/6 text-gray-500"></p>
               </div>
             </div>
           </template>
