@@ -193,7 +193,12 @@ describe('status text contrast', () => {
 });
 
 describe('type scale and target size', () => {
-    const EL = /<(?:button|a|RouterLink|router-link)\b[^>]*?class="([^"]*)"/gis;
+    // The static class attribute specifically. Without the lookbehind this also
+    // matches a `:class` binding, and since bindings usually come first, the
+    // buttons that have one were never checked at all - which is how the
+    // calculator's submit button kept rounded-md through the pass that was
+    // supposed to standardise every radius.
+    const EL = /<(?:button|a|RouterLink|router-link)\b[^>]*?(?<![:\w-])class="([^"]*)"/gis;
 
     // The house style is 14px on 24 and 12px on 20. Tailwind's bare text-sm and
     // text-xs are 20 and 16, so a bare one is not "the default", it is a
