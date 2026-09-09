@@ -75,7 +75,7 @@ const processFile = async () => {
   file.status = "uploading";
 
   await s3Utils.uploadToPreSignedS3Url(response.data.token, file.file).then(() => {
-    file.path = new URL(response.data.token).pathname.split("/").slice(2).join("/");
+    file.path = response.data.object_key ?? new URL(response.data.token).pathname.split("/").slice(2).join("/");
     file.status = "completed";
   }).catch(() => {
     error.value = "Something went wrong. Please try again!";

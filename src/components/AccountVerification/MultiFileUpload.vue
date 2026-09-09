@@ -77,7 +77,7 @@ const uploadFiles = async () => {
     getPreSignedUrl(fileObj.file).then((preSignedUrl) => {
       fileObj.status = 'uploading';
       uploadToS3(preSignedUrl, fileObj).then(() => {
-        fileObj.path = new URL(preSignedUrl).pathname.split('/').slice(2).join('/');
+        fileObj.path = objectKeyFrom(tokenResponses.get(preSignedUrl), preSignedUrl);
         fileObj.status = 'completed';
       }).catch(() => {
         fileObj.status = 'failed';
@@ -88,10 +88,19 @@ const uploadFiles = async () => {
   }
 };
 
+// The object key used to be derived from the URL's path (everything after the
+// first two segments), which depends on the bucket's URL shape rather than on
+// the key layout. The API can send `object_key` beside `token`; when it does,
+// that wins.
+const objectKeyFrom = (response, url) => response.data.object_key ?? new URL(url).pathname.split('/').slice(2).join('/');
+
+const tokenResponses = new Map();
+
 const getPreSignedUrl = async (file) => {
   let accessToken = null;
   await customerUtils.getAccountVerificationToken(props.documentCategory, props.documentType, file).then((response) => {
     accessToken = response.data.token;
+    tokenResponses.set(accessToken, response);
   }).catch((e) => {
     console.error(e);
     throw e;

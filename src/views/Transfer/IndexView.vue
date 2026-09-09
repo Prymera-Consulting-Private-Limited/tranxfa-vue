@@ -1,4 +1,5 @@
 <script setup>
+import {fixFor} from "@/composables/verification_routes.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
@@ -191,6 +192,17 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "duplicate_transaction" || error.response.data.type === "active_transfer_disable_rule") {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message;
+      } else if (error.response.data.type === "missing_recipient") {
+        // The quote has no recipient any more (deleted, or a stale tab).
+        isStepProcessing.value = false;
+        preconditionFailedMessage.value = error.response.data.message || 'Please choose who to send this transfer to.';
+        await send({ type: 'SELECT_RECIPIENT' });
+      } else if (fixFor(error.response.data.type, null)) {
+        // Something on the profile has to be finished first: a mobile number
+        // to verify, an identity form to complete. Send them there; the
+        // onboarding flow brings them back to this transfer.
+        isStepProcessing.value = false;
+        await router.push(fixFor(error.response.data.type, null).route);
       } else {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message || 'We could not confirm this transfer. Please try again.';

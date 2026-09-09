@@ -1,4 +1,6 @@
 <script setup>
+import {fixForError} from "@/composables/verification_routes.js";
+import router from "@/router/index.js";
 import {ExclamationTriangleIcon, IdentificationIcon} from "@heroicons/vue/24/outline";
 import DocumentType from "@/models/document_type.js";
 import {ref} from "vue";
@@ -40,6 +42,7 @@ const sdkRejectionReason = ref('')
 
 async function openAccountVerificationModal () {
   sdkErrorMessage.value = '';
+  sdkFix.value = null;
   sdkRejected.value = false;
   sdkRejectionReason.value = '';
   openSdk.value = true;
@@ -58,7 +61,18 @@ async function openAccountVerificationModal () {
 function sdkFailed(error) {
   sdkErrorMessage.value = getCustomerMessage(error)
       || 'We could not start your verification. Please try again.';
+  // The token endpoint answers 412 when the profile is missing something the
+  // check needs (identity details, an address). That is not a retry.
+  sdkFix.value = fixForError(error, router.currentRoute?.value?.fullPath ?? null);
   isSdkInitialized.value = false;
+}
+
+const sdkFix = ref(null);
+
+function goToFix() {
+  const fix = sdkFix.value;
+  closeSdk();
+  router.push(fix.route);
 }
 
 /**
@@ -87,6 +101,7 @@ async function sdkApplicantRejected(payload) {
 function retrySdk() {
   isSdkInitialized.value = false;
   sdkErrorMessage.value = '';
+  sdkFix.value = null;
   sdkRejected.value = false;
   sdkRejectionReason.value = '';
 }
@@ -104,6 +119,7 @@ async function closeSdk() {
   openSdk.value = false;
   isSdkInitialized.value = false;
   sdkErrorMessage.value = '';
+  sdkFix.value = null;
   sdkRejected.value = false;
   sdkRejectionReason.value = '';
 }
@@ -149,7 +165,8 @@ async function closeSdk() {
                 <h3 class="mt-4 text-sm/6 font-medium text-gray-900">Verification could not start</h3>
                 <p class="mt-2 text-sm/6 text-gray-500">{{ sdkErrorMessage }}</p>
                 <div class="mt-6 flex justify-center gap-3">
-                  <button v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try again</button>
+                  <button v-if="sdkFix" v-on:click="goToFix" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">{{ sdkFix.label }}</button>
+                  <button v-else v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try again</button>
                   <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm/6 font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
                 </div>
               </div>
