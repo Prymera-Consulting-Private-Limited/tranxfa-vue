@@ -6,7 +6,7 @@ import {useCustomerStore} from "@/stores/customer.js";
 import {installFakeEcho, modalStubs} from "./helpers.js";
 
 vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn()}}));
-vi.mock('@/router/index.js', () => ({default: {push: vi.fn()}}));
+vi.mock('@/router/index.js', () => ({default: {push: vi.fn(), currentRoute: {value: {fullPath: '/transfer/quote-1'}}}}));
 vi.mock('@/components/CustomerLayout.vue', () => ({default: {name: 'CustomerLayout', template: '<div><slot /></div>'}}));
 
 // The wizard's navigation machine calls useCustomerStore() at module scope,
@@ -80,6 +80,35 @@ describe('Transfer wizard confirm refusals', () => {
         await wrapper.vm.confirmQuote();
         expect(wrapper.vm.isStepProcessing).toBe(false);
         expect(wrapper.vm.preconditionFailedMessage).toBe('You already have this transfer in flight.');
+    });
+
+    // Two of the sixteen 412 types the back office listed can only be cleared
+    // by finishing the profile. They used to read as a refusal.
+    it('sends a customer with an unverified mobile number to onboarding', async () => {
+        const router = (await import('@/router/index.js')).default;
+        const wrapper = await mountWizard();
+        wrapper.vm.isStepProcessing = true;
+        axios.post.mockRejectedValue({response: {status: 412, data: {type: 'unverified_customer_mobile_number', message: 'Verify your mobile number first.'}}});
+        await wrapper.vm.confirmQuote();
+        expect(wrapper.vm.isStepProcessing).toBe(false);
+        expect(router.push).toHaveBeenCalledWith(expect.objectContaining({name: 'onboardingWorkflow'}));
+    });
+
+    it('sends a customer with an incomplete identity to onboarding', async () => {
+        const router = (await import('@/router/index.js')).default;
+        const wrapper = await mountWizard();
+        axios.post.mockRejectedValue({response: {status: 412, data: {type: 'incomplete_customer_identity', message: 'Complete your details.'}}});
+        await wrapper.vm.confirmQuote();
+        expect(router.push).toHaveBeenCalledWith(expect.objectContaining({name: 'onboardingWorkflow'}));
+    });
+
+    it('returns to the recipient step when the quote has no recipient', async () => {
+        const wrapper = await mountWizard();
+        wrapper.vm.isStepProcessing = true;
+        axios.post.mockRejectedValue({response: {status: 412, data: {type: 'missing_recipient', message: 'Choose a recipient.'}}});
+        await wrapper.vm.confirmQuote();
+        expect(wrapper.vm.isStepProcessing).toBe(false);
+        expect(wrapper.vm.preconditionFailedMessage).toBe('Choose a recipient.');
     });
 
     it('collects field errors for a 422 and stops processing', async () => {

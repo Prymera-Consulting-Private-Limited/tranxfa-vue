@@ -88,6 +88,17 @@ onMounted(async () => {
                                   <a class="text-danger-700 font-semibold">Failed</a>
                                 </dd>
                               </template>
+                              <!-- A status this app does not know. The API filters the ones it can produce
+                                   and we cannot render, but a blank card is the failure nobody reports. -->
+                              <template v-else>
+                                <dt class="sr-only">Information</dt>
+                                <dd class="mt-3 text-sm/6 text-gray-700">
+                                  <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is marked <span class="font-semibold">{{ document.statusTitle || document.statusCode }}</span>.</p>
+                                </dd>
+                                <dd class="mt-3 text-sm/6 text-gray-700">
+                                  If you are not sure what this means, <router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">contact support</router-link> and quote the document name.
+                                </dd>
+                              </template>
                             </dl>
                           </div>
                         </li>
