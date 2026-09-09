@@ -6,7 +6,7 @@ import PaymentTransactionState from "@/models/payment_transaction_state.js";
 /**
  * A Transaction instance shaped the way the payment components read it.
  */
-export function makeTransaction({stateCode, paymentUrl = null, providerCode = 'FINCODE', clientPaymentAccount = null, paymentTerms = null, expiresAt = null} = {}) {
+export function makeTransaction({stateCode, paymentUrl = null, providerCode = 'FINCODE', clientPaymentAccount = null, paymentTerms = null, expiresAt = null, awaitingConfirmation = false} = {}) {
     const transaction = new Transaction();
     transaction.id = 'trx-1';
 
@@ -20,6 +20,7 @@ export function makeTransaction({stateCode, paymentUrl = null, providerCode = 'F
     payment.clientPaymentAccount = clientPaymentAccount;
     payment.paymentTerms = paymentTerms;
     payment.expiresAt = expiresAt;
+    payment.awaitingConfirmation = awaitingConfirmation;
     transaction.payment = payment;
 
     return transaction;
@@ -28,7 +29,7 @@ export function makeTransaction({stateCode, paymentUrl = null, providerCode = 'F
 /**
  * An API-shaped payload accepted by Transaction.getInstance.
  */
-export function makeTransactionPayload({stateCode = 'PENDING', paymentUrl = null, providerCode = 'FINCODE'} = {}) {
+export function makeTransactionPayload({stateCode = 'PENDING', paymentUrl = null, providerCode = 'FINCODE', awaitingConfirmation = false} = {}) {
     return {
         id: 'trx-1',
         transaction_number: 1001,
@@ -53,6 +54,7 @@ export function makeTransactionPayload({stateCode = 'PENDING', paymentUrl = null
             total_payment_amount_formatted: '100.00',
             total_payment_amount_currency_prefixed: 'AUD 100.00',
             customer_confirmed_payment: false,
+            awaiting_confirmation: awaitingConfirmation,
         },
     };
 }

@@ -89,6 +89,18 @@ class PaymentTransaction {
      */
     state = null;
 
+    /**
+     * Nothing for the customer to do: the provider will settle this payment
+     * on its own (Belmoney's FINISHED and PENDING return shapes). PENDING with
+     * no payment_url is healthy while this is true. Absent means false.
+     *
+     * The API also carries a failure_reason on failed payments. It is written
+     * for operators and names processors, so it is deliberately not mapped
+     * here: the failure screens use our own wording.
+     * @type {Boolean}
+     */
+    awaitingConfirmation = false;
+
     static getInstance(data) {
         const paymentTransaction = new PaymentTransaction();
         paymentTransaction.id = data.id;
@@ -108,6 +120,7 @@ class PaymentTransaction {
         paymentTransaction.createdAt = data.created_at;
         paymentTransaction.updatedAt = data.updated_at;
         paymentTransaction.customerConfirmedPayment = data.customer_confirmed_payment;
+        paymentTransaction.awaitingConfirmation = data.awaiting_confirmation === true;
         if (data.state) {
             paymentTransaction.state = PaymentTransactionState.getInstance(data.state);
         }

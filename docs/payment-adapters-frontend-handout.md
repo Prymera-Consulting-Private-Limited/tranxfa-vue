@@ -55,9 +55,12 @@ The `payment` object on the transaction. Field names are the JSON keys the front
 | `payment_terms` | Plain text, rendered verbatim with line breaks kept. Never HTML |
 | `total_payment_amount`, `_formatted`, `_currency_prefixed` | Amount to pay. `_currency_prefixed` is what the customer sees |
 | `customer_confirmed_payment` | Hides the "I've paid" button once true |
+| `awaiting_confirmation` | Boolean. Nothing for the customer to do; the provider settles the payment on its own. `PENDING` with no `payment_url` is healthy while this is true, and the "taking longer than usual" notice stays quiet. Absent means false |
 | `payment_account` | Receipt line on the transaction page (`institution`, `accountNumber`) |
 
 Two things the frontend never does: it never computes an amount, and it never decides that a payment is paid. Both come from the API.
+
+One field the frontend deliberately does not read: `failure_reason`. It exists on every failed payment but is written for operators and names processors, so the failure screens use the frontend's own wording. Customer-facing failure text is a separate piece of work on the API side, provider by provider.
 
 ## 4. What the frontend listens to
 
@@ -94,6 +97,7 @@ Anything else renders nothing. A new state code needs a frontend change before i
 | `PAY360`, `PAY-CROSS`, `FINCODE`, `CINET_PAY` | Pay360, PayCross, Fincode, CinetPay | Hosted redirect | `payment_url`; `expires_at` and `payment_terms` optional; return to `/payment/cb/{transactionId}` |
 | `VOLUME-PAYMENTS` | Volume | Embedded SDK (open banking) | `total_payment_amount`, `id` as the merchant payment id, the transaction number as the reference. Needs `VITE_VOLUME_PAYMENT_ENVIRONMENT` and `VITE_VOLUME_PAYMENT_MERCHANT_ID` at build time |
 | `WALLET` | WalletPayment | Internal | A `wallet_otp` at confirm time; the payment settles server-side |
+| `BELMONEY-CARD` | BelmoneyCard (tranxfa only) | Hosted card page, same tab, with 3-D Secure | `payment_url` with `PENDING` for the redirect shape; `awaiting_confirmation` for the two shapes that need nothing from the customer; a pre-flight address check that fails `INITIALIZED -> FAILED` with no redirect; `expires_at` (one day, then `CANCELLED`); no payment-sent, no extra fields, no build keys, no CSP change |
 
 Note the code spelling: every code uses hyphens except `CINET_PAY`, which uses an underscore. The frontend matches the string exactly.
 
@@ -156,7 +160,7 @@ The retry response replaces the `payment` object on the page in full, so it must
 8. After `payment-sent`, `customer_confirmed_payment` is true on the next read.
 9. The customer's final landing page after a hosted payment is `{frontend origin}/payment/cb/{transactionId}`, reached through the API's transport host (section 1). Nothing in that URL is read.
 10. Retry returns the whole new payment, with `payment_url` null for hosted providers until the queued provider call fills it, and `422` errors keyed by `payment_data_requirements[].attribute`.
-11. A hosted payment that reaches `PENDING` never stays without `payment_url` for long. One adapter today drops the key when the provider omits it; the page then shows "taking longer than usual" after a minute with a way back to the transfer, but it cannot complete the payment.
+11. A hosted payment that reaches `PENDING` without `payment_url` either carries `awaiting_confirmation: true`, meaning the provider will settle it, or gets its URL within seconds. Anything else is stuck: the page shows "taking longer than usual" after a minute with a way back to the transfer, but it cannot complete the payment.
 12. Every `payment_provider.code` the API can send for this app has a component (section 6). A code without one now renders "This way to pay isn't available in the app yet" rather than a blank page; the back office has adapters with no screen here (BelmoneyCard, CheckoutCom, Cybrid, Leatherback, Volt as of September 2026).
 
 ## 10. What to hand the frontend for a new provider
@@ -195,3 +199,4 @@ Write the copy items in words a customer would use: "code" not OTP, "transfer" n
 - The retry endpoint returned a payment without its account details, reference, extra fields, terms or account. Fixed on the API on 10 September 2026 after this handout was audited.
 - A provider code with no component rendered a blank payment page. The page now says the method is not available in the app.
 - After a retry the page kept watching the old payment's channel with polling stopped, so a hosted retry never got its Pay button. The provider component now mounts afresh for the new payment.
+- Belmoney Card can take the card without a redirect. Without `awaiting_confirmation` that healthy state was indistinguishable from a stuck one and would have shown the "taking longer than usual" notice on every such payment.
