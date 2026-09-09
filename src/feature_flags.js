@@ -36,3 +36,25 @@ export function flag(value, fallback) {
 export function travelEnabled() {
     return flag(import.meta.env.VITE_TRAVEL_ENABLED, true);
 }
+
+/**
+ * Which Volume (open banking) environment to talk to.
+ *
+ * The transfer flow used to hardcode SANDBOX. A production build that ships
+ * that takes no real money and the transfer sits waiting, so this is the one
+ * flag with no production fallback: a production build with the variable unset
+ * gets null, and the payment components render an unavailable state instead of
+ * guessing. Development builds fall back to SANDBOX so a local checkout works.
+ *
+ * @param {boolean} isProductionBuild defaults to Vite's PROD
+ * @returns {'PRODUCTION'|'SANDBOX'|null}
+ */
+export function volumePaymentEnvironment(isProductionBuild = import.meta.env.PROD) {
+    const raw = String(import.meta.env.VITE_VOLUME_PAYMENT_ENVIRONMENT ?? '').trim().toUpperCase();
+
+    if (raw === 'PRODUCTION' || raw === 'SANDBOX') {
+        return raw;
+    }
+
+    return isProductionBuild ? null : 'SANDBOX';
+}

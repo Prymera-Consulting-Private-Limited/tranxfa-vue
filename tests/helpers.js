@@ -63,13 +63,21 @@ export function makeTransactionPayload({stateCode = 'PENDING', paymentUrl = null
  */
 export function installFakeEcho() {
     const listeners = {};
+    const channel = (name) => ({
+        listen(event, callback) {
+            listeners[`${name}:${event}`] = callback;
+            return this;
+        },
+        stopListening(event) {
+            delete listeners[`${name}:${event}`];
+            return this;
+        },
+    });
     globalThis.Echo = {
-        channel: (name) => ({
-            listen: (event, callback) => {
-                listeners[`${name}:${event}`] = callback;
-            },
-        }),
+        channel: vi.fn(channel),
+        private: vi.fn(channel),
         leaveChannel: vi.fn(),
+        leave: vi.fn(),
     };
     return listeners;
 }

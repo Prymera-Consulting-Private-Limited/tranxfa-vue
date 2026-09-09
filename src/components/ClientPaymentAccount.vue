@@ -20,11 +20,11 @@ defineProps({
           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
         </button>
       </div>
-      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">{{ accountAttribute.key }} has been copied!</p>
+      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Copied.</p>
     </UseClipboard>
   </div>
   <div class="text-left my-3">
-    <label :for="`payment-reference`" class="block text-sm/6 font-medium text-gray-900">Payment Reference</label>
+    <label :for="`payment-reference`" class="block text-sm/6 font-medium text-gray-900">Payment reference</label>
     <UseClipboard v-slot="{ copy, copied }" :source="account.paymentReference">
       <div class="mt-2 flex">
         <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
@@ -34,7 +34,7 @@ defineProps({
           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
         </button>
       </div>
-      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Payment Reference has been copied!</p>
+      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Copied.</p>
     </UseClipboard>
   </div>
 </template>

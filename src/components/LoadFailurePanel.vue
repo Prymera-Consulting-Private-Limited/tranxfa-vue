@@ -18,7 +18,10 @@ defineProps({
   message: {type: String, default: null},
   backTo: {type: Object, default: null},
   backLabel: {type: String, default: 'Go back'},
+  // When the failure was a request that can simply be sent again.
+  retryLabel: {type: String, default: null},
 })
+defineEmits(['retry'])
 </script>
 
 <template>
@@ -28,9 +31,20 @@ defineProps({
     </div>
     <h1 class="mt-6 text-base font-semibold text-gray-900">{{ title }}</h1>
     <p v-if="message" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ message }}</p>
+    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">
+      Nothing on your account has changed. Please try again.
+    </p>
     <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">
       It may have been removed, or the link may be out of date.
     </p>
+    <button
+      v-if="retryLabel"
+      type="button"
+      @click="$emit('retry')"
+      class="mt-6 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-medium text-white transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+    >
+      {{ retryLabel }}
+    </button>
     <RouterLink
       v-if="backTo"
       :to="backTo"

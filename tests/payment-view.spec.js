@@ -76,12 +76,52 @@ describe('PaymentView', () => {
         expect(wrapper.vm.paymentAttempt).toBe(2);
     });
 
+    // The back office answered the handout: a retry now returns the whole new
+    // payment, but payment_url is always null on that response for hosted
+    // providers - the provider call runs on a queue after the answer. The page
+    // must therefore watch the NEW payment (its channel, its polling), which it
+    // only does if the provider component mounts afresh for the new id.
+    it('mounts the provider afresh for the new payment after a retry', async () => {
+        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'FINCODE', paymentUrl: 'https://pay/1'})});
+        const wrapper = mountView();
+        await flushPromises();
+        const before = wrapper.findComponent({name: 'Fincode'}).vm.$.uid;
+
+        const fresh = makeTransactionPayload({providerCode: 'FINCODE'}).payment;
+        fresh.id = 'pay-2';
+        fresh.payment_url = null;
+        axios.post.mockResolvedValue({data: fresh});
+        await wrapper.vm.retryPayment();
+        await flushPromises();
+
+        const after = wrapper.findComponent({name: 'Fincode'}).vm.$.uid;
+        expect(after).not.toBe(before);
+        expect(wrapper.vm.transaction.payment.id).toBe('pay-2');
+    });
+
+    // Five back-office adapters have no component here. A code with no
+    // component rendered nothing at all, which is hard to notice and worse
+    // to explain.
+    it('says so when the provider has no screen in this app', async () => {
+        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'BELMONEY-CARD'})});
+        const wrapper = mountView();
+        await flushPromises();
+
+        expect(wrapper.text()).toContain("This way to pay isn't available in the app yet");
+        expect(wrapper.text()).toContain('Nothing has been charged');
+        expect(wrapper.text()).toContain('#1001');
+    });
+
     it('routes back to the transaction once the attempt cap is exceeded', async () => {
+        vi.useFakeTimers();
         axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'FINCODE'})});
         const wrapper = mountView();
         await flushPromises();
         wrapper.vm.paymentAttempt = 4;
         await flushPromises();
+        expect(wrapper.text()).toContain("We've paused this transfer");
+        await vi.advanceTimersByTimeAsync(8000);
         expect(router.push).toHaveBeenCalledWith({name: 'viewTransaction', params: {transactionId: 'trx-1'}});
+        vi.useRealTimers();
     });
 });

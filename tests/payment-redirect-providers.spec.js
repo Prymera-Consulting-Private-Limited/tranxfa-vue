@@ -89,24 +89,24 @@ describe.each([
     it('shows the expiry face when the payment TIMED_OUT', () => {
         const {wrapper} = mountWith({stateCode: 'TIMED-OUT'});
         expect(wrapper.text()).toContain('This payment has expired');
-        expect(wrapper.text()).toContain('View Transaction');
+        expect(wrapper.text()).toContain('View transfer');
     });
 
     it('shows the cancelled face when the payment is CANCELLED', () => {
         const {wrapper} = mountWith({stateCode: 'CANCELLED'});
         expect(wrapper.text()).toContain('This payment was cancelled');
-        expect(wrapper.text()).toContain('View Transaction');
+        expect(wrapper.text()).toContain('View transfer');
     });
 
     it('shows the refunded face when the payment is REFUNDED', () => {
         const {wrapper} = mountWith({stateCode: 'REFUNDED'});
-        expect(wrapper.text()).toContain('Payment Refunded');
-        expect(wrapper.text()).toContain('View Transaction');
+        expect(wrapper.text()).toContain('Payment refunded');
+        expect(wrapper.text()).toContain('View transfer');
     });
 
     it('shows the refunded face when the payment is PART-REFUNDED', () => {
         const {wrapper} = mountWith({stateCode: 'PART-REFUNDED'});
-        expect(wrapper.text()).toContain('Payment Refunded');
+        expect(wrapper.text()).toContain('Payment refunded');
     });
 
     it('does not schedule a poll for a terminal payment', () => {
@@ -146,7 +146,7 @@ describe.each([
 
     it('routes to the transaction after an AUTHORIZED websocket event', async () => {
         const {wrapper} = mountWith({stateCode: 'REDIRECTED'});
-        expect(wrapper.text()).toContain('Awaiting Payment Update');
+        expect(wrapper.text()).toContain("We're watching for your payment");
         listeners['client-payment.pay-1:PaymentTransactionStateUpdated']({
             state: {id: 'st-2', code: 'AUTHORIZED', color_scheme: 'green'},
             shared_reference: 'REF-2',
