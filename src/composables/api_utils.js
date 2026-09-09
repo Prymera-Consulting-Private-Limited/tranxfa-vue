@@ -81,3 +81,80 @@ export function getCustomerMessage(error) {
 
     return FRAMEWORK_MESSAGE.test(data.message) ? null : data.message;
 }
+
+/**
+ * The messages in a Laravel validation error bag that do not belong to a
+ * field with its own place on screen.
+ *
+ * @param {object|Array|null} errors `response.data.errors`
+ * @param {string} fieldPrefix keys starting with this are rendered elsewhere
+ * @returns {string[]}
+ */
+export function fieldlessErrors(errors, fieldPrefix) {
+    if (! errors || typeof errors !== 'object') {
+        return [];
+    }
+
+    return Object.entries(errors)
+        .filter(([key]) => ! key.startsWith(fieldPrefix))
+        .flatMap(([, messages]) => (Array.isArray(messages) ? messages : [messages]))
+        .filter(message => typeof message === 'string' && message.length > 0);
+}
+
+/**
+ * Logs a failed request without its body.
+ *
+ * `console.error(e)` on an axios error prints the whole error, and
+ * `e.config.data` is the serialised request: on the sign-in, sign-up and OTP
+ * screens that is the customer's password or code, kept in the console for
+ * as long as it is open.
+ *
+ * @param {*} error
+ * @param {string} context
+ */
+export function logRequestFailure(error, context) {
+    if (! error?.response && ! error?.request) {
+        reportUnexpectedError(error, context);
+        return;
+    }
+
+    console.error(`[${context}] ${error.config?.method?.toUpperCase() ?? ''} ${error.config?.url ?? ''} -> ${error.response?.status ?? 'no response'}`);
+}
+
+/**
+ * A sentence the customer can act on when a request fails.
+ *
+ * Every silent `.catch(console.error)` in the audit had the same shape: the
+ * button re-enabled and nothing was said. This turns the error into one line
+ * for the screen. The fallback is the caller's own wording for "it did not
+ * work" and should say what did not happen and whether money moved.
+ *
+ * @param {*} error
+ * @param {string} fallback
+ * @returns {string}
+ */
+export function failureMessage(error, fallback) {
+    if (error?.request && ! error?.response) {
+        return "We couldn't connect. Check your internet connection and try again.";
+    }
+
+    const status = error?.response?.status;
+
+    if (status === 429) {
+        return 'Too many tries. Please wait a minute and try again.';
+    }
+
+    if (status === 401 || status === 419) {
+        return 'Your session has ended. Please sign in again.';
+    }
+
+    if (status === 422) {
+        return getCustomerMessage(error) ?? fieldlessErrors(error.response?.data?.errors, ' ')[0] ?? fallback;
+    }
+
+    if (status >= 500) {
+        return fallback;
+    }
+
+    return getCustomerMessage(error) ?? fallback;
+}
