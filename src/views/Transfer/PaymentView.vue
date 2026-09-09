@@ -17,6 +17,7 @@ import Pay360 from "@/components/Payment/Pay360.vue";
 import PayCross from "@/components/Payment/PayCross.vue";
 import Fincode from "@/components/Payment/Fincode.vue";
 import CinetPay from "@/components/Payment/CinetPay.vue";
+import BelmoneyCard from "@/components/Payment/BelmoneyCard.vue";
 import WalletPayment from "@/components/Payment/Wallet.vue";
 import ModalCloseButton from "@/components/ModalCloseButton.vue";
 
@@ -34,7 +35,7 @@ const transaction = ref(null);
 // Every code with a component below. The back office has adapters the app has
 // no screen for (BelmoneyCard, CheckoutCom, Cybrid, Leatherback, Volt as of
 // September 2026); one of those used to render a blank page.
-const KNOWN_PROVIDER_CODES = new Set(['MANUAL-PAYMENT', 'PAGA', 'MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'WALLET']);
+const KNOWN_PROVIDER_CODES = new Set(['MANUAL-PAYMENT', 'PAGA', 'MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'WALLET', 'BELMONEY-CARD']);
 const isKnownProvider = computed(() => KNOWN_PROVIDER_CODES.has(transaction.value?.payment?.paymentProvider?.code));
 
 const isLoading = ref(true);
@@ -165,6 +166,7 @@ function closePaymentModal() {
                     <PayCross :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'PAY-CROSS'" v-bind:transaction="transaction"  />
                     <Fincode :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'FINCODE'" v-bind:transaction="transaction"  />
                     <CinetPay :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'CINET_PAY'" v-bind:transaction="transaction"  />
+                    <BelmoneyCard :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'BELMONEY-CARD'" v-bind:transaction="transaction"  />
                     <WalletPayment :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'WALLET'" v-bind:transaction="transaction"  />
                   </div>
                   <div v-else-if="loadFailed" class="text-center">

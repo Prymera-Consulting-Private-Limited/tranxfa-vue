@@ -94,6 +94,9 @@ export function usePaymentWatch(transaction, {isReady, isFinal, intervalMs = 500
         if ('payment_url' in event) {
             current.paymentUrl = event.payment_url;
         }
+        if ('awaiting_confirmation' in event) {
+            current.awaitingConfirmation = event.awaiting_confirmation === true;
+        }
 
         revision++;
         if (settled()) {

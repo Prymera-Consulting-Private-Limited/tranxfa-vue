@@ -103,7 +103,7 @@ describe('PaymentView', () => {
     // component rendered nothing at all, which is hard to notice and worse
     // to explain.
     it('says so when the provider has no screen in this app', async () => {
-        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'BELMONEY-CARD'})});
+        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'CHECKOUT-COM'})});
         const wrapper = mountView();
         await flushPromises();
 
