@@ -104,7 +104,7 @@ function updateIsdCode(updated) {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/login.webp" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/bg.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
@@ -168,7 +168,7 @@ function updateIsdCode(updated) {
               </template>
               <template v-else-if="authChannel === 'EMAIL'">
                 <div>
-                  <label for="email" class="block text-brand-700 mb-2 font-medium">Contraseña</label>
+                  <label for="email" class="block text-brand-700 mb-2 font-medium">Correo electrónico</label>
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
                     :class="emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300'"

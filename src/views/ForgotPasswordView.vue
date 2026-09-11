@@ -71,7 +71,7 @@ async function requestResetPassword() {
               </div>
 
               <div>
-                <label for="email" class="mb-2 block font-medium text-brand-700">Email</label>
+                <label for="email" class="mb-2 block font-medium text-brand-700">Correo electrónico</label>
                 <div
                   class="relative rounded-2xl border bg-white transition-all duration-200"
                   :class="emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300'"

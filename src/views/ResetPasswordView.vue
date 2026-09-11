@@ -126,7 +126,7 @@ const totalPasswordRulesCount = computed(() => validatedPasswordPolicies.rules.l
 
 const passwordRequirementsSummary = computed(() => {
   if (!form.password) {
-    return 'View password requirements';
+    return 'Ver requisitos de contraseña';
   }
   if (allPasswordRulesMet.value) {
     return 'All requirements met';
