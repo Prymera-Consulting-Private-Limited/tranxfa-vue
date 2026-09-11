@@ -79,6 +79,13 @@ reviewItems.push({
   label: 'Exchange Rate',
   value: props.quote.exchangeRateFormatted,
 });
+if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCouponFormatted) {
+  reviewItems.push({
+    icon: PercentBadgeIcon,
+    label: `Rate before coupon ${props.quote.coupon.code}`,
+    value: props.quote.coupon.exchangeRateBeforeCouponFormatted,
+  });
+}
 reviewItems.push({
   icon: WalletIcon,
   label: 'Recipient Gets',
@@ -98,6 +105,13 @@ reviewItems.push({
   label: 'Fees',
   value: props.quote.baseFeesCurrencyPrefixed,
 });
+if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
+  reviewItems.push({
+    icon: PercentBadgeIcon,
+    label: `Coupon ${props.quote.coupon.code}`,
+    value: `- ${props.quote.coupon.discountAmountCurrencyPrefixed}`,
+  });
+}
 reviewItems.push({
   icon: CalculatorIcon,
   label: 'Subtotal',
