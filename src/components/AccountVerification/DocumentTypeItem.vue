@@ -142,11 +142,11 @@ async function closeSdk() {
     </dl>
   </div>
   <TransitionRoot as="div" :show="openSdk">
-    <Dialog class="relative z-10" @close="closeSdk">
+    <Dialog class="relative z-50" @close="closeSdk">
       <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
       </TransitionChild>
-      <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+      <div class="fixed inset-0 z-50 w-screen overflow-y-auto">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
           <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
             <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all min-w-sm sm:my-8 sm:w-full lg:min-w-md sm:max-w-sm lg:max-w-md lg:w-md">
@@ -187,6 +187,7 @@ async function closeSdk() {
                 <UpPass
                   v-if="documentType.api === 'UPPASS'"
                   v-on:sdkInitialized="isSdkInitialized = true"
+                  v-on:sdkCancelled="closeSdk"
                   v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                   v-on:sdkError="sdkFailed"
                   v-on:sdkApplicantRejected="sdkApplicantRejected"
@@ -206,6 +207,7 @@ async function closeSdk() {
                 <Shufti
                     v-if="documentType.api === 'SHUFTI'"
                     v-on:sdkInitialized="isSdkInitialized = true"
+                    v-on:sdkCancelled="closeSdk"
                     v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
                     v-on:sdkError="sdkFailed"
                     v-on:sdkApplicantRejected="sdkApplicantRejected"

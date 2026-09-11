@@ -1,10 +1,14 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import {acceptFor, IMAGE_TYPES, validateUpload} from "@/composables/upload_rules.js";
 import {reactive, ref} from "vue";
 import { IdentificationIcon, DocumentTextIcon } from "@heroicons/vue/24/outline";
 import { useAwsS3Utils } from "@/composables/aws_s3_utils.js";
 import { useCustomerUtils } from "@/composables/customer_utils.js";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
+
+const accept = acceptFor(IMAGE_TYPES);
 
 const customerUtils = useCustomerUtils();
 const s3Utils = useAwsS3Utils();
@@ -55,8 +59,9 @@ const handleDrop = (event) => {
 const emit = defineEmits(["fileSelected"]);
 
 const processFile = async () => {
-  if (!file.file.type.startsWith("image/")) {
-    error.value = "Only images are allowed!";
+  const problem = validateUpload(file.file, {types: IMAGE_TYPES});
+  if (problem) {
+    error.value = problem;
     return;
   }
   const reader = new FileReader();
@@ -70,7 +75,16 @@ const processFile = async () => {
   file.path = null;
   file.status = "preparing";
 
-  const response = await customerUtils.getAccountVerificationToken(props.documentCategory, props.documentType, file.file);
+  let response;
+  try {
+    response = await customerUtils.getAccountVerificationToken(props.documentCategory, props.documentType, file.file);
+  } catch (e) {
+    // The most common failure of all used to leave the overlay pulsing forever.
+    logRequestFailure(e, 'upload-token');
+    error.value = failureMessage(e, "We couldn't prepare this photo for upload. Please try again.");
+    file.status = "failed";
+    return;
+  }
   error.value = null;
   file.status = "uploading";
 
@@ -78,7 +92,7 @@ const processFile = async () => {
     file.path = response.data.object_key ?? new URL(response.data.token).pathname.split("/").slice(2).join("/");
     file.status = "completed";
   }).catch(() => {
-    error.value = "Something went wrong. Please try again!";
+    error.value = "The upload was interrupted. Check your connection and choose the photo again.";
     file.status = "failed";
   });
 };
@@ -129,7 +143,7 @@ const removeFile = () => {
       </div>
     </div>
 
-    <input ref="fileInput" type="file" class="hidden" @change="handleFileInput" accept="image/*" />
+    <input ref="fileInput" type="file" class="hidden" @change="handleFileInput" :accept="accept" />
 
   </div>
 </template>

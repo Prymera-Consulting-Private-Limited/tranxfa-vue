@@ -1,4 +1,5 @@
 <script setup>
+import {customerChannel} from "@/realtime.js";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
 import {onMounted, onUnmounted, ref} from "vue";
@@ -13,7 +14,8 @@ const emit = defineEmits([
   'sdkInitialized',
   'sdkError',
   'sdkStepCompleted',
-  'sdkApplicantStatusChanged'
+  'sdkApplicantStatusChanged',
+  'sdkCancelled',
 ]);
 
 const props = defineProps({
@@ -69,14 +71,20 @@ onMounted(async () => {
     return;
   }
   sdkInitialized();
-  Echo.channel(`client-customer.${customer.data?.id}`)
-      .listen('CustomerDocumentUploaded', () => {
-        sdkFinalStateReached();
-      });
+  // The layout listens on this same channel for the document outcome toasts.
+  // Leaving the channel on unmount, as this used to, silenced those for the
+  // rest of the page; only this listener is removed now.
+  customerChannel(`client-customer.${customer.data?.id}`)
+      .listen('CustomerDocumentUploaded', onDocumentUploaded);
 })
 
+const onDocumentUploaded = () => {
+  sdkFinalStateReached();
+};
+
 onUnmounted(() => {
-  Echo.leaveChannel(`client-customer.${customer.data?.id}`);
+  customerChannel(`client-customer.${customer.data?.id}`)
+      .stopListening('CustomerDocumentUploaded', onDocumentUploaded);
 });
 </script>
 
@@ -87,8 +95,8 @@ onUnmounted(() => {
       Please complete the process to verify your identity securely.
     </p>
     <div class="flex justify-end gap-3">
-      <button @click="sdkFinalStateReached" class="px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm/6">
-        Cancel
+      <button type="button" @click="emit('sdkCancelled')" class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 px-3 text-sm/6 text-gray-700 hover:bg-gray-100">
+        Not now
       </button>
       <a :href="accessToken"
          class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-800 text-sm/6">
