@@ -3,6 +3,7 @@ import InlineFailure from "@/components/InlineFailure.vue";
 import {fixFor} from "@/composables/verification_routes.js";
 import {findTransactionForQuote, isOutcomeUnknown, MFA_REQUIRED_TYPE, saveCheckoutDraft, takeCheckoutDraft} from "@/composables/checkout_safety.js";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
+import {CUSTOMER_ACTIONS, refreshServiceStatus, useServiceStatus} from "@/composables/service_status.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
@@ -183,8 +184,13 @@ async function reconcileOutcome() {
   }
 }
 
+const serviceStatus = useServiceStatus();
+
 const showContinueButton = computed(() => {
   if (outcomeUnknown.value) return false;
+  // A maintenance window that stops new transfers: the button goes, the
+  // banner says why.
+  if (snapshot.value?.value === 'confirm' && serviceStatus.isFrozen(CUSTOMER_ACTIONS.NEW_TRANSFERS)) return false;
   return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'accountVerification');
 });
 
@@ -291,6 +297,11 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "duplicate_transaction" || error.response.data.type === "active_transfer_disable_rule") {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message;
+        if (error.response.data.type === "active_transfer_disable_rule") {
+          // The reference: this refusal and the service-status endpoint
+          // describe the same window, so ask it again now.
+          refreshServiceStatus();
+        }
       } else if (error.response.data.type === "missing_recipient") {
         // The quote has no recipient any more (deleted, or a stale tab).
         isStepProcessing.value = false;

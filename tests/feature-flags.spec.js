@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
-import {flag, travelEnabled} from "@/feature_flags.js";
+import {couponsEnabled, flag, flightsEnabled, hotelsEnabled, serviceStatusEnabled, walletEnabled} from "@/feature_flags.js";
 
 describe('flag', () => {
     it.each([
@@ -15,27 +15,42 @@ describe('flag', () => {
     });
 });
 
-describe('travelEnabled', () => {
+// Value-added services are licensed per deployment and the API tells the app
+// nothing about it; visibility is env only, one flag per product (SD-1036).
+// Off unless the deployment says so: a flag that is on without the licence
+// shows entry points that lead to 404s.
+describe('value-added service flags', () => {
     afterEach(() => vi.unstubAllEnvs());
 
-    // feature/travel_hotels read this inline as `VITE_TRAVEL_ENABLED !==
-    // 'false'`, which only recognises the exact string "false". A deployment
-    // without the travel licence that wrote 0, no or off got the Hotels and
-    // Bookings tabs anyway, pointing at routes the backend answers 404 for.
-    it.each(['0', 'no', 'off', 'false', 'FALSE'])('is off for %j', (raw) => {
-        vi.stubEnv('VITE_TRAVEL_ENABLED', raw);
-        expect(travelEnabled()).toBe(false);
+    it.each([
+        ['VITE_HOTELS_ENABLED', hotelsEnabled],
+        ['VITE_FLIGHTS_ENABLED', flightsEnabled],
+        ['VITE_COUPONS_ENABLED', couponsEnabled],
+        ['VITE_SERVICE_STATUS_ENABLED', serviceStatusEnabled],
+    ])('%s is off unless set, and reads every spelling', (name, read) => {
+        vi.stubEnv(name, '');
+        expect(read()).toBe(false);
+        for (const raw of ['0', 'no', 'off', 'false']) {
+            vi.stubEnv(name, raw);
+            expect(read()).toBe(false);
+        }
+        for (const raw of ['1', 'yes', 'on', 'true']) {
+            vi.stubEnv(name, raw);
+            expect(read()).toBe(true);
+        }
     });
 
-    it.each(['1', 'yes', 'on', 'true'])('is on for %j', (raw) => {
-        vi.stubEnv('VITE_TRAVEL_ENABLED', raw);
-        expect(travelEnabled()).toBe(true);
+    // The wallet has the documented probe as its runtime guard; the flag is
+    // the hard off-switch in front of it, so it stays on by default.
+    it('the wallet switch is on unless turned off', () => {
+        vi.stubEnv('VITE_WALLET_ENABLED', '');
+        expect(walletEnabled()).toBe(true);
+        vi.stubEnv('VITE_WALLET_ENABLED', 'false');
+        expect(walletEnabled()).toBe(false);
     });
 
-    // Default-on is what the feature branch shipped. A deployment without the
-    // licence has to say so explicitly.
-    it('defaults to on when unset', () => {
-        vi.stubEnv('VITE_TRAVEL_ENABLED', '');
-        expect(travelEnabled()).toBe(true);
+    it('the old single travel flag is gone', async () => {
+        const flags = await import('@/feature_flags.js');
+        expect(flags.travelEnabled).toBeUndefined();
     });
 });

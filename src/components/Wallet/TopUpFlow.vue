@@ -1,5 +1,5 @@
 <script setup>
-import {onUnmounted, ref, watch} from "vue";
+import {computed, onUnmounted, ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ClipboardIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import {UseClipboard} from "@vueuse/components";
@@ -13,6 +13,7 @@ import WalletTopup from "@/models/wallet_topup.js";
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
 import {fixForError} from "@/composables/verification_routes.js";
 import router from "@/router/index.js";
+import {CUSTOMER_ACTIONS, useServiceStatus} from "@/composables/service_status.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 
 const props = defineProps({
@@ -39,6 +40,8 @@ const amount = ref('');
 const amountErrors = ref([]);
 const collisionMessage = ref('');
 const generalError = ref('');
+const serviceStatus = useServiceStatus();
+const topupsFrozen = computed(() => serviceStatus.isFrozen(CUSTOMER_ACTIONS.WALLET_TOPUPS));
 // A 412 the customer can act on (verify identity first): where to go.
 const generalFix = ref(null);
 const isSubmitting = ref(false);
@@ -167,7 +170,8 @@ function close() {
                   <template v-for="(message, i) in amountErrors" :key="`amount-error-${i}`">
                     <p class="mt-2 text-sm/6 text-danger-600">{{ message }}</p>
                   </template>
-                  <button type="submit" :disabled="isSubmitting || ! amount" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                  <p v-if="topupsFrozen" role="status" class="mt-3 text-sm/6 text-warning-800">Wallet loads are paused during maintenance. Please try again later.</p>
+                  <button type="submit" :disabled="isSubmitting || ! amount || topupsFrozen" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>Saving ...</span>

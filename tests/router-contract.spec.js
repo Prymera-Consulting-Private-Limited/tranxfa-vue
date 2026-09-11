@@ -1,4 +1,4 @@
-import {describe, expect, it, vi} from "vitest";
+import {afterEach, describe, expect, it, vi} from "vitest";
 import {createPinia, setActivePinia} from "pinia";
 
 vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn(), defaults: {}, interceptors: {request: {use: vi.fn()}, response: {use: vi.fn()}}}}));
@@ -23,16 +23,6 @@ const ROUTES = {
     '/sign-up': 'signUp',
     '/workflow/onboarding': 'onboardingWorkflow',
     '/dashboard': 'dashboard',
-    '/travel/hotels': 'hotels',
-    '/travel/hotel/:id/:slug': 'viewHotel',
-    '/travel/hotel/quote/:id': 'hotelQuote',
-    '/travel/hotel/book/:id': 'hotelBooking',
-    '/travel/hotel/booking/:id': 'hotelBookingDetails',
-    '/travel/quote/:id': 'travelQuote',
-    '/travel/bookings': 'travelBookings',
-    '/travel/booking/:id/payment': 'travelPaymentStatus',
-    '/travel/booking/:id/pay': 'travelBookingPayment',
-    '/travel/booking/:id': 'travelBooking',
     '/transfer/:quoteId': 'transferWizard',
     '/pay/:transactionId': 'makePayment',
     '/payment/cb/:transactionId': 'paymentCallback',
@@ -44,9 +34,24 @@ const ROUTES = {
     '/account-verification/upload/:category': 'categoryView',
     '/settings': 'settings',
     '/devices': 'devices',
+    '/:pathMatch(.*)*': 'notFound',
+};
+
+// Value-added services are env only (SD-1036): these routes exist only when
+// the deployment turns them on, and the default is off.
+const HOTEL_ROUTES = {
+    '/travel/hotels': 'hotels',
+    '/travel/hotel/:id/:slug': 'viewHotel',
+    '/travel/quote/:id': 'travelQuote',
+    '/travel/bookings': 'travelBookings',
+    '/travel/booking/:id/payment': 'travelPaymentStatus',
+    '/travel/booking/:id/pay': 'travelBookingPayment',
+    '/travel/booking/:id': 'travelBooking',
+};
+
+const WALLET_ROUTES = {
     '/wallet': 'wallet',
     '/wallet/statement': 'walletStatement',
-    '/:pathMatch(.*)*': 'notFound',
 };
 
 describe('router contract', () => {
@@ -59,7 +64,7 @@ describe('router contract', () => {
     });
 
     it('registers no route this table does not know about', () => {
-        const known = new Set(Object.keys(ROUTES));
+        const known = new Set([...Object.keys(ROUTES), ...Object.keys(WALLET_ROUTES)]);
         const surprises = routes.map(r => r.path).filter(p => !known.has(p));
 
         expect(surprises, 'add it to the table, deliberately').toEqual([]);
@@ -76,5 +81,38 @@ describe('router contract', () => {
     it('has no duplicate route names', () => {
         const names = routes.map(r => r.name).filter(Boolean);
         expect(names.length).toBe(new Set(names).size);
+    });
+});
+
+describe('value-added routes by env', () => {
+    afterEach(() => vi.unstubAllEnvs());
+
+    it('does not register the hotel routes unless VITE_HOTELS_ENABLED is on', () => {
+        const paths = new Set(router.getRoutes().map(r => r.path));
+        for (const path of Object.keys(HOTEL_ROUTES)) {
+            expect(paths.has(path), `${path} should not exist with hotels off`).toBe(false);
+        }
+    });
+
+    it('registers every hotel route when VITE_HOTELS_ENABLED is on', async () => {
+        vi.stubEnv('VITE_HOTELS_ENABLED', 'true');
+        vi.resetModules();
+        setActivePinia(createPinia());
+        const {default: withHotels} = await import("@/router/index.js");
+        const byPath = new Map(withHotels.getRoutes().map(r => [r.path, r]));
+        for (const [path, name] of Object.entries(HOTEL_ROUTES)) {
+            expect(byPath.get(path)?.name, path).toBe(name);
+        }
+    });
+
+    it('drops the wallet routes when VITE_WALLET_ENABLED is off', async () => {
+        vi.stubEnv('VITE_WALLET_ENABLED', 'false');
+        vi.resetModules();
+        setActivePinia(createPinia());
+        const {default: withoutWallet} = await import("@/router/index.js");
+        const paths = new Set(withoutWallet.getRoutes().map(r => r.path));
+        for (const path of Object.keys(WALLET_ROUTES)) {
+            expect(paths.has(path), path).toBe(false);
+        }
     });
 });
