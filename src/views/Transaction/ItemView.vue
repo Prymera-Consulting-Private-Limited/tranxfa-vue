@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {onMounted, onUnmounted, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import Transaction from "@/models/transaction.js";
 import {useColorUtils} from "@/composables/color_utils.js";
@@ -40,6 +40,14 @@ const isLoading = ref(false);
 /**
  * @type {Reactive<{data: Transaction|null}>}
  */
+// The API's rule: when the payment is FAILED or TIMED-OUT, offer Retry
+// Payment. Until now the only retry lived on the payment page reached from
+// checkout, so a customer who came back through their history was stuck.
+const canRetryPayment = computed(() => {
+  const code = transaction.data?.payment?.state?.code;
+  return code === PaymentState.FAILED || code === PaymentState.TIMED_OUT;
+});
+
 const transaction = reactive({
   data: null
 });
@@ -175,6 +183,10 @@ const isShowPaymentAccountModalOpen = ref(false);
                        }" class="text-sm/6">
                       {{ transaction.data.state.description }}
                     </p>
+                    <!-- FAILED and TIMED-OUT are the two payment states the API says to offer Retry Payment for. -->
+                    <router-link v-if="canRetryPayment" :to="{name: 'makePayment', params: {transactionId: transaction.data.id}}" :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
+                       }" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold hover:underline">Try the payment again <span aria-hidden="true">&rarr;</span></router-link>
                   </div>
                 </div>
               </div>

@@ -1,6 +1,8 @@
 <script setup>
 import InlineFailure from "@/components/InlineFailure.vue";
 import {fixFor} from "@/composables/verification_routes.js";
+import {findTransactionForQuote, isOutcomeUnknown, MFA_REQUIRED_TYPE, saveCheckoutDraft, takeCheckoutDraft} from "@/composables/checkout_safety.js";
+import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
@@ -64,6 +66,17 @@ const isStepProcessing = ref(false);
 const isSubComponentLoading = ref(false);
 const purpose = ref(null);
 const paymentMethod = ref(null);
+const transactionUtils = useTransactionUtils();
+
+// The confirm step's choices, restored after the MFA round trip.
+const resumedAfterMfa = ref(false);
+
+// A confirm that got no answer (or a 5xx) may still have created the
+// transfer. Until the list has been checked nothing may be confirmed again.
+const outcomeUnknown = ref(false);
+const isReconciling = ref(false);
+const reconcileFailure = ref(null);
+let attemptStartedAt = null;
 const isAddressRequired = ref(false);
 const selectedUploadDocumentCategory = ref(null);
 
@@ -105,10 +118,73 @@ onMounted(async () => {
   if (quote.data.pendingDocuments.length === 1) {
     selectedUploadDocumentCategory.value = quote.data.pendingDocuments[0];
   }
+  restoreDraft();
   isLoading.value = false;
 });
 
+// What the customer had chosen before a 412 sent them to the MFA screen.
+// The quote id is the same, so the same Confirm Quote goes out again once
+// they press Confirm; only the picks had to survive the navigation.
+function restoreDraft() {
+  const draft = takeCheckoutDraft(props.id);
+  if (! draft) return;
+  purpose.value = quote.data.purposes.find((p) => p.id === draft.purposeId) ?? purpose.value;
+  const method = quote.data.paymentMethods.find((m) => m.id === draft.paymentMethodId);
+  if (method) {
+    paymentMethod.value = method;
+  }
+  thirdPartyDeclarationAccepted.value = draft.thirdPartyDeclarationAccepted === true;
+  if (draft.paymentData && paymentData.data) {
+    for (const [attribute, value] of Object.entries(draft.paymentData)) {
+      if (paymentData.data[attribute]) {
+        paymentData.data[attribute].value = value;
+      }
+    }
+  }
+  resumedAfterMfa.value = true;
+}
+
+function saveDraft() {
+  const values = {};
+  if (paymentData.data) {
+    for (const [attribute, entry] of Object.entries(paymentData.data)) {
+      values[attribute] = entry.value;
+    }
+  }
+  saveCheckoutDraft(props.id, {
+    purposeId: purpose.value?.id ?? null,
+    paymentMethodId: paymentMethod.value?.id ?? null,
+    thirdPartyDeclarationAccepted: thirdPartyDeclarationAccepted.value,
+    paymentData: values,
+  });
+}
+
+// Did the confirm that never answered create the transfer? The list says.
+// Found: carry on to its payment page. Not found: the quote is untouched
+// and may be confirmed again. Unknown (the list failed too): stay put and
+// point at the transfers page, never at the Confirm button.
+async function reconcileOutcome() {
+  isReconciling.value = true;
+  reconcileFailure.value = null;
+  try {
+    const transaction = await findTransactionForQuote(transactionUtils, quote.data, attemptStartedAt ?? Date.now());
+    if (transaction) {
+      outcomeUnknown.value = false;
+      await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
+      return;
+    }
+    outcomeUnknown.value = false;
+    preconditionFailedMessage.value = 'Your transfer was not created. Nothing has been charged. You can confirm it again.';
+  } catch (e) {
+    logRequestFailure(e, 'confirm-reconcile');
+    reconcileFailure.value = "We still couldn't reach the server. Check your transfers before confirming again.";
+  } finally {
+    isReconciling.value = false;
+  }
+}
+
 const showContinueButton = computed(() => {
+  if (outcomeUnknown.value) return false;
   return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'accountVerification');
 });
 
@@ -151,6 +227,8 @@ const confirmGeneralErrors = computed(() => fieldlessErrors(confirmFormErrors.va
 
 const confirmQuote = async () => {
   preconditionFailedMessage.value = '';
+  resumedAfterMfa.value = false;
+  attemptStartedAt = Date.now();
   try {
     let paymentDataAttributes = {};
     if (paymentData.data) {
@@ -165,7 +243,18 @@ const confirmQuote = async () => {
     await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
   } catch (error) {
     if (error.response?.status === 412) {
-      if (error.response.data.type === "incomplete_customer_address") {
+      if (error.response.data.type === MFA_REQUIRED_TYPE) {
+        // The session lost its MFA trust mid-checkout. The interceptor is
+        // already taking the customer to the MFA screen and back here; the
+        // quote is persisted, so only the picks need keeping.
+        saveDraft();
+        isStepProcessing.value = false;
+      } else if (error.response.data.type === "payment_amount_collides") {
+        // The rail already holds a deposit for this exact figure. Retrying
+        // the same amount is refused again; a different amount goes through.
+        isStepProcessing.value = false;
+        preconditionFailedMessage.value = (error.response.data.message || 'You already have a transfer open for this exact amount.') + ' Change the amount and confirm again.';
+      } else if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
         await send({ type: 'ADDRESS_REQUIRED' });
@@ -220,9 +309,16 @@ const confirmQuote = async () => {
     } else if (error.response?.status === 422) {
       confirmFormErrors.value = error.response.data.errors;
       isStepProcessing.value = false;
+    } else if (isOutcomeUnknown(error)) {
+      // No answer, or a 5xx: the transfer may exist. Never offer the button
+      // again until the list has been checked (the double-payment rule).
+      logRequestFailure(error, 'confirm-quote');
+      isStepProcessing.value = false;
+      outcomeUnknown.value = true;
+      await reconcileOutcome();
     } else {
       isStepProcessing.value = false;
-      preconditionFailedMessage.value = 'We could not confirm this transfer. Please check your connection and try again.';
+      preconditionFailedMessage.value = failureMessage(error, 'We could not confirm this transfer. Please try again.');
     }
   }
 }
@@ -500,6 +596,18 @@ const canContinue = computed(() => {
                   />
                   <template v-else>
                     <InlineFailure :message="stepFailure" retryLabel="Try again" @retry="loadPoiCategory" class="mb-5" />
+                    <div v-if="resumedAfterMfa" role="status" class="border-l-4 border-success-400 bg-success-50 p-4 mb-5">
+                      <p class="text-sm/6 text-success-800">Thanks, you're verified. Check the details and press Confirm to send this transfer.</p>
+                    </div>
+                    <div v-if="outcomeUnknown" role="alert" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
+                      <p class="text-sm/6 font-semibold text-warning-800">We didn't get an answer when confirming this transfer.</p>
+                      <p class="mt-1 text-sm/6 text-warning-800">It may already exist. We're checking your transfers so you are not charged twice.</p>
+                      <p v-if="reconcileFailure" class="mt-2 text-sm/6 text-danger-700">{{ reconcileFailure }}</p>
+                      <div class="mt-3 flex flex-wrap gap-3">
+                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? 'Checking…' : 'Check again' }}</button>
+                        <router-link :to="{name: 'transactions'}" class="inline-flex min-h-11 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50">See my transfers</router-link>
+                      </div>
+                    </div>
                     <div v-if="preconditionFailedMessage" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
                       <div class="flex">
                         <div class="shrink-0">

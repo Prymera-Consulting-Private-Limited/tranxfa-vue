@@ -1,4 +1,5 @@
 <script setup>
+import {isOutcomeUnknown} from "@/composables/checkout_safety.js";
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -79,15 +80,29 @@ const retryPayment = async (paymentData = null) => {
   transactionUtils.retryPayment(props.id, paymentData).then((response) => {
     paymentAttempt.value++;
     transaction.value.payment = PaymentTransaction.getInstance(response.data);
-  }).catch((e) => {
+  }).catch(async (e) => {
     if (e.response) {
       paymentAttempt.value++;
     }
     if (e.response?.status === 422) {
       retryPaymentErrors.value = e.response.data.errors;
+    } else if (isOutcomeUnknown(e)) {
+      // No answer, or a 5xx: a new payment may have started. Re-read the
+      // transaction before saying anything, and never claim nothing was
+      // charged (the double-payment rule).
+      logRequestFailure(e, 'retry-payment');
+      paymentAttempt.value++;
+      try {
+        const fresh = await transactionUtils.getTransaction(props.id);
+        transaction.value = Transaction.getInstance(fresh.data);
+        retryFailure.value = "We didn't get an answer from the server, so we've refreshed this page. If it still shows a failed payment, you can try again.";
+      } catch (refreshError) {
+        logRequestFailure(refreshError, 'retry-payment-reconcile');
+        retryFailure.value = "We couldn't reach the server. Check your transfers before trying again, so you are not charged twice.";
+      }
     } else {
       logRequestFailure(e, 'retry-payment');
-      retryFailure.value = failureMessage(e, "We couldn't start a new payment. Nothing has been charged. Please try again.");
+      retryFailure.value = failureMessage(e, "We couldn't start a new payment. Please try again.");
     }
   }).finally(() => {
     isLoading.value = false;
