@@ -1,4 +1,5 @@
 <script setup>
+import {isOutcomeUnknown} from "@/composables/checkout_safety.js";
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -79,15 +80,29 @@ const retryPayment = async (paymentData = null) => {
   transactionUtils.retryPayment(props.id, paymentData).then((response) => {
     paymentAttempt.value++;
     transaction.value.payment = PaymentTransaction.getInstance(response.data);
-  }).catch((e) => {
+  }).catch(async (e) => {
     if (e.response) {
       paymentAttempt.value++;
     }
     if (e.response?.status === 422) {
       retryPaymentErrors.value = e.response.data.errors;
+    } else if (isOutcomeUnknown(e)) {
+      // No answer, or a 5xx: a new payment may have started. Re-read the
+      // transaction before saying anything, and never claim nothing was
+      // charged (the double-payment rule).
+      logRequestFailure(e, 'retry-payment');
+      paymentAttempt.value++;
+      try {
+        const fresh = await transactionUtils.getTransaction(props.id);
+        transaction.value = Transaction.getInstance(fresh.data);
+        retryFailure.value = "No recibimos respuesta del servidor, así que hemos actualizado esta página. Si sigue mostrando un pago fallido, puedes intentarlo de nuevo.";
+      } catch (refreshError) {
+        logRequestFailure(refreshError, 'retry-payment-reconcile');
+        retryFailure.value = "No pudimos conectar con el servidor. Revisa tus transferencias antes de intentarlo de nuevo, para que no se te cobre dos veces.";
+      }
     } else {
       logRequestFailure(e, 'retry-payment');
-      retryFailure.value = failureMessage(e, "We couldn't start a new payment. Nothing has been charged. Please try again.");
+      retryFailure.value = failureMessage(e, "No pudimos iniciar un nuevo pago. Inténtalo de nuevo.");
     }
   }).finally(() => {
     isLoading.value = false;

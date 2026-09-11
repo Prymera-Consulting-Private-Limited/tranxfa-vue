@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {onMounted, onUnmounted, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import Transaction from "@/models/transaction.js";
 import {useColorUtils} from "@/composables/color_utils.js";
@@ -73,6 +73,14 @@ const isLoading = ref(false);
 /**
  * @type {Reactive<{data: Transaction|null}>}
  */
+// The API's rule: when the payment is FAILED or TIMED-OUT, offer Retry
+// Payment. Until now the only retry lived on the payment page reached from
+// checkout, so a customer who came back through their history was stuck.
+const canRetryPayment = computed(() => {
+  const code = transaction.data?.payment?.state?.code;
+  return code === PaymentState.FAILED || code === PaymentState.TIMED_OUT;
+});
+
 const transaction = reactive({
   data: null
 });
@@ -215,6 +223,10 @@ const isShowPaymentAccountModalOpen = ref(false);
                        }" class="text-sm/6">
                       {{ transaction.data.state.description }}
                     </p>
+                    <!-- FAILED and TIMED-OUT are the two payment states the API says to offer Retry Payment for. -->
+                    <router-link v-if="canRetryPayment" :to="{name: 'makePayment', params: {transactionId: transaction.data.id}}" :style="{
+                         color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
+                       }" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold hover:underline">Intentar el pago de nuevo <span aria-hidden="true">&rarr;</span></router-link>
                   </div>
                 </div>
               </div>
@@ -303,6 +315,15 @@ const isShowPaymentAccountModalOpen = ref(false);
                 <div class="py-3">
                   <h2 class="text-sm/6 font-medium text-gray-900">Tarifa</h2>
                   <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">El total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
+                </div>
+                <!-- A coupon taken at checkout: the API sends the discount, or the rate it replaced. -->
+                <div v-if="transaction.data.couponDiscountAmountCurrencyPrefixed" class="py-3">
+                  <h2 class="text-sm/6 font-medium text-gray-900">Cupón</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-success-700">Ahorraste <span class="font-medium">{{ transaction.data.couponDiscountAmountCurrencyPrefixed }}</span></p>
+                </div>
+                <div v-else-if="transaction.data.exchangeRateBeforeCouponFormatted" class="py-3">
+                  <h2 class="text-sm/6 font-medium text-gray-900">Cupón</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-success-700">La tasa era <span class="font-medium">{{ transaction.data.exchangeRateBeforeCouponFormatted }}</span>, obtuviste <span class="font-medium">{{ transaction.data.exchangeRateFormatted }}</span></p>
                 </div>
                 <div class="py-3">
                   <h2 class="text-sm/6 font-medium text-gray-900">Importe total</h2>

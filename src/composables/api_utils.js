@@ -133,6 +133,30 @@ export function logRequestFailure(error, context) {
  * @param {string} fallback
  * @returns {string}
  */
+/**
+ * How long a 429 asks the client to wait, from its Retry-After header
+ * (seconds, or an HTTP date). Null when the header is absent or unreadable.
+ *
+ * @param {*} error an axios error
+ * @returns {number|null} whole seconds, never below 1
+ */
+export function retryAfterSeconds(error) {
+    const raw = error?.response?.headers?.['retry-after'];
+    if (raw === undefined || raw === null || raw === '') {
+        return null;
+    }
+    const asNumber = Number(raw);
+    if (Number.isFinite(asNumber)) {
+        return Math.max(1, Math.ceil(asNumber));
+    }
+    const asDate = Date.parse(raw);
+    if (Number.isNaN(asDate)) {
+        return null;
+    }
+
+    return Math.max(1, Math.ceil((asDate - Date.now()) / 1000));
+}
+
 export function failureMessage(error, fallback) {
     if (error?.request && ! error?.response) {
         return "We couldn't connect. Check your internet connection and try again.";
@@ -141,6 +165,11 @@ export function failureMessage(error, fallback) {
     const status = error?.response?.status;
 
     if (status === 429) {
+        const seconds = retryAfterSeconds(error);
+        if (seconds !== null) {
+            return `Too many tries. Please wait ${seconds} second${seconds === 1 ? '' : 's'} and try again.`;
+        }
+
         return 'Too many tries. Please wait a minute and try again.';
     }
 

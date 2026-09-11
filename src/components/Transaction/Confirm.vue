@@ -79,6 +79,13 @@ reviewItems.push({
   label: 'Tasa de cambio',
   value: props.quote.exchangeRateFormatted,
 });
+if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCouponFormatted) {
+  reviewItems.push({
+    icon: PercentBadgeIcon,
+    label: `Tasa antes del cupón ${props.quote.coupon.code}`,
+    value: props.quote.coupon.exchangeRateBeforeCouponFormatted,
+  });
+}
 reviewItems.push({
   icon: WalletIcon,
   label: 'La destinataria obtiene',
@@ -98,6 +105,13 @@ reviewItems.push({
   label: 'Honorarios',
   value: props.quote.baseFeesCurrencyPrefixed,
 });
+if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
+  reviewItems.push({
+    icon: PercentBadgeIcon,
+    label: `Cupón ${props.quote.coupon.code}`,
+    value: `- ${props.quote.coupon.discountAmountCurrencyPrefixed}`,
+  });
+}
 reviewItems.push({
   icon: CalculatorIcon,
   label: 'Total parcial',

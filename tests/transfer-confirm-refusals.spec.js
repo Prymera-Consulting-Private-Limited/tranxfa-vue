@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import {createPinia, setActivePinia} from "pinia";
 import axios from "axios";
+import router from "@/router/index.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {installFakeEcho, modalStubs} from "./helpers.js";
 
@@ -138,21 +139,83 @@ describe('Transfer wizard confirm refusals', () => {
         expect(wrapper.vm.preconditionFailedMessage).toBe('We could not confirm this transfer. Please try again.');
     });
 
-    it('shows generic copy for a non-412/422 failure and stops processing', async () => {
+    // The API reference's double-payment rule: after a 5xx or a request that
+    // never answered, the transfer may exist. The wizard checks the list
+    // before it lets the customer press Confirm again.
+    it('re-checks the transfers after a 5xx and, finding none, says the transfer was not created', async () => {
         const wrapper = await mountWizard();
         wrapper.vm.isStepProcessing = true;
-        axios.post.mockRejectedValue({response: {status: 503, data: {message: 'Service unavailable.'}}});
+        axios.post.mockRejectedValue({request: {}, response: {status: 503, data: {message: 'Service unavailable.'}}});
+        axios.get.mockResolvedValue({data: {data: []}});
         await wrapper.vm.confirmQuote();
         expect(wrapper.vm.isStepProcessing).toBe(false);
-        expect(wrapper.vm.preconditionFailedMessage).toBe('We could not confirm this transfer. Please check your connection and try again.');
+        expect(axios.get).toHaveBeenCalledWith('/client/v1/transactions', expect.objectContaining({params: expect.objectContaining({limit: 5})}));
+        expect(wrapper.vm.outcomeUnknown).toBe(false);
+        expect(wrapper.vm.preconditionFailedMessage).toBe('Your transfer was not created. Nothing has been charged. You can confirm it again.');
     });
 
-    it('handles a network error without throwing and stops processing', async () => {
+    it('goes to the payment page when the unanswered confirm did create the transfer', async () => {
+        const wrapper = await mountWizard();
+        wrapper.vm.quote.data.recipient = {id: 'r-1'};
+        wrapper.vm.quote.data.paymentCurrency = {id: 'EUR'};
+        wrapper.vm.quote.data.localAmount = 100;
+        axios.post.mockRejectedValue({request: {}, message: 'timeout of 30000ms exceeded'});
+        axios.get.mockResolvedValue({data: {data: [{
+            id: 'txn-9', created_at: new Date().toISOString(), local_amount: 100,
+            payment_currency: {id: 'EUR'}, recipient: {id: 'r-1'}, state: {code: 'PENDING-PAYMENT'},
+        }]}});
+        await wrapper.vm.confirmQuote();
+        expect(router.push).toHaveBeenCalledWith({name: 'makePayment', params: {transactionId: 'txn-9'}});
+        expect(wrapper.vm.outcomeUnknown).toBe(false);
+    });
+
+    it('keeps Confirm hidden while the list itself cannot be fetched', async () => {
+        const wrapper = await mountWizard();
+        axios.post.mockRejectedValue({request: {}, message: 'Network Error'});
+        axios.get.mockRejectedValue({request: {}, message: 'Network Error'});
+        await wrapper.vm.confirmQuote();
+        expect(wrapper.vm.isStepProcessing).toBe(false);
+        expect(wrapper.vm.outcomeUnknown).toBe(true);
+        expect(wrapper.vm.showContinueButton).toBe(false);
+        expect(wrapper.vm.reconcileFailure).toMatch(/Check your transfers before confirming again/);
+    });
+
+    it('treats an error that was never sent as a plain refusal', async () => {
         const wrapper = await mountWizard();
         wrapper.vm.isStepProcessing = true;
         axios.post.mockRejectedValue(new Error('Network Error'));
         await wrapper.vm.confirmQuote();
         expect(wrapper.vm.isStepProcessing).toBe(false);
-        expect(wrapper.vm.preconditionFailedMessage).toBe('We could not confirm this transfer. Please check your connection and try again.');
+        expect(wrapper.vm.outcomeUnknown).toBe(false);
+        expect(wrapper.vm.preconditionFailedMessage).toBe('We could not confirm this transfer. Please try again.');
+    });
+
+    // 412 more_authentication_required: the quote stays persisted, so the
+    // picks are kept for the return trip and the same quote is confirmed again.
+    it('keeps the confirm choices when the session needs MFA again', async () => {
+        sessionStorage.clear();
+        const wrapper = await mountWizard();
+        wrapper.vm.thirdPartyDeclarationAccepted = true;
+        axios.post.mockRejectedValue({request: {}, response: {status: 412, data: {type: 'more_authentication_required', message: 'More authentication required.'}}});
+        await wrapper.vm.confirmQuote();
+        expect(wrapper.vm.isStepProcessing).toBe(false);
+        expect(JSON.parse(sessionStorage.getItem('checkout-draft:quote-1'))).toEqual({
+            purposeId: 'purpose-1', paymentMethodId: 'pm-1', thirdPartyDeclarationAccepted: true, paymentData: {},
+        });
+    });
+
+    it('restores the choices and says so when the wizard loads with a draft', async () => {
+        sessionStorage.setItem('checkout-draft:quote-1', JSON.stringify({purposeId: 'p-9', paymentMethodId: 'pm-9', thirdPartyDeclarationAccepted: true, paymentData: {}}));
+        axios.get.mockResolvedValue({data: {...quotePayload, purposes: [{id: 'p-9', title: 'Gift'}], payment_methods: [{id: 'pm-9', code: 'CARD', providers: [{id: 'pp', code: 'BELMONEY-CARD', payment_data_attributes: []}]}]}});
+        const customerStore = useCustomerStore(pinia);
+        customerStore.isLoaded = true;
+        customerStore.customer.data = {addressInformationRequired: () => false, pendingDocuments: [], isBlockedForSending: false};
+        const wrapper = mount(IndexView, {props: {id: 'quote-1'}, global: {plugins: [pinia], stubs: wizardStubs}});
+        await flushPromises();
+        expect(wrapper.vm.resumedAfterMfa).toBe(true);
+        expect(wrapper.vm.purpose?.id).toBe('p-9');
+        expect(wrapper.vm.paymentMethod?.id).toBe('pm-9');
+        expect(wrapper.vm.thirdPartyDeclarationAccepted).toBe(true);
+        expect(sessionStorage.getItem('checkout-draft:quote-1')).toBeNull();
     });
 });

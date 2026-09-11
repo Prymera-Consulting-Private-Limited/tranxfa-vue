@@ -1,4 +1,5 @@
 <script setup>
+import WalletRefusalType from "@/enums/wallet_refusal_type.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import { UserIcon, HomeIcon, PhoneIcon, LockClosedIcon, DevicePhoneMobileIcon, WalletIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
@@ -47,7 +48,11 @@ const closeWallet = async () => {
         -1,
     )
   }).catch((e) => {
-    closeWalletError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+    if (e.response?.data?.type === WalletRefusalType.BALANCE_MUST_BE_ZERO) {
+      closeWalletError.value = (e.response.data.message ?? 'Tu billetera todavía tiene saldo.') + ' Gasta o retira el saldo primero y luego cierra la billetera.';
+    } else {
+      closeWalletError.value = e.response?.data?.message ?? 'Algo salió mal. Inténtalo de nuevo.';
+    }
   }).finally(() => {
     isClosingWallet.value = false;
   });

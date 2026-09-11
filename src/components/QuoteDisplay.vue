@@ -33,6 +33,12 @@ const items = computed(() => {
     label: 'Nuestra tasa',
     value: props.quote.exchangeRateFormatted
   });
+  if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCouponFormatted) {
+    items.push({
+      label: `Tasa antes del cupón ${props.quote.coupon.code}`,
+      value: props.quote.coupon.exchangeRateBeforeCouponFormatted
+    });
+  }
   items.push({
     label: ( props.quote.recipient?.wholeName || 'Beneficiaria' ) + ' Obtiene',
     value: props.quote.foreignAmountCurrencyPrefixed
@@ -41,6 +47,12 @@ const items = computed(() => {
     label: 'Comisión',
     value: props.quote.baseFeesCurrencyPrefixed
   });
+  if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
+    items.push({
+      label: `Cupón ${props.quote.coupon.code}`,
+      value: `- ${props.quote.coupon.discountAmountCurrencyPrefixed}`
+    });
+  }
   items.push({
     label: 'Total parcial',
     value: props.quote.subTotalAmountCurrencyPrefixed

@@ -1,3 +1,4 @@
+import {hotelsEnabled, walletEnabled} from '@/feature_flags.js'
 import { createRouter, createWebHistory } from 'vue-router'
 import SignUpView from "@/views/SignUpView.vue";
 import SignInView from "@/views/SignInView.vue";
@@ -83,7 +84,11 @@ const router = createRouter({
         title: 'Dashboard',
         description: '',
       },
-    }, {
+    },
+    // Hotels are licensed per deployment and the API answers 404 without the
+    // licence; the routes exist only when VITE_HOTELS_ENABLED says so, so a
+    // deep link on a brand without hotels reaches the not-found page.
+    ...(hotelsEnabled() ? [{
       path: '/travel/hotels',
       name: 'hotels',
       component: () => import('@/views/Travel/Hotels/IndexView.vue'),
@@ -98,37 +103,6 @@ const router = createRouter({
       component: () => import('@/views/Travel/Hotels/HotelView.vue'),
       meta: {
         title: 'View Hotel',
-        description: '',
-      },
-    }, {
-      path: '/travel/hotel/quote/:id',
-      name: 'hotelQuote',
-      props: route => ({ quoteId: route.params.id, search: route.query.search }),
-      component: () => import('@/views/Travel/Hotels/QuoteView.vue'),
-      meta: {
-        title: 'Booking Summary',
-        description: '',
-      },
-    }, {
-      // Reached once "book" succeeds — its own id, not the quote's, so a
-      // refresh here re-fetches the attempt instead of restarting the booking.
-      path: '/travel/hotel/book/:id',
-      name: 'hotelBooking',
-      props: route => ({ attemptId: route.params.id, search: route.query.search }),
-      component: () => import('@/views/Travel/Hotels/QuoteView.vue'),
-      meta: {
-        title: 'Complete Booking',
-        description: '',
-      },
-    }, {
-      // Reached once guest details are saved — a read-only recap of the
-      // attempt, since there's no further submit step built yet.
-      path: '/travel/hotel/booking/:id',
-      name: 'hotelBookingDetails',
-      props: route => ({ attemptId: route.params.id }),
-      component: () => import('@/views/Travel/Hotels/BookingDetailsView.vue'),
-      meta: {
-        title: 'Booking Details',
         description: '',
       },
     }, {
@@ -182,7 +156,8 @@ const router = createRouter({
         title: 'Booking',
         description: '',
       },
-    }, {
+    }] : []),
+    {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
       props: route => ({ id: route.params.quoteId }),
@@ -276,7 +251,10 @@ const router = createRouter({
         title: 'Devices',
         description: '',
       },
-    }, {
+    },
+    // The wallet's own runtime guard is the documented probe of GET
+    // /wallet/subscription; this is the deployment's hard off-switch.
+    ...(walletEnabled() ? [{
       path: '/wallet',
       name: 'wallet',
       component: () => import('@/views/Wallet/IndexView.vue'),
@@ -292,7 +270,8 @@ const router = createRouter({
         title: 'Wallet Statement',
         description: '',
       },
-    },, {
+    }] : []),
+    {
       // Anything unmatched. Without this an unknown address rendered an
       // empty RouterView titled "Default Title".
       path: '/:pathMatch(.*)*',

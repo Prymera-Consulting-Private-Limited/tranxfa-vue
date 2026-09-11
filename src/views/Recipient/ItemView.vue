@@ -13,7 +13,6 @@ import ItemDescriptionShimmer from "@/components/ItemDescriptionShimmer.vue";
 import {useTimeUtils} from "@/composables/time_utils.js";
 import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
-import UpdateAttributeCollection from "@/components/Recipient/UpdateAttributeCollection.vue";
 import {notify} from "notiwind";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import {failureMessage, getCustomerMessage, logRequestFailure} from "@/composables/api_utils.js";
