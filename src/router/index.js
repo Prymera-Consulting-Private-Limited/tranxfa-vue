@@ -283,9 +283,30 @@ const router = createRouter({
         title: 'Wallet Statement',
         description: '',
       },
-    },
+    },, {
+      // Anything unmatched. Without this an unknown address rendered an
+      // empty RouterView titled "Default Title".
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      component: () => import('@/views/NotFoundView.vue'),
+      meta: {
+        title: 'Page not found',
+        description: '',
+      },
+    }
   ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    if (to.hash) {
+      return { el: to.hash, top: 16 }
+    }
+    return { top: 0 }
+  },
 })
+
+const APP_NAME = import.meta.env.VITE_APP_NAME || 'RemitSo'
 
 NProgress.configure({ showSpinner: false, trickleSpeed: 300 })
 
@@ -307,7 +328,7 @@ router.beforeEach((to) => {
 })
 
 router.beforeEach((to, from) => {
-  document.title = to.meta?.title ?? 'Default Title'
+  document.title = to.meta?.title ?? APP_NAME
 })
 
 router.afterEach(() => {

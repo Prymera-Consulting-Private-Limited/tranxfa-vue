@@ -8,6 +8,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
+import {installErrorHandling} from "@/error_handling.js";
 import axios from "axios";
 
 import Echo from 'laravel-echo';
@@ -18,6 +19,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+installErrorHandling(app, router)
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_URL
 axios.defaults.withCredentials = true;
