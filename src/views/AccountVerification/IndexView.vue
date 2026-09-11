@@ -86,18 +86,18 @@ onMounted(load);
                         <li :class="{
                           'bg-success-400/5  border-success-300': document.statusCode === KycDocumentStatus.APPROVED,
                           'bg-blue-400/5 border-blue-300': document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED,
-                          'bg-danger-400/5 border-danger-300': document.statusCode === KycDocumentStatus.REJECTED
+                          'bg-danger-400/5 border-danger-300': document.statusCode === KycDocumentStatus.REJECTED || document.statusCode === KycDocumentStatus.INVALIDATED
                         }" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg border text-center">
                           <div class="flex flex-1 flex-col p-8">
                             <IdentificationIcon :class="{
                             'text-success-700': document.statusCode === KycDocumentStatus.APPROVED,
                             'text-blue-700': document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED,
-                            'text-danger-700': document.statusCode === KycDocumentStatus.REJECTED
+                            'text-danger-700': document.statusCode === KycDocumentStatus.REJECTED || document.statusCode === KycDocumentStatus.INVALIDATED
                           }" class="mx-auto size-16 shrink-0 rounded-full" />
                             <h3 :class="{
                             'text-success-700': document.statusCode === KycDocumentStatus.APPROVED,
                             'text-blue-700': document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED,
-                            'text-danger-700': document.statusCode === KycDocumentStatus.REJECTED
+                            'text-danger-700': document.statusCode === KycDocumentStatus.REJECTED || document.statusCode === KycDocumentStatus.INVALIDATED
                           }" class="mt-6 text-sm/6 font-medium">{{ document.documentCategory.title }}</h3>
                             <dl v-if="document.documentCategory.description" class="mt-1 flex grow flex-col justify-between">
                               <template v-if="document.statusCode === KycDocumentStatus.APPROVED">
@@ -110,7 +110,17 @@ onMounted(load);
                                   <a class="text-success-700 font-semibold">Verified</a>
                                 </dd>
                               </template>
-                              <template v-else-if="document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING || document.statusCode === KycDocumentStatus.REVIEW_REQUIRED">
+                              <template v-else-if="document.statusCode === KycDocumentStatus.REVIEW_REQUIRED">
+                                <dt class="sr-only">Information</dt>
+                                <dd class="mt-3 text-sm/6 text-gray-700">
+                                  <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is with our compliance team. We will email you when it is done. You do not need to do anything else for now.</p>
+                                </dd>
+                                <dt class="sr-only">Under review</dt>
+                                <dd class="mt-3 text-sm/6">
+                                  <a class="text-blue-700 font-semibold">Under review</a>
+                                </dd>
+                              </template>
+                              <template v-else-if="document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING">
                                 <dt class="sr-only">Information</dt>
                                 <dd class="mt-3 text-sm/6 text-gray-700">
                                   <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is currently under verification.</p>
@@ -120,14 +130,19 @@ onMounted(load);
                                   <a class="text-blue-700 font-semibold">Verifying</a>
                                 </dd>
                               </template>
-                              <template v-else-if="document.statusCode === KycDocumentStatus.REJECTED">
+                              <!-- rejected and invalidated cannot be re-decided; the KYC spec's way
+                                   forward from either is a new document, so that is what is offered. -->
+                              <template v-else-if="document.statusCode === KycDocumentStatus.REJECTED || document.statusCode === KycDocumentStatus.INVALIDATED">
                                 <dt class="sr-only">Information</dt>
                                 <dd class="mt-3 text-sm/6 text-danger-700">
-                                  <p>We were unable to verify your document <span class="font-semibold">{{ document.documentType.title }}</span>.</p>
+                                  <p v-if="document.statusCode === KycDocumentStatus.INVALIDATED">Your <span class="font-semibold">{{ document.documentType.title }}</span> was accepted, but that acceptance has since been withdrawn.</p>
+                                  <p v-else>We couldn't accept your <span class="font-semibold">{{ document.documentType.title }}</span>.</p>
+                                  <p class="mt-1 text-gray-700">Please upload another document, or a clearer photo of this one. Transfers stay on hold until a document is accepted.</p>
                                 </dd>
-                                <dt class="sr-only">Failed</dt>
+                                <dt class="sr-only">Next step</dt>
                                 <dd class="mt-3 text-sm/6">
-                                  <a class="text-danger-700 font-semibold">Failed</a>
+                                  <router-link v-if="document.documentCategory?.id" :to="{name: 'categoryView', params: {category: document.documentCategory.id}}" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800">Upload another document</router-link>
+                                  <span v-else class="text-danger-700 font-semibold">{{ document.statusTitle || 'Not accepted' }}</span>
                                 </dd>
                               </template>
                               <!-- A status this app does not know. The API filters the ones it can produce

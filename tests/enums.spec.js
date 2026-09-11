@@ -78,6 +78,7 @@ describe('enums', () => {
                 'review-required',
                 'approved',
                 'rejected',
+                'invalidated',
             ])
         })
     })

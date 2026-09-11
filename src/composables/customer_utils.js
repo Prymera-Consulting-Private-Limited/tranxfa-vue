@@ -194,9 +194,19 @@ export function useCustomerUtils() {
         return axios.get(`/client/v1/document-categories`);
     }
 
-    async function uploadDocument(documentCategory, documentType, pages = []) {
+    /**
+     * @param {object} details the documented optional fields: document_number,
+     *   expiry_date, issue_date, issuing_country_id, issuing_authority,
+     *   liveliness_artifact. Empty values are not sent.
+     */
+    async function uploadDocument(documentCategory, documentType, pages = [], details = {}) {
         const data = {
             pages: pages,
+        }
+        for (const [key, value] of Object.entries(details)) {
+            if (value !== null && value !== undefined && value !== '') {
+                data[key] = value;
+            }
         }
         return axios.post(`/client/v1/document/upload`, data, {
             params: {

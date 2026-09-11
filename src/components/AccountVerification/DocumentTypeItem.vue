@@ -1,4 +1,6 @@
 <script setup>
+import {useCustomerStore} from "@/stores/customer.js";
+import KycDocumentStatus from "@/enums/kyc_document_status.js";
 import {fixForError} from "@/composables/verification_routes.js";
 import router from "@/router/index.js";
 import {ExclamationTriangleIcon, IdentificationIcon} from "@heroicons/vue/24/outline";
@@ -17,6 +19,7 @@ import Didit from "@/components/AccountVerification/Provider/Didit.vue";
 import {getCustomerMessage} from "@/composables/api_utils.js";
 
 const customerUtils = useCustomerUtils();
+const customerStore = useCustomerStore();
 
 // Provider codes the backend sends as `api` that are all served by the Sumsub
 // web SDK. SUMSUB-VIA-FINCODE is Sumsub reached through Fincode: same SDK, same
@@ -88,8 +91,11 @@ function goToFix() {
  * verification screen behind this reads it from the customer.
  */
 async function sdkApplicantRejected(payload) {
+  // Sumsub's payload names the reason; other providers decide by webhook and
+  // the app hears about it as a CustomerDocumentRejected event with none.
   sdkRejectionReason.value = payload?.reviewResult?.moderationComment
       || payload?.reviewResult?.clientComment
+      || payload?.reason
       || '';
   sdkRejected.value = true;
   isSdkInitialized.value = false;
@@ -111,6 +117,18 @@ const emit = defineEmits([
 ])
 
 async function sdkFinalStateReached () {
+  // Didit, Persona, Shufti and UpPass finish their flow without a verdict;
+  // the API decides by webhook. Read the refreshed profile before leaving:
+  // a document of this type already marked rejected is shown here, with the
+  // way forward, rather than closed over as if it had passed.
+  await customerUtils.refresh().catch(() => {});
+  const mine = (customerStore.customer.data?.documents ?? []).find((document) =>
+      document.documentType?.id === props.documentType.id
+      && (document.statusCode === KycDocumentStatus.REJECTED || document.statusCode === KycDocumentStatus.INVALIDATED));
+  if (mine) {
+    await sdkApplicantRejected({reason: ''});
+    return;
+  }
   await emit('sdkFinalStateReached');
   await closeSdk();
 }
