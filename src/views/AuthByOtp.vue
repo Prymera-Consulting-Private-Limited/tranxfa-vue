@@ -7,6 +7,13 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import Spinner from "@/components/Spinner.vue";
 import router from "@/router/index.js";
+import {safeRedirect} from "@/router/guards.js";
+
+// The redirect sign-in was carrying, if it is still a path on this site.
+const onward = () => {
+  const redirect = safeRedirect(router.currentRoute.value.query.redirect);
+  return redirect ? {redirect} : {};
+};
 
 const otp = ref('');
 const isLoading = ref(false);
@@ -30,7 +37,7 @@ async function authenticate() {
   isLoading.value = true;
   isVerifying.value = true;
   await customerUtils.loginWithMobileNumber(country.id, number, otp.value).then(() => {
-    router.push({name: 'onboardingWorkflow'});
+    router.push({name: 'onboardingWorkflow', query: onward()});
   }).catch((e) => {
     if (e.response?.status === 422 || e.response?.status === 401) {
       otpError.value = e.response.data.message;

@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import SignUpView from "@/views/SignUpView.vue";
 import SignInView from "@/views/SignInView.vue";
 import NProgress from 'nprogress'
+import { createAuthGuard } from '@/router/guards.js'
+import { useCustomerStore } from '@/stores/customer.js'
+import { useCustomerUtils } from '@/composables/customer_utils.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -289,6 +292,18 @@ NProgress.configure({ showSpinner: false, trickleSpeed: 300 })
 router.beforeEach((to, from, next) => {
   NProgress.start()
   next()
+})
+
+// Resolved inside the guard rather than at module load: the store needs the
+// pinia the app installs, and this module is imported before that happens.
+router.beforeEach((to) => {
+  const guard = createAuthGuard({
+    store: useCustomerStore(),
+    // The interceptor's own 401 redirect would race the one this guard
+    // returns and win without the redirect query.
+    refresh: () => useCustomerUtils().refresh({skipAuthRedirect: true}),
+  })
+  return guard(to)
 })
 
 router.beforeEach((to, from) => {

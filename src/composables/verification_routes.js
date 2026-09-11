@@ -25,7 +25,7 @@ const ADDRESS_TYPES = new Set([
  * @returns {{route: object, label: string}|null}
  */
 export function fixFor(type, returnTo = null) {
-    const query = {};
+    const query = returnTo ? {redirect: returnTo} : {};
 
     if (ONBOARDING_TYPES.has(type)) {
         return {route: {name: 'onboardingWorkflow', query}, label: 'Complete your details'};

@@ -3,6 +3,7 @@ import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
+import {safeRedirect} from "@/router/guards.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import axios from "axios";
 import IsdCodeInput from "@/components/IsdCodeInput.vue";
@@ -44,6 +45,10 @@ async function login() {
   isLoading.value = true;
   loginError.value = null;
   await axios.get('/sanctum/csrf-cookie');
+  // Where the customer was heading when the session ran out, if anywhere.
+  // Only a path on this site survives (see guards.js).
+  const redirect = safeRedirect(router.currentRoute.value.query.redirect);
+  const query = redirect ? {redirect} : {};
   if (authChannel === 'MOBILE_NUMBER') {
     await customerUtils.getLoginOtp(form.country, form.mobile_number).then(() => {
       const country = countries.value.find(o => o.id === form.country)
@@ -54,7 +59,7 @@ async function login() {
             number: form.mobile_number
           })
       );
-      router.push({name: 'authByOtp'});
+      router.push({name: 'authByOtp', query});
     }).catch((e) => {
       loginError.value = e.response?.data?.message;
       console.error(e);
@@ -64,9 +69,9 @@ async function login() {
   } else {
     await customerUtils.login(form.email, form.password).then(() => {
       if (customerStore.customer.data?.account?.isEmailVerified && customerStore.customer.data?.session?.mfaMethod !== null) {
-        router.push({name: 'multiFactorAuth'});
+        router.push({name: 'multiFactorAuth', query});
       } else {
-        router.push({name: 'onboardingWorkflow'});
+        router.push({name: 'onboardingWorkflow', query});
       }
 
     }).catch((e) => {

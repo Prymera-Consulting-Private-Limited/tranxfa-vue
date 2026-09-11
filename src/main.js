@@ -7,6 +7,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
 import axios from "axios";
 
 import Echo from 'laravel-echo';
@@ -37,7 +38,10 @@ axios.interceptors.response.use((response) => {
     NProgress.done()
     const shouldSkipAuthRedirect = e.config?.skipAuthRedirect === true;
     if (e.status === 401 && ! shouldSkipAuthRedirect) {
-        router.push({ name: 'signIn' });
+        // A session that expires mid-task comes back to that task after
+        // signing in again.
+        const current = router.currentRoute.value;
+        router.push({ name: 'signIn', query: PUBLIC_ROUTES.has(current.name) ? {} : redirectQueryFor(current) });
     }
     throw e;
 })
