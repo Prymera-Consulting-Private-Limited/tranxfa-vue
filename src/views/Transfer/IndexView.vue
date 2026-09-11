@@ -1,4 +1,5 @@
 <script setup>
+import InlineFailure from "@/components/InlineFailure.vue";
 import {fixFor} from "@/composables/verification_routes.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
@@ -16,7 +17,7 @@ import RecipientCardShimmer from "@/components/Recipient/RecipientCardShimmer.vu
 import vSelect from 'vue-select';
 import router from "@/router/index.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
-import {getCustomerMessage} from "@/composables/api_utils.js";
+import {failureMessage, fieldlessErrors, getCustomerMessage, logRequestFailure} from "@/composables/api_utils.js";
 import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import {useCustomerStore} from "@/stores/customer.js";
@@ -118,10 +119,14 @@ const createRecipient = async () => {
 
 const setRecipient =  async (recipient) => {
   isLoading.value = true;
+  stepFailure.value = null;
   await quoteUtils.setRecipient(props.id, recipient).then((response) => {
     quote.data = TransactionQuote.getInstance(response.data);
     send({ type: 'SET_CONTEXT', quote: quote.data });
     send({ type: 'PROCEED' });
+  }).catch((e) => {
+    logRequestFailure(e, 'quote-set-recipient');
+    stepFailure.value = failureMessage(e, "We couldn't add that recipient to this transfer. Please choose them again.");
   });
   isLoading.value = false;
 }
@@ -138,6 +143,11 @@ const recipientAddedOnQuote = async (recipient)  => {
 const preconditionFailedMessage = ref('');
 
 const confirmFormErrors = ref([]);
+
+// Everything the confirm step refused that is not a payment-data field. Those
+// were stored and never rendered, so the spinner cleared and the form looked
+// unchanged.
+const confirmGeneralErrors = computed(() => fieldlessErrors(confirmFormErrors.value, 'payment_data.'));
 
 const confirmQuote = async () => {
   preconditionFailedMessage.value = '';
@@ -236,6 +246,7 @@ const customerAttributeCategoryUpdated = async () => {
 }
 
 async function documentUploaded() {
+  stepFailure.value = null;
   await quoteUtils.getTransferQuote(props.id).then((response) => {
     quote.data = TransactionQuote.getInstance(response.data);
     send({ type: 'SET_CONTEXT', quote: quote.data });
@@ -245,6 +256,9 @@ async function documentUploaded() {
         confirmQuote();
       }
     }
+  }).catch((e) => {
+    logRequestFailure(e, 'quote-after-upload');
+    stepFailure.value = failureMessage(e, "Your document was received, but we couldn't refresh this transfer. Please reload the page.");
   });
   selectedUploadDocumentCategory.value = null;
   isLoading.value = false;
@@ -282,17 +296,27 @@ const addRecipientLoadingStateUpdated = (e) => {
   isSubComponentLoading.value = e;
 }
 
+// The document was handed over but the category is still pending, which
+// means it is with our compliance team rather than missing.
+const documentInReview = computed(() => {
+  if (! watchForDocumentUpdate.value || isLoading.value) return null;
+  return selectedUploadDocumentCategory.value?.title?.toLowerCase() ?? 'document';
+});
+
+const applyPoiFailure = ref(null);
 const isApplyingInfoFromPoiDocument = ref(false);
 
 const applyInfoFromPoiDocument = async () => {
   isApplyingInfoFromPoiDocument.value = true;
+  applyPoiFailure.value = null;
   customerUtils.applyInfoFromPoiDocument().then((response) => {
     customerUtils.updateStore(response.data);
     send({ type: 'PROCEED' });
     isStepProcessing.value = true;
     confirmQuote();
   }).catch((e) => {
-    console.error(e);
+    logRequestFailure(e, 'apply-poi-details');
+    applyPoiFailure.value = failureMessage(e, "We couldn't copy the details from your document. Please try again or update your details by hand.");
   }).finally(() => {
     isApplyingInfoFromPoiDocument.value = false;
   });
@@ -333,22 +357,33 @@ function startVerification(category) {
   selectedUploadDocumentCategory.value = category;
 }
 
+const stepFailure = ref(null);
+
+// The "upload another document" step needs the identity category before it
+// can show anything. If that request fails the customer used to be left on a
+// blank step with the spinner gone.
+function loadPoiCategory() {
+  isLoading.value = true;
+  stepFailure.value = null;
+  customerUtils.documentCategories().then((response) => {
+    const documentCategories = response.data.map((category) => DocumentCategory.getInstance(category));
+    const poiDocumentCategory = documentCategories.find(category => category.code === 'POI');
+    if (poiDocumentCategory) {
+      selectedUploadDocumentCategory.value =  poiDocumentCategory;
+      quote.data.pendingDocuments.push(poiDocumentCategory);
+    }
+    send({ type: 'PROCEED' });
+  }).catch((e) => {
+    logRequestFailure(e, 'poi-category');
+    stepFailure.value = failureMessage(e, "We couldn't load the document upload. Please try again.");
+  }).finally(() => {
+    isLoading.value = false;
+  });
+}
+
 watch(snapshot, () => {
   if (snapshot.value?.value === 'uploadAnotherPoi') {
-    isLoading.value = true;
-    customerUtils.documentCategories().then((response) => {
-      const documentCategories = response.data.map((category) => DocumentCategory.getInstance(category));
-      const poiDocumentCategory = documentCategories.find(category => category.code === 'POI');
-      if (poiDocumentCategory) {
-        selectedUploadDocumentCategory.value =  poiDocumentCategory;
-        quote.data.pendingDocuments.push(poiDocumentCategory);
-      }
-      send({ type: 'PROCEED' });
-    }).catch((e) => {
-      console.error(e);
-    }).finally(() => {
-      isLoading.value = false;
-    });
+    loadPoiCategory();
   }
 });
 
@@ -464,6 +499,7 @@ const canContinue = computed(() => {
                     backLabel="Start a new transfer"
                   />
                   <template v-else>
+                    <InlineFailure :message="stepFailure" retryLabel="Try again" @retry="loadPoiCategory" class="mb-5" />
                     <div v-if="preconditionFailedMessage" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
                       <div class="flex">
                         <div class="shrink-0">
@@ -521,6 +557,10 @@ const canContinue = computed(() => {
                       <h3 class="text-gray-900 mb-4 font-semibold">One-time account verification</h3>
                       <template v-if="selectedUploadDocumentCategory">
                         <CategoryDescription v-bind:category="selectedUploadDocumentCategory" />
+                        <div v-if="documentInReview" role="status" class="mb-5 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
+                          <p class="font-semibold">Thanks, we have your {{ documentInReview }}.</p>
+                          <p>We are checking it now. We will email you when it is done, and your transfer will carry on from here.</p>
+                        </div>
                         <ul v-if="selectedUploadDocumentCategory.documentTypes?.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                           <li v-for="documentType in selectedUploadDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
                             <DocumentTypeItem
@@ -667,6 +707,11 @@ const canContinue = computed(() => {
                   </div>
                 </template>
               </template>
+              <div v-if="confirmGeneralErrors.length > 0" class="mx-3 sm:mx-0 rounded-md bg-danger-50 p-4" role="alert">
+                <ul role="list" class="list-disc space-y-1 pl-5 text-sm/6 text-danger-700">
+                  <li v-for="(message, index) in confirmGeneralErrors" :key="index">{{ message }}</li>
+                </ul>
+              </div>
               <div class="py-4 px-3 sm:px-0">
                 <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6">
                   <span v-if="isStepProcessing" class="flex justify-center items-center">
@@ -690,11 +735,11 @@ const canContinue = computed(() => {
           </div>
         </div>
         <TransitionRoot as="template" :show="true">
-          <Dialog class="relative z-10">
+          <Dialog class="relative z-50">
             <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
               <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
             </TransitionChild>
-            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="fixed inset-0 z-50 w-screen overflow-y-auto">
               <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                   <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
@@ -729,6 +774,7 @@ const canContinue = computed(() => {
                               </div>
                             </div>
                           </li>
+                          <li v-if="applyPoiFailure" class="py-2"><InlineFailure :message="applyPoiFailure" /></li>
                           <li @click="applyInfoFromPoiDocument" :class="isApplyingInfoFromPoiDocument ? 'bg-gray-100' : 'cursor-pointer'">
                             <div class="group relative flex items-start space-x-3 py-4">
                               <div class="shrink-0">

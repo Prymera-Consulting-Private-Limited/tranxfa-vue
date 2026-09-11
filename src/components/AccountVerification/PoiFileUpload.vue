@@ -1,4 +1,7 @@
 <script setup>
+import {MAX_UPLOAD_MB} from "@/composables/upload_rules.js";
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
 import {computed, onMounted, ref} from "vue";
@@ -49,13 +52,16 @@ const backSideSelected = (file) => {
 }
 
 const isSaving = ref(false);
+const saveFailure = ref(null);
 
 async function save() {
   isSaving.value = true;
+  saveFailure.value = null;
   customerUtils.uploadDocument(props.documentCategory, props.documentType, files.value.map((file) => file.path)).then((response) => {
     emit('sdkApplicantStatusChanged', response.data);
   }).catch((e) => {
-    console.error(e);
+    logRequestFailure(e, 'upload-document');
+    saveFailure.value = failureMessage(e, "We couldn't attach these photos to your account. They are still here, so please try again.");
   }).finally(() => {
     isSaving.value = false;
   });
@@ -79,7 +85,7 @@ const canSave = computed(() => {
   <div class="px-6 py-8 space-y-6">
     <div>
       <h1 class="text-lg font-bold">Upload {{ documentType.title }}</h1>
-      <p class="text-sm/6 text-gray-600">Ensure all details on the document are clear and readable</p>
+      <p class="text-sm/6 text-gray-600">Take a photo of the whole document with no glare, so every detail is readable. JPEG, PNG or WebP, up to {{ MAX_UPLOAD_MB }} MB each. "Front" is the side with your photo.</p>
     </div>
     <div class="grid sm:grid-cols-2 items-center justify-center gap-5">
       <SingleFileUpload
@@ -105,6 +111,7 @@ const canSave = computed(() => {
         </template>
         <template v-else>Upload</template>
       </button>
+      <InlineFailure :message="saveFailure" />
     </form>
   </div>
 </template>
