@@ -29,7 +29,7 @@ describe('Customer.getInstance', () => {
             unique_identity_number: 'UID-1',
             created_at: '2025-01-01',
             updated_at: '2025-06-01',
-            poi_name_check: 'passed',
+            poi_info_check: 'passed',
             is_blocked_for_sending: true,
         })
 
@@ -42,7 +42,7 @@ describe('Customer.getInstance', () => {
         expect(customer.uniqueIdentityNumber).toBe('UID-1')
         expect(customer.createdAt).toBe('2025-01-01')
         expect(customer.updatedAt).toBe('2025-06-01')
-        expect(customer.poiNameCheck).toBe('passed')
+        expect(customer.poiInfoCheck).toBe('passed')
         expect(customer.isBlockedForSending).toBe(true)
     })
 

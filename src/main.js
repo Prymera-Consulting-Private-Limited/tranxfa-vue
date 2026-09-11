@@ -48,7 +48,10 @@ axios.interceptors.response.use((response) => {
         // A session that expires mid-task comes back to that task after
         // signing in again.
         const current = router.currentRoute.value;
-        router.push({ name: 'signIn', query: PUBLIC_ROUTES.has(current.name) ? {} : redirectQueryFor(current) });
+        // Already on a public page (sign-in itself, say): keep the redirect it
+        // was carrying rather than replacing it with nothing.
+        const carried = typeof current.query?.redirect === 'string' ? {redirect: current.query.redirect} : {};
+        router.push({ name: 'signIn', query: PUBLIC_ROUTES.has(current.name) ? carried : redirectQueryFor(current) });
     }
     // A session that lost its MFA trust mid-task: any endpoint can answer
     // 412 more_authentication_required. The MFA screen sends a fresh code

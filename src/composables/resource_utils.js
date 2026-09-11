@@ -1,8 +1,14 @@
 import axios from "axios";
 
 export function useResourceUtils () {
-    const relationships =  async () => {
-        return axios.get('/client/v1/resources/relationships');
+    /**
+     * @param {string|null} countryId narrows the list to the relationships
+     *   enabled for the recipient's country, as the reference documents
+     */
+    const relationships =  async (countryId = null) => {
+        return axios.get('/client/v1/resources/relationships', {
+            params: countryId ? {country_id: countryId} : {},
+        });
     }
 
     const occupations =  async () => {

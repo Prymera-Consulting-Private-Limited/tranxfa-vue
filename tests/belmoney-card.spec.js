@@ -74,21 +74,17 @@ describe('BelmoneyCard', () => {
         expect(setIntervalSpy.mock.calls.some(([, delay]) => delay === 10000)).toBe(true);
     });
 
-    it('shows the setting-up screen when PENDING has neither a URL nor the flag', () => {
-        const {wrapper} = mountWith({stateCode: 'PENDING'});
-        expect(wrapper.text()).toContain('setting up the payment');
+    // The payment resource does not carry awaiting_confirmation today
+    // (SD-1039): for Belmoney, PENDING with no URL is the provider settling
+    // the card itself, so that face shows with or without the flag.
+    it('shows the confirming screen when PENDING has no URL, flag or not', () => {
+        expect(mountWith({stateCode: 'PENDING'}).wrapper.text()).toContain('confirming your payment');
+        expect(mountWith({stateCode: 'PENDING', awaitingConfirmation: true}).wrapper.text()).toContain('confirming your payment');
     });
 
-    it('shows the stuck notice after a minute only when the provider is not settling it', async () => {
+    it('shows the stuck notice after a minute even while the provider is settling it', async () => {
         vi.restoreAllMocks();
         vi.useFakeTimers();
-        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'BELMONEY-CARD', stateCode: 'PENDING', awaitingConfirmation: true})});
-        const waiting = mountWith({stateCode: 'PENDING', awaitingConfirmation: true});
-        await flushPromises();
-        await vi.advanceTimersByTimeAsync(61_000);
-        await flushPromises();
-        expect(waiting.wrapper.text()).not.toContain('taking longer than usual');
-
         axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'BELMONEY-CARD', stateCode: 'PENDING'})});
         const stuck = mountWith({stateCode: 'PENDING'});
         await flushPromises();

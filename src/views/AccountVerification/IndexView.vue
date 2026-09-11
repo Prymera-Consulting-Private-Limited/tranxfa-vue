@@ -4,13 +4,35 @@ import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {IdentificationIcon} from "@heroicons/vue/24/outline/index.js";
 import KycDocumentStatus from "@/enums/kyc_document_status.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const isLoading = ref(false);
+
+// The profile's poi_info_check is `failed` when the name or date of birth on
+// the identity document differs from what the customer typed. The reference
+// says to offer Apply Info From POI on `failed`; until now the customer only
+// met it as a refusal at the end of checkout.
+const poiMismatch = computed(() => customerStore.customer.data?.poiInfoCheck === 'failed');
+const isApplyingPoi = ref(false);
+const applyPoiFailure = ref(null);
+
+async function applyInfoFromPoi() {
+  isApplyingPoi.value = true;
+  applyPoiFailure.value = null;
+  try {
+    const response = await customerUtils.applyInfoFromPoiDocument();
+    customerUtils.updateStore(response.data);
+  } catch (e) {
+    logRequestFailure(e, 'apply-poi-details');
+    applyPoiFailure.value = failureMessage(e, "We couldn't copy the details from your document. Please try again, or upload another document below.");
+  } finally {
+    isApplyingPoi.value = false;
+  }
+}
 /**
  * @type {{data: Customer|null}}
  */
@@ -51,6 +73,12 @@ onMounted(load);
               <div>
                 <h2 class="text-base font-semibold text-gray-900">One Time Verification</h2>
                 <p class="mt-1 text-sm/6 text-gray-500">To keep your account secure and compliant, we just need to verify a few details.<br />This is a quick, one-time process - please follow the steps below to continue.</p>
+                <div v-if="poiMismatch" role="alert" class="mt-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3">
+                  <p class="text-sm/6 font-semibold text-warning-800">The name or date of birth on your ID is different from your profile.</p>
+                  <p class="mt-1 text-sm/6 text-warning-800">We can update your profile to match your ID, or you can upload a document that matches your profile below. Transfers stay on hold until one of these is done.</p>
+                  <p v-if="applyPoiFailure" class="mt-2 text-sm/6 text-danger-700">{{ applyPoiFailure }}</p>
+                  <button type="button" @click="applyInfoFromPoi" :disabled="isApplyingPoi" class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isApplyingPoi ? 'Updating…' : 'Use the details from my ID' }}</button>
+                </div>
                 <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
                   <ul v-if="customerStore.isLoaded === true" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <template v-if="customer.data?.documents.length > 0">

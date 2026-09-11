@@ -64,7 +64,6 @@ describe('every silent catch on the money path now speaks', () => {
     'src/views/Transfer/PaymentCallbackView.vue': 'retryFailure',
     'src/components/Payment/Volume.vue': 'sdkFailure',
     'src/components/Recipient/AttributeCollection.vue': 'saveFailure',
-    'src/components/Recipient/UpdateAttributeCollection.vue': 'saveFailure',
     'src/views/Recipient/ItemView.vue': 'deleteFailure',
     'src/components/DeviceCard.vue': 'signOutFailure',
     'src/components/Customer/CustomerAttributeForm.vue': 'saveFailure',

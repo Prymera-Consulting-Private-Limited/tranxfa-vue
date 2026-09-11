@@ -130,7 +130,7 @@ async function updatePayoutMethod(payoutMethod) {
 async function fetchRelationships() {
   isLoading.value = true;
   retryLast = fetchRelationships;
-  await resourceUtils.relationships().then((response) => {
+  await resourceUtils.relationships(recipient.country?.id ?? null).then((response) => {
     relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship))
   }).catch((e) => {
     logRequestFailure(e, 'recipient-relationships');
