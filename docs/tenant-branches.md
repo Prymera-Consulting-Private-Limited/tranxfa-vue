@@ -118,6 +118,27 @@ Use the `port-to-tenant-branches` skill. The rules it enforces:
 6. **Staging before production.** `<brand>_staging` gets the pick and a smoke
    test before `<brand>_production`.
 
+## Re-applying a brand's copy after a merge
+
+A translated brand (salvtech is the first) carries its Spanish as edits to
+the templates themselves, so a merge of `main` into `<brand>_staging`
+conflicts on every translated file. Resolve those files `--theirs` (main's
+version) and let `scripts/reapply-brand-copy.py` put the brand's words back:
+
+```
+git checkout --theirs -- <the translation-only files>
+python3 scripts/reapply-brand-copy.py --base <merge-base> --brand origin/<brand>_production \
+    --main origin/main --files-from /tmp/translation-only.txt --report /tmp/copy-report.md
+```
+
+It matches each brand edit to main's line by markup skeleton and the English
+words, splices the Spanish into main's line (so main's classes survive), and
+never replaces a bare substring. The report lists (a) what it applied, (b)
+what it could not match, with the closest current line, for a person to do,
+and (c) every English string main introduced since the base: the
+translator's list. `--dry-run` writes the report only; `--self-test` checks
+the matching without git.
+
 ## Starting a new brand
 
 Use the `rebrand-tenant` skill. In outline:
