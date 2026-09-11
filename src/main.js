@@ -7,6 +7,8 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
+import {installErrorHandling} from "@/error_handling.js";
 import axios from "axios";
 
 import Echo from 'laravel-echo';
@@ -17,6 +19,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+installErrorHandling(app, router)
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_URL
 axios.defaults.withCredentials = true;
@@ -24,8 +27,14 @@ axios.defaults.withXSRFToken = true;
 axios.interceptors.request.use((config) => {
     NProgress.start()
     config.headers['Accept'] = 'application/json'
-    config.headers['Accept-Language'] = import.meta.env.VITE_APP_LOCALE
-    config.headers['ngrok-skip-browser-warning'] = 'yes'
+    if (import.meta.env.VITE_APP_LOCALE) {
+        config.headers['Accept-Language'] = import.meta.env.VITE_APP_LOCALE
+    }
+    // Only a local API sits behind ngrok; in production the custom header
+    // just widens every preflight for nothing.
+    if (import.meta.env.VITE_APP_ENV === 'local') {
+        config.headers['ngrok-skip-browser-warning'] = 'yes'
+    }
 
     return config;
 })
@@ -38,7 +47,10 @@ axios.interceptors.response.use((response) => {
     NProgress.done()
     const shouldSkipAuthRedirect = e.config?.skipAuthRedirect === true;
     if (e.status === 401 && ! shouldSkipAuthRedirect) {
-        router.push({ name: 'signIn' });
+        // A session that expires mid-task comes back to that task after
+        // signing in again.
+        const current = router.currentRoute.value;
+        router.push({ name: 'signIn', query: PUBLIC_ROUTES.has(current.name) ? {} : redirectQueryFor(current) });
     }
     throw e;
 })

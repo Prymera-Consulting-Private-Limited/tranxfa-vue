@@ -46,6 +46,20 @@ class PaymentTransaction {
     paymentUrl = null;
 
     /**
+     * Partner payment terms, normalised to plain text server-side; render
+     * verbatim or not at all.
+     * @type {String|null}
+     */
+    paymentTerms = null;
+
+    /**
+     * Absolute ISO-8601 expiry; null means the payment never expires, not
+     * unknown — render no countdown and no urgency when absent.
+     * @type {String|null}
+     */
+    expiresAt = null;
+
+    /**
      * @type {String|null}
      */
     totalPaymentAmount = null;
@@ -75,6 +89,18 @@ class PaymentTransaction {
      */
     state = null;
 
+    /**
+     * Nothing for the customer to do: the provider will settle this payment
+     * on its own (Belmoney's FINISHED and PENDING return shapes). PENDING with
+     * no payment_url is healthy while this is true. Absent means false.
+     *
+     * The API also carries a failure_reason on failed payments. It is written
+     * for operators and names processors, so it is deliberately not mapped
+     * here: the failure screens use our own wording.
+     * @type {Boolean}
+     */
+    awaitingConfirmation = false;
+
     static getInstance(data) {
         const paymentTransaction = new PaymentTransaction();
         paymentTransaction.id = data.id;
@@ -86,12 +112,15 @@ class PaymentTransaction {
         paymentTransaction.paymentProvider = PaymentProvider.getInstance(data.payment_provider);
         paymentTransaction.sharedReference = data.shared_reference;
         paymentTransaction.paymentUrl = data.payment_url;
+        paymentTransaction.paymentTerms = data.payment_terms;
+        paymentTransaction.expiresAt = data.expires_at;
         paymentTransaction.totalPaymentAmount = data.total_payment_amount;
         paymentTransaction.totalPaymentAmountFormatted = data.total_payment_amount_formatted;
         paymentTransaction.totalPaymentAmountCurrencyPrefixed = data.total_payment_amount_currency_prefixed;
         paymentTransaction.createdAt = data.created_at;
         paymentTransaction.updatedAt = data.updated_at;
         paymentTransaction.customerConfirmedPayment = data.customer_confirmed_payment;
+        paymentTransaction.awaitingConfirmation = data.awaiting_confirmation === true;
         if (data.state) {
             paymentTransaction.state = PaymentTransactionState.getInstance(data.state);
         }

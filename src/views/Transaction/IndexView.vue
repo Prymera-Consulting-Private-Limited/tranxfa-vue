@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import Calculator from "@/components/Calculator.vue";
 import { computed, onMounted, ref } from "vue";
@@ -18,11 +20,16 @@ const timeUtils = useTimeUtils();
 
 const data = ref(null);
 const isLoading = ref(true);
+const loadFailure = ref(null);
 
 async function getTransactions(page = null) {
   isLoading.value = true;
+  loadFailure.value = null;
   await transactionUtils.get(page).then((response) => {
     data.value = response.data;
+  }).catch((e) => {
+    logRequestFailure(e, 'transactions');
+    loadFailure.value = failureMessage(e, "We couldn't load your transfers.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -54,12 +61,12 @@ const transactions = computed(() => {
             class="flex flex-col gap-3 rounded-lg border border-gray-100 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div>
               <h2 class="text-base font-semibold text-gray-900">Tus transacciones</h2>
-              <p class="mt-0.5 text-sm text-gray-500">
+              <p class="mt-0.5 text-sm/6 text-gray-500">
                 Solicite un extracto por correo electrónico para cualquier rango de fechas.
               </p>
             </div>
             <button type="button"
-              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
               @click="isStatementModalOpen = true">
               <ArrowDownTrayIcon class="size-5" aria-hidden="true" />
               Descargar declaración
@@ -75,6 +82,9 @@ const transactions = computed(() => {
                 </div>
               </div>
             </div>
+          </template>
+          <template v-else-if="loadFailure">
+            <LoadFailurePanel title="We couldn't load your transfers" :message="loadFailure" retryLabel="Try again" @retry="getTransactions()" class="mt-0 lg:col-span-2" />
           </template>
           <template v-else>
             <template v-if="transactions?.length > 0">
@@ -105,7 +115,7 @@ const transactions = computed(() => {
                 <div>
                   <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
                   <span class="mt-4 block text-lg font-semibold text-gray-900">Aún no tienes transacciones</span>
-                  <p class="mt-2 text-sm text-gray-600 max-w-sm">
+                  <p class="mt-2 text-sm/6 text-gray-600 max-w-sm">
                     ¿Listo para enviar dinero? Tu primera
                     transferencia está a solo unos clics.
                     Comienza ahora y disfruta de envíos

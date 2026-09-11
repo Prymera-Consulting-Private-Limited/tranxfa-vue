@@ -1,10 +1,14 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import {acceptFor, IMAGE_TYPES, validateUpload} from "@/composables/upload_rules.js";
 import {reactive, ref} from "vue";
 import { IdentificationIcon, DocumentTextIcon } from "@heroicons/vue/24/outline";
 import { useAwsS3Utils } from "@/composables/aws_s3_utils.js";
 import { useCustomerUtils } from "@/composables/customer_utils.js";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
+
+const accept = acceptFor(IMAGE_TYPES);
 
 const customerUtils = useCustomerUtils();
 const s3Utils = useAwsS3Utils();
@@ -55,8 +59,9 @@ const handleDrop = (event) => {
 const emit = defineEmits(["fileSelected"]);
 
 const processFile = async () => {
-  if (!file.file.type.startsWith("image/")) {
-    error.value = "Only images are allowed!";
+  const problem = validateUpload(file.file, {types: IMAGE_TYPES});
+  if (problem) {
+    error.value = problem;
     return;
   }
   const reader = new FileReader();
@@ -70,15 +75,24 @@ const processFile = async () => {
   file.path = null;
   file.status = "preparing";
 
-  const response = await customerUtils.getAccountVerificationToken(props.documentCategory, props.documentType, file.file);
+  let response;
+  try {
+    response = await customerUtils.getAccountVerificationToken(props.documentCategory, props.documentType, file.file);
+  } catch (e) {
+    // The most common failure of all used to leave the overlay pulsing forever.
+    logRequestFailure(e, 'upload-token');
+    error.value = failureMessage(e, "We couldn't prepare this photo for upload. Please try again.");
+    file.status = "failed";
+    return;
+  }
   error.value = null;
   file.status = "uploading";
 
   await s3Utils.uploadToPreSignedS3Url(response.data.token, file.file).then(() => {
-    file.path = new URL(response.data.token).pathname.split("/").slice(2).join("/");
+    file.path = response.data.object_key ?? new URL(response.data.token).pathname.split("/").slice(2).join("/");
     file.status = "completed";
   }).catch(() => {
-    error.value = "Something went wrong. Please try again!";
+    error.value = "The upload was interrupted. Check your connection and choose the photo again.";
     file.status = "failed";
   });
 };
@@ -98,7 +112,7 @@ const removeFile = () => {
        :class="{
       'border-brand-500 bg-brand-50': isDragging,
       'border-gray-300 bg-white': !isDragging && !error,
-      'border-red-500 bg-red-50': error,
+      'border-danger-500 bg-danger-50': error,
       'px-6 py-4': !filePreview
     }"
        @dragover.prevent="isDragging = true"
@@ -113,8 +127,8 @@ const removeFile = () => {
     <div v-if="filePreview" class="flex items-center justify-start w-full gap-x-6">
       <div class="relative mx-auto">
         <img :src="filePreview" class="w-48 h-48 object-cover rounded-md mx-auto" :alt="page" />
-        <button class="absolute top-0 right-0 text-white p-1 rounded-full text-xs" @click.stop="removeFile">
-          <i class="pi pi-close text-xs"></i>
+        <button class="absolute top-0 right-0 text-white p-1 rounded-full text-xs/5" @click.stop="removeFile">
+          <i class="pi pi-close text-xs/5"></i>
         </button>
       </div>
     </div>
@@ -124,12 +138,12 @@ const removeFile = () => {
       <IdentificationIcon v-if="page === 'photo'" class="text-gray-400 size-10 mx-auto" />
       <DocumentTextIcon v-else class="text-gray-400 size-10 mx-auto" />
       <div>
-        <p class="text-sm text-gray-600">{{ `Click or drag file here to upload ${page} page` }}</p>
-        <p v-if="error" class="text-xs text-red-500 mt-1">{{ error }}</p>
+        <p class="text-sm/6 text-gray-600">{{ `Click or drag file here to upload ${page} page` }}</p>
+        <p v-if="error" class="text-xs/5 text-danger-600 mt-1">{{ error }}</p>
       </div>
     </div>
 
-    <input ref="fileInput" type="file" class="hidden" @change="handleFileInput" accept="image/*" />
+    <input ref="fileInput" type="file" class="hidden" @change="handleFileInput" :accept="accept" />
 
   </div>
 </template>

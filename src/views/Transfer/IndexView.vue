@@ -1,4 +1,6 @@
 <script setup>
+import InlineFailure from "@/components/InlineFailure.vue";
+import {fixFor} from "@/composables/verification_routes.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
@@ -14,6 +16,8 @@ import Progress from "@/components/Transaction/Progress.vue";
 import RecipientCardShimmer from "@/components/Recipient/RecipientCardShimmer.vue";
 import vSelect from 'vue-select';
 import router from "@/router/index.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
+import {failureMessage, fieldlessErrors, getCustomerMessage, logRequestFailure} from "@/composables/api_utils.js";
 import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import {useCustomerStore} from "@/stores/customer.js";
@@ -25,6 +29,12 @@ import {createPopper} from "@popperjs/core";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
 import QuotePendingDocument from "@/models/quote_pending_document.js";
 import DocumentCategory from "@/models/document_category.js";
+import SpendOtpModal from "@/components/Wallet/SpendOtpModal.vue";
+import TermsModal from "@/components/Wallet/TermsModal.vue";
+import TopUpFlow from "@/components/Wallet/TopUpFlow.vue";
+import WalletRefusalType from "@/enums/wallet_refusal_type.js";
+import {useWalletStore} from "@/stores/wallet.js";
+import {useWalletUtils} from "@/composables/wallet_utils.js";
 
 const thirdPartyDeclaration = import.meta.env.VITE_THIRD_PARTY_TRANSACTION_DECLARATION;
 const thirdPartyDeclarationAccepted = ref(false);
@@ -49,12 +59,23 @@ const quote = reactive({
   data: null
 });
 const isLoading = ref(false);
+const quoteFailure = ref(null);
 const isStepProcessing = ref(false);
 const isSubComponentLoading = ref(false);
 const purpose = ref(null);
 const paymentMethod = ref(null);
 const isAddressRequired = ref(false);
 const selectedUploadDocumentCategory = ref(null);
+
+const walletStore = useWalletStore();
+const walletUtils = useWalletUtils();
+const walletOtp = ref('');
+const isSpendOtpModalOpen = ref(false);
+const spendOtpError = ref('');
+const isWalletTermsModalOpen = ref(false);
+const walletTermsMode = ref('enrol');
+const isWalletTopUpOpen = ref(false);
+const walletShortMessage = ref('');
 
 onMounted(async () => {
   if (customerStore.isLoaded === false) {
@@ -64,11 +85,19 @@ onMounted(async () => {
   isAddressRequired.value = customerStore.customer.data.addressInformationRequired();
   if (! quote.data) {
     isLoading.value = true;
-    await quoteUtils.getTransferQuote(props.id).then((response) => {
+    // Without this the rejection escaped onMounted before isLoading could be
+    // cleared, so a quote that had expired or never existed left the customer
+    // watching a spinner with no way to know it would never finish.
+    try {
+      const response = await quoteUtils.getTransferQuote(props.id);
       quote.data = TransactionQuote.getInstance(response.data);
       send({ type: 'SET_CONTEXT', quote: quote.data });
       send({ type: 'PROCEED' });
-    });
+    } catch (error) {
+      quoteFailure.value = getCustomerMessage(error) ?? true;
+      isLoading.value = false;
+      return;
+    }
   }
   if (quote.data.paymentMethods.length === 1) {
     paymentMethod.value = quote.data.paymentMethods[0];
@@ -90,10 +119,14 @@ const createRecipient = async () => {
 
 const setRecipient =  async (recipient) => {
   isLoading.value = true;
+  stepFailure.value = null;
   await quoteUtils.setRecipient(props.id, recipient).then((response) => {
     quote.data = TransactionQuote.getInstance(response.data);
     send({ type: 'SET_CONTEXT', quote: quote.data });
     send({ type: 'PROCEED' });
+  }).catch((e) => {
+    logRequestFailure(e, 'quote-set-recipient');
+    stepFailure.value = failureMessage(e, "We couldn't add that recipient to this transfer. Please choose them again.");
   });
   isLoading.value = false;
 }
@@ -111,6 +144,11 @@ const preconditionFailedMessage = ref('');
 
 const confirmFormErrors = ref([]);
 
+// Everything the confirm step refused that is not a payment-data field. Those
+// were stored and never rendered, so the spinner cleared and the form looked
+// unchanged.
+const confirmGeneralErrors = computed(() => fieldlessErrors(confirmFormErrors.value, 'payment_data.'));
+
 const confirmQuote = async () => {
   preconditionFailedMessage.value = '';
   try {
@@ -120,12 +158,13 @@ const confirmQuote = async () => {
         paymentDataAttributes[paymentDataAttribute[0]] = paymentDataAttribute[1].value;
       }
     }
-    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes, thirdPartyDeclarationAccepted.value);
+    const response = await quoteUtils.confirmQuote(quote.data, purpose.value, paymentMethod.value, paymentDataAttributes, thirdPartyDeclarationAccepted.value, walletOtp.value || null);
     const transaction = response.data;
     isStepProcessing.value = false;
+    isSpendOtpModalOpen.value = false;
     await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
   } catch (error) {
-    if (error.response.status === 412) {
+    if (error.response?.status === 412) {
       if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
@@ -141,13 +180,49 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "poi_info_check_failed") {
         isStepProcessing.value = false;
         await send({ type: 'POI_INFO_CHECK_FAILED' });
+      } else if (error.response.data.type === WalletRefusalType.SUBSCRIPTION_REQUIRED) {
+        isStepProcessing.value = false;
+        walletTermsMode.value = 'enrol';
+        isWalletTermsModalOpen.value = true;
+      } else if (error.response.data.type === WalletRefusalType.TERMS_REACCEPTANCE_REQUIRED) {
+        isStepProcessing.value = false;
+        walletTermsMode.value = 'reaccept';
+        isWalletTermsModalOpen.value = true;
+      } else if (error.response.data.type === WalletRefusalType.INSUFFICIENT_BALANCE) {
+        isStepProcessing.value = false;
+        isSpendOtpModalOpen.value = false;
+        walletShortMessage.value = error.response.data.message;
+        walletUtils.getWallet().catch(() => {});
+      } else if (error.response.data.type === WalletRefusalType.AUTHORIZATION_REQUIRED) {
+        await requestWalletSpendCode();
+      } else if (error.response.data.type === WalletRefusalType.AUTHORIZATION_INVALID) {
+        isStepProcessing.value = false;
+        spendOtpError.value = error.response.data.message;
+        isSpendOtpModalOpen.value = true;
       } else if (error.response.data.type === "duplicate_transaction" || error.response.data.type === "active_transfer_disable_rule") {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message;
+      } else if (error.response.data.type === "missing_recipient") {
+        // The quote has no recipient any more (deleted, or a stale tab).
+        isStepProcessing.value = false;
+        preconditionFailedMessage.value = error.response.data.message || 'Please choose who to send this transfer to.';
+        await send({ type: 'SELECT_RECIPIENT' });
+      } else if (fixFor(error.response.data.type, router.currentRoute.value.fullPath)) {
+        // Something on the profile has to be finished first: a mobile number
+        // to verify, an identity form to complete. Send them there; the
+        // onboarding flow brings them back to this transfer.
+        isStepProcessing.value = false;
+        await router.push(fixFor(error.response.data.type, router.currentRoute.value.fullPath).route);
+      } else {
+        isStepProcessing.value = false;
+        preconditionFailedMessage.value = error.response.data.message || 'We could not confirm this transfer. Please try again.';
       }
-    } else if (error.response.status === 422) {
+    } else if (error.response?.status === 422) {
       confirmFormErrors.value = error.response.data.errors;
       isStepProcessing.value = false;
+    } else {
+      isStepProcessing.value = false;
+      preconditionFailedMessage.value = 'We could not confirm this transfer. Please check your connection and try again.';
     }
   }
 }
@@ -171,6 +246,7 @@ const customerAttributeCategoryUpdated = async () => {
 }
 
 async function documentUploaded() {
+  stepFailure.value = null;
   await quoteUtils.getTransferQuote(props.id).then((response) => {
     quote.data = TransactionQuote.getInstance(response.data);
     send({ type: 'SET_CONTEXT', quote: quote.data });
@@ -180,6 +256,9 @@ async function documentUploaded() {
         confirmQuote();
       }
     }
+  }).catch((e) => {
+    logRequestFailure(e, 'quote-after-upload');
+    stepFailure.value = failureMessage(e, "Your document was received, but we couldn't refresh this transfer. Please reload the page.");
   });
   selectedUploadDocumentCategory.value = null;
   isLoading.value = false;
@@ -217,17 +296,27 @@ const addRecipientLoadingStateUpdated = (e) => {
   isSubComponentLoading.value = e;
 }
 
+// The document was handed over but the category is still pending, which
+// means it is with our compliance team rather than missing.
+const documentInReview = computed(() => {
+  if (! watchForDocumentUpdate.value || isLoading.value) return null;
+  return selectedUploadDocumentCategory.value?.title?.toLowerCase() ?? 'document';
+});
+
+const applyPoiFailure = ref(null);
 const isApplyingInfoFromPoiDocument = ref(false);
 
 const applyInfoFromPoiDocument = async () => {
   isApplyingInfoFromPoiDocument.value = true;
+  applyPoiFailure.value = null;
   customerUtils.applyInfoFromPoiDocument().then((response) => {
     customerUtils.updateStore(response.data);
     send({ type: 'PROCEED' });
     isStepProcessing.value = true;
     confirmQuote();
   }).catch((e) => {
-    console.error(e);
+    logRequestFailure(e, 'apply-poi-details');
+    applyPoiFailure.value = failureMessage(e, "We couldn't copy the details from your document. Please try again or update your details by hand.");
   }).finally(() => {
     isApplyingInfoFromPoiDocument.value = false;
   });
@@ -268,22 +357,33 @@ function startVerification(category) {
   selectedUploadDocumentCategory.value = category;
 }
 
+const stepFailure = ref(null);
+
+// The "upload another document" step needs the identity category before it
+// can show anything. If that request fails the customer used to be left on a
+// blank step with the spinner gone.
+function loadPoiCategory() {
+  isLoading.value = true;
+  stepFailure.value = null;
+  customerUtils.documentCategories().then((response) => {
+    const documentCategories = response.data.map((category) => DocumentCategory.getInstance(category));
+    const poiDocumentCategory = documentCategories.find(category => category.code === 'POI');
+    if (poiDocumentCategory) {
+      selectedUploadDocumentCategory.value =  poiDocumentCategory;
+      quote.data.pendingDocuments.push(poiDocumentCategory);
+    }
+    send({ type: 'PROCEED' });
+  }).catch((e) => {
+    logRequestFailure(e, 'poi-category');
+    stepFailure.value = failureMessage(e, "We couldn't load the document upload. Please try again.");
+  }).finally(() => {
+    isLoading.value = false;
+  });
+}
+
 watch(snapshot, () => {
   if (snapshot.value?.value === 'uploadAnotherPoi') {
-    isLoading.value = true;
-    customerUtils.documentCategories().then((response) => {
-      const documentCategories = response.data.map((category) => DocumentCategory.getInstance(category));
-      const poiDocumentCategory = documentCategories.find(category => category.code === 'POI');
-      if (poiDocumentCategory) {
-        selectedUploadDocumentCategory.value =  poiDocumentCategory;
-        quote.data.pendingDocuments.push(poiDocumentCategory);
-      }
-      send({ type: 'PROCEED' });
-    }).catch((e) => {
-      console.error(e);
-    }).finally(() => {
-      isLoading.value = false;
-    });
+    loadPoiCategory();
   }
 });
 
@@ -299,8 +399,53 @@ watch(paymentMethod, (newValue) => {
         paymentData.data[attribute.attribute] = attribute;
       });
     }
+    walletOtp.value = '';
+    walletShortMessage.value = '';
+    if (newValue.code === 'WALLET' && walletStore.isEnrolled) {
+      walletUtils.getWallet().catch(() => {});
+    }
   }
 });
+
+const walletCheckoutBalance = computed(() => {
+  return walletStore.wallet.data?.balanceFor(quote.data?.paymentCurrency?.code) ?? null;
+});
+
+watch(() => walletStore.isEnrolled, (enrolled) => {
+  if (enrolled && paymentMethod.value?.code === 'WALLET') {
+    walletUtils.getWallet().catch(() => {});
+  }
+});
+
+const requestWalletSpendCode = async () => {
+  spendOtpError.value = '';
+  walletOtp.value = '';
+  await walletUtils.requestSpendOtp(quote.data.id).then(() => {
+    isStepProcessing.value = false;
+    isSpendOtpModalOpen.value = true;
+  }).catch((error) => {
+    isStepProcessing.value = false;
+    preconditionFailedMessage.value = error.response?.data?.message ?? 'Something went wrong. Please try again.';
+  });
+}
+
+const walletOtpEntered = async (otp) => {
+  walletOtp.value = otp;
+  spendOtpError.value = '';
+  isStepProcessing.value = true;
+  await confirmQuote();
+}
+
+const walletTermsAccepted = async () => {
+  isWalletTermsModalOpen.value = false;
+  isStepProcessing.value = true;
+  await confirmQuote();
+}
+
+const walletTopUpClosed = () => {
+  isWalletTopUpOpen.value = false;
+  walletUtils.getWallet().catch(() => {});
+}
 
 const canContinue = computed(() => {
   if (snapshot.value?.value === 'confirm') {
@@ -346,14 +491,22 @@ const canContinue = computed(() => {
                     <Spinner class="size-16 mx-auto" />
                     <span class="sr-only">Cargando...</span>
                   </div>
+                  <LoadFailurePanel
+                    v-else-if="quoteFailure"
+                    title="We couldn't load this transfer"
+                    :message="typeof quoteFailure === 'string' ? quoteFailure : null"
+                    :backTo="{name: 'dashboard'}"
+                    backLabel="Start a new transfer"
+                  />
                   <template v-else>
-                    <div v-if="preconditionFailedMessage" class="border-l-4 border-yellow-400 bg-yellow-50 p-4 mb-5">
+                    <InlineFailure :message="stepFailure" retryLabel="Try again" @retry="loadPoiCategory" class="mb-5" />
+                    <div v-if="preconditionFailedMessage" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
                       <div class="flex">
                         <div class="shrink-0">
-                          <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+                          <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                         </div>
                         <div class="ml-3">
-                          <p class="text-sm text-yellow-700">
+                          <p class="text-sm/6 text-warning-700">
                             {{ preconditionFailedMessage }}
                           </p>
                         </div>
@@ -383,11 +536,11 @@ const canContinue = computed(() => {
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
                       <h3 class="text-gray-900 mb-4 font-semibold">Proporcione su dirección</h3>
-                      <p class="text-gray-500 text-sm mb-3 -mt-2">
+                      <p class="text-gray-500 text-sm/6 mb-3 -mt-2">
                         Por favor, proporcione su dirección residencial completa en
                         <span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span>.
                       </p>
-                      <p class="text-gray-500 text-sm mb-6 -mt-2 leading-5">
+                      <p class="text-gray-500 text-sm/6 mb-6 -mt-2">
                         <span>Se requiere información precisa sobre la dirección para cumplir con las normativas financieras y garantizar transferencias seguras.</span>
                       </p>
 
@@ -404,6 +557,10 @@ const canContinue = computed(() => {
                       <h3 class="text-gray-900 mb-4 font-semibold">Verificación única</h3>
                       <template v-if="selectedUploadDocumentCategory">
                         <CategoryDescription v-bind:category="selectedUploadDocumentCategory" />
+                        <div v-if="documentInReview" role="status" class="mb-5 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
+                          <p class="font-semibold">Thanks, we have your {{ documentInReview }}.</p>
+                          <p>We are checking it now. We will email you when it is done, and your transfer will carry on from here.</p>
+                        </div>
                         <ul v-if="selectedUploadDocumentCategory.documentTypes?.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                           <li v-for="documentType in selectedUploadDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
                             <DocumentTypeItem
@@ -415,20 +572,20 @@ const canContinue = computed(() => {
                         </ul>
                       </template>
                       <template v-else>
-                        <p class="text-gray-500 text-sm mb-6">
+                        <p class="text-gray-500 text-sm/6 mb-6">
                           Necesitamos verificar su cuenta para procesar esta transacción. Para ello, por favor proporcione los documentos correspondientes a cada una de las categorías que se indican a continuación.
                         </p>
                         <ul v-if="quote.data.pendingDocuments[0].documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6">
                           <li v-for="pendingCategory in quote.data?.pendingDocuments" :key="pendingCategory.id" class="col-span-1 flex rounded-lg bg-white items-start border-1 border-gray-200 hover:shadow-sm transition-transform transform hover:scale-105 px-6 py-3">
                             <div class="text-left pl-3 py-3">
-                              <h3 class="text-sm font-medium text-gray-900">{{ pendingCategory.title }}</h3>
+                              <h3 class="text-sm/6 font-medium text-gray-900">{{ pendingCategory.title }}</h3>
                               <dl v-if="pendingCategory.description" class="mt-0 flex grow flex-col justify-between">
                                 <dt class="sr-only">Información</dt>
-                                <dd class="mt-1 text-sm text-gray-500">
+                                <dd class="mt-1 text-sm/6 text-gray-500">
                                   <CategoryDescription v-bind:category="pendingCategory" />
                                 </dd>
                                 <dt class="sr-only">Iniciar verificación</dt>
-                                <dd class="text-sm text-gray-500">
+                                <dd class="text-sm/6 text-gray-500">
                                   <a href="javascript:" @click="startVerification(pendingCategory)" class="text-brand-700 font-semibold hover:underline">Iniciar verificación</a>
                                 </dd>
                               </dl>
@@ -454,39 +611,39 @@ const canContinue = computed(() => {
                 <div v-if="snapshot.value !== 'confirm'" class="hidden sm:grid"><QuoteDisplay v-bind:quote="quote.data" /></div>
                 <template v-else>
                   <div class="px-3 sm:px-0">
-                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Selecciona el motivo <span class="text-red-500">*</span></label>
-                    <p class="mb-4 text-sm text-gray-500">Por favor, indique al destinatario el motivo de su transferencia.</p>
+                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Selecciona el motivo <span class="text-danger-600">*</span></label>
+                    <p class="mb-4 text-sm/6 text-gray-500">Por favor, indique al destinatario el motivo de su transferencia.</p>
                     <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Por favor, seleccione`" key-by="id" label="title">
                       <template v-slot:no-options="{ search, searching }">
-                        <template class="text-sm text-gray-300" v-if="searching">No se encontraron resultados para <em>{{ search }}</em>.</template>
-                        <em class="text-sm text-gray-400 opacity-50" v-else>Empieza a escribir para buscar...</em>
+                        <template class="text-sm/6 text-gray-300" v-if="searching">No se encontraron resultados para <em>{{ search }}</em>.</template>
+                        <em class="text-sm/6 text-gray-500 opacity-50" v-else>Empieza a escribir para buscar...</em>
                       </template>
                       <template #selected-option-container="{ option, deselect, multiple, disabled }">
                         <div class="vs__selected">
                           <div class="flex items-center w-auto">
-                            <div class="text-sm flex items-center w-full gap-x-2">
+                            <div class="text-sm/6 flex items-center w-full gap-x-2">
                               <span class="lg:max-w-sm xl:max-w-md truncate">{{ option.title }}</span>
                             </div>
                           </div>
                         </div>
                       </template>
                       <template #option="option">
-                        <div class="text-sm flex items-center w-full gap-x-3 truncate">
+                        <div class="text-sm/6 flex items-center w-full gap-x-3 truncate">
                           <span class="truncate">{{ option.title }}</span>
                         </div>
                       </template>
                     </v-select>
 
                     <fieldset aria-label="Payment Method" class="mt-6 mb-4">
-                      <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Método de pago<span class="text-red-500">*</span></label>
-                      <p class="mb-4 text-sm text-gray-500">Por favor, seleccione cómo desea pagar.</p>
+                      <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Método de pago <span class="text-danger-600">*</span></label>
+                      <p class="mb-4 text-sm/6 text-gray-500">Por favor, seleccione cómo desea pagar.</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
                           <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
                           <span class="flex flex-1">
                             <span class="flex flex-col">
-                              <span class="block text-sm font-medium text-gray-900">{{ paymentMethod.title }}</span>
-                              <!--<span class="mt-1 flex items-center text-sm text-gray-500">{{ paymentMethod.description }}</span>-->
+                              <span class="block text-sm/6 font-medium text-gray-900">{{ paymentMethod.title }}</span>
+                              <!--<span class="mt-1 flex items-center text-sm/6 text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
                             <CheckCircleIcon v-if="checked" :class="[!checked ? 'text-gray-400' : 'text-brand-600', 'size-5']" aria-hidden="true" />
@@ -499,13 +656,46 @@ const canContinue = computed(() => {
                     <template v-if="paymentMethod?.providers[0]?.paymentDataAttributes?.length > 0">
                       <template v-for="attribute in paymentMethod?.providers[0].paymentDataAttributes">
                         <div class="mb-4">
-                          <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-red-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-red-500" v-if="attribute.isRequired">*</span></label>
-                          <p v-if="attribute.info" class="mb-4 text-sm text-gray-500">{{ attribute.info }}</p>
+                          <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
+                          <p v-if="attribute.info" class="mb-4 text-sm/6 text-gray-500">{{ attribute.info }}</p>
                           <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
                           <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
-                          <p v-if="confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ confirmFormErrors[`payment_data.${attribute.attribute}`][0] }}</p>
+                          <p v-if="confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ confirmFormErrors[`payment_data.${attribute.attribute}`][0] }}</p>
                         </div>
                       </template>
+                    </template>
+
+                    <template v-if="paymentMethod?.code === 'WALLET'">
+                      <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                        <template v-if="walletStore.isEnrolled">
+                          <div class="flex items-center justify-between text-sm/6 text-gray-600">
+                            <span>Wallet balance</span>
+                            <span class="font-semibold text-gray-900">{{ walletCheckoutBalance?.amountFormatted ?? '—' }}</span>
+                          </div>
+                          <div class="mt-1 flex items-center justify-between text-sm/6 text-gray-600">
+                            <span>This transfer</span>
+                            <span class="font-semibold text-gray-900">{{ quote.data.totalAmountCurrencyPrefixed }}</span>
+                          </div>
+                          <template v-if="walletStore.requiresReacceptance">
+                            <div class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
+                              <p class="text-sm/6 text-warning-700">We've updated the wallet terms — accept the new version to pay with your wallet.</p>
+                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Review and accept &rarr;</button>
+                            </div>
+                          </template>
+                          <p v-else class="mt-2 text-xs/5 text-gray-500">You'll confirm this payment with a code we email you.</p>
+                          <div v-if="walletShortMessage" class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
+                            <p class="text-sm/6 text-warning-700">{{ walletShortMessage }}</p>
+                            <div class="mt-2 flex items-center gap-x-4">
+                              <button type="button" @click="isWalletTopUpOpen = true" class="text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Add money &rarr;</button>
+                              <span class="text-xs/5 text-warning-700">or choose another way to pay above</span>
+                            </div>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <p class="text-sm/6 text-gray-600">Activate your wallet to pay this way — read and accept the terms, then load money by bank transfer.</p>
+                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">Activate wallet &rarr;</button>
+                        </template>
+                      </div>
                     </template>
 
                     <!-- Checkbox -->
@@ -517,13 +707,18 @@ const canContinue = computed(() => {
                   </div>
                 </template>
               </template>
+              <div v-if="confirmGeneralErrors.length > 0" class="mx-3 sm:mx-0 rounded-md bg-danger-50 p-4" role="alert">
+                <ul role="list" class="list-disc space-y-1 pl-5 text-sm/6 text-danger-700">
+                  <li v-for="(message, index) in confirmGeneralErrors" :key="index">{{ message }}</li>
+                </ul>
+              </div>
               <div class="py-4 px-3 sm:px-0">
-                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+                <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6">
                   <span v-if="isStepProcessing" class="flex justify-center items-center">
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>Saving...</span>
                   </span>
-                  <span v-else>Continuar</span>
+                  <span v-else>{{ snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? 'Pay with Wallet' : 'Continue' }}</span>
                 </button>
               </div>
             </section>
@@ -540,19 +735,19 @@ const canContinue = computed(() => {
           </div>
         </div>
         <TransitionRoot as="template" :show="true">
-          <Dialog class="relative z-10">
+          <Dialog class="relative z-50">
             <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
               <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
             </TransitionChild>
-            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="fixed inset-0 z-50 w-screen overflow-y-auto">
               <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                   <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
                     <button class="sr-only">Se ha detectado una discrepancia de identidad</button>
                     <div class="">
                       <div class="text-left">
-                        <h3 class="font-semibold text-gray-600">Se ha detectado una discrepancia de identidad</h3>
-                        <p class="leading-5 font-normal text-sm/8 text-gray-500 mt-3">
+                        <h3 class="font-semibold text-danger-600">Se ha detectado una discrepancia de identidad</h3>
+                        <p class="font-normal text-sm/6 text-danger-600 mt-3">
                           Hemos detectado una discrepancia entre su perfil y el documento de identidad que ha enviado. Para continuar con el proceso de verificación, por favor elija una de las siguientes opciones:
                         </p>
                         <ul role="list" class="mt-6 divide-y divide-gray-200" :class="isApplyingInfoFromPoiDocument ? 'opacity:70 animate animate-pulse' : ''">
@@ -564,13 +759,13 @@ const canContinue = computed(() => {
                                 </span>
                               </div>
                               <div class="min-w-0 flex-1 px-2.5">
-                                <div class="text-sm font-medium text-gray-900">
+                                <div class="text-sm/6 font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
                                     Subir otro documento
                                   </div>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-1 leading-5">
+                                <p class="text-sm/6 text-gray-500 mt-1">
                                   Proporcionaré un documento diferente que coincida con mi perfil.
                                 </p>
                               </div>
@@ -579,6 +774,7 @@ const canContinue = computed(() => {
                               </div>
                             </div>
                           </li>
+                          <li v-if="applyPoiFailure" class="py-2"><InlineFailure :message="applyPoiFailure" /></li>
                           <li @click="applyInfoFromPoiDocument" :class="isApplyingInfoFromPoiDocument ? 'bg-gray-100' : 'cursor-pointer'">
                             <div class="group relative flex items-start space-x-3 py-4">
                               <div class="shrink-0">
@@ -587,13 +783,13 @@ const canContinue = computed(() => {
                                 </span>
                               </div>
                               <div class="min-w-0 flex-1 px-2.5">
-                                <div class="text-sm font-medium text-gray-900">
+                                <div class="text-sm/6 font-medium text-gray-900">
                                   <div>
                                     <span class="absolute inset-0" aria-hidden="true" />
                                     Usar detalles del documento
                                   </div>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-1 leading-5">
+                                <p class="text-sm/6 text-gray-500 mt-1">
                                   Actualizar mi perfil con la información de este documento.
                                 </p>
                               </div>
@@ -612,6 +808,9 @@ const canContinue = computed(() => {
           </Dialog>
         </TransitionRoot>
       </template>
+      <SpendOtpModal :open="isSpendOtpModalOpen" :quoteId="quote.data?.id" :error="spendOtpError" :isSubmitting="isStepProcessing" @close="isSpendOtpModalOpen = false" @complete="walletOtpEntered" />
+      <TermsModal :open="isWalletTermsModalOpen" :mode="walletTermsMode" @close="isWalletTermsModalOpen = false" @accepted="walletTermsAccepted" />
+      <TopUpFlow :open="isWalletTopUpOpen" @close="walletTopUpClosed" />
     </main>
   </CustomerLayout>
 </template>

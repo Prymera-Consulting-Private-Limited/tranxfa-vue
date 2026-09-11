@@ -44,9 +44,19 @@ const maskaOptions = reactive({
 });
 
 const unmaskedValue = ref(null);
+const input = ref(null);
 
 const onMaska = (event) => {
   unmaskedValue.value = event.detail.unmasked;
+  // Emit while typing, not only on blur. The calculator debounces this, so a
+  // burst of keystrokes still produces one quote - but the customer sees the
+  // price follow what they type instead of having to leave the field first.
+  //
+  // Read the masked value rather than event.detail.unmasked: unmasked drops the
+  // decimal point, so "12.34" arrives as "1234" and would quote a hundred times
+  // the amount. parseAmount already handles the displayed form, and it is the
+  // same path blur takes.
+  emitAmount(event.target.value);
 }
 
 const amountModel = computed({
@@ -59,30 +69,53 @@ function selectOption(option) {
     emit('option:updated', option);
   }
 }
-function amountUpdated(event) {
-  const raw = event.target.value?.replace(/,/g, '');
-  const newValue = parseFloat(raw);
-  if (!isNaN(newValue)) {
-    const fixedValue = Number(newValue.toFixed(props.currency.decimalPlaces));
-    if (fixedValue !== props.amount) {
-      emit('update:amount', fixedValue);
-    }
+function parseAmount(value) {
+  const raw = value?.replace(/,/g, '');
+  const parsed = parseFloat(raw);
+  if (isNaN(parsed)) {
+    return null;
+  }
+  return Number(parsed.toFixed(props.currency.decimalPlaces));
+}
+
+function emitAmount(value) {
+  const newValue = parseAmount(value);
+  if (newValue !== null && newValue !== props.amount) {
+    emit('update:amount', newValue);
   }
 }
 
+// Blur still emits. Typing covers the ordinary case, but maska can settle on a
+// different value when the field loses focus - a trailing separator dropped, a
+// half-typed decimal completed - and that correction has to reach the quote.
+function amountUpdated(event) {
+  emitAmount(event.target.value);
+}
 
+// The typed value when it differs from the quoted amount — blur has not fired yet.
+function pendingAmount() {
+  const newValue = parseAmount(input.value?.value);
+  if (newValue === null || newValue === props.amount) {
+    return null;
+  }
+  return newValue;
+}
+
+defineExpose({
+  pendingAmount,
+});
 </script>
 <template>
   <div class="flex items-center rounded-md bg-white pl-3 outline-2 -outline-offset-1 outline-brand-700 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-brand-700">
     <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6">{{ currency.iconUnicode }}</div>
-    <input inputmode="decimal" :id="inputId" @blur="amountUpdated" v-maska="maskaOptions" @maska="onMaska" type="text" v-model="amountModel" class="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" placeholder="0.00" />
+    <input ref="input" inputmode="decimal" :id="inputId" @blur="amountUpdated" v-maska="maskaOptions" @maska="onMaska" type="text" v-model="amountModel" class="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none sm:text-sm/6" placeholder="0.00" />
     <div class="grid shrink-0 grid-cols-1 focus-within:relative bg-white">
       <Menu as="div" class="relative inline-block text-left">
         <div>
-          <MenuButton as="div" :class="{'cursor-pointer': options.length > 1 && ! disableSelection}" class="inline-flex w-full items-center justify-center rounded-r-md bg-brand-700 px-4 py-4 text-sm font-medium text-white">
+          <MenuButton as="div" :class="{'cursor-pointer': options.length > 1 && ! disableSelection}" class="inline-flex w-full items-center justify-center rounded-r-md bg-brand-700 px-4 py-4 text-sm/6 font-medium text-white">
             <FlagIcon :class="['ring-2 ring-white']" :code="country.iso2Alpha.toLowerCase()" circle />
-            <strong class="text-sm tracking-wider ml-2">{{ currency.code }}</strong>
-            <ChevronDownIcon v-if="options.length > 1 && !disableSelection" class="-mr-1 ml-2 h-5 w-5 text-violet-200 hover:text-violet-100" aria-hidden="true"/>
+            <strong class="text-sm/6 tracking-wider ml-2">{{ currency.code }}</strong>
+            <ChevronDownIcon v-if="options.length > 1 && !disableSelection" class="-mr-1 ml-2 h-5 w-5 text-brand-200 hover:text-brand-100" aria-hidden="true"/>
           </MenuButton>
         </div>
         <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
@@ -90,13 +123,13 @@ function amountUpdated(event) {
             <MenuItem as="div" v-for="(option, index) in options" v-slot="{ active }">
               <button @click="selectOption(option)" :class="[
                 active ? 'text-brand-900' : 'text-gray-900',
-                'group flex w-full items-center px-4 py-4 text-sm tracking-wider gap-x-2 cursor-pointer',
+                'group flex w-full items-center px-4 py-4 text-sm/6 tracking-wider gap-x-2 cursor-pointer',
                 index === 0 ? 'rounded-t-md' : '',
                 index === options.length - 1 ? 'rounded-b-md' : ''
               ]">
                 <FlagIcon :class="['ring-2 ring-white']" :code="option.country.iso2Alpha.toLowerCase()" circle />
-                <strong class="text-sm">{{ option.currency.code }}</strong>
-                <span class="text-sm">{{ option.country.commonName }}</span>
+                <strong class="text-sm/6">{{ option.currency.code }}</strong>
+                <span class="text-sm/6">{{ option.country.commonName }}</span>
               </button>
             </MenuItem>
           </MenuItems>
@@ -104,5 +137,5 @@ function amountUpdated(event) {
       </Menu>
     </div>
   </div>
-  <p v-if="errors.length > 0" class="mt-3 ml-6 text-xs text-red-600">{{ errors[0] }}</p>
+  <p v-if="errors.length > 0" class="mt-3 ml-6 text-xs/5 text-danger-600">{{ errors[0] }}</p>
 </template>

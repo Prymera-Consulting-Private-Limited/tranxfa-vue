@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import Country from "@/models/country.js";
 import Currency from "@/models/currency.js";
 import PayoutMethod from "@/models/payout_method.js";
@@ -129,9 +131,13 @@ async function updateRelationship(relationship) {
 }
 
 const isFetchingDeliveryOptions = ref(false);
+const deliveryOptionsFailure = ref(null);
+let lastDeliveryOption = null;
 
 function loadSubDeliveryOptions(deliveryOption) {
   isFetchingDeliveryOptions.value = true;
+  deliveryOptionsFailure.value = null;
+  lastDeliveryOption = deliveryOption;
   props.payoutChannel.attributes.forEach(function (attribute) {
     if (attribute.type === RecipientDataType.SUB_DELIVERY_OPTION) {
       attribute.options = [];
@@ -143,6 +149,9 @@ function loadSubDeliveryOptions(deliveryOption) {
         attribute.options = response.data.map(o => SubDeliveryOption.getInstance(o));
       }
     });
+  }).catch((e) => {
+    logRequestFailure(e, 'sub-delivery-options');
+    deliveryOptionsFailure.value = failureMessage(e, "We couldn't load the branches for that choice.");
   }).finally(() => {
     isFetchingDeliveryOptions.value = false;
   });
@@ -164,6 +173,7 @@ async function updateRecipientInput(updated, attribute) {
 }
 
 const isSaving = ref(false);
+const saveFailure = ref(null);
 
 const recipientUtils = useRecipientUtils();
 
@@ -175,6 +185,7 @@ const emit = defineEmits([
 
 async function addRecipient() {
   isSaving.value = true;
+  saveFailure.value = null;
   Object.entries(errors).forEach(([key]) => {
     errors[key] = [];
   });
@@ -183,14 +194,13 @@ async function addRecipient() {
     emit('recipient:added', recipient);
   }).catch((e) => {
     emit('recipient:add:failed');
-    if (e.status === 422) {
+    if (e.response?.status === 422) {
       for (const [key, value] of Object.entries(e.response.data.errors)) {
         errors[key] = value;
       }
     } else {
-      console.error(e)
-      isSaving.value = false;
-      throw e;
+      logRequestFailure(e, 'recipient-add');
+      saveFailure.value = failureMessage(e, "We couldn't save this recipient. Please try again.");
     }
   }).finally(() => {
     isSaving.value = false;
@@ -198,12 +208,12 @@ async function addRecipient() {
 }
 
 const isLookingUp = ref(false);
+const nameLookupRequirements = computed(() => {
+  return props.payoutChannel.configuration?.nameLookupRequirements ?? [];
+});
 const nameLookup = computed(() => {
-  let requirements = props.payoutChannel.configuration?.nameLookupRequirements;
-  if (requirements?.length === 0) {
-    requirements = props.payoutChannel.configuration?.nameValidationRequirements;
-  }
-  if (requirements?.length > 0) {
+  const requirements = nameLookupRequirements.value;
+  if (requirements.length > 0) {
     return {
       attributes: requirements.map((attribute => {
         return {
@@ -284,6 +294,9 @@ const debouncedLookup = debounce(() => {
 }, 1000);
 
 watch(nameLookup, function (newValue) {
+  if (nameLookupRequirements.value.length === 0) {
+    return;
+  }
   const nameAttribute = props.payoutChannel.attributes.find((attribute) => {
     return attribute.type === RecipientDataType.NAME;
   });
@@ -300,38 +313,40 @@ watchEffect(() => {
 
 <template>
   <form @submit.prevent="addRecipient" class="space-y-6 sm:min-w-md">
+    <p v-if="isFetchingDeliveryOptions" role="status" class="flex items-center gap-2 text-sm/6 text-gray-500"><Spinner class="size-4" aria-hidden="true" /> Loading branches...</p>
+    <InlineFailure :message="deliveryOptionsFailure" retryLabel="Try again" @retry="loadSubDeliveryOptions(lastDeliveryOption)" />
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
           <div class="space-y-6">
             <div>
-              <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+              <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">
                 {{ attribute.label }}
-                <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
+                <span v-if="attribute.isRequired === true" class="ml-0.5 text-danger-600">*</span>
               </label>
-              <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
+              <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
               <TextInput v-on:recipient:input:updated="updateRecipientInput" v-bind:attribute="attribute" :id="attribute.attribute" />
-              <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[attribute.attribute][0] }}</p>
+              <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-danger-600 text-sm/6">{{ errors[attribute.attribute][0] }}</p>
             </div>
             <div v-if="props.payoutChannel.configuration.confirmAccountNumber">
-              <label :for="`confirm-input-${attribute.attribute}`" :class="[errors[`confirm_${attribute.attribute}`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+              <label :for="`confirm-input-${attribute.attribute}`" :class="[errors[`confirm_${attribute.attribute}`]?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">
                 Confirm {{ attribute.label }}
-                <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
+                <span v-if="attribute.isRequired === true" class="ml-0.5 text-danger-600">*</span>
               </label>
-              <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
+              <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
               <TextInput v-on:recipient:input:updated="updateRecipientAccountNumberConfirmation" v-bind:attribute="attribute" :id="`confirm-input-${attribute.attribute}`" />
-              <p v-if="errors[`confirm_${attribute.attribute}`]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[`confirm_${attribute.attribute}`][0] }}</p>
+              <p v-if="errors[`confirm_${attribute.attribute}`]?.length > 0" class="mt-2 mb-3 text-danger-600 text-sm/6">{{ errors[`confirm_${attribute.attribute}`][0] }}</p>
             </div>
           </div>
         </AccountNumberInput>
       </template>
       <template v-else>
         <template v-if="(componentMap[attribute.type] || componentMap['default']) === MobileNumberInput || (componentMap[attribute.type] || componentMap['default']) === PhoneNumberInput">
-          <label :for="attribute.attribute" :class="[errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+          <label :for="attribute.attribute" :class="[errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">
             {{ attribute.label }}
-            <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
+            <span v-if="attribute.isRequired === true" class="ml-0.5 text-danger-600">*</span>
           </label>
-          <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
+          <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
           <component
               v-bind:country="props.country"
               v-on:recipient:input:updated="updateRecipientInput"
@@ -339,16 +354,16 @@ watchEffect(() => {
               v-bind:attribute="attribute"
               :id="attribute.attribute"
           />
-          <p v-if="errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[`${attribute.attribute}.country`][0] || errors[`${attribute.attribute}.number`][0] }}</p>
+          <p v-if="errors[`${attribute.attribute}.country`]?.length > 0 || errors[`${attribute.attribute}.number`]?.length > 0" class="mt-2 mb-3 text-danger-600 text-sm/6">{{ errors[`${attribute.attribute}.country`][0] || errors[`${attribute.attribute}.number`][0] }}</p>
         </template>
         <template v-else>
-          <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+          <label :for="attribute.attribute" :class="[errors[attribute.attribute]?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">
             {{ attribute.label }}
-            <span v-if="attribute.isRequired === true" class="ml-0.5 text-red-500">*</span>
+            <span v-if="attribute.isRequired === true" class="ml-0.5 text-danger-600">*</span>
           </label>
-          <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
+          <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">{{ attribute.helpText }}</p>
           <component
-              v-bind:disableNameInput="payoutChannel.configuration?.nameLookupRequirements?.length > 0"
+              v-bind:disableNameInput="nameLookupRequirements.length > 0"
               v-bind:isLookingUp="isLookingUp"
               v-bind:input="input.data"
               v-on:recipient:input:updated="updateRecipientInput"
@@ -356,25 +371,26 @@ watchEffect(() => {
               v-bind:attribute="attribute"
               :id="attribute.attribute"
           />
-          <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors[attribute.attribute][0] }}</p>
+          <p v-if="errors[attribute.attribute]?.length > 0" class="mt-2 mb-3 text-danger-600 text-sm/6">{{ errors[attribute.attribute][0] }}</p>
         </template>
       </template>
     </div>
     <div>
-      <label for="relationship" :class="[errors?.relationship_id?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+      <label for="relationship" :class="[errors?.relationship_id?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">
         Relation
-        <span class="ml-0.5 text-red-500">*</span>
+        <span class="ml-0.5 text-danger-600">*</span>
       </label>
-      <p class="mb-2 mt-1 text-xs text-gray-500 tracking-wider">Please select your relation with the recipient.</p>
+      <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">Please select your relation with the recipient.</p>
       <RelationshipInput v-bind:relationships="relationships" v-on:recipient:relationship:updated="updateRelationship" />
-      <p v-if="errors?.relationship_id?.length > 0" class="mt-2 mb-3 text-red-500 text-sm">{{ errors.relationship_id[0] }}</p>
+      <p v-if="errors?.relationship_id?.length > 0" class="mt-2 mb-3 text-danger-600 text-sm/6">{{ errors.relationship_id[0] }}</p>
     </div>
-    <button v-if="! props.quote" :class="{'opacity-60' : isSaving}" :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer text-sm">
+    <button v-if="! props.quote" :class="{'opacity-60' : isSaving}" :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6">
       <span v-if="isSaving" class="flex justify-center items-center">
         <Spinner :class="'w-5 h-5 mr-3'"/>
         <span>Saving...</span>
       </span>
       <span v-else>Save Recipient</span>
     </button>
+    <InlineFailure :message="saveFailure" />
   </form>
 </template>

@@ -249,21 +249,21 @@ async function submit() {
               <DialogTitle class="text-lg font-semibold text-gray-900">
                 Descargar extracto de transacción
               </DialogTitle>
-              <p class="mt-1 text-sm text-gray-600">
+              <p class="mt-1 text-sm/6 text-gray-600">
                 Seleccione un rango de fechas y un formato. Le enviaremos el extracto por correo electrónico cuando esté listo; no se descarga aquí.
               </p>
 
               <form class="mt-6 space-y-5" @submit.prevent="submit">
                 <p
                   v-if="formErrors.general"
-                  class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
+                  class="rounded-lg bg-danger-50 px-3 py-2 text-sm/6 text-danger-700"
                 >
                   {{ formErrors.general }}
                 </p>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">Fecha de inicio</label>
+                    <label class="block text-sm/6 font-medium text-gray-700">Fecha de inicio</label>
                     <div class="statement-date-picker mt-2">
                       <VueDatePicker
                         v-model="form.startDate"
@@ -281,13 +281,13 @@ async function submit() {
                     <p
                       v-for="(msg, i) in formErrors.start_date"
                       :key="`start-${i}`"
-                      class="mt-1 text-sm text-red-600"
+                      class="mt-1 text-sm/6 text-danger-600"
                     >
                       {{ msg }}
                     </p>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">Fecha de fin</label>
+                    <label class="block text-sm/6 font-medium text-gray-700">Fecha de fin</label>
                     <div class="statement-date-picker mt-2">
                       <VueDatePicker
                         v-model="form.endDate"
@@ -305,7 +305,7 @@ async function submit() {
                     <p
                       v-for="(msg, i) in formErrors.end_date"
                       :key="`end-${i}`"
-                      class="mt-1 text-sm text-red-600"
+                      class="mt-1 text-sm/6 text-danger-600"
                     >
                       {{ msg }}
                     </p>
@@ -313,7 +313,7 @@ async function submit() {
                 </div>
 
                 <div>
-                  <span class="block text-sm font-medium text-gray-700">Formato</span>
+                  <span class="block text-sm/6 font-medium text-gray-700">Formato</span>
                   <div class="mt-2 flex gap-3">
                     <label class="inline-flex cursor-pointer items-center gap-2">
                       <input
@@ -322,7 +322,7 @@ async function submit() {
                         value="pdf"
                         class="border-gray-300 text-brand-600 focus:ring-brand-600"
                       />
-                      <span class="text-sm text-gray-900">PDF</span>
+                      <span class="text-sm/6 text-gray-900">PDF</span>
                     </label>
                     <label class="inline-flex cursor-pointer items-center gap-2">
                       <input
@@ -331,27 +331,27 @@ async function submit() {
                         value="csv"
                         class="border-gray-300 text-brand-600 focus:ring-brand-600"
                       />
-                      <span class="text-sm text-gray-900">CSV</span>
+                      <span class="text-sm/6 text-gray-900">CSV</span>
                     </label>
                   </div>
                   <p
                     v-for="(msg, i) in formErrors.type"
                     :key="`type-${i}`"
-                    class="mt-1 text-sm text-red-600"
+                    class="mt-1 text-sm/6 text-danger-600"
                   >
                     {{ msg }}
                   </p>
                 </div>
 
                 <div>
-                  <label for="statement-currency" class="block text-sm font-medium text-gray-700">
+                  <label for="statement-currency" class="block text-sm/6 font-medium text-gray-700">
                     Moneda <span class="font-normal text-gray-500">(opcional)</span>
                   </label>
                   <select
                     id="statement-currency"
                     v-model="form.currencyId"
                     :disabled="isLoadingCurrencies"
-                    class="mt-2 block w-full rounded-xl border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm disabled:bg-gray-50"
+                    class="mt-2 block w-full rounded-xl border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm/6 disabled:bg-gray-50"
                   >
                     <option value="">Todas las monedas</option>
                     <option v-for="currency in currencies" :key="currency.id" :value="currency.id">
@@ -361,14 +361,14 @@ async function submit() {
                   <p
                     v-for="(msg, i) in formErrors.currency"
                     :key="`currency-${i}`"
-                    class="mt-1 text-sm text-red-600"
+                    class="mt-1 text-sm/6 text-danger-600"
                   >
                     {{ msg }}
                   </p>
                 </div>
 
                 <div>
-                  <label for="statement-email" class="block text-sm font-medium text-gray-700">
+                  <label for="statement-email" class="block text-sm/6 font-medium text-gray-700">
                     Correo electrónico adicional <span class="font-normal text-gray-500">(opcional)</span>
                   </label>
                   <input
@@ -377,12 +377,12 @@ async function submit() {
                     type="email"
                     autocomplete="email"
                     placeholder="name@example.com"
-                    class="mt-2 block w-full rounded-xl border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm"
+                    class="mt-2 block w-full rounded-xl border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm/6"
                   />
                   <p
                     v-for="(msg, i) in formErrors.email"
                     :key="`email-${i}`"
-                    class="mt-1 text-sm text-red-600"
+                    class="mt-1 text-sm/6 text-danger-600"
                   >
                     {{ msg }}
                   </p>
@@ -391,7 +391,7 @@ async function submit() {
                 <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
                   <button
                     type="button"
-                    class="inline-flex justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    class="inline-flex justify-center rounded-xl bg-white px-4 py-2.5 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     :disabled="isSubmitting"
                     @click="close"
                   >
@@ -399,7 +399,7 @@ async function submit() {
                   </button>
                   <button
                     type="submit"
-                    class="inline-flex justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="inline-flex justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
                     :disabled="isSubmitting || isLoadingCurrencies"
                   >
                     <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2" aria-hidden="true" />

@@ -1,4 +1,7 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
+import BrandLogo from "@/components/BrandLogo.vue";
 import {computed, onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import MobileNumberInput from "@/components/CustomerAttribute/MobileNumberInput.vue";
@@ -35,17 +38,26 @@ function mobileNumberUpdated(updated) {
   mobile.country = updated?.country;
 }
 
+const saveFailure = ref(null);
+
+// Only move on once the number is saved; a validation error used to show
+// and then the workflow proceeded anyway.
 async function updateMobileNumber() {
   isSaving.value = true;
-  await customerUtils.updateMobileNumber(mobile.country, mobile.number).catch((e) => {
-    if (e.status === 422) {
+  saveFailure.value = null;
+  errors.value = {};
+  try {
+    await customerUtils.updateMobileNumber(mobile.country, mobile.number);
+    emit('mobileNumberUpdated');
+  } catch (e) {
+    if (e.response?.status === 422) {
       errors.value = e.response.data.errors;
     } else {
-      console.error(e);
+      logRequestFailure(e, 'mobile-number');
+      saveFailure.value = failureMessage(e, "We couldn't save your mobile number. Please try again.");
     }
     isSaving.value = false;
-  });
-  emit('mobileNumberUpdated');
+  }
 }
 
 const showLoading = computed(() => {
@@ -64,25 +76,39 @@ const editPersonalInformation = () => {
     </div>
     <div v-show="! showLoading || isSaving" class="w-full max-w-xl">
       <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+        <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
       <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Ingresa tu número de teléfono móvil</h2>
       <p class="text-md text-gray-900 mb-8 text-left">Indícanos tu número de teléfono móvil para continuar.</p>
       <!-- Form -->
-      <form @submit.prevent="updateMobileNumber" class="space-y-6 mt-12">
+      <form @submit.prevent="updateMobileNumber" class="mt-12 space-y-5">
         <MobileNumberInput v-bind:mobile="mobile" v-bind:errors="errors" v-on:update:mobileNumberUpdated="mobileNumberUpdated" />
-        <button :disabled="showLoading || isSaving" :class="[{'opacity-70': isLoading || isSaving}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3  rounded-[10px] font-medium hover:bg-brand-800 transition cursor-pointer">
+        <button
+          :disabled="showLoading || isSaving"
+          type="submit"
+          class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
+        >
           <template v-if="isSaving">
-              <span class="flex items-center justify-center whitespace-nowrap">
-                <Spinner :class="'size-4 mr-2'" />
-                Guardando...
-              </span>
+            <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
+              <Spinner :class="'size-4'" />
+              Guardando...
+            </span>
           </template>
-          <template v-else>Continuar</template>
+          <template v-else>
+            <span class="inline-flex items-center justify-center gap-2">
+              Continuar
+              <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
+            </span>
+          </template>
         </button>
+        <InlineFailure :message="saveFailure" />
       </form>
-      <div class="text-center mt-12">
-        <a @click="editPersonalInformation" class="text-brand-700 text-sm hover:underline" href="javascript:">Editar información personal</a>
+      <div class="mt-12 text-center">
+        <a
+          @click="editPersonalInformation"
+          class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
+          href="javascript:"
+        >Editar información personal</a>
       </div>
     </div>
   </div>

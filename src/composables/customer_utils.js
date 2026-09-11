@@ -1,5 +1,8 @@
 import Customer from "@/models/customer.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import {useWalletStore} from "@/stores/wallet.js";
+import {useCountriesStore} from "@/stores/countries.js";
+import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import axios from "axios";
 
 let refreshPromise = null;
@@ -72,15 +75,23 @@ export function useCustomerUtils() {
     }
 
     async function logout() {
-        await axios.post('/client/v1/logout', {}).then(() => {
-            customerStore.customer.data = null;
-            customerStore.isLoaded = false;
-        })
+        try {
+            await axios.post('/client/v1/logout', {});
+        } finally {
+            // Whatever the server said, this tab is done with the customer:
+            // every store is cleared (wallet state used to survive into the
+            // next sign-in on a shared device) and the socket is dropped.
+            customerStore.reset();
+            useWalletStore().reset();
+            useCountriesStore().reset();
+            usePasswordPolicyStore().reset();
+            window.Echo?.disconnect?.();
+        }
     }
 
-    async function refresh() {
+    async function refresh(config = {}) {
         if (refreshPromise) return refreshPromise;
-        refreshPromise = axios.get('/client/v1/profile')
+        refreshPromise = axios.get('/client/v1/profile', config)
             .then((response) => {
                 updateStore(response.data);
             })
@@ -124,6 +135,18 @@ export function useCustomerUtils() {
         }
 
         await axios.post(`/client/v1/update?category=${categories}`, requestData).then((response) => {
+            updateStore(response.data);
+        })
+    }
+
+    async function resendMobileVerification() {
+        await axios.post('/client/v1/resend-mobile-verification', {})
+    }
+
+    async function verifyMobileNumber(otp) {
+        await axios.post('/client/v1/verify-mobile-number', {
+            otp: otp,
+        }).then((response) => {
             updateStore(response.data);
         })
     }
@@ -231,6 +254,8 @@ export function useCustomerUtils() {
         updateCountry,
         updateProfileAttribute,
         updateMobileNumber,
+        resendMobileVerification,
+        verifyMobileNumber,
         updateEmailAddress,
         logout,
         getAccountVerificationToken,

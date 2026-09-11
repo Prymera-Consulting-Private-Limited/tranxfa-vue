@@ -57,7 +57,7 @@ const items = computed(() => {
 <template>
   <ul class="rounded-lg bg-white border border-gray-300">
     <li v-for="(item, index) in items" :class="{'bg-gray-50': index % 2 === 0}" class="px-4 py-4 sm:px-6 flex justify-between items-center gap-4 border-b border-dashed border-gray-300">
-      <div v-if="item.label" class="text-gray-700 font-semibold text-sm">{{ item.label }}</div>
+      <div v-if="item.label" class="text-gray-700 font-semibold text-sm/6">{{ item.label }}</div>
       <p class="text-gray-700 text-sm/6">{{ item.value }}</p>
     </li>
   </ul>

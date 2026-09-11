@@ -46,5 +46,5 @@ const sdkFinalStateReached = () => {
       v-on:sdkInitialized="sdkInitialized"
       v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
     />
-  <p class="leading-5 text-gray-400 text-xs text-center mb-8 px-4">Todos los datos se procesan de conformidad con nuestra política de privacidad.</p>
+  <p class="text-gray-500 text-xs/5 text-center mb-8 px-4">Todos los datos se procesan de conformidad con nuestra política de privacidad.</p>
 </template>

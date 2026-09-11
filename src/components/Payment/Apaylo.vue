@@ -1,14 +1,21 @@
 <script setup>
+import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
 import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
-import PaymentTransactionState from "@/models/payment_transaction_state.js";
 import PaymentState from "@/enums/payment_state.js";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
 import Processing from "@/components/Payment/State/Processing.vue";
 import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import Failed from "@/components/Payment/State/Failed.vue";
-import {useTransactionUtils} from "@/composables/transaction_utils.js";
+import {usePaymentWatch} from "@/composables/payment_watch.js";
 import router from "@/router/index.js";
+import {useTransactionUtils} from "@/composables/transaction_utils.js";
+import {failureMessage, reportUnexpectedError} from "@/composables/api_utils.js";
+
+const FINAL_STATES = [
+  PaymentState.AUTHORIZED, PaymentState.CAPTURED, PaymentState.FAILED,
+  PaymentState.TIMED_OUT, PaymentState.CANCELLED, PaymentState.REFUNDED, PaymentState.PART_REFUNDED,
+];
 
 const props = defineProps({
   transaction: {
@@ -29,35 +36,32 @@ const props = defineProps({
 
 const transactionUtils = useTransactionUtils();
 
-const getTransaction = async () => {
-  transactionUtils.getTransaction(props.transaction.id).then((response) => {
-    const transaction = Transaction.getInstance(response.data);
-    props.transaction.payment = transaction.payment;
-  });
+// Cleared on unmount: a customer who closed the modal was pulled to the
+// transaction page seconds later.
+let onStateRedirectId = null;
+
+const {stopPolling, isSlow} = usePaymentWatch(props.transaction, {
+  isReady: () => isReadyToPay(),
+  isFinal: () => FINAL_STATES.includes(props.transaction.payment.state.code),
+  onState: (code) => {
+    if (code === PaymentState.AUTHORIZED || code === PaymentState.CAPTURED) {
+      stopPolling();
+      onStateRedirectId = setTimeout(() => {
+        router.push({name: 'viewTransaction', params: {transactionId: props.transaction.id}});
+      }, 1500);
+    }
+  },
+});
+
+
+
+
+
+// PENDING alone is not payable - the hosted payment URL can arrive later than
+// the state, so the payment is only ready when both are here.
+const isReadyToPay = () => {
+  return props.transaction.payment.state.code === PaymentState.PENDING && !! props.transaction.payment.paymentUrl;
 }
-
-onMounted(async () => {
-  Echo.channel(`client-payment.${props.transaction.payment.id}`)
-      .listen('PaymentTransactionStateUpdated', (e) => {
-        props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
-        props.transaction.payment.sharedReference = e.shared_reference;
-        props.transaction.payment.paymentUrl = e.payment_url;
-        if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
-          setTimeout(() => {
-            router.push({
-              name: 'viewTransaction',
-              params: {
-                transactionId: props.transaction.id
-              }
-            });
-          }, 1500)
-        }
-      });
-})
-
-onUnmounted(async () => {
-  Echo.leaveChannel(`client-payment.${props.transaction.payment.id}`);
-})
 
 const status = computed(() => {
   if (
@@ -93,16 +97,25 @@ function redirectToPaymentUrl() {
   props.transaction.payment.state.code = PaymentState.REDIRECTED;
 }
 
+const isConfirmingPayment = ref(false);
+const confirmFailure = ref(null);
+
+// Tell the server the customer has paid before hiding the button, so a failed
+// request leaves them a way to try again.
 const iHaveMadePayment = async () => {
-  props.transaction.payment.customerConfirmedPayment = true;
-  await transactionUtils.iHaveMadePayment(props.transaction.payment.id).then(() => {
-    router.push({
-      name: 'viewTransaction',
-      params: {
-        transactionId: props.transaction.id
-      }
-    });
-  });
+  if (isConfirmingPayment.value) return;
+  isConfirmingPayment.value = true;
+  confirmFailure.value = null;
+  try {
+    await transactionUtils.iHaveMadePayment(props.transaction.payment.id);
+    props.transaction.payment.customerConfirmedPayment = true;
+    router.push({name: 'viewTransaction', params: {transactionId: props.transaction.id}});
+  } catch (e) {
+    reportUnexpectedError(e, 'payment-sent');
+    confirmFailure.value = failureMessage(e, "We couldn't record that you've paid. Your transfer is still open, so please try again.");
+  } finally {
+    isConfirmingPayment.value = false;
+  }
 }
 
 const paymentData = reactive({
@@ -114,58 +127,65 @@ if (props.transaction?.payment.paymentProvider?.paymentDataAttributes?.length > 
     paymentData.data[attribute.attribute] = attribute;
   });
 }
+onUnmounted(() => clearTimeout(onStateRedirectId));
 </script>
 
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
-    <div class="-m-5 -mt-10">
-      <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Complete Your Interac Payment</h2>
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">Complete your Interac payment</h2>
       <p class="text-sm/6 text-gray-600 mb-6 text-left">
-        Your transaction is awaiting payment. Please proceed by clicking the button below to securely complete your Interac e-Transfer.
+        Your transfer is awaiting payment. Please proceed by clicking the button below to securely complete your Interac e-Transfer.
       </p>
-      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-green-600 text-white text-center py-3 rounded-md font-medium hover:bg-green-700 transition cursor-pointer text-sm outline-none ring-0 tracking-wider">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
-      <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the Interac platform to finalize your payment.</p>
+      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-success-700 text-white text-center py-3 rounded-md font-medium hover:bg-success-800 transition cursor-pointer text-sm/6 outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
+      <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the Interac platform to finalise your payment.</p>
     </div>
   </template>
 
   <template v-else-if="status === 'pending'">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Un momento...</h2>
-    <p class="text-base text-gray-600 mb-6">Estamos preparando tu pago.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait…</h2>
+    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
+    <p v-if="isSlow" role="status" class="mt-2 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
+      This is taking longer than usual. Nothing has been charged. You can keep waiting, or
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">go to your transfer</router-link>
+      and try the payment again later.
+    </p>
   </template>
 
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">A la espera de actualización del pago</h2>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">We're watching for your payment</h2>
     <p class="text-base/6 text-gray-600 mb-6">Once you've sent the Interac e-Transfer, click "I have made the payment" below to let us know. It usually takes <strong>up to 5 minutes</strong> for the payment to be confirmed.</p>
     <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
-      <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 cursor-pointer">I've made payment</button>
+      <button @click="iHaveMadePayment" :disabled="isConfirmingPayment" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 cursor-pointer">I've made payment</button>
+          <InlineFailure :message="confirmFailure" />
     </div>
   </template>
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Pago exitosa</h2>
-    <p class="text-lg text-gray-600 mb-6">Su pago se ha recibido correctamente.</p>
+    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment received</h2>
+    <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-red-500 mb-3 -mt-15">Pago fallido</h2>
-    <p class="text-base text-red-600 mb-5">Su pago no pudo ser completado.</p>
+    <h2 class="text-2xl font-semibold text-danger-600 mb-3 -mt-15">Payment failed</h2>
+    <p class="text-base text-danger-600 mb-5">Your payment could not be completed.</p>
     <template v-if="transaction.payment.paymentProvider.paymentDataAttributes?.length > 0">
-      <p class="text-sm text-gray-600 mb-2 text-left">Por favor, revise o actualice la información a continuación y verifique que todo esté correcto, luego intente de nuevo.</p>
+      <p class="text-sm/6 text-gray-600 mb-2 text-left">Por favor, revise o actualice la información a continuación y verifique que todo esté correcto, luego intente de nuevo.</p>
       <template v-for="attribute in transaction.payment.paymentProvider.paymentDataAttributes">
         <div class="mb-3 text-left">
-          <label :class="[retryFormErrors[`${attribute.attribute}`]?.length > 0 ? 'text-red-600' : 'text-gray-900']" :for="`payment-data-${attribute.attribute}`" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-red-500" v-if="attribute.isRequired">*</span></label>
-          <p v-if="attribute.info" class="mb-4 text-sm text-gray-500">{{ attribute.info }}</p>
-          <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
-          <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
-          <p v-if="retryFormErrors[`${attribute.attribute}`]?.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ retryFormErrors[`${attribute.attribute}`][0] }}</p>
+          <label :class="[retryFormErrors[`${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" :for="`payment-data-${attribute.attribute}`" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
+          <p v-if="attribute.info" class="mb-4 text-sm/6 text-gray-500">{{ attribute.info }}</p>
+          <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
+          <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
+          <p v-if="retryFormErrors[`${attribute.attribute}`]?.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ retryFormErrors[`${attribute.attribute}`][0] }}</p>
         </div>
       </template>
     </template>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-600 text-white text-center py-3 rounded-md font-medium hover:bg-brand-700 transition cursor-pointer text-sm outline-none ring-0">Reintentar pago</button>
-    <p class="text-base text-red-600 mt-5 text-sm">If the issue continues, please contact our support team. We'll be happy to assist you!</p>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-700 text-white text-center py-3 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Try the payment again</button>
+    <p class="text-base text-danger-600 mt-5 text-sm/6">If the issue continues, please contact our support team. We'll be happy to help.</p>
   </template>
 </template>

@@ -4,11 +4,21 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-flag-assets.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/generate-flag-assets.mjs",
     "build": "vite build",
-    "preview": "vite preview"
+    "prepreview": "node scripts/generate-flag-assets.mjs",
+    "preview": "vite preview",
+    "pretest": "node scripts/generate-flag-assets.mjs",
+    "test": "vitest run",
+    "pretest:watch": "node scripts/generate-flag-assets.mjs",
+    "test:watch": "vitest",
+    "pretest:coverage": "node scripts/generate-flag-assets.mjs",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@didit-protocol/sdk-web": "^0.2.1",
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@lottiefiles/dotlottie-vue": "^0.5.8",
@@ -21,6 +31,7 @@
     "@vueuse/core": "^13.1.0",
     "@xstate/vue": "^4.0.2",
     "axios": "^1.7.9",
+    "laravel-echo": "^2.0.2",
     "lodash": "^4.17.21",
     "maska": "^3.1.0",
     "moment": "^2.30.1",
@@ -30,6 +41,7 @@
     "persona": "^5.3.1",
     "pinia": "^3.0.1",
     "primeicons": "^7.0.0",
+    "pusher-js": "^8.4.0",
     "tailwindcss": "^4.0.6",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
@@ -41,11 +53,11 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
-    "laravel-echo": "^2.0.2",
-    "pusher-js": "^8.4.0",
-    "typescript": "^6.0.3",
+    "@vitest/coverage-v8": "^5.0.0",
+    "@vue/test-utils": "^2.5.0",
+    "jsdom": "^25.0.1",
     "vite": "^6.1.0",
     "vite-plugin-vue-devtools": "^7.7.2",
-    "vue-tsc": "^3.3.3"
+    "vitest": "^5.0.0"
   }
 }
