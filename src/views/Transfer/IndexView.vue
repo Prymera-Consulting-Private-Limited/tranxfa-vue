@@ -4,6 +4,8 @@ import {fixFor} from "@/composables/verification_routes.js";
 import {findTransactionForQuote, isOutcomeUnknown, MFA_REQUIRED_TYPE, saveCheckoutDraft, takeCheckoutDraft} from "@/composables/checkout_safety.js";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import {CUSTOMER_ACTIONS, refreshServiceStatus, useServiceStatus} from "@/composables/service_status.js";
+import {useCouponUtils} from "@/composables/coupon_utils.js";
+import {couponsEnabled} from "@/feature_flags.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
@@ -185,6 +187,78 @@ async function reconcileOutcome() {
 }
 
 const serviceStatus = useServiceStatus();
+
+// Promotion coupons (Client API reference, "Promotion Coupons"), behind
+// VITE_COUPONS_ENABLED. Validate previews a code and soft-fails with a
+// customer-written reason; Apply reprices the quote and every later quote
+// response carries the coupon block, so the quote is always taken from the
+// response rather than remembered.
+const couponUtils = useCouponUtils();
+const hasCoupons = couponsEnabled();
+const couponCode = ref('');
+const couponPreview = ref(null);
+const couponFailure = ref(null);
+const isCouponBusy = ref(false);
+
+function replaceQuote(data) {
+  quote.data = TransactionQuote.getInstance(data);
+  send({ type: 'SET_CONTEXT', quote: quote.data });
+}
+
+async function previewCoupon() {
+  if (! couponCode.value.trim() || isCouponBusy.value) return;
+  isCouponBusy.value = true;
+  couponFailure.value = null;
+  couponPreview.value = null;
+  try {
+    const response = await couponUtils.validate(quote.data.id, couponCode.value.trim());
+    if (response.data?.is_valid === true) {
+      couponPreview.value = response.data;
+    } else {
+      // Soft-fail by design: the reason is written for the customer.
+      couponFailure.value = response.data?.failure_reason || "This code can't be used on this transfer.";
+    }
+  } catch (e) {
+    logRequestFailure(e, 'coupon-validate');
+    couponFailure.value = failureMessage(e, "We couldn't check that code. Please try again.");
+  } finally {
+    isCouponBusy.value = false;
+  }
+}
+
+async function applyCoupon() {
+  if (isCouponBusy.value) return;
+  isCouponBusy.value = true;
+  couponFailure.value = null;
+  try {
+    const response = await couponUtils.apply(quote.data.id, couponCode.value.trim());
+    replaceQuote(response.data);
+    couponPreview.value = null;
+    couponCode.value = '';
+  } catch (e) {
+    logRequestFailure(e, 'coupon-apply');
+    // A 422 carries the same customer wording Validate returns.
+    couponFailure.value = failureMessage(e, "We couldn't apply that code. Please try again.");
+    couponPreview.value = null;
+  } finally {
+    isCouponBusy.value = false;
+  }
+}
+
+async function removeCoupon() {
+  if (isCouponBusy.value) return;
+  isCouponBusy.value = true;
+  couponFailure.value = null;
+  try {
+    const response = await couponUtils.remove(quote.data.id);
+    replaceQuote(response.data);
+  } catch (e) {
+    logRequestFailure(e, 'coupon-remove');
+    couponFailure.value = failureMessage(e, "We couldn't remove the code. Please try again.");
+  } finally {
+    isCouponBusy.value = false;
+  }
+}
 
 const showContinueButton = computed(() => {
   if (outcomeUnknown.value) return false;
@@ -752,6 +826,32 @@ const canContinue = computed(() => {
                         </div>
                       </template>
                     </v-select>
+
+                    <div v-if="hasCoupons" class="mt-6 mb-4">
+                      <label for="coupon-code" class="text-sm/6 font-semibold text-gray-900">Have a promotion code?</label>
+                      <template v-if="quote.data.coupon">
+                        <div role="status" class="mt-2 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-sm/6 text-success-800">
+                          <p class="font-semibold">Code {{ quote.data.coupon.code }} applied<template v-if="quote.data.coupon.discountAmountCurrencyPrefixed">: you save {{ quote.data.coupon.discountAmountCurrencyPrefixed }}</template><template v-else-if="quote.data.coupon.exchangeRateBeforeCouponFormatted">: rate was {{ quote.data.coupon.exchangeRateBeforeCouponFormatted }}, now {{ quote.data.exchangeRateFormatted }}</template>.</p>
+                          <p v-if="quote.data.coupon.infoText">{{ quote.data.coupon.infoText }}</p>
+                          <p v-if="quote.data.coupon.termsText" class="text-xs/5 text-success-700">{{ quote.data.coupon.termsText }}</p>
+                          <button type="button" @click="removeCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold underline underline-offset-2 disabled:opacity-60">Remove code</button>
+                        </div>
+                      </template>
+                      <template v-else>
+                        <div class="mt-2 flex gap-2">
+                          <input id="coupon-code" v-model="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="255" placeholder="Enter code" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 uppercase focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" @keydown.enter.prevent="previewCoupon" />
+                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? 'Checking…' : 'Check code' }}</button>
+                        </div>
+                        <p v-if="couponFailure" role="alert" class="mt-2 text-sm/6 text-danger-700">{{ couponFailure }}</p>
+                        <div v-if="couponPreview" role="status" class="mt-2 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
+                          <p class="font-semibold">{{ couponPreview.info_text || 'This code applies to your transfer.' }}</p>
+                          <p v-if="couponPreview.discount_amount">Saves {{ couponPreview.discount_amount }} {{ quote.data.paymentCurrency?.isoAlpha ?? '' }} on this transfer.</p>
+                          <p v-else-if="couponPreview.adjusted_exchange_rate">Improves your rate to {{ couponPreview.adjusted_exchange_rate }}.</p>
+                          <p v-if="couponPreview.terms_text" class="text-xs/5 text-info-700">{{ couponPreview.terms_text }}</p>
+                          <button type="button" @click="applyCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">Use this code</button>
+                        </div>
+                      </template>
+                    </div>
 
                     <fieldset aria-label="Payment Method" class="mt-6 mb-4">
                       <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Payment Method <span class="text-danger-600">*</span></label>

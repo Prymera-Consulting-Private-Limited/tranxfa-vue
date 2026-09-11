@@ -276,6 +276,15 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <h2 class="text-sm/6 font-medium text-gray-900">Fee</h2>
                   <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
                 </div>
+                <!-- A coupon taken at checkout: the API sends the discount, or the rate it replaced. -->
+                <div v-if="transaction.data.couponDiscountAmountCurrencyPrefixed" class="py-3">
+                  <h2 class="text-sm/6 font-medium text-gray-900">Coupon</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-success-700">You saved <span class="font-medium">{{ transaction.data.couponDiscountAmountCurrencyPrefixed }}</span></p>
+                </div>
+                <div v-else-if="transaction.data.exchangeRateBeforeCouponFormatted" class="py-3">
+                  <h2 class="text-sm/6 font-medium text-gray-900">Coupon</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-success-700">Rate was <span class="font-medium">{{ transaction.data.exchangeRateBeforeCouponFormatted }}</span>, you got <span class="font-medium">{{ transaction.data.exchangeRateFormatted }}</span></p>
+                </div>
                 <div class="py-3">
                   <h2 class="text-sm/6 font-medium text-gray-900">Total Amount</h2>
                   <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
