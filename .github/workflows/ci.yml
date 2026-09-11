@@ -10,7 +10,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    # feature/** so a stacked PR (base = the previous feature branch) is
+    # checked before it is retargeted onto main.
+    branches: [main, 'feature/**']
   push:
     branches: [main]
 

@@ -2,6 +2,7 @@
 import {onMounted, ref} from 'vue';
 import OrderPayment from '@/models/travel/orders/order_payment.js';
 import Spinner from '@/components/Spinner.vue';
+import {loadVolumeSdk} from '@/composables/script_loader.js';
 
 const props = defineProps({
   payment: {
@@ -37,8 +38,12 @@ const CONTAINER_ID = 'travel-volume-element-container';
  * minor units, our own id for the payment, and the reference that reconciles it
  * with the provider afterwards.
  */
-onMounted(() => {
+onMounted(async () => {
   const amount = props.payment.majorAmount;
+
+  // The sdk is fetched here rather than on every page; index.html no longer
+  // carries it.
+  await loadVolumeSdk().catch(() => {});
 
   // Every one of these is the api not sending something rather than the customer
   // doing anything wrong, so they are logged as ours and reported as a failure to
