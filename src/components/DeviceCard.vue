@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import { computed, ref } from 'vue';
 import { useCustomerUtils } from '@/composables/customer_utils';
 import { ComputerDesktopIcon, DevicePhoneMobileIcon, GlobeAltIcon } from '@heroicons/vue/24/outline';
@@ -41,10 +43,13 @@ const isConfirmDeleteModalOpen = ref(false);
 const isDeleting = ref(false);
 const isDeleted = ref(false);
 
+const signOutFailure = ref(null);
+
 const handleDelete = async () => {
   isConfirmDeleteModalOpen.value = false;
   try {
     isDeleting.value = true;
+    signOutFailure.value = null;
     await customerUtils.deleteDevice(props.device.id);
     isDeleted.value = true;
     setTimeout(() => {
@@ -52,7 +57,8 @@ const handleDelete = async () => {
       isConfirmDeleteModalOpen.value = false;
     }, 300); // Wait for fade-out animation to complete
   } catch (error) {
-    console.error('Failed to delete device:', error);
+    logRequestFailure(error, 'device-sign-out');
+    signOutFailure.value = failureMessage(error, "We couldn't sign that device out. Please try again.");
     isDeleting.value = false;
   }
 };
@@ -90,9 +96,10 @@ const handleDelete = async () => {
           class="text-sm/6 text-danger-600 hover:text-danger-700 font-medium hover:underline cursor-pointer"
           :disabled="isDeleting"
         >
-          {{ isDeleting ? 'Deleting...' : 'Sign Out' }}
+          {{ isDeleting ? 'Signing out...' : 'Sign Out' }}
         </button>
       </div>
+      <InlineFailure :message="signOutFailure" />
 
       <p class="text-xs/5 mt-0.5">Last used {{ timeUtils.getNiceTime(device.touchedAt) }}</p>
 

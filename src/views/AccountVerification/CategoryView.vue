@@ -1,4 +1,5 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {onMounted, reactive, ref} from "vue";
@@ -34,16 +35,29 @@ const selectedCategory = reactive({
 // it above an empty list.
 const isResolved = ref(false);
 
-onMounted(async () => {
+const loadFailure = ref(null);
+
+async function load() {
+  loadFailure.value = null;
   if (! customerStore.isLoaded) {
-    await customerUtils.refresh();
+    try {
+      await customerUtils.refresh();
+    } catch (e) {
+      logRequestFailure(e, 'verification-category');
+      loadFailure.value = failureMessage(e, "We couldn't load this verification step.");
+      return;
+    }
   }
   selectedCategory.data = customer.data?.pendingDocuments?.find(category => category.id === props.id) ?? null;
   isResolved.value = true;
-});
+}
 
+onMounted(load);
+
+// The provider is done. A failed refresh must not trap the customer in the
+// modal; the verification page fetches its own state anyway.
 const finalStateReached = async () => {
-  await customerUtils.refresh();
+  await customerUtils.refresh().catch((e) => logRequestFailure(e, 'verification-refresh'));
   if (router.currentRoute.value.query._utm === 'dashboard-todos') {
     return router.push({ name: 'dashboard' });
   }
@@ -57,7 +71,15 @@ const finalStateReached = async () => {
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Select document type for your {{ selectedCategory.data?.title }}</h1>
         <LoadFailurePanel
-          v-if="isResolved && ! selectedCategory.data"
+          v-if="loadFailure"
+          title="We couldn't load this verification step"
+          :message="loadFailure"
+          retryLabel="Try again"
+          @retry="load"
+          class="mt-0"
+        />
+        <LoadFailurePanel
+          v-else-if="isResolved && ! selectedCategory.data"
           title="There is nothing to upload here"
           message="This document category is no longer waiting on you. It may already be complete."
           :backTo="{name: 'accountVerification'}"

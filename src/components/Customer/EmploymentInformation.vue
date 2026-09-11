@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {computed, onMounted, reactive, ref} from "vue";
@@ -29,18 +31,27 @@ const currencySalaryRange = reactive({
   ranges: [],
 });
 
-onMounted( async () => {
+// The form cannot be completed without occupations and salary ranges, so a
+// failed load is shown instead of two empty dropdowns.
+const loadFailure = ref(null);
+
+function loadOptions() {
+  loadFailure.value = null;
+
   if (! customerStore.isLoaded) {
-    customerUtils.refresh().finally();
+    customerUtils.refresh().catch((e) => logRequestFailure(e, 'employment-customer'));
   }
 
   if (! countriesStore.isLoaded) {
-    countryUtils.getCountries().finally();
+    countryUtils.getCountries().catch((e) => logRequestFailure(e, 'employment-countries'));
   }
 
   isOccupationsLoading.value = true;
   resourceUtils.occupations().then((response) => {
     occupations.value = response.data.map((o) => Occupation.getInstance(o));
+  }).catch((e) => {
+    logRequestFailure(e, 'occupations');
+    loadFailure.value = failureMessage(e, "We couldn't load the list of occupations.");
   }).finally(() => {
     isOccupationsLoading.value = false;
   });
@@ -53,10 +64,15 @@ onMounted( async () => {
     if (response?.data?.salary_ranges) {
       currencySalaryRange.ranges = response.data.salary_ranges.map((o) => SalaryRange.getInstance(o));
     }
+  }).catch((e) => {
+    logRequestFailure(e, 'salary-ranges');
+    loadFailure.value = loadFailure.value ?? failureMessage(e, "We couldn't load the salary ranges.");
   }).finally(() => {
     isSalaryRangesLoading.value = false;
   })
-});
+}
+
+onMounted(loadOptions);
 
 const showLoading = computed(() => {
   return isOccupationsLoading.value || isSalaryRangesLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
@@ -77,7 +93,11 @@ const editPersonalInformation = () => {
     <div v-if="showLoading" class="absolute inset-0 flex items-center justify-center bg-white/75 z-10">
       <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
     </div>
-    <div v-show="! showLoading" class="w-full max-w-xl">
+    <div v-if="loadFailure && ! showLoading" class="w-full max-w-xl">
+      <div class="hidden md:block flex items-center justify-center w-full"><BrandLogo class="mb-5" /></div>
+      <LoadFailurePanel title="We couldn't load this step" :message="loadFailure" retryLabel="Try again" @retry="loadOptions" class="mt-0" />
+    </div>
+    <div v-else v-show="! showLoading" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:"><BrandLogo class="mb-5" /></a>

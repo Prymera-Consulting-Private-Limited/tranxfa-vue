@@ -1,4 +1,5 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
@@ -25,9 +26,9 @@ async function verifyEmailAddress() {
   isLoading.value = true;
   isVerifying.value = true;
   await customerUtils.verifyEmail(emailVerificationCode.value).catch((e) => {
-    if (e.status === 422) {
+    if (e.response?.status === 422) {
       otpError.value = e.response.data.message;
-    } else if (e.status === 403) {
+    } else if (e.response?.status === 403) {
       customerUtils.refresh();
       emit('emailVerified');
     } else {
@@ -66,12 +67,22 @@ async function startResendOtpTimer() {
   }
 }
 
+const resentMessage = ref('');
+const resendFailure = ref('');
+
 async function resend() {
   isResendingToken.value = true;
-  customerUtils.resendEmailVerification().catch(async (e) => {
-    if (e.status === 403) {
+  resentMessage.value = '';
+  resendFailure.value = '';
+  customerUtils.resendEmailVerification().then(() => {
+    resentMessage.value = `We've sent a new code to ${customer.data?.account?.email ?? 'your email'}. It can take a minute to arrive.`;
+  }).catch(async (e) => {
+    if (e.response?.status === 403) {
       await customerUtils.refresh();
+      return;
     }
+    logRequestFailure(e, 'resend-email-code');
+    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
   }).finally(() => {
     isResendingToken.value = false;
   });
@@ -142,6 +153,8 @@ onMounted(async () => {
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
+          <p v-if="resentMessage" role="status" class="mb-3 rounded-lg bg-success-50 px-3 py-2 text-center text-sm/6 text-success-700">{{ resentMessage }}</p>
+          <p v-if="resendFailure" role="alert" class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-center text-sm/6 text-danger-700">{{ resendFailure }}</p>
           <div v-if="! isResendingToken" class="text-sm/6 text-gray-500 text-center">
             Didn't receive verification code?
             <a

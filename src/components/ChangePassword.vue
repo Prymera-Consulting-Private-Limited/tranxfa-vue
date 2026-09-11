@@ -1,4 +1,6 @@
 <script setup>
+import InlineFailure from "@/components/InlineFailure.vue";
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import {usePasswordPolicyUtils} from "@/composables/password_policy_utils.js";
 import {computed, onMounted, reactive, ref} from "vue";
@@ -30,15 +32,22 @@ const formErrors = reactive({
   confirm_password: [],
 });
 
+const policyFailed = ref(false);
+
+async function loadPolicy() {
+  if (passwordPolicyStore.isLoaded) return;
+  isLoading.value = true;
+  policyFailed.value = false;
+  await passwordPolicyUtils.getPolicy().catch((e) => {
+    logRequestFailure(e, 'change-password');
+    policyFailed.value = true;
+  }).finally(() => {
+    isLoading.value = false
+  });
+}
+
 onMounted(async () => {
-    if (! passwordPolicyStore.isLoaded) {
-    isLoading.value = true;
-    await passwordPolicyUtils.getPolicy().catch((e) => {
-      console.error(e);
-    }).finally(() => {
-      isLoading.value = false
-    });
-  }
+    await loadPolicy();
   validatedPasswordPolicies.rules = [];
   for (const rule of passwordPolicyStore.rules) {
     validatedPasswordPolicies.rules.push({
@@ -64,8 +73,14 @@ onMounted(async () => {
 
 const emit = defineEmits(["account:password:changed"]);
 
+const isSaving = ref(false);
+const changeFailure = ref(null);
+
+// The form stays on screen while the request runs, so a failure has
+// somewhere to land and the customer keeps what they typed.
 const changePassword = async () => {
-  isLoading.value = true;
+  isSaving.value = true;
+  changeFailure.value = null;
   formErrors.current_password = [];
   formErrors.password = [];
   formErrors.confirm_password = [];
@@ -73,13 +88,16 @@ const changePassword = async () => {
   await customerUtils.changePassword(form.current_password, form.password, form.confirm_password).then(() => {
     emit("account:password:changed");
   }).catch((error) => {
-    if (error.response.status === 422) {
+    if (error.response?.status === 422) {
       for (const [key, value] of Object.entries(error.response.data.errors)) {
         formErrors[key] = value;
       }
+    } else {
+      logRequestFailure(error, 'change-password');
+      changeFailure.value = failureMessage(error, "We couldn't change your password. Your old password still works. Please try again.");
     }
   }).finally(() => {
-    isLoading.value = false;
+    isSaving.value = false;
   });
 }
 </script>
@@ -117,6 +135,7 @@ const changePassword = async () => {
                 <p v-if="formErrors.password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.password[0] }}</p>
             </div>
         </div>
+        <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">We couldn't load the password rules. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Try again</button></p>
         <ul role="list" class="space-y-2">
             <li v-for="validatedPasswordPolicyRule in validatedPasswordPolicies.rules">
                 <div class="relative">
@@ -166,6 +185,7 @@ const changePassword = async () => {
             <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.confirm_password[0] }}</p>
         </div>
         <!-- Submit Button -->
-        <button :disabled="isLoading" type="submit" class="block w-full bg-brand-700 text-center py-3.5 font-medium text-white rounded-xl transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">Change Password</button>
+        <button :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-center py-3.5 font-medium text-white rounded-xl transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">{{ isSaving ? 'Changing...' : 'Change Password' }}</button>
+        <InlineFailure :message="changeFailure" />
     </form>
 </template>

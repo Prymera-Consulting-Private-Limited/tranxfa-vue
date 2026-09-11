@@ -24,6 +24,12 @@ export const useWalletStore = defineStore('wallet', () => {
 
     const requiresReacceptance = computed(() => availability.value === WalletAvailability.PAUSED);
 
+    const reset = () => {
+        availability.value = WalletAvailability.UNKNOWN;
+        subscription.data = null;
+        wallet.data = null;
+    }
+
     return {
         availability,
         subscription,
@@ -31,5 +37,6 @@ export const useWalletStore = defineStore('wallet', () => {
         isAvailable,
         isEnrolled,
         requiresReacceptance,
+        reset,
     }
 });

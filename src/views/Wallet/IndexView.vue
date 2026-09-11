@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import {
@@ -48,10 +50,21 @@ onMounted(async () => {
   }
 });
 
+// Three requests feed this page. If any fails the balance used to show a
+// dash and the list said "No movements yet", which reads as an empty
+// wallet rather than a failed load.
+const loadFailure = ref(null);
+
+function noteFailure(e, context, what) {
+  logRequestFailure(e, context);
+  loadFailure.value = loadFailure.value ?? failureMessage(e, `We couldn't load ${what}.`);
+}
+
 async function loadWalletData() {
   isLoadingWallet.value = true;
+  loadFailure.value = null;
   await Promise.all([
-    walletUtils.getWallet().catch(() => {}),
+    walletUtils.getWallet().catch((e) => noteFailure(e, 'wallet', 'your wallet')),
     refreshTopups(),
     refreshMovements(),
   ]).finally(() => {
@@ -63,13 +76,13 @@ async function refreshTopups() {
   await walletUtils.getTopups().then((response) => {
     const items = Array.isArray(response.data) ? response.data : (response.data?.data ?? []);
     topups.value = items.map(o => WalletTopup.getInstance(o));
-  }).catch(() => {});
+  }).catch((e) => noteFailure(e, 'wallet-topups', 'your pending deposits'));
 }
 
 async function refreshMovements() {
   await walletUtils.getMovements().then((response) => {
     movementsData.value = response.data;
-  }).catch(() => {});
+  }).catch((e) => noteFailure(e, 'wallet-movements', 'your wallet activity'));
 }
 
 watch(() => walletStore.wallet.data, () => {
@@ -173,6 +186,10 @@ async function termsAccepted() {
             <button type="button" @click="startEnrolment" class="mt-8 inline-flex items-center justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-sm transition hover:bg-brand-800 cursor-pointer">Read terms &amp; activate</button>
             <p class="mt-3 text-xs/5 text-gray-500">Your wallet is activated once you accept its terms.</p>
           </div>
+        </template>
+
+        <template v-else-if="loadFailure">
+          <LoadFailurePanel title="We couldn't load your wallet" :message="loadFailure" retryLabel="Try again" @retry="loadWalletData" class="mt-0" />
         </template>
 
         <template v-else>

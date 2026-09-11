@@ -40,6 +40,7 @@ const otp = ref('');
 const otpInput = ref(null);
 const isResending = ref(false);
 const resendError = ref('');
+const resentMessage = ref('');
 
 const showResendButton = ref(false);
 const countdown = ref(30);
@@ -108,7 +109,10 @@ async function resend() {
   resendError.value = '';
   otp.value = '';
   otpInput.value?.clearInput();
-  walletUtils.requestSpendOtp(props.quoteId).catch((e) => {
+  resentMessage.value = '';
+  walletUtils.requestSpendOtp(props.quoteId).then(() => {
+    resentMessage.value = "We've sent a new code to your email. It can take a minute to arrive.";
+  }).catch((e) => {
     resendError.value = e.response?.data?.message ?? 'We could not send a new code. Please try again.';
   }).finally(() => {
     isResending.value = false;
@@ -143,6 +147,9 @@ function close() {
                 </div>
                 <div v-if="resendError" class="mb-4 rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
                   <p class="text-sm/6 text-danger-700">{{ resendError }}</p>
+                </div>
+                <div v-if="resentMessage" role="status" class="mb-4 rounded-2xl border border-success-100 bg-success-50 px-4 py-3">
+                  <p class="text-sm/6 text-success-700">{{ resentMessage }}</p>
                 </div>
                 <v-otp-input
                     ref="otpInput"

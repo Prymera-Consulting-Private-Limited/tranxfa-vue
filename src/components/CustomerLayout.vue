@@ -68,7 +68,7 @@ onMounted(async () => {
               {
                 group: 'customer',
                 title: `${category} - Rejected`,
-                text: `We were unable to verify your ${document}.`,
+                text: `We couldn't accept your ${document}. Open Account verification to see why and upload it again.`,
                 type: 'danger',
               },
               -1,

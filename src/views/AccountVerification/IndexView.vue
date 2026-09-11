@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -14,13 +16,23 @@ const isLoading = ref(false);
  */
 const customer = customerStore.customer;
 
-onMounted(async () => {
-  if (! customerStore.isLoaded) {
-    isLoading.value = true;
+const loadFailure = ref(null);
+
+async function load() {
+  if (customerStore.isLoaded) return;
+  isLoading.value = true;
+  loadFailure.value = null;
+  try {
     await customerUtils.refresh();
+  } catch (e) {
+    logRequestFailure(e, 'verification');
+    loadFailure.value = failureMessage(e, "We couldn't load your verification status.");
+  } finally {
     isLoading.value = false;
   }
-});
+}
+
+onMounted(load);
 </script>
 
 <template>
@@ -28,8 +40,10 @@ onMounted(async () => {
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Account Verification</h1>
+
+        <LoadFailurePanel v-if="loadFailure" title="We couldn't load your verification status" :message="loadFailure" retryLabel="Try again" @retry="load" class="mt-0" />
         <!-- Main 3 column grid -->
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
+        <div v-else class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">

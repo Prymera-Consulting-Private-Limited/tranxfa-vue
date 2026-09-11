@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import {
   ArrowRightIcon,
   CheckIcon, ChevronDownIcon,
@@ -50,6 +52,7 @@ const props = defineProps({
 
 const isFetchingQuote = ref(true);
 const isSavingQuote = ref(false);
+const saveFailure = ref(null);
 
 const sendMoneyInput = ref(null);
 const receiveMoneyInput = ref(null);
@@ -244,6 +247,7 @@ onUnmounted(() => {
 
 async function saveQuote() {
   isSavingQuote.value = true;
+  saveFailure.value = null;
 
   // An amount typed without leaving the field has not refreshed the quote yet
   // (blur never fires on Enter-key submission) — re-quote it before saving.
@@ -266,15 +270,17 @@ async function saveQuote() {
     recipientUtil.getQuote(props.recipient, quoteUtil.quote.data).then((response) => {
       const quote = TransactionQuote.getInstance(response.data);
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
-    }).catch(() => {
+    }).catch((e) => {
       isSavingQuote.value = false;
+      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
     });
   } else {
     quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
       const quote = TransactionQuote.getInstance(response.data);
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
-    }).catch(() => {
+    }).catch((e) => {
       isSavingQuote.value = false;
+      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
     });
   }
 
@@ -551,6 +557,7 @@ async function saveQuote() {
             <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
           </template>
         </button>
+        <InlineFailure :message="saveFailure" />
       </template>
       <div v-else class="rounded-b-md bg-warning-50 p-4 mt-12 -mx-5 -mb-8">
         <div class="flex">

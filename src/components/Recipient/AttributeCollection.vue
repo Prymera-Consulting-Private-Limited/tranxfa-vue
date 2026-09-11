@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import Country from "@/models/country.js";
 import Currency from "@/models/currency.js";
 import PayoutMethod from "@/models/payout_method.js";
@@ -129,9 +131,13 @@ async function updateRelationship(relationship) {
 }
 
 const isFetchingDeliveryOptions = ref(false);
+const deliveryOptionsFailure = ref(null);
+let lastDeliveryOption = null;
 
 function loadSubDeliveryOptions(deliveryOption) {
   isFetchingDeliveryOptions.value = true;
+  deliveryOptionsFailure.value = null;
+  lastDeliveryOption = deliveryOption;
   props.payoutChannel.attributes.forEach(function (attribute) {
     if (attribute.type === RecipientDataType.SUB_DELIVERY_OPTION) {
       attribute.options = [];
@@ -143,6 +149,9 @@ function loadSubDeliveryOptions(deliveryOption) {
         attribute.options = response.data.map(o => SubDeliveryOption.getInstance(o));
       }
     });
+  }).catch((e) => {
+    logRequestFailure(e, 'sub-delivery-options');
+    deliveryOptionsFailure.value = failureMessage(e, "We couldn't load the branches for that choice.");
   }).finally(() => {
     isFetchingDeliveryOptions.value = false;
   });
@@ -164,6 +173,7 @@ async function updateRecipientInput(updated, attribute) {
 }
 
 const isSaving = ref(false);
+const saveFailure = ref(null);
 
 const recipientUtils = useRecipientUtils();
 
@@ -175,6 +185,7 @@ const emit = defineEmits([
 
 async function addRecipient() {
   isSaving.value = true;
+  saveFailure.value = null;
   Object.entries(errors).forEach(([key]) => {
     errors[key] = [];
   });
@@ -183,14 +194,13 @@ async function addRecipient() {
     emit('recipient:added', recipient);
   }).catch((e) => {
     emit('recipient:add:failed');
-    if (e.status === 422) {
+    if (e.response?.status === 422) {
       for (const [key, value] of Object.entries(e.response.data.errors)) {
         errors[key] = value;
       }
     } else {
-      console.error(e)
-      isSaving.value = false;
-      throw e;
+      logRequestFailure(e, 'recipient-add');
+      saveFailure.value = failureMessage(e, "We couldn't save this recipient. Please try again.");
     }
   }).finally(() => {
     isSaving.value = false;
@@ -303,6 +313,8 @@ watchEffect(() => {
 
 <template>
   <form @submit.prevent="addRecipient" class="space-y-6 sm:min-w-md">
+    <p v-if="isFetchingDeliveryOptions" role="status" class="flex items-center gap-2 text-sm/6 text-gray-500"><Spinner class="size-4" aria-hidden="true" /> Loading branches...</p>
+    <InlineFailure :message="deliveryOptionsFailure" retryLabel="Try again" @retry="loadSubDeliveryOptions(lastDeliveryOption)" />
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
@@ -379,5 +391,6 @@ watchEffect(() => {
       </span>
       <span v-else>Save Recipient</span>
     </button>
+    <InlineFailure :message="saveFailure" />
   </form>
 </template>

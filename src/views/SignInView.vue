@@ -1,4 +1,5 @@
 <script setup>
+import {getCustomerMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -61,8 +62,10 @@ async function login() {
       );
       router.push({name: 'authByOtp', query});
     }).catch((e) => {
-      loginError.value = e.response?.data?.message;
-      console.error(e);
+      // A network failure has no response, and an empty message meant the error
+      // box never rendered: the customer pressed the button and nothing happened.
+      loginError.value = getCustomerMessage(e) ?? "We couldn't sign you in. Please check your internet connection and try again.";
+      logRequestFailure(e, 'sign-in');
     }).finally(() => {
       isLoading.value = false;
     })
@@ -75,8 +78,10 @@ async function login() {
       }
 
     }).catch((e) => {
-      loginError.value = e.response?.data?.message;
-      console.error(e);
+      // A network failure has no response, and an empty message meant the error
+      // box never rendered: the customer pressed the button and nothing happened.
+      loginError.value = getCustomerMessage(e) ?? "We couldn't sign you in. Please check your internet connection and try again.";
+      logRequestFailure(e, 'sign-in');
     }).finally(() => {
       isLoading.value = false;
     })

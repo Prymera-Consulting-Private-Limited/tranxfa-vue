@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import TextInput from "@/components/Recipient/Attribute/TextInput.vue";
 import DeliveryOptionInput from "@/components/Recipient/Attribute/DeliveryOptionInput.vue";
 import MobileNumberInput from "@/components/Recipient/Attribute/MobileNumberInput.vue";
@@ -143,6 +145,7 @@ async function updateRecipientInput(updated, attribute) {
 }
 
 const isSaving = ref(false);
+const saveFailure = ref(null);
 
 const isLoading = ref(false);
 
@@ -157,6 +160,7 @@ const emit = defineEmits([
 
 async function updateRecipient() {
   isSaving.value = true;
+  saveFailure.value = null;
   Object.entries(errors).forEach(([key]) => {
     errors[key] = [];
   });
@@ -165,14 +169,13 @@ async function updateRecipient() {
     const recipient = Recipient.getInstance(response.data);
     emit('recipient:updated', recipient);
   }).catch((e) => {
-    if (e.status === 422) {
+    if (e.response?.status === 422) {
       for (const [key, value] of Object.entries(e.response.data.errors)) {
         errors[key] = value;
       }
     } else {
-      console.error(e)
-      isSaving.value = false;
-      throw e;
+      logRequestFailure(e, 'recipient-update');
+      saveFailure.value = failureMessage(e, "We couldn't save these changes. Please try again.");
     }
     emit('recipient:update:failed');
   }).finally(() => {
@@ -315,5 +318,6 @@ watchEffect(() => {
       </span>
       <span v-else>Save Changes</span>
     </button>
+    <InlineFailure :message="saveFailure" />
   </form>
 </template>

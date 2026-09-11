@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import Calculator from "@/components/Calculator.vue";
 import { computed, onMounted, ref } from "vue";
@@ -18,11 +20,16 @@ const timeUtils = useTimeUtils();
 
 const data = ref(null);
 const isLoading = ref(true);
+const loadFailure = ref(null);
 
 async function getTransactions(page = null) {
   isLoading.value = true;
+  loadFailure.value = null;
   await transactionUtils.get(page).then((response) => {
     data.value = response.data;
+  }).catch((e) => {
+    logRequestFailure(e, 'transactions');
+    loadFailure.value = failureMessage(e, "We couldn't load your transfers.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -75,6 +82,9 @@ const transactions = computed(() => {
                 </div>
               </div>
             </div>
+          </template>
+          <template v-else-if="loadFailure">
+            <LoadFailurePanel title="We couldn't load your transfers" :message="loadFailure" retryLabel="Try again" @retry="getTransactions()" class="mt-0 lg:col-span-2" />
           </template>
           <template v-else>
             <template v-if="transactions?.length > 0">

@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import {ArrowLongLeftIcon} from "@heroicons/vue/20/solid/index.js";
@@ -17,11 +19,16 @@ const walletStore = useWalletStore();
 
 const data = ref(null);
 const isLoading = ref(true);
+const loadFailure = ref(null);
 
 async function getMovements(page = 1) {
   isLoading.value = true;
+  loadFailure.value = null;
   await walletUtils.getMovements(page).then((response) => {
     data.value = response.data;
+  }).catch((e) => {
+    logRequestFailure(e, 'wallet-statement');
+    loadFailure.value = failureMessage(e, "We couldn't load your wallet activity.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -93,6 +100,9 @@ const movements = computed(() => {
                 <Pagination v-bind:pagination="data.pagination" v-on:pageClicked="getMovements" />
               </div>
             </div>
+          </template>
+          <template v-else-if="loadFailure">
+            <LoadFailurePanel title="We couldn't load your wallet activity" :message="loadFailure" retryLabel="Try again" @retry="getMovements()" class="mt-0" />
           </template>
           <template v-else>
             <div class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white shadow-lg">
