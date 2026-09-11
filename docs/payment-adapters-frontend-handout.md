@@ -33,7 +33,6 @@ When a partner asks which domain to whitelist, it is the transport host.
 | Payment page opens, every poll, callback page | `GET /client/v1/transaction/{transactionId}` | – |
 | Customer says they have paid (bank transfer, Paga, Monoova, Apaylo) | `POST /client/v1/transaction/payment-sent/{paymentId}` | – |
 | Customer presses "Try the payment again" | `POST /client/v1/transaction/payment/{transactionId}` | `payment_data` attributes for providers that collect them (Apaylo), otherwise null |
-| Private channel subscription (when `VITE_BROADCAST_AUTH_ENDPOINT` is set) | `POST {auth endpoint}` | `socket_id`, `channel_name` |
 
 The retry endpoint's `422` answer is shown field by field: `errors` keyed by the attribute name from `payment_data_requirements`. Any other failure shows one sentence with "Nothing has been charged".
 
@@ -68,7 +67,7 @@ Channel `client-payment.{paymentId}`, event `PaymentTransactionStateUpdated`.
 
 The API sends five keys on every event: `id`, `state` (an object with `code`), `shared_reference`, `vendor_unique_id` and `payment_url`, each resolved from the database at the moment of broadcast. The frontend reads `state`, `shared_reference` and `payment_url` and applies **only the keys present**; it ignores `vendor_unique_id`. Because every value is resolved at broadcast time, a `null` you receive is a real null. If a value the page holds is ever cleared by an event, that is the bug to report.
 
-The channel is subscribed as a private channel when the app is built with `VITE_BROADCAST_AUTH_ENDPOINT`; the authoriser posts `socket_id` and `channel_name` with the customer's session cookie and XSRF header. Without that variable the channel is public, which is the current production setting.
+The channel is public on this app (`src/realtime.js`); the local Reverb build authorises with the customer session token header set in `main.js`. payvel's copy of this handout describes the private-channel variant, which this app does not have.
 
 Document events (`CustomerDocumentUploaded`, `Processing`, `Approved`, `Rejected`) go on `client-customer.{customerId}` and are unrelated to payments.
 

@@ -27,7 +27,11 @@ axios.defaults.withXSRFToken = true;
 axios.interceptors.request.use((config) => {
     NProgress.start()
     config.headers['Accept'] = 'application/json'
-    config.headers['ngrok-skip-browser-warning'] = 'yes'
+    // Only a local API sits behind ngrok; in production the custom header
+    // just widens every preflight for nothing.
+    if (import.meta.env.VITE_APP_ENV === 'local') {
+        config.headers['ngrok-skip-browser-warning'] = 'yes'
+    }
 
     return config;
 })

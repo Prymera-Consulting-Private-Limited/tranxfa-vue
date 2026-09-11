@@ -92,4 +92,11 @@ describe('response headers', () => {
 
         expect(missing, 'script hosts absent from the CSP').toEqual([]);
     });
+
+    // The Volume SDK is loaded by script_loader when a Volume payment renders,
+    // so no page pays for it up front. The host stays in the CSP for that load.
+    it('loads no third-party script on every page', () => {
+        expect(html).not.toMatch(/<script[^>]*\ssrc="https:/);
+        expect(csp).toContain('https://js.volumepay.io');
+    });
 });
