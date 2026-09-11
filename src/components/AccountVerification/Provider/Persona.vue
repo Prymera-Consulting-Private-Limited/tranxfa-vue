@@ -1,6 +1,6 @@
 <script setup>
 import Persona from 'persona';
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
@@ -61,9 +61,26 @@ async function launchPersonaWebSdk() {
   });
 }
 
+// getNewAccessToken() rethrows, and this used to let that reject unhandled -
+// so the most likely failure of all, a token endpoint answering 500, emitted
+// nothing and left the parent's spinner turning forever. It still rethrows,
+// because Sumsub also uses it as the SDK's token-refresh callback where
+// throwing is the contract; the catch belongs here instead.
 onMounted(async () => {
-  // const accessToken = await getNewAccessToken();
-  await launchPersonaWebSdk();
+  try {
+    await launchPersonaWebSdk();
+  } catch (e) {
+    emit('sdkError', e);
+  }
+})
+
+onUnmounted(() => {
+  // Persona's client owns a modal it appends to the document, outside this
+  // component's tree, so unmounting the component does not remove it. Without
+  // this the overlay outlives the dialog and the next mount opens a second one
+  // behind the first.
+  client?.destroy?.();
+  client = null;
 })
 </script>
 <template>

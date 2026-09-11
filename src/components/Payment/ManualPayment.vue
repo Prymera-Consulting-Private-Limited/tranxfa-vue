@@ -1,17 +1,25 @@
 <script setup>
+import moment from "moment";
+import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
-import {computed, onMounted, onUnmounted} from "vue";
-import PaymentTransactionState from "@/models/payment_transaction_state.js";
+import {computed, onUnmounted, ref} from "vue";
+import {useTransactionUtils} from "@/composables/transaction_utils.js";
+import {failureMessage, reportUnexpectedError} from "@/composables/api_utils.js";
 import PaymentState from "@/enums/payment_state.js";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
 import Processing from "@/components/Payment/State/Processing.vue";
 import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import Failed from "@/components/Payment/State/Failed.vue";
-import {useTransactionUtils} from "@/composables/transaction_utils.js";
+import {usePaymentWatch} from "@/composables/payment_watch.js";
 import ClientPaymentAccount from "@/components/ClientPaymentAccount.vue";
 import {ClipboardIcon} from "@heroicons/vue/24/outline/index.js";
 import {UseClipboard} from "@vueuse/components";
 import router from "@/router/index.js";
+
+const FINAL_STATES = [
+  PaymentState.AUTHORIZED, PaymentState.CAPTURED, PaymentState.FAILED,
+  PaymentState.TIMED_OUT, PaymentState.CANCELLED, PaymentState.REFUNDED, PaymentState.PART_REFUNDED,
+];
 
 const props = defineProps({
   transaction: {
@@ -27,68 +35,59 @@ const props = defineProps({
 
 const transactionUtils = useTransactionUtils();
 
-const getTransaction = async () => {
-  transactionUtils.getTransaction(props.transaction.id).then((response) => {
-    const transaction = Transaction.getInstance(response.data);
-    props.transaction.payment = transaction.payment;
-    if (props.transaction.payment.state.code === PaymentState.PENDING) {
-      clearPullInterval();
+// Cleared on unmount: a customer who closed the modal was pulled to the
+// transaction page seconds later.
+let onStateRedirectId = null;
+
+const {stopPolling} = usePaymentWatch(props.transaction, {
+  isReady: () => props.transaction.payment.state.code === PaymentState.PENDING,
+  isFinal: () => FINAL_STATES.includes(props.transaction.payment.state.code),
+  onState: (code) => {
+    if (code === PaymentState.AUTHORIZED || code === PaymentState.CAPTURED) {
+      stopPolling();
+      onStateRedirectId = setTimeout(() => {
+        router.push({name: 'viewTransaction', params: {transactionId: props.transaction.id}});
+      }, 1500);
     }
-  });
-}
+  },
+});
 
-let intervalId = null;
 
-onMounted(async () => {
-  Echo.channel(`client-payment.${props.transaction.payment.id}`)
-      .listen('PaymentTransactionStateUpdated', (e) => {
-        props.transaction.payment.state = PaymentTransactionState.getInstance(e.state);
-        props.transaction.payment.sharedReference = e.shared_reference;
-        if (props.transaction.payment.state.code === PaymentState.PENDING) {
-          clearPullInterval();
-        } else if (props.transaction.payment.state.code === PaymentState.AUTHORIZED || props.transaction.payment.state.code === PaymentState.CAPTURED) {
-          setTimeout(() => {
-            router.push({
-              name: 'viewTransaction',
-              params: {
-                transactionId: props.transaction.id
-              }
-            });
-          }, 1500)
-        }
-      });
-  if (props.transaction.payment.state.code !== PaymentState.PENDING) {
-    intervalId = setInterval(getTransaction, 5000);
-  }
-})
 
-const clearPullInterval = async () => {
-  if (intervalId) {
-    await clearInterval(intervalId);
-    intervalId = null;
-  }
-}
 
-onUnmounted(async () => {
-  Echo.leaveChannel(`client-payment.${props.transaction.payment.id}`);
-  await clearPullInterval();
-})
 
+
+
+let redirectTimeoutId = null;
+const isConfirmingPayment = ref(false);
+const confirmFailure = ref(null);
+
+// The customer says they have paid: tell the server, then show the waiting
+// state. The optimistic flip happens first so the button cannot be clicked
+// twice, and is reverted if the request fails so they can try again.
 const iHaveMadePayment = async () => {
-  await clearPullInterval();
+  if (isConfirmingPayment.value) return;
+  isConfirmingPayment.value = true;
+  confirmFailure.value = null;
+  const previousState = props.transaction.payment.state.code;
+  stopPolling();
   props.transaction.payment.state.code = PaymentState.REDIRECTED;
-  await transactionUtils.iHaveMadePayment(props.transaction.payment.id).then(() => {
+  try {
+    await transactionUtils.iHaveMadePayment(props.transaction.payment.id);
     props.transaction.payment.customerConfirmedPayment = true;
-    setTimeout(() => {
-      router.push({
-        name: 'viewTransaction',
-        params: {
-          transactionId: props.transaction.id
-        }
-      });
-    }, 3000)
-  });
+    redirectTimeoutId = setTimeout(() => {
+      router.push({name: 'viewTransaction', params: {transactionId: props.transaction.id}});
+    }, 3000);
+  } catch (e) {
+    props.transaction.payment.state.code = previousState;
+    reportUnexpectedError(e, 'payment-sent');
+    confirmFailure.value = failureMessage(e, "We couldn't record that you've paid. Your transfer is still open, so please try again.");
+  } finally {
+    isConfirmingPayment.value = false;
+  }
 }
+
+onUnmounted(() => clearTimeout(redirectTimeoutId));
 
 const status = computed(() => {
   if (
@@ -105,35 +104,53 @@ const status = computed(() => {
     return 'completed';
   } else if (props.transaction.payment.state.code === PaymentState.FAILED) {
     return 'failed';
+  } else if (props.transaction.payment.state.code === PaymentState.TIMED_OUT || props.transaction.payment.state.code === PaymentState.CANCELLED) {
+    return 'cancelled';
+  } else if (props.transaction.payment.state.code === PaymentState.REFUNDED || props.transaction.payment.state.code === PaymentState.PART_REFUNDED) {
+    return 'refunded';
   }
+  return 'unknown';
 })
+onUnmounted(() => clearTimeout(onStateRedirectId));
+
+// Only the api knows whether this payment has a deadline; null means it
+// does not, and the line is left out rather than guessed.
+const payByFormatted = computed(() => {
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('MMM D, YYYY h:mm A') : '';
+});
 </script>
 
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
-    <div class="-m-5">
-      <h2 class="text-lg font-semibold text-gray-900 mb-5 text-left">Completa tu pago</h2>
-      <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm text-gray-600 mb-6 text-left leading-6">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">Complete your payment</h2>
+      <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm/6 text-gray-600 mb-6 text-left">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
+      <div v-if="transaction.payment.clientPaymentAccount" class="mb-6 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
+        <p v-if="transaction.payment.clientPaymentAccount.paymentReference">Put the <strong>Payment reference</strong> in the reference or description box at your bank. Without it we cannot match your money to this transfer.</p>
+        <p>Send exactly <strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong>.</p>
+        <p v-if="payByFormatted">Please pay by <strong>{{ payByFormatted }}</strong> (your local time). If we do not see your money by then, this transfer is cancelled and nothing is charged.</p>
+      </div>
       <template v-if="transaction.payment.clientPaymentAccount">
         <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" /><div class="text-left my-5">
-        <label :for="`payment-amount`" class="block text-sm/6 font-medium text-gray-900">Payment Amount</label>
+        <label :for="`payment-amount`" class="block text-sm/6 font-medium text-gray-900">Payment amount</label>
         <UseClipboard v-slot="{ copy, copied }" :source="transaction.payment.totalPaymentAmountFormatted">
           <div class="mt-2 flex">
             <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
-              <input type="text" readonly :value="transaction.payment.totalPaymentAmountCurrencyPrefixed" :id="`payment-amount`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6" />
+              <input type="text" readonly :value="transaction.payment.totalPaymentAmountCurrencyPrefixed" :id="`payment-amount`" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6" />
             </div>
-            <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
+            <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm/6 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 cursor-pointer">
               <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
             </button>
           </div>
-          <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Payment Amount has been copied!</p>
+          <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Copied.</p>
         </UseClipboard>
       </div>
         <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
-          <button @click="iHaveMadePayment" type="button" class="rounded-md w-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 cursor-pointer">I've made payment</button>
+          <button @click="iHaveMadePayment" :disabled="isConfirmingPayment" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 cursor-pointer">I've made payment</button>
+          <InlineFailure :message="confirmFailure" />
         </div>
-        <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
-          <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
+        <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
+          <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
         </div>
       </template>
     </div>
@@ -141,28 +158,47 @@ const status = computed(() => {
 
   <template v-else-if="status === 'pending'">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Un momento...</h2>
-    <p class="text-base text-gray-600 mb-6">Estamos preparando tu pago.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait…</h2>
+    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
   </template>
 
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">A la espera de actualización del pago</h2>
-    <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage }}</p>
-    <div v-if="showViewTransfer" class="mb-6 leading-6 text-center text-gray-900 hover:text-brand-700 font-semibold text-sm">
-      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View Transaction</router-link>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">We're watching for your payment</h2>
+    <p class="text-base text-gray-600 mb-2">Thanks for letting us know. Bank transfers usually arrive within a few minutes, but can take up to one business day. This page updates as soon as your money lands.</p>
+    <p v-if="transaction.payment.clientPaymentAccount?.waitTimeMessage" class="text-sm/6 text-gray-500 mb-6">{{ transaction.payment.clientPaymentAccount.waitTimeMessage }}</p>
+    <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
     </div>
   </template>
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-green-700 mb-5 -mt-10">Pago exitosa</h2>
-    <p class="text-lg text-gray-600 mb-6">Su pago se ha recibido correctamente.</p>
+    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment received</h2>
+    <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-red-500 mb-5 -mt-10">Pago fallido</h2>
-    <p class="text-base text-red-600">Su pago ha fallado. Por favor, intente de nuevo</p>
+    <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment failed</h2>
+    <p class="text-base text-danger-600">We couldn't take your payment and no money has left your account. You can try again or choose another way to pay.</p>
+  </template>
+
+  <!-- Expired, cancelled and refunded payments rendered an empty modal here. -->
+  <template v-else-if="status === 'cancelled'">
+    <Failed class="-mt-20" />
+    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
+    <p class="text-base text-gray-600 mb-6">No money has moved. You can start the transfer again whenever you're ready.</p>
+    <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
+    </div>
+  </template>
+
+  <template v-else-if="status === 'refunded'">
+    <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment refunded</h2>
+    <p class="text-base text-gray-600 mb-6">This payment was returned to you. Check the transfer for details.</p>
+    <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
+    </div>
   </template>
 </template>

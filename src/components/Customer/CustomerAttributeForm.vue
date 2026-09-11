@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import FormGroup from "@/components/CustomerAttribute/FormGroup.vue";
 import Spinner from "@/components/Spinner.vue";
 import {computed, onMounted, reactive, ref, watchEffect} from "vue";
@@ -54,6 +56,7 @@ const form = reactive({
 })
 
 const isSaving = ref(false);
+const saveFailure = ref(null);
 
 const emit = defineEmits([
   'customer:attribute_category:updated',
@@ -63,13 +66,15 @@ const emit = defineEmits([
 async function update() {
   isSaving.value = true;
   form.errors = null;
+  saveFailure.value = null;
   customerUtils.updateProfileAttribute(form.data, props.categories).then(() => {
     emit('customer:attribute_category:updated');
   }).catch((e) => {
-    if (e.response.status === 422) {
+    if (e.response?.status === 422) {
       form.errors = e.response.data.errors;
     } else {
-      console.error(e);
+      logRequestFailure(e, 'customer-attributes');
+      saveFailure.value = failureMessage(e, "We couldn't save your details. Please try again.");
     }
     emit('customer:attribute_category:update_failed', e);
   }).finally(() => {
@@ -132,16 +137,22 @@ watchEffect(() => {
       />
     </div>
     <button
-      v-if="! updateOutsourced" :disabled="showLoading || isSaving" :class="[{'opacity-70': showLoading || isSaving}]"
+      v-if="! updateOutsourced" :disabled="showLoading || isSaving"
       type="submit"
-      class="block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition cursor-pointer">
+      class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70">
       <template v-if="isSaving">
-        <span class="flex items-center justify-center whitespace-nowrap">
-          <Spinner :class="'size-4 mr-2'" />
+        <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
+          <Spinner :class="'size-4'" />
           Guardando...
         </span>
       </template>
-      <template v-else>{{ saveBtnText }}</template>
+      <template v-else>
+        <span class="inline-flex items-center justify-center gap-2">
+          {{ saveBtnText }}
+          <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
+        </span>
+      </template>
     </button>
+    <InlineFailure v-if="! updateOutsourced" :message="saveFailure" />
   </form>
 </template>

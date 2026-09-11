@@ -30,3 +30,7 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Unpacked from vue3-flag-icons by scripts/generate-flag-assets.mjs
+public/flags
+src/assets/flags.css

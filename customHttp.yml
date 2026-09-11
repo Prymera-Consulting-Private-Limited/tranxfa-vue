@@ -1,0 +1,82 @@
+# Response headers for AWS Amplify Hosting.
+#
+# The staging audit found the app served with no CSP, no X-Frame-Options, no
+# HSTS, and Cache-Control: max-age=0 on every asset - so each visit re-fetched
+# every immutable hashed bundle.
+#
+# The Content-Security-Policy is deliberately Report-Only. This is a money
+# application, its API host differs per deployment, and it embeds five different
+# KYC providers whose SDKs mount iframes and fetch model weights we do not
+# control. An enforcing policy authored from a static reading of the source
+# would be a good way to lock a customer out of identity verification. Run it in
+# report-only for a release, read what the browser reports, tighten `connect-src`
+# and `img-src` off the evidence, then rename the key to
+# `Content-Security-Policy`. Everything below it is safe to enforce today and is.
+customHeaders:
+  - pattern: '**'
+    headers:
+      - key: 'Strict-Transport-Security'
+        value: 'max-age=31536000; includeSubDomains'
+
+      # Nosniff matters here specifically: we now serve 540 flag SVGs, and an SVG
+      # served as anything the browser is willing to guess at is a script vector.
+      - key: 'X-Content-Type-Options'
+        value: 'nosniff'
+
+      # SAMEORIGIN rather than DENY: some white-label deployments are embedded by
+      # the brand's own site. This is the enforcing counterpart to frame-ancestors,
+      # which does nothing while the CSP is report-only.
+      - key: 'X-Frame-Options'
+        value: 'SAMEORIGIN'
+
+      # Referrer carries transfer and recipient ids in the path. Send the origin
+      # only, and only to HTTPS.
+      - key: 'Referrer-Policy'
+        value: 'strict-origin-when-cross-origin'
+
+      # camera and microphone are left alone on purpose - liveness and document
+      # capture need them, and the KYC SDKs request them from their own iframe
+      # origins, which we cannot enumerate here without breaking verification.
+      - key: 'Permissions-Policy'
+        value: 'geolocation=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), midi=(), serial=(), bluetooth=()'
+
+      - key: 'Content-Security-Policy-Report-Only'
+        value: >-
+          default-src 'self';
+          base-uri 'self';
+          object-src 'none';
+          frame-ancestors 'self';
+          form-action 'self';
+          img-src 'self' data: blob: https:;
+          font-src 'self' data: https://fonts.gstatic.com;
+          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+          # salvtech: GA4, Clarity and the Meta pixel are inline blocks in index.html; they
+          # need hashes (or nonces) before this policy can be enforced.
+          script-src 'self' 'wasm-unsafe-eval' https://js.volumepay.io https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://connect.facebook.net;
+          worker-src 'self' blob:;
+          media-src 'self' blob: https://lottie.host;
+          connect-src 'self' https: wss:;
+          frame-src 'self' https://js.volumepay.io https://verify.didit.me
+          https://*.sumsub.com https://*.shuftipro.com https://*.uppass.io
+          https://*.withpersona.com
+
+  # Vite fingerprints everything under /assets, so the content behind a given URL
+  # can never change. A year, immutable.
+  - pattern: '/assets/**'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=31536000, immutable'
+
+  # Flags are not fingerprinted - the file name is the ISO country code. A week,
+  # revalidated after, so a corrected flag ships within one.
+  - pattern: '/flags/**'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=604800, stale-while-revalidate=86400'
+
+  # The entry document names the hashed bundles, so it must never be held. This
+  # is the one file that has to be re-fetched for a deploy to reach anyone.
+  - pattern: '/index.html'
+    headers:
+      - key: 'Cache-Control'
+        value: 'no-cache'

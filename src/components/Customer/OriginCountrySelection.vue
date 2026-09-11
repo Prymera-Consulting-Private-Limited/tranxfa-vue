@@ -1,4 +1,7 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
+import InlineFailure from "@/components/InlineFailure.vue";
 import {computed, onMounted, ref} from "vue";
 import {useCountryUtils} from "@/composables/country_utils.js";
 import FlagIcon from "vue3-flag-icons";
@@ -36,23 +39,42 @@ const filteredCountries = computed(() => {
   return countries.filter((country) => countrySearchText(country).includes(query));
 });
 
+const saveFailure = ref(null);
+const loadFailure = ref(null);
+
 async function updateCountry(country) {
   if (isSaving.value) {
     return;
   }
   isSaving.value = true;
-  await customerUtils.updateCountry(country);
-  emit('countryUpdated');
+  saveFailure.value = null;
+  try {
+    await customerUtils.updateCountry(country);
+    emit('countryUpdated');
+  } catch (e) {
+    logRequestFailure(e, 'origin-country');
+    saveFailure.value = failureMessage(e, "No pudimos guardar tu país. Elígelo de nuevo.");
+    isSaving.value = false;
+  }
 }
 
-onMounted(async () => {
-  if (!customerStore.isLoaded) {
-    await customerUtils.refresh();
-  }
-  await countryUtils.getSources().finally(() => {
+async function loadSources() {
+  isLoading.value = true;
+  loadFailure.value = null;
+  try {
+    if (!customerStore.isLoaded) {
+      await customerUtils.refresh();
+    }
+    await countryUtils.getSources();
+  } catch (e) {
+    logRequestFailure(e, 'source-countries');
+    loadFailure.value = failureMessage(e, "No pudimos cargar la lista de países.");
+  } finally {
     isLoading.value = false;
-  });
-});
+  }
+}
+
+onMounted(loadSources);
 </script>
 
 <template>
@@ -73,7 +95,8 @@ onMounted(async () => {
         <i class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
       </div>
 
-      <template v-if="countryUtils.sources.value?.length > 0">
+      <LoadFailurePanel v-if="loadFailure" title="No pudimos cargar la lista de países" :message="loadFailure" retryLabel="Intentar de nuevo" @retry="loadSources" class="mt-0" />
+      <template v-else-if="countryUtils.sources.value?.length > 0">
         <div class="relative mb-4 shrink-0">
           <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <i class="pi pi-search text-gray-400"></i>
@@ -83,16 +106,16 @@ onMounted(async () => {
             type="search"
             autocomplete="off"
             placeholder="Buscar país..."
-            class="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-10 text-gray-900 placeholder:text-gray-400 focus:border-brand-700 focus:outline-none focus:ring-1 focus:ring-brand-700"
+            class="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-10 text-gray-900 placeholder:text-gray-500 focus:border-brand-700 focus:outline-none focus:ring-1 focus:ring-brand-700"
           />
           <button
             v-if="searchQuery"
             type="button"
-            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-600"
             aria-label="Borrar búsqueda"
             @click="searchQuery = ''"
           >
-            <i class="pi pi-times text-sm"></i>
+            <i class="pi pi-times text-sm/6"></i>
           </button>
         </div>
 
@@ -115,7 +138,7 @@ onMounted(async () => {
                 <FlagIcon :class="['text-2xl']" :code="country.iso2Alpha.toLowerCase()" circle />
               </div>
               <div class="flex min-w-0 flex-1 items-center py-3 pr-4">
-                <div class="min-w-0 flex-1 truncate pl-0 text-sm">
+                <div class="min-w-0 flex-1 truncate pl-0 text-sm/6">
                   <p class="truncate font-medium text-gray-900">{{ country.commonName }}</p>
                   <p class="truncate text-gray-500">{{ country.endonym ?? country.officialName }}</p>
                 </div>
@@ -124,7 +147,7 @@ onMounted(async () => {
           </ul>
           <p
             v-else
-            class="px-4 py-8 text-center text-sm text-gray-500"
+            class="px-4 py-8 text-center text-sm/6 text-gray-500"
           >
             No se encontraron países para «{{ searchQuery.trim() }}».
           </p>
@@ -143,7 +166,7 @@ onMounted(async () => {
               <span class="size-10 animate-pulse rounded-full bg-gray-200"></span>
             </div>
             <div class="flex min-w-0 flex-1 items-center rounded-r-md border border-l-0 border-gray-200 bg-white py-3 pr-4">
-              <div class="min-w-0 flex-1 truncate pl-4 text-sm">
+              <div class="min-w-0 flex-1 truncate pl-4 text-sm/6">
                 <div class="h-4 w-24 animate-pulse bg-gray-200"></div>
                 <div class="mt-2 h-2 w-16 animate-pulse bg-gray-200"></div>
               </div>
@@ -151,6 +174,7 @@ onMounted(async () => {
           </li>
         </template>
       </ul>
+      <InlineFailure :message="saveFailure" />
     </div>
   </div>
 </template>

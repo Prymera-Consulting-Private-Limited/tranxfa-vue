@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import {
   ArrowRightIcon,
   CheckIcon, ChevronDownIcon,
@@ -17,7 +19,7 @@ import {
   ListboxOptions,
 
 } from "@headlessui/vue";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 import { useQuoteUtils } from "@/composables/quote_utils.js";
 import MoneyInput from "@/components/MoneyInput.vue";
 import MoneyInputShimmer from "@/components/MoneyInputShimmer.vue";
@@ -28,6 +30,8 @@ import router from "@/router/index.js";
 import TransactionQuote from "@/models/transaction_quote.js";
 import {useRecipientUtils} from "@/composables/recipient_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import {debounce} from "lodash";
+import axios from "axios";
 
 const customerStore = useCustomerStore();
 
@@ -48,6 +52,10 @@ const props = defineProps({
 
 const isFetchingQuote = ref(true);
 const isSavingQuote = ref(false);
+const saveFailure = ref(null);
+
+const sendMoneyInput = ref(null);
+const receiveMoneyInput = ref(null);
 
 const quoteUtil = useQuoteUtils();
 const recipientUtil = useRecipientUtils();
@@ -70,12 +78,46 @@ const quoteErrors = reactive({
 
 const quoteFailureReason = ref('');
 
+/**
+ * How long the calculator waits after a keystroke before it prices.
+ *
+ * Every character typed into an amount fired its own /quote request, so "1000"
+ * was four calls and only the last one was ever wanted. Each of those hits a
+ * rate provider, and the three that are thrown away still cost a round trip and
+ * still count against whatever the provider meters.
+ *
+ * 300ms is the same figure the recipient name lookup uses. It is long enough to
+ * swallow ordinary typing and short enough that pausing feels like the answer
+ * arriving rather than a wait.
+ */
+const QUOTE_DEBOUNCE_MS = 300;
+
+/**
+ * The in-flight quote, so one that has been overtaken can be abandoned.
+ *
+ * The amount fields stay mounted across a re-quote now, which is what lets the
+ * price follow the typing - and it also means a customer can carry on typing,
+ * or change the currency, while a request is still out. Whichever reply lands
+ * second would win, and on this screen that means a rate and a total for a
+ * figure they are no longer looking at.
+ *
+ * Aborted rather than ignored on arrival, because ignoring is not available:
+ * quote_utils assigns quote.data inside its own `then` and the template renders
+ * straight from there, so by the time this component could check anything the
+ * stale quote is already on screen.
+ */
+let inFlightQuote = null;
+
+
 async function getQuote() {
+  inFlightQuote?.abort();
+  const controller = new AbortController();
+  inFlightQuote = controller;
   isFetchingQuote.value = true;
   quoteErrors.payment = [];
   quoteErrors.payout = [];
   quoteFailureReason.value = '';
-  await quoteUtil.getQuote(query).then(() => {
+  await quoteUtil.getQuote(query, {signal: controller.signal}).then(() => {
     query.amountType = quoteUtil.quote.data?.amountType;
     query.amount = quoteUtil.quote.data?.amount;
     query.paymentCountry = quoteUtil.quote.data?.paymentCountry;
@@ -93,7 +135,16 @@ async function getQuote() {
       quoteErrors.payout.push(quoteUtil.quote.data.alerts.payout_amount);
     }
   }).catch((e) => {
-    if (e.response.status === 422) {
+    // An abort is this component superseding itself, not a failure. Surfacing it
+    // would flash an error for a quote nobody is waiting on any more.
+    if (axios.isCancel?.(e) || e?.code === 'ERR_CANCELED' || e?.name === 'CanceledError') {
+      return;
+    }
+    // Optional chaining because a request that never got a response has no
+    // `response` at all. Reading through it threw inside this catch, and now
+    // that getQuote can be called from a timer there is no caller left to
+    // notice - it would surface as an unhandled rejection and nothing else.
+    if (e.response?.status === 422) {
       const errors = e.response.data.errors;
       if (errors?.amount?.length > 0) {
         if ((query?.amountType || AmountType.SEND) === AmountType.SEND) {
@@ -114,37 +165,63 @@ async function getQuote() {
           quoteErrors.payout.push(error);
         }
       }
-    } else if (e.response.status === 503) {
+    } else if (e.response?.status === 503) {
       quoteFailureReason.value = e.response.data.message;
     } else {
+      // Says something rather than leaving the last good quote on screen
+      // looking current.
+      quoteFailureReason.value = 'We could not price this transfer just now. Please check your connection and try again.';
       console.error(e);
     }
   }).finally(() => {
+    // A superseded request must not clear the spinner - the newer one that
+    // replaced it is still running.
+    if (inFlightQuote !== controller) {
+      return;
+    }
+    inFlightQuote = null;
     isFetchingQuote.value = false;
   });
 }
 
+const debouncedGetQuote = debounce(getQuote, QUOTE_DEBOUNCE_MS);
+
+/**
+ * Typing an amount. Debounced, and deliberately without touching
+ * isFetchingQuote here.
+ *
+ * Setting it on the keystroke looks like the right thing - it would stop the
+ * calculator showing the previous total beside a newly typed figure for the
+ * length of the debounce. But that flag drives `v-if="! isFetchingQuote"` on
+ * the MoneyInput itself, so raising it early unmounts the field the customer is
+ * typing into and replaces it with the shimmer. They lose the caret mid-number.
+ *
+ * A 300ms stale total is the smaller problem, so the loading state stays where
+ * it was: raised by getQuote when the request actually goes out.
+ */
 async function sentAmountUpdated(amount) {
   query.amountType = AmountType.SEND;
   query.amount = amount;
-  await getQuote();
+  debouncedGetQuote();
 }
 
 async function sourceUpdated(option) {
   query.paymentCountry = option.country;
   query.paymentCurrency = option.currency;
+  debouncedGetQuote.cancel();
   await getQuote();
 }
 
 async function receiveAmountUpdated(amount) {
   query.amountType = AmountType.RECEIVE;
   query.amount = amount;
-  await getQuote();
+  debouncedGetQuote();
 }
 
 async function targetUpdated(option) {
   query.payoutCountry = option.country;
   query.payoutCurrency = option.currency;
+  debouncedGetQuote.cancel();
   await getQuote();
 }
 
@@ -152,27 +229,58 @@ const selectedPayoutMethod = computed({
   get: () => quoteUtil.quote.data?.payoutMethod,
   set: (value) => {
     query.payoutMethod = value;
+    debouncedGetQuote.cancel();
     getQuote();
   }
 })
 
 onMounted(getQuote)
 
-function saveQuote() {
+onUnmounted(() => {
+  // A keystroke still waiting would otherwise fire after the component is gone,
+  // pricing a screen nobody is looking at and writing into a store it no longer
+  // renders from.
+  debouncedGetQuote.cancel();
+  inFlightQuote?.abort();
+  inFlightQuote = null;
+})
+
+async function saveQuote() {
   isSavingQuote.value = true;
+  saveFailure.value = null;
+
+  // An amount typed without leaving the field has not refreshed the quote yet
+  // (blur never fires on Enter-key submission) — re-quote it before saving.
+  const pendingSendAmount = sendMoneyInput.value?.pendingAmount() ?? null;
+  const pendingReceiveAmount = receiveMoneyInput.value?.pendingAmount() ?? null;
+  let requoted = false;
+  if (pendingSendAmount !== null) {
+    await sentAmountUpdated(pendingSendAmount);
+    requoted = true;
+  } else if (pendingReceiveAmount !== null) {
+    await receiveAmountUpdated(pendingReceiveAmount);
+    requoted = true;
+  }
+  if (requoted && (quoteErrors.payment.length > 0 || quoteErrors.payout.length > 0 || quoteFailureReason.value || quoteUtil.quote.data?.transferDisableReason)) {
+    isSavingQuote.value = false;
+    return;
+  }
+
   if (props.recipient) {
     recipientUtil.getQuote(props.recipient, quoteUtil.quote.data).then((response) => {
       const quote = TransactionQuote.getInstance(response.data);
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
-    }).catch(() => {
+    }).catch((e) => {
       isSavingQuote.value = false;
+      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
     });
   } else {
     quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
       const quote = TransactionQuote.getInstance(response.data);
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
-    }).catch(() => {
+    }).catch((e) => {
       isSavingQuote.value = false;
+      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
     });
   }
 
@@ -180,13 +288,13 @@ function saveQuote() {
 
 </script>
 <template>
-  <div v-if="quoteFailureReason" class="rounded-b-md bg-red-50 px-8 py-12">
+  <div v-if="quoteFailureReason" class="rounded-b-md bg-danger-50 px-8 py-12">
     <div class="flex-col text-center">
       <div class="mx-auto">
-        <ExclamationTriangleIcon class="size-8 mt-0.5 text-red-700 mx-auto" aria-hidden="true" />
+        <ExclamationTriangleIcon class="size-8 mt-0.5 text-danger-700 mx-auto" aria-hidden="true" />
       </div>
       <div class="mt-3">
-        <div class="text-sm text-red-700">
+        <div class="text-sm/6 text-danger-700">
           <p>{{ quoteFailureReason }}</p>
         </div>
       </div>
@@ -210,7 +318,8 @@ function saveQuote() {
                     </div>
                     <div class="mt-2">
                       <MoneyInput
-                          v-if="! isFetchingQuote"
+                          v-if="quoteUtil.quote.data?.paymentCurrency"
+                          ref="sendMoneyInput"
                           v-bind:country="quoteUtil.quote.data.paymentCountry"
                           v-bind:currency="quoteUtil.quote.data.paymentCurrency"
                           v-bind:options="quoteUtil.quote.data.sources"
@@ -241,10 +350,10 @@ function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRateFormatted }}</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRateFormatted }}</p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
                 </div>
-                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
+                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm/6 whitespace-nowrap font-semibold tracking-wider">
                   <span>Nuestra tasa</span>
                 </div>
               </div>
@@ -262,13 +371,13 @@ function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm tracking-wider">
-                    <span class="text-emerald-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Sin comisión</span>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 tracking-wider">
+                    <span class="text-success-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Sin comisión</span>
                     <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
                   </p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
                 </div>
-                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm whitespace-nowrap font-semibold tracking-wider">
+                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm/6 whitespace-nowrap font-semibold tracking-wider">
                   <span>Comisión</span>
                 </div>
               </div>
@@ -290,7 +399,8 @@ function saveQuote() {
                     </div>
                     <div class="mt-4">
                       <MoneyInput
-                          v-if="! isFetchingQuote"
+                          v-if="quoteUtil.quote.data?.payoutCurrency"
+                          ref="receiveMoneyInput"
                           v-bind:country="quoteUtil.quote.data.payoutCountry"
                           v-bind:currency="quoteUtil.quote.data.payoutCurrency"
                           v-bind:options="quoteUtil.quote.data.targets"
@@ -330,7 +440,7 @@ function saveQuote() {
                             <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
                               <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
                                 <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                                <p class="text-sm font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Selecciona una opción' }}</p>
+                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Selecciona una opción' }}</p>
                               </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
                                 <span class="sr-only">Selecciona o cambia el método de pago</span>
@@ -342,7 +452,7 @@ function saveQuote() {
                           <transition v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
                             <ListboxOptions class="absolute right-0 z-10 mt-2 w-72 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden">
                               <ListboxOption as="template" v-for="payoutMethod in quoteUtil.quote?.data?.payoutMethods" :key="payoutMethod.id" :value="payoutMethod" v-slot="{ active, selectedPayoutMethod }">
-                                <li :class="[active ? 'bg-brand-700 text-white' : 'text-gray-900', 'cursor-default p-4 text-sm select-none']">
+                                <li :class="[active ? 'bg-brand-700 text-white' : 'text-gray-900', 'cursor-default p-4 text-sm/6 select-none']">
                                   <div class="flex flex-col">
                                     <div class="flex justify-between">
                                       <p :class="selectedPayoutMethod?.id === payoutMethod.id ? 'font-semibold' : 'font-normal'">{{ payoutMethod.title }}</p>
@@ -377,8 +487,8 @@ function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-xs text-gray-900 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.instructions }}</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                  <p v-if="! isFetchingQuote" class="text-xs/5 text-gray-900 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.instructions }}</p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
             </div>
@@ -389,14 +499,14 @@ function saveQuote() {
             <span class="absolute top-4 left-4 -ml-px h-full w-[2px]" :class="[!isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']" aria-hidden="true" />
             <div class="relative flex space-x-3">
               <div>
-              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-lime-700' : 'bg-gray-300']">
+              <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-success-700' : 'bg-gray-300']">
                   <PercentBadgeIcon class="size-5 text-white"/>
               </span>
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-xs text-lime-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                  <p v-if="! isFetchingQuote" class="text-xs/5 text-success-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
             </div>
@@ -414,8 +524,8 @@ function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-brand-700 font-semibold tracking-wider">Transferencias fáciles, seguras y rápidas</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 text-brand-700 font-semibold tracking-wider">Transferencias fáciles, seguras y rápidas</p>
+                  <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
             </div>
@@ -424,20 +534,20 @@ function saveQuote() {
       </ul>
       <template v-if="(customer.data?.isBlockedForSending || false) === false">
         <template v-if="quoteUtil.quote?.data?.transferDisableReason">
-          <div class="rounded-b-md bg-yellow-50 p-4 mt-12 -mx-5 -mb-8">
+          <div class="rounded-b-md bg-warning-50 p-4 mt-12 -mx-5 -mb-8">
             <div class="flex">
               <div class="shrink-0">
-                <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
+                <ExclamationTriangleIcon class="size-5 mt-0.5 text-warning-400" aria-hidden="true" />
               </div>
               <div class="ml-3">
-                <div class="text-sm text-yellow-700">
+                <div class="text-sm/6 text-warning-700">
                   <p>{{ quoteUtil.quote?.data?.transferDisableReason }}</p>
                 </div>
               </div>
             </div>
           </div>
         </template>
-        <button v-else :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-md bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
+        <button v-else :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-xl bg-brand-700 px-3.5 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
           <template v-if="isSavingQuote">
             <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
             Guardando...
@@ -447,15 +557,16 @@ function saveQuote() {
             <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
           </template>
         </button>
+        <InlineFailure :message="saveFailure" />
       </template>
-      <div v-else class="rounded-b-md bg-yellow-50 p-4 mt-12 -mx-5 -mb-8">
+      <div v-else class="rounded-b-md bg-warning-50 p-4 mt-12 -mx-5 -mb-8">
         <div class="flex">
           <div class="shrink-0">
-            <ExclamationTriangleIcon class="size-5 mt-0.5 text-yellow-400" aria-hidden="true" />
+            <ExclamationTriangleIcon class="size-5 mt-0.5 text-warning-400" aria-hidden="true" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-yellow-800">Tu posibilidad de enviar dinero está restringida temporalmente.</h3>
-            <div class="mt-2 text-sm text-yellow-700">
+            <h3 class="text-sm/6 font-medium text-warning-800">Tu posibilidad de enviar dinero está restringida temporalmente.</h3>
+            <div class="mt-2 text-sm/6 text-warning-700">
               <p>Contacta a nuestro equipo de soporte para recibir ayuda o conocer el motivo de esta restricción.</p>
             </div>
           </div>

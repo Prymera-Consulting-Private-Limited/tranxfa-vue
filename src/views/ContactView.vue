@@ -25,7 +25,7 @@ const emailUrl = `mailto:${email}`;
                         <div class="mb-6">
                             <h2 class="text-base font-semibold text-gray-900">Contactar con el soporte técnico</h2>
 
-                            <p class="mt-1 text-sm text-gray-500">¿Necesitas ayuda? Contáctanos por WhatsApp o correo electrónico.
+                            <p class="mt-1 text-sm/6 text-gray-500">¿Necesitas ayuda? Contáctanos por WhatsApp o correo electrónico.
                             </p>
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
@@ -36,14 +36,14 @@ const emailUrl = `mailto:${email}`;
                                 <h3 class="text-base font-semibold text-gray-900">
                                     Llamar a soporte
                                 </h3>
-                                <p class="mt-2 text-sm text-gray-500 flex-grow mb-1">
+                                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-1">
                                     Hable directamente con nuestro equipo de soporte para recibir asistencia inmediata.
                                 </p>
-                                <span class="text-sm text-gray-500 mb-3">
+                                <span class="text-sm/6 text-gray-500 mb-3">
                                     +393773847277
                                 </span>
                                 <span
-                                    class="mt-auto text-sm inline-block font-semibold text-blue-600 hover:text-blue-500">
+                                    class="mt-auto text-sm/6 inline-block font-semibold text-blue-600 hover:text-blue-500">
                                     Llame ahora →
                                 </span>
                             </a>
@@ -55,14 +55,14 @@ const emailUrl = `mailto:${email}`;
                                 <h3 class="text-base font-semibold text-gray-900">
                                     Chat de WhatsApp
                                 </h3>
-                                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">
+                                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">
                                     Chatea con nosotras al instante a través de WhatsApp.
                                 </p>
-                                <span class="text-sm text-gray-500 mb-3">
+                                <span class="text-sm/6 text-gray-500 mb-3">
                                     +393773847277
                                 </span>
                                 <span
-                                    class="mt-auto text-sm inline-block font-semibold text-green-600 hover:text-green-500">
+                                    class="mt-auto text-sm/6 inline-block font-semibold text-green-600 hover:text-green-500">
                                     Chatear ahora →
                                 </span>
                             </a>
@@ -74,14 +74,14 @@ const emailUrl = `mailto:${email}`;
                                 <h3 class="text-base font-semibold text-gray-900">
                                     Soporte por correo electrónico
                                 </h3>
-                                <p class="mt-2 text-sm text-gray-500 flex-grow mb-2">
+                                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-2">
                                     Soporte por correo electrónico para consultas detalladas o problemas que no requieran asistencia inmediata.
                                 </p>
-                                <span class="text-sm text-gray-500 mb-3">
+                                <span class="text-sm/6 text-gray-500 mb-3">
                                     hola@xenvia.eu
                                 </span>
                                 <span
-                                    class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">
+                                    class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">
                                     Send Email →
                                 </span>
                             </a>

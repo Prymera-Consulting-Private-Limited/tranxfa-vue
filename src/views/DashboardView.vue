@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -26,12 +28,11 @@ import Transaction from "@/models/transaction.js";
 import ListItem from "@/components/Transaction/ListItem.vue";
 import ListShimmer from "@/components/Transaction/ListShimmer.vue";
 import Pagination from "@/components/Pagination.vue";
-import {useMonthlyBudgetUtils} from "@/composables/monthly_budget_utils.js";
+import WalletDashboardCard from "@/components/Wallet/DashboardCard.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const transactionUtils = useTransactionUtils();
-const monthlyBudgetUtils = useMonthlyBudgetUtils();
 const isCreateRecipientModalOpen = ref(false);
 const createRecipient = () => {
   isCreateRecipientModalOpen.value = true;
@@ -68,7 +69,7 @@ const taskItems = [
     description: '',
     status: '',
     icon: IdentificationIcon,
-    background: 'bg-yellow-500',
+    background: 'bg-warning-500',
     completed: false,
     href: null,
   },
@@ -78,7 +79,7 @@ const taskItems = [
     description: '',
     status: '',
     icon: HomeIcon,
-    background: 'bg-green-500',
+    background: 'bg-success-500',
     completed: false,
     href: null,
   },
@@ -139,6 +140,9 @@ const serverTasks = ref([]);
 const getTasks = async () => {
   customerUtils.tasks().then((response) => {
     serverTasks.value = response.data.map((task) => CustomerTaskModal.getInstance(task));
+  }).catch((e) => {
+    // The task list is guidance, not data; the page still works without it.
+    logRequestFailure(e, 'dashboard-tasks');
   }).finally(() => {
     isTaskLoading.value = false;
   });
@@ -147,19 +151,22 @@ const getTasks = async () => {
 const timeUtils = useTimeUtils();
 const transactionsData = ref(null);
 
+const transactionsFailure = ref(null);
+
 async function getTransactions(page = null) {
   isTransactionLoading.value = true;
+  transactionsFailure.value = null;
   await transactionUtils.get(page).then((response) => {
     transactionsData.value = response.data;
+  }).catch((e) => {
+    logRequestFailure(e, 'dashboard-transactions');
+    transactionsFailure.value = failureMessage(e, "We couldn't load your transfers.");
   }).finally(() => {
     isTransactionLoading.value = false;
   });
 }
 
 onMounted(async () => {
-  // await monthlyBudgetUtils.createBudget('299e5c3d-0485-4b04-9249-39d87fd8e0a3', 1000.00);
-  // await monthlyBudgetUtils.getHistory();
-  // await monthlyBudgetUtils.getCurrent();
   if (! customerStore.isLoaded) {
     customerUtils.refresh().catch();
   }
@@ -199,6 +206,9 @@ const recipientCreated = (recipient) => {
                 <template v-if="isTransactionLoading">
                   <ListShimmer />
                 </template>
+                <template v-else-if="transactionsFailure">
+                  <LoadFailurePanel title="We couldn't load your transfers" :message="transactionsFailure" retryLabel="Try again" @retry="getTransactions()" class="mt-0" />
+                </template>
                 <template v-else>
                   <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
                     <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -220,7 +230,7 @@ const recipientCreated = (recipient) => {
                     </div>
                   </div>
                   <template v-else>
-                    <p class="mt-1 text-sm text-gray-500 hidden lg:block">Empieza completando los siguientes pasos.</p>
+                    <p class="mt-1 text-sm/6 text-gray-500 hidden lg:block">Empieza completando los siguientes pasos.</p>
                     <ul v-if="tasks.length === 0 && isTaskLoading" role="list" class="mt-6 grid-cols-1 gap-6 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 sm:grid-cols-2 hidden lg:grid">
                       <li v-for="i of 6" :key="i" class="flow-root pulse">
                         <div v-if="isTaskLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
@@ -228,13 +238,13 @@ const recipientCreated = (recipient) => {
                             <DocumentTextIcon class="size-6 text-white" aria-hidden="true" />
                           </div>
                           <div>
-                            <h3 class="text-sm font-medium text-gray-900 mb-3">
-                              <a href="#" class="focus:outline-hidden">
+                            <h3 class="text-sm/6 font-medium text-gray-900 mb-3">
+                              <a href="#" class="focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
                                 <span class="absolute inset-0" aria-hidden="true" />
                                 <div class="h-3 block pulse bg-gray-300 w-full w-64"></div>
                               </a>
                             </h3>
-                            <p class="flex flex-col mt-1 text-sm text-gray-500 space-y-1">
+                            <p class="flex flex-col mt-1 text-sm/6 text-gray-500 space-y-1">
                               <span class="h-2 block pulse bg-gray-300 w-48"></span>
                               <span class="h-2 block pulse bg-gray-300 w-32"></span>
                               <span class="h-2 block pulse bg-gray-300 w-24"></span>
@@ -277,8 +287,9 @@ const recipientCreated = (recipient) => {
 
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4">
-            <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Enviar dinero</h2>
+            <WalletDashboardCard />
+            <section aria-labelledby="send-money-title">
+              <h2 class="sr-only" id="send-money-title">Enviar dinero</h2>
               <div class="rounded-lg bg-white shadow-lg p-5 pb-8">
                 <Calculator />
               </div>
