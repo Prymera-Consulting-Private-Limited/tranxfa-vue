@@ -24,6 +24,9 @@ Carried over from `console.remitso`, where they were learned the hard way:
 
 - **PRs target `main`.** Never open an ordinary PR against `staging` or a brand
   branch. `staging` is the Tranxfa brand branch, not an integration branch.
+- **Every piece of work starts as a Rover ticket** (`SD-<n>`), lives on
+  `feature/sd-<n>-<slug>` cut from `main`, ships by a PR titled `SD-<n>`, and
+  ends with a closing note on the ticket. The steps are in `docs/workflow.md`.
 - **No `Co-Authored-By` or generated-with trailers**, in commits or PR bodies.
 - Short imperative commit subject, reasoning in the body: why the change
   exists, not what the diff shows. Plain hyphens, no em-dashes.
