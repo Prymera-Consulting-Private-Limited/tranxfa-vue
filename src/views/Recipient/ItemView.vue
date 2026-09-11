@@ -1,4 +1,5 @@
 <script setup>
+import InlineFailure from "@/components/InlineFailure.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import Calculator from "@/components/Calculator.vue";
 import {onMounted, ref} from "vue";
@@ -15,7 +16,7 @@ import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import UpdateAttributeCollection from "@/components/Recipient/UpdateAttributeCollection.vue";
 import {notify} from "notiwind";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
-import {getCustomerMessage} from "@/composables/api_utils.js";
+import {failureMessage, getCustomerMessage, logRequestFailure} from "@/composables/api_utils.js";
 
 const recipientUtils = useRecipientUtils();
 const isLoading = ref(true);
@@ -50,14 +51,19 @@ onMounted(async () => {
   intervalId = setInterval(updateTimestamp, 30000);
 });
 
+const deleteFailure = ref(null);
+
 const handleDelete = async () => {
   try {
     isDeleting.value = true;
+    deleteFailure.value = null;
     await recipientUtils.deleteRecipient(props.id);
     isDeleted.value = true;
+    notify({group: 'customer', title: 'Recipient removed', text: `${recipient.value?.wholeName ?? 'This recipient'} is no longer in your list.`, type: 'success'}, 6000);
     await router.replace({name: 'recipients'});
   } catch (error) {
-    console.error('Failed to delete recipient:', error);
+    logRequestFailure(error, 'recipient-delete');
+    deleteFailure.value = failureMessage(error, "We couldn't remove this recipient. Please try again.");
     isDeleting.value = false;
   }
 };
@@ -197,6 +203,7 @@ const handleDelete = async () => {
                     </div>
                   </div>
                 </div>
+                <InlineFailure :message="deleteFailure" />
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
                   <button
                       type="button"

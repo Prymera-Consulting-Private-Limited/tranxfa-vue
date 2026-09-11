@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -138,6 +140,9 @@ const serverTasks = ref([]);
 const getTasks = async () => {
   customerUtils.tasks().then((response) => {
     serverTasks.value = response.data.map((task) => CustomerTaskModal.getInstance(task));
+  }).catch((e) => {
+    // The task list is guidance, not data; the page still works without it.
+    logRequestFailure(e, 'dashboard-tasks');
   }).finally(() => {
     isTaskLoading.value = false;
   });
@@ -146,10 +151,16 @@ const getTasks = async () => {
 const timeUtils = useTimeUtils();
 const transactionsData = ref(null);
 
+const transactionsFailure = ref(null);
+
 async function getTransactions(page = null) {
   isTransactionLoading.value = true;
+  transactionsFailure.value = null;
   await transactionUtils.get(page).then((response) => {
     transactionsData.value = response.data;
+  }).catch((e) => {
+    logRequestFailure(e, 'dashboard-transactions');
+    transactionsFailure.value = failureMessage(e, "We couldn't load your transfers.");
   }).finally(() => {
     isTransactionLoading.value = false;
   });
@@ -194,6 +205,9 @@ const recipientCreated = (recipient) => {
               <div>
                 <template v-if="isTransactionLoading">
                   <ListShimmer />
+                </template>
+                <template v-else-if="transactionsFailure">
+                  <LoadFailurePanel title="We couldn't load your transfers" :message="transactionsFailure" retryLabel="Try again" @retry="getTransactions()" class="mt-0" />
                 </template>
                 <template v-else>
                   <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">

@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import FormGroup from "@/components/CustomerAttribute/FormGroup.vue";
 import Spinner from "@/components/Spinner.vue";
 import {computed, onMounted, reactive, ref, watchEffect} from "vue";
@@ -54,6 +56,7 @@ const form = reactive({
 })
 
 const isSaving = ref(false);
+const saveFailure = ref(null);
 
 const emit = defineEmits([
   'customer:attribute_category:updated',
@@ -63,13 +66,15 @@ const emit = defineEmits([
 async function update() {
   isSaving.value = true;
   form.errors = null;
+  saveFailure.value = null;
   customerUtils.updateProfileAttribute(form.data, props.categories).then(() => {
     emit('customer:attribute_category:updated');
   }).catch((e) => {
-    if (e.response.status === 422) {
+    if (e.response?.status === 422) {
       form.errors = e.response.data.errors;
     } else {
-      console.error(e);
+      logRequestFailure(e, 'customer-attributes');
+      saveFailure.value = failureMessage(e, "We couldn't save your details. Please try again.");
     }
     emit('customer:attribute_category:update_failed', e);
   }).finally(() => {
@@ -148,5 +153,6 @@ watchEffect(() => {
         </span>
       </template>
     </button>
+    <InlineFailure v-if="! updateOutsourced" :message="saveFailure" />
   </form>
 </template>

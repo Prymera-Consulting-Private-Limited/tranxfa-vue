@@ -1,4 +1,5 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -10,18 +11,20 @@ const form = reactive({
 });
 const isLoading = ref(false);
 const forgotPasswordMessage = ref(null);
+const forgotPasswordError = ref(null);
 const emailFocused = ref(false);
 
 async function requestResetPassword() {
   isLoading.value = true;
   forgotPasswordMessage.value = null;
+  forgotPasswordError.value = null;
   await axios.get('/sanctum/csrf-cookie');
   await customerUtils.forgotPassword(form.email).then((response) => {
     forgotPasswordMessage.value = response?.data?.message;
     form.email = '';
   }).catch((e) => {
-    forgotPasswordMessage.value = e.response?.data?.message;
-    console.error(e);
+    forgotPasswordError.value = failureMessage(e, "We couldn't send the reset link. Please try again.");
+    logRequestFailure(e, 'forgot-password');
   }).finally(() => {
     isLoading.value = false;
   })
@@ -60,8 +63,11 @@ async function requestResetPassword() {
             <p class="text-sm/6 text-[#B7A3C1] mb-6 ">Forgot your password? No problem. Enter the email linked to your account and click "Send Reset Link." We'll email you a secure link to reset your password.</p>
             <!-- Form -->
             <form @submit.prevent="requestResetPassword" class="space-y-5">
-              <div v-if="forgotPasswordMessage" class="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
-                <p class="text-sm/6 text-blue-700">{{ forgotPasswordMessage }}</p>
+              <div v-if="forgotPasswordMessage" role="status" class="rounded-2xl border border-info-100 bg-info-50 px-4 py-3">
+                <p class="text-sm/6 text-info-700">{{ forgotPasswordMessage }}</p>
+              </div>
+              <div v-if="forgotPasswordError" role="alert" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
+                <p class="text-sm/6 text-danger-700">{{ forgotPasswordError }}</p>
               </div>
 
               <div>

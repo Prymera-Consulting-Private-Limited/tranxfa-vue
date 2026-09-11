@@ -1,4 +1,5 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
@@ -33,6 +34,14 @@ const otpData = JSON.parse(
 
 const country = otpData.country
 const number = otpData.number
+
+// A refresh or a deep link lands here with nothing in session storage; the
+// form would then throw on the first submit. Send them back to start over.
+onMounted(() => {
+  if (! country?.id || ! number) {
+    router.replace({name: 'signIn'});
+  }
+});
 async function authenticate() {
   isLoading.value = true;
   isVerifying.value = true;
@@ -42,8 +51,8 @@ async function authenticate() {
     if (e.response?.status === 422 || e.response?.status === 401) {
       otpError.value = e.response.data.message;
     } else {
-      console.error(e);
-      throw e;
+      logRequestFailure(e, 'otp-sign-in');
+      otpError.value = failureMessage(e, "We couldn't check that code. Please try again.");
     }
   }).finally(() => {
     isLoading.value = false;
@@ -76,10 +85,18 @@ async function startResendOtpTimer() {
   }
 }
 
+const resentMessage = ref('');
+const resendFailure = ref('');
+
 async function resend() {
   isResendingOtp.value = true;
-  customerUtils.getLoginOtp(otpData.country.id, otpData.number).catch(async (e) => {
-    console.error(e);
+  resentMessage.value = '';
+  resendFailure.value = '';
+  customerUtils.getLoginOtp(otpData.country.id, otpData.number).then(() => {
+    resentMessage.value = "We've sent a new code by SMS. It can take a minute to arrive.";
+  }).catch(async (e) => {
+    logRequestFailure(e, 'otp-sign-in');
+    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
   }).finally(() => {
     isResendingOtp.value = false;
   });
@@ -145,6 +162,8 @@ onMounted(async () => {
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
+          <p v-if="resentMessage" role="status" class="mb-3 rounded-lg bg-success-50 px-3 py-2 text-center text-sm/6 text-success-700">{{ resentMessage }}</p>
+          <p v-if="resendFailure" role="alert" class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-center text-sm/6 text-danger-700">{{ resendFailure }}</p>
           <div v-if="! isResendingOtp" class="text-sm/6 text-gray-500 text-center">
             Didn't receive OTP?
             <a

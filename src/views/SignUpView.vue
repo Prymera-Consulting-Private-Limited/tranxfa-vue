@@ -1,4 +1,5 @@
 <script setup>
+import {logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {computed, onMounted, reactive, ref, watch} from "vue";
 import router from "@/router/index.js";
@@ -39,16 +40,23 @@ const validatedPasswordPolicies = reactive({
 const countries = ref([]);
 const countryUtils = useCountryUtils();
 const customerUtils = useCustomerUtils();
+const policyFailed = ref(false);
+
+async function loadPolicy() {
+  if (passwordPolicyStore.isLoaded) return;
+  isLoading.value = true;
+  policyFailed.value = false;
+  await passwordPolicyUtils.getPolicy().catch((e) => {
+    logRequestFailure(e, 'sign-up');
+    policyFailed.value = true;
+  }).finally(() => {
+    isLoading.value = false
+  });
+}
+
 onMounted(async () => {
   if (authChannel === 'EMAIL') {
-    if (! passwordPolicyStore.isLoaded) {
-      isLoading.value = true;
-      await passwordPolicyUtils.getPolicy().catch((e) => {
-        console.error(e);
-      }).finally(() => {
-        isLoading.value = false
-      });
-    }
+    await loadPolicy();
     validatedPasswordPolicies.rules = [];
     for (const rule of passwordPolicyStore.rules) {
       validatedPasswordPolicies.rules.push({
@@ -89,7 +97,7 @@ async function register() {
     customerUtils.register(form.email, form.password, form.confirm_password, thirdPartyDeclarationAccepted.value).then(() => {
       router.push({name: 'onboardingWorkflow'});
     }).catch((e) => {
-      if (e.status === 422) {
+      if (e.response?.status === 422) {
         const errors = e.response.data.errors;
         if (typeof errors.email !== 'undefined') {
           formErrors.email = errors.email;
@@ -121,7 +129,7 @@ async function register() {
       );
       router.push({name: 'authByOtp'});
     }).catch((e) => {
-      if (e.status === 422) {
+      if (e.response?.status === 422) {
         const errors = e.response.data.errors;
         if (typeof errors.country !== 'undefined') {
           formErrors.country = errors.country;
@@ -363,6 +371,7 @@ watch(
                         :class="[passwordRequirementsHeaderClass, passwordRequirementsOpen ? 'pi-chevron-up' : 'pi-chevron-down']"
                       />
                     </button>
+                    <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">We couldn't load the password rules. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Try again</button></p>
                     <ul
                       v-show="passwordRequirementsOpen"
                       role="list"

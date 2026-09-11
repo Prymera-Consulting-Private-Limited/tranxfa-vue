@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {computed, onMounted, ref} from "vue";
@@ -9,19 +11,25 @@ import DeviceCard from "@/components/DeviceCard.vue";
 const customerUtils = useCustomerUtils();
 const response = ref(null);
 const isLoading = ref(true);
+const loadFailure = ref(null);
 
-onMounted(async () => {
-  response.value = await customerUtils.devices();
-  isLoading.value = false;
-});
+onMounted(refreshDevices);
 
 const devices = computed(() => {
   return response.value?.data?.data?.map((device) => Device.getInstance(device)) || [];
 })
 
-const refreshDevices = async () => {
-  response.value = await customerUtils.devices();
-  isLoading.value = false;
+async function refreshDevices() {
+  isLoading.value = true;
+  loadFailure.value = null;
+  try {
+    response.value = await customerUtils.devices();
+  } catch (e) {
+    logRequestFailure(e, 'devices');
+    loadFailure.value = failureMessage(e, "We couldn't load the devices signed in to your account.");
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>
 <template>
@@ -38,6 +46,9 @@ const refreshDevices = async () => {
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-4xl">
               <template v-if="isLoading">
                 <CardShimmer v-for="i in 3" :key="i" />
+              </template>
+              <template v-else-if="loadFailure">
+                <LoadFailurePanel title="We couldn't load your devices" :message="loadFailure" retryLabel="Try again" @retry="refreshDevices" class="mt-0 md:col-span-2 lg:col-span-3" />
               </template>
               <template v-else>
                 <DeviceCard v-for="device in devices" :key="device.id" :device="device" @deviceDeleted="refreshDevices" />

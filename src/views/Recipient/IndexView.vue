@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -28,13 +30,21 @@ const colors = [
   "blue",
 ]
 
+const loadFailure = ref(null);
+
 async function getRecipients(page = null) {
   const query = {
     page: page
   };
+  isLoading.value = true;
+  loadFailure.value = null;
   await recipientUtils.get(query).then((response) => {
     recipients.value = response.data.data.map((recipient) => Recipient.getInstance(recipient));
     pagination.value = response.data.pagination;
+  }).catch((e) => {
+    logRequestFailure(e, 'recipients');
+    loadFailure.value = failureMessage(e, "We couldn't load your recipients.");
+  }).finally(() => {
     isLoading.value = false;
   });
 }
@@ -85,6 +95,9 @@ const recipientCreated = (recipient) => {
                     <RecipientCardShimmer />
                   </li>
                 </ul>
+              </template>
+              <template v-else-if="loadFailure">
+                <LoadFailurePanel title="We couldn't load your recipients" :message="loadFailure" retryLabel="Try again" @retry="getRecipients()" class="mt-6" />
               </template>
               <template v-else>
                 <template v-if="recipients.length > 0">

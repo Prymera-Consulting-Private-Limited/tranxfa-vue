@@ -1,4 +1,5 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {computed, onMounted, reactive, ref, watch} from "vue";
 import router from "@/router/index.js";
@@ -34,15 +35,22 @@ const validatedPasswordPolicies = reactive({
   rules: [],
 });
 
+const policyFailed = ref(false);
+
+async function loadPolicy() {
+  if (passwordPolicyStore.isLoaded) return;
+  isLoading.value = true;
+  policyFailed.value = false;
+  await passwordPolicyUtils.getPolicy().catch((e) => {
+    logRequestFailure(e, 'reset-password');
+    policyFailed.value = true;
+  }).finally(() => {
+    isLoading.value = false
+  });
+}
+
 onMounted(async () => {
-  if (! passwordPolicyStore.isLoaded) {
-    isLoading.value = true;
-    await passwordPolicyUtils.getPolicy().catch((e) => {
-      console.error(e);
-    }).finally(() => {
-      isLoading.value = false
-    });
-  }
+  await loadPolicy();
   validatedPasswordPolicies.rules = [];
   for (const rule of passwordPolicyStore.rules) {
     validatedPasswordPolicies.rules.push({
@@ -75,7 +83,7 @@ async function resetPassword() {
   customerUtils.resetPassword(props.token, form.password, form.confirm_password).then(() => {
     router.push({name: 'signIn', query: {referer: "reset-password"}});
   }).catch((e) => {
-    if (e.status === 422) {
+    if (e.response?.status === 422) {
       const errors = e.response.data.errors;
       if (typeof errors.password !== 'undefined') {
         formErrors.password = errors.password;
@@ -87,7 +95,8 @@ async function resetPassword() {
         resetPasswordFailureMessage.value = errors.token[0];
       }
     } else {
-      resetPasswordFailureMessage.value = e.response.data?.message;
+      logRequestFailure(e, 'reset-password');
+      resetPasswordFailureMessage.value = failureMessage(e, "We couldn't reset your password. Please try again.");
     }
   }).finally(() => {
     isLoading.value = false;
@@ -244,6 +253,7 @@ watch(
                       :class="[passwordRequirementsHeaderClass, passwordRequirementsOpen ? 'pi-chevron-up' : 'pi-chevron-down']"
                     />
                   </button>
+                  <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">We couldn't load the password rules. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Try again</button></p>
                   <ul
                     v-show="passwordRequirementsOpen"
                     role="list"

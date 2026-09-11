@@ -1,5 +1,8 @@
 import Customer from "@/models/customer.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import {useWalletStore} from "@/stores/wallet.js";
+import {useCountriesStore} from "@/stores/countries.js";
+import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import axios from "axios";
 
 let refreshPromise = null;
@@ -72,10 +75,18 @@ export function useCustomerUtils() {
     }
 
     async function logout() {
-        await axios.post('/client/v1/logout', {}).then(() => {
-            customerStore.customer.data = null;
-            customerStore.isLoaded = false;
-        })
+        try {
+            await axios.post('/client/v1/logout', {});
+        } finally {
+            // Whatever the server said, this tab is done with the customer:
+            // every store is cleared (wallet state used to survive into the
+            // next sign-in on a shared device) and the socket is dropped.
+            customerStore.reset();
+            useWalletStore().reset();
+            useCountriesStore().reset();
+            usePasswordPolicyStore().reset();
+            window.Echo?.disconnect?.();
+        }
     }
 
     async function refresh(config = {}) {

@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {computed, onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -36,17 +38,26 @@ function mobileNumberUpdated(updated) {
   mobile.country = updated?.country;
 }
 
+const saveFailure = ref(null);
+
+// Only move on once the number is saved; a validation error used to show
+// and then the workflow proceeded anyway.
 async function updateMobileNumber() {
   isSaving.value = true;
-  await customerUtils.updateMobileNumber(mobile.country, mobile.number).catch((e) => {
-    if (e.status === 422) {
+  saveFailure.value = null;
+  errors.value = {};
+  try {
+    await customerUtils.updateMobileNumber(mobile.country, mobile.number);
+    emit('mobileNumberUpdated');
+  } catch (e) {
+    if (e.response?.status === 422) {
       errors.value = e.response.data.errors;
     } else {
-      console.error(e);
+      logRequestFailure(e, 'mobile-number');
+      saveFailure.value = failureMessage(e, "We couldn't save your mobile number. Please try again.");
     }
     isSaving.value = false;
-  });
-  emit('mobileNumberUpdated');
+  }
 }
 
 const showLoading = computed(() => {
@@ -90,6 +101,7 @@ const editPersonalInformation = () => {
             </span>
           </template>
         </button>
+        <InlineFailure :message="saveFailure" />
       </form>
       <div class="mt-12 text-center">
         <a

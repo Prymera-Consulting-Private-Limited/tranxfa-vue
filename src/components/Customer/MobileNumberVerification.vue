@@ -1,4 +1,5 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
@@ -30,14 +31,14 @@ async function verifyMobileNumber() {
   isVerifying.value = true;
   otpError.value = '';
   await customerUtils.verifyMobileNumber(verificationCode.value).catch((e) => {
-    if (e.status === 422) {
+    if (e.response?.status === 422) {
       otpError.value = e.response.data.message;
 
       return;
     }
     // 403 means the number is already verified - refresh and move on rather
     // than stranding the customer on a step they have finished.
-    if (e.status === 403) {
+    if (e.response?.status === 403) {
       customerUtils.refresh();
       emit('mobileNumberVerified');
 
@@ -80,10 +81,18 @@ async function startResendOtpTimer() {
   }
 }
 
+const resentMessage = ref('');
+const resendFailure = ref('');
+
 async function resend() {
   isResendingToken.value = true;
-  await customerUtils.resendMobileVerification().catch((e) => {
-    console.error(e);
+  resentMessage.value = '';
+  resendFailure.value = '';
+  await customerUtils.resendMobileVerification().then(() => {
+    resentMessage.value = "We've sent a new code by SMS. It can take a minute to arrive.";
+  }).catch((e) => {
+    logRequestFailure(e, 'resend-mobile-code');
+    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
   }).finally(() => {
     isResendingToken.value = false;
   });
@@ -143,6 +152,8 @@ onMounted(async () => {
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
+          <p v-if="resentMessage" role="status" class="mb-3 rounded-lg bg-success-50 px-3 py-2 text-center text-sm/6 text-success-700">{{ resentMessage }}</p>
+          <p v-if="resendFailure" role="alert" class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-center text-sm/6 text-danger-700">{{ resendFailure }}</p>
           <div v-if="! isResendingToken" class="text-sm/6 text-gray-500 text-center">
             Didn't receive the code?
             <a @click="resend" class="text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a>

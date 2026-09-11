@@ -1,8 +1,8 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
-import pTimeout from 'p-timeout';
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import Spinner from "@/components/Spinner.vue";
@@ -40,8 +40,8 @@ async function authenticate() {
       customerUtils.refresh();
       router.push({name: 'onboardingWorkflow', query: onward()});
     } else {
-      console.error(e);
-      throw e;
+      logRequestFailure(e, 'mfa');
+      otpError.value = failureMessage(e, "We couldn't check that code. Please try again.");
     }
   }).finally(() => {
     isLoading.value = false;
@@ -51,35 +51,49 @@ async function authenticate() {
 
 const showResendButton = ref(false);
 const countdown = ref(30);
+let resendInterval = null;
 
-async function startResendOtpTimer() {
-  showResendButton.value = false;
-  countdown.value = 30;
-
-  try {
-    const timer = new Promise((resolve) => {
-      const interval = setInterval(() => {
-        countdown.value -= 1;
-        if (countdown.value === 0) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 1000);
-    });
-
-    await pTimeout(timer, { milliseconds: 30000 });
-    showResendButton.value = true;
-  } catch (error) {
-    console.log("Timeout error:", error);
+// Counts against the clock rather than ticks: a background tab throttles
+// timers, and the old one-second decrement could sit on "Resend in 12s" for
+// minutes. Any earlier interval is cleared so a double resend cannot race.
+function startResendOtpTimer() {
+  if (resendInterval) {
+    clearInterval(resendInterval);
   }
+
+  showResendButton.value = false;
+
+  const end = Date.now() + 30000;
+
+  resendInterval = setInterval(() => {
+    const remaining = Math.ceil((end - Date.now()) / 1000);
+
+    countdown.value = Math.max(0, remaining);
+
+    if (remaining <= 0) {
+      clearInterval(resendInterval);
+      resendInterval = null;
+      showResendButton.value = true;
+    }
+  }, 250);
 }
+
+const resentMessage = ref('');
+const resendFailure = ref('');
 
 async function resend() {
   isResendingOtp.value = true;
-  customerUtils.resendMfaOtp().catch(async (e) => {
-    if (e.status === 403) {
+  resentMessage.value = '';
+  resendFailure.value = '';
+  customerUtils.resendMfaOtp().then(() => {
+    resentMessage.value = "We've sent a new code. It can take a minute to arrive.";
+  }).catch(async (e) => {
+    if (e.response?.status === 403) {
       await customerUtils.refresh();
+      return;
     }
+    logRequestFailure(e, 'resend-mfa-code');
+    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
   }).finally(() => {
     isResendingOtp.value = false;
   });
@@ -94,6 +108,12 @@ onMounted(async () => {
     isLoading.value = false;
   }
   await startResendOtpTimer();
+});
+
+onUnmounted(() => {
+  if (resendInterval) {
+    clearInterval(resendInterval);
+  }
 });
 </script>
 <template>
@@ -150,6 +170,8 @@ onMounted(async () => {
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
+          <p v-if="resentMessage" role="status" class="mb-3 rounded-lg bg-success-50 px-3 py-2 text-center text-sm/6 text-success-700">{{ resentMessage }}</p>
+          <p v-if="resendFailure" role="alert" class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-center text-sm/6 text-danger-700">{{ resendFailure }}</p>
           <div v-if="! isResendingOtp" class="text-sm/6 text-gray-500 text-center">
             Didn't receive OTP?
             <a

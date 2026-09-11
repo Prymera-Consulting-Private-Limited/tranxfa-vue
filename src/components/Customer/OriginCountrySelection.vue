@@ -1,4 +1,7 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
+import InlineFailure from "@/components/InlineFailure.vue";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import {useCountryUtils} from "@/composables/country_utils.js";
@@ -14,20 +17,41 @@ const isLoading = ref(true);
 const isSaving = ref(false);
 const emit = defineEmits(['countryUpdated']);
 
+const saveFailure = ref(null);
+const loadFailure = ref(null);
+
 async function updateCountry(country) {
   isLoading.value = true;
   isSaving.value = true;
-  await customerUtils.updateCountry(country);
-  emit('countryUpdated');
-}
-onMounted(async () => {
-  if (! customerStore.isLoaded) {
-    await customerUtils.refresh();
-  }
-  await countryUtils.getSources().finally(() => {
+  saveFailure.value = null;
+  try {
+    await customerUtils.updateCountry(country);
+    emit('countryUpdated');
+  } catch (e) {
+    logRequestFailure(e, 'origin-country');
+    saveFailure.value = failureMessage(e, "We couldn't save your country. Please choose it again.");
     isLoading.value = false;
-  });
-});
+    isSaving.value = false;
+  }
+}
+
+async function loadSources() {
+  isLoading.value = true;
+  loadFailure.value = null;
+  try {
+    if (! customerStore.isLoaded) {
+      await customerUtils.refresh();
+    }
+    await countryUtils.getSources();
+  } catch (e) {
+    logRequestFailure(e, 'source-countries');
+    loadFailure.value = failureMessage(e, "We couldn't load the list of countries.");
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(loadSources);
 </script>
 
 <template>
@@ -61,6 +85,7 @@ onMounted(async () => {
           </li>
         </template>
       </ul>
+      <LoadFailurePanel v-else-if="loadFailure" title="We couldn't load the list of countries" :message="loadFailure" retryLabel="Try again" @retry="loadSources" class="mt-0" />
       <ul v-else role="list" class="mt-3 grid grid-cols-1 gap-4 xl:grid-cols-2 sm:gap-5">
         <template v-for="i in 4" :key="i">
           <li class="col-span-1 flex overflow-hidden rounded-2xl border border-gray-200">
@@ -76,6 +101,7 @@ onMounted(async () => {
           </li>
         </template>
       </ul>
+      <InlineFailure :message="saveFailure" />
     </div>
   </div>
 </template>

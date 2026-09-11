@@ -1,4 +1,6 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {computed, onMounted, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -32,19 +34,24 @@ const skip = () => {
 
 const email = ref('');
 const errors = ref([]);
+const saveFailure = ref(null);
 const emailFocused = ref(false);
 
 async function updateEmail() {
   isSaving.value = true;
+  saveFailure.value = null;
+  errors.value = [];
   await customerUtils.updateEmailAddress(email.value).then(() => {
     customerUtils.refresh().then(() => {
       emit('emailUpdated');
     });
   }).catch((e) => {
-    if (e.status === 422) {
-      errors.value = e.response.data.errors;
+    if (e.response?.status === 422) {
+      // Laravel answers {email: ['...']}; the template reads a flat list.
+      errors.value = Object.values(e.response.data.errors ?? {}).flat();
     } else {
-      console.error(e);
+      logRequestFailure(e, 'email-address');
+      saveFailure.value = failureMessage(e, "We couldn't save your email address. Please try again.");
     }
     isSaving.value = false;
   });
@@ -120,6 +127,7 @@ onMounted( async () => {
         >
           Skip
         </button>
+        <InlineFailure :message="saveFailure" />
       </form>
       <div class="mt-12 text-center">
         <a
