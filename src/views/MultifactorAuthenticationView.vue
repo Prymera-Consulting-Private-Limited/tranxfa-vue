@@ -17,6 +17,9 @@ const onward = () => {
 
 const otp = ref('');
 const isLoading = ref(false);
+// Sent here by the 412 interceptor rather than by sign-in: the API has not
+// sent a code for this step yet, so one is requested on arrival.
+const isSessionReverify = router.currentRoute.value.query.reason === 'session';
 const isVerifying = ref(false);
 const isResendingOtp = ref(false);
 const otpError = ref('');
@@ -107,6 +110,12 @@ onMounted(async () => {
     await customerUtils.refresh();
     isLoading.value = false;
   }
+  if (isSessionReverify) {
+    customerUtils.resendMfaOtp().catch((e) => {
+      logRequestFailure(e, 'mfa-reverify-code');
+      resendFailure.value = failureMessage(e, "We couldn't send a new code. Use Resend code below.");
+    });
+  }
   await startResendOtpTimer();
 });
 
@@ -129,7 +138,8 @@ onUnmounted(() => {
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">More authentication needed</h2>
-      <p class="text-md text-[#B7A3C1] mb-2 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
+      <p v-if="isSessionReverify" class="text-md text-[#B7A3C1] mb-2 text-center">To keep going we need to check it's you. We've sent a one time password to {{ customer.data?.account?.email }}; nothing you were doing is lost.</p>
+      <p v-else class="text-md text-[#B7A3C1] mb-2 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
       <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
       <!-- Form -->
       <form @submit.prevent="authenticate" class="space-y-10">
