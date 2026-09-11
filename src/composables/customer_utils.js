@@ -78,9 +78,9 @@ export function useCustomerUtils() {
         })
     }
 
-    async function refresh() {
+    async function refresh(config = {}) {
         if (refreshPromise) return refreshPromise;
-        refreshPromise = axios.get('/client/v1/profile')
+        refreshPromise = axios.get('/client/v1/profile', config)
             .then((response) => {
                 updateStore(response.data);
             })

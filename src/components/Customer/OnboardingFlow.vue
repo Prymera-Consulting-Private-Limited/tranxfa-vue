@@ -12,6 +12,7 @@ import MobileNumberInput from "@/components/Customer/MobileNumberInput.vue";
 import MobileNumberVerification from "@/components/Customer/MobileNumberVerification.vue";
 import EmailInput from "@/components/Customer/EmailInput.vue";
 import router from "@/router/index.js";
+import {safeRedirect} from "@/router/guards.js";
 
 /**
  * The machine-driven half of onboarding.
@@ -35,7 +36,10 @@ const {snapshot, send} = useMachine(
 
 watch(() => snapshot.value, (newSnapshot) => {
     if (newSnapshot?.value === 'onboardingComplete') {
-        router.push({name: 'dashboard'});
+        // Back to where the customer was heading when they had to sign in or
+        // finish their details, if that was somewhere on this site.
+        const redirect = safeRedirect(router.currentRoute.value.query.redirect);
+        router.push(redirect ?? {name: 'dashboard'});
     }
 }, {deep: true});
 

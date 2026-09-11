@@ -13,7 +13,7 @@ describe('fixFor', () => {
       const fix = fixFor(type, '/transfer/q-1');
       expect(fix.route.name).toBe('onboardingWorkflow');
       expect(fix.label).toBe('Complete your details');
-      expect(fix.route.query).toEqual({});
+      expect(fix.route.query).toEqual({redirect: '/transfer/q-1'});
     }
   });
 

@@ -197,12 +197,12 @@ const confirmQuote = async () => {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message || 'Please choose who to send this transfer to.';
         await send({ type: 'SELECT_RECIPIENT' });
-      } else if (fixFor(error.response.data.type, null)) {
+      } else if (fixFor(error.response.data.type, router.currentRoute.value.fullPath)) {
         // Something on the profile has to be finished first: a mobile number
         // to verify, an identity form to complete. Send them there; the
         // onboarding flow brings them back to this transfer.
         isStepProcessing.value = false;
-        await router.push(fixFor(error.response.data.type, null).route);
+        await router.push(fixFor(error.response.data.type, router.currentRoute.value.fullPath).route);
       } else {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message || 'We could not confirm this transfer. Please try again.';
