@@ -1,6 +1,7 @@
 <script setup>
 import {getCustomerMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
+import ServiceStatusBanner from "@/components/ServiceStatusBanner.vue";
 import {onMounted, reactive, ref} from "vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
@@ -130,6 +131,8 @@ function updateIsdCode(updated) {
             <h2 class="text-2xl font-bold text-black mb-2">¡Qué bueno verte de nuevo!</h2>
             <p class="text-sm/6 text-[#B7A3C1] mb-6 ">Envía tu dinero de forma fácil y rápida.</p>
             <!-- Form -->
+            <!-- The service-status endpoint answers on the app token, so a maintenance notice can show before sign-in. -->
+            <ServiceStatusBanner class="mb-6 rounded-2xl border" />
             <form @submit.prevent="login" class="space-y-5">
               <div v-if="loginError" class="rounded-2xl bg-danger-50 border border-danger-100 px-4 py-3">
                 <h3 class="text-sm/6 font-medium text-danger-800">Error al iniciar sesión</h3>

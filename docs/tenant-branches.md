@@ -151,7 +151,10 @@ then: brand variables in `src/assets/main.css`; replace `public/images/logo.png`
 (+ `logo-white.png`, `favicon`), `backgrounds/{login,signup,resetpassword}`;
 swap the analytics/chat tags in `index.html`; set the brand env vars
 (`VITE_APP_NAME`, `VITE_APP_URL`, `VITE_USER_AGREEMENT_URL`,
-`VITE_PRIVACY_POLICY_URL`, and the declarations if the brand needs them).
+`VITE_PRIVACY_POLICY_URL`, the declarations if the brand needs them, and the
+value-added service flags from the brand's licence: `VITE_HOTELS_ENABLED`,
+`VITE_FLIGHTS_ENABLED`, `VITE_WALLET_ENABLED`, `VITE_COUPONS_ENABLED`,
+`VITE_SERVICE_STATUS_ENABLED`, see `DEPLOY.md`).
 
 `pekepay_staging` is the cleanest worked example — a 16-file diff that touches
 assets, `main.css`, `index.html` and six logo references, and nothing else.

@@ -704,51 +704,6 @@ export function useHotelUtils() {
         return await axios.get(`/client/v1/travel/quote/${quoteId}`);
     }
 
-    /**
-     * Fetches the priced, ready-to-book quote a prebook resolves into.
-     *
-     * @param {string} quoteId
-     */
-    async function getHotelQuote(quoteId) {
-        return await axios.get(`/client/v1/travel/hotel/quote/${quoteId}`);
-    }
-
-    /**
-     * Starts the booking against a quote — the step a "Continue Booking" or a
-     * price-change confirmation both funnel into, since either one is the
-     * customer's go-ahead to book at the price the quote is currently showing.
-     *
-     * @param {string} quoteId
-     */
-    async function bookHotel(quoteId) {
-        return await axios.post(`/client/v1/travel/hotel/book/${quoteId}`);
-    }
-
-    /**
-     * Re-fetches a booking attempt already in progress, so landing on its url
-     * directly — a refresh mid-flow, a shared link — resumes it instead of
-     * having nothing to show until "book" is clicked again.
-     *
-     * @param {string} attemptId
-     */
-    async function getBookingAttempt(attemptId) {
-        return await axios.get(`/client/v1/travel/hotel/booking-attempt/${attemptId}`);
-    }
-
-    /**
-     * Saves whichever guests the customer has real names for, against their
-     * pre-created slots on the attempt. Callable repeatedly while the attempt
-     * is still "form_started" — each call only touches the guests it mentions,
-     * so a partial fill now and the rest later both work. Rejected with a 409
-     * once the attempt has moved past guest collection.
-     *
-     * @param {string} attemptId
-     * @param {{guests: Array}} payload
-     */
-    async function saveBookingGuests(attemptId, payload) {
-        return await axios.put(`/client/v1/travel/hotel/booking-attempt/${attemptId}/guests`, payload);
-    }
-
     return {
         criteria,
         nights,
@@ -758,10 +713,6 @@ export function useHotelUtils() {
         getHotelView,
         createQuote,
         getQuote,
-        getHotelQuote,
-        bookHotel,
-        getBookingAttempt,
-        saveBookingGuests,
         regions,
     }
 }

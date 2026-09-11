@@ -96,13 +96,19 @@ const isReadyToPay = () => {
   return props.transaction.payment.state.code === PaymentState.PENDING && !! props.transaction.payment.paymentUrl;
 }
 
+// Belmoney answers the initialise call FINISHED or PENDING when it is taking
+// or deciding the card itself; the API then leaves the payment PENDING with
+// no payment_url and settles it by webhook. The payment resource does not
+// yet carry the awaiting_confirmation flag the feature spec describes
+// (SD-1039), so for this provider PENDING-with-no-URL is read as that state
+// rather than as a stall. The "taking longer" notice still appears after a
+// minute, so a payment that never settles is not silent.
 const isAwaitingConfirmation = computed(() => {
   return props.transaction.payment.state.code === PaymentState.PENDING
-      && ! props.transaction.payment.paymentUrl
-      && props.transaction.payment.awaitingConfirmation === true;
+      && ! props.transaction.payment.paymentUrl;
 });
 
-const isTakingLong = computed(() => isSlow.value && ! isAwaitingConfirmation.value);
+const isTakingLong = computed(() => isSlow.value);
 
 const status = computed(() => {
   const code = props.transaction.payment.state.code;
@@ -150,6 +156,11 @@ const retryPayment = async () => {
     <Processing class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">We're confirming your payment</h2>
     <p class="text-base text-gray-600 mb-6">We are confirming your card payment with your bank. This usually takes a few seconds. You can close this page; we will email you when it is done.</p>
+    <p v-if="isTakingLong" role="status" class="mb-6 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
+      Esto está tardando más de lo habitual. Puedes seguir esperando o
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">ir a tu transferencia</router-link>
+      y te enviaremos un correo cuando termine.
+    </p>
     <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
     </div>
@@ -160,9 +171,9 @@ const retryPayment = async () => {
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait…</h2>
     <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
     <p v-if="isTakingLong" role="status" class="mt-2 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
-      This is taking longer than usual. Nothing has been charged. You can keep waiting, or
-      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">go to your transfer</router-link>
-      and try the payment again later.
+      Esto está tardando más de lo habitual. No se ha realizado ningún cargo. Puedes seguir esperando o
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">ir a tu transferencia</router-link>
+      e intentar el pago de nuevo más tarde.
     </p>
   </template>
 

@@ -1,6 +1,11 @@
 <script setup>
 import InlineFailure from "@/components/InlineFailure.vue";
 import {fixFor} from "@/composables/verification_routes.js";
+import {findTransactionForQuote, isOutcomeUnknown, MFA_REQUIRED_TYPE, saveCheckoutDraft, takeCheckoutDraft} from "@/composables/checkout_safety.js";
+import {useTransactionUtils} from "@/composables/transaction_utils.js";
+import {CUSTOMER_ACTIONS, refreshServiceStatus, useServiceStatus} from "@/composables/service_status.js";
+import {useCouponUtils} from "@/composables/coupon_utils.js";
+import {couponsEnabled} from "@/feature_flags.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
@@ -64,6 +69,17 @@ const isStepProcessing = ref(false);
 const isSubComponentLoading = ref(false);
 const purpose = ref(null);
 const paymentMethod = ref(null);
+const transactionUtils = useTransactionUtils();
+
+// The confirm step's choices, restored after the MFA round trip.
+const resumedAfterMfa = ref(false);
+
+// A confirm that got no answer (or a 5xx) may still have created the
+// transfer. Until the list has been checked nothing may be confirmed again.
+const outcomeUnknown = ref(false);
+const isReconciling = ref(false);
+const reconcileFailure = ref(null);
+let attemptStartedAt = null;
 const isAddressRequired = ref(false);
 const selectedUploadDocumentCategory = ref(null);
 
@@ -105,10 +121,150 @@ onMounted(async () => {
   if (quote.data.pendingDocuments.length === 1) {
     selectedUploadDocumentCategory.value = quote.data.pendingDocuments[0];
   }
+  restoreDraft();
   isLoading.value = false;
 });
 
+// What the customer had chosen before a 412 sent them to the MFA screen.
+// The quote id is the same, so the same Confirm Quote goes out again once
+// they press Confirm; only the picks had to survive the navigation.
+function restoreDraft() {
+  const draft = takeCheckoutDraft(props.id);
+  if (! draft) return;
+  purpose.value = quote.data.purposes.find((p) => p.id === draft.purposeId) ?? purpose.value;
+  const method = quote.data.paymentMethods.find((m) => m.id === draft.paymentMethodId);
+  if (method) {
+    paymentMethod.value = method;
+  }
+  thirdPartyDeclarationAccepted.value = draft.thirdPartyDeclarationAccepted === true;
+  if (draft.paymentData && paymentData.data) {
+    for (const [attribute, value] of Object.entries(draft.paymentData)) {
+      if (paymentData.data[attribute]) {
+        paymentData.data[attribute].value = value;
+      }
+    }
+  }
+  resumedAfterMfa.value = true;
+}
+
+function saveDraft() {
+  const values = {};
+  if (paymentData.data) {
+    for (const [attribute, entry] of Object.entries(paymentData.data)) {
+      values[attribute] = entry.value;
+    }
+  }
+  saveCheckoutDraft(props.id, {
+    purposeId: purpose.value?.id ?? null,
+    paymentMethodId: paymentMethod.value?.id ?? null,
+    thirdPartyDeclarationAccepted: thirdPartyDeclarationAccepted.value,
+    paymentData: values,
+  });
+}
+
+// Did the confirm that never answered create the transfer? The list says.
+// Found: carry on to its payment page. Not found: the quote is untouched
+// and may be confirmed again. Unknown (the list failed too): stay put and
+// point at the transfers page, never at the Confirm button.
+async function reconcileOutcome() {
+  isReconciling.value = true;
+  reconcileFailure.value = null;
+  try {
+    const transaction = await findTransactionForQuote(transactionUtils, quote.data, attemptStartedAt ?? Date.now());
+    if (transaction) {
+      outcomeUnknown.value = false;
+      await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
+      return;
+    }
+    outcomeUnknown.value = false;
+    preconditionFailedMessage.value = 'Tu transferencia no se creó. No se ha realizado ningún cargo. Puedes confirmarla de nuevo.';
+  } catch (e) {
+    logRequestFailure(e, 'confirm-reconcile');
+    reconcileFailure.value = "Seguimos sin poder conectar con el servidor. Revisa tus transferencias antes de confirmar de nuevo.";
+  } finally {
+    isReconciling.value = false;
+  }
+}
+
+const serviceStatus = useServiceStatus();
+
+// Promotion coupons (Client API reference, "Promotion Coupons"), behind
+// VITE_COUPONS_ENABLED. Validate previews a code and soft-fails with a
+// customer-written reason; Apply reprices the quote and every later quote
+// response carries the coupon block, so the quote is always taken from the
+// response rather than remembered.
+const couponUtils = useCouponUtils();
+const hasCoupons = couponsEnabled();
+const couponCode = ref('');
+const couponPreview = ref(null);
+const couponFailure = ref(null);
+const isCouponBusy = ref(false);
+
+function replaceQuote(data) {
+  quote.data = TransactionQuote.getInstance(data);
+  send({ type: 'SET_CONTEXT', quote: quote.data });
+}
+
+async function previewCoupon() {
+  if (! couponCode.value.trim() || isCouponBusy.value) return;
+  isCouponBusy.value = true;
+  couponFailure.value = null;
+  couponPreview.value = null;
+  try {
+    const response = await couponUtils.validate(quote.data.id, couponCode.value.trim());
+    if (response.data?.is_valid === true) {
+      couponPreview.value = response.data;
+    } else {
+      // Soft-fail by design: the reason is written for the customer.
+      couponFailure.value = response.data?.failure_reason || "Este código no se puede usar en esta transferencia.";
+    }
+  } catch (e) {
+    logRequestFailure(e, 'coupon-validate');
+    couponFailure.value = failureMessage(e, "No pudimos comprobar ese código. Inténtalo de nuevo.");
+  } finally {
+    isCouponBusy.value = false;
+  }
+}
+
+async function applyCoupon() {
+  if (isCouponBusy.value) return;
+  isCouponBusy.value = true;
+  couponFailure.value = null;
+  try {
+    const response = await couponUtils.apply(quote.data.id, couponCode.value.trim());
+    replaceQuote(response.data);
+    couponPreview.value = null;
+    couponCode.value = '';
+  } catch (e) {
+    logRequestFailure(e, 'coupon-apply');
+    // A 422 carries the same customer wording Validate returns.
+    couponFailure.value = failureMessage(e, "No pudimos aplicar ese código. Inténtalo de nuevo.");
+    couponPreview.value = null;
+  } finally {
+    isCouponBusy.value = false;
+  }
+}
+
+async function removeCoupon() {
+  if (isCouponBusy.value) return;
+  isCouponBusy.value = true;
+  couponFailure.value = null;
+  try {
+    const response = await couponUtils.remove(quote.data.id);
+    replaceQuote(response.data);
+  } catch (e) {
+    logRequestFailure(e, 'coupon-remove');
+    couponFailure.value = failureMessage(e, "No pudimos quitar el código. Inténtalo de nuevo.");
+  } finally {
+    isCouponBusy.value = false;
+  }
+}
+
 const showContinueButton = computed(() => {
+  if (outcomeUnknown.value) return false;
+  // A maintenance window that stops new transfers: the button goes, the
+  // banner says why.
+  if (snapshot.value?.value === 'confirm' && serviceStatus.isFrozen(CUSTOMER_ACTIONS.NEW_TRANSFERS)) return false;
   return !(snapshot.value?.value === 'selectRecipient' || snapshot.value?.value === 'accountVerification');
 });
 
@@ -151,6 +307,8 @@ const confirmGeneralErrors = computed(() => fieldlessErrors(confirmFormErrors.va
 
 const confirmQuote = async () => {
   preconditionFailedMessage.value = '';
+  resumedAfterMfa.value = false;
+  attemptStartedAt = Date.now();
   try {
     let paymentDataAttributes = {};
     if (paymentData.data) {
@@ -165,7 +323,18 @@ const confirmQuote = async () => {
     await router.push({name: 'makePayment', params: {transactionId: transaction.id}});
   } catch (error) {
     if (error.response?.status === 412) {
-      if (error.response.data.type === "incomplete_customer_address") {
+      if (error.response.data.type === MFA_REQUIRED_TYPE) {
+        // The session lost its MFA trust mid-checkout. The interceptor is
+        // already taking the customer to the MFA screen and back here; the
+        // quote is persisted, so only the picks need keeping.
+        saveDraft();
+        isStepProcessing.value = false;
+      } else if (error.response.data.type === "payment_amount_collides") {
+        // The rail already holds a deposit for this exact figure. Retrying
+        // the same amount is refused again; a different amount goes through.
+        isStepProcessing.value = false;
+        preconditionFailedMessage.value = (error.response.data.message || 'Ya tienes una transferencia abierta por este mismo importe.') + ' Cambia el importe y confirma de nuevo.';
+      } else if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
         await send({ type: 'ADDRESS_REQUIRED' });
@@ -202,6 +371,11 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "duplicate_transaction" || error.response.data.type === "active_transfer_disable_rule") {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message;
+        if (error.response.data.type === "active_transfer_disable_rule") {
+          // The reference: this refusal and the service-status endpoint
+          // describe the same window, so ask it again now.
+          refreshServiceStatus();
+        }
       } else if (error.response.data.type === "missing_recipient") {
         // The quote has no recipient any more (deleted, or a stale tab).
         isStepProcessing.value = false;
@@ -215,14 +389,21 @@ const confirmQuote = async () => {
         await router.push(fixFor(error.response.data.type, router.currentRoute.value.fullPath).route);
       } else {
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = error.response.data.message || 'We could not confirm this transfer. Please try again.';
+        preconditionFailedMessage.value = error.response.data.message || 'No pudimos confirmar esta transferencia. Inténtalo de nuevo.';
       }
     } else if (error.response?.status === 422) {
       confirmFormErrors.value = error.response.data.errors;
       isStepProcessing.value = false;
+    } else if (isOutcomeUnknown(error)) {
+      // No answer, or a 5xx: the transfer may exist. Never offer the button
+      // again until the list has been checked (the double-payment rule).
+      logRequestFailure(error, 'confirm-quote');
+      isStepProcessing.value = false;
+      outcomeUnknown.value = true;
+      await reconcileOutcome();
     } else {
       isStepProcessing.value = false;
-      preconditionFailedMessage.value = 'We could not confirm this transfer. Please check your connection and try again.';
+      preconditionFailedMessage.value = failureMessage(error, 'No pudimos confirmar esta transferencia. Inténtalo de nuevo.');
     }
   }
 }
@@ -499,7 +680,19 @@ const canContinue = computed(() => {
                     backLabel="Start a new transfer"
                   />
                   <template v-else>
-                    <InlineFailure :message="stepFailure" retryLabel="Try again" @retry="loadPoiCategory" class="mb-5" />
+                    <InlineFailure :message="stepFailure" retryLabel="Reintentar" @retry="loadPoiCategory" class="mb-5" />
+                    <div v-if="resumedAfterMfa" role="status" class="border-l-4 border-success-400 bg-success-50 p-4 mb-5">
+                      <p class="text-sm/6 text-success-800">Gracias, ya estás verificado. Revisa los datos y pulsa Confirmar para enviar esta transferencia.</p>
+                    </div>
+                    <div v-if="outcomeUnknown" role="alert" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
+                      <p class="text-sm/6 font-semibold text-warning-800">No recibimos respuesta al confirmar esta transferencia.</p>
+                      <p class="mt-1 text-sm/6 text-warning-800">Puede que ya exista. Estamos revisando tus transferencias para que no se te cobre dos veces.</p>
+                      <p v-if="reconcileFailure" class="mt-2 text-sm/6 text-danger-700">{{ reconcileFailure }}</p>
+                      <div class="mt-3 flex flex-wrap gap-3">
+                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? 'Comprobando…' : 'Comprobar de nuevo' }}</button>
+                        <router-link :to="{name: 'transactions'}" class="inline-flex min-h-11 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50">Ver mis transferencias</router-link>
+                      </div>
+                    </div>
                     <div v-if="preconditionFailedMessage" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
                       <div class="flex">
                         <div class="shrink-0">
@@ -633,6 +826,32 @@ const canContinue = computed(() => {
                         </div>
                       </template>
                     </v-select>
+
+                    <div v-if="hasCoupons" class="mt-6 mb-4">
+                      <label for="coupon-code" class="text-sm/6 font-semibold text-gray-900">¿Tienes un código de promoción?</label>
+                      <template v-if="quote.data.coupon">
+                        <div role="status" class="mt-2 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-sm/6 text-success-800">
+                          <p class="font-semibold">Código {{ quote.data.coupon.code }} aplicado<template v-if="quote.data.coupon.discountAmountCurrencyPrefixed">: ahorras {{ quote.data.coupon.discountAmountCurrencyPrefixed }}</template><template v-else-if="quote.data.coupon.exchangeRateBeforeCouponFormatted">: la tasa era {{ quote.data.coupon.exchangeRateBeforeCouponFormatted }}, ahora {{ quote.data.exchangeRateFormatted }}</template>.</p>
+                          <p v-if="quote.data.coupon.infoText">{{ quote.data.coupon.infoText }}</p>
+                          <p v-if="quote.data.coupon.termsText" class="text-xs/5 text-success-700">{{ quote.data.coupon.termsText }}</p>
+                          <button type="button" @click="removeCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold underline underline-offset-2 disabled:opacity-60">Quitar código</button>
+                        </div>
+                      </template>
+                      <template v-else>
+                        <div class="mt-2 flex gap-2">
+                          <input id="coupon-code" v-model="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="255" placeholder="Ingresa el código" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 uppercase focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" @keydown.enter.prevent="previewCoupon" />
+                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? 'Comprobando…' : 'Comprobar código' }}</button>
+                        </div>
+                        <p v-if="couponFailure" role="alert" class="mt-2 text-sm/6 text-danger-700">{{ couponFailure }}</p>
+                        <div v-if="couponPreview" role="status" class="mt-2 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
+                          <p class="font-semibold">{{ couponPreview.info_text || 'Este código se aplica a tu transferencia.' }}</p>
+                          <p v-if="couponPreview.discount_amount">Ahorras {{ couponPreview.discount_amount }} {{ quote.data.paymentCurrency?.isoAlpha ?? '' }} en esta transferencia.</p>
+                          <p v-else-if="couponPreview.adjusted_exchange_rate">Mejora tu tasa a {{ couponPreview.adjusted_exchange_rate }}.</p>
+                          <p v-if="couponPreview.terms_text" class="text-xs/5 text-info-700">{{ couponPreview.terms_text }}</p>
+                          <button type="button" @click="applyCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">Usar este código</button>
+                        </div>
+                      </template>
+                    </div>
 
                     <fieldset aria-label="Payment Method" class="mt-6 mb-4">
                       <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Método de pago <span class="text-danger-600">*</span></label>

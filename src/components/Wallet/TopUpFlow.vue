@@ -1,5 +1,5 @@
 <script setup>
-import {onUnmounted, ref, watch} from "vue";
+import {computed, onUnmounted, ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ClipboardIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import {UseClipboard} from "@vueuse/components";
@@ -11,6 +11,9 @@ import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import ClientPaymentAccountModel from "@/models/client_payment_account.js";
 import WalletTopup from "@/models/wallet_topup.js";
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
+import {fixForError} from "@/composables/verification_routes.js";
+import router from "@/router/index.js";
+import {CUSTOMER_ACTIONS, useServiceStatus} from "@/composables/service_status.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 
 const props = defineProps({
@@ -37,6 +40,10 @@ const amount = ref('');
 const amountErrors = ref([]);
 const collisionMessage = ref('');
 const generalError = ref('');
+const serviceStatus = useServiceStatus();
+const topupsFrozen = computed(() => serviceStatus.isFrozen(CUSTOMER_ACTIONS.WALLET_TOPUPS));
+// A 412 the customer can act on (verify identity first): where to go.
+const generalFix = ref(null);
 const isSubmitting = ref(false);
 
 const declaration = ref(null);
@@ -90,6 +97,7 @@ async function fetchInstructions() {
       account.value = instance;
     }
   }).catch((e) => {
+    generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
     generalError.value = e.response?.data?.message ?? 'We were unable to load your deposit details. Please try again.';
   });
 }
@@ -99,6 +107,7 @@ async function declare() {
   amountErrors.value = [];
   collisionMessage.value = '';
   generalError.value = '';
+  generalFix.value = null;
   isSubmitting.value = true;
   await walletUtils.declareTopup(amount.value).then((response) => {
     declaration.value = WalletTopup.getInstance(response.data);
@@ -111,6 +120,7 @@ async function declare() {
     } else if (e.response?.status === 422) {
       amountErrors.value = e.response.data.errors?.amount ?? [e.response.data.message];
     } else {
+      generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
       generalError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
     }
   }).finally(() => {
@@ -141,7 +151,7 @@ function close() {
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Add money to your wallet</DialogTitle>
                 <p class="mt-1 text-sm/6 text-gray-500">Declare the amount first, then transfer exactly that amount from your bank. The match is made on the amount, so it has to be spot on.</p>
 
-                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }}</div>
+                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }} <router-link v-if="generalFix" :to="generalFix.route" class="ml-1 font-semibold underline underline-offset-2 text-danger-800">{{ generalFix.label }}</router-link></div>
 
                 <div v-if="collisionMessage" class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <div class="flex">
@@ -160,7 +170,8 @@ function close() {
                   <template v-for="(message, i) in amountErrors" :key="`amount-error-${i}`">
                     <p class="mt-2 text-sm/6 text-danger-600">{{ message }}</p>
                   </template>
-                  <button type="submit" :disabled="isSubmitting || ! amount" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                  <p v-if="topupsFrozen" role="status" class="mt-3 text-sm/6 text-warning-800">Las recargas de la billetera están pausadas durante el mantenimiento. Inténtalo de nuevo más tarde.</p>
+                  <button type="submit" :disabled="isSubmitting || ! amount || topupsFrozen" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>Saving ...</span>
@@ -182,7 +193,7 @@ function close() {
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Make your bank transfer</DialogTitle>
                 <p v-if="account?.instruction" class="mt-1 text-sm/6 text-gray-600">{{ account.instruction }}</p>
 
-                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }}</div>
+                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }} <router-link v-if="generalFix" :to="generalFix.route" class="ml-1 font-semibold underline underline-offset-2 text-danger-800">{{ generalFix.label }}</router-link></div>
 
                 <div class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <div class="flex">

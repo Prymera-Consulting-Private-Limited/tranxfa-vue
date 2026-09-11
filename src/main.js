@@ -8,6 +8,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
+import {MFA_REQUIRED_TYPE} from "@/composables/checkout_safety.js";
 import {installErrorHandling} from "@/error_handling.js";
 import axios from "axios";
 
@@ -50,7 +51,21 @@ axios.interceptors.response.use((response) => {
         // A session that expires mid-task comes back to that task after
         // signing in again.
         const current = router.currentRoute.value;
-        router.push({ name: 'signIn', query: PUBLIC_ROUTES.has(current.name) ? {} : redirectQueryFor(current) });
+        // Already on a public page (sign-in itself, say): keep the redirect it
+        // was carrying rather than replacing it with nothing.
+        const carried = typeof current.query?.redirect === 'string' ? {redirect: current.query.redirect} : {};
+        router.push({ name: 'signIn', query: PUBLIC_ROUTES.has(current.name) ? carried : redirectQueryFor(current) });
+    }
+    // A session that lost its MFA trust mid-task: any endpoint can answer
+    // 412 more_authentication_required. The MFA screen sends a fresh code
+    // and brings the customer back to where they were; what they had typed
+    // is the caller's to keep (the transfer wizard keeps a draft).
+    const shouldSkipMfaRedirect = e.config?.skipMfaRedirect === true;
+    if (e.response?.status === 412 && e.response?.data?.type === MFA_REQUIRED_TYPE && ! shouldSkipMfaRedirect) {
+        const current = router.currentRoute.value;
+        if (current.name !== 'multiFactorAuth') {
+            router.push({ name: 'multiFactorAuth', query: { ...redirectQueryFor(current), reason: 'session' } });
+        }
     }
     throw e;
 })

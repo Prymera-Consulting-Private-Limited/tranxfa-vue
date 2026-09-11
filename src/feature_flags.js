@@ -20,21 +20,47 @@ export function flag(value, fallback) {
 }
 
 /**
- * Whether this deployment sells travel.
+ * Which value-added services this deployment shows.
  *
- * Travel is licensed per deployment and nothing on the customer says whether
- * this one has the licence - every travel route simply answers 404 without it.
- * The flag is the stand-in until app and domain scoping lands and supplies a
- * real field.
+ * The backend licenses each service separately (HOTELS, FLIGHTS, WALLETS,
+ * PROMOTIONAL-COUPONS, ...) and tells the customer app nothing about it: an
+ * unlicensed feature's routes simply answer 404. Visibility here is decided
+ * by env only, one flag per product, all off unless the deployment says
+ * otherwise (decision on SD-1036). A flag that is on for a service the
+ * deployment does not hold shows entry points that lead to 404s, so set them
+ * from the licence, not from hope.
  *
- * Defaults to on, which is what feature/travel_hotels shipped. A deployment
- * without the licence must set VITE_TRAVEL_ENABLED=false, or its customers see
- * Hotels and Bookings tabs leading to 404s.
- *
- * @returns {boolean}
+ * VITE_TRAVEL_ENABLED (default on) is gone; a brand that had it set must move
+ * to VITE_HOTELS_ENABLED.
  */
-export function travelEnabled() {
-    return flag(import.meta.env.VITE_TRAVEL_ENABLED, true);
+
+/** Hotels: the search, hotel page, price hold and bookings. */
+export function hotelsEnabled() {
+    return flag(import.meta.env.VITE_HOTELS_ENABLED, false);
+}
+
+/** Flights: reserved for the flights UI; nothing renders yet. */
+export function flightsEnabled() {
+    return flag(import.meta.env.VITE_FLIGHTS_ENABLED, false);
+}
+
+/**
+ * The customer wallet. A hard off-switch in front of the documented probe:
+ * with this on, the wallet appears only when GET /wallet/subscription says
+ * the deployment offers it; with it off, nothing is asked or shown.
+ */
+export function walletEnabled() {
+    return flag(import.meta.env.VITE_WALLET_ENABLED, true);
+}
+
+/** Promotion coupons on the quote and receipt (SD-1037). */
+export function couponsEnabled() {
+    return flag(import.meta.env.VITE_COUPONS_ENABLED, false);
+}
+
+/** The maintenance-window banner fed by GET /client/v1/service-status. */
+export function serviceStatusEnabled() {
+    return flag(import.meta.env.VITE_SERVICE_STATUS_ENABLED, false);
 }
 
 /**

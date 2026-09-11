@@ -17,6 +17,9 @@ const onward = () => {
 
 const otp = ref('');
 const isLoading = ref(false);
+// Sent here by the 412 interceptor rather than by sign-in: the API has not
+// sent a code for this step yet, so one is requested on arrival.
+const isSessionReverify = router.currentRoute.value.query.reason === 'session';
 const isVerifying = ref(false);
 const isResendingOtp = ref(false);
 const otpError = ref('');
@@ -93,7 +96,7 @@ async function resend() {
       return;
     }
     logRequestFailure(e, 'resend-mfa-code');
-    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
+    resendFailure.value = failureMessage(e, "No pudimos enviar un nuevo código. Inténtalo de nuevo.");
   }).finally(() => {
     isResendingOtp.value = false;
   });
@@ -106,6 +109,12 @@ onMounted(async () => {
     isLoading.value = true;
     await customerUtils.refresh();
     isLoading.value = false;
+  }
+  if (isSessionReverify) {
+    customerUtils.resendMfaOtp().catch((e) => {
+      logRequestFailure(e, 'mfa-reverify-code');
+      resendFailure.value = failureMessage(e, "No pudimos enviar un nuevo código. Usa Reenviar código más abajo.");
+    });
   }
   await startResendOtpTimer();
 });
@@ -129,7 +138,8 @@ onUnmounted(() => {
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">Necesitamos verificar que eres tú</h2>
-      <p class="text-md text-[#B7A3C1] mb-2 text-center">Ingresa el código de un solo uso que enviamos a tu correo {{ customer.data?.account?.email }}</p>
+      <p v-if="isSessionReverify" class="text-md text-[#B7A3C1] mb-2 text-center">Para continuar necesitamos comprobar que eres tú. Enviamos un código de un solo uso a {{ customer.data?.account?.email }}; no se pierde nada de lo que estabas haciendo.</p>
+      <p v-else class="text-md text-[#B7A3C1] mb-2 text-center">Ingresa el código de un solo uso que enviamos a tu correo {{ customer.data?.account?.email }}</p>
       <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">Ten en cuenta que el correo puede tardar hasta un minuto en llegar. Si no lo ves en tu bandeja de entrada, revisa también tu carpeta de spam o correo no deseado.</p>
       <!-- Form -->
       <form @submit.prevent="authenticate" class="space-y-10">

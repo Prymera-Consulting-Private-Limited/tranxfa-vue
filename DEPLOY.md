@@ -63,7 +63,9 @@ per brand:
 | `VITE_AUTH_CHANNEL` | `EMAIL` \| `MOBILE_NUMBER` \| `BOTH` - picks the onboarding flow. `BOTH` resolves per customer from whether they have an email |
 | `VITE_ONBOARDING_COLLECT_ADDRESS` | Default true. Turning it off skips the onboarding address step; the transfer wizard still asks when the backend answers 412 |
 | `VITE_ONBOARDING_VERIFY_MOBILE_NUMBER` | Default false. Email-first only - a mobile-first signup has already proven the number |
-| `VITE_TRAVEL_ENABLED` | **Default true.** Set `false` on any deployment without the travel licence, or customers get Hotels and Bookings tabs leading to 404s |
+| `VITE_HOTELS_ENABLED`, `VITE_FLIGHTS_ENABLED`, `VITE_COUPONS_ENABLED` | **Default false.** One per licensed value-added service; the routes and nav items exist only when on. `VITE_TRAVEL_ENABLED` is gone |
+| `VITE_WALLET_ENABLED` | Default true. Hard off-switch in front of the wallet's own `GET /wallet/subscription` probe |
+| `VITE_SERVICE_STATUS_ENABLED` | Default false. Polls `/client/v1/service-status` and shows the maintenance banner (also before sign-in) |
 | `VITE_VOLUME_PAYMENT_MERCHANT_ID` | Travel payments only. Unset means travel cannot take payment |
 | `VITE_VOLUME_PAYMENT_ENVIRONMENT` | `SANDBOX` \| `PRODUCTION`, `SANDBOX` when unset - a deployment that forgets it takes no money rather than the wrong money |
 | `VITE_PUSHER_APP_KEY` + host/cluster/scheme | Realtime. `VITE_APP_ENV` must **not** be `local`. |
