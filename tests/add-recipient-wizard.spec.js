@@ -99,7 +99,7 @@ describe('AddRecipientWizard', () => {
             routeApi({targets: [target(1)], methods: [method(1)], recipientType: 'individual'});
             const wrapper = await mountWizard();
 
-            expect(axios.get).toHaveBeenCalledWith('/client/v1/resources/relationships');
+            expect(axios.get).toHaveBeenCalledWith('/client/v1/resources/relationships', expect.objectContaining({params: expect.any(Object)}));
             expect(wrapper.getComponent({name: 'AttributeCollection'}).props('relationships').length)
                 .toBeGreaterThan(0);
         });

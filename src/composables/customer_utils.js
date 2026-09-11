@@ -35,9 +35,13 @@ export function useCustomerUtils() {
     }
 
     async function login(email, password) {
+        // A 401 here is a wrong password, not an expired session: the
+        // interceptor must not bounce the page and lose the ?redirect.
         await axios.post('/client/v1/login', {
             email: email,
             password: password,
+        }, {
+            skipAuthRedirect: true,
         }).then((response) => {
             updateStore(response.data);
         })
@@ -229,8 +233,18 @@ export function useCustomerUtils() {
     }
 
     async function resetPassword(token, newPassword, confirmNewPassword) {
+        // The emailed link carries the token base64-encoded once more than the
+        // API wants. A link that is not base64 at all (truncated by a mail
+        // client) is sent as-is, so the API's own "expired or malformed"
+        // answer reaches the form instead of a thrown DOMException.
+        let decoded = token;
+        try {
+            decoded = atob(token);
+        } catch (e) {
+            decoded = token;
+        }
         return axios.post(`/client/v1/reset-password`, {
-            token: atob(token),
+            token: decoded,
             password: newPassword,
             confirm_password: confirmNewPassword,
         });

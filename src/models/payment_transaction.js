@@ -90,14 +90,13 @@ class PaymentTransaction {
     state = null;
 
     /**
-     * Nothing for the customer to do: the provider will settle this payment
-     * on its own (Belmoney's FINISHED and PENDING return shapes). PENDING with
-     * no payment_url is healthy while this is true. Absent means false.
-     *
-     * The API also carries a failure_reason on failed payments. It is written
-     * for operators and names processors, so it is deliberately not mapped
-     * here: the failure screens use our own wording.
-     * @type {Boolean}
+     * The provider is settling the payment without the customer (Belmoney's
+     * FINISHED / PENDING answers to the initialise call). The Client API
+     * reference does not list this on the payment resource or the broadcast
+     * today - it exists on the flights booking assembler only - so it is read
+     * when present and otherwise inferred by the provider component. Asked
+     * of the backend in SD-1039. The reference carries no failure_reason on
+     * payments either; nothing here reads one.
      */
     awaitingConfirmation = false;
 
