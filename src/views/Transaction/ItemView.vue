@@ -96,7 +96,7 @@ const isShowPaymentAccountModalOpen = ref(false);
         <template v-if="isLoading">
           <div class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
             <div class="-mx-4 px-4 py-8 ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20 ">
-              <h2 class="text-base font-semibold text-gray-900 animate-pulse">Transaction #</h2>
+              <h2 class="text-base font-semibold text-gray-900 animate-pulse">{{ $t('account.transaction') }}</h2>
               <div class="col-span-2">
                 <div class="border-l-4 border-1 border-gray-300 rounded-md mt-4 p-4 bg-gray-200 h-10 animate-pulse"></div>
               </div>
@@ -108,15 +108,15 @@ const isShowPaymentAccountModalOpen = ref(false);
               </dl>
             </div>
             <div class="lg:col-start-3 lg:row-end-1">
-              <h2 class="sr-only">Summary</h2>
+              <h2 class="sr-only">{{ $t('account.summary') }}</h2>
               <div class="rounded-lg bg-white ring-1 shadow-xs ring-gray-900/5">
                 <dl class="flex flex-wrap animate-pulse">
                   <div class="flex-auto py-6 pl-6">
-                    <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
+                    <dt class="text-sm/6 font-semibold text-gray-900">{{ $t('account.totalAmount') }}</dt>
                     <dd class="mt-1 h-4 w-32 bg-gray-300 rounded"></dd>
                   </div>
                   <div class="flex-none self-end px-6 py-4">
-                    <dt class="sr-only">Status</dt>
+                    <dt class="sr-only">{{ $t('account.status') }}</dt>
                     <dd class="rounded-md bg-gray-300 h-6 w-12"></dd>
                   </div>
                 </dl>
@@ -126,10 +126,10 @@ const isShowPaymentAccountModalOpen = ref(false);
         </template>
         <LoadFailurePanel
           v-else-if="failure"
-          title="We couldn't load this transaction"
+          :title="$t('account.transactionLoadFailure')"
           :message="typeof failure === 'string' ? failure : null"
           :backTo="{name: 'transactions'}"
-          backLabel="All transactions"
+          :backLabel="$t('account.allTransactions')"
         />
         <div v-else-if="transaction.data" class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           <!-- Invoice -->
@@ -160,7 +160,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <div :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
                        }" class="text-sm/6 mt-2">
-                      <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm/6 hover:underline">View Our {{ transaction.data.payment.paymentMethod.title }} Account</a>
+                      <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm/6 hover:underline">{{ $t('account.viewClientAccount', {title: transaction.data.payment.paymentMethod.title}) }}</a>
                     </div>
                   </div>
                 </div>
@@ -186,7 +186,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <!-- FAILED and TIMED-OUT are the two payment states the API says to offer Retry Payment for. -->
                     <router-link v-if="canRetryPayment" :to="{name: 'makePayment', params: {transactionId: transaction.data.id}}" :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
-                       }" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold hover:underline">Try the payment again <span aria-hidden="true">&rarr;</span></router-link>
+                       }" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold hover:underline">{{ $t('transfer.payment.tryThePaymentAgain') }} <span aria-hidden="true">→</span></router-link>
                   </div>
                 </div>
               </div>
@@ -198,7 +198,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <div class="flex flex-1 items-center justify-between rounded-l-md rounded-r-md border border-warning-200 bg-warning-50">
                       <div class="flex-1 px-4 py-2 text-sm/6">
                         <p class="font-medium text-warning-700">{{ document.documentCategory.title }}</p>
-                        <p class="text-warning-700 leading-6">Upload your {{ document.documentCategory.title.toLowerCase() }} to process the transaction</p>
+                        <p class="text-warning-700 leading-6">{{ $t('account.uploadDocumentPrompt', {toLowerCase: document.documentCategory.title.toLowerCase()}) }}</p>
                       </div>
                       <div class="shrink-0 px-3 text-warning-700">
                         <ArrowUpTrayIcon class="size-5" aria-hidden="true" />
@@ -210,19 +210,19 @@ const isShowPaymentAccountModalOpen = ref(false);
             </div>
             <dl class="mt-6 grid grid-cols-1 text-sm/6 lg:grid-cols-2">
               <div class="sm:pr-4 col-span-2 sm:col-span-1">
-                <dt class="inline text-gray-500">Date</dt>
+                <dt class="inline text-gray-500">{{ $t('account.date') }}</dt>
                 {{  }}
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.createdAt">{{ moment(transaction.data.createdAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-2 sm:mt-0 sm:pl-4 col-span-2 sm:col-span-1">
-                <dt class="inline text-gray-500">Updated on</dt>
+                <dt class="inline text-gray-500">{{ $t('account.updatedOn') }}</dt>
                 {{ ' ' }}
                 <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
               </div>
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
-                <dt class="font-semibold text-gray-900">Sending from <span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></dt>
+                <dt class="font-semibold text-gray-900"><i18n-t keypath="account.sendingFromCountry" scope="global"><template #country><span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></template></i18n-t></dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
-                  <span class="font-medium text-gray-900">You sent</span>
+                  <span class="font-medium text-gray-900">{{ $t('account.youSent') }}</span>
                   <span class="text-gray-900">{{ transaction.data.localAmountCurrencyPrefixed }}</span>
                   <span class="">{{ transaction.data.payment.paymentMethod.title }}</span>
                 </dd>
@@ -234,24 +234,24 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
                   <span class="">{{ transaction.data.payoutMethod.title }}</span>
                   <span v-if="transaction.data.payout?.collectionPin" :class="transaction.data.payout.collectionPinAvailable ? 'text-gray-900 font-semibold' : 'text-warning-700 text-xs/5 mt-1'" class="">
-                    <template v-if="transaction.data.payout.collectionPinAvailable">Collection PIN: </template>
+                    <template v-if="transaction.data.payout.collectionPinAvailable">{{ $t('account.collectionPin') }}</template>
                     {{ transaction.data.payout.collectionPin }}
                   </span>
                 </dd>
               </div>
               <div class="col-span-2 mt-8 sm:mt-6 border-t border-gray-900/5">
                 <div class="py-6">
-                  <h2 class="text-sm/6 font-medium text-gray-900">Recipient Information</h2>
+                  <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.recipientInformation') }}</h2>
                   <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">{{ transaction.data.payoutMethod.title }} in {{ transaction.data.payoutCountry.commonName }}</p>
                 </div>
                 <div class="">
                   <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                     <div class="sm:col-span-1">
-                      <dt class="text-sm/6 font-medium text-gray-500">Name</dt>
+                      <dt class="text-sm/6 font-medium text-gray-500">{{ $t('recipient.name') }}</dt>
                       <dd class="mt-1 text-sm/6 text-gray-900">{{ transaction.data.recipient.wholeName }}</dd>
                     </div>
                     <div class="sm:col-span-1">
-                      <dt class="text-sm/6 font-medium text-gray-500">Relation</dt>
+                      <dt class="text-sm/6 font-medium text-gray-500">{{ $t('recipient.relation') }}</dt>
                       <dd class="mt-1 text-sm/6 text-gray-900">{{ transaction.data.recipient.relationship.title }}</dd>
                     </div>
                     <template v-for="attribute in transaction.data.recipient.attributes">
@@ -269,82 +269,82 @@ const isShowPaymentAccountModalOpen = ref(false);
               </div>
               <div class="col-span-2 print:grid grid-cols-2 mt-8 sm:mt-6 border-t border-gray-900/5 hidden py-3">
                 <div class="py-3">
-                  <h2 class="text-sm/6 font-medium text-gray-900">Sent Amount</h2>
-                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Total <span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.sentAmount') }}</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500"><i18n-t keypath="account.totalAmountIs" scope="global"><template #amount><span class="font-medium">{{ transaction.data.localAmountCurrencyPrefixed }}</span></template></i18n-t></p>
                 </div>
                 <div class="py-3">
-                  <h2 class="text-sm/6 font-medium text-gray-900">Fee</h2>
-                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Total <span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.fee') }}</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500"><i18n-t keypath="account.totalAmountIs" scope="global"><template #amount><span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></template></i18n-t></p>
                 </div>
                 <!-- A coupon taken at checkout: the API sends the discount, or the rate it replaced. -->
                 <div v-if="transaction.data.couponDiscountAmountCurrencyPrefixed" class="py-3">
-                  <h2 class="text-sm/6 font-medium text-gray-900">Coupon</h2>
-                  <p class="mt-1 max-w-2xl text-sm/6 text-success-700">You saved <span class="font-medium">{{ transaction.data.couponDiscountAmountCurrencyPrefixed }}</span></p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.coupon') }}</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-success-700"><i18n-t keypath="account.youSavedAmount" scope="global"><template #amount><span class="font-medium">{{ transaction.data.couponDiscountAmountCurrencyPrefixed }}</span></template></i18n-t></p>
                 </div>
                 <div v-else-if="transaction.data.exchangeRateBeforeCouponFormatted" class="py-3">
-                  <h2 class="text-sm/6 font-medium text-gray-900">Coupon</h2>
-                  <p class="mt-1 max-w-2xl text-sm/6 text-success-700">Rate was <span class="font-medium">{{ transaction.data.exchangeRateBeforeCouponFormatted }}</span>, you got <span class="font-medium">{{ transaction.data.exchangeRateFormatted }}</span></p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.coupon') }}</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-success-700"><i18n-t keypath="account.rateWasNowIs" scope="global"><template #before><span class="font-medium">{{ transaction.data.exchangeRateBeforeCouponFormatted }}</span></template><template #after><span class="font-medium">{{ transaction.data.exchangeRateFormatted }}</span></template></i18n-t></p>
                 </div>
                 <div class="py-3">
-                  <h2 class="text-sm/6 font-medium text-gray-900">Total Amount</h2>
-                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Total <span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></p>
+                  <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.totalAmount') }}</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500"><i18n-t keypath="account.totalAmountIs" scope="global"><template #amount><span class="font-medium">{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</span></template></i18n-t></p>
                 </div>
                 <div class="py-3">
-                  <h2 v-if="false" class="text-sm/6 font-medium text-gray-900">Payment Status</h2>
+                  <h2 v-if="false" class="text-sm/6 font-medium text-gray-900">{{ $t('account.paymentStatus') }}</h2>
                   <p v-if="false" class="mt-1 max-w-2xl text-sm/6 text-gray-500">
-                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm/6 font-medium">Pending</span>
-                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm/6 font-medium">Failed</span>
-                    <span v-else class="text-sm/6 font-medium">Paid</span>
+                    <span v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="text-sm/6 font-medium">{{ $t('account.pending') }}</span>
+                    <span v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="text-sm/6 font-medium">{{ $t('account.failed') }}</span>
+                    <span v-else class="text-sm/6 font-medium">{{ $t('account.paid') }}</span>
                   </p>
                 </div>
               </div>
             </dl>
           </div>
           <div class="lg:col-start-3 lg:row-end-1 print:hidden">
-            <h2 class="sr-only">Summary</h2>
+            <h2 class="sr-only">{{ $t('account.summary') }}</h2>
             <div class="rounded-lg bg-white ring-1 shadow-xs ring-gray-900/5">
               <dl class="flex items-center flex-wrap">
                 <div class="flex-auto pt-6 pl-6">
-                  <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
+                  <dt class="text-sm/6 font-semibold text-gray-900">{{ $t('account.totalAmount') }}</dt>
                   <dd class="text-base font-semibold text-gray-900">{{ transaction.data.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div v-if="false" class="flex-none px-6">
-                  <dt class="sr-only">Status</dt>
-                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-warning-50 px-2 py-1 text-xs/5 font-medium text-warning-700 ring-1 ring-warning-600/20 ring-inset">Pending</dd>
-                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-danger-50 px-2 py-1 text-xs/5 font-medium text-danger-600 ring-1 ring-danger-600/20 ring-inset">Failed</dd>
-                  <dd v-else class="rounded-md bg-success-50 px-2 py-1 text-xs/5 font-medium text-success-700 ring-1 ring-success-600/20 ring-inset">Paid</dd>
+                  <dt class="sr-only">{{ $t('account.status') }}</dt>
+                  <dd v-if="transaction.data?.payment?.state?.code === PaymentState.PENDING || transaction.data?.payment?.state?.code === PaymentState.CREATED  || transaction.data?.payment?.state?.code === PaymentState.INITIALIZED" class="rounded-md bg-warning-50 px-2 py-1 text-xs/5 font-medium text-warning-700 ring-1 ring-warning-600/20 ring-inset">{{ $t('account.pending') }}</dd>
+                  <dd v-else-if="transaction.data?.payment?.state?.code === PaymentState.FAILED" class="rounded-md bg-danger-50 px-2 py-1 text-xs/5 font-medium text-danger-600 ring-1 ring-danger-600/20 ring-inset">{{ $t('account.failed') }}</dd>
+                  <dd v-else class="rounded-md bg-success-50 px-2 py-1 text-xs/5 font-medium text-success-700 ring-1 ring-success-600/20 ring-inset">{{ $t('account.paid') }}</dd>
                 </div>
                 <div class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6">
                   <dt class="flex-none">
-                    <span class="sr-only">Client</span>
+                    <span class="sr-only">{{ $t('account.client') }}</span>
                     <RocketLaunchIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">{{ $t('account.sentAmount') }}</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
-                    <span class="sr-only">Fees</span>
+                    <span class="sr-only">{{ $t('calculator.fees') }}</span>
                     <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">{{ $t('calculator.fees') }}</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
-                    <span class="sr-only">Total</span>
+                    <span class="sr-only">{{ $t('account.total') }}</span>
                     <CalculatorIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Total</span><br />{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">{{ $t('account.total') }}</span><br />{{ transaction.data.payment.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 mb-4 flex w-full flex-none gap-x-4 px-6" v-if="transaction.data?.payment?.paymentAccount">
                   <dt class="flex-none">
-                    <span class="sr-only">Status</span>
+                    <span class="sr-only">{{ $t('account.status') }}</span>
                     <CreditCardIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Payment Method</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">{{ $t('transfer.wizard.paymentMethod') }}</span><br />{{ transaction.data.payment.paymentAccount?.institution }}<br />{{ transaction.data.payment.paymentAccount?.accountNumber }}</dd>
                 </div>
               </dl>
               <div class="mt-6 border-t border-gray-900/5 px-6 py-6 print:hidden">
-                <a href="javascript:window.print()" class="text-sm/6 font-semibold text-gray-900">Print receipt <span aria-hidden="true">&rarr;</span></a>
+                <a href="javascript:window.print()" class="text-sm/6 font-semibold text-gray-900">{{ $t('account.printReceipt') }} <span aria-hidden="true">→</span></a>
               </div>
             </div>
           </div>

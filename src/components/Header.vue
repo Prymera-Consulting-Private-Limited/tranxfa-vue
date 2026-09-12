@@ -85,7 +85,7 @@ onMounted(async () => {
             <div>
               <MenuButton class="relative flex rounded-full bg-white text-sm/6 ring-2 ring-white/20 focus:ring-white focus:outline-hidden cursor-pointer">
                 <span class="absolute -inset-1.5" />
-                <span class="sr-only">Open user menu</span>
+                <span class="sr-only">{{ $t('account.openUserMenu') }}</span>
                 <div class="bg-gray-200 text-gray-500 size-8 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
                   <template v-if="customer.data">{{ customer.data?.name?.slice(0, 1).toUpperCase() }}</template>
                   <template v-else>
@@ -112,7 +112,7 @@ onMounted(async () => {
           <!-- Mobile menu button -->
           <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-transparent p-2 text-brand-200 hover:bg-white/10 hover:text-white outline-none focus:ring-0 focus:ring-white focus:outline-hidden">
             <span class="absolute -inset-0.5" />
-            <span class="sr-only">Open main menu</span>
+            <span class="sr-only">{{ $t('account.openMainMenu') }}</span>
             <Bars3Icon v-if="!open" class="block size-6" aria-hidden="true" />
             <XMarkIcon v-else class="block size-6" aria-hidden="true" />
           </PopoverButton>
@@ -146,7 +146,7 @@ onMounted(async () => {
                   <div class="-mr-2">
                     <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-500 outline-none focus:ring-0 focus:ring-brand-700 focus:outline-hidden focus:ring-inset">
                       <span class="absolute -inset-0.5" />
-                      <span class="sr-only">Close menu</span>
+                      <span class="sr-only">{{ $t('account.closeMenu') }}</span>
                       <XMarkIcon class="size-6" aria-hidden="true" />
                     </PopoverButton>
                   </div>

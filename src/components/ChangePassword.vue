@@ -110,7 +110,7 @@ const changePassword = async () => {
   </template>
     <form v-else @submit.prevent="changePassword" class="space-y-6">
         <div>
-            <label :class="[formErrors.current_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="current_password" class="block mb-3 text-base">Current Password</label>
+            <label :class="[formErrors.current_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="current_password" class="block mb-3 text-base">{{ $t('account.currentPassword') }}</label>
             <div class="relative ">
                 <input :type="showCurrentPassword ? 'text' : 'password'" id="current_password" v-model="form.current_password" :class="[formErrors.current_password.length > 0 ? 'text-danger-600 border-danger-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
                 <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">
@@ -123,7 +123,7 @@ const changePassword = async () => {
 
         <!-- Password Field -->
         <div>
-            <label :class="[formErrors.password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">Password</label>
+            <label :class="[formErrors.password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="password" class="block mb-3 text-base">{{ $t('common.password') }}</label>
             <div class="mb-3">
                 <div class="relative">
                 <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" :class="[formErrors.password.length > 0 ? 'text-danger-600 border-danger-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
@@ -135,7 +135,7 @@ const changePassword = async () => {
                 <p v-if="formErrors.password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.password[0] }}</p>
             </div>
         </div>
-        <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">We couldn't load the password rules. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Try again</button></p>
+        <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">{{ $t('common.passwordRulesFailed') }} <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">{{ $t('common.tryAgain') }}</button></p>
         <ul role="list" class="space-y-2">
             <li v-for="validatedPasswordPolicyRule in validatedPasswordPolicies.rules">
                 <div class="relative">
@@ -174,7 +174,7 @@ const changePassword = async () => {
         </ul>
         <!-- Confirm Password -->
         <div>
-            <label :class="[formErrors.confirm_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">Confirm Password</label>
+            <label :class="[formErrors.confirm_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="confirm_password" class="block mb-3 text-base">{{ $t('auth.resetPassword.confirmLabel') }}</label>
             <div class="relative">
                 <input :type="showConfirmPassword ? 'text' : 'password'" id="confirm_password" v-model="form.confirm_password" :class="[formErrors.confirm_password.length > 0 ? 'text-danger-600 border-danger-500' : 'text-gray-900 border-gray-300']" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg">
                 <button type="button" class="absolute inset-y-0 right-0 top-1.5 flex items-center px-3 cursor-pointer">

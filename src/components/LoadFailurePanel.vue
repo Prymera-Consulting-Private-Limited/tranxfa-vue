@@ -31,15 +31,9 @@ defineEmits(['retry'])
     </div>
     <h1 class="mt-6 text-base font-semibold text-gray-900">{{ title }}</h1>
     <p v-if="message" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ message }}</p>
-    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">
-      Nothing on your account has changed. Please try again.
-    </p>
-    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">
-      Nothing on your account has changed. Please try again.
-    </p>
-    <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">
-      It may have been removed, or the link may be out of date.
-    </p>
+    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('account.nothingChanged') }}</p>
+    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('account.nothingChanged') }}</p>
+    <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('account.maybeRemoved') }}</p>
     <button
       v-if="retryLabel"
       type="button"

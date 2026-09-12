@@ -127,8 +127,8 @@ const stepCommandExecuted = async (e) => {
 
 </script>
 <template>
-  <nav class="flex items-center justify-between space-x-8 sm:hidden py-3 px-4" aria-label="Progress">
-    <p class="text-sm/6 font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
+  <nav class="flex items-center justify-between space-x-8 sm:hidden py-3 px-4" :aria-label="$t('account.progress')">
+    <p class="text-sm/6 font-medium">{{ $t('account.stepOf', {current: progress.findIndex((step) => step.status === 'current') + 1, total: progress.length}) }}</p>
     <ol role="list" class="flex items-center space-x-5">
       <li v-for="step in progress" :key="step.name">
         <button v-if="step.status === 'complete'" type="button" @click="stepCommandExecuted(step.stepCommand)" class="group flex size-6 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
@@ -149,7 +149,7 @@ const stepCommandExecuted = async (e) => {
       </li>
     </ol>
   </nav>
-  <nav aria-label="Progress" class="hidden sm:block">
+  <nav :aria-label="$t('account.progress')" class="hidden sm:block">
     <ol role="list" class="overflow-hidden">
       <template v-for="(step, stepIdx) in progress" :key="step.id">
         <li :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">
