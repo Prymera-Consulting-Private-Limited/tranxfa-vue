@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {onMounted, onUnmounted, ref} from "vue";
 import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
@@ -59,8 +63,8 @@ async function cancelTopup() {
     notify(
         {
           group: 'customer',
-          title: 'Top-up Cancelled',
-          text: 'The declaration has been withdrawn. No money has moved.',
+          title: t('wallet.topUpCancelled'),
+          text: t('wallet.theDeclarationHasBeen'),
           type: 'success',
         },
         -1,
@@ -73,7 +77,7 @@ async function cancelTopup() {
       notify(
           {
             group: 'customer',
-            title: 'Top-up Updated',
+            title: t('wallet.topUpUpdated'),
             text: e.response.data.message,
             type: 'info',
           },
@@ -81,7 +85,7 @@ async function cancelTopup() {
       );
       emit('cancelled');
     } else {
-      cancelError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+      cancelError.value = e.response?.data?.message ?? t('account.somethingWentWrongPlease');
     }
   }).finally(() => {
     isCancelling.value = false;

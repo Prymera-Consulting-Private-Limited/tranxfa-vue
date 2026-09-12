@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {onMounted, onUnmounted, ref} from "vue";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
@@ -60,12 +64,12 @@ const startFaceDetection = async () => {
       const faceCount = await detectFaceInFrame();
       if (faceCount === 0) {
         liveCheckMessage.value = "";
-        liveCheckError.value = "No face detected. Please ensure your face is clearly visible.";
+        liveCheckError.value = t('verification.noFaceDetectedPlease');
       } else if (faceCount > 1) {
         liveCheckMessage.value = "";
-        liveCheckError.value = "Multiple faces detected. Please be alone in the frame.";
+        liveCheckError.value = t('verification.multipleFacesDetectedPlease');
       } else {
-        liveCheckMessage.value = "Hold still while we verify your identity...";
+        liveCheckMessage.value = t('verification.holdStillWhileWe');
         liveCheckError.value = "";
         if (!isProcessing.value) {
           isProcessing.value = true;
@@ -108,7 +112,7 @@ const startCamera = async () => {
     await startFaceDetection();
   } catch (err) {
     console.error("Camera Access Error:", err);
-    liveCheckError.value = "Camera access denied. Please grant permission.";
+    liveCheckError.value = t('verification.cameraAccessDeniedPlease');
   }
 };
 

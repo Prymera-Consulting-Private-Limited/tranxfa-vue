@@ -30,6 +30,7 @@ them. That produced, on the one brand that needed it:
 | `scripts/i18n-render-check.py` | Proves a migration changed no rendered English, by comparing the text each template renders before and after |
 | `scripts/i18n-compose.py` | Puts a sentence the markup split back together as one `<i18n-t>` message with a slot per styled part |
 | `scripts/i18n-expression-sweep.py` | Lists copy hiding inside a template expression, where a text sweep cannot see it |
+| `scripts/i18n-script-sweep.py` | Lists copy in a component's script block: navigation labels, failure fallbacks, toasts |
 
 English is both source and fallback, so a half-translated brand reads in
 English rather than showing raw keys. That matters: a missing translation must
@@ -159,6 +160,26 @@ carrying copy and merges from `main` stop conflicting on it.
   fails on these, and `scripts/i18n-expression-sweep.py` lists them. It knows
   the difference between copy and a Tailwind class list, an icon class, a date
   format, an enum and a value being compared against.
+
+## The four places copy hides
+
+Each needed its own tool, because each is invisible to the one before:
+
+1. **A text node or a known attribute.** `scripts/i18n-extract.py`.
+2. **A sentence the markup split** around a link or a bold value.
+   `scripts/i18n-compose.py`, rendered with `<i18n-t>`.
+3. **A literal inside a template expression**, `{{ ok ? 'Yes' : 'No' }}`.
+   `scripts/i18n-expression-sweep.py`.
+4. **A literal in the script block**, rendered as data: the navigation labels,
+   the failure fallbacks, a template literal with a value in it.
+   `scripts/i18n-script-sweep.py`.
+
+The catalogue guard covers all four. Each sweep knows what is not copy: a
+Tailwind class list, an icon class, a date format, a media query, an enum, a
+slug, an event name, a compound written as one word, a developer log line, a
+value being compared against, a string being concatenated, and a default inside
+`defineProps`, which cannot call `t()` because Vue hoists it above `setup()`.
+Every one of those rules was paid for by a mistake this migration made.
 
 ## Where the migration stands
 

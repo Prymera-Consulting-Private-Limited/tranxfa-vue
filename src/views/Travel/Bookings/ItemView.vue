@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from 'vue';
 import moment from 'moment';
 import CustomerLayout from '@/components/CustomerLayout.vue';
@@ -115,13 +119,13 @@ async function load({quiet = false} = {}) {
   await getOrder(props.orderId).then((response) => {
     order.value = Order.getInstance(response.data);
   }).catch((error) => {
-    reportUnexpectedError(error, 'travel booking');
+    reportUnexpectedError(error, t('travel.travelBooking'));
 
     // A booking that is not this customer's answers 404 rather than 403, and so
     // does a deployment without the travel licence.
     hasFailed.value = true;
     failureMessage.value = getCustomerMessage(error)
-        ?? (error.response?.status === 404 ? "We couldn't find this booking." : null);
+        ?? (error.response?.status === 404 ? t('travel.weCouldntFindThis') : null);
   }).finally(() => {
     isLoading.value = false;
     schedulePoll();
@@ -147,8 +151,8 @@ async function cancel() {
     // answer about this booking rather than a failure of the request.
     cancelError.value = getCustomerMessage(error)
         ?? (error.response?.status === 409
-            ? 'This booking can no longer be cancelled.'
-            : 'We could not ask the hotel to cancel this. Please try again in a moment.');
+            ? t('travel.thisBookingCanNo')
+            : t('travel.weCouldNotAsk'));
   }).finally(() => {
     isCancelling.value = false;
   });

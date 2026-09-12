@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
@@ -45,7 +49,7 @@ async function authenticate() {
       router.push({name: 'onboardingWorkflow', query: onward()});
     } else {
       logRequestFailure(e, 'mfa');
-      otpError.value = failureMessage(e, "We couldn't check that code. Please try again.");
+      otpError.value = failureMessage(e, t('onboarding.weCouldntCheckThat'));
     }
   }).finally(() => {
     isLoading.value = false;
@@ -63,14 +67,14 @@ async function resend() {
   resentMessage.value = '';
   resendFailure.value = '';
   customerUtils.resendMfaOtp().then(() => {
-    resentMessage.value = "We've sent a new code. It can take a minute to arrive.";
+    resentMessage.value = t('onboarding.weveSentANew3');
   }).catch(async (e) => {
     if (e.response?.status === 403) {
       await customerUtils.refresh();
       return;
     }
     logRequestFailure(e, 'resend-mfa-code');
-    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
+    resendFailure.value = failureMessage(e, t('onboarding.weCouldntSendA'));
   }).finally(() => {
     isResendingOtp.value = false;
   });
@@ -87,7 +91,7 @@ onMounted(async () => {
   if (isSessionReverify) {
     customerUtils.resendMfaOtp().catch((e) => {
       logRequestFailure(e, 'mfa-reverify-code');
-      resendFailure.value = failureMessage(e, "We couldn't send a new code. Use Resend code below.");
+      resendFailure.value = failureMessage(e, t('onboarding.weCouldntSendA2'));
     });
   }
   await startResendOtpTimer();

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {MAX_UPLOAD_MB} from "@/composables/upload_rules.js";
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
@@ -64,7 +68,7 @@ async function save() {
     emit('sdkApplicantStatusChanged', response.data);
   }).catch((e) => {
     logRequestFailure(e, 'upload-document');
-    saveFailure.value = failureMessage(e, "We couldn't attach these photos to your account. They are still here, so please try again.");
+    saveFailure.value = failureMessage(e, t('verification.weCouldntAttachThese2'));
   }).finally(() => {
     isSaving.value = false;
   });

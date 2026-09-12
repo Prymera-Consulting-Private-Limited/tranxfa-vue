@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import en from '@/locales/en.json';
 import {readFileSync} from 'node:fs';
 
 // The 2026-09 feedback audit: resends said nothing on success. These guards
@@ -18,7 +19,12 @@ describe('resend says the code was sent', () => {
   for (const f of screens) {
     it(`${f} confirms and reports failure`, () => {
       const s = read(f);
-      expect(s).toMatch(/resentMessage\.value = ["`]We've sent a new code/);
+      // Each screen sends the code a different way, so the sentence differs;
+      // what this guards is that every one of them says a new code went out.
+      const key = s.match(/resentMessage\.value = t\('([\w.]+)'/)?.[1];
+      expect(key, `${f} does not set a resent message from the catalogue`).toBeTruthy();
+      const message = key.split('.').reduce((node, part) => node?.[part], en);
+      expect(message, key).toMatch(/^We've sent a new code/);
       expect(s).toMatch(/v-if="resentMessage" role="status"/);
       expect(s).toMatch(/resendFailure|resendError/);
     });
@@ -33,7 +39,8 @@ describe('uploads say what went wrong', () => {
   it('multi-file rows carry a reason and a retry', () => {
     const s = read('src/components/AccountVerification/MultiFileUpload.vue');
     expect(s).toContain('const uploadFile = async (fileObj) => {');
-    expect(s).toContain("fileObj.reason = failureMessage(e, \"We couldn't prepare this file for upload.\");");
+    expect(s).toContain("failureMessage(e, t('verification.weCouldntPrepareThis'))");
+    expect(en.verification.weCouldntPrepareThis).toBe("We couldn't prepare this file for upload.");
     expect(s).toContain('@click="uploadFile(file)"');
     expect(s).toContain('{{ file.name }}: {{ file.reason }}');
     expect(s).toContain('<InlineFailure :message="saveFailure" />');
@@ -72,6 +79,7 @@ describe('the redirect providers', () => {
 
 describe('small confirmations', () => {
   it('the rejected-document toast says what to do next', () => {
-    expect(read('src/components/CustomerLayout.vue')).toContain('Open Account verification to see why and upload it again.');
+    expect(read('src/components/CustomerLayout.vue')).toContain("account.weCouldntAcceptYour");
+    expect(en.account.weCouldntAcceptYour).toContain('Open Account verification to see why and upload it again.');
   });
 });

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ClipboardIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
@@ -98,7 +102,7 @@ async function fetchInstructions() {
     }
   }).catch((e) => {
     generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
-    generalError.value = e.response?.data?.message ?? 'We were unable to load your deposit details. Please try again.';
+    generalError.value = e.response?.data?.message ?? t('wallet.weWereUnableTo2');
   });
 }
 
@@ -121,7 +125,7 @@ async function declare() {
       amountErrors.value = e.response.data.errors?.amount ?? [e.response.data.message];
     } else {
       generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
-      generalError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+      generalError.value = e.response?.data?.message ?? t('account.somethingWentWrongPlease');
     }
   }).finally(() => {
     isSubmitting.value = false;

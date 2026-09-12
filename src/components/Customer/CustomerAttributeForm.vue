@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import FormGroup from "@/components/CustomerAttribute/FormGroup.vue";
@@ -74,7 +78,7 @@ async function update() {
       form.errors = e.response.data.errors;
     } else {
       logRequestFailure(e, 'customer-attributes');
-      saveFailure.value = failureMessage(e, "We couldn't save your details. Please try again.");
+      saveFailure.value = failureMessage(e, t('onboarding.weCouldntSaveYour'));
     }
     emit('customer:attribute_category:update_failed', e);
   }).finally(() => {

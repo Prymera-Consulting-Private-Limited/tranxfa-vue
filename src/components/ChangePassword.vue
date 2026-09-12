@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import InlineFailure from "@/components/InlineFailure.vue";
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
@@ -94,7 +98,7 @@ const changePassword = async () => {
       }
     } else {
       logRequestFailure(error, 'change-password');
-      changeFailure.value = failureMessage(error, "We couldn't change your password. Your old password still works. Please try again.");
+      changeFailure.value = failureMessage(error, t('account.weCouldntChangeYour'));
     }
   }).finally(() => {
     isSaving.value = false;

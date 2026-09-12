@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
@@ -17,9 +21,7 @@ const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
 const emit = defineEmits(['emailVerified']);
 
-/**
- * @type {{data: Customer | null}}
- */
+
 const customer = customerStore.customer;
 
 async function verifyEmailAddress() {
@@ -52,14 +54,14 @@ async function resend() {
   resentMessage.value = '';
   resendFailure.value = '';
   customerUtils.resendEmailVerification().then(() => {
-    resentMessage.value = `We've sent a new code to ${customer.data?.account?.email ?? 'your email'}. It can take a minute to arrive.`;
+    resentMessage.value = t('verification.weveSentANew4', {email: customer.data?.account?.email ?? t('common.yourEmail')});
   }).catch(async (e) => {
     if (e.response?.status === 403) {
       await customerUtils.refresh();
       return;
     }
     logRequestFailure(e, 'resend-email-code');
-    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
+    resendFailure.value = failureMessage(e, t('onboarding.weCouldntSendA'));
   }).finally(() => {
     isResendingToken.value = false;
   });

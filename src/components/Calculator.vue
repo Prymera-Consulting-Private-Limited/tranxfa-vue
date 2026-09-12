@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import {
@@ -170,7 +174,7 @@ async function getQuote() {
     } else {
       // Says something rather than leaving the last good quote on screen
       // looking current.
-      quoteFailureReason.value = 'We could not price this transfer just now. Please check your connection and try again.';
+      quoteFailureReason.value = t('calculator.weCouldNotPrice');
       console.error(e);
     }
   }).finally(() => {
@@ -272,7 +276,7 @@ async function saveQuote() {
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
     }).catch((e) => {
       isSavingQuote.value = false;
-      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
+      saveFailure.value = failureMessage(e, t('calculator.weCouldntStartYour'));
     });
   } else {
     quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
@@ -280,7 +284,7 @@ async function saveQuote() {
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
     }).catch((e) => {
       isSavingQuote.value = false;
-      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
+      saveFailure.value = failureMessage(e, t('calculator.weCouldntStartYour'));
     });
   }
 

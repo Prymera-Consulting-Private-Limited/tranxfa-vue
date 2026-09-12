@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {useCustomerStore} from "@/stores/customer.js";
 import KycDocumentStatus from "@/enums/kyc_document_status.js";
 import {fixForError} from "@/composables/verification_routes.js";
@@ -63,7 +67,7 @@ async function openAccountVerificationModal () {
  */
 function sdkFailed(error) {
   sdkErrorMessage.value = getCustomerMessage(error)
-      || 'We could not start your verification. Please try again.';
+      || t('verification.weCouldNotStart');
   // The token endpoint answers 412 when the profile is missing something the
   // check needs (identity details, an address). That is not a retry.
   sdkFix.value = fixForError(error, router.currentRoute?.value?.fullPath ?? null);

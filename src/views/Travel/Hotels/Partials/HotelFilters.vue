@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, ref} from 'vue';
 import {formatMoney, getFilters, hasFilters} from "@/composables/travel/hotels/hotel_utils.js";
 import {AdjustmentsHorizontalIcon} from "@heroicons/vue/24/outline";
@@ -77,8 +81,8 @@ function toggle(key, value) {
 }
 
 const PHOTO_OPTIONS = [
-  {value: 'with', label: 'With photos'},
-  {value: 'without', label: 'No photos'},
+  {value: 'with', label: t('travel.withPhotos')},
+  {value: 'without', label: t('travel.noPhotos')},
 ];
 
 // Picking the option that is already on means no preference either way.

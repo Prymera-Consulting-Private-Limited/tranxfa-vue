@@ -202,7 +202,7 @@ const passwordRequirementsSummary = computed(() => {
   if (allPasswordRulesMet.value) {
     return 'All requirements met';
   }
-  return `${unmetPasswordRulesCount.value} of ${totalPasswordRulesCount.value} not met`;
+  return t('onboarding.unmetpasswordrulescountOfTotalpasswordrulescountNot2', {unmetPasswordRulesCount: unmetPasswordRulesCount.value, totalPasswordRulesCount: totalPasswordRulesCount.value});
 });
 
 const passwordRequirementsHeaderClass = computed(() => {

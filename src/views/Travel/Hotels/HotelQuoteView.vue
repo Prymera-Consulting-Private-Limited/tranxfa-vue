@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from 'vue';
 import moment from 'moment';
 import {useRouter} from 'vue-router';
@@ -92,7 +96,7 @@ async function load() {
   await getQuote(props.quoteId).then((response) => {
     quote.value = TravelQuote.getInstance(response.data);
   }).catch((error) => {
-    reportUnexpectedError(error, 'travel quote');
+    reportUnexpectedError(error, t('travel.travelQuote'));
     quote.value = null;
     hasExpired.value = error.response?.status === 410;
     hasFailed.value = !hasExpired.value;
@@ -146,7 +150,7 @@ async function book(payload) {
       bookingValidation.value = error.response?.data?.errors ?? null;
       bookingError.value = getCustomerMessage(error);
     } else {
-      bookingError.value = getCustomerMessage(error) ?? 'We could not book this room. Please try again in a moment.';
+      bookingError.value = getCustomerMessage(error) ?? t('travel.weCouldNotBook');
     }
 
     isBooking.value = false;

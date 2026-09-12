@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import BrandLogo from "@/components/BrandLogo.vue";
@@ -51,7 +55,7 @@ function loadOptions() {
     occupations.value = response.data.map((o) => Occupation.getInstance(o));
   }).catch((e) => {
     logRequestFailure(e, 'occupations');
-    loadFailure.value = failureMessage(e, "We couldn't load the list of occupations.");
+    loadFailure.value = failureMessage(e, t('onboarding.weCouldntLoadThe'));
   }).finally(() => {
     isOccupationsLoading.value = false;
   });
@@ -66,7 +70,7 @@ function loadOptions() {
     }
   }).catch((e) => {
     logRequestFailure(e, 'salary-ranges');
-    loadFailure.value = loadFailure.value ?? failureMessage(e, "We couldn't load the salary ranges.");
+    loadFailure.value = loadFailure.value ?? failureMessage(e, t('onboarding.weCouldntLoadThe2'));
   }).finally(() => {
     isSalaryRangesLoading.value = false;
   })

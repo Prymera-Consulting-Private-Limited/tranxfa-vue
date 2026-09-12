@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import CustomerLayout from '@/components/CustomerLayout.vue';
@@ -46,7 +50,7 @@ const failureTitle = computed(() => {
     return "We couldn't load this page";
   }
 
-  return orderFailed.value ? "We couldn't load your booking" : "We couldn't load your payment options";
+  return orderFailed.value ? t('travel.weCouldntLoadYour5') : t('travel.weCouldntLoadYour4');
 });
 
 const selectedMethod = ref(null);
@@ -81,7 +85,7 @@ async function load() {
     getOrder(props.orderId).then((response) => {
       order.value = Order.getInstance(response.data);
     }).catch((error) => {
-      reportUnexpectedError(error, 'travel payment: order');
+      reportUnexpectedError(error, t('travel.travelPaymentOrder'));
       orderFailed.value = true;
       failureMessage.value = getCustomerMessage(error) ?? failureMessage.value;
     }),
@@ -91,7 +95,7 @@ async function load() {
       methods.value = (response.data.data ?? response.data.payment_methods ?? response.data ?? [])
           .map(method => PaymentMethod.getInstance(method));
     }).catch((error) => {
-      reportUnexpectedError(error, 'travel payment: methods');
+      reportUnexpectedError(error, t('travel.travelPaymentMethods'));
       methodsFailed.value = true;
       failureMessage.value = getCustomerMessage(error) ?? failureMessage.value;
     }),
@@ -150,7 +154,7 @@ async function pay() {
     // at least tells them the truth about where the payment got to.
     router.push({name: 'travelPaymentStatus', params: {id: props.orderId}});
   }).catch((error) => {
-    paymentError.value = getCustomerMessage(error) ?? 'We could not start this payment. Please try again in a moment.';
+    paymentError.value = getCustomerMessage(error) ?? t('travel.weCouldNotStart2');
     isPaying.value = false;
   });
 }
@@ -172,7 +176,7 @@ function paymentInitiated() {
 function paymentFailed() {
   activePayment.value = null;
   isPaying.value = false;
-  paymentError.value = 'We could not open your bank list. Please try again in a moment.';
+  paymentError.value = t('travel.weCouldNotOpen');
 }
 
 watch(() => props.orderId, load, {immediate: true});

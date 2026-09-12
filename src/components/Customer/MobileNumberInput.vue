@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import BrandLogo from "@/components/BrandLogo.vue";
@@ -54,7 +58,7 @@ async function updateMobileNumber() {
       errors.value = e.response.data.errors;
     } else {
       logRequestFailure(e, 'mobile-number');
-      saveFailure.value = failureMessage(e, "We couldn't save your mobile number. Please try again.");
+      saveFailure.value = failureMessage(e, t('onboarding.weCouldntSaveYour3'));
     }
     isSaving.value = false;
   }

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -29,7 +33,7 @@ async function getTransactions(page = null) {
     data.value = response.data;
   }).catch((e) => {
     logRequestFailure(e, 'transactions');
-    loadFailure.value = failureMessage(e, "We couldn't load your transfers.");
+    loadFailure.value = failureMessage(e, t('account.weCouldntLoadYour2'));
   }).finally(() => {
     isLoading.value = false;
   });

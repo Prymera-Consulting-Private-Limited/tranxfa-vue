@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, ref, watch} from 'vue';
 import {RouterLink, useRoute, useRouter} from 'vue-router';
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -112,7 +116,7 @@ async function holdPrice() {
       // rather than left showing a room that cannot be had.
       getHotelDetails({quiet: true});
     } else {
-      holdFailureMessage.value = getCustomerMessage(error) ?? 'We could not hold this price. Please try again in a moment.';
+      holdFailureMessage.value = getCustomerMessage(error) ?? t('travel.weCouldNotHold');
     }
 
     isHolding.value = false;
@@ -140,7 +144,7 @@ async function getHotelDetails({quiet = false} = {}) {
   if (!searchId.value) {
     hotel.value = null;
     hasFailed.value = true;
-    failureMessage.value = 'These results are out of date. Search again to see current prices.';
+    failureMessage.value = t('travel.theseResultsAreOut');
 
     return;
   }
@@ -166,7 +170,7 @@ async function getHotelDetails({quiet = false} = {}) {
       selectedRate.value = getCheapestRate(rates.value);
     }
   }).catch((error) => {
-    reportUnexpectedError(error, 'travel hotel');
+    reportUnexpectedError(error, t('travel.travelHotel'));
     hotel.value = null;
     rates.value = [];
     hasFailed.value = true;
