@@ -75,7 +75,7 @@ const stay = computed(() => {
     return null;
   }
 
-  return `${moment(quote.value.checkIn).format('ddd D MMM')} – ${moment(quote.value.checkOut).format('ddd D MMM YYYY')}`;
+  return `${moment(quote.value.checkIn).format('ddd D MMM')} – ${moment(quote.value.checkOut).format('llll')}`;
 });
 
 const guests = computed(() => (quote.value ? getGuestBreakdown(quote.value.rooms) : []));

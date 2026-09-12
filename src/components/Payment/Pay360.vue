@@ -69,7 +69,7 @@ const expiresIn = computed(() => {
 });
 
 const expiresAtFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('MMM D, YYYY h:mm A') : '';
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
 });
 
 // PENDING alone is not payable — the hosted payment URL can arrive later than

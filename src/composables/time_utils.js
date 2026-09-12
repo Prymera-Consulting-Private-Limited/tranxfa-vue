@@ -18,11 +18,11 @@ export function useTimeUtils()
             const hours = moment().diff(instance, 'hour');
             return t('common.hoursHoursAgo', {hours: hours});
         } else if (instance.isAfter(moment().subtract(1, 'day'))) {
-            return instance.format('h:mm A');
+            return instance.format('LT');
         } else if (instance.isAfter(moment().subtract(1, 'week'))) {
             return instance.format('dddd');
         } else {
-            return instance.format('MMM D, YYYY');
+            return instance.format('ll');
         }
     }
 

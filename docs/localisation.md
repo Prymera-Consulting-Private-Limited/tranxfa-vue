@@ -135,6 +135,23 @@ carrying copy and merges from `main` stop conflicting on it.
 - **Dates and numbers are not strings** and never appear in a sweep. They
   follow the locale set in `src/main.js`. A brand that forgets this renders
   "Thursday" beside its own language.
+- **A spelled-out date format is a decision that belongs to the language.**
+  `MMM D, YYYY h:mm A` gives "septiembre 12, 2026 02:39 AM": the month
+  translates, the order and the clock do not. Ask by meaning instead, with the
+  formats each locale defines for itself, and Spanish reads "12 de septiembre
+  de 2026, 2:39".
+
+  | Ask for | English | Spanish |
+  | --- | --- | --- |
+  | `ll` | Sep 12, 2026 | 12 de sep. de 2026 |
+  | `lll` | Sep 12, 2026 2:39 AM | 12 de sep. de 2026 2:39 |
+  | `LLL` | September 12, 2026 2:39 AM | 12 de septiembre de 2026 2:39 |
+  | `LT` | 2:39 AM | 2:39 |
+
+  `scripts/i18n-date-formats.py` does the swap and lists what it kept. A format
+  sent to an API, such as `YYYY-MM-DD`, is not display and stays. A day and
+  month without a year has no localised equivalent, so those stay too and are
+  the ones to look at if a language needs a different order.
 - **Text the back office sends** (transfer statuses, document categories,
   purposes, relationships) is not in the catalogue and cannot be. It is
   translated in the console, by whoever owns that environment.

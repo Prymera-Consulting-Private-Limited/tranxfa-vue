@@ -15,7 +15,7 @@ const {status, start} = useServiceStatus();
 
 onMounted(start);
 
-const when = (iso) => (iso ? moment(iso).format('ddd D MMM, h:mm A') : null);
+const when = (iso) => (iso ? moment(iso).format('llll') : null);
 
 const active = computed(() => status.activeWindow);
 const upcoming = computed(() => status.upcomingWindow);
