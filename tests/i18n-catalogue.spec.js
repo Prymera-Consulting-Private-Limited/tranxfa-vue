@@ -15,6 +15,12 @@ const MIGRATED = [
   'src/views/SignInView.vue',
   'src/views/ForgotPasswordView.vue',
   'src/views/ResetPasswordView.vue',
+  // slice 2, the money path
+  'src/components/Calculator.vue',
+  'src/components/Payment/BelmoneyCard.vue',
+  'src/views/Transfer/IndexView.vue',
+  'src/views/Transfer/PaymentView.vue',
+  'src/views/Transfer/PaymentCallbackView.vue',
 ];
 
 const flatten = (node, prefix = '') =>

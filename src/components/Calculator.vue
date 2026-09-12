@@ -295,7 +295,7 @@ async function saveQuote() {
       </div>
       <div class="mt-3">
         <div class="text-sm/6 text-danger-700">
-          <p>{{ quoteFailureReason }}</p>
+          <p>{{ $t('calculator.quotefailurereason', {quoteFailureReason: quoteFailureReason}) }}</p>
         </div>
       </div>
     </div>
@@ -314,7 +314,7 @@ async function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <PaperAirplaneIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="send-money-input" class="block text-sm/6 font-medium ml-2  tracking-wider">You send</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="send-money-input" class="block text-sm/6 font-medium ml-2  tracking-wider">{{ $t('calculator.youSend') }}</label>
                     </div>
                     <div class="mt-2">
                       <MoneyInput
@@ -350,11 +350,11 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm/6 text-gray-900 font-semibold tracking-wider">{{ quoteUtil.quote.data?.exchangeRateFormatted }}</p>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 text-gray-900 font-semibold tracking-wider">{{ $t('calculator.exchangerateformatted', {exchangeRateFormatted: quoteUtil.quote.data?.exchangeRateFormatted}) }}</p>
                   <p v-else class="text-sm/6 bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm/6 whitespace-nowrap font-semibold tracking-wider">
-                  <span>Our Rate</span>
+                  <span>{{ $t('calculator.ourRate') }}</span>
                 </div>
               </div>
             </div>
@@ -372,13 +372,13 @@ async function saveQuote() {
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
                   <p v-if="! isFetchingQuote" class="text-sm/6 tracking-wider">
-                    <span class="text-success-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Zero</span>
-                    <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
+                    <span class="text-success-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">{{ $t('calculator.zero') }}</span>
+                    <span class="text-gray-700 font-semibold" v-else>{{ $t('calculator.basefeescurrencyprefixed', {baseFeesCurrencyPrefixed: quoteUtil.quote.data.baseFeesCurrencyPrefixed}) }}</span>
                   </p>
                   <p v-else class="text-sm/6 bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm/6 whitespace-nowrap font-semibold tracking-wider">
-                  <span>Fees</span>
+                  <span>{{ $t('calculator.fees') }}</span>
                 </div>
               </div>
             </div>
@@ -395,7 +395,7 @@ async function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <UserIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.wholeName || 'Recipient' }} Gets</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ $t('calculator.recipientGets', {Recipient: recipient?.wholeName || 'Recipient'}) }}</label>
                     </div>
                     <div class="mt-4">
                       <MoneyInput
@@ -430,20 +430,20 @@ async function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <TruckIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="price" class="block text-sm/6 font-medium ml-2 tracking-wider">Delivery Method</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="price" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ $t('calculator.deliveryMethod') }}</label>
                     </div>
                     <div class="mt-4">
                       <Listbox v-if="! isFetchingQuote" as="div" v-model="selectedPayoutMethod">
-                        <ListboxLabel class="sr-only">Select or Change Delivery Method</ListboxLabel>
+                        <ListboxLabel class="sr-only">{{ $t('calculator.selectOrChangeDeliveryMethod') }}</ListboxLabel>
                         <div class="relative">
                           <div  class="flex divide-x divide-brand-700 rounded-md outline-2 outline-brand-700 bg-white w-full">
                             <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
                               <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
                                 <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
+                                <p class="text-sm/6 font-semibold ml-2">{{ $t('calculator.select', {Select: selectedPayoutMethod?.title || 'Please Select'}) }}</p>
                               </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
-                                <span class="sr-only">Select or Change Delivery Method</span>
+                                <span class="sr-only">{{ $t('calculator.selectOrChangeDeliveryMethod') }}</span>
                                 <ChevronDownIcon class="size-5 text-brand-700 forced-colors:text-[Highlight]" aria-hidden="true" />
                               </template>
                             </ListboxButton>
@@ -455,12 +455,12 @@ async function saveQuote() {
                                 <li :class="[active ? 'bg-brand-700 text-white' : 'text-gray-900', 'cursor-default p-4 text-sm/6 select-none']">
                                   <div class="flex flex-col">
                                     <div class="flex justify-between">
-                                      <p :class="selectedPayoutMethod?.id === payoutMethod.id ? 'font-semibold' : 'font-normal'">{{ payoutMethod.title }}</p>
+                                      <p :class="selectedPayoutMethod?.id === payoutMethod.id ? 'font-semibold' : 'font-normal'">{{ $t('calculator.title', {title: payoutMethod.title}) }}</p>
                                       <span v-if="selectedPayoutMethod?.id === payoutMethod.id" :class="active ? 'text-white' : 'text-brand-700'">
                                       <CheckIcon class="size-5" aria-hidden="true" />
                                     </span>
                                     </div>
-                                    <p v-if="payoutMethod.description" :class="[active ? 'text-brand-200' : 'text-gray-500', 'mt-2']">{{ payoutMethod.description }}</p>
+                                    <p v-if="payoutMethod.description" :class="[active ? 'text-brand-200' : 'text-gray-500', 'mt-2']">{{ $t('calculator.description', {description: payoutMethod.description}) }}</p>
                                   </div>
                                 </li>
                               </ListboxOption>
@@ -487,7 +487,7 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-xs/5 text-gray-900 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.instructions }}</p>
+                  <p v-if="! isFetchingQuote" class="text-xs/5 text-gray-900 tracking-wider">{{ $t('calculator.instructions', {instructions: quoteUtil.quote?.data?.payoutMethod?.instructions}) }}</p>
                   <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
@@ -505,7 +505,7 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-0.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-xs/5 text-success-700 tracking-wider">{{ quoteUtil.quote?.data?.payoutMethod?.promo }}</p>
+                  <p v-if="! isFetchingQuote" class="text-xs/5 text-success-700 tracking-wider">{{ $t('calculator.promo', {promo: quoteUtil.quote?.data?.payoutMethod?.promo}) }}</p>
                   <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
@@ -524,7 +524,7 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm/6 text-brand-700 font-semibold tracking-wider">Fast, Secure Transfers</p>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 text-brand-700 font-semibold tracking-wider">{{ $t('calculator.fastSecureTransfers') }}</p>
                   <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
@@ -541,7 +541,7 @@ async function saveQuote() {
               </div>
               <div class="ml-3">
                 <div class="text-sm/6 text-warning-700">
-                  <p>{{ quoteUtil.quote?.data?.transferDisableReason }}</p>
+                  <p>{{ $t('calculator.transferdisablereason', {transferDisableReason: quoteUtil.quote?.data?.transferDisableReason}) }}</p>
                 </div>
               </div>
             </div>
@@ -549,12 +549,8 @@ async function saveQuote() {
         </template>
         <button v-else :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-xl bg-brand-700 px-3.5 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
           <template v-if="isSavingQuote">
-            <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
-            Saving ...
-          </template>
-          <template v-else>
-            Send Money
-            <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
+            <Spinner class="-ml-0.5 size-5" aria-hidden="true" />{{ $t('calculator.saving') }}</template>
+          <template v-else>{{ $t('calculator.sendMoney') }}<ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
           </template>
         </button>
         <InlineFailure :message="saveFailure" />
@@ -565,15 +561,15 @@ async function saveQuote() {
             <ExclamationTriangleIcon class="size-5 mt-0.5 text-warning-400" aria-hidden="true" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm/6 font-medium text-warning-800">Your ability to send money is temporarily restricted.</h3>
+            <h3 class="text-sm/6 font-medium text-warning-800">{{ $t('calculator.yourAbilityToSendMoney') }}</h3>
             <div class="mt-2 text-sm/6 text-warning-700">
-              <p>Please reach out to our customer support team for assistance or to understand the reason behind this restriction.</p>
+              <p>{{ $t('calculator.pleaseReachOutToOur') }}</p>
             </div>
           </div>
         </div>
       </div>
     </form>
-    <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">KYC verification</router-link> is required before you can send money. This is a one-time process to ensure your account and transactions are secure.</p>
+    <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">{{ $t('calculator.kycVerification') }}</router-link>{{ $t('calculator.isRequiredBeforeYouCan') }}</p>
   </template>
 </template>
 
