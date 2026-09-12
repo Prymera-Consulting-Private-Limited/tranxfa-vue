@@ -397,21 +397,21 @@ function viewHotel(hotel) {
         <div class="mt-8 sm:flex sm:items-end sm:justify-between sm:gap-4">
           <div>
             <h2 class="text-base font-semibold text-gray-900">
-              <template v-if="!hasDestination">Where do you want to stay?</template>
-              <template v-else-if="isLoading">Searching for hotels…</template>
+              <template v-if="!hasDestination">{{ $t('travel.whereDoYouWantTo') }}</template>
+              <template v-else-if="isLoading">{{ $t('travel.searchingForHotels') }}</template>
               <template v-else-if="filteredResults.length">{{ filteredResults.length }} hotel{{ filteredResults.length === 1 ? '' : 's' }} available<template v-if="region"> in {{ region }}</template></template>
-              <template v-else>No results</template>
+              <template v-else>{{ $t('travel.noResults') }}</template>
             </h2>
             <p class="mt-1 text-sm/6 text-gray-500">
-              <template v-if="!hasDestination">Pick a destination, your dates and who is travelling to see live prices.</template>
-              <template v-else-if="isFiltered">Filtered from {{ results.length }} hotel{{ results.length === 1 ? '' : 's' }} the supplier had for your dates.</template>
+              <template v-if="!hasDestination">{{ $t('travel.pickADestinationYourDates') }}</template>
+              <template v-else-if="isFiltered">{{ $t('travel.filteredFromLengthHotelS', {length: results.length, s: results.length === 1 ? '' : 's'}) }}</template>
               <!-- The count above is what we could price, which is not always
               what the supplier had. Deliberately silent on why the two differ:
               total_hotels has been described both as the destination's own count
               and as the supplier's count before our filtering, and the wording
               would have to change to suit whichever it turns out to be. -->
-              <template v-else-if="isCapped">Showing {{ results.length }} of the {{ totalHotelsLabel }} hotels the supplier had for your dates.</template>
-              <template v-else>Prices shown are the lowest available for your dates, for the whole stay.</template>
+              <template v-else-if="isCapped">{{ $t('travel.showingLengthOfTheTotalhotelslabel', {length: results.length, totalHotelsLabel: totalHotelsLabel}) }}</template>
+              <template v-else>{{ $t('travel.pricesShownAreTheLowest') }}</template>
             </p>
           </div>
           <HotelSort v-if="showFilters" :model-value="sort" @update:model-value="updateSort" class="mt-3 sm:mt-0" />
@@ -432,7 +432,7 @@ function viewHotel(hotel) {
             <!-- Nothing searched yet -->
             <EmptyHotels
                 v-if="!hasDestination"
-                title="Start with a destination"
+                :title="$t('travel.startWithADestination')"
                 description="Search for a city above and we'll price every available hotel for your stay."
             />
             <!-- Loading -->
@@ -444,16 +444,16 @@ function viewHotel(hotel) {
               <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
                 <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
               </div>
-              <h3 class="mt-6 text-base font-semibold text-gray-900">We couldn't load hotels</h3>
+              <h3 class="mt-6 text-base font-semibold text-gray-900">{{ $t('travel.weCouldntLoadHotels') }}</h3>
               <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
-              <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong while contacting our travel partner. Please try your search again in a moment.</p>
+              <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('travel.somethingWentWrongWhileContacting2') }}</p>
             </div>
             <!-- Empty -->
             <EmptyHotels v-else-if="results.length === 0" />
             <!-- Filtered out -->
             <EmptyHotels
                 v-else-if="filteredResults.length === 0"
-                title="No hotels match your filters"
+                :title="$t('travel.noHotelsMatchYourFilters')"
                 description="Try clearing a filter or raising the price limit to see more of this destination."
             />
             <!-- Results -->

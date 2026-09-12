@@ -212,20 +212,20 @@ function providerName(method) {
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">{{ failureTitle }}</h1>
           <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
-          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong on our side. Your room is still booked — please try again in a moment.</p>
+          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('travel.somethingWentWrongOnOur2') }}</p>
           <button
               type="button"
               @click="load"
               class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
-          >Try again</button>
+          >{{ $t('common.tryAgain') }}</button>
         </div>
         <template v-else-if="order">
           <!-- The room is booked; this is only about paying for it. -->
           <div class="flex items-start gap-3 rounded-2xl border border-success-200 bg-success-50 px-5 py-4">
             <CheckCircleIcon class="mt-0.5 size-5 shrink-0 text-success-600" aria-hidden="true" />
             <div>
-              <p class="text-sm/6 font-medium text-success-900">Your room is booked</p>
-              <p class="mt-0.5 text-sm/6 text-success-800">{{ order.hotel?.name }} — pay now to confirm it with the hotel.</p>
+              <p class="text-sm/6 font-medium text-success-900">{{ $t('travel.yourRoomIsBooked') }}</p>
+              <p class="mt-0.5 text-sm/6 text-success-800">{{ $t('travel.namePayNowToConfirm', {name: order.hotel?.name}) }}</p>
             </div>
           </div>
           <!-- Volume builds its bank picker in the page rather than sending the
@@ -240,7 +240,7 @@ function providerName(method) {
           />
           <section v-else class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
             <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-gray-100 px-5 py-4">
-              <h1 class="text-sm/6 font-semibold text-gray-900">How would you like to pay?</h1>
+              <h1 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.howWouldYouLikeTo') }}</h1>
               <p class="text-base font-semibold text-gray-900 tabular-nums">{{ order.total.currencyPrefixed }}</p>
             </header>
             <div v-if="hasMethods" class="divide-y divide-gray-100">
@@ -271,9 +271,7 @@ function providerName(method) {
             <!-- Cash at a branch and manual bank transfer are refused for travel:
             they are closed by a person rather than a timer, and a payment that
             never times out outlives the room it is holding. -->
-            <p v-else class="px-5 py-8 text-center text-sm/6 text-gray-500">
-              There are no payment methods available for this booking. Please get in touch and we'll sort it out.
-            </p>
+            <p v-else class="px-5 py-8 text-center text-sm/6 text-gray-500">{{ $t('travel.thereAreNoPaymentMethods') }}</p>
             <div v-if="hasMethods" class="border-t border-gray-100 px-5 py-5">
               <div v-if="paymentError" class="mb-3 flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700">
                 <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
@@ -288,13 +286,13 @@ function providerName(method) {
                 <Spinner v-if="isPaying" class="size-4" />
                 {{ isPaying ? 'Taking you to pay…' : `Pay ${order.total.currencyPrefixed}` }}
               </button>
-              <p class="mt-3 text-center text-xs/5 text-gray-500">You can close the payment page once it's done — we'll pick the result up either way.</p>
+              <p class="mt-3 text-center text-xs/5 text-gray-500">{{ $t('travel.youCanCloseThePayment') }}</p>
             </div>
           </section>
           <RouterLink
               :to="{name: 'travelBooking', params: {id: orderId}}"
               class="mt-4 block text-center text-sm/6 font-medium text-gray-500 transition hover:text-gray-900"
-          >View this booking</RouterLink>
+          >{{ $t('travel.viewThisBooking') }}</RouterLink>
         </template>
       </div>
     </main>

@@ -18,7 +18,7 @@ const emit = defineEmits([
 <template>
   <Menu as="div" class="relative shrink-0 text-left">
     <MenuButton class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm/6 font-medium text-gray-700 shadow-xs transition hover:border-gray-300 focus-visible:outline-0">
-      <span class="text-gray-500">Sort:</span>
+      <span class="text-gray-500">{{ $t('travel.sort') }}</span>
       {{ SORT_OPTIONS.find(option => option.value === modelValue)?.label }}
       <ChevronDownIcon class="size-4 text-gray-400" aria-hidden="true" />
     </MenuButton>

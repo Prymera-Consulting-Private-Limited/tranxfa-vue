@@ -133,48 +133,42 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div>
-      <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">Complete your Interac payment</h2>
-      <p class="text-sm/6 text-gray-600 mb-6 text-left">
-        Your transfer is awaiting payment. Please proceed by clicking the button below to securely complete your Interac e-Transfer.
-      </p>
+      <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">{{ $t('payment.provider.completeYourInteracPayment') }}</h2>
+      <p class="text-sm/6 text-gray-600 mb-6 text-left">{{ $t('payment.provider.yourTransferIsAwaitingPayment') }}</p>
       <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-success-700 text-white text-center py-3 rounded-md font-medium hover:bg-success-800 transition cursor-pointer text-sm/6 outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
-      <p class="text-sm/6 text-gray-600 mt-4 text-left">You will be redirected to the Interac platform to finalise your payment.</p>
+      <p class="text-sm/6 text-gray-600 mt-4 text-left">{{ $t('payment.provider.youWillBeRedirectedTo') }}</p>
     </div>
   </template>
 
   <template v-else-if="status === 'pending'">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait…</h2>
-    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
-    <p v-if="isSlow" role="status" class="mt-2 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
-      This is taking longer than usual. Nothing has been charged. You can keep waiting, or
-      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">go to your transfer</router-link>
-      and try the payment again later.
-    </p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.pleaseWait') }}</h2>
+    <p class="text-base text-gray-600 mb-6">{{ $t('payment.card.pleaseWaitWhileWeAre') }}</p>
+    <p v-if="isSlow" role="status" class="mt-2 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800"><i18n-t keypath="payment.provider.thisIsTakingLongerThan" scope="global"><template #value><router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">{{ $t('payment.card.goToYourTransfer') }}</router-link></template></i18n-t></p>
   </template>
 
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">We're watching for your payment</h2>
-    <p class="text-base/6 text-gray-600 mb-6">Once you've sent the Interac e-Transfer, click "I have made the payment" below to let us know. It usually takes <strong>up to 5 minutes</strong> for the payment to be confirmed.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.wereWatchingForYourPayment') }}</h2>
+    <p class="text-base/6 text-gray-600 mb-6"><i18n-t keypath="payment.provider.onceYouveSentTheInterac2" scope="global"><template #value><strong>{{ $t('payment.provider.upToMinutes') }}</strong></template></i18n-t></p>
     <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
-      <button @click="iHaveMadePayment" :disabled="isConfirmingPayment" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 cursor-pointer">I've made payment</button>
+      <button @click="iHaveMadePayment" :disabled="isConfirmingPayment" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 cursor-pointer">{{ $t('payment.provider.iveMadePayment') }}</button>
           <InlineFailure :message="confirmFailure" />
     </div>
   </template>
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment received</h2>
-    <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
+    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">{{ $t('transfer.payment.paymentReceived') }}</h2>
+    <p class="text-lg text-gray-600 mb-6">{{ $t('transfer.payment.yourPaymentHasBeenSuccessfully') }}</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-danger-600 mb-3 -mt-15">Payment failed</h2>
-    <p class="text-base text-danger-600 mb-5">Your payment could not be completed.</p>
+    <h2 class="text-2xl font-semibold text-danger-600 mb-3 -mt-15">{{ $t('transfer.payment.paymentFailed') }}</h2>
+    <p class="text-base text-danger-600 mb-5">{{ $t('payment.provider.yourPaymentCouldNotBe') }}</p>
     <template v-if="transaction.payment.paymentProvider.paymentDataAttributes?.length > 0">
-      <p class="text-sm/6 text-gray-600 mb-2 text-left">Please review or update the information below and double-check that everything is correct, then try again.</p>
+      <p class="text-sm/6 text-gray-600 mb-2 text-left">{{ $t('payment.provider.pleaseReviewOrUpdateThe') }}</p>
       <template v-for="attribute in transaction.payment.paymentProvider.paymentDataAttributes">
         <div class="mb-3 text-left">
           <label :class="[retryFormErrors[`${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" :for="`payment-data-${attribute.attribute}`" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
@@ -185,7 +179,7 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
         </div>
       </template>
     </template>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-700 text-white text-center py-3 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Try the payment again</button>
-    <p class="text-base text-danger-600 mt-5 text-sm/6">If the issue continues, please contact our support team. We'll be happy to help.</p>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 block w-full lg:px-8 bg-brand-700 text-white text-center py-3 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('transfer.payment.tryThePaymentAgain') }}</button>
+    <p class="text-base text-danger-600 mt-5 text-sm/6">{{ $t('payment.provider.ifTheIssueContinuesPlease') }}</p>
   </template>
 </template>

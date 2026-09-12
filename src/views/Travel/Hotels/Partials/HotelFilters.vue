@@ -110,16 +110,14 @@ function formatPrice(amount) {
         class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-xs transition hover:border-gray-300 lg:hidden"
     >
       <span class="flex items-center gap-2 text-sm/6 font-semibold text-gray-900">
-        <AdjustmentsHorizontalIcon class="size-5 text-gray-400" aria-hidden="true" />
-        Filters
-      </span>
+        <AdjustmentsHorizontalIcon class="size-5 text-gray-400" aria-hidden="true" />{{ $t('travel.filters') }}</span>
       <span class="text-xs/5 text-gray-500">{{ matchCount }} of {{ totalCount }}</span>
     </button>
     <div :class="[isOpen ? 'mt-3 block' : 'hidden', 'divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white shadow-xs lg:sticky lg:top-6 lg:mt-0 lg:block']">
       <!-- Heading -->
       <header class="flex items-baseline justify-between gap-3 px-4 py-3">
         <div>
-          <h3 class="text-sm/6 font-semibold text-gray-900">Filters</h3>
+          <h3 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.filters') }}</h3>
           <p class="mt-0.5 text-xs/5 text-gray-500">{{ matchCount }} of {{ totalCount }} hotel{{ totalCount === 1 ? '' : 's' }}</p>
         </div>
         <button
@@ -127,12 +125,12 @@ function formatPrice(amount) {
             type="button"
             @click="clear"
             class="cursor-pointer text-xs/5 font-medium text-brand-700 transition hover:text-brand-800"
-        >Clear all</button>
+        >{{ $t('travel.clearAll') }}</button>
       </header>
       <!-- Price -->
       <section v-if="hasPriceRange" class="px-4 py-3">
         <div class="flex items-baseline justify-between gap-2">
-          <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Total price</h4>
+          <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">{{ $t('travel.totalPrice') }}</h4>
           <p class="text-xs/5 font-medium text-gray-900">
             up to {{ facets.price.currency }} {{ formatPrice(maxPrice) }}
           </p>
@@ -144,7 +142,7 @@ function formatPrice(amount) {
             :value="maxPrice"
             @input="setMaxPrice($event.target.value)"
             class="mt-3 w-full cursor-pointer accent-brand-700"
-            aria-label="Maximum total price"
+            :aria-label="$t('travel.maximumTotalPrice')"
         />
         <div class="mt-1 flex justify-between text-xs/5 text-gray-500">
           <span>{{ formatPrice(facets.price.min) }}</span>
@@ -153,7 +151,7 @@ function formatPrice(amount) {
       </section>
       <!-- Star rating -->
       <section v-if="facets.stars.length" class="px-4 py-3">
-        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Star rating</h4>
+        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">{{ $t('travel.starRating') }}</h4>
         <div class="mt-2 space-y-1.5">
           <label v-for="star in facets.stars" :key="star.value" class="flex cursor-pointer items-center gap-2.5">
             <input
@@ -171,7 +169,7 @@ function formatPrice(amount) {
       </section>
       <!-- Photos, only worth offering when the results are mixed -->
       <section v-if="facets.photos.with > 0 && facets.photos.without > 0" class="px-4 py-3">
-        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Photos</h4>
+        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">{{ $t('travel.photos') }}</h4>
         <div class="mt-2 grid grid-cols-2 gap-2">
           <button
               v-for="option in PHOTO_OPTIONS"
@@ -192,7 +190,7 @@ function formatPrice(amount) {
       </section>
       <!-- Amenities -->
       <section v-if="facets.amenities.length" class="px-4 py-3">
-        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Amenities</h4>
+        <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">{{ $t('travel.amenities') }}</h4>
         <div class="mt-2 space-y-1.5">
           <label v-for="amenity in amenities" :key="amenity.value" class="flex cursor-pointer items-center gap-2.5">
             <input

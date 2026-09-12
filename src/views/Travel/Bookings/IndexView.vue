@@ -120,8 +120,8 @@ const isFiltered = computed(() => upcoming.value || state.value !== null);
         <!-- Heading -->
         <div class="pt-8 sm:flex sm:items-end sm:justify-between sm:gap-4">
           <div>
-            <h1 class="text-base font-semibold text-gray-900">Your bookings</h1>
-            <p class="mt-1 text-sm/6 text-gray-500">Every hotel stay you've booked with us, newest first.</p>
+            <h1 class="text-base font-semibold text-gray-900">{{ $t('travel.yourBookings') }}</h1>
+            <p class="mt-1 text-sm/6 text-gray-500">{{ $t('travel.everyHotelStayYouveBooked') }}</p>
           </div>
           <!-- Filters -->
           <div class="mt-4 flex flex-wrap items-center gap-2 sm:mt-0">
@@ -132,14 +132,14 @@ const isFiltered = computed(() => upcoming.value || state.value !== null);
                   upcoming ? 'border-brand-700 bg-brand-50 text-brand-800' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300',
                   'cursor-pointer rounded-xl border px-3 py-2 text-sm/6 font-medium transition focus-visible:outline-0',
                 ]"
-            >Upcoming only</button>
+            >{{ $t('travel.upcomingOnly') }}</button>
             <select
                 :value="state ?? ''"
                 @change="updateQuery({state: $event.target.value || undefined})"
                 class="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm/6 font-medium text-gray-700 transition hover:border-gray-300 focus-visible:outline-0"
-                aria-label="Filter by status"
+                :aria-label="$t('travel.filterByStatus')"
             >
-              <option value="">All statuses</option>
+              <option value="">{{ $t('travel.allStatuses') }}</option>
               <option v-for="option in ORDER_STATES" :key="option.value" :value="option.value">{{ option.label }}</option>
             </select>
           </div>
@@ -154,9 +154,9 @@ const isFiltered = computed(() => upcoming.value || state.value !== null);
             <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
               <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
             </div>
-            <h2 class="mt-6 text-base font-semibold text-gray-900">We couldn't load your bookings</h2>
+            <h2 class="mt-6 text-base font-semibold text-gray-900">{{ $t('travel.weCouldntLoadYourBookings') }}</h2>
             <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
-            <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong on our side. Please try again in a moment.</p>
+            <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('travel.somethingWentWrongOnOur') }}</p>
           </div>
           <!-- Empty -->
           <div v-else-if="!hasBookings" class="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white px-8 py-16 text-center">
@@ -173,7 +173,7 @@ const isFiltered = computed(() => upcoming.value || state.value !== null);
                 v-if="!isFiltered"
                 :to="{name: 'hotels'}"
                 class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0"
-            >Find a hotel</RouterLink>
+            >{{ $t('travel.findAHotel') }}</RouterLink>
           </div>
           <!-- Results -->
           <template v-else>

@@ -42,8 +42,6 @@ const classes = computed(() => {
       <span class="relative flex size-1.5">
         <span class="absolute inline-flex size-full animate-ping rounded-full bg-warning-500 opacity-75" />
         <span class="relative inline-flex size-1.5 rounded-full bg-warning-500" />
-      </span>
-      Confirming with the hotel
-    </span>
+      </span>{{ $t('travel.confirmingWithTheHotel') }}</span>
   </div>
 </template>

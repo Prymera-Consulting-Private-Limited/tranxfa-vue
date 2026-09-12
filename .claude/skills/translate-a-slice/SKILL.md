@@ -41,7 +41,9 @@ and reports, which is the part you do by hand:
   Add `import {useI18n} from "vue-i18n";` and `const {t} = useI18n();`, then
   replace the literal with `t('key')`.
 - **Sentences split across tags**, where a link or a bold value sits
-  mid-sentence. Do not leave these as three keys: a translator cannot reorder
+  mid-sentence. Run `python3 scripts/i18n-compose.py . <prefix> <files>`
+  first: it rewrites the runs it can rebuild safely and tells you which ones
+  it left, with the reason. The rest are yours. Do not leave these as three keys: a translator cannot reorder
   them and the spaces between them are gone. Use `<i18n-t keypath="..." tag="p"
   scope="global">` with one `<template #name>` per styled part, and one message
   holding `{name}`. `docs/localisation.md` has the shape.
@@ -51,7 +53,13 @@ and reports, which is the part you do by hand:
 - **Anything with an `@` in it.** Escape as `{'@'}` or message compilation
   fails at render, not at build.
 
-Then read the generated keys and rename the ones that read badly. The script
+Check the messages for HTML entities as well (`&rarr;`, `&mdash;`,
+`&middot;`): those are markup, so write the character, and keep a decorative
+arrow in the template rather than in the message.
+
+Then read the generated keys and rename the ones that read badly. Check the
+name is not already used elsewhere in the catalogue before you write it by
+hand; one collision silently changed a screen the slice never touched. The script
 names from the first few words, which gives `thanksWeHaveYourDocumentinreview`
 where `documentReceived` was meant.
 

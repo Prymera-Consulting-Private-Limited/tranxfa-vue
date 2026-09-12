@@ -12,7 +12,7 @@ const props = defineProps({
 
 <template>
   <div>
-    <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">Room</p>
+    <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('travel.room') }}</p>
     <h4 class="mt-1 font-medium text-gray-900">{{ rate.roomName }}</h4>
   </div>
 </template>

@@ -71,10 +71,10 @@ function classes(payment) {
 <template>
   <section v-if="payments.length" class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
     <header class="border-b border-gray-100 px-5 py-4">
-      <h2 class="text-sm/6 font-semibold text-gray-900">Payments</h2>
+      <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.payments') }}</h2>
       <!-- Failed attempts are listed too: somebody declined once who paid on the
       second try should see both rather than wonder if they paid twice. -->
-      <p class="mt-0.5 text-xs/5 text-gray-500">Every attempt on this booking, including any that didn't go through.</p>
+      <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.everyAttemptOnThisBooking') }}</p>
     </header>
     <ul class="divide-y divide-gray-100">
       <li v-for="payment in payments" :key="payment.reference" class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 py-4">

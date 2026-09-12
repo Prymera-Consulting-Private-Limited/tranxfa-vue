@@ -28,6 +28,7 @@ them. That produced, on the one brand that needed it:
 | `tests/i18n-catalogue.spec.js` | The ratchet: per migrated file, every key must exist and no bare sentence may remain |
 | `scripts/i18n-extract.py` | Moves a component's copy into the catalogue, leaving anything it cannot place confidently |
 | `scripts/i18n-render-check.py` | Proves a migration changed no rendered English, by comparing the text each template renders before and after |
+| `scripts/i18n-compose.py` | Puts a sentence the markup split back together as one `<i18n-t>` message with a slot per styled part |
 
 English is both source and fallback, so a half-translated brand reads in
 English rather than showing raw keys. That matters: a missing translation must
@@ -72,6 +73,16 @@ vue-i18n's own component instead. One message, one slot per styled value:
 with `"documentUnderVerification": "Your {document} is under review."`. The slot
 keeps the styling, the message keeps the word order. `scope="global"` is needed
 because the catalogue is global and the component has no local messages.
+
+The tooling does this for you. `scripts/i18n-compose.py` finds runs of
+adjacent keys separated by inline elements and rewrites each as one message.
+It refuses a run it cannot rebuild safely, and says why:
+
+- **crosses a block boundary** — the run reached a `<p>` or a `<div>`, so it
+  is joining two sentences. Split them yourself.
+- **a marker, not a word** — one of the elements holds no word and no value,
+  such as the asterisk beside a required label. It is not part of the
+  sentence.
 
 ## Proving nothing changed on screen
 
@@ -119,6 +130,27 @@ carrying copy and merges from `main` stop conflicting on it.
   the only thing that catches it.
 - **The same sentence twice** with a straight and a curly apostrophe are two
   entries and two translations. Pick one and use the key in both places.
+- **An HTML entity is markup.** `&rarr;`, `&mdash;`, `&middot;` inside a
+  message are punctuation a translator has to carry and cannot see. Write the
+  character, and keep a decorative arrow in the template.
+- **An interpolation can contain `>`.** An arrow function inside `{{ }}` used
+  to break the extractor's idea of where a text node ends. It now leaves any
+  node whose braces do not balance; if you write one, check the result.
+- **A literal inside an attribute expression** (`:aria-label="open ? 'Hide' :
+  'Show'"`) is invisible to the extractor and to a text sweep. Only reading
+  finds those.
+
+## Where the migration stands
+
+Every component in `src/` that holds copy now reads it from the catalogue, and
+`tests/i18n-catalogue.spec.js` names all of them, so a new sentence in a
+template fails the build. What stays outside the catalogue on purpose:
+
+- Text the back office sends: transfer statuses, document categories,
+  purposes, relationship names. Translated in the console.
+- Dates, times and money, which follow the locale rather than a message.
+- Provider SDK screens, such as a hosted KYC or card form, which are the
+  provider's own copy.
 
 ## Migrating another area
 
