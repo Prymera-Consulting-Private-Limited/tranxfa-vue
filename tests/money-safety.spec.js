@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import en from '@/locales/en.json';
 import {readFileSync} from 'node:fs';
 
 // Source guards for the three money-safety rules in the Client API reference
@@ -19,7 +20,8 @@ describe('412 more_authentication_required', () => {
     const s = read('src/views/MultifactorAuthenticationView.vue');
     expect(s).toContain("query.reason === 'session'");
     expect(s).toMatch(/if \(isSessionReverify\) \{\n\s*customerUtils\.resendMfaOtp\(\)/);
-    expect(s).toContain('nothing you were doing is lost');
+    expect(s).toContain("$t('onboarding.mfaIntro'");
+    expect(en.onboarding.mfaIntro).toContain('nothing you were doing is lost');
   });
 
   it('the wizard keeps the confirm choices and confirms the same quote again', () => {
@@ -27,7 +29,8 @@ describe('412 more_authentication_required', () => {
     expect(s).toContain('error.response.data.type === MFA_REQUIRED_TYPE');
     expect(s).toContain('saveDraft();');
     expect(s).toContain('const draft = takeCheckoutDraft(props.id);');
-    expect(s).toContain("Thanks, you're verified. Check the details and press Confirm");
+    expect(s).toContain('transfer.wizard.verifiedReadyToConfirm');
+    expect(en.transfer.wizard.verifiedReadyToConfirm).toContain("Thanks, you're verified");
   });
 });
 

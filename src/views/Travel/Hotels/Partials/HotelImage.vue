@@ -15,7 +15,7 @@ const props = defineProps({
     <!-- No Photo -->
     <div v-else class="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
       <BuildingOffice2Icon class="size-10 text-gray-400" aria-hidden="true" />
-      <span class="sr-only">No photo available</span>
+      <span class="sr-only">{{ $t('travel.noPhotoAvailable') }}</span>
     </div>
   </div>
 </template>

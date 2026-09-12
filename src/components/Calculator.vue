@@ -170,7 +170,7 @@ async function getQuote() {
     } else {
       // Says something rather than leaving the last good quote on screen
       // looking current.
-      quoteFailureReason.value = 'No hemos podido calcular este envío en este momento. Comprueba tu conexión e inténtalo de nuevo.';
+      quoteFailureReason.value = 'We could not price this transfer just now. Please check your connection and try again.';
       console.error(e);
     }
   }).finally(() => {
@@ -272,7 +272,7 @@ async function saveQuote() {
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
     }).catch((e) => {
       isSavingQuote.value = false;
-      saveFailure.value = failureMessage(e, "No hemos podido iniciar tu envío. No se ha enviado nada. Inténtalo de nuevo.");
+      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
     });
   } else {
     quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
@@ -280,7 +280,7 @@ async function saveQuote() {
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
     }).catch((e) => {
       isSavingQuote.value = false;
-      saveFailure.value = failureMessage(e, "No hemos podido iniciar tu envío. No se ha enviado nada. Inténtalo de nuevo.");
+      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
     });
   }
 
@@ -314,7 +314,7 @@ async function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <PaperAirplaneIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="send-money-input" class="block text-sm/6 font-medium ml-2  tracking-wider">Tú envías</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="send-money-input" class="block text-sm/6 font-medium ml-2  tracking-wider">{{ $t('calculator.youSend') }}</label>
                     </div>
                     <div class="mt-2">
                       <MoneyInput
@@ -354,7 +354,7 @@ async function saveQuote() {
                   <p v-else class="text-sm/6 bg-gray-300 h-5 w-36 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm/6 whitespace-nowrap font-semibold tracking-wider">
-                  <span>Nuestra tasa</span>
+                  <span>{{ $t('calculator.ourRate') }}</span>
                 </div>
               </div>
             </div>
@@ -372,13 +372,13 @@ async function saveQuote() {
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
                   <p v-if="! isFetchingQuote" class="text-sm/6 tracking-wider">
-                    <span class="text-success-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">Sin comisión</span>
+                    <span class="text-success-700 font-semibold" v-if="quoteUtil.quote.data.baseFees === 0">{{ $t('calculator.zero') }}</span>
                     <span class="text-gray-700 font-semibold" v-else>{{ quoteUtil.quote.data.baseFeesCurrencyPrefixed }}</span>
                   </p>
                   <p v-else class="text-sm/6 bg-gray-300 h-5 w-24 font-semibold tracking-wider pulse"></p>
                 </div>
                 <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="text-right text-sm/6 whitespace-nowrap font-semibold tracking-wider">
-                  <span>Comisión</span>
+                  <span>{{ $t('calculator.fees') }}</span>
                 </div>
               </div>
             </div>
@@ -395,7 +395,7 @@ async function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <UserIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ recipient?.wholeName || 'Beneficiario' }} recibe</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="receive-money-input" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ $t('calculator.recipientGets', {Recipient: recipient?.wholeName || 'Recipient'}) }}</label>
                     </div>
                     <div class="mt-4">
                       <MoneyInput
@@ -430,20 +430,20 @@ async function saveQuote() {
                     <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
                       <TruckIcon class="size-4 text-white"/>
                     </span>
-                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="price" class="block text-sm/6 font-medium ml-2 tracking-wider">Método de pago</label>
+                      <label :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" for="price" class="block text-sm/6 font-medium ml-2 tracking-wider">{{ $t('calculator.deliveryMethod') }}</label>
                     </div>
                     <div class="mt-4">
                       <Listbox v-if="! isFetchingQuote" as="div" v-model="selectedPayoutMethod">
-                        <ListboxLabel class="sr-only">Selecciona o cambia el método de pago</ListboxLabel>
+                        <ListboxLabel class="sr-only">{{ $t('calculator.selectOrChangeDeliveryMethod') }}</ListboxLabel>
                         <div class="relative">
                           <div  class="flex divide-x divide-brand-700 rounded-md outline-2 outline-brand-700 bg-white w-full">
                             <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
                               <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
                                 <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Selecciona una opción' }}</p>
+                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
                               </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
-                                <span class="sr-only">Selecciona o cambia el método de pago</span>
+                                <span class="sr-only">{{ $t('calculator.selectOrChangeDeliveryMethod') }}</span>
                                 <ChevronDownIcon class="size-5 text-brand-700 forced-colors:text-[Highlight]" aria-hidden="true" />
                               </template>
                             </ListboxButton>
@@ -524,7 +524,7 @@ async function saveQuote() {
               </div>
               <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                 <div>
-                  <p v-if="! isFetchingQuote" class="text-sm/6 text-brand-700 font-semibold tracking-wider">Transferencias fáciles, seguras y rápidas</p>
+                  <p v-if="! isFetchingQuote" class="text-sm/6 text-brand-700 font-semibold tracking-wider">{{ $t('calculator.fastSecureTransfers') }}</p>
                   <p v-else class="text-sm/6 bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
                 </div>
               </div>
@@ -549,12 +549,8 @@ async function saveQuote() {
         </template>
         <button v-else :disabled="isFetchingQuote || isSavingQuote" :class="[(isFetchingQuote || isSavingQuote) ? 'opacity-75' : 'cursor-pointer']" type="submit" class="mt-12 flex items-center justify-center gap-x-2 rounded-xl bg-brand-700 px-3.5 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 w-full">
           <template v-if="isSavingQuote">
-            <Spinner class="-ml-0.5 size-5" aria-hidden="true" />
-            Guardando...
-          </template>
-          <template v-else>
-            Enviar dinero
-            <ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
+            <Spinner class="-ml-0.5 size-5" aria-hidden="true" />{{ $t('calculator.saving') }}</template>
+          <template v-else>{{ $t('calculator.sendMoney') }}<ArrowRightIcon class="-mr-0.5 size-5" aria-hidden="true" />
           </template>
         </button>
         <InlineFailure :message="saveFailure" />
@@ -565,15 +561,15 @@ async function saveQuote() {
             <ExclamationTriangleIcon class="size-5 mt-0.5 text-warning-400" aria-hidden="true" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm/6 font-medium text-warning-800">Tu posibilidad de enviar dinero está restringida temporalmente.</h3>
+            <h3 class="text-sm/6 font-medium text-warning-800">{{ $t('calculator.yourAbilityToSendMoney') }}</h3>
             <div class="mt-2 text-sm/6 text-warning-700">
-              <p>Contacta a nuestro equipo de soporte para recibir ayuda o conocer el motivo de esta restricción.</p>
+              <p>{{ $t('calculator.pleaseReachOutToOur') }}</p>
             </div>
           </div>
         </div>
       </div>
     </form>
-    <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">Verificación KYC</router-link> es necesaria antes de que puedas enviar dinero. Es un proceso de una sola vez para mantener tu cuenta y tus transacciones seguras.</p>
+    <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">{{ $t('calculator.kycVerification') }}</router-link>{{ $t('calculator.isRequiredBeforeYouCan') }}</p>
   </template>
 </template>
 

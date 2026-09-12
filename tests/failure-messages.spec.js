@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import en from '@/locales/en.json';
 import {mount} from '@vue/test-utils';
 import {readFileSync} from 'node:fs';
 import {failureMessage} from '@/composables/api_utils.js';
@@ -98,7 +99,9 @@ describe('every silent catch on the money path now speaks', () => {
 describe('sign-in and auth pages', () => {
   it('says something when sign-in fails without a response', () => {
     const s = read('src/views/SignInView.vue');
-    expect(s).toContain('getCustomerMessage(e) ?? "We couldn\'t sign you in. Please check your internet connection and try again."');
+    // SD-1076: the sentence moved to the catalogue; the guard follows it there.
+    expect(s).toContain("getCustomerMessage(e) ?? t('auth.signIn.connectionFailed')");
+    expect(en.auth.signIn.connectionFailed).toBe("We couldn't sign you in. Please check your internet connection and try again.");
     expect(s).not.toMatch(/loginError\.value = e\.response\?\.data\?\.message;/);
   });
 
@@ -149,10 +152,12 @@ describe('sign-in and auth pages', () => {
     expect(s).not.toMatch(/const changePassword = async \(\) => \{\n\s*isLoading\.value = true;/);
   });
 
-  it('counts the MFA resend against the clock and clears it on unmount', () => {
+  // SD-1072 moved this timer into a composable that every resend screen shares;
+  // the clock-counting and the unmount cleanup are asserted in
+  // tests/resend-countdown.spec.js, against behaviour rather than source.
+  it('takes the MFA resend countdown from the shared composable', () => {
     const s = read('src/views/MultifactorAuthenticationView.vue');
-    expect(s).toContain('const end = Date.now() + 30000;');
-    expect(s).toMatch(/onUnmounted\(\(\) => \{\n\s*if \(resendInterval\) \{\n\s*clearInterval\(resendInterval\);/);
+    expect(s).toContain('useResendCountdown()');
     expect(s).not.toContain('p-timeout');
   });
 });

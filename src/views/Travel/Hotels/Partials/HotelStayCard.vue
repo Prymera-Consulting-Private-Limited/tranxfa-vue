@@ -79,7 +79,7 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
     </div>
     <div class="border-t border-gray-100 pt-4">
       <template v-if="selected">
-        <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">Your room</p>
+        <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('travel.yourRoom') }}</p>
         <p class="mt-1 text-sm/6 font-medium text-gray-900">{{ selected.roomName }}</p>
         <p class="mt-3 text-2xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ selected.total.currencyPrefixed }}</p>
         <p v-if="selected.perNight.isStated" class="mt-0.5 text-xs/5 text-gray-500">{{ selected.perNight.currencyPrefixed }} / night</p>
@@ -87,13 +87,13 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
           <HotelCancellationBadge :cancellation="selected.cancellation" />
         </div>
       </template>
-      <p v-else class="text-sm/6 text-gray-500">Pick a room to see the price for your stay.</p>
+      <p v-else class="text-sm/6 text-gray-500">{{ $t('travel.pickARoomToSee') }}</p>
     </div>
     <!-- A room selling out between reading about it and choosing it is ordinary,
     so it is answered in place rather than as an error the customer must dismiss. -->
     <div v-if="roomGone" class="flex items-start gap-2 rounded-xl border border-warning-200 bg-warning-50 p-3 text-sm/6 text-warning-800">
       <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-      <span>That room has just gone. Choose another from the list.</span>
+      <span>{{ $t('travel.thatRoomHasJustGone') }}</span>
     </div>
     <div v-else-if="failureMessage" class="flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700">
       <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
@@ -108,6 +108,6 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
       <Spinner v-if="isHolding" class="size-4" />
       {{ isHolding ? 'Holding this price…' : 'Continue' }}
     </button>
-    <p class="text-center text-xs/5 text-gray-500">We'll hold this price for 15 minutes while you check the details.</p>
+    <p class="text-center text-xs/5 text-gray-500">{{ $t('travel.wellHoldThisPriceFor') }}</p>
   </div>
 </template>

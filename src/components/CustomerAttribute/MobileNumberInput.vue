@@ -33,13 +33,13 @@ watch(mobileNumber, () => {
 
 <template>
   <div>
-    <label :class="[errors?.mobile_number_country_id?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">País</label>
+    <label :class="[errors?.mobile_number_country_id?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">{{ $t('account.country') }}</label>
     <p class="mt-2 mb-3 text-gray-500 text-sm/6"></p>
     <IsdCodeInput v-bind:modelValue="mobileNumber?.country" v-on:update:modelValue="updateIsdCode" />
     <p v-if="errors?.mobile_number_country_id?.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ errors.mobile_number_country_id[0] }}</p>
   </div>
   <div>
-    <label for="mobile-number" :class="[errors?.mobile_number?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">Número de móvil</label>
+    <label for="mobile-number" :class="[errors?.mobile_number?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">{{ $t('auth.signIn.mobileNumberPlaceholder') }}</label>
     <p class="mt-2 mb-3 text-gray-500 text-sm/6"></p>
     <input autofocus inputmode="number" id="mobile-number" type="tel" v-model="mobileNumber.number" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
     <p v-if="errors?.mobile_number?.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ errors.mobile_number[0] }}</p>

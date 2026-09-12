@@ -9,7 +9,7 @@ import {RouterLink} from "vue-router";
  * belongs to someone else - all of them land on a detail route with an id the
  * API will not return. Before this existed the transaction view rendered an
  * empty skeleton, the recipient view rendered nothing at all, and the transfer
- * view said "Cargando…" forever.
+ * view said "Loading..." forever.
  */
 defineProps({
   title: {type: String, required: true},
@@ -17,7 +17,7 @@ defineProps({
   // what decides that; null falls through to our own wording.
   message: {type: String, default: null},
   backTo: {type: Object, default: null},
-  backLabel: {type: String, default: 'Volver'},
+  backLabel: {type: String, default: 'Go back'},
   // When the failure was a request that can simply be sent again.
   retryLabel: {type: String, default: null},
 })
@@ -31,15 +31,9 @@ defineEmits(['retry'])
     </div>
     <h1 class="mt-6 text-base font-semibold text-gray-900">{{ title }}</h1>
     <p v-if="message" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ message }}</p>
-    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">
-      No ha cambiado nada en tu cuenta. Inténtalo de nuevo.
-    </p>
-    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">
-      No ha cambiado nada en tu cuenta. Inténtalo de nuevo.
-    </p>
-    <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">
-      Puede que se haya eliminado o que el enlace ya no esté vigente.
-    </p>
+    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('account.nothingChanged') }}</p>
+    <p v-else-if="retryLabel" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('account.nothingChanged') }}</p>
+    <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('account.maybeRemoved') }}</p>
     <button
       v-if="retryLabel"
       type="button"

@@ -3,7 +3,7 @@
     <div class="focus:outline-hidden xl:mb-4">
       <span class="absolute inset-0" aria-hidden="true" />
       <span>{{ index+1 }}. {{ task.title }}</span>
-      <span class="xl:hidden" aria-hidden="true"> &rarr;</span>
+      <span class="xl:hidden" aria-hidden="true">→</span>
     </div>
   </div>
   <p class="mt-1 text-sm/6 text-gray-500">{{ task.description }}</p>

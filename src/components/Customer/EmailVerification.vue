@@ -3,10 +3,10 @@ import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
-import pTimeout from 'p-timeout';
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import Spinner from "@/components/Spinner.vue";
+import {useResendCountdown} from "@/composables/resend_countdown.js";
 
 const emailVerificationCode = ref('');
 const isLoading = ref(false);
@@ -42,30 +42,7 @@ async function verifyEmailAddress() {
   emit('emailVerified');
 }
 
-const showResendButton = ref(false);
-const countdown = ref(30);
-
-async function startResendOtpTimer() {
-  showResendButton.value = false;
-  countdown.value = 30;
-
-  try {
-    const timer = new Promise((resolve) => {
-      const interval = setInterval(() => {
-        countdown.value -= 1;
-        if (countdown.value === 0) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 1000);
-    });
-
-    await pTimeout(timer, { milliseconds: 30000 });
-    showResendButton.value = true;
-  } catch (error) {
-    console.log("Timeout error:", error);
-  }
-}
+const {countdown, showResendButton, start: startResendOtpTimer} = useResendCountdown();
 
 const resentMessage = ref('');
 const resendFailure = ref('');
@@ -82,7 +59,7 @@ async function resend() {
       return;
     }
     logRequestFailure(e, 'resend-email-code');
-    resendFailure.value = failureMessage(e, "No hemos podido enviar un código nuevo. Inténtalo de nuevo.");
+    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
   }).finally(() => {
     isResendingToken.value = false;
   });
@@ -111,9 +88,9 @@ onMounted(async () => {
         <a href="javascript:"><BrandLogo class="mb-5 mx-auto" /></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">¡Verifica tu correo!</h2>
-      <p class="text-md text-[#B7A3C1] mb-2 text-center">Enviamos un código de verificación a tu correo {{ customer.data?.account?.email }}</p>
-      <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">Ten en cuenta que el correo puede tardar hasta un minuto en llegar. Si no lo ves en tu bandeja de entrada, revisa también tu carpeta de spam o correo no deseado.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">{{ $t('verification.verifyYourEmail') }}</h2>
+      <p class="text-md text-[#B7A3C1] mb-2 text-center">{{ $t('verification.emailCodeSent', {email: customer.data?.account?.email}) }}</p>
+      <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">{{ $t('verification.emailCodeDelay') }}</p>
       <!-- Form -->
       <form @submit.prevent="verifyEmailAddress" class="space-y-10">
         <div v-if="otpError" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
@@ -140,14 +117,10 @@ onMounted(async () => {
           >
             <template v-if="isVerifying">
               <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
-                <Spinner :class="'size-4'" />
-                Verificando correo...
-              </span>
+                <Spinner :class="'size-4'" />{{ $t('verification.verifyingEmail') }}</span>
             </template>
             <template v-else>
-              <span class="inline-flex items-center justify-center gap-2">
-                Verificar correo
-                <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
+              <span class="inline-flex items-center justify-center gap-2">{{ $t('verification.verifyEmail') }}<i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
               </span>
             </template>
           </button>
@@ -155,16 +128,14 @@ onMounted(async () => {
         <template v-if="! isLoading && ! isVerifying">
           <p v-if="resentMessage" role="status" class="mb-3 rounded-lg bg-success-50 px-3 py-2 text-center text-sm/6 text-success-700">{{ resentMessage }}</p>
           <p v-if="resendFailure" role="alert" class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-center text-sm/6 text-danger-700">{{ resendFailure }}</p>
-          <div v-if="! isResendingToken" class="text-sm/6 text-gray-500 text-center">
-            ¿No recibiste el código de verificación?
-            <a
+          <div v-if="! isResendingToken" class="text-sm/6 text-gray-500 text-center">{{ $t('verification.didntReceiveEmailCode') }} <a
               v-if="showResendButton"
               @click="resend"
               class="ml-1 inline-flex cursor-pointer items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
-            >Reenviar código</a>
-            <template v-else> Reenviar en {{ countdown }}s</template>
+            >{{ $t('verification.resendCode') }}</a>
+            <template v-else>{{ $t('verification.resendInCountdownS', {countdown: countdown}) }}</template>
           </div>
-          <div v-else class="text-sm/6 text-gray-500 text-center animate-pulse">Reenviando el código de verificación a tu correo {{ customer.data?.account?.email }} ...</div>
+          <div v-else class="text-sm/6 text-gray-500 text-center animate-pulse">{{ $t('verification.resendingEmailCode', {email: customer.data?.account?.email}) }}</div>
         </template>
       </form>
     </div>

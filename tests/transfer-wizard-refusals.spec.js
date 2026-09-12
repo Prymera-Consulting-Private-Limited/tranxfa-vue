@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import en from '@/locales/en.json';
 import {readFileSync} from 'node:fs';
 import {fieldlessErrors} from '@/composables/api_utils.js';
 
@@ -32,7 +33,8 @@ describe('step fetches that fail', () => {
   it('the upload-another-document step can be retried', () => {
     const s = wizard();
     expect(s).toContain('function loadPoiCategory()');
-    expect(s).toContain('<InlineFailure :message="stepFailure" retryLabel="Try again" @retry="loadPoiCategory"');
+    expect(s).toContain('<InlineFailure :message="stepFailure" :retryLabel="$t(');
+    expect(s).toContain('@retry="loadPoiCategory"');
   });
 
   it('copying details from the ID reports failure inside the dialog', () => {
@@ -46,8 +48,10 @@ describe('a document under review', () => {
   it('is named and the customer is told what happens next', () => {
     const s = wizard();
     expect(s).toContain('const documentInReview = computed(');
-    expect(s).toContain('Thanks, we have your {{ documentInReview }}.');
-    expect(s).toContain('your transfer will carry on from here');
+    expect(s).toContain('transfer.wizard.documentReceived');
+    expect(en.transfer.wizard.documentReceived).toBe('Thanks, we have your {documentInReview}.');
+    expect(s).toContain('transfer.wizard.weAreCheckingItNow');
+    expect(en.transfer.wizard.weAreCheckingItNow).toContain('your transfer will carry on from here');
   });
 
   it('the identity dialog sits above the layout header', () => {

@@ -186,21 +186,21 @@ onUnmounted(() => clearInterval(clock));
           <RouterLink
               :to="{name: 'hotels'}"
               class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
-          >Search again</RouterLink>
+          >{{ $t('travel.searchAgain') }}</RouterLink>
         </div>
         <!-- Failed -->
         <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-danger-200">
           <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
-          <h1 class="mt-6 text-base font-semibold text-gray-900">We couldn't load this price</h1>
+          <h1 class="mt-6 text-base font-semibold text-gray-900">{{ $t('travel.weCouldntLoadThisPrice') }}</h1>
           <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
-          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong on our side. Please try again in a moment.</p>
+          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('travel.somethingWentWrongOnOur') }}</p>
           <button
               type="button"
               @click="load"
               class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
-          >Reintentar</button>
+          >{{ $t('common.tryAgain') }}</button>
         </div>
         <template v-else-if="quote">
           <!-- Countdown -->
@@ -209,9 +209,7 @@ onUnmounted(() => clearInterval(clock));
             'flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-2xl border px-5 py-3',
           ]">
             <p class="flex items-center gap-2 text-sm/6 font-medium">
-              <ClockIcon class="size-4 shrink-0" aria-hidden="true" />
-              This price is held for you
-            </p>
+              <ClockIcon class="size-4 shrink-0" aria-hidden="true" />{{ $t('travel.thisPriceIsHeldFor') }}</p>
             <p v-if="countdown" class="text-sm/6 font-semibold tabular-nums">{{ countdown }} left</p>
           </div>
           <!-- Hotel -->
@@ -238,7 +236,7 @@ onUnmounted(() => clearInterval(clock));
               </p>
             </div>
             <div v-if="quote.room" class="mt-4 border-t border-gray-100 pt-4">
-              <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">Your room</p>
+              <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('travel.yourRoom') }}</p>
               <p class="mt-1 text-sm/6 font-medium text-gray-900">{{ quote.room.roomName }}</p>
               <div class="mt-2 flex flex-wrap items-center gap-2">
                 <HotelMealBadge :meal="quote.room.meal" :labels="quote.labels" />
@@ -249,7 +247,7 @@ onUnmounted(() => clearInterval(clock));
           <!-- Price -->
           <section class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
             <header class="border-b border-gray-100 px-5 py-4">
-              <h2 class="text-sm/6 font-semibold text-gray-900">Your price</h2>
+              <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.yourPrice') }}</h2>
             </header>
             <dl class="divide-y divide-gray-100">
               <div v-for="line in quote.breakdown" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
@@ -257,7 +255,7 @@ onUnmounted(() => clearInterval(clock));
                 <dd class="shrink-0 text-sm/6 text-gray-900 tabular-nums">{{ line.amount.currencyPrefixed }}</dd>
               </div>
               <div class="flex items-baseline justify-between gap-4 bg-gray-50/70 px-5 py-3">
-                <dt class="text-sm/6 font-semibold text-gray-900">Total</dt>
+                <dt class="text-sm/6 font-semibold text-gray-900">{{ $t('account.total') }}</dt>
                 <dd class="text-right">
                   <span class="block text-base font-semibold text-gray-900 tabular-nums">{{ quote.total.currencyPrefixed }}</span>
                   <span v-if="quote.perNight.isStated" class="mt-0.5 block text-xs/5 font-normal text-gray-500">{{ quote.perNight.currencyPrefixed }} / night</span>
@@ -265,24 +263,22 @@ onUnmounted(() => clearInterval(clock));
               </div>
             </dl>
             <!-- Not part of the total: the hotel collects this on arrival. -->
-            <p v-if="quote.payableAtProperty.isStated" class="border-t border-gray-100 px-5 py-3 text-sm/6 text-warning-700">
-              Plus {{ quote.payableAtProperty.currencyPrefixed }} payable at the property
-            </p>
+            <p v-if="quote.payableAtProperty.isStated" class="border-t border-gray-100 px-5 py-3 text-sm/6 text-warning-700">{{ $t('travel.plusCurrencyprefixedPayableAtThe', {currencyPrefixed: quote.payableAtProperty.currencyPrefixed}) }}</p>
           </section>
           <!-- What cancelling would give back, while the terms still say so. -->
           <section v-if="quote.cancellation?.refundNow?.isStated" class="mt-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
-            <h2 class="text-sm/6 font-semibold text-gray-900">If you cancel</h2>
+            <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.ifYouCancel') }}</h2>
             <dl class="mt-3 space-y-2 text-sm/6">
               <div class="flex items-baseline justify-between gap-3">
-                <dt class="text-gray-500">Cancelling now would cost</dt>
+                <dt class="text-gray-500">{{ $t('travel.cancellingNowWouldCost') }}</dt>
                 <dd class="font-medium text-gray-900 tabular-nums">{{ quote.cancellation.costsNow.currencyPrefixed }}</dd>
               </div>
               <div class="flex items-baseline justify-between gap-3">
-                <dt class="text-gray-500">You would get back</dt>
+                <dt class="text-gray-500">{{ $t('travel.youWouldGetBack') }}</dt>
                 <dd class="font-medium text-gray-900 tabular-nums">{{ quote.cancellation.refundNow.currencyPrefixed }}</dd>
               </div>
             </dl>
-            <p class="mt-3 text-xs/5 text-gray-500">Worked out fresh each time this page is opened, since it changes as your stay approaches.</p>
+            <p class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.workedOutFreshEachTime') }}</p>
           </section>
           <!-- Who is staying, and how to reach them -->
           <GuestContactForm

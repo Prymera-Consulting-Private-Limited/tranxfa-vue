@@ -75,15 +75,15 @@ function go(page) {
 </script>
 
 <template>
-  <nav v-if="pageCount > 1" class="flex flex-col items-center justify-between gap-3 sm:flex-row" aria-label="Hotel results">
-    <p class="text-xs/5 text-gray-500">Showing {{ from }}–{{ to }} of {{ total }} hotel{{ total === 1 ? '' : 's' }}</p>
+  <nav v-if="pageCount > 1" class="flex flex-col items-center justify-between gap-3 sm:flex-row" :aria-label="$t('travel.hotelResults')">
+    <p class="text-xs/5 text-gray-500">{{ $t('travel.showingFromToOfTotal', {from: from, to: to, total: total, s: total === 1 ? '' : 's'}) }}</p>
     <div class="flex items-center gap-1">
       <button
           type="button"
           :disabled="page === 1"
           @click="go(page - 1)"
           class="flex size-8 cursor-pointer items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:border-gray-300 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-40"
-          aria-label="Previous page"
+          :aria-label="$t('travel.previousPage')"
       >
         <ChevronLeftIcon class="size-4" aria-hidden="true" />
       </button>
@@ -107,7 +107,7 @@ function go(page) {
           :disabled="page === pageCount"
           @click="go(page + 1)"
           class="flex size-8 cursor-pointer items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:border-gray-300 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-40"
-          aria-label="Next page"
+          :aria-label="$t('travel.nextPage')"
       >
         <ChevronRightIcon class="size-4" aria-hidden="true" />
       </button>

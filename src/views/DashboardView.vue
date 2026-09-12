@@ -160,7 +160,7 @@ async function getTransactions(page = null) {
     transactionsData.value = response.data;
   }).catch((e) => {
     logRequestFailure(e, 'dashboard-transactions');
-    transactionsFailure.value = failureMessage(e, "No hemos podido cargar tus envíos.");
+    transactionsFailure.value = failureMessage(e, "We couldn't load your transfers.");
   }).finally(() => {
     isTransactionLoading.value = false;
   });
@@ -193,21 +193,21 @@ const recipientCreated = (recipient) => {
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Panel</h1>
+        <h1 class="sr-only">{{ $t('account.dashboard') }}</h1>
         <!-- Main 3 column grid -->
-        <h2 class="text-base font-semibold text-gray-900 mb-5">Hola, {{ customer.data?.name }}</h2>
+        <h2 class="text-base font-semibold text-gray-900 mb-5">Welcome {{ customer.data?.name }}</h2>
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 lg:flex-row-reverse">
 
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2 order-last lg:order-first">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Título de sección</h2>
+              <h2 class="sr-only" id="section-2-title">{{ $t('account.sectionTitle') }}</h2>
               <div>
                 <template v-if="isTransactionLoading">
                   <ListShimmer />
                 </template>
                 <template v-else-if="transactionsFailure">
-                  <LoadFailurePanel title="No hemos podido cargar tus envíos" :message="transactionsFailure" retryLabel="Reintentar" @retry="getTransactions()" class="mt-0" />
+                  <LoadFailurePanel :title="$t('account.transfersLoadFailure')" :message="transactionsFailure" :retryLabel="$t('common.tryAgain')" @retry="getTransactions()" class="mt-0" />
                 </template>
                 <template v-else>
                   <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
@@ -230,7 +230,7 @@ const recipientCreated = (recipient) => {
                     </div>
                   </div>
                   <template v-else>
-                    <p class="mt-1 text-sm/6 text-gray-500 hidden lg:block">Empieza completando los siguientes pasos.</p>
+                    <p class="mt-1 text-sm/6 text-gray-500 hidden lg:block">{{ $t('verification.getStarted') }}</p>
                     <ul v-if="tasks.length === 0 && isTaskLoading" role="list" class="mt-6 grid-cols-1 gap-6 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 sm:grid-cols-2 hidden lg:grid">
                       <li v-for="i of 6" :key="i" class="flow-root pulse">
                         <div v-if="isTaskLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
@@ -289,7 +289,7 @@ const recipientCreated = (recipient) => {
           <div class="grid grid-cols-1 gap-4">
             <WalletDashboardCard />
             <section aria-labelledby="send-money-title">
-              <h2 class="sr-only" id="send-money-title">Enviar dinero</h2>
+              <h2 class="sr-only" id="send-money-title">{{ $t('calculator.sendMoney') }}</h2>
               <div class="rounded-lg bg-white shadow-lg p-5 pb-8">
                 <Calculator />
               </div>

@@ -77,28 +77,28 @@ function validateClient() {
   const end = formatDateForApi(form.endDate);
 
   if (!start) {
-    formErrors.start_date = ["Selecciona una fecha inicial."];
+    formErrors.start_date = ["Please select a start date."];
     valid = false;
   } else if (moment(start).isAfter(today.value, "day")) {
-    formErrors.start_date = ["La fecha inicial no puede ser futura."];
+    formErrors.start_date = ["Start date cannot be in the future."];
     valid = false;
   }
 
   if (!end) {
-    formErrors.end_date = ["Selecciona una fecha final."];
+    formErrors.end_date = ["Please select an end date."];
     valid = false;
   } else if (moment(end).isAfter(today.value, "day")) {
-    formErrors.end_date = ["La fecha final no puede ser futura."];
+    formErrors.end_date = ["End date cannot be in the future."];
     valid = false;
   }
 
   if (start && end && moment(start).isAfter(end, "day")) {
-    formErrors.end_date = ["La fecha final debe ser igual o posterior a la fecha inicial."];
+    formErrors.end_date = ["End date must be on or after the start date."];
     valid = false;
   }
 
   if (form.email.trim() && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email.trim())) {
-    formErrors.email = ["Introduce un correo electrónico válido."];
+    formErrors.email = ["Please enter a valid email address."];
     valid = false;
   }
 
@@ -160,7 +160,7 @@ async function submit() {
     const response = await statementUtils.requestStatement(payload);
     const message =
       response.data?.message ??
-      "Hemos empezado a generar tu extracto. Revisa tu correo en unos minutos.";
+      "Statement generation started successfully. Please check your email shortly.";
 
     notify(
       {
@@ -178,7 +178,7 @@ async function submit() {
     if (status === 412) {
       formErrors.general =
         error.response?.data?.message ??
-        "Tu cuenta debe estar totalmente verificada para descargar extractos.";
+        "Your account must be fully verified to download statements.";
       notify(
         {
           group: "customer",
@@ -205,12 +205,12 @@ async function submit() {
         !formErrors.email.length &&
         !formErrors.currency.length
       ) {
-        formErrors.general = error.response?.data?.message ?? "Revisa el formulario e inténtalo de nuevo.";
+        formErrors.general = error.response?.data?.message ?? "Please check the form and try again.";
       }
       return;
     }
 
-    formErrors.general = "Algo no ha funcionado. Inténtalo de nuevo.";
+    formErrors.general = "Something went wrong. Please try again.";
   } finally {
     isSubmitting.value = false;
   }
@@ -246,12 +246,8 @@ async function submit() {
             <DialogPanel
               class="relative w-full transform overflow-hidden rounded-2xl bg-white px-5 pb-6 pt-5 text-left shadow-xl transition-all sm:my-8 sm:max-w-lg sm:p-6"
             >
-              <DialogTitle class="text-lg font-semibold text-gray-900">
-                Descargar extracto de transacción
-              </DialogTitle>
-              <p class="mt-1 text-sm/6 text-gray-600">
-                Seleccione un rango de fechas y un formato. Le enviaremos el extracto por correo electrónico cuando esté listo; no se descarga aquí.
-              </p>
+              <DialogTitle class="text-lg font-semibold text-gray-900">{{ $t('account.downloadTransactionStatement') }}</DialogTitle>
+              <p class="mt-1 text-sm/6 text-gray-600">{{ $t('account.statementModalHint') }}</p>
 
               <form class="mt-6 space-y-5" @submit.prevent="submit">
                 <p
@@ -263,7 +259,7 @@ async function submit() {
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label class="block text-sm/6 font-medium text-gray-700">Fecha de inicio</label>
+                    <label class="block text-sm/6 font-medium text-gray-700">{{ $t('account.startDate') }}</label>
                     <div class="statement-date-picker mt-2">
                       <VueDatePicker
                         v-model="form.startDate"
@@ -275,7 +271,7 @@ async function submit() {
                         auto-apply
                         teleport="body"
                         position="left"
-                        placeholder="Select start date"
+                        :placeholder="$t('account.selectStartDate')"
                       />
                     </div>
                     <p
@@ -287,7 +283,7 @@ async function submit() {
                     </p>
                   </div>
                   <div>
-                    <label class="block text-sm/6 font-medium text-gray-700">Fecha de fin</label>
+                    <label class="block text-sm/6 font-medium text-gray-700">{{ $t('account.endDate') }}</label>
                     <div class="statement-date-picker mt-2">
                       <VueDatePicker
                         v-model="form.endDate"
@@ -299,7 +295,7 @@ async function submit() {
                         auto-apply
                         teleport="body"
                         position="left"
-                        placeholder="Select end date"
+                        :placeholder="$t('account.selectEndDate')"
                       />
                     </div>
                     <p
@@ -313,7 +309,7 @@ async function submit() {
                 </div>
 
                 <div>
-                  <span class="block text-sm/6 font-medium text-gray-700">Formato</span>
+                  <span class="block text-sm/6 font-medium text-gray-700">{{ $t('account.format') }}</span>
                   <div class="mt-2 flex gap-3">
                     <label class="inline-flex cursor-pointer items-center gap-2">
                       <input
@@ -322,7 +318,7 @@ async function submit() {
                         value="pdf"
                         class="border-gray-300 text-brand-600 focus:ring-brand-600"
                       />
-                      <span class="text-sm/6 text-gray-900">PDF</span>
+                      <span class="text-sm/6 text-gray-900">{{ $t('account.pdf') }}</span>
                     </label>
                     <label class="inline-flex cursor-pointer items-center gap-2">
                       <input
@@ -331,7 +327,7 @@ async function submit() {
                         value="csv"
                         class="border-gray-300 text-brand-600 focus:ring-brand-600"
                       />
-                      <span class="text-sm/6 text-gray-900">CSV</span>
+                      <span class="text-sm/6 text-gray-900">{{ $t('account.csv') }}</span>
                     </label>
                   </div>
                   <p
@@ -344,8 +340,7 @@ async function submit() {
                 </div>
 
                 <div>
-                  <label for="statement-currency" class="block text-sm/6 font-medium text-gray-700">
-                    Moneda <span class="font-normal text-gray-500">(opcional)</span>
+                  <label for="statement-currency" class="block text-sm/6 font-medium text-gray-700">{{ $t('account.currency') }} <span class="font-normal text-gray-500">{{ $t('account.optional') }}</span>
                   </label>
                   <select
                     id="statement-currency"
@@ -353,7 +348,7 @@ async function submit() {
                     :disabled="isLoadingCurrencies"
                     class="mt-2 block w-full rounded-xl border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm/6 disabled:bg-gray-50"
                   >
-                    <option value="">Todas las monedas</option>
+                    <option value="">{{ $t('account.allCurrencies') }}</option>
                     <option v-for="currency in currencies" :key="currency.id" :value="currency.id">
                       {{ currency.iconUnicode }} {{ currency.code }} — {{ currency.commonName }}
                     </option>
@@ -368,15 +363,14 @@ async function submit() {
                 </div>
 
                 <div>
-                  <label for="statement-email" class="block text-sm/6 font-medium text-gray-700">
-                    Correo electrónico adicional <span class="font-normal text-gray-500">(opcional)</span>
+                  <label for="statement-email" class="block text-sm/6 font-medium text-gray-700">{{ $t('account.additionalEmail') }} <span class="font-normal text-gray-500">{{ $t('account.optional') }}</span>
                   </label>
                   <input
                     id="statement-email"
                     v-model="form.email"
                     type="email"
                     autocomplete="email"
-                    placeholder="name@example.com"
+                    :placeholder="$t('account.emailPlaceholder')"
                     class="mt-2 block w-full rounded-xl border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm/6"
                   />
                   <p
@@ -394,17 +388,13 @@ async function submit() {
                     class="inline-flex justify-center rounded-xl bg-white px-4 py-2.5 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     :disabled="isSubmitting"
                     @click="close"
-                  >
-                    Cancelar
-                  </button>
+                  >{{ $t('recipient.cancel') }}</button>
                   <button
                     type="submit"
                     class="inline-flex justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
                     :disabled="isSubmitting || isLoadingCurrencies"
                   >
-                    <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2" aria-hidden="true" />
-                    Solicitar extracto
-                  </button>
+                    <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2" aria-hidden="true" />{{ $t('account.requestStatement') }}</button>
                 </div>
               </form>
             </DialogPanel>

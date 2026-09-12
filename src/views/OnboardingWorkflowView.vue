@@ -48,14 +48,14 @@ onMounted(loadProfile);
   <main>
     <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
       <div v-if="loadFailed" class="text-center px-6">
-        <p class="text-lg font-semibold text-gray-900 mb-2">No hemos podido cargar tus datos</p>
-        <p class="text-sm/6 text-gray-500 mb-6">Comprueba tu conexión e inténtalo de nuevo.</p>
-        <button @click="loadProfile" type="button" class="rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white hover:bg-brand-800 cursor-pointer">Reintentar</button>
+        <p class="text-lg font-semibold text-gray-900 mb-2">{{ $t('onboarding.detailsLoadFailure') }}</p>
+        <p class="text-sm/6 text-gray-500 mb-6">{{ $t('transfer.payment.pleaseCheckYourConnectionAnd') }}</p>
+        <button @click="loadProfile" type="button" class="rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white hover:bg-brand-800 cursor-pointer">{{ $t('common.tryAgain') }}</button>
       </div>
       <i v-else-if="! isReady" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class="w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/bg.png" alt="Imagen de fondo del inicio de sesión" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/signup.webp" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>

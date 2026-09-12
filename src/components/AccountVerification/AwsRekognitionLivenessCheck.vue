@@ -63,9 +63,9 @@ const startFaceDetection = async () => {
         liveCheckError.value = "No face detected. Please ensure your face is clearly visible.";
       } else if (faceCount > 1) {
         liveCheckMessage.value = "";
-        liveCheckError.value = "Se han detectado varias caras. Debes estar solo en la imagen.";
+        liveCheckError.value = "Multiple faces detected. Please be alone in the frame.";
       } else {
-        liveCheckMessage.value = "No te muevas mientras verificamos tu identidad…";
+        liveCheckMessage.value = "Hold still while we verify your identity...";
         liveCheckError.value = "";
         if (!isProcessing.value) {
           isProcessing.value = true;
@@ -108,7 +108,7 @@ const startCamera = async () => {
     await startFaceDetection();
   } catch (err) {
     console.error("Camera Access Error:", err);
-    liveCheckError.value = "Acceso a la cámara denegado. Concede el permiso para continuar.";
+    liveCheckError.value = "Camera access denied. Please grant permission.";
   }
 };
 
@@ -154,14 +154,12 @@ onUnmounted(() => {
 <template>
   <div :class="{'min-h-128': !isInitialized}" class="flex flex-col items-center justify-center bg-gray-50 text-gray-800 p-6">
     <div v-if="!cameraAccess" class="text-center">
-      <p class="text-lg font-semibold mb-4">Necesitamos acceso a la cámara</p>
-      <button @click="startCamera" class="bg-brand-700 text-white px-6 py-2.5 rounded-xl shadow-lg transition cursor-pointer">
-        Conceder acceso
-      </button>
+      <p class="text-lg font-semibold mb-4">{{ $t('verification.cameraAccessNeeded') }}</p>
+      <button @click="startCamera" class="bg-brand-700 text-white px-6 py-2.5 rounded-xl shadow-lg transition cursor-pointer">{{ $t('verification.grantAccess') }}</button>
     </div>
     <div v-show="isInitialized" class="w-full flex flex-col items-center justify-center">
-      <h2 class="text-lg font-semibold mb-4">Prueba de vida</h2>
-      <p class="leading-6 text-gray-500 mb-3 text-center">Para verificar tu identidad, necesitamos que grabes un vídeo corto. Asegúrate de que tu cara se vea con claridad en la imagen.</p>
+      <h2 class="text-lg font-semibold mb-4">{{ $t('verification.livenessTest') }}</h2>
+      <p class="leading-6 text-gray-500 mb-3 text-center">{{ $t('verification.livenessIntro') }}</p>
       <p v-if="liveCheckMessage" class="leading-6 text-gray-500 mb-3 text-center">{{ liveCheckMessage }}</p>
       <p v-if="liveCheckSuccess" class="leading-6 text-success-700 font-semibold mb-3 text-center">{{ liveCheckSuccess }}</p>
       <p v-if="liveCheckError" class="leading-6 text-danger-600 mb-3 text-center animate-pulse">{{ liveCheckError }}</p>
@@ -169,7 +167,7 @@ onUnmounted(() => {
       <div class="relative h-72 w-72 bg-black rounded-full overflow-hidden border-6 p-4 border-gray-300">
         <video ref="video" autoplay playsinline class="w-full h-full transform scale-160"></video>
       </div>
-      <p class="text-gray-500 text-xs/5 mt-3 text-center">Todos los datos se procesan de conformidad con nuestra política de privacidad.</p>
+      <p class="text-gray-500 text-xs/5 mt-3 text-center">{{ $t('verification.privacyNote') }}</p>
     </div>
   </div>
 </template>

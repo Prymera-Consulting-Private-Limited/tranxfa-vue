@@ -41,17 +41,17 @@ const closeWallet = async () => {
     notify(
         {
           group: 'customer',
-          title: 'Monedero cerrado',
-          text: 'Tu suscripción al monedero se ha cerrado.',
+          title: 'Wallet Closed',
+          text: 'Your wallet subscription has been closed.',
           type: 'success',
         },
         -1,
     )
   }).catch((e) => {
     if (e.response?.data?.type === WalletRefusalType.BALANCE_MUST_BE_ZERO) {
-      closeWalletError.value = (e.response.data.message ?? 'Tu billetera todavía tiene saldo.') + ' Gasta o retira el saldo primero y luego cierra la billetera.';
+      closeWalletError.value = (e.response.data.message ?? 'Your wallet still holds money.') + ' Spend or withdraw the balance first, then close the wallet.';
     } else {
-      closeWalletError.value = e.response?.data?.message ?? 'Algo salió mal. Inténtalo de nuevo.';
+      closeWalletError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
     }
   }).finally(() => {
     isClosingWallet.value = false;
@@ -76,8 +76,8 @@ const identityUpdated = () => {
   notify(
       {
         group: 'customer',
-        title: 'Datos personales actualizados',
-        text: 'Tus datos personales se actualizaron correctamente.',
+        title: 'Personal Details Updated',
+        text: 'Your personal information has been successfully updated.',
         type: 'success',
       },
       -1,
@@ -89,8 +89,8 @@ const addressUpdated = () => {
   notify(
       {
         group: 'customer',
-        title: 'Dirección actualizada',
-        text: 'Los datos de tu dirección se actualizaron correctamente.',
+        title: 'Address Updated',
+        text: 'Your address details have been successfully updated.',
         type: 'success',
       },
       -1,
@@ -118,50 +118,50 @@ const passwordChanged = async () => {
       <div class="mx-auto max-w-3xl lg:max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="rounded-lg bg-white px-4 sm:px-6 lg:px-8 py-6">
           <section aria-labelledby="section-2-title">
-            <h1 class="sr-only" id="section-2-title">Configuración de la cuenta</h1>
+            <h1 class="sr-only" id="section-2-title">{{ $t('account.accountSettings') }}</h1>
             <div class="mb-6">
-              <h2 class="text-base font-semibold text-gray-900">Configuración de la cuenta</h2>
-              <p class="mt-1 text-sm/6 text-gray-500">Administra tus datos personales, ajustes de seguridad y dispositivos conectados, todo en un solo lugar.</p>
+              <h2 class="text-base font-semibold text-gray-900">{{ $t('account.accountSettings') }}</h2>
+              <p class="mt-1 text-sm/6 text-gray-500">{{ $t('account.settingsIntro') }}</p>
             </div>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 lg:gap-8 max-w-2xl">
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <UserIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Datos personales</h3>
-                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Consulta y actualiza tu nombre, correo electrónico y otros datos personales.</p>
-                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">Modificar &rarr;</a>
+                <h3 class="text-base font-semibold text-gray-900">{{ $t('onboarding.personalDetails') }}</h3>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">{{ $t('account.personalDetailsHint') }}</p>
+                <a href="javascript:" @click="isPersonalDetailsModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">{{ $t('account.modify') }} <span aria-hidden="true">→</span></a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <HomeIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Dirección</h3>
-                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Asegúrate de que los datos de tu dirección estén actualizados.</p>
-                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">Modificar &rarr;</a>
+                <h3 class="text-base font-semibold text-gray-900">{{ $t('account.address') }}</h3>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">{{ $t('account.addressHint') }}</p>
+                <a href="javascript:" @click="isAddressModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">{{ $t('account.modify') }} <span aria-hidden="true">→</span></a>
               </div>
               <div v-if="false" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <PhoneIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Teléfono móvil</h3>
-                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Actualiza tu número de teléfono para recuperar la cuenta y recibir notificaciones.</p>
-                <a href="#" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">Actualizar &rarr;</a>
+                <h3 class="text-base font-semibold text-gray-900">{{ $t('auth.signIn.mobileNumberPlaceholder') }}</h3>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">{{ $t('account.mobileHint') }}</p>
+                <a href="#" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">{{ $t('account.update') }} <span aria-hidden="true">→</span></a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <LockClosedIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Contraseña</h3>
-                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Cambia tu contraseña para mantener tu cuenta segura.</p>
-                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">Cambiar contraseña &rarr;</a>
+                <h3 class="text-base font-semibold text-gray-900">{{ $t('common.password') }}</h3>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">{{ $t('account.passwordHint') }}</p>
+                <a href="javascript:" @click="isChangePasswordModalOpen = true" class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">{{ $t('account.changePassword') }} <span aria-hidden="true">→</span></a>
               </div>
               <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <DevicePhoneMobileIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Dispositivos</h3>
-                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Administra los dispositivos que tienen acceso a tu cuenta.</p>
-                <router-link class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'devices'}">Administrar dispositivos &rarr;</router-link>
+                <h3 class="text-base font-semibold text-gray-900">{{ $t('account.devices') }}</h3>
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">{{ $t('account.devicesHint') }}</p>
+                <router-link class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'devices'}">{{ $t('account.manageDevices') }} <span aria-hidden="true">→</span></router-link>
               </div>
               <div v-if="walletStore.isAvailable" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <WalletIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Monedero</h3>
-                <p v-if="walletStore.isEnrolled" class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Tu número de monedero es <span class="font-medium tracking-wider text-gray-900">{{ walletStore.subscription.data?.walletNumber }}</span>.<template v-if="walletStore.requiresReacceptance"> Hay condiciones nuevas pendientes de que las aceptes.</template></p>
-                <p v-else class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Guarda dinero en tu cuenta y paga tus envíos al instante.</p>
+                <h3 class="text-base font-semibold text-gray-900">{{ $t('account.wallet') }}</h3>
+                <p v-if="walletStore.isEnrolled" class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3"><i18n-t keypath="account.walletNumberIs" scope="global"><template #number><span class="font-medium tracking-wider text-gray-900">{{ walletStore.subscription.data?.walletNumber }}</span></template></i18n-t><template v-if="walletStore.requiresReacceptance"> {{ $t('account.walletTermsPending') }}</template></p>
+                <p v-else class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">{{ $t('account.walletHint') }}</p>
                 <div class="mt-auto flex items-center gap-x-4">
-                  <router-link class="text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'wallet'}">{{ walletStore.isEnrolled ? 'Manage Wallet' : 'Get Started' }} &rarr;</router-link>
-                  <a v-if="walletStore.isEnrolled" href="javascript:" @click="closeWalletError = ''; isCloseWalletModalOpen = true" class="text-sm/6 inline-block font-medium text-danger-600 hover:text-danger-600">Cerrar monedero</a>
+                  <router-link class="text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'wallet'}">{{ walletStore.isEnrolled ? $t('account.manageWallet') : $t('account.getStarted') }} <span aria-hidden="true">→</span></router-link>
+                  <a v-if="walletStore.isEnrolled" href="javascript:" @click="closeWalletError = ''; isCloseWalletModalOpen = true" class="text-sm/6 inline-block font-medium text-danger-600 hover:text-danger-600">{{ $t('account.closeWallet') }}</a>
                 </div>
               </div>
             </div>
@@ -199,7 +199,7 @@ const passwordChanged = async () => {
                 <div class="rounded-t-md bg-brand-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
-                      <p class="text-xs/5 text-brand-700 max-w-sm">Actualizar datos personales ya verificados puede requerir que verifiques tu identidad de nuevo para garantizar la exactitud y el cumplimiento. Revisa los cambios con cuidado antes de continuar.</p>
+                      <p class="text-xs/5 text-brand-700 max-w-sm">{{ $t('account.reverifyPersonalWarning') }}</p>
                     </div>
                   </div>
                 </div>
@@ -207,7 +207,7 @@ const passwordChanged = async () => {
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`"
                       v-bind:showLoading="showLoading"
-                      v-bind:saveBtnText="'Guardar cambios'"
+                      v-bind:saveBtnText="'Save Changes'"
                       v-on:customer:attribute_category:updated="identityUpdated"
                       v-on:customer:attribute_category:update_failed="identityUpdateFailed"
                   />
@@ -230,7 +230,7 @@ const passwordChanged = async () => {
                 <div class="rounded-t-md bg-brand-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
-                      <p class="text-xs/5 text-brand-700 max-w-sm">Actualizar tu dirección puede requerir que la verifiques de nuevo para garantizar la exactitud y el cumplimiento. Revisa los cambios con cuidado antes de continuar.</p>
+                      <p class="text-xs/5 text-brand-700 max-w-sm">{{ $t('account.reverifyAddressWarning') }}</p>
                     </div>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ const passwordChanged = async () => {
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
                       v-bind:showLoading="showLoading"
-                      v-bind:saveBtnText="'Guardar cambios'"
+                      v-bind:saveBtnText="'Save Changes'"
                       v-on:customer:attribute_category:updated="addressUpdated"
                       v-on:customer:attribute_category:update_failed="addressUpdateFailed"
                   />
@@ -263,22 +263,18 @@ const passwordChanged = async () => {
                     <ExclamationTriangleIcon class="h-6 w-6 text-danger-600" aria-hidden="true" />
                   </div>
                   <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                    <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Cerrar tu monedero</DialogTitle>
+                    <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">{{ $t('account.closeYourWallet') }}</DialogTitle>
                     <div class="mt-2">
-                      <DialogDescription class="text-sm/6 text-gray-500">
-                        Solo puedes cerrarlo con saldo cero: gasta lo que quede o contacta con soporte para que te lo devuelvan antes. Tu número de monedero se dará de baja de forma definitiva; si vuelves a darte de alta más adelante, recibirás uno nuevo.
-                      </DialogDescription>
+                      <DialogDescription class="text-sm/6 text-gray-500">{{ $t('account.closeWalletCondition') }}</DialogDescription>
                     </div>
                     <p v-if="closeWalletError" class="mt-2 text-sm/6 text-danger-600">{{ closeWalletError }}</p>
                   </div>
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
                   <button type="button" class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer" @click="closeWallet" :disabled="isClosingWallet">
-                    {{ isClosingWallet ? 'Closing...' : 'Cerrar monedero' }}
+                    {{ isClosingWallet ? 'Closing...' : 'Close Wallet' }}
                   </button>
-                  <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="isCloseWalletModalOpen = false" :disabled="isClosingWallet">
-                    Mantener monedero
-                  </button>
+                  <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="isCloseWalletModalOpen = false" :disabled="isClosingWallet">{{ $t('account.keepWallet') }}</button>
                 </div>
               </DialogPanel>
             </TransitionChild>

@@ -3,10 +3,10 @@ import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
-import pTimeout from 'p-timeout';
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import Spinner from "@/components/Spinner.vue";
+import {useResendCountdown} from "@/composables/resend_countdown.js";
 
 // The mobile counterpart of EmailVerification, reached only when the
 // deployment sets VITE_ONBOARDING_VERIFY_MOBILE_NUMBER. The API has supported
@@ -56,30 +56,7 @@ async function verifyMobileNumber() {
   }
 }
 
-const showResendButton = ref(false);
-const countdown = ref(30);
-
-async function startResendOtpTimer() {
-  showResendButton.value = false;
-  countdown.value = 30;
-
-  try {
-    const timer = new Promise((resolve) => {
-      const interval = setInterval(() => {
-        countdown.value -= 1;
-        if (countdown.value === 0) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 1000);
-    });
-
-    await pTimeout(timer, {milliseconds: 30000});
-    showResendButton.value = true;
-  } catch (error) {
-    console.error(error);
-  }
-}
+const {countdown, showResendButton, start: startResendOtpTimer} = useResendCountdown();
 
 const resentMessage = ref('');
 const resendFailure = ref('');
@@ -92,7 +69,7 @@ async function resend() {
     resentMessage.value = "We've sent a new code by SMS. It can take a minute to arrive.";
   }).catch((e) => {
     logRequestFailure(e, 'resend-mobile-code');
-    resendFailure.value = failureMessage(e, "No hemos podido enviar un código nuevo. Inténtalo de nuevo.");
+    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
   }).finally(() => {
     isResendingToken.value = false;
   });
@@ -114,14 +91,11 @@ onMounted(async () => {
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:" class="mx-auto"><BrandLogo class="mb-5 mx-auto" /></a>
       </div>
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">Verify your mobile number</h2>
-      <p class="text-md text-gray-500 mb-2 text-center">
-        Please enter the one time password we have sent to
-        <span class="font-semibold text-brand-700">{{ customer.data?.account?.mobileNumber }}</span>.
-      </p>
-      <p class="text-sm/6 text-gray-500 mb-8 text-center lg:px-12">
-        It can take up to a minute to arrive.
-      </p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">{{ $t('verification.verifyYourMobileNumber') }}</h2>
+      <i18n-t keypath="verification.enterOneTimePassword" tag="p" scope="global" class="text-md text-gray-500 mb-2 text-center">
+        <template #number><span class="font-semibold text-brand-700">{{ customer.data?.account?.mobileNumber }}</span></template>
+      </i18n-t>
+      <p class="text-sm/6 text-gray-500 mb-8 text-center lg:px-12">{{ $t('verification.codeDelay') }}</p>
 
       <form @submit.prevent="verifyMobileNumber" class="space-y-10">
         <div v-if="otpError" class="rounded-md bg-danger-50 p-4">
@@ -144,25 +118,19 @@ onMounted(async () => {
           <button :disabled="isLoading" :class="[{'opacity-70': isLoading}]" type="submit" class="block w-full bg-brand-700 text-white text-center py-3 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer">
             <template v-if="isVerifying">
               <span class="flex items-center justify-center whitespace-nowrap">
-                <Spinner :class="'size-4 mr-2'" />
-                Please wait...
-              </span>
+                <Spinner :class="'size-4 mr-2'" />{{ $t('recipient.pleaseWait') }}</span>
             </template>
-            <template v-else>Verify</template>
+            <template v-else>{{ $t('verification.verify') }}</template>
           </button>
         </div>
         <template v-if="! isLoading && ! isVerifying">
           <p v-if="resentMessage" role="status" class="mb-3 rounded-lg bg-success-50 px-3 py-2 text-center text-sm/6 text-success-700">{{ resentMessage }}</p>
           <p v-if="resendFailure" role="alert" class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-center text-sm/6 text-danger-700">{{ resendFailure }}</p>
-          <div v-if="! isResendingToken" class="text-sm/6 text-gray-500 text-center">
-            Didn't receive the code?
-            <a @click="resend" class="text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">Resend code</a>
-            <template v-else>Resend in {{ countdown }}s</template>
+          <div v-if="! isResendingToken" class="text-sm/6 text-gray-500 text-center">{{ $t('verification.didntReceiveTheCode') }} <a @click="resend" class="text-brand-700 hover:underline cursor-pointer" v-if="showResendButton">{{ $t('verification.resendCode') }}</a>
+            <template v-else>{{ $t('verification.resendInCountdownS', {countdown: countdown}) }}</template>
           </div>
-          <div v-else class="text-sm/6 text-gray-500 text-center animate-pulse">Resending the code ...</div>
-          <div class="text-sm/6 text-gray-500 text-center">
-            Wrong number?
-            <a @click="emit('editMobileNumberRequested')" class="text-brand-700 hover:underline cursor-pointer">Change it</a>
+          <div v-else class="text-sm/6 text-gray-500 text-center animate-pulse">{{ $t('verification.resendingTheCode') }}</div>
+          <div class="text-sm/6 text-gray-500 text-center">{{ $t('verification.wrongNumber') }} <a @click="emit('editMobileNumberRequested')" class="text-brand-700 hover:underline cursor-pointer">{{ $t('verification.changeIt') }}</a>
           </div>
         </template>
       </form>

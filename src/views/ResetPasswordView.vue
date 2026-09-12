@@ -2,6 +2,7 @@
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {computed, onMounted, reactive, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
 import router from "@/router/index.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -28,6 +29,7 @@ const formErrors = reactive({
   confirm_password: [],
 });
 const resetPasswordFailureMessage = ref('');
+const {t} = useI18n();
 const passwordPolicyStore = usePasswordPolicyStore();
 const customerUtils = useCustomerUtils();
 const passwordPolicyUtils = usePasswordPolicyUtils();
@@ -96,7 +98,7 @@ async function resetPassword() {
       }
     } else {
       logRequestFailure(e, 'reset-password');
-      resetPasswordFailureMessage.value = failureMessage(e, "No hemos podido restablecer tu contraseña. Inténtalo de nuevo.");
+      resetPasswordFailureMessage.value = failureMessage(e, t('auth.resetPassword.failed'));
     }
   }).finally(() => {
     isLoading.value = false;
@@ -126,10 +128,10 @@ const totalPasswordRulesCount = computed(() => validatedPasswordPolicies.rules.l
 
 const passwordRequirementsSummary = computed(() => {
   if (!form.password) {
-    return 'Ver requisitos de contraseña';
+    return t('auth.resetPassword.requirementsToggle');
   }
   if (allPasswordRulesMet.value) {
-    return 'All requirements met';
+    return t('auth.resetPassword.requirementsMet');
   }
   return `${unmetPasswordRulesCount.value} of ${totalPasswordRulesCount.value} not met`;
 });
@@ -166,7 +168,7 @@ watch(
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
-          <img src="/images/backgrounds/bg.png" alt="Imagen a tamaño completo" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/resetpassword.png" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
@@ -191,7 +193,7 @@ watch(
               <a href="javascript:"><BrandLogo class="mb-5" /></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-6">Restablecer contraseña</h2>
+            <h2 class="text-2xl font-bold text-black mb-6">{{ $t('auth.resetPassword.title') }}</h2>
 
             <!-- Form -->
             <form @submit.prevent="resetPassword" class="space-y-5">
@@ -201,7 +203,7 @@ watch(
 
               <!-- Password Field -->
               <div>
-                <label :class="[formErrors.password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="password" class="mb-2 block text-base font-medium">Elige tu contraseña</label>
+                <label :class="[formErrors.password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="password" class="mb-2 block text-base font-medium">{{ $t('auth.resetPassword.chooseLabel') }}</label>
                 <div class="mb-3">
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
@@ -211,7 +213,7 @@ watch(
                       :type="showPassword ? 'text' : 'password'"
                       id="password"
                       v-model="form.password"
-                      placeholder="••••••••"
+                      :placeholder="$t('common.passwordPlaceholder')"
                       class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                       @focus="passwordFocused = true"
                       @blur="passwordFocused = false"
@@ -219,7 +221,7 @@ watch(
                     <button
                       type="button"
                       class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
-                      :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                      :aria-label="showPassword ? $t('common.hidePassword') : $t('common.showPassword')"
                       @click="showPassword = !showPassword"
                     >
                       <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
@@ -253,7 +255,7 @@ watch(
                       :class="[passwordRequirementsHeaderClass, passwordRequirementsOpen ? 'pi-chevron-up' : 'pi-chevron-down']"
                     />
                   </button>
-                  <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">No hemos podido cargar los requisitos de la contraseña. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Reintentar</button></p>
+                  <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">{{ $t('common.passwordRulesFailed') }} <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">{{ $t('common.tryAgain') }}</button></p>
                   <ul
                     v-show="passwordRequirementsOpen"
                     role="list"
@@ -285,7 +287,7 @@ watch(
 
               <!-- Confirm Password -->
               <div>
-                <label :class="[formErrors.confirm_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="confirm_password" class="mb-2 block text-base font-medium">Confirmar contraseña</label>
+                <label :class="[formErrors.confirm_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="confirm_password" class="mb-2 block text-base font-medium">{{ $t('auth.resetPassword.confirmLabel') }}</label>
                 <div
                   class="relative rounded-2xl border bg-white transition-all duration-200"
                   :class="formErrors.confirm_password.length > 0 ? 'border-danger-500' : (confirmPasswordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
@@ -294,7 +296,7 @@ watch(
                     :type="showConfirmPassword ? 'text' : 'password'"
                     id="confirm_password"
                     v-model="form.confirm_password"
-                    placeholder="••••••••"
+                    :placeholder="$t('common.passwordPlaceholder')"
                     class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                     @focus="confirmPasswordFocused = true"
                     @blur="confirmPasswordFocused = false"
@@ -302,7 +304,7 @@ watch(
                   <button
                     type="button"
                     class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
-                    :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+                    :aria-label="showConfirmPassword ? $t('common.hidePassword') : $t('common.showPassword')"
                     @click="showConfirmPassword = !showConfirmPassword"
                   >
                     <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
@@ -317,7 +319,7 @@ watch(
                 class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span class="inline-flex items-center justify-center gap-2">
-                  Continuar
+                  {{ $t('common.continue') }}
                   <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>

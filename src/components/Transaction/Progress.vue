@@ -23,48 +23,48 @@ const props = defineProps({
 const steps = [
   {
     id: 'selectRecipient',
-    name: 'Elige tu beneficiario',
-    description: 'Dinos a quién envías el dinero indicando su nombre y los datos del envío.',
+    name: 'Choose your recipient',
+    description: 'Tell us who you are sending money to by providing their name and transfer information.',
     show: true,
     stepCommand: 'SELECT_RECIPIENT',
     isMain: true,
   },
   {
     id: 'addRecipient',
-    name: 'Datos del beneficiario',
-    description: 'Dinos a quién envías el dinero indicando su nombre y los datos del envío.',
+    name: 'Add Recipient Details',
+    description: 'Tell us who you are sending money to by providing their name and transfer information.',
     show: false,
     stepCommand: 'ADD_RECIPIENT',
     isMain: false,
   },
   {
     id: 'provideAddress',
-    name: 'Tu dirección',
-    description: 'Por seguridad y cumplimiento normativo, necesitamos los datos de tu domicilio antes de continuar.',
+    name: 'Provide Your Address',
+    description: 'For security and compliance, we need your address details before proceeding.',
     show: false,
     stepCommand: null,
     isMain: false,
   },
   {
     id: 'accountVerification',
-    name: 'Verificación de cuenta',
-    description: 'Por seguridad y cumplimiento normativo, verifica tu cuenta antes de continuar con la transacción.',
+    name: 'Account verification',
+    description: 'For security and compliance, please verify your account before proceeding with the transaction.',
     show: false,
     stepCommand: null,
     isMain: false,
   },
   {
     id: 'confirm',
-    name: 'Revisa y confirma',
-    description: 'Revisa todos los datos antes de finalizar tu envío.',
+    name: 'Review & Confirm',
+    description: 'Double-check all details before finalizing your transfer.',
     show: true,
     stepCommand: null,
     isMain: true,
   },
   {
     id: 'makePayment',
-    name: 'Realiza el pago',
-    description: 'Complete your transfer by choosing a EMétodo de pagoand sending the funds.',
+    name: 'Make Payment',
+    description: 'Complete your transfer by choosing a payment method and sending the funds.',
     show: true,
     stepCommand: null,
     isMain: true,
@@ -127,8 +127,8 @@ const stepCommandExecuted = async (e) => {
 
 </script>
 <template>
-  <nav class="flex items-center justify-between space-x-8 sm:hidden py-3 px-4" aria-label="Progress">
-    <p class="text-sm/6 font-medium">Step {{ progress.findIndex((step) => step.status === 'current') + 1 }} of {{ progress.length }}</p>
+  <nav class="flex items-center justify-between space-x-8 sm:hidden py-3 px-4" :aria-label="$t('account.progress')">
+    <p class="text-sm/6 font-medium">{{ $t('account.stepOf', {current: progress.findIndex((step) => step.status === 'current') + 1, total: progress.length}) }}</p>
     <ol role="list" class="flex items-center space-x-5">
       <li v-for="step in progress" :key="step.name">
         <button v-if="step.status === 'complete'" type="button" @click="stepCommandExecuted(step.stepCommand)" class="group flex size-6 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
@@ -149,7 +149,7 @@ const stepCommandExecuted = async (e) => {
       </li>
     </ol>
   </nav>
-  <nav aria-label="Progress" class="hidden sm:block">
+  <nav :aria-label="$t('account.progress')" class="hidden sm:block">
     <ol role="list" class="overflow-hidden">
       <template v-for="(step, stepIdx) in progress" :key="step.id">
         <li :class="[stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative']">

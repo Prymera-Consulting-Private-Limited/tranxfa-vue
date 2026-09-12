@@ -51,7 +51,7 @@ async function updateEmail() {
       errors.value = Object.values(e.response.data.errors ?? {}).flat();
     } else {
       logRequestFailure(e, 'email-address');
-      saveFailure.value = failureMessage(e, "No hemos podido guardar tu correo electrónico. Inténtalo de nuevo.");
+      saveFailure.value = failureMessage(e, "We couldn't save your email address. Please try again.");
     }
     isSaving.value = false;
   });
@@ -75,12 +75,12 @@ onMounted( async () => {
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Introduce tu correo electrónico</h2>
-      <p class="text-md text-gray-900 mb-8 text-left">Introduce tu correo electrónico para continuar.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">{{ $t('onboarding.enterYourEmail') }}</h2>
+      <p class="text-md text-gray-900 mb-8 text-left">{{ $t('onboarding.emailStepHint') }}</p>
       <!-- Form -->
       <form @submit.prevent="updateEmail" class="mt-12 space-y-5">
         <div>
-          <label for="email" class="mb-2 block font-medium text-brand-700">Correo electrónico</label>
+          <label for="email" class="mb-2 block font-medium text-brand-700">{{ $t('common.email') }}</label>
           <div
             class="relative rounded-2xl border bg-white transition-all duration-200"
             :class="errors.length > 0 ? 'border-danger-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
@@ -90,7 +90,7 @@ onMounted( async () => {
               id="email"
               required
               v-model="email"
-              placeholder="introduce tu correo electrónico"
+              :placeholder="$t('onboarding.emailPlaceholderShort')"
               class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
               @focus="emailFocused = true"
               @blur="emailFocused = false"
@@ -108,14 +108,10 @@ onMounted( async () => {
         >
           <template v-if="isSaving">
             <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
-              <Spinner :class="'size-4'" />
-              Guardando...
-            </span>
+              <Spinner :class="'size-4'" />{{ $t('calculator.saving') }}</span>
           </template>
           <template v-else>
-            <span class="inline-flex items-center justify-center gap-2">
-              Continuar
-              <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
+            <span class="inline-flex items-center justify-center gap-2">{{ $t('common.continue') }}<i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
             </span>
           </template>
         </button>
@@ -124,9 +120,7 @@ onMounted( async () => {
           :disabled="showLoading || isSaving"
           type="button"
           class="block w-full rounded-full bg-gray-100 py-3.5 text-center text-base font-medium text-gray-600 transition-all duration-200 hover:bg-gray-200 hover:text-gray-700 active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          Omitir
-        </button>
+        >{{ $t('onboarding.skip') }}</button>
         <InlineFailure :message="saveFailure" />
       </form>
       <div class="mt-12 text-center">
@@ -134,7 +128,7 @@ onMounted( async () => {
           @click="editPersonalInformation"
           class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
           href="javascript:"
-        >Editar datos personales</a>
+        >{{ $t('onboarding.editPersonalInformation') }}</a>
       </div>
     </div>
   </div>

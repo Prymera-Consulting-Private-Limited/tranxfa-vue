@@ -177,10 +177,10 @@ async function reconcileOutcome() {
       return;
     }
     outcomeUnknown.value = false;
-    preconditionFailedMessage.value = 'Tu transferencia no se creó. No se ha realizado ningún cargo. Puedes confirmarla de nuevo.';
+    preconditionFailedMessage.value = 'Your transfer was not created. Nothing has been charged. You can confirm it again.';
   } catch (e) {
     logRequestFailure(e, 'confirm-reconcile');
-    reconcileFailure.value = "Seguimos sin poder conectar con el servidor. Revisa tus transferencias antes de confirmar de nuevo.";
+    reconcileFailure.value = "We still couldn't reach the server. Check your transfers before confirming again.";
   } finally {
     isReconciling.value = false;
   }
@@ -216,11 +216,11 @@ async function previewCoupon() {
       couponPreview.value = response.data;
     } else {
       // Soft-fail by design: the reason is written for the customer.
-      couponFailure.value = response.data?.failure_reason || "Este código no se puede usar en esta transferencia.";
+      couponFailure.value = response.data?.failure_reason || "This code can't be used on this transfer.";
     }
   } catch (e) {
     logRequestFailure(e, 'coupon-validate');
-    couponFailure.value = failureMessage(e, "No pudimos comprobar ese código. Inténtalo de nuevo.");
+    couponFailure.value = failureMessage(e, "We couldn't check that code. Please try again.");
   } finally {
     isCouponBusy.value = false;
   }
@@ -238,7 +238,7 @@ async function applyCoupon() {
   } catch (e) {
     logRequestFailure(e, 'coupon-apply');
     // A 422 carries the same customer wording Validate returns.
-    couponFailure.value = failureMessage(e, "No pudimos aplicar ese código. Inténtalo de nuevo.");
+    couponFailure.value = failureMessage(e, "We couldn't apply that code. Please try again.");
     couponPreview.value = null;
   } finally {
     isCouponBusy.value = false;
@@ -254,7 +254,7 @@ async function removeCoupon() {
     replaceQuote(response.data);
   } catch (e) {
     logRequestFailure(e, 'coupon-remove');
-    couponFailure.value = failureMessage(e, "No pudimos quitar el código. Inténtalo de nuevo.");
+    couponFailure.value = failureMessage(e, "We couldn't remove the code. Please try again.");
   } finally {
     isCouponBusy.value = false;
   }
@@ -282,7 +282,7 @@ const setRecipient =  async (recipient) => {
     send({ type: 'PROCEED' });
   }).catch((e) => {
     logRequestFailure(e, 'quote-set-recipient');
-    stepFailure.value = failureMessage(e, "No hemos podido añadir ese beneficiario a este envío. Vuelve a seleccionarlo.");
+    stepFailure.value = failureMessage(e, "We couldn't add that recipient to this transfer. Please choose them again.");
   });
   isLoading.value = false;
 }
@@ -333,7 +333,7 @@ const confirmQuote = async () => {
         // The rail already holds a deposit for this exact figure. Retrying
         // the same amount is refused again; a different amount goes through.
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = (error.response.data.message || 'Ya tienes una transferencia abierta por este mismo importe.') + ' Cambia el importe y confirma de nuevo.';
+        preconditionFailedMessage.value = (error.response.data.message || 'You already have a transfer open for this exact amount.') + ' Change the amount and confirm again.';
       } else if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
@@ -379,7 +379,7 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "missing_recipient") {
         // The quote has no recipient any more (deleted, or a stale tab).
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = error.response.data.message || 'Elige a quién quieres enviar este envío.';
+        preconditionFailedMessage.value = error.response.data.message || 'Please choose who to send this transfer to.';
         await send({ type: 'SELECT_RECIPIENT' });
       } else if (fixFor(error.response.data.type, router.currentRoute.value.fullPath)) {
         // Something on the profile has to be finished first: a mobile number
@@ -389,7 +389,7 @@ const confirmQuote = async () => {
         await router.push(fixFor(error.response.data.type, router.currentRoute.value.fullPath).route);
       } else {
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = error.response.data.message || 'No pudimos confirmar esta transferencia. Inténtalo de nuevo.';
+        preconditionFailedMessage.value = error.response.data.message || 'We could not confirm this transfer. Please try again.';
       }
     } else if (error.response?.status === 422) {
       confirmFormErrors.value = error.response.data.errors;
@@ -403,7 +403,7 @@ const confirmQuote = async () => {
       await reconcileOutcome();
     } else {
       isStepProcessing.value = false;
-      preconditionFailedMessage.value = failureMessage(error, 'No pudimos confirmar esta transferencia. Inténtalo de nuevo.');
+      preconditionFailedMessage.value = failureMessage(error, 'We could not confirm this transfer. Please try again.');
     }
   }
 }
@@ -439,7 +439,7 @@ async function documentUploaded() {
     }
   }).catch((e) => {
     logRequestFailure(e, 'quote-after-upload');
-    stepFailure.value = failureMessage(e, "Hemos recibido tu documento, pero no hemos podido actualizar este envío. Vuelve a cargar la página.");
+    stepFailure.value = failureMessage(e, "Your document was received, but we couldn't refresh this transfer. Please reload the page.");
   });
   selectedUploadDocumentCategory.value = null;
   isLoading.value = false;
@@ -497,7 +497,7 @@ const applyInfoFromPoiDocument = async () => {
     confirmQuote();
   }).catch((e) => {
     logRequestFailure(e, 'apply-poi-details');
-    applyPoiFailure.value = failureMessage(e, "No hemos podido copiar los datos de tu documento. Inténtalo de nuevo o introduce tus datos manualmente.");
+    applyPoiFailure.value = failureMessage(e, "We couldn't copy the details from your document. Please try again or update your details by hand.");
   }).finally(() => {
     isApplyingInfoFromPoiDocument.value = false;
   });
@@ -556,7 +556,7 @@ function loadPoiCategory() {
     send({ type: 'PROCEED' });
   }).catch((e) => {
     logRequestFailure(e, 'poi-category');
-    stepFailure.value = failureMessage(e, "No hemos podido cargar la subida de documentos. Inténtalo de nuevo.");
+    stepFailure.value = failureMessage(e, "We couldn't load the document upload. Please try again.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -606,7 +606,7 @@ const requestWalletSpendCode = async () => {
     isSpendOtpModalOpen.value = true;
   }).catch((error) => {
     isStepProcessing.value = false;
-    preconditionFailedMessage.value = error.response?.data?.message ?? 'Algo no ha funcionado. Inténtalo de nuevo.';
+    preconditionFailedMessage.value = error.response?.data?.message ?? 'Something went wrong. Please try again.';
   });
 }
 
@@ -654,7 +654,7 @@ const canContinue = computed(() => {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-5"  v-if="snapshot.value !== 'poiInfoCheckFailed'">
-        <h1 class="sr-only">Revisar y confirmar</h1>
+        <h1 class="sr-only">{{ $t('transfer.wizard.reviewConfirm') }}</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 bg-white rounded-lg p-4 md:px-6 md:py-10 shadow-lg">
           <!-- Left column -->
@@ -670,27 +670,27 @@ const canContinue = computed(() => {
                 <div :class="{'animate-pulse': isStepProcessing}" class="xl:col-span-2 px-3">
                   <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center w-64 lg:min-w-96 mx-auto min-h-96">
                     <Spinner class="size-16 mx-auto" />
-                    <span class="sr-only">Cargando...</span>
+                    <span class="sr-only">{{ $t('transfer.wizard.loading') }}</span>
                   </div>
                   <LoadFailurePanel
                     v-else-if="quoteFailure"
-                    title="No hemos podido cargar este envío"
+                    :title="$t('transfer.wizard.weCouldntLoadThisTransfer')"
                     :message="typeof quoteFailure === 'string' ? quoteFailure : null"
                     :backTo="{name: 'dashboard'}"
-                    backLabel="Start a new transfer"
+                    :backLabel="$t('transfer.wizard.startANewTransfer')"
                   />
                   <template v-else>
-                    <InlineFailure :message="stepFailure" retryLabel="Reintentar" @retry="loadPoiCategory" class="mb-5" />
+                    <InlineFailure :message="stepFailure" :retryLabel="$t('common.tryAgain')" @retry="loadPoiCategory" class="mb-5" />
                     <div v-if="resumedAfterMfa" role="status" class="border-l-4 border-success-400 bg-success-50 p-4 mb-5">
-                      <p class="text-sm/6 text-success-800">Gracias, ya estás verificado. Revisa los datos y pulsa Confirmar para enviar esta transferencia.</p>
+                      <p class="text-sm/6 text-success-800">{{ $t('transfer.wizard.verifiedReadyToConfirm') }}</p>
                     </div>
                     <div v-if="outcomeUnknown" role="alert" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
-                      <p class="text-sm/6 font-semibold text-warning-800">No recibimos respuesta al confirmar esta transferencia.</p>
-                      <p class="mt-1 text-sm/6 text-warning-800">Puede que ya exista. Estamos revisando tus transferencias para que no se te cobre dos veces.</p>
+                      <p class="text-sm/6 font-semibold text-warning-800">{{ $t('transfer.wizard.weDidntGetAnAnswer') }}</p>
+                      <p class="mt-1 text-sm/6 text-warning-800">{{ $t('transfer.wizard.itMayAlreadyExistWere') }}</p>
                       <p v-if="reconcileFailure" class="mt-2 text-sm/6 text-danger-700">{{ reconcileFailure }}</p>
                       <div class="mt-3 flex flex-wrap gap-3">
-                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? 'Comprobando…' : 'Comprobar de nuevo' }}</button>
-                        <router-link :to="{name: 'transactions'}" class="inline-flex min-h-11 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50">Ver mis transferencias</router-link>
+                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? 'Checking…' : 'Check again' }}</button>
+                        <router-link :to="{name: 'transactions'}" class="inline-flex min-h-11 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50">{{ $t('transfer.wizard.seeMyTransfers') }}</router-link>
                       </div>
                     </div>
                     <div v-if="preconditionFailedMessage" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
@@ -699,9 +699,7 @@ const canContinue = computed(() => {
                           <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                         </div>
                         <div class="ml-3">
-                          <p class="text-sm/6 text-warning-700">
-                            {{ preconditionFailedMessage }}
-                          </p>
+                          <p class="text-sm/6 text-warning-700">{{ preconditionFailedMessage }}</p>
                         </div>
                       </div>
                     </div>
@@ -728,13 +726,11 @@ const canContinue = computed(() => {
                       </template>
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
-                      <h3 class="text-gray-900 mb-4 font-semibold">Indica tu dirección</h3>
-                      <p class="text-gray-500 text-sm/6 mb-3 -mt-2">
-                        Indica tu domicilio completo en
-                        <span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span>.
+                      <h3 class="text-gray-900 mb-4 font-semibold">{{ $t('transfer.wizard.provideYourAddress') }}</h3>
+                      <p class="text-gray-500 text-sm/6 mb-3 -mt-2"><i18n-t keypath="onboarding.addressIntroShort" scope="global"><template #country><span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span></template></i18n-t>
                       </p>
                       <p class="text-gray-500 text-sm/6 mb-6 -mt-2">
-                        <span>Se requiere información precisa sobre la dirección para cumplir con las normativas financieras y garantizar transferencias seguras.</span>
+                        <span>{{ $t('transfer.wizard.accurateAddressInformationIsRequired') }}</span>
                       </p>
 
                       <CustomerAttributeForm
@@ -747,12 +743,12 @@ const canContinue = computed(() => {
                       />
                     </template>
                     <template v-if="snapshot.value === 'accountVerification'">
-                      <h3 class="text-gray-900 mb-4 font-semibold">Verificación única</h3>
+                      <h3 class="text-gray-900 mb-4 font-semibold">{{ $t('transfer.wizard.oneTimeAccountVerification') }}</h3>
                       <template v-if="selectedUploadDocumentCategory">
                         <CategoryDescription v-bind:category="selectedUploadDocumentCategory" />
                         <div v-if="documentInReview" role="status" class="mb-5 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
-                          <p class="font-semibold">Gracias, ya tenemos tu {{ documentInReview }}.</p>
-                          <p>Lo estamos revisando. Te avisaremos por correo cuando esté listo y tu envío continuará desde aquí.</p>
+                          <p class="font-semibold">{{ $t('transfer.wizard.documentReceived', {documentInReview: documentInReview}) }}</p>
+                          <p>{{ $t('transfer.wizard.weAreCheckingItNow') }}</p>
                         </div>
                         <ul v-if="selectedUploadDocumentCategory.documentTypes?.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                           <li v-for="documentType in selectedUploadDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
@@ -765,21 +761,19 @@ const canContinue = computed(() => {
                         </ul>
                       </template>
                       <template v-else>
-                        <p class="text-gray-500 text-sm/6 mb-6">
-                          Necesitamos verificar su cuenta para procesar esta transacción. Para ello, por favor proporcione los documentos correspondientes a cada una de las categorías que se indican a continuación.
-                        </p>
+                        <p class="text-gray-500 text-sm/6 mb-6">{{ $t('transfer.wizard.weNeedToVerifyYour') }}</p>
                         <ul v-if="quote.data.pendingDocuments[0].documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6">
                           <li v-for="pendingCategory in quote.data?.pendingDocuments" :key="pendingCategory.id" class="col-span-1 flex rounded-lg bg-white items-start border-1 border-gray-200 hover:shadow-sm transition-transform transform hover:scale-105 px-6 py-3">
                             <div class="text-left pl-3 py-3">
                               <h3 class="text-sm/6 font-medium text-gray-900">{{ pendingCategory.title }}</h3>
                               <dl v-if="pendingCategory.description" class="mt-0 flex grow flex-col justify-between">
-                                <dt class="sr-only">Información</dt>
+                                <dt class="sr-only">{{ $t('transfer.wizard.information') }}</dt>
                                 <dd class="mt-1 text-sm/6 text-gray-500">
                                   <CategoryDescription v-bind:category="pendingCategory" />
                                 </dd>
-                                <dt class="sr-only">Iniciar verificación</dt>
+                                <dt class="sr-only">{{ $t('transfer.wizard.startVerification') }}</dt>
                                 <dd class="text-sm/6 text-gray-500">
-                                  <a href="javascript:" @click="startVerification(pendingCategory)" class="text-brand-700 font-semibold hover:underline">Iniciar verificación</a>
+                                  <a href="javascript:" @click="startVerification(pendingCategory)" class="text-brand-700 font-semibold hover:underline">{{ $t('transfer.wizard.startVerification') }}</a>
                                 </dd>
                               </dl>
                             </div>
@@ -799,17 +793,17 @@ const canContinue = computed(() => {
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Resumen de la transacción</h2>
+              <h2 class="sr-only" id="section-2-title">{{ $t('transfer.wizard.transactionSummary') }}</h2>
               <template v-if="quote.data">
                 <div v-if="snapshot.value !== 'confirm'" class="hidden sm:grid"><QuoteDisplay v-bind:quote="quote.data" /></div>
                 <template v-else>
                   <div class="px-3 sm:px-0">
-                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Selecciona el motivo <span class="text-danger-600">*</span></label>
-                    <p class="mb-4 text-sm/6 text-gray-500">Indica al beneficiario el motivo de tu transferencia.</p>
-                    <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Por favor, seleccione`" key-by="id" label="title">
+                    <label for="purpose" class="text-sm/6 font-semibold text-gray-900">{{ $t('transfer.wizard.selectAPurpose') }}<span class="text-danger-600">*</span></label>
+                    <p class="mb-4 text-sm/6 text-gray-500">{{ $t('transfer.wizard.pleaseProvideThePurposeOf') }}</p>
+                    <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" :label="$t('transfer.wizard.title')">
                       <template v-slot:no-options="{ search, searching }">
-                        <template class="text-sm/6 text-gray-300" v-if="searching">No se encontraron resultados para <em>{{ search }}</em>.</template>
-                        <em class="text-sm/6 text-gray-500 opacity-50" v-else>Empieza a escribir para buscar...</em>
+                        <template class="text-sm/6 text-gray-300" v-if="searching"><i18n-t keypath="transfer.wizard.noResultsFound" scope="global"><template #query><em>{{ search }}</em></template></i18n-t></template>
+                        <em class="text-sm/6 text-gray-500 opacity-50" v-else>{{ $t('transfer.wizard.startTypingToSearch') }}</em>
                       </template>
                       <template #selected-option-container="{ option, deselect, multiple, disabled }">
                         <div class="vs__selected">
@@ -828,34 +822,34 @@ const canContinue = computed(() => {
                     </v-select>
 
                     <div v-if="hasCoupons" class="mt-6 mb-4">
-                      <label for="coupon-code" class="text-sm/6 font-semibold text-gray-900">¿Tienes un código de promoción?</label>
+                      <label for="coupon-code" class="text-sm/6 font-semibold text-gray-900">{{ $t('transfer.wizard.haveAPromotionCode') }}</label>
                       <template v-if="quote.data.coupon">
                         <div role="status" class="mt-2 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-sm/6 text-success-800">
-                          <p class="font-semibold">Código {{ quote.data.coupon.code }} aplicado<template v-if="quote.data.coupon.discountAmountCurrencyPrefixed">: ahorras {{ quote.data.coupon.discountAmountCurrencyPrefixed }}</template><template v-else-if="quote.data.coupon.exchangeRateBeforeCouponFormatted">: la tasa era {{ quote.data.coupon.exchangeRateBeforeCouponFormatted }}, ahora {{ quote.data.exchangeRateFormatted }}</template>.</p>
+                          <p class="font-semibold">{{ $t('transfer.wizard.codeCodeApplied', {code: quote.data.coupon.code}) }}<template v-if="quote.data.coupon.discountAmountCurrencyPrefixed">{{ $t('transfer.wizard.youSaveDiscountamountcurrencyprefixed', {discountAmountCurrencyPrefixed: quote.data.coupon.discountAmountCurrencyPrefixed}) }}</template><template v-else-if="quote.data.coupon.exchangeRateBeforeCouponFormatted">{{ $t('transfer.wizard.rateWasExchangeratebeforecouponformattedNowExchangerateformatted', {exchangeRateBeforeCouponFormatted: quote.data.coupon.exchangeRateBeforeCouponFormatted, exchangeRateFormatted: quote.data.exchangeRateFormatted}) }}</template>.</p>
                           <p v-if="quote.data.coupon.infoText">{{ quote.data.coupon.infoText }}</p>
                           <p v-if="quote.data.coupon.termsText" class="text-xs/5 text-success-700">{{ quote.data.coupon.termsText }}</p>
-                          <button type="button" @click="removeCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold underline underline-offset-2 disabled:opacity-60">Quitar código</button>
+                          <button type="button" @click="removeCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold underline underline-offset-2 disabled:opacity-60">{{ $t('transfer.wizard.removeCode') }}</button>
                         </div>
                       </template>
                       <template v-else>
                         <div class="mt-2 flex gap-2">
-                          <input id="coupon-code" v-model="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="255" placeholder="Ingresa el código" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 uppercase focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" @keydown.enter.prevent="previewCoupon" />
-                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? 'Comprobando…' : 'Comprobar código' }}</button>
+                          <input id="coupon-code" v-model="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="255" :placeholder="$t('transfer.wizard.enterCode')" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 uppercase focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" @keydown.enter.prevent="previewCoupon" />
+                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? 'Checking…' : 'Check code' }}</button>
                         </div>
                         <p v-if="couponFailure" role="alert" class="mt-2 text-sm/6 text-danger-700">{{ couponFailure }}</p>
                         <div v-if="couponPreview" role="status" class="mt-2 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
-                          <p class="font-semibold">{{ couponPreview.info_text || 'Este código se aplica a tu transferencia.' }}</p>
-                          <p v-if="couponPreview.discount_amount">Ahorras {{ couponPreview.discount_amount }} {{ quote.data.paymentCurrency?.isoAlpha ?? '' }} en esta transferencia.</p>
-                          <p v-else-if="couponPreview.adjusted_exchange_rate">Mejora tu tasa a {{ couponPreview.adjusted_exchange_rate }}.</p>
+                          <p class="font-semibold">{{ couponPreview.info_text || 'This code applies to your transfer.' }}</p>
+                          <p v-if="couponPreview.discount_amount">{{ $t('transfer.wizard.savesDiscountAmountIsoalphaOn', {discount_amount: couponPreview.discount_amount, isoAlpha: quote.data.paymentCurrency?.isoAlpha ?? ''}) }}</p>
+                          <p v-else-if="couponPreview.adjusted_exchange_rate">{{ $t('transfer.wizard.improvesYourRateToAdjusted', {adjusted_exchange_rate: couponPreview.adjusted_exchange_rate}) }}</p>
                           <p v-if="couponPreview.terms_text" class="text-xs/5 text-info-700">{{ couponPreview.terms_text }}</p>
-                          <button type="button" @click="applyCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">Usar este código</button>
+                          <button type="button" @click="applyCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ $t('transfer.wizard.useThisCode') }}</button>
                         </div>
                       </template>
                     </div>
 
-                    <fieldset aria-label="Método de pago" class="mt-6 mb-4">
-                      <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Método de pago <span class="text-danger-600">*</span></label>
-                      <p class="mb-4 text-sm/6 text-gray-500">Elige cómo quieres pagar.</p>
+                    <fieldset :aria-label="$t('transfer.wizard.paymentMethod')" class="mt-6 mb-4">
+                      <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">{{ $t('transfer.wizard.paymentMethod') }}<span class="text-danger-600">*</span></label>
+                      <p class="mb-4 text-sm/6 text-gray-500">{{ $t('transfer.wizard.pleaseSelectHowWouldYou') }}</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
                           <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
@@ -875,7 +869,7 @@ const canContinue = computed(() => {
                     <template v-if="paymentMethod?.providers[0]?.paymentDataAttributes?.length > 0">
                       <template v-for="attribute in paymentMethod?.providers[0].paymentDataAttributes">
                         <div class="mb-4">
-                          <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ attribute.label }} <span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
+                          <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ attribute.label }}<span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
                           <p v-if="attribute.info" class="mb-4 text-sm/6 text-gray-500">{{ attribute.info }}</p>
                           <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
                           <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
@@ -888,31 +882,31 @@ const canContinue = computed(() => {
                       <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
                         <template v-if="walletStore.isEnrolled">
                           <div class="flex items-center justify-between text-sm/6 text-gray-600">
-                            <span>Wallet balance</span>
+                            <span>{{ $t('transfer.wizard.walletBalance') }}</span>
                             <span class="font-semibold text-gray-900">{{ walletCheckoutBalance?.amountFormatted ?? '—' }}</span>
                           </div>
                           <div class="mt-1 flex items-center justify-between text-sm/6 text-gray-600">
-                            <span>This transfer</span>
+                            <span>{{ $t('transfer.wizard.thisTransfer') }}</span>
                             <span class="font-semibold text-gray-900">{{ quote.data.totalAmountCurrencyPrefixed }}</span>
                           </div>
                           <template v-if="walletStore.requiresReacceptance">
                             <div class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
-                              <p class="text-sm/6 text-warning-700">Hemos actualizado las condiciones del monedero: acepta la nueva versión para pagar con tu monedero.</p>
-                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Revisar y aceptar &rarr;</button>
+                              <p class="text-sm/6 text-warning-700">{{ $t('transfer.wizard.weveUpdatedTheWalletTerms') }}</p>
+                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">{{ $t('transfer.wizard.reviewAndAccep') }} <span aria-hidden="true">→</span></button>
                             </div>
                           </template>
-                          <p v-else class="mt-2 text-xs/5 text-gray-500">Confirmarás este pago con un código que te enviaremos por correo.</p>
+                          <p v-else class="mt-2 text-xs/5 text-gray-500">{{ $t('transfer.wizard.youllConfirmThisPaymentWith') }}</p>
                           <div v-if="walletShortMessage" class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
                             <p class="text-sm/6 text-warning-700">{{ walletShortMessage }}</p>
                             <div class="mt-2 flex items-center gap-x-4">
-                              <button type="button" @click="isWalletTopUpOpen = true" class="text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Add money &rarr;</button>
-                              <span class="text-xs/5 text-warning-700">o elige arriba otra forma de pago</span>
+                              <button type="button" @click="isWalletTopUpOpen = true" class="text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">{{ $t('transfer.wizard.addMone') }} <span aria-hidden="true">→</span></button>
+                              <span class="text-xs/5 text-warning-700">{{ $t('transfer.wizard.orChooseAnotherWayTo') }}</span>
                             </div>
                           </div>
                         </template>
                         <template v-else>
-                          <p class="text-sm/6 text-gray-600">Activa tu monedero para pagar así: lee y acepta las condiciones y luego carga saldo por transferencia bancaria.</p>
-                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">Activate wallet &rarr;</button>
+                          <p class="text-sm/6 text-gray-600">{{ $t('transfer.wizard.activateYourWalletToPay') }}</p>
+                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">{{ $t('transfer.wizard.activateWalle') }} <span aria-hidden="true">→</span></button>
                         </template>
                       </div>
                     </template>
@@ -935,7 +929,7 @@ const canContinue = computed(() => {
                 <button v-if="showContinueButton" @click="submitAndContinue" :class="{'opacity-60' : !canContinue}" :disabled="!canContinue" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6">
                   <span v-if="isStepProcessing" class="flex justify-center items-center">
                     <Spinner :class="'w-5 h-5 mr-3'"/>
-                    <span>Saving...</span>
+                    <span>{{ $t('transfer.wizard.saving') }}</span>
                   </span>
                   <span v-else>{{ snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? 'Pay with Wallet' : 'Continue' }}</span>
                 </button>
@@ -949,7 +943,7 @@ const canContinue = computed(() => {
           <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
             <div class="text-center" v-if="isLoading">
               <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-500"></span>
-              <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Por favor, espere ...</h2>
+              <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">{{ $t('transfer.wizard.pleaseWait') }}</h2>
             </div>
           </div>
         </div>
@@ -962,13 +956,11 @@ const canContinue = computed(() => {
               <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                   <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                    <button class="sr-only">Se ha detectado una discrepancia de identidad</button>
+                    <button class="sr-only">{{ $t('transfer.wizard.identityMismatchDetected') }}</button>
                     <div class="">
                       <div class="text-left">
-                        <h3 class="font-semibold text-danger-600">Se ha detectado una discrepancia de identidad</h3>
-                        <p class="font-normal text-sm/6 text-danger-600 mt-3">
-                          Hemos detectado una discrepancia entre su perfil y el documento de identidad que ha enviado. Para continuar con el proceso de verificación, por favor elija una de las siguientes opciones:
-                        </p>
+                        <h3 class="font-semibold text-danger-600">{{ $t('transfer.wizard.identityMismatchDetected') }}</h3>
+                        <p class="font-normal text-sm/6 text-danger-600 mt-3">{{ $t('transfer.wizard.weVeDetectedADiscrepancy') }}</p>
                         <ul role="list" class="mt-6 divide-y divide-gray-200" :class="isApplyingInfoFromPoiDocument ? 'opacity:70 animate animate-pulse' : ''">
                           <li @click="stepCommandExecuted('UPLOAD_ANOTHER_POI')" :class="isApplyingInfoFromPoiDocument ? '' : 'cursor-pointer'">
                             <div class="group relative flex items-start space-x-3 py-4">
@@ -980,13 +972,9 @@ const canContinue = computed(() => {
                               <div class="min-w-0 flex-1 px-2.5">
                                 <div class="text-sm/6 font-medium text-gray-900">
                                   <div>
-                                    <span class="absolute inset-0" aria-hidden="true" />
-                                    Subir otro documento
-                                  </div>
+                                    <span class="absolute inset-0" aria-hidden="true" />{{ $t('transfer.wizard.uploadAnotherDocument') }}</div>
                                 </div>
-                                <p class="text-sm/6 text-gray-500 mt-1">
-                                  Proporcionaré un documento diferente que coincida con mi perfil.
-                                </p>
+                                <p class="text-sm/6 text-gray-500 mt-1">{{ $t('transfer.wizard.iLlProvideADifferent') }}</p>
                               </div>
                               <div class="shrink-0 self-center">
                                 <ChevronRightIcon class="size-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true" />
@@ -1004,13 +992,9 @@ const canContinue = computed(() => {
                               <div class="min-w-0 flex-1 px-2.5">
                                 <div class="text-sm/6 font-medium text-gray-900">
                                   <div>
-                                    <span class="absolute inset-0" aria-hidden="true" />
-                                    Usar detalles del documento
-                                  </div>
+                                    <span class="absolute inset-0" aria-hidden="true" />{{ $t('transfer.wizard.useDocumentDetails') }}</div>
                                 </div>
-                                <p class="text-sm/6 text-gray-500 mt-1">
-                                  Actualizar mi perfil con la información de este documento.
-                                </p>
+                                <p class="text-sm/6 text-gray-500 mt-1">{{ $t('transfer.wizard.updateMyProfileWithThe') }}</p>
                               </div>
                               <div class="shrink-0 self-center">
                                 <ChevronRightIcon class="size-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true" />
