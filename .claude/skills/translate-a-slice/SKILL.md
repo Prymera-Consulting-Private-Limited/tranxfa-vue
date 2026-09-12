@@ -40,8 +40,14 @@ and reports, which is the part you do by hand:
 - **String literals in `<script setup>`** — failure messages, computed labels.
   Add `import {useI18n} from "vue-i18n";` and `const {t} = useI18n();`, then
   replace the literal with `t('key')`.
-- **Sentences split across tags**, where a link sits mid-sentence. Decide
-  whether the link text is its own key or the sentence carries a placeholder.
+- **Sentences split across tags**, where a link or a bold value sits
+  mid-sentence. Do not leave these as three keys: a translator cannot reorder
+  them and the spaces between them are gone. Use `<i18n-t keypath="..." tag="p"
+  scope="global">` with one `<template #name>` per styled part, and one message
+  holding `{name}`. `docs/localisation.md` has the shape.
+- **Keys whose message is only a placeholder** (`"{amount}"`). The script no
+  longer makes them, but earlier slices did. Put the interpolation back in the
+  template and delete the key.
 - **Anything with an `@` in it.** Escape as `{'@'}` or message compilation
   fails at render, not at build.
 
@@ -54,11 +60,16 @@ where `documentReceived` was meant.
 1. Add every migrated file to `MIGRATED` in `tests/i18n-catalogue.spec.js`.
    The guard then requires that each key exists and that the file spells out no
    sentence of its own. Run it; it will find what you missed.
-2. `npm run build` and `npx vitest run`.
-3. Existing specs that assert the English will fail. That is the point: move
+2. `python3 scripts/i18n-render-check.py HEAD <the files>`. It must print no
+   differences: the English on screen has to be identical, down to the spaces
+   between a label and the element beside it. Every difference it prints is a
+   defect you introduced, except one you meant to fix, and then say so in the
+   pull request.
+3. `npm run build` and `npx vitest run`.
+4. Existing specs that assert the English will fail. That is the point: move
    each one to read the catalogue (`expect(en.transfer.wizard.x).toBe(...)`)
    and assert the key in the source. Do not weaken the assertion.
-4. If the area belongs to a brand that already ships in another language, add
+5. If the area belongs to a brand that already ships in another language, add
    the same keys to that catalogue in the same pull request, or the screen
    silently falls back to English.
 

@@ -69,21 +69,21 @@ const finalStateReached = async () => {
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Select document type for your {{ selectedCategory.data?.title }}</h1>
+        <h1 class="sr-only">{{ $t('verification.selectDocumentType', {title: selectedCategory.data?.title}) }}</h1>
         <LoadFailurePanel
           v-if="loadFailure"
-          title="We couldn't load this verification step"
+          :title="$t('verification.categoryLoadFailure')"
           :message="loadFailure"
-          retryLabel="Try again"
+          :retryLabel="$t('common.tryAgain')"
           @retry="load"
           class="mt-0"
         />
         <LoadFailurePanel
           v-else-if="isResolved && ! selectedCategory.data"
-          title="There is nothing to upload here"
+          :title="$t('verification.nothingToUpload')"
           message="This document category is no longer waiting on you. It may already be complete."
           :backTo="{name: 'accountVerification'}"
-          backLabel="Account verification"
+          :backLabel="$t('verification.backToVerification')"
         />
         <!-- Main 3 column grid -->
         <div v-else class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
@@ -94,7 +94,7 @@ const finalStateReached = async () => {
               <div>
                 <h2 class="text-base font-semibold text-gray-900">{{ selectedCategory.data?.title }}</h2>
                 <div class="mt-1" v-if="selectedCategory.data"><CategoryDescription v-bind:category="selectedCategory.data" /></div>
-                <p v-else class="mt-1 text-sm/6 text-gray-500">Get started by completing the following steps.</p>
+                <p v-else class="mt-1 text-sm/6 text-gray-500">{{ $t('verification.getStarted') }}</p>
                 <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
                   <template v-if="customerStore.isLoaded">
                     <ul v-if="selectedCategory.data?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

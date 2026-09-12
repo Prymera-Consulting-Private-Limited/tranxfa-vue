@@ -46,5 +46,5 @@ const sdkFinalStateReached = () => {
       v-on:sdkInitialized="sdkInitialized"
       v-on:sdkApplicantStatusChanged="sdkFinalStateReached"
     />
-  <p class="text-gray-500 text-xs/5 text-center mb-8 px-4">All data is processed in accordance with our privacy policy.</p>
+  <p class="text-gray-500 text-xs/5 text-center mb-8 px-4">{{ $t('verification.privacyNote') }}</p>
 </template>

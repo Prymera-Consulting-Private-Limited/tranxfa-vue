@@ -20,8 +20,8 @@ const targetSelected = (target) => {
 
 <template>
   <div>
-    <h2 class="text-base font-semibold text-gray-900">Select Recipient Country</h2>
-    <p class="mt-1 text-sm/6 text-gray-500">Choose the country of the recipient from the list below.</p>
+    <h2 class="text-base font-semibold text-gray-900">{{ $t('recipient.selectRecipientCountry') }}</h2>
+    <p class="mt-1 text-sm/6 text-gray-500">{{ $t('recipient.chooseCountryHint') }}</p>
     <ul role="list" class="mt-0 grid grid-cols-1 gap-6 py-6">
       <li class="flow-root" v-for="(target, index) in targets" :key="index">
         <a href="javascript:" @click="targetSelected(target)" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-0 hover:bg-gray-50">

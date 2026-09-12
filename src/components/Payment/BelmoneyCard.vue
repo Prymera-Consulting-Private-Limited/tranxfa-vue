@@ -146,7 +146,7 @@ const retryPayment = async () => {
         <template v-if="! isExpiryPassed">{{ $t('payment.card.payableForAnotherExpiresinExpiresatformatted', {expiresIn: expiresIn, expiresAtFormatted: expiresAtFormatted}) }}</template>
         <template v-else>{{ $t('payment.card.thePaymentWindowHasPassed') }}</template>
       </p>
-      <p v-if="transaction.payment.paymentTerms" class="mt-4 text-xs/5 text-gray-500 text-left whitespace-pre-line">{{ $t('payment.card.paymentterms', {paymentTerms: transaction.payment.paymentTerms}) }}</p>
+      <p v-if="transaction.payment.paymentTerms" class="mt-4 text-xs/5 text-gray-500 text-left whitespace-pre-line">{{ transaction.payment.paymentTerms }}</p>
     </div>
   </template>
 
@@ -191,7 +191,7 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'cancelled'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.cancelled', {cancelled: transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled'}) }}</h2>
+    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
     <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>

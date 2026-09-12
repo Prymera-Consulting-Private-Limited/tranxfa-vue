@@ -73,7 +73,7 @@ const recipientCreated = (recipient) => {
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Your Recipients</h1>
+        <h1 class="sr-only">{{ $t('recipient.yourRecipients') }}</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
@@ -81,13 +81,11 @@ const recipientCreated = (recipient) => {
             <section aria-labelledby="section-2-title">
               <div class="flex justify-between items-center gap-3">
                 <div>
-                  <h2 class="text-base font-semibold text-gray-900">Your Recipients</h2>
-                  <p class="mt-1 text-sm/6 text-gray-500">Here you can manage all your recipients and perform various actions such as adding, editing, or deleting recipients.</p>
+                  <h2 class="text-base font-semibold text-gray-900">{{ $t('recipient.yourRecipients') }}</h2>
+                  <p class="mt-1 text-sm/6 text-gray-500">{{ $t('recipient.recipientsIntro') }}</p>
                 </div>
                 <button @click="createRecipient" type="button" class="inline-flex w-auto whitespace-nowrap items-center rounded-xl bg-brand-700 px-3 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer ml-3">
-                  <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />
-                  Add Recipient
-                </button>
+                  <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />{{ $t('recipient.addRecipient') }}</button>
               </div>
               <template v-if="isLoading">
                 <ul role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 border-t border-gray-200 py-6">
@@ -97,7 +95,7 @@ const recipientCreated = (recipient) => {
                 </ul>
               </template>
               <template v-else-if="loadFailure">
-                <LoadFailurePanel title="We couldn't load your recipients" :message="loadFailure" retryLabel="Try again" @retry="getRecipients()" class="mt-6" />
+                <LoadFailurePanel :title="$t('recipient.listLoadFailure')" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="getRecipients()" class="mt-6" />
               </template>
               <template v-else>
                 <template v-if="recipients.length > 0">
@@ -121,12 +119,10 @@ const recipientCreated = (recipient) => {
                   <div  class="mt-6 border-t border-gray-200 py-6">
                     <div class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:ring-0 focus:ring-offset-0 focus:outline-hidden">
                       <UserPlusIcon class="mx-auto size-12 text-gray-400" />
-                      <span class="mt-4 block text-sm/6 font-semibold text-gray-500">Oops! No recipients found. Let's add some!</span>
+                      <span class="mt-4 block text-sm/6 font-semibold text-gray-500">{{ $t('recipient.noRecipientsYet') }}</span>
                       <div class="mt-6">
                         <button @click="createRecipient" type="button" class="inline-flex items-center rounded-xl bg-brand-700 px-3 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer">
-                          <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />
-                          Recipient
-                        </button>
+                          <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />{{ $t('recipient.recipient') }}</button>
                       </div>
                     </div>
                   </div>
