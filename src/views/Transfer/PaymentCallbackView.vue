@@ -141,7 +141,7 @@ const retryPayment = async () => {
     router.push({ name: 'makePayment', params: { transactionId: transaction.value.id } });
   }).catch((e) => {
     logRequestFailure(e, 'retry-payment');
-    retryFailure.value = failureMessage(e, "No hemos podido iniciar un pago nuevo. No se te ha cobrado nada. Inténtalo de nuevo.");
+    retryFailure.value = failureMessage(e, "We couldn't start a new payment. Nothing has been charged. Please try again.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -156,11 +156,11 @@ function closePaymentModal() {
   <CustomerLayout>
     <div>
       <div class="mx-auto max-w-3xl lg:max-w-full">
-        <h1 class="sr-only">Procesando el pago</h1>
+        <h1 class="sr-only">{{ $t('transfer.payment.processingPayment') }}</h1>
         <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
           <div class="text-center" v-if="isLoading">
             <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-500"></span>
-            <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Espera un momento…</h2>
+            <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">{{ $t('transfer.payment.pleaseWait') }}</h2>
           </div>
         </div>
       </div>
@@ -180,39 +180,39 @@ function closePaymentModal() {
                 <div class="mt-3 text-center sm:mt-5">
                   <template v-if="status === 'pending' || status === 'processing'">
                     <Processing class="-mt-10" />
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Estamos pendientes de tu pago</h2>
-                    <p class="text-base text-gray-600 mb-6">Tu pago se está procesando. Espera un momento mientras confirmamos el estado.</p>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.wereWatchingForYourPayment') }}</h2>
+                    <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.yourPaymentIsBeingProcessed') }}</p>
                   </template>
 
                   <template v-else-if="status === 'completed'">
                     <PaymentCompleted class="-mt-10" />
-                    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment received</h2>
-                    <p class="text-lg text-gray-600 mb-6">Hemos recibido tu pago correctamente.</p>
+                    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">{{ $t('transfer.payment.paymentReceived') }}</h2>
+                    <p class="text-lg text-gray-600 mb-6">{{ $t('transfer.payment.yourPaymentHasBeenSuccessfully') }}</p>
                   </template>
 
                   <template v-else-if="status === 'failed'">
                     <Failed class="-mt-20" />
-                    <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment failed</h2>
-                    <p class="text-base text-danger-600">We couldn't take your payment and no money has left your account. You can try again or choose another way to pay.</p>
-                    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Reintentar el pago</button>
+                    <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">{{ $t('transfer.payment.paymentFailed') }}</h2>
+                    <p class="text-base text-danger-600">{{ $t('transfer.payment.weCouldntTakeYourPayment') }}</p>
+                    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('transfer.payment.tryThePaymentAgain') }}</button>
                     <InlineFailure :message="retryFailure" />
                   </template>
 
                   <template v-else-if="status === 'cancelled'">
                     <Failed class="-mt-20" />
                     <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
-                    <p class="text-base text-gray-600 mb-6">No money has moved. You can start the transfer again whenever you're ready.</p>
+                    <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
                   </template>
 
                   <template v-else-if="status === 'refunded'">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5">Pago reembolsado</h2>
-                    <p class="text-base text-gray-600 mb-6">Este pago se te ha devuelto. Consulta el envío para ver los detalles.</p>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.paymentRefunded') }}</h2>
+                    <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.thisPaymentWasReturnedTo') }}</p>
                   </template>
 
                   <template v-else-if="loadFailed">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5">No hemos podido comprobar tu pago</h2>
-                    <p class="text-base text-gray-600 mb-6">Comprueba tu conexión e inténtalo de nuevo.</p>
-                    <button @click="router.go(0)" class="mt-2 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Reintentar</button>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.weCouldntCheckYourPayment') }}</h2>
+                    <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.pleaseCheckYourConnectionAnd') }}</p>
+                    <button @click="router.go(0)" class="mt-2 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('common.tryAgain') }}</button>
                   </template>
                 </div>
               </div>

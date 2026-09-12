@@ -121,7 +121,7 @@ async function declare() {
       amountErrors.value = e.response.data.errors?.amount ?? [e.response.data.message];
     } else {
       generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
-      generalError.value = e.response?.data?.message ?? 'Algo no ha funcionado. Inténtalo de nuevo.';
+      generalError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
     }
   }).finally(() => {
     isSubmitting.value = false;
@@ -148,8 +148,8 @@ function close() {
               <ModalCloseButton @close="close" />
 
               <template v-if="step === 'declare'">
-                <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Add money to your wallet</DialogTitle>
-                <p class="mt-1 text-sm/6 text-gray-500">Declare the amount first, then transfer exactly that amount from your bank. The match is made on the amount, so it has to be spot on.</p>
+                <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">{{ $t('wallet.addMoneyToYourWallet') }}</DialogTitle>
+                <p class="mt-1 text-sm/6 text-gray-500">{{ $t('wallet.declareTheAmountFirstThen') }}</p>
 
                 <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }} <router-link v-if="generalFix" :to="generalFix.route" class="ml-1 font-semibold underline underline-offset-2 text-danger-800">{{ generalFix.label }}</router-link></div>
 
@@ -165,18 +165,18 @@ function close() {
                 </div>
 
                 <form @submit.prevent="declare" class="mt-4">
-                  <label for="topup-amount" :class="[amountErrors.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="block text-sm/6 font-semibold">Amount <span class="text-danger-600">*</span></label>
+                  <label for="topup-amount" :class="[amountErrors.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="block text-sm/6 font-semibold">{{ $t('wallet.amount') }} <span class="text-danger-600">*</span></label>
                   <input v-model="amount" id="topup-amount" type="text" inputmode="decimal" placeholder="0.00" class="mt-2 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm text-base text-gray-900 focus:outline-none" />
                   <template v-for="(message, i) in amountErrors" :key="`amount-error-${i}`">
                     <p class="mt-2 text-sm/6 text-danger-600">{{ message }}</p>
                   </template>
-                  <p v-if="topupsFrozen" role="status" class="mt-3 text-sm/6 text-warning-800">Las recargas de la billetera están pausadas durante el mantenimiento. Inténtalo de nuevo más tarde.</p>
+                  <p v-if="topupsFrozen" role="status" class="mt-3 text-sm/6 text-warning-800">{{ $t('wallet.walletLoadsArePausedDuring') }}</p>
                   <button type="submit" :disabled="isSubmitting || ! amount || topupsFrozen" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
-                      <span>Saving ...</span>
+                      <span>{{ $t('calculator.saving') }}</span>
                     </span>
-                    <span v-else>Continue</span>
+                    <span v-else>{{ $t('common.continue') }}</span>
                   </button>
                 </form>
               </template>
@@ -184,13 +184,13 @@ function close() {
               <template v-else-if="isProvisioning">
                 <div class="text-center">
                   <AwaitingPending class="-mt-6" />
-                  <h3 class="text-lg font-semibold text-gray-900 -mt-8">Getting your account ready</h3>
-                  <p class="mt-2 mb-4 text-sm/6 text-gray-500">We're opening your personal deposit account. This usually takes a moment — your transfer details will appear automatically.</p>
+                  <h3 class="text-lg font-semibold text-gray-900 -mt-8">{{ $t('wallet.gettingYourAccountReady') }}</h3>
+                  <p class="mt-2 mb-4 text-sm/6 text-gray-500">{{ $t('wallet.wereOpeningYourPersonalDeposit') }}</p>
                 </div>
               </template>
 
               <template v-else-if="step === 'instructions'">
-                <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Make your bank transfer</DialogTitle>
+                <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">{{ $t('wallet.makeYourBankTransfer') }}</DialogTitle>
                 <p v-if="account?.instruction" class="mt-1 text-sm/6 text-gray-600">{{ account.instruction }}</p>
 
                 <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }} <router-link v-if="generalFix" :to="generalFix.route" class="ml-1 font-semibold underline underline-offset-2 text-danger-800">{{ generalFix.label }}</router-link></div>
@@ -201,13 +201,13 @@ function close() {
                       <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                     </div>
                     <div class="ml-3">
-                      <p class="text-sm/6 text-warning-700">Transfer exactly <strong>{{ declaration?.amountFormatted }}</strong> — this is how we match your deposit to your wallet. A different amount will not be credited automatically.</p>
+                      <p class="text-sm/6 text-warning-700"><i18n-t keypath="wallet.transferExactlyThisIsHow" scope="global"><template #value><strong>{{ declaration?.amountFormatted }}</strong></template></i18n-t></p>
                     </div>
                   </div>
                 </div>
 
                 <div class="text-left my-4">
-                  <label for="topup-declared-amount" class="block text-sm/6 font-medium text-gray-900">Transfer Amount</label>
+                  <label for="topup-declared-amount" class="block text-sm/6 font-medium text-gray-900">{{ $t('wallet.transferAmount') }}</label>
                   <UseClipboard v-slot="{ copy, copied }" :source="declaration?.amount">
                     <div class="mt-2 flex">
                       <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
@@ -217,7 +217,7 @@ function close() {
                         <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
                       </button>
                     </div>
-                    <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Transfer Amount has been copied!</p>
+                    <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">{{ $t('wallet.transferAmountHasBeenCopied') }}</p>
                   </UseClipboard>
                 </div>
 
@@ -225,9 +225,9 @@ function close() {
                   <ClientPaymentAccount v-bind:account="account" />
                 </template>
 
-                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">This declaration expires {{ moment(declaration.expiresAt).fromNow() }} ({{ moment(declaration.expiresAt).format('MMMM D, YYYY h:mm A') }}). A declaration that expires moves no money.</p>
+                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.thisDeclarationExpiresFromnowA', {fromNow: moment(declaration.expiresAt).fromNow(), A: moment(declaration.expiresAt).format('MMMM D, YYYY h:mm A')}) }}</p>
 
-                <button type="button" @click="close" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
+                <button type="button" @click="close" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">{{ $t('wallet.done') }}</button>
               </template>
             </DialogPanel>
           </TransitionChild>

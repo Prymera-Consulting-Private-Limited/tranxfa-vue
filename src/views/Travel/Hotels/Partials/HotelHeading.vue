@@ -50,9 +50,7 @@ const times = computed(() => {
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-1 font-medium text-brand-700 transition hover:text-brand-800"
-      >
-        View on map
-        <ArrowTopRightOnSquareIcon class="size-3.5" aria-hidden="true" />
+      >{{ $t('travel.viewOnMap') }}<ArrowTopRightOnSquareIcon class="size-3.5" aria-hidden="true" />
       </a>
     </div>
     <p v-if="times" class="mt-1.5 flex items-start gap-1.5 text-sm/6 text-gray-500">

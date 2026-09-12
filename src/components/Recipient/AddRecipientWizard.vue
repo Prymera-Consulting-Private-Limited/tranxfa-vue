@@ -51,7 +51,7 @@ const relationships = ref([]);
 
 // Each step fetches what the next one needs. A rejected fetch used to leave
 // the spinner up for good; now the step stays put with a message and a
-// "Reintentar" that repeats the same fetch.
+// "Try again" that repeats the same fetch.
 const loadFailure = ref(null);
 let retryLast = () => {};
 
@@ -71,7 +71,7 @@ async function fetchPayoutMethods() {
     payoutMethods.value = response.data.data.map((o) => PayoutMethod.getInstance(o));
   } catch (e) {
     logRequestFailure(e, 'recipient-payout-methods');
-    loadFailure.value = failureMessage(e, "No hemos podido cargar las formas de enviar dinero a este país.");
+    loadFailure.value = failureMessage(e, "We couldn't load the ways to send money to this country.");
     isLoading.value = false;
     return;
   }
@@ -104,7 +104,7 @@ async function fetchPayoutChannel() {
     });
   } catch (e) {
     logRequestFailure(e, 'recipient-payout-channel');
-    loadFailure.value = failureMessage(e, "No hemos podido cargar los datos que necesita este método de entrega.");
+    loadFailure.value = failureMessage(e, "We couldn't load the details this delivery method needs.");
     isLoading.value = false;
     return;
   }
@@ -134,7 +134,7 @@ async function fetchRelationships() {
     relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship))
   }).catch((e) => {
     logRequestFailure(e, 'recipient-relationships');
-    loadFailure.value = failureMessage(e, "No hemos podido cargar la lista de relaciones, y todo beneficiario necesita una.");
+    loadFailure.value = failureMessage(e, "We couldn't load the list of relationships, and a recipient needs one.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -167,7 +167,7 @@ onMounted(async () => {
       targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
     }).catch((e) => {
       logRequestFailure(e, 'recipient-targets');
-      loadFailure.value = failureMessage(e, "No hemos podido cargar los países a los que puedes enviar.");
+      loadFailure.value = failureMessage(e, "We couldn't load the countries you can send to.");
     });
     if (targets.value.length === 1) {
       await updateRecipientTarget(targets.value[0]);
@@ -207,13 +207,17 @@ function updateChildComponentLoadingState(newState) {
   <div>
     <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center w-64 lg:min-w-96 mx-auto min-h-96">
       <Spinner class="size-16 mx-auto" />
-      <span class="sr-only">Cargando…</span>
+      <span class="sr-only">{{ $t('transfer.wizard.loading') }}</span>
     </div>
-    <InlineFailure v-else-if="loadFailure" :message="loadFailure" retryLabel="Reintentar" @retry="retry" class="mt-0 mb-4" />
+    <InlineFailure v-else-if="loadFailure" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="retry" class="mt-0 mb-4" />
     <template v-else>
       <template v-if="snapshot?.value === 'addRecipientForm'">
-        <h4 class="text-base text-gray-800 font-semibold">Datos del beneficiario</h4>
-        <p class="mt-1 text-sm/6 text-gray-700 mb-5">Para recepción <span class="text-brand-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span> en <span class="text-brand-700 font-semibold">{{ recipient.country?.commonName }}</span> usando <span class="text-brand-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></p>
+        <h4 class="text-base text-gray-800 font-semibold">{{ $t('recipient.recipientDetails') }}</h4>
+        <i18n-t keypath="recipient.forReceivingCurrencyInCountry" tag="p" scope="global" class="mt-1 text-sm/6 text-gray-700 mb-5">
+          <template #currency><span class="text-brand-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span></template>
+          <template #country><span class="text-brand-700 font-semibold">{{ recipient.country?.commonName }}</span></template>
+          <template #method><span class="text-brand-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></template>
+        </i18n-t>
         <AttributeCollection
             v-bind:country="recipient.country"
             v-bind:currency="recipient.currency"

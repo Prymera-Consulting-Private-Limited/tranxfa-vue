@@ -32,8 +32,8 @@ const emit = defineEmits([
 
 <template>
   <div>
-    <h2 class="text-lg font-semibold text-gray-900">Tipo de beneficiario</h2>
-    <p class="mt-1 text-sm/6 text-gray-500">Para recibir {{ currency.isoAlpha }} in {{ country.commonName }} mediante {{ payoutMethod.title }}</p>
+    <h2 class="text-lg font-semibold text-gray-900">{{ $t('recipient.selectRecipientType') }}</h2>
+    <p class="mt-1 text-sm/6 text-gray-500">{{ $t('recipient.forReceivingIsoalphaInCommonname', {isoAlpha: currency.isoAlpha, commonName: country.commonName, title: payoutMethod.title}) }}</p>
     <div class="mt-4 grid grid-cols-1 gap-6 py-6 sm:grid-cols-2">
       <div class="flow-root" v-if="payoutChannel.configuration.recipientType === RecipientType.INDIVIDUAL || payoutChannel.configuration.recipientType === null">
         <a href="javascript:" @click="emit('recipient:typeSelected', RecipientType.INDIVIDUAL)" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-0 hover:bg-gray-50">
@@ -44,12 +44,10 @@ const emit = defineEmits([
             <h3 class="text-sm/6 font-medium text-gray-900">
               <a href="#" class="focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
                 <span class="absolute inset-0" aria-hidden="true" />
-                <span>Persona</span>
+                <span>{{ $t('recipient.individual') }}</span>
               </a>
             </h3>
-            <p class="mt-0 text-sm/6 text-gray-500">
-              Una persona natural
-            </p>
+            <p class="mt-0 text-sm/6 text-gray-500">{{ $t('recipient.anIndividualRecipient') }}</p>
           </div>
         </a>
       </div>
@@ -62,12 +60,10 @@ const emit = defineEmits([
             <h3 class="text-sm/6 font-medium text-gray-900">
               <a href="#" class="focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
                 <span class="absolute inset-0" aria-hidden="true" />
-                <span>Empresa</span>
+                <span>{{ $t('recipient.business') }}</span>
               </a>
             </h3>
-            <p class="mt-0 text-sm/6 text-gray-500">
-              Una empresa o persona jurídica
-            </p>
+            <p class="mt-0 text-sm/6 text-gray-500">{{ $t('recipient.aBusinessRecipient') }}</p>
           </div>
         </a>
       </div>

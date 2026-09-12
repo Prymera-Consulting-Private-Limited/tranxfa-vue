@@ -374,7 +374,7 @@ function search() {
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-gray-500 ring-1 ring-gray-200">
         <PencilSquareIcon class="size-4" aria-hidden="true" />
       </span>
-      <p class="text-sm/6 font-semibold text-gray-900">Edit your search</p>
+      <p class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.editYourSearch') }}</p>
     </div>
     <!-- Stacked, the hairlines between cells become gaps between white chips on a tinted band. -->
     <div :class="[stacked ? 'gap-2.5 border-t border-gray-100 bg-gray-50/70 p-3' : 'divide-y divide-gray-200 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0', 'flex flex-col']">
@@ -386,7 +386,7 @@ function search() {
           </span>
           <MapPinIcon v-else class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
-            <ComboboxLabel class="block text-xs/5 text-gray-500">Destination</ComboboxLabel>
+            <ComboboxLabel class="block text-xs/5 text-gray-500">{{ $t('travel.destination') }}</ComboboxLabel>
             <ComboboxInput
                 class="w-full truncate border-0 p-0 text-sm/6 font-medium text-gray-900 placeholder:font-normal placeholder:text-gray-500 focus:outline-0"
                 :placeholder="region ?? 'Where to?'"
@@ -401,28 +401,26 @@ function search() {
           </ComboboxButton>
         </div>
         <ComboboxOptions class="absolute top-full left-0 z-20 mt-2 max-h-80 w-full min-w-72 overflow-y-auto rounded-xl border border-gray-200 bg-white py-2 shadow-lg focus-visible:outline-0">
-          <li v-if="isSearchingRegions" class="px-4 py-3 text-sm/6 text-gray-500">Searching destinations…</li>
+          <li v-if="isSearchingRegions" class="px-4 py-3 text-sm/6 text-gray-500">{{ $t('travel.searchingDestinations') }}</li>
           <!-- Travel is simply not part of this product, which must not be -->
           <!-- dressed up as an outage the customer could wait out. -->
-          <li v-else-if="regionsError === 'unavailable'" class="px-4 py-3 text-sm/6 text-gray-500">Travel isn't available on this app.</li>
+          <li v-else-if="regionsError === 'unavailable'" class="px-4 py-3 text-sm/6 text-gray-500">{{ $t('travel.travelIsntAvailableOnThis') }}</li>
           <!-- mousedown.prevent keeps the input focused, so the list is still -->
           <!-- open by the time the click lands. -->
           <li v-else-if="regionsError === 'failed'" class="px-4 py-3">
             <p class="flex items-center gap-1.5 text-sm/6 font-medium text-gray-900">
-              <ExclamationTriangleIcon class="size-4 shrink-0 text-warning-500" aria-hidden="true" />
-              We couldn't load destinations
-            </p>
-            <p class="mt-1 text-xs/5 text-gray-500">Something went wrong reaching our travel partner. Your search is fine — please try again.</p>
+              <ExclamationTriangleIcon class="size-4 shrink-0 text-warning-500" aria-hidden="true" />{{ $t('travel.weCouldntLoadDestinations') }}</p>
+            <p class="mt-1 text-xs/5 text-gray-500">{{ $t('travel.somethingWentWrongReachingOur') }}</p>
             <button
                 type="button"
                 @mousedown.prevent
                 @click="retryRegions"
                 class="mt-2 cursor-pointer text-xs/5 font-medium text-brand-700 transition hover:text-brand-800"
-            >Reintentar</button>
+            >{{ $t('common.tryAgain') }}</button>
           </li>
-          <li v-else-if="showTypePrompt" class="px-4 py-3 text-sm/6 text-gray-500">Type at least {{ REGION_QUERY_MIN }} characters to find a destination</li>
-          <li v-else-if="regions.length === 0" class="px-4 py-3 text-sm/6 text-gray-500">No destinations found</li>
-          <li v-else-if="regionsFeatured" class="px-4 pt-1 pb-2 text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Popular destinations</li>
+          <li v-else-if="showTypePrompt" class="px-4 py-3 text-sm/6 text-gray-500">{{ $t('travel.typeAtLeastRegionQuery', {REGION_QUERY_MIN: REGION_QUERY_MIN}) }}</li>
+          <li v-else-if="regions.length === 0" class="px-4 py-3 text-sm/6 text-gray-500">{{ $t('travel.noDestinationsFound') }}</li>
+          <li v-else-if="regionsFeatured" class="px-4 pt-1 pb-2 text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">{{ $t('travel.popularDestinations') }}</li>
           <ComboboxOption v-for="option in regions" :key="option.id" :value="option" as="template" v-slot="{active, selected}">
             <li :class="[active ? 'bg-gray-50' : '', 'flex cursor-pointer items-center justify-between gap-3 px-4 py-2']">
               <div class="min-w-0">
@@ -471,7 +469,7 @@ function search() {
           </span>
           <UserGroupIcon v-else class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
           <div class="min-w-0 flex-1">
-            <p class="text-xs/5 text-gray-500">Guests</p>
+            <p class="text-xs/5 text-gray-500">{{ $t('travel.guests') }}</p>
             <p class="truncate text-sm/6 font-medium text-gray-900">{{ occupancyLabel }}</p>
           </div>
           <ChevronDownIcon :class="[open ? 'rotate-180' : '', 'size-4 shrink-0 text-gray-400 transition']" aria-hidden="true" />
@@ -487,7 +485,7 @@ function search() {
                     type="button"
                     @click="removeRoom(index)"
                     class="cursor-pointer text-xs/5 font-medium text-danger-600 transition hover:text-danger-700"
-                >Remove</button>
+                >{{ $t('travel.remove') }}</button>
               </header>
               <!-- Counters -->
               <div v-for="item in OCCUPANCY" :key="item.key" class="mt-2 flex items-center justify-between gap-3">
@@ -522,7 +520,7 @@ function search() {
                 <div v-for="(childAge, childIndex) in room.children" :key="childIndex" class="flex items-center justify-between gap-3">
                   <p class="truncate text-sm/6 text-gray-500">
                     Child {{ childIndex + 1 }}
-                    <span class="ml-0.5 text-xs/5 text-gray-500">age</span>
+                    <span class="ml-0.5 text-xs/5 text-gray-500">{{ $t('travel.age') }}</span>
                   </p>
                   <div class="flex shrink-0 items-center gap-2.5">
                     <button
@@ -552,7 +550,7 @@ function search() {
           </div>
           <!-- Actions -->
           <div class="border-t border-gray-200 px-4 py-3">
-            <p v-if="hasUnevenRooms" class="mb-2.5 text-xs/5 text-gray-500">For best results with multiple rooms, use the same number of guests per room.</p>
+            <p v-if="hasUnevenRooms" class="mb-2.5 text-xs/5 text-gray-500">{{ $t('travel.forBestResultsWithMultiple') }}</p>
             <div class="flex items-center justify-between gap-3">
               <button
                   type="button"
@@ -560,14 +558,12 @@ function search() {
                   @click="addRoom"
                   class="flex cursor-pointer items-center gap-1 text-sm/6 font-medium text-brand-700 transition hover:text-brand-800 disabled:cursor-not-allowed disabled:text-gray-500"
               >
-                <PlusIcon class="size-4" aria-hidden="true" />
-                Add room
-              </button>
+                <PlusIcon class="size-4" aria-hidden="true" />{{ $t('travel.addRoom') }}</button>
               <button
                   type="button"
                   @click="close()"
                   class="cursor-pointer rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
-              >Done</button>
+              >{{ $t('wallet.done') }}</button>
             </div>
           </div>
         </PopoverPanel>
@@ -575,9 +571,7 @@ function search() {
       <!-- Search -->
       <div :class="[stacked ? '' : 'p-2 lg:pl-4', 'flex items-center']">
         <button type="button" @click="search" :disabled="isLoading || ! canSearch" :class="[stacked ? 'shadow-sm' : 'lg:w-auto', 'flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60']">
-          <MagnifyingGlassIcon class="size-4" aria-hidden="true" />
-          Search
-        </button>
+          <MagnifyingGlassIcon class="size-4" aria-hidden="true" />{{ $t('travel.search') }}</button>
       </div>
     </div>
   </div>

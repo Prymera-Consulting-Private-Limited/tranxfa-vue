@@ -122,8 +122,8 @@ function close() {
               <template v-if="enrolled">
                 <div class="text-center py-4">
                   <CheckCircleIcon class="mx-auto size-12 text-success-500" aria-hidden="true" />
-                  <DialogTitle as="h3" class="mt-3 text-lg font-semibold text-gray-900">Your wallet is active</DialogTitle>
-                  <p class="mt-2 text-sm/6 text-gray-500">Here is your wallet number — you'll see it on your wallet screen and statements.</p>
+                  <DialogTitle as="h3" class="mt-3 text-lg font-semibold text-gray-900">{{ $t('wallet.yourWalletIsActive') }}</DialogTitle>
+                  <p class="mt-2 text-sm/6 text-gray-500">{{ $t('wallet.hereIsYourWalletNumber') }}</p>
                   <div class="mt-4 max-w-xs mx-auto text-left">
                     <UseClipboard v-slot="{ copy, copied }" :source="walletStore.subscription.data?.walletNumber">
                       <div class="flex">
@@ -134,10 +134,10 @@ function close() {
                           <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
                         </button>
                       </div>
-                      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Wallet number has been copied!</p>
+                      <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">{{ $t('wallet.walletNumberHasBeenCopied') }}</p>
                     </UseClipboard>
                   </div>
-                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Done</button>
+                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">{{ $t('wallet.done') }}</button>
                 </div>
               </template>
 
@@ -145,8 +145,8 @@ function close() {
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">
                   {{ mode === 'reaccept' ? 'Updated wallet terms' : 'Wallet terms' }}
                 </DialogTitle>
-                <p v-if="mode === 'reaccept'" class="mt-2 rounded-md bg-brand-50 px-4 py-3 text-sm/6 text-brand-800">We've updated the wallet terms. Review and accept the new version to keep using your wallet — your balance is safe either way.</p>
-                <p v-else class="mt-1 text-sm/6 text-gray-500">Please read and accept the terms to activate your wallet.</p>
+                <p v-if="mode === 'reaccept'" class="mt-2 rounded-md bg-brand-50 px-4 py-3 text-sm/6 text-brand-800">{{ $t('wallet.weveUpdatedTheWalletTerms') }}</p>
+                <p v-else class="mt-1 text-sm/6 text-gray-500">{{ $t('wallet.pleaseReadAndAcceptThe') }}</p>
 
                 <div v-if="generalError" class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <p class="text-sm/6 text-warning-700">{{ generalError }}</p>
@@ -162,12 +162,12 @@ function close() {
                   <p class="mt-2 text-xs/5 text-gray-500">Version {{ terms.version }}</p>
                   <div class="mt-4 flex items-start space-x-2">
                     <input type="checkbox" id="wallet-terms-accepted" v-model="accepted" class="mt-1 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
-                    <label for="wallet-terms-accepted" class="text-sm/6 text-gray-700">I have read and accept the wallet terms.</label>
+                    <label for="wallet-terms-accepted" class="text-sm/6 text-gray-700">{{ $t('wallet.iHaveReadAndAccept') }}</label>
                   </div>
                   <button type="button" @click="accept" :disabled="! accepted || isSubmitting" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
-                      <span>Saving ...</span>
+                      <span>{{ $t('calculator.saving') }}</span>
                     </span>
                     <span v-else>{{ mode === 'reaccept' ? 'Accept and continue' : 'Accept and activate' }}</span>
                   </button>

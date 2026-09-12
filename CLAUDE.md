@@ -13,6 +13,10 @@ product mainline; every `<brand>_staging` / `<brand>_production` branch is a
 long-lived fork for one deployment. Read `docs/tenant-branches.md` before
 merging, cherry-picking, or "just fixing it on staging".
 
+Copy is **not** written in templates: it lives in `src/locales`, and a brand
+ships a locale file rather than editing components. Read
+`docs/localisation.md` before adding any user-facing words.
+
 Architecture lives in `docs/architecture.md`. The API surface the SPA actually
 uses is enumerated in `docs/api-surface.md` (the API *itself* is documented in
 the console's API Documentation page, which is authoritative). Local end-to-end
@@ -27,6 +31,9 @@ Carried over from `console.remitso`, where they were learned the hard way:
 - **Every piece of work starts as a Rover ticket** (`SD-<n>`), lives on
   `feature/sd-<n>-<slug>` cut from `main`, ships by a PR titled `SD-<n>`, and
   ends with a closing note on the ticket. The steps are in `docs/workflow.md`.
+- **Every ticket is assigned to Dhruv Patel**, who owns these repositories.
+  That includes a ticket raised for a defect found along the way, not only
+  the one the work started from. Never leave a ticket unassigned.
 - **No `Co-Authored-By` or generated-with trailers**, in commits or PR bodies.
 - Short imperative commit subject, reasoning in the body: why the change
   exists, not what the diff shows. Plain hyphens, no em-dashes.

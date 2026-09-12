@@ -2,9 +2,11 @@
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {reactive, ref} from "vue";
+import {useI18n} from "vue-i18n";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import axios from "axios";
 
+const {t} = useI18n();
 const customerUtils = useCustomerUtils();
 const form = reactive({
   email: '',
@@ -23,7 +25,7 @@ async function requestResetPassword() {
     forgotPasswordMessage.value = response?.data?.message;
     form.email = '';
   }).catch((e) => {
-    forgotPasswordError.value = failureMessage(e, "No hemos podido enviar el enlace para restablecer la contraseña. Inténtalo de nuevo.");
+    forgotPasswordError.value = failureMessage(e, t('auth.forgotPassword.failed'));
     logRequestFailure(e, 'forgot-password');
   }).finally(() => {
     isLoading.value = false;
@@ -36,7 +38,7 @@ async function requestResetPassword() {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/bg.png" alt="Imagen de fondo del inicio de sesión" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/resetpassword.png" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
@@ -59,8 +61,8 @@ async function requestResetPassword() {
               <a href="javascript:"><BrandLogo class="mb-5" /></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-2">¿Olvidaste tu contraseña?</h2>
-            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">¿Olvidaste tu contraseña? No te preocupes. Ingresa el correo vinculado a tu cuenta y haz clic en "Enviar enlace de restablecimiento". Te enviaremos un enlace seguro para restablecerla.</p>
+            <h2 class="text-2xl font-bold text-black mb-2">{{ $t('auth.forgotPassword.title') }}</h2>
+            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">{{ $t('auth.forgotPassword.intro') }}</p>
             <!-- Form -->
             <form @submit.prevent="requestResetPassword" class="space-y-5">
               <div v-if="forgotPasswordMessage" role="status" class="rounded-2xl border border-info-100 bg-info-50 px-4 py-3">
@@ -71,7 +73,7 @@ async function requestResetPassword() {
               </div>
 
               <div>
-                <label for="email" class="mb-2 block font-medium text-brand-700">Correo electrónico</label>
+                <label for="email" class="mb-2 block font-medium text-brand-700">{{ $t('common.email') }}</label>
                 <div
                   class="relative rounded-2xl border bg-white transition-all duration-200"
                   :class="emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300'"
@@ -80,7 +82,7 @@ async function requestResetPassword() {
                     type="email"
                     id="email"
                     v-model="form.email"
-                    placeholder="ejemplo@correo.com"
+                    :placeholder="$t('common.emailPlaceholder')"
                     class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                     @focus="emailFocused = true"
                     @blur="emailFocused = false"
@@ -98,18 +100,18 @@ async function requestResetPassword() {
               >
                 <span class="inline-flex items-center justify-center gap-2">
                   <i v-if="isLoading" class="pi pi-spin pi-spinner text-sm/6"></i>
-                  Enviar enlace de restablecimiento
+                  {{ $t('auth.forgotPassword.submit') }}
                   <i v-if="!isLoading" class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
 
               <p class="mt-2 text-center text-sm/6 text-gray-600">
-                ¿Cambiaste de opinión?
+                {{ $t('auth.forgotPassword.changedMind') }}
                 <router-link
                   :to="{name: 'signIn'}"
                   class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
                 >
-                  Inicia sesión
+                  {{ $t('auth.forgotPassword.signInInstead') }}
                 </router-link>
               </p>
             </form>

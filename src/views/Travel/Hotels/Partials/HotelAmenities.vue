@@ -34,7 +34,7 @@ const remaining = computed(() => Math.max(0, props.amenities.length - props.limi
 <template>
   <div v-if="amenities.length" class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs/5 text-gray-500">
     <template v-for="(amenity, index) in visible" :key="amenity">
-      <span v-if="index" class="text-gray-300" aria-hidden="true">&middot;</span>
+      <span v-if="index" class="text-gray-300" aria-hidden="true">{{ $t('travel.middot') }}</span>
       <span>{{ amenity }}</span>
     </template>
     <span v-if="remaining" class="font-medium text-brand-700">+{{ remaining }} more</span>

@@ -134,9 +134,9 @@ function submit() {
 <template>
   <form @submit.prevent="submit" class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
     <header class="border-b border-gray-100 px-5 py-4">
-      <h2 class="text-sm/6 font-semibold text-gray-900">Who is staying</h2>
+      <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.whoIsStaying') }}</h2>
       <!-- Nothing beyond a name is asked for, and nothing beyond a name should be. -->
-      <p class="mt-0.5 text-xs/5 text-gray-500">Names as they appear on the ID each guest will bring to the hotel.</p>
+      <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.namesAsTheyAppearOn') }}</p>
     </header>
     <div class="space-y-5 px-5 py-5">
       <div v-for="(room, roomIndex) in rooms" :key="roomIndex" class="space-y-4">
@@ -150,7 +150,7 @@ function submit() {
                   type="text"
                   autocomplete="off"
                   :maxlength="NAME_MAX"
-                  placeholder="First name"
+                  :placeholder="$t('travel.firstName')"
                   :class="[
                     fieldError(`rooms.${roomIndex}.guests.${guestIndex}.first_name`) ? 'ring-danger-300' : 'ring-gray-200',
                     'w-full rounded-xl px-3.5 py-2.5 text-sm/6 text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
@@ -164,7 +164,7 @@ function submit() {
                   type="text"
                   autocomplete="off"
                   :maxlength="NAME_MAX"
-                  placeholder="Last name"
+                  :placeholder="$t('travel.lastName')"
                   :class="[
                     fieldError(`rooms.${roomIndex}.guests.${guestIndex}.last_name`) ? 'ring-danger-300' : 'ring-gray-200',
                     'w-full rounded-xl px-3.5 py-2.5 text-sm/6 text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
@@ -176,15 +176,15 @@ function submit() {
         </div>
       </div>
       <div class="border-t border-gray-100 pt-5">
-        <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">Where to reach you</p>
-        <p class="mt-1 text-xs/5 text-gray-500">We'll send the confirmation to your email. The hotel needs a phone number for the booking, and will only use it if they have to reach you.</p>
+        <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('travel.whereToReachYou') }}</p>
+        <p class="mt-1 text-xs/5 text-gray-500">{{ $t('travel.wellSendTheConfirmationTo') }}</p>
         <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <input
                 v-model="email"
                 type="email"
                 autocomplete="email"
-                placeholder="Email address"
+                :placeholder="$t('travel.emailAddress')"
                 :class="[
                   fieldError('email') ? 'ring-danger-300' : 'ring-gray-200',
                   'w-full rounded-xl px-3.5 py-2.5 text-sm/6 text-gray-900 ring-1 transition placeholder:text-gray-500 focus:ring-brand-400 focus:outline-0',
@@ -197,7 +197,7 @@ function submit() {
                 v-model="phone"
                 type="tel"
                 autocomplete="tel"
-                placeholder="Phone number"
+                :placeholder="$t('travel.phoneNumber')"
                 :maxlength="PHONE_MAX"
                 :class="[
                   fieldError('phone') ? 'ring-danger-300' : 'ring-gray-200',

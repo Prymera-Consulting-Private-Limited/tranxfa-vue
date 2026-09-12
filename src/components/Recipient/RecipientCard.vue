@@ -39,30 +39,30 @@ onMounted(() => {
     <h3 class="mt-6 text-sm/6 font-medium text-gray-900 break-words">{{ recipient.wholeName }}</h3>
     <dl class="mt-1 flex grow flex-col justify-between">
       <template v-if="recipient?.channel?.country">
-        <dt class="sr-only">En el país</dt>
+        <dt class="sr-only">{{ $t('recipient.inCountry') }}</dt>
         <dd class="text-gray-500 text-sm/6 flex items-center mx-auto gap-x-2 truncate">
           <FlagIcon :code="recipient.channel.country.iso2Alpha.toLowerCase()" circle  />
           {{ recipient.channel.country.commonName }}
         </dd>
       </template>
       <template v-if="recipient?.channel?.payoutMethod">
-        <dt class="sr-only">Método de pago al beneficiario</dt>
+        <dt class="sr-only">{{ $t('recipient.payoutMethod') }}</dt>
         <dd class="mt-3">
           <span class="inline-flex items-center rounded-full bg-success-50 px-2 py-1 text-xs/5 font-medium text-success-700 ring-1 ring-success-600/20 ring-inset">{{ recipient.channel.payoutMethod.title }}</span>
         </dd>
       </template>
       <slot />
       <template v-if="lastSentOn">
-        <dt class="sr-only">Última transacción enviada el</dt>
+        <dt class="sr-only">{{ $t('recipient.lastTransactionSentOn') }}</dt>
         <dd class="text-gray-500 text-xs/5 flex-col items-center mx-auto gap-x-2 mt-2">
-          <p>Última transacción</p>
+          <p>{{ $t('recipient.lastTransaction') }}</p>
           <p class="text-brand-700">{{ lastSentOn }}</p>
         </dd>
       </template>
       <template v-else>
-        <dt class="sr-only">Nunca has enviado dinero a {{ recipient.wholeName }}</dt>
+        <dt class="sr-only">{{ $t('recipient.neverSentMoneyToName', {wholeName: recipient.wholeName}) }}</dt>
         <dd class="text-gray-500 text-xs/5 flex-col items-center mx-auto gap-x-2 mt-2">
-          <p>Nunca has enviado dinero a</p>
+          <p>{{ $t('recipient.neverSentMoneyTo') }}</p>
           <p>{{ recipient.wholeName }}</p>
         </dd>
       </template>

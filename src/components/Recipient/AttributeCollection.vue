@@ -151,7 +151,7 @@ function loadSubDeliveryOptions(deliveryOption) {
     });
   }).catch((e) => {
     logRequestFailure(e, 'sub-delivery-options');
-    deliveryOptionsFailure.value = failureMessage(e, "No hemos podido cargar las sucursales de esa opción.");
+    deliveryOptionsFailure.value = failureMessage(e, "We couldn't load the branches for that choice.");
   }).finally(() => {
     isFetchingDeliveryOptions.value = false;
   });
@@ -200,7 +200,7 @@ async function addRecipient() {
       }
     } else {
       logRequestFailure(e, 'recipient-add');
-      saveFailure.value = failureMessage(e, "No hemos podido guardar este beneficiario. Inténtalo de nuevo.");
+      saveFailure.value = failureMessage(e, "We couldn't save this recipient. Please try again.");
     }
   }).finally(() => {
     isSaving.value = false;
@@ -313,8 +313,8 @@ watchEffect(() => {
 
 <template>
   <form @submit.prevent="addRecipient" class="space-y-6 sm:min-w-md">
-    <p v-if="isFetchingDeliveryOptions" role="status" class="flex items-center gap-2 text-sm/6 text-gray-500"><Spinner class="size-4" aria-hidden="true" /> Cargando sucursales...</p>
-    <InlineFailure :message="deliveryOptionsFailure" retryLabel="Reintentar" @retry="loadSubDeliveryOptions(lastDeliveryOption)" />
+    <p v-if="isFetchingDeliveryOptions" role="status" class="flex items-center gap-2 text-sm/6 text-gray-500"><Spinner class="size-4" aria-hidden="true" />{{ $t('recipient.loadingBranches') }}</p>
+    <InlineFailure :message="deliveryOptionsFailure" :retryLabel="$t('common.tryAgain')" @retry="loadSubDeliveryOptions(lastDeliveryOption)" />
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
@@ -376,20 +376,18 @@ watchEffect(() => {
       </template>
     </div>
     <div>
-      <label for="relationship" :class="[errors?.relationship_id?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">
-        Relation
-        <span class="ml-0.5 text-danger-600">*</span>
+      <label for="relationship" :class="[errors?.relationship_id?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">{{ $t('recipient.relation') }} <span class="ml-0.5 text-danger-600">*</span>
       </label>
-      <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">Indica tu relación con el beneficiario.</p>
+      <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">{{ $t('recipient.selectRelationHint') }}</p>
       <RelationshipInput v-bind:relationships="relationships" v-on:recipient:relationship:updated="updateRelationship" />
       <p v-if="errors?.relationship_id?.length > 0" class="mt-2 mb-3 text-danger-600 text-sm/6">{{ errors.relationship_id[0] }}</p>
     </div>
     <button v-if="! props.quote" :class="{'opacity-60' : isSaving}" :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6">
       <span v-if="isSaving" class="flex justify-center items-center">
         <Spinner :class="'w-5 h-5 mr-3'"/>
-        <span>Guardando...</span>
+        <span>{{ $t('transfer.wizard.saving') }}</span>
       </span>
-      <span v-else>Guardar beneficiario</span>
+      <span v-else>{{ $t('recipient.saveRecipient') }}</span>
     </button>
     <InlineFailure :message="saveFailure" />
   </form>

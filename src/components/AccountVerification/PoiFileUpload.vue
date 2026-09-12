@@ -64,7 +64,7 @@ async function save() {
     emit('sdkApplicantStatusChanged', response.data);
   }).catch((e) => {
     logRequestFailure(e, 'upload-document');
-    saveFailure.value = failureMessage(e, "No hemos podido adjuntar estas fotos a tu cuenta. Siguen aquí, inténtalo de nuevo.");
+    saveFailure.value = failureMessage(e, "We couldn't attach these photos to your account. They are still here, so please try again.");
   }).finally(() => {
     isSaving.value = false;
   });
@@ -88,7 +88,7 @@ const canSave = computed(() => {
   <div class="px-6 py-8 space-y-6">
     <div>
       <h1 class="text-lg font-bold">Upload {{ documentType.title }}</h1>
-      <p class="text-sm/6 text-gray-600">Take a photo of the whole document with no glare, so every detail is readable. JPEG, PNG or WebP, up to {{ MAX_UPLOAD_MB }} MB each. "Front" is the side with your photo.</p>
+      <p class="text-sm/6 text-gray-600">{{ $t('verification.uploadPhotoHint', {MAX_UPLOAD_MB: MAX_UPLOAD_MB}) }}</p>
     </div>
     <div class="grid sm:grid-cols-2 items-center justify-center gap-5">
       <SingleFileUpload
@@ -111,18 +111,16 @@ const canSave = computed(() => {
           <input :id="`document-number-${documentType.id}`" v-model.trim="documentNumber" type="text" autocomplete="off" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
         </div>
         <div>
-          <label :for="`expiry-date-${documentType.id}`" class="block text-sm/6 font-medium text-gray-900">Fecha de vencimiento <span class="font-normal text-gray-500">(si el documento la tiene)</span></label>
+          <label :for="`expiry-date-${documentType.id}`" class="block text-sm/6 font-medium text-gray-900">{{ $t('verification.expiryDate') }} <span class="font-normal text-gray-500">{{ $t('verification.expiryDateOptional') }}</span></label>
           <input :id="`expiry-date-${documentType.id}`" v-model="expiryDate" type="date" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
         </div>
       </div>
       <button :disabled="!canSave" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3.5 rounded-xl font-medium transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
-            <Spinner class="size-4 mr-2" />
-            Subiendo...
-          </span>
+            <Spinner class="size-4 mr-2" />{{ $t('verification.uploading') }}</span>
         </template>
-        <template v-else>Subir</template>
+        <template v-else>{{ $t('verification.upload') }}</template>
       </button>
       <InlineFailure :message="saveFailure" />
     </form>

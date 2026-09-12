@@ -70,7 +70,7 @@ const guests = computed(() => {
         <p v-if="order.stateDescription" class="mt-2 text-xs/5 text-gray-500">{{ order.stateDescription }}</p>
       </div>
       <div class="shrink-0 sm:text-right">
-        <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">Total</p>
+        <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('account.total') }}</p>
         <p class="mt-1 text-xl font-semibold tracking-tight text-gray-900">{{ order.total.currencyPrefixed }}</p>
         <p v-if="order.reference" class="mt-1 text-xs/5 text-gray-500">{{ order.reference }}</p>
       </div>

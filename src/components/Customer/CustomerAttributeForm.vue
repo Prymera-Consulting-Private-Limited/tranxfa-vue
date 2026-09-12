@@ -41,7 +41,7 @@ const props = defineProps({
   saveBtnText: {
     type: String,
     required: false,
-    default: 'Continuar',
+    default: 'Continue',
   },
 })
 
@@ -74,7 +74,7 @@ async function update() {
       form.errors = e.response.data.errors;
     } else {
       logRequestFailure(e, 'customer-attributes');
-      saveFailure.value = failureMessage(e, "No hemos podido guardar tus datos. Inténtalo de nuevo.");
+      saveFailure.value = failureMessage(e, "We couldn't save your details. Please try again.");
     }
     emit('customer:attribute_category:update_failed', e);
   }).finally(() => {
@@ -142,9 +142,7 @@ watchEffect(() => {
       class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70">
       <template v-if="isSaving">
         <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
-          <Spinner :class="'size-4'" />
-          Guardando...
-        </span>
+          <Spinner :class="'size-4'" />{{ $t('calculator.saving') }}</span>
       </template>
       <template v-else>
         <span class="inline-flex items-center justify-center gap-2">

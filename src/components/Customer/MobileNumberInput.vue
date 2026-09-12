@@ -54,7 +54,7 @@ async function updateMobileNumber() {
       errors.value = e.response.data.errors;
     } else {
       logRequestFailure(e, 'mobile-number');
-      saveFailure.value = failureMessage(e, "No hemos podido guardar tu número de móvil. Inténtalo de nuevo.");
+      saveFailure.value = failureMessage(e, "We couldn't save your mobile number. Please try again.");
     }
     isSaving.value = false;
   }
@@ -78,8 +78,8 @@ const editPersonalInformation = () => {
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Ingresa tu número de teléfono móvil</h2>
-      <p class="text-md text-gray-900 mb-8 text-left">Indícanos tu número de teléfono móvil para continuar.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">{{ $t('onboarding.enterYourMobileNumber') }}</h2>
+      <p class="text-md text-gray-900 mb-8 text-left">{{ $t('onboarding.mobileStepHint') }}</p>
       <!-- Form -->
       <form @submit.prevent="updateMobileNumber" class="mt-12 space-y-5">
         <MobileNumberInput v-bind:mobile="mobile" v-bind:errors="errors" v-on:update:mobileNumberUpdated="mobileNumberUpdated" />
@@ -90,14 +90,10 @@ const editPersonalInformation = () => {
         >
           <template v-if="isSaving">
             <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
-              <Spinner :class="'size-4'" />
-              Guardando...
-            </span>
+              <Spinner :class="'size-4'" />{{ $t('calculator.saving') }}</span>
           </template>
           <template v-else>
-            <span class="inline-flex items-center justify-center gap-2">
-              Continuar
-              <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
+            <span class="inline-flex items-center justify-center gap-2">{{ $t('common.continue') }}<i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
             </span>
           </template>
         </button>
@@ -108,7 +104,7 @@ const editPersonalInformation = () => {
           @click="editPersonalInformation"
           class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
           href="javascript:"
-        >Editar información personal</a>
+        >{{ $t('onboarding.editPersonalInformation') }}</a>
       </div>
     </div>
   </div>

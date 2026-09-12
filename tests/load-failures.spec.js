@@ -2,6 +2,7 @@ import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {readFileSync} from 'node:fs';
 import LoadFailurePanel from '@/components/LoadFailurePanel.vue';
+import en from '@/locales/en.json';
 
 // The 2026-09 feedback audit found loads that either spun forever on failure
 // or rendered an empty state ("No transactions yet") over an error. These
@@ -69,13 +70,14 @@ describe('wizard steps do not spin forever', () => {
       expect(s).toContain(`async function ${fn}()`);
       expect(s).toContain(`retryLast = ${fn};`);
     }
-    expect(s).toContain('<InlineFailure v-else-if="loadFailure" :message="loadFailure" retryLabel="Try again" @retry="retry"');
+    expect(s).toContain(`<InlineFailure v-else-if="loadFailure" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="retry"`);
+    expect(en.common.tryAgain).toBe('Try again');
   });
 
   it('shows the branch fetch and its failure in the recipient form', () => {
     const s = read('src/components/Recipient/AttributeCollection.vue');
     expect(s).toContain('v-if="isFetchingDeliveryOptions" role="status"');
-    expect(s).toContain(':message="deliveryOptionsFailure" retryLabel="Try again"');
+    expect(s).toContain(`:message="deliveryOptionsFailure" :retryLabel="$t('common.tryAgain')"`);
   });
 
   it('the first onboarding step catches the save and the country list', () => {

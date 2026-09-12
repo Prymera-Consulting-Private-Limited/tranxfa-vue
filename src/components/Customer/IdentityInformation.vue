@@ -51,10 +51,9 @@ const identityUpdated = () => {
         <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">Datos personales</h2>
-      <div class="text-sm/6 text-gray-900 mb-8 flex items-center justify-start gap-x-1">
-        Te registraste desde <FlagIcon v-if="customer?.data?.country" :class="['text-xl border border-gray-100']" :code="customer?.data?.country?.iso2Alpha.toLowerCase()" circle  /> <span class="font-semibold">{{ customer?.data?.country?.commonName }}</span>
-        <a class="text-brand-700 hover:underline" @click="changeCountry" href="javascript:">Cambiar</a></div>
+      <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">{{ $t('onboarding.personalDetails') }}</h2>
+      <div class="text-sm/6 text-gray-900 mb-8 flex items-center justify-start gap-x-1">{{ $t('onboarding.signedUpFrom') }}<FlagIcon v-if="customer?.data?.country" :class="['text-xl border border-gray-100']" :code="customer?.data?.country?.iso2Alpha.toLowerCase()" circle  /> <span class="font-semibold">{{ customer?.data?.country?.commonName }}</span>
+        <a class="text-brand-700 hover:underline" @click="changeCountry" href="javascript:">{{ $t('onboarding.change') }}</a></div>
       <!-- Form -->
       <CustomerAttributeForm
           v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`"

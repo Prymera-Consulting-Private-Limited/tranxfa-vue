@@ -200,7 +200,7 @@ const totalPasswordRulesCount = computed(() => validatedPasswordPolicies.rules.l
 
 const passwordRequirementsSummary = computed(() => {
   if (!form.password) {
-    return 'Ver requisitos de contraseña';
+    return 'View password requirements';
   }
   if (allPasswordRulesMet.value) {
     return 'All requirements met';
@@ -240,7 +240,7 @@ watch(
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
-          <img src="/images/backgrounds/bg.png" alt="Imagen a tamaño completo" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/signup.webp" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
@@ -265,17 +265,15 @@ watch(
               <a href="javascript:"><BrandLogo class="mb-5" /></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-2">
-              Bienvenido a XENVIA · Envía dinero a Venezuela.
-              <img src="/images/rocket.gif" alt="Verified" class="w-8 h-8 inline-block">
+            <h2 class="text-2xl font-bold text-black mb-2">{{ $t('onboarding.signUpHeading') }}<img src="/images/rocket.gif" :alt="$t('verification.verified')" class="w-8 h-8 inline-block">
             </h2>
-            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">Sencillo, seguro y rápido.</p>
+            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">{{ $t('onboarding.signUpSubtitle') }}</p>
 
             <!-- Form -->
             <form @submit.prevent="register" class="space-y-5">
               <template v-if="authChannel === 'MOBILE_NUMBER'">
                 <div v-if="! isLoading" class="space-y-3">
-                  <label :class="[(formErrors.mobile_number.length > 0 || formErrors.country.length > 0) ? 'text-danger-700' : 'text-brand-700']" for="mobile-number" class="block mb-1 text-base font-medium">Número de móvil</label>
+                  <label :class="[(formErrors.mobile_number.length > 0 || formErrors.country.length > 0) ? 'text-danger-700' : 'text-brand-700']" for="mobile-number" class="block mb-1 text-base font-medium">{{ $t('auth.signIn.mobileNumberPlaceholder') }}</label>
                   <div class="space-y-3">
                     <IsdCodeInput v-bind:countries="countries" v-bind:fetchCountries="false" :class="['min-w-36 sm:min-w-40']" v-bind:modelValue="form.country" v-bind:itemLabelGenerator="itemLabelGenerator" v-on:update:modelValue="updateIsdCode" />
                     <div
@@ -287,7 +285,7 @@ watch(
                         type="tel"
                         v-model="form.mobile_number"
                         class="w-full rounded-2xl border-0 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-500"
-                        placeholder="Número de móvil"
+                        :placeholder="$t('auth.signIn.mobileNumberPlaceholder')"
                         @focus="mobileFocused = true"
                         @blur="mobileFocused = false"
                       />
@@ -300,7 +298,7 @@ watch(
               <template v-else-if="authChannel === 'EMAIL'">
                 <!-- Email Field -->
                 <div>
-                  <label :class="[formErrors.email.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="email" class="block mb-2 text-base font-medium">Correo electrónico</label>
+                  <label :class="[formErrors.email.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="email" class="block mb-2 text-base font-medium">{{ $t('common.email') }}</label>
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
                     :class="formErrors.email.length > 0 ? 'border-danger-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
@@ -309,7 +307,7 @@ watch(
                       type="email"
                       id="email"
                       v-model="form.email"
-                      placeholder="ejemplo@correo.com"
+                      :placeholder="$t('onboarding.emailPlaceholderShort')"
                       class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                       @focus="emailFocused = true"
                       @blur="emailFocused = false"
@@ -323,7 +321,7 @@ watch(
 
                 <!-- Password Field -->
                 <div>
-                  <label :class="[formErrors.password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="password" class="block mb-2 text-base font-medium">Contraseña</label>
+                  <label :class="[formErrors.password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="password" class="block mb-2 text-base font-medium">{{ $t('common.password') }}</label>
                   <div class="mb-3">
                     <div
                       class="relative rounded-2xl border bg-white transition-all duration-200"
@@ -341,7 +339,7 @@ watch(
                       <button
                         type="button"
                         class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
-                        :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
                         @click="showPassword = !showPassword"
                       >
                         <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
@@ -374,7 +372,7 @@ watch(
                         :class="[passwordRequirementsHeaderClass, passwordRequirementsOpen ? 'pi-chevron-up' : 'pi-chevron-down']"
                       />
                     </button>
-                    <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">No pudimos cargar las reglas de contraseña. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Intentar de nuevo</button></p>
+                    <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">{{ $t('common.passwordRulesFailed') }} <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">{{ $t('common.tryAgain') }}</button></p>
                     <ul
                       v-show="passwordRequirementsOpen"
                       role="list"
@@ -419,7 +417,7 @@ watch(
                 </div>
                 <!-- Confirm Password -->
                 <div>
-                  <label :class="[formErrors.confirm_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="confirm_password" class="block mb-2 text-base font-medium">Confirmar contraseña</label>
+                  <label :class="[formErrors.confirm_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="confirm_password" class="block mb-2 text-base font-medium">{{ $t('auth.resetPassword.confirmLabel') }}</label>
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
                     :class="formErrors.confirm_password.length > 0 ? 'border-danger-500' : (confirmPasswordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
@@ -436,7 +434,7 @@ watch(
                     <button
                       type="button"
                       class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
-                      :aria-label="showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                      :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
                       @click="showConfirmPassword = !showConfirmPassword"
                     >
                       <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
@@ -453,7 +451,7 @@ watch(
                 :class="termsAccepted ? 'border-brand-200 bg-brand-50' : ''"
               >
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="mt-0.5 h-4 w-4 min-w-4 min-h-4 rounded border-gray-300 text-brand-700 accent-brand-700 outline-none focus:ring-0" />
-                <span class="text-sm/6 text-gray-700">Acepto la <a :href="privacyPolicyUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>política de privacidad</a> & <a :href="userAgreementUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>términos del servicio</a>.</span>
+                <span class="text-sm/6 text-gray-700">{{ $t('onboarding.iAgreeTo') }} <a :href="privacyPolicyUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>{{ $t('onboarding.privacyPolicy') }}</a> & <a :href="userAgreementUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>{{ $t('onboarding.termsOfService') }}</a>.</span>
               </label>
 
               <!-- Checkbox -->
@@ -473,20 +471,16 @@ watch(
                 class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span class="inline-flex items-center justify-center gap-2">
-                  {{ authChannel === 'MOBILE_NUMBER' ? 'Get Code' : 'Continuar' }}
+                  {{ authChannel === 'MOBILE_NUMBER' ? 'Get Code' : 'Continue' }}
                   <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
             </form>
 
-            <p class="mt-8 text-center text-sm/6 text-gray-500">
-              ¿Ya tienes cuenta?
-              <router-link
+            <p class="mt-8 text-center text-sm/6 text-gray-500">{{ $t('onboarding.alreadyHaveAnAccount') }} <router-link
                 class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
                 :to="{name: 'signIn'}"
-              >
-                Inicia sesión
-              </router-link>
+              >{{ $t('auth.forgotPassword.signInInstead') }}</router-link>
             </p>
           </div>
         </div>
