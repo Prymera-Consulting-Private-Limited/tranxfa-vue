@@ -88,7 +88,7 @@ if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCou
 }
 reviewItems.push({
   icon: WalletIcon,
-  label: 'La destinataria obtiene',
+  label: 'El beneficiario recibe',
   value: props.quote.foreignAmountCurrencyPrefixed,
 });
 if (props.quote.payoutMethod.promo) {

@@ -133,7 +133,7 @@ const isShowPaymentAccountModalOpen = ref(false);
         <template v-if="isLoading">
           <div class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
             <div class="-mx-4 px-4 py-8 ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20 ">
-              <h2 class="text-base font-semibold text-gray-900 animate-pulse">Transaction #</h2>
+              <h2 class="text-base font-semibold text-gray-900 animate-pulse">Transacción n.º</h2>
               <div class="col-span-2">
                 <div class="border-l-4 border-1 border-gray-300 rounded-md mt-4 p-4 bg-gray-200 h-10 animate-pulse"></div>
               </div>
@@ -174,7 +174,7 @@ const isShowPaymentAccountModalOpen = ref(false);
             <div class="mb-6 hidden print:block">
               <img src="/images/logo.png" alt="RemitSo Logo" class="max-h-10 max-w-48" />
             </div>
-            <h2 class="text-base font-semibold text-gray-900">Transaction #{{ transaction.data.transactionNumber }}</h2>
+            <h2 class="text-base font-semibold text-gray-900">Transacción n.º {{ transaction.data.transactionNumber }}</h2>
             <div v-if="transaction.data.state.code === TransactionState['PENDING-PAYMENT'] && transaction.data.payment.clientPaymentAccount">
               <div :style="{
                  backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),

@@ -313,7 +313,7 @@ watchEffect(() => {
 
 <template>
   <form @submit.prevent="addRecipient" class="space-y-6 sm:min-w-md">
-    <p v-if="isFetchingDeliveryOptions" role="status" class="flex items-center gap-2 text-sm/6 text-gray-500"><Spinner class="size-4" aria-hidden="true" /> Loading branches...</p>
+    <p v-if="isFetchingDeliveryOptions" role="status" class="flex items-center gap-2 text-sm/6 text-gray-500"><Spinner class="size-4" aria-hidden="true" /> Cargando sucursales...</p>
     <InlineFailure :message="deliveryOptionsFailure" retryLabel="Reintentar" @retry="loadSubDeliveryOptions(lastDeliveryOption)" />
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
@@ -387,7 +387,7 @@ watchEffect(() => {
     <button v-if="! props.quote" :class="{'opacity-60' : isSaving}" :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6">
       <span v-if="isSaving" class="flex justify-center items-center">
         <Spinner :class="'w-5 h-5 mr-3'"/>
-        <span>Saving...</span>
+        <span>Guardando...</span>
       </span>
       <span v-else>Guardar beneficiario</span>
     </button>

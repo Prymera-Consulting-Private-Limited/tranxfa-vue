@@ -109,7 +109,7 @@ onMounted( async () => {
           <template v-if="isSaving">
             <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
               <Spinner :class="'size-4'" />
-              Saving ...
+              Guardando...
             </span>
           </template>
           <template v-else>
@@ -125,7 +125,7 @@ onMounted( async () => {
           type="button"
           class="block w-full rounded-full bg-gray-100 py-3.5 text-center text-base font-medium text-gray-600 transition-all duration-200 hover:bg-gray-200 hover:text-gray-700 active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
         >
-          Skip
+          Omitir
         </button>
         <InlineFailure :message="saveFailure" />
       </form>

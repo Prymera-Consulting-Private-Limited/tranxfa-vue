@@ -25,10 +25,10 @@ function reload() {
 
 <template>
   <main v-if="failed" class="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-6 py-16 text-center">
-    <p class="text-xs/5 font-semibold tracking-wide text-brand-700 uppercase">Something went wrong</p>
+    <p class="text-xs/5 font-semibold tracking-wide text-brand-700 uppercase">Algo no ha funcionado</p>
     <h1 class="mt-2 text-2xl font-bold text-gray-900">Esta página ha dejado de funcionar</h1>
     <p class="mt-3 max-w-md text-sm/6 text-gray-600">No ha cambiado nada en tu cuenta. Vuelve a cargar la página para continuar; si sigue ocurriendo, contacta con soporte.</p>
-    <button type="button" @click="reload" class="mt-8 inline-flex items-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Reload page</button>
+    <button type="button" @click="reload" class="mt-8 inline-flex items-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Volver a cargar la página</button>
   </main>
   <RouterView v-else />
 </template>

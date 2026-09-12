@@ -5,7 +5,7 @@ import Confirm from "@/components/Transaction/Confirm.vue";
 </script>
 <template>
   <div>
-    <h1>Wizard</h1>
+    <h1>Asistente</h1>
     <RecipientListing />
     <AddRecipientWizard />
     <Confirm />
