@@ -44,7 +44,7 @@ async function load() {
       await customerUtils.refresh();
     } catch (e) {
       logRequestFailure(e, 'verification-category');
-      loadFailure.value = failureMessage(e, "We couldn't load this verification step.");
+      loadFailure.value = failureMessage(e, "No hemos podido cargar este paso de la verificación.");
       return;
     }
   }
@@ -72,15 +72,15 @@ const finalStateReached = async () => {
         <h1 class="sr-only">Select tipo de documento for your {{ selectedCategory.data?.title }}</h1>
         <LoadFailurePanel
           v-if="loadFailure"
-          title="We couldn't load this verification step"
+          title="No hemos podido cargar este paso de la verificación"
           :message="loadFailure"
-          retryLabel="Try again"
+          retryLabel="Reintentar"
           @retry="load"
           class="mt-0"
         />
         <LoadFailurePanel
           v-else-if="isResolved && ! selectedCategory.data"
-          title="There is nothing to upload here"
+          title="Aquí no hay nada que subir"
           message="This document category is no longer waiting on you. It may already be complete."
           :backTo="{name: 'accountVerification'}"
           backLabel="Account verification"
@@ -94,7 +94,7 @@ const finalStateReached = async () => {
               <div>
                 <h2 class="text-base font-semibold text-gray-900">{{ selectedCategory.data?.title }}</h2>
                 <div class="mt-1" v-if="selectedCategory.data"><CategoryDescription v-bind:category="selectedCategory.data" /></div>
-                <p v-else class="mt-1 text-sm/6 text-gray-500">Get started by completing the following steps.</p>
+                <p v-else class="mt-1 text-sm/6 text-gray-500">Empieza completando los siguientes pasos.</p>
                 <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
                   <template v-if="customerStore.isLoaded">
                     <ul v-if="selectedCategory.data?.documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

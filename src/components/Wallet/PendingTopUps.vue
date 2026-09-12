@@ -81,7 +81,7 @@ async function cancelTopup() {
       );
       emit('cancelled');
     } else {
-      cancelError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+      cancelError.value = e.response?.data?.message ?? 'Algo no ha funcionado. Inténtalo de nuevo.';
     }
   }).finally(() => {
     isCancelling.value = false;
@@ -101,7 +101,7 @@ async function cancelTopup() {
         </div>
         <div class="flex shrink-0 items-center gap-x-4">
           <a href="javascript:" @click="emit('view', topup)" class="text-sm/6 font-semibold text-brand-700 hover:text-brand-800">View details</a>
-          <a href="javascript:" @click="openCancelModal(topup)" class="text-sm/6 font-medium text-danger-600 hover:text-danger-600">Cancel</a>
+          <a href="javascript:" @click="openCancelModal(topup)" class="text-sm/6 font-medium text-danger-600 hover:text-danger-600">Cancelar</a>
         </div>
       </li>
     </ul>

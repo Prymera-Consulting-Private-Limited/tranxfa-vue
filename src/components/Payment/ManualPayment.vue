@@ -123,7 +123,7 @@ const payByFormatted = computed(() => {
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div>
-      <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">Complete your payment</h2>
+      <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">Completa tu pago</h2>
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm/6 text-gray-600 mb-6 text-left">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
       <div v-if="transaction.payment.clientPaymentAccount" class="mb-6 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
         <p v-if="transaction.payment.clientPaymentAccount.paymentReference">Put the <strong>Payment reference</strong> in the reference or description box at your bank. Without it we cannot match your money to this transfer.</p>
@@ -158,13 +158,13 @@ const payByFormatted = computed(() => {
 
   <template v-else-if="status === 'pending'">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait…</h2>
-    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Espera un momento…</h2>
+    <p class="text-base text-gray-600 mb-6">Espera un momento mientras preparamos el pago.</p>
   </template>
 
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">We're watching for your payment</h2>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Estamos pendientes de tu pago</h2>
     <p class="text-base text-gray-600 mb-2">Thanks for letting us know. Bank transfers usually arrive within a few minutes, but can take up to one business day. This page updates as soon as your money lands.</p>
     <p v-if="transaction.payment.clientPaymentAccount?.waitTimeMessage" class="text-sm/6 text-gray-500 mb-6">{{ transaction.payment.clientPaymentAccount.waitTimeMessage }}</p>
     <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
@@ -175,7 +175,7 @@ const payByFormatted = computed(() => {
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
     <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment received</h2>
-    <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
+    <p class="text-lg text-gray-600 mb-6">Hemos recibido tu pago correctamente.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
@@ -196,7 +196,7 @@ const payByFormatted = computed(() => {
 
   <template v-else-if="status === 'refunded'">
     <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment refunded</h2>
-    <p class="text-base text-gray-600 mb-6">This payment was returned to you. Check the transfer for details.</p>
+    <p class="text-base text-gray-600 mb-6">Este pago se te ha devuelto. Consulta el envío para ver los detalles.</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
     </div>

@@ -21,7 +21,7 @@ const emailUrl = `mailto:${email}`;
             <div class="mx-auto max-w-3xl lg:max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="rounded-lg bg-white px-4 sm:px-6 lg:px-8 py-6">
                     <section aria-labelledby="support-section">
-                        <h1 class="sr-only" id="support-section">Support</h1>
+                        <h1 class="sr-only" id="support-section">Soporte</h1>
                         <div class="mb-6">
                             <h2 class="text-base font-semibold text-gray-900">Contactar con el soporte técnico</h2>
 
@@ -82,7 +82,7 @@ const emailUrl = `mailto:${email}`;
                                 </span>
                                 <span
                                     class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">
-                                    Send Email →
+                                    Enviar correo →
                                 </span>
                             </a>
                         </div>

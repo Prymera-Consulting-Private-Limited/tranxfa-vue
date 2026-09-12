@@ -145,15 +145,15 @@ const isShowPaymentAccountModalOpen = ref(false);
               </dl>
             </div>
             <div class="lg:col-start-3 lg:row-end-1">
-              <h2 class="sr-only">Summary</h2>
+              <h2 class="sr-only">Resumen</h2>
               <div class="rounded-lg bg-white ring-1 shadow-xs ring-gray-900/5">
                 <dl class="flex flex-wrap animate-pulse">
                   <div class="flex-auto py-6 pl-6">
-                    <dt class="text-sm/6 font-semibold text-gray-900">Total Amount</dt>
+                    <dt class="text-sm/6 font-semibold text-gray-900">Importe total</dt>
                     <dd class="mt-1 h-4 w-32 bg-gray-300 rounded"></dd>
                   </div>
                   <div class="flex-none self-end px-6 py-4">
-                    <dt class="sr-only">Status</dt>
+                    <dt class="sr-only">Estado</dt>
                     <dd class="rounded-md bg-gray-300 h-6 w-12"></dd>
                   </div>
                 </dl>
@@ -163,7 +163,7 @@ const isShowPaymentAccountModalOpen = ref(false);
         </template>
         <LoadFailurePanel
           v-else-if="failure"
-          title="We couldn't load this transaction"
+          title="No hemos podido cargar esta transacción"
           :message="typeof failure === 'string' ? failure : null"
           :backTo="{name: 'transactions'}"
           backLabel="All transactions"
@@ -200,7 +200,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <div :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
                        }" class="text-sm/6 mt-2">
-                      <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm/6 hover:underline">View Our {{ transaction.data.payment.paymentMethod.title }} Account</a>
+                      <a href="javascript:" @click="isShowPaymentAccountModalOpen = true" class="font-semibold text-sm/6 hover:underline">Ver nuestra cuenta de {{ transaction.data.payment.paymentMethod.title }} Account</a>
                     </div>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <div class="flex flex-1 items-center justify-between rounded-l-md rounded-r-md border border-warning-200 bg-warning-50">
                       <div class="flex-1 px-4 py-2 text-sm/6">
                         <p class="font-medium text-warning-700">{{ document.documentCategory.title }}</p>
-                        <p class="text-warning-700 leading-6">Upload your {{ document.documentCategory.title.toLowerCase() }} to process the transaction</p>
+                        <p class="text-warning-700 leading-6">Sube tu {{ document.documentCategory.title.toLowerCase() }} para procesar la transacción</p>
                       </div>
                       <div class="shrink-0 px-3 text-warning-700">
                         <ArrowUpTrayIcon class="size-5" aria-hidden="true" />
@@ -274,7 +274,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
                   <span class="">{{ transaction.data.payoutMethod.title }}</span>
                   <span v-if="transaction.data.payout?.collectionPin" :class="transaction.data.payout.collectionPinAvailable ? 'text-gray-900 font-semibold' : 'text-warning-700 text-xs/5 mt-1'" class="">
-                    <template v-if="transaction.data.payout.collectionPinAvailable">Collection PIN: </template>
+                    <template v-if="transaction.data.payout.collectionPinAvailable">PIN de cobro: </template>
                     {{ transaction.data.payout.collectionPin }}
                   </span>
                 </dd>
@@ -282,7 +282,7 @@ const isShowPaymentAccountModalOpen = ref(false);
               <div class="col-span-2 mt-8 sm:mt-6 border-t border-gray-900/5">
                 <div class="py-6">
                   <h2 class="text-sm/6 font-medium text-gray-900">Datos del beneficiario</h2>
-                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">{{ transaction.data.payoutMethod.title }} in {{ transaction.data.payoutCountry.commonName }}</p>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">{{ transaction.data.payoutMethod.title }} en {{ transaction.data.payoutCountry.commonName }}</p>
                 </div>
                 <div class="">
                   <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
@@ -359,14 +359,14 @@ const isShowPaymentAccountModalOpen = ref(false);
                     <span class="sr-only">Cliente</span>
                     <RocketLaunchIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Sent Amount</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Importe enviado</span><br />{{ transaction.data.localAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
                     <span class="sr-only">Honorarios</span>
                     <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
-                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Fees</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">Comisión</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">

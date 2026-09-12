@@ -48,7 +48,7 @@ async function load() {
     await customerUtils.refresh();
   } catch (e) {
     logRequestFailure(e, 'verification');
-    loadFailure.value = failureMessage(e, "We couldn't load your verification status.");
+    loadFailure.value = failureMessage(e, "No hemos podido cargar el estado de tu verificación.");
   } finally {
     isLoading.value = false;
   }
@@ -63,7 +63,7 @@ onMounted(load);
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">Verificación de la cuenta</h1>
 
-        <LoadFailurePanel v-if="loadFailure" title="We couldn't load your verification status" :message="loadFailure" retryLabel="Try again" @retry="load" class="mt-0" />
+        <LoadFailurePanel v-if="loadFailure" title="No hemos podido cargar el estado de tu verificación" :message="loadFailure" retryLabel="Reintentar" @retry="load" class="mt-0" />
         <!-- Main 3 column grid -->
         <div v-else class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
@@ -153,7 +153,7 @@ onMounted(load);
                                   <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is marked <span class="font-semibold">{{ document.statusTitle || document.statusCode }}</span>.</p>
                                 </dd>
                                 <dd class="mt-3 text-sm/6 text-gray-700">
-                                  If you are not sure what this means, <router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">contact support</router-link> and quote the document name.
+                                  Si no sabes qué significa esto, <router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">contacta con soporte</router-link> e indica el nombre del documento.
                                 </dd>
                               </template>
                             </dl>

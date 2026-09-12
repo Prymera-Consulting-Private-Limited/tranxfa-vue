@@ -77,28 +77,28 @@ function validateClient() {
   const end = formatDateForApi(form.endDate);
 
   if (!start) {
-    formErrors.start_date = ["Please select a start date."];
+    formErrors.start_date = ["Selecciona una fecha inicial."];
     valid = false;
   } else if (moment(start).isAfter(today.value, "day")) {
-    formErrors.start_date = ["Start date cannot be in the future."];
+    formErrors.start_date = ["La fecha inicial no puede ser futura."];
     valid = false;
   }
 
   if (!end) {
-    formErrors.end_date = ["Please select an end date."];
+    formErrors.end_date = ["Selecciona una fecha final."];
     valid = false;
   } else if (moment(end).isAfter(today.value, "day")) {
-    formErrors.end_date = ["End date cannot be in the future."];
+    formErrors.end_date = ["La fecha final no puede ser futura."];
     valid = false;
   }
 
   if (start && end && moment(start).isAfter(end, "day")) {
-    formErrors.end_date = ["End date must be on or after the start date."];
+    formErrors.end_date = ["La fecha final debe ser igual o posterior a la fecha inicial."];
     valid = false;
   }
 
   if (form.email.trim() && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email.trim())) {
-    formErrors.email = ["Please enter a valid email address."];
+    formErrors.email = ["Introduce un correo electrónico válido."];
     valid = false;
   }
 
@@ -160,7 +160,7 @@ async function submit() {
     const response = await statementUtils.requestStatement(payload);
     const message =
       response.data?.message ??
-      "Statement generation started successfully. Please check your email shortly.";
+      "Hemos empezado a generar tu extracto. Revisa tu correo en unos minutos.";
 
     notify(
       {
@@ -178,7 +178,7 @@ async function submit() {
     if (status === 412) {
       formErrors.general =
         error.response?.data?.message ??
-        "Your account must be fully verified to download statements.";
+        "Tu cuenta debe estar totalmente verificada para descargar extractos.";
       notify(
         {
           group: "customer",
@@ -205,12 +205,12 @@ async function submit() {
         !formErrors.email.length &&
         !formErrors.currency.length
       ) {
-        formErrors.general = error.response?.data?.message ?? "Please check the form and try again.";
+        formErrors.general = error.response?.data?.message ?? "Revisa el formulario e inténtalo de nuevo.";
       }
       return;
     }
 
-    formErrors.general = "Something went wrong. Please try again.";
+    formErrors.general = "Algo no ha funcionado. Inténtalo de nuevo.";
   } finally {
     isSubmitting.value = false;
   }

@@ -240,7 +240,7 @@ watch(
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
-          <img src="/images/backgrounds/bg.png" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/bg.png" alt="Imagen a tamaño completo" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
@@ -275,7 +275,7 @@ watch(
             <form @submit.prevent="register" class="space-y-5">
               <template v-if="authChannel === 'MOBILE_NUMBER'">
                 <div v-if="! isLoading" class="space-y-3">
-                  <label :class="[(formErrors.mobile_number.length > 0 || formErrors.country.length > 0) ? 'text-danger-700' : 'text-brand-700']" for="mobile-number" class="block mb-1 text-base font-medium">Mobile Number</label>
+                  <label :class="[(formErrors.mobile_number.length > 0 || formErrors.country.length > 0) ? 'text-danger-700' : 'text-brand-700']" for="mobile-number" class="block mb-1 text-base font-medium">Número de móvil</label>
                   <div class="space-y-3">
                     <IsdCodeInput v-bind:countries="countries" v-bind:fetchCountries="false" :class="['min-w-36 sm:min-w-40']" v-bind:modelValue="form.country" v-bind:itemLabelGenerator="itemLabelGenerator" v-on:update:modelValue="updateIsdCode" />
                     <div
@@ -287,7 +287,7 @@ watch(
                         type="tel"
                         v-model="form.mobile_number"
                         class="w-full rounded-2xl border-0 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-500"
-                        placeholder="Mobile Number"
+                        placeholder="Número de móvil"
                         @focus="mobileFocused = true"
                         @blur="mobileFocused = false"
                       />

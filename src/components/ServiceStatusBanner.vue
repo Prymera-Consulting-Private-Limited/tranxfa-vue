@@ -41,7 +41,7 @@ const activeIsBlocking = computed(() => active.value !== null && ! status.isAvai
     <div class="mx-auto flex max-w-7xl items-start gap-3 px-4 py-3 sm:px-6 lg:px-8">
       <InformationCircleIcon class="mt-0.5 size-5 shrink-0 text-info-600" aria-hidden="true" />
       <div class="text-sm/6 text-info-800">
-        <p class="font-semibold">Planned maintenance{{ upcoming.startsAt ? ` from ${when(upcoming.startsAt)}` : '' }}{{ upcoming.expectedToEndAt ? ` until around ${when(upcoming.expectedToEndAt)}` : '' }}.</p>
+        <p class="font-semibold">Mantenimiento programado{{ upcoming.startsAt ? ` desde ${when(upcoming.startsAt)}` : '' }}{{ upcoming.expectedToEndAt ? ` hasta aproximadamente ${when(upcoming.expectedToEndAt)}` : '' }}.</p>
         <p v-if="upcoming.message">{{ upcoming.message }}</p>
       </div>
     </div>

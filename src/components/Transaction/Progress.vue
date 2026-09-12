@@ -24,7 +24,7 @@ const steps = [
   {
     id: 'selectRecipient',
     name: 'Elige tu beneficiario',
-    description: 'Tell us who you are sending money to by providing their name and transfer information.',
+    description: 'Dinos a quién envías el dinero indicando su nombre y los datos del envío.',
     show: true,
     stepCommand: 'SELECT_RECIPIENT',
     isMain: true,
@@ -32,7 +32,7 @@ const steps = [
   {
     id: 'addRecipient',
     name: 'Datos del beneficiario',
-    description: 'Tell us who you are sending money to by providing their name and transfer information.',
+    description: 'Dinos a quién envías el dinero indicando su nombre y los datos del envío.',
     show: false,
     stepCommand: 'ADD_RECIPIENT',
     isMain: false,
@@ -40,7 +40,7 @@ const steps = [
   {
     id: 'provideAddress',
     name: 'Tu dirección',
-    description: 'For security and compliance, we need your address details before proceeding.',
+    description: 'Por seguridad y cumplimiento normativo, necesitamos los datos de tu domicilio antes de continuar.',
     show: false,
     stepCommand: null,
     isMain: false,
@@ -48,7 +48,7 @@ const steps = [
   {
     id: 'accountVerification',
     name: 'Verificación de cuenta',
-    description: 'For security and compliance, please verify your account before proceeding with the transaction.',
+    description: 'Por seguridad y cumplimiento normativo, verifica tu cuenta antes de continuar con la transacción.',
     show: false,
     stepCommand: null,
     isMain: false,
@@ -56,7 +56,7 @@ const steps = [
   {
     id: 'confirm',
     name: 'Revisa y confirma',
-    description: 'Double-check all details before finalizing your transfer.',
+    description: 'Revisa todos los datos antes de finalizar tu envío.',
     show: true,
     stepCommand: null,
     isMain: true,

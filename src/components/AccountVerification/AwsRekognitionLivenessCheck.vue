@@ -63,9 +63,9 @@ const startFaceDetection = async () => {
         liveCheckError.value = "No face detected. Please ensure your face is clearly visible.";
       } else if (faceCount > 1) {
         liveCheckMessage.value = "";
-        liveCheckError.value = "Multiple faces detected. Please be alone in the frame.";
+        liveCheckError.value = "Se han detectado varias caras. Debes estar solo en la imagen.";
       } else {
-        liveCheckMessage.value = "Hold still while we verify your identity...";
+        liveCheckMessage.value = "No te muevas mientras verificamos tu identidad…";
         liveCheckError.value = "";
         if (!isProcessing.value) {
           isProcessing.value = true;
@@ -108,7 +108,7 @@ const startCamera = async () => {
     await startFaceDetection();
   } catch (err) {
     console.error("Camera Access Error:", err);
-    liveCheckError.value = "Camera access denied. Please grant permission.";
+    liveCheckError.value = "Acceso a la cámara denegado. Concede el permiso para continuar.";
   }
 };
 
@@ -154,14 +154,14 @@ onUnmounted(() => {
 <template>
   <div :class="{'min-h-128': !isInitialized}" class="flex flex-col items-center justify-center bg-gray-50 text-gray-800 p-6">
     <div v-if="!cameraAccess" class="text-center">
-      <p class="text-lg font-semibold mb-4">We Need Camera Access</p>
+      <p class="text-lg font-semibold mb-4">Necesitamos acceso a la cámara</p>
       <button @click="startCamera" class="bg-brand-700 text-white px-6 py-2.5 rounded-xl shadow-lg transition cursor-pointer">
-        Grant Access
+        Conceder acceso
       </button>
     </div>
     <div v-show="isInitialized" class="w-full flex flex-col items-center justify-center">
-      <h2 class="text-lg font-semibold mb-4">Liveliness Test</h2>
-      <p class="leading-6 text-gray-500 mb-3 text-center">To verify your identity, we kindly request you to record a short video. Please ensure your face is clearly visible in the frame.</p>
+      <h2 class="text-lg font-semibold mb-4">Prueba de vida</h2>
+      <p class="leading-6 text-gray-500 mb-3 text-center">Para verificar tu identidad, necesitamos que grabes un vídeo corto. Asegúrate de que tu cara se vea con claridad en la imagen.</p>
       <p v-if="liveCheckMessage" class="leading-6 text-gray-500 mb-3 text-center">{{ liveCheckMessage }}</p>
       <p v-if="liveCheckSuccess" class="leading-6 text-success-700 font-semibold mb-3 text-center">{{ liveCheckSuccess }}</p>
       <p v-if="liveCheckError" class="leading-6 text-danger-600 mb-3 text-center animate-pulse">{{ liveCheckError }}</p>

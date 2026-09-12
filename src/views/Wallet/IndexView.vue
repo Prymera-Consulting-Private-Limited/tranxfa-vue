@@ -151,7 +151,7 @@ async function termsAccepted() {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Wallet</h1>
+        <h1 class="sr-only">Monedero</h1>
 
         <template v-if="isResolving">
           <div class="rounded-lg bg-white border border-gray-100 p-6 animate-pulse">
@@ -189,7 +189,7 @@ async function termsAccepted() {
         </template>
 
         <template v-else-if="loadFailure">
-          <LoadFailurePanel title="We couldn't load your wallet" :message="loadFailure" retryLabel="Try again" @retry="loadWalletData" class="mt-0" />
+          <LoadFailurePanel title="We couldn't load your wallet" :message="loadFailure" retryLabel="Reintentar" @retry="loadWalletData" class="mt-0" />
         </template>
 
         <template v-else>
@@ -203,7 +203,7 @@ async function termsAccepted() {
                   </div>
                   <div class="ml-3">
                     <p class="text-sm/6 text-warning-700">We've updated the wallet terms. Your balance is safe and visible, but adding and spending money is paused until you accept the new version.</p>
-                    <button type="button" @click="reviewNewTerms" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Review and accept &rarr;</button>
+                    <button type="button" @click="reviewNewTerms" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Revisar y aceptar &rarr;</button>
                   </div>
                 </div>
               </div>

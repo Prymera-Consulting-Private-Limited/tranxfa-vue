@@ -63,7 +63,7 @@ async function openAccountVerificationModal () {
  */
 function sdkFailed(error) {
   sdkErrorMessage.value = getCustomerMessage(error)
-      || 'We could not start your verification. Please try again.';
+      || 'No hemos podido iniciar tu verificación. Inténtalo de nuevo.';
   // The token endpoint answers 412 when the profile is missing something the
   // check needs (identity details, an address). That is not a retry.
   sdkFix.value = fixForError(error, router.currentRoute?.value?.fullPath ?? null);
@@ -171,27 +171,27 @@ async function closeSdk() {
               <button class="sr-only"></button>
               <div v-if="sdkRejected" role="alert" class="p-10 text-center">
                 <ExclamationTriangleIcon class="mx-auto size-12 text-warning-500" />
-                <h3 class="mt-4 text-sm/6 font-medium text-gray-900">This document was not accepted</h3>
+                <h3 class="mt-4 text-sm/6 font-medium text-gray-900">Este documento no se ha aceptado</h3>
                 <p class="mt-2 text-sm/6 text-gray-500">{{ sdkRejectionReason || 'The check did not pass. You can try again with a clearer photo, or a different document.' }}</p>
                 <div class="mt-6 flex justify-center gap-3">
-                  <button v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try another document</button>
-                  <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm/6 font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
+                  <button v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">Probar con otro documento</button>
+                  <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm/6 font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Cerrar</button>
                 </div>
               </div>
               <div v-else-if="sdkErrorMessage" role="alert" class="p-10 text-center">
                 <ExclamationTriangleIcon class="mx-auto size-12 text-danger-500" />
-                <h3 class="mt-4 text-sm/6 font-medium text-gray-900">Verification could not start</h3>
+                <h3 class="mt-4 text-sm/6 font-medium text-gray-900">No se ha podido iniciar la verificación</h3>
                 <p class="mt-2 text-sm/6 text-gray-500">{{ sdkErrorMessage }}</p>
                 <div class="mt-6 flex justify-center gap-3">
                   <button v-if="sdkFix" v-on:click="goToFix" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">{{ sdkFix.label }}</button>
-                  <button v-else v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">Try again</button>
-                  <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm/6 font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Close</button>
+                  <button v-else v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">Reintentar</button>
+                  <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm/6 font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">Cerrar</button>
                 </div>
               </div>
               <template v-else>
                 <div v-show="! isSdkInitialized" role="status" class="p-10">
                   <Spinner class="size-16 mx-auto" />
-                  <span class="sr-only">Loading...</span>
+                  <span class="sr-only">Cargando…</span>
                 </div>
                 <Sumsub
                     v-if="SUMSUB_APIS.includes(documentType.api)"

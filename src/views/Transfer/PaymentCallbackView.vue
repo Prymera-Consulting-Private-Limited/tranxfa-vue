@@ -141,7 +141,7 @@ const retryPayment = async () => {
     router.push({ name: 'makePayment', params: { transactionId: transaction.value.id } });
   }).catch((e) => {
     logRequestFailure(e, 'retry-payment');
-    retryFailure.value = failureMessage(e, "We couldn't start a new payment. Nothing has been charged. Please try again.");
+    retryFailure.value = failureMessage(e, "No hemos podido iniciar un pago nuevo. No se te ha cobrado nada. Inténtalo de nuevo.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -160,7 +160,7 @@ function closePaymentModal() {
         <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
           <div class="text-center" v-if="isLoading">
             <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-500"></span>
-            <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Please wait…</h2>
+            <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Espera un momento…</h2>
           </div>
         </div>
       </div>
@@ -180,21 +180,21 @@ function closePaymentModal() {
                 <div class="mt-3 text-center sm:mt-5">
                   <template v-if="status === 'pending' || status === 'processing'">
                     <Processing class="-mt-10" />
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">We're watching for your payment</h2>
-                    <p class="text-base text-gray-600 mb-6">Your payment is being processed. Please wait a moment while we confirm the status.</p>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Estamos pendientes de tu pago</h2>
+                    <p class="text-base text-gray-600 mb-6">Tu pago se está procesando. Espera un momento mientras confirmamos el estado.</p>
                   </template>
 
                   <template v-else-if="status === 'completed'">
                     <PaymentCompleted class="-mt-10" />
                     <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment received</h2>
-                    <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
+                    <p class="text-lg text-gray-600 mb-6">Hemos recibido tu pago correctamente.</p>
                   </template>
 
                   <template v-else-if="status === 'failed'">
                     <Failed class="-mt-20" />
                     <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment failed</h2>
                     <p class="text-base text-danger-600">We couldn't take your payment and no money has left your account. You can try again or choose another way to pay.</p>
-                    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Try the payment again</button>
+                    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Reintentar el pago</button>
                     <InlineFailure :message="retryFailure" />
                   </template>
 
@@ -206,13 +206,13 @@ function closePaymentModal() {
 
                   <template v-else-if="status === 'refunded'">
                     <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment refunded</h2>
-                    <p class="text-base text-gray-600 mb-6">This payment was returned to you. Check the transfer for details.</p>
+                    <p class="text-base text-gray-600 mb-6">Este pago se te ha devuelto. Consulta el envío para ver los detalles.</p>
                   </template>
 
                   <template v-else-if="loadFailed">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5">We couldn't check your payment</h2>
-                    <p class="text-base text-gray-600 mb-6">Please check your connection and try again.</p>
-                    <button @click="router.go(0)" class="mt-2 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Try again</button>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">No hemos podido comprobar tu pago</h2>
+                    <p class="text-base text-gray-600 mb-6">Comprueba tu conexión e inténtalo de nuevo.</p>
+                    <button @click="router.go(0)" class="mt-2 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Reintentar</button>
                   </template>
                 </div>
               </div>

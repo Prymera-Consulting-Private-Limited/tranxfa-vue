@@ -11,7 +11,7 @@ import {ArrowLeftIcon} from "@heroicons/vue/24/outline";
 <template>
   <div class="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-6 py-16">
     <BrandLogo class="h-10" />
-    <p class="mt-10 text-xs/5 font-semibold tracking-wide text-brand-700 uppercase">Page not found</p>
+    <p class="mt-10 text-xs/5 font-semibold tracking-wide text-brand-700 uppercase">Página no encontrada</p>
     <h1 class="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">No encontramos esa página</h1>
     <p class="mt-3 max-w-md text-center text-sm/6 text-gray-600">Puede que el enlace esté desactualizado o que la dirección esté mal escrita. Nada ha cambiado en tu cuenta.</p>
     <div class="mt-8 flex flex-wrap items-center justify-center gap-3">

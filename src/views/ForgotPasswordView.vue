@@ -23,7 +23,7 @@ async function requestResetPassword() {
     forgotPasswordMessage.value = response?.data?.message;
     form.email = '';
   }).catch((e) => {
-    forgotPasswordError.value = failureMessage(e, "We couldn't send the reset link. Please try again.");
+    forgotPasswordError.value = failureMessage(e, "No hemos podido enviar el enlace para restablecer la contraseña. Inténtalo de nuevo.");
     logRequestFailure(e, 'forgot-password');
   }).finally(() => {
     isLoading.value = false;
@@ -36,7 +36,7 @@ async function requestResetPassword() {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/bg.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/bg.png" alt="Imagen de fondo del inicio de sesión" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>

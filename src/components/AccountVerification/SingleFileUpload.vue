@@ -81,7 +81,7 @@ const processFile = async () => {
   } catch (e) {
     // The most common failure of all used to leave the overlay pulsing forever.
     logRequestFailure(e, 'upload-token');
-    error.value = failureMessage(e, "We couldn't prepare this photo for upload. Please try again.");
+    error.value = failureMessage(e, "No hemos podido preparar esta foto para subirla. Inténtalo de nuevo.");
     file.status = "failed";
     return;
   }
@@ -92,7 +92,7 @@ const processFile = async () => {
     file.path = response.data.object_key ?? new URL(response.data.token).pathname.split("/").slice(2).join("/");
     file.status = "completed";
   }).catch(() => {
-    error.value = "The upload was interrupted. Check your connection and choose the photo again.";
+    error.value = "La subida se ha interrumpido. Comprueba tu conexión y vuelve a elegir la foto.";
     file.status = "failed";
   });
 };

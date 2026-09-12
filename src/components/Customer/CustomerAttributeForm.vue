@@ -74,7 +74,7 @@ async function update() {
       form.errors = e.response.data.errors;
     } else {
       logRequestFailure(e, 'customer-attributes');
-      saveFailure.value = failureMessage(e, "We couldn't save your details. Please try again.");
+      saveFailure.value = failureMessage(e, "No hemos podido guardar tus datos. Inténtalo de nuevo.");
     }
     emit('customer:attribute_category:update_failed', e);
   }).finally(() => {

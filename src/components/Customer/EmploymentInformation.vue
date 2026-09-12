@@ -51,7 +51,7 @@ function loadOptions() {
     occupations.value = response.data.map((o) => Occupation.getInstance(o));
   }).catch((e) => {
     logRequestFailure(e, 'occupations');
-    loadFailure.value = failureMessage(e, "We couldn't load the list of occupations.");
+    loadFailure.value = failureMessage(e, "No hemos podido cargar la lista de ocupaciones.");
   }).finally(() => {
     isOccupationsLoading.value = false;
   });
@@ -66,7 +66,7 @@ function loadOptions() {
     }
   }).catch((e) => {
     logRequestFailure(e, 'salary-ranges');
-    loadFailure.value = loadFailure.value ?? failureMessage(e, "We couldn't load the salary ranges.");
+    loadFailure.value = loadFailure.value ?? failureMessage(e, "No hemos podido cargar los rangos salariales.");
   }).finally(() => {
     isSalaryRangesLoading.value = false;
   })
@@ -95,7 +95,7 @@ const editPersonalInformation = () => {
     </div>
     <div v-if="loadFailure && ! showLoading" class="w-full max-w-xl">
       <div class="hidden md:block flex items-center justify-center w-full"><BrandLogo class="mb-5" /></div>
-      <LoadFailurePanel title="We couldn't load this step" :message="loadFailure" retryLabel="Try again" @retry="loadOptions" class="mt-0" />
+      <LoadFailurePanel title="No hemos podido cargar este paso" :message="loadFailure" retryLabel="Reintentar" @retry="loadOptions" class="mt-0" />
     </div>
     <div v-else v-show="! showLoading" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->

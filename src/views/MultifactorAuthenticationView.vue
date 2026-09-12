@@ -44,7 +44,7 @@ async function authenticate() {
       router.push({name: 'onboardingWorkflow', query: onward()});
     } else {
       logRequestFailure(e, 'mfa');
-      otpError.value = failureMessage(e, "We couldn't check that code. Please try again.");
+      otpError.value = failureMessage(e, "No hemos podido comprobar ese código. Inténtalo de nuevo.");
     }
   }).finally(() => {
     isLoading.value = false;
@@ -89,7 +89,7 @@ async function resend() {
   resentMessage.value = '';
   resendFailure.value = '';
   customerUtils.resendMfaOtp().then(() => {
-    resentMessage.value = "We've sent a new code. It can take a minute to arrive.";
+    resentMessage.value = "Te hemos enviado un código nuevo. Puede tardar un minuto en llegar.";
   }).catch(async (e) => {
     if (e.response?.status === 403) {
       await customerUtils.refresh();

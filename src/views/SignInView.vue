@@ -65,7 +65,7 @@ async function login() {
     }).catch((e) => {
       // A network failure has no response, and an empty message meant the error
       // box never rendered: the customer pressed the button and nothing happened.
-      loginError.value = getCustomerMessage(e) ?? "We couldn't sign you in. Please check your internet connection and try again.";
+      loginError.value = getCustomerMessage(e) ?? "No hemos podido iniciar tu sesión. Comprueba tu conexión a internet e inténtalo de nuevo.";
       logRequestFailure(e, 'sign-in');
     }).finally(() => {
       isLoading.value = false;
@@ -81,7 +81,7 @@ async function login() {
     }).catch((e) => {
       // A network failure has no response, and an empty message meant the error
       // box never rendered: the customer pressed the button and nothing happened.
-      loginError.value = getCustomerMessage(e) ?? "We couldn't sign you in. Please check your internet connection and try again.";
+      loginError.value = getCustomerMessage(e) ?? "No hemos podido iniciar tu sesión. Comprueba tu conexión a internet e inténtalo de nuevo.";
       logRequestFailure(e, 'sign-in');
     }).finally(() => {
       isLoading.value = false;
@@ -105,7 +105,7 @@ function updateIsdCode(updated) {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/bg.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/bg.png" alt="Imagen de fondo del inicio de sesión" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
@@ -149,7 +149,7 @@ function updateIsdCode(updated) {
 
               <template v-if="authChannel === 'MOBILE_NUMBER'">
                 <div v-if="! isLoading" class="space-y-3">
-                  <label for="mobile-number" class="block mb-1 text-base font-medium text-brand-700">Mobile Number</label>
+                  <label for="mobile-number" class="block mb-1 text-base font-medium text-brand-700">Número de móvil</label>
                   <div class="space-y-3">
                     <IsdCodeInput v-bind:countries="countries" v-bind:fetchCountries="false" :class="['min-w-36 sm:min-w-40']" v-bind:modelValue="form.country" v-bind:itemLabelGenerator="itemLabelGenerator" v-on:update:modelValue="updateIsdCode" />
                     <div
@@ -161,7 +161,7 @@ function updateIsdCode(updated) {
                         type="tel"
                         v-model="form.mobile_number"
                         class="w-full rounded-2xl border-0 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-500"
-                        placeholder="Mobile Number"
+                        placeholder="Número de móvil"
                         @focus="mobileFocused = true"
                         @blur="mobileFocused = false"
                       />

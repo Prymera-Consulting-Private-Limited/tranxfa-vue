@@ -41,8 +41,8 @@ const closeWallet = async () => {
     notify(
         {
           group: 'customer',
-          title: 'Wallet Closed',
-          text: 'Your wallet subscription has been closed.',
+          title: 'Monedero cerrado',
+          text: 'Tu suscripción al monedero se ha cerrado.',
           type: 'success',
         },
         -1,
@@ -156,12 +156,12 @@ const passwordChanged = async () => {
               </div>
               <div v-if="walletStore.isAvailable" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8">
                 <WalletIcon class="h-6 w-6 text-brand-600 mb-2" />
-                <h3 class="text-base font-semibold text-gray-900">Wallet</h3>
-                <p v-if="walletStore.isEnrolled" class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Your wallet number is <span class="font-medium tracking-wider text-gray-900">{{ walletStore.subscription.data?.walletNumber }}</span>.<template v-if="walletStore.requiresReacceptance"> New terms are awaiting your acceptance.</template></p>
-                <p v-else class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Store money on your account and pay for transfers instantly.</p>
+                <h3 class="text-base font-semibold text-gray-900">Monedero</h3>
+                <p v-if="walletStore.isEnrolled" class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Tu número de monedero es <span class="font-medium tracking-wider text-gray-900">{{ walletStore.subscription.data?.walletNumber }}</span>.<template v-if="walletStore.requiresReacceptance"> Hay condiciones nuevas pendientes de que las aceptes.</template></p>
+                <p v-else class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">Guarda dinero en tu cuenta y paga tus envíos al instante.</p>
                 <div class="mt-auto flex items-center gap-x-4">
                   <router-link class="text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800 cursor-pointer" :to="{name: 'wallet'}">{{ walletStore.isEnrolled ? 'Manage Wallet' : 'Get Started' }} &rarr;</router-link>
-                  <a v-if="walletStore.isEnrolled" href="javascript:" @click="closeWalletError = ''; isCloseWalletModalOpen = true" class="text-sm/6 inline-block font-medium text-danger-600 hover:text-danger-600">Close Wallet</a>
+                  <a v-if="walletStore.isEnrolled" href="javascript:" @click="closeWalletError = ''; isCloseWalletModalOpen = true" class="text-sm/6 inline-block font-medium text-danger-600 hover:text-danger-600">Cerrar monedero</a>
                 </div>
               </div>
             </div>
@@ -263,10 +263,10 @@ const passwordChanged = async () => {
                     <ExclamationTriangleIcon class="h-6 w-6 text-danger-600" aria-hidden="true" />
                   </div>
                   <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                    <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Close your wallet</DialogTitle>
+                    <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Cerrar tu monedero</DialogTitle>
                     <div class="mt-2">
                       <DialogDescription class="text-sm/6 text-gray-500">
-                        Closing is only possible on a zero balance — spend what's left or contact support to have it returned first. Your wallet number is retired permanently; if you enrol again later you'll receive a new one.
+                        Solo puedes cerrarlo con saldo cero: gasta lo que quede o contacta con soporte para que te lo devuelvan antes. Tu número de monedero se dará de baja de forma definitiva; si vuelves a darte de alta más adelante, recibirás uno nuevo.
                       </DialogDescription>
                     </div>
                     <p v-if="closeWalletError" class="mt-2 text-sm/6 text-danger-600">{{ closeWalletError }}</p>
@@ -274,10 +274,10 @@ const passwordChanged = async () => {
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
                   <button type="button" class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer" @click="closeWallet" :disabled="isClosingWallet">
-                    {{ isClosingWallet ? 'Closing...' : 'Close Wallet' }}
+                    {{ isClosingWallet ? 'Closing...' : 'Cerrar monedero' }}
                   </button>
                   <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="isCloseWalletModalOpen = false" :disabled="isClosingWallet">
-                    Keep Wallet
+                    Mantener monedero
                   </button>
                 </div>
               </DialogPanel>

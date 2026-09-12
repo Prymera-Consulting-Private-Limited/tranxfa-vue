@@ -96,7 +96,7 @@ async function resetPassword() {
       }
     } else {
       logRequestFailure(e, 'reset-password');
-      resetPasswordFailureMessage.value = failureMessage(e, "We couldn't reset your password. Please try again.");
+      resetPasswordFailureMessage.value = failureMessage(e, "No hemos podido restablecer tu contraseña. Inténtalo de nuevo.");
     }
   }).finally(() => {
     isLoading.value = false;
@@ -166,7 +166,7 @@ watch(
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
-          <img src="/images/backgrounds/bg.png" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/bg.png" alt="Imagen a tamaño completo" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
@@ -253,7 +253,7 @@ watch(
                       :class="[passwordRequirementsHeaderClass, passwordRequirementsOpen ? 'pi-chevron-up' : 'pi-chevron-down']"
                     />
                   </button>
-                  <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">We couldn't load the password rules. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Try again</button></p>
+                  <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">No hemos podido cargar los requisitos de la contraseña. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Reintentar</button></p>
                   <ul
                     v-show="passwordRequirementsOpen"
                     role="list"

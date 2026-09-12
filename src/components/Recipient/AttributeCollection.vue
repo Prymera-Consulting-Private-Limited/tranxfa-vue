@@ -151,7 +151,7 @@ function loadSubDeliveryOptions(deliveryOption) {
     });
   }).catch((e) => {
     logRequestFailure(e, 'sub-delivery-options');
-    deliveryOptionsFailure.value = failureMessage(e, "We couldn't load the branches for that choice.");
+    deliveryOptionsFailure.value = failureMessage(e, "No hemos podido cargar las sucursales de esa opción.");
   }).finally(() => {
     isFetchingDeliveryOptions.value = false;
   });
@@ -200,7 +200,7 @@ async function addRecipient() {
       }
     } else {
       logRequestFailure(e, 'recipient-add');
-      saveFailure.value = failureMessage(e, "We couldn't save this recipient. Please try again.");
+      saveFailure.value = failureMessage(e, "No hemos podido guardar este beneficiario. Inténtalo de nuevo.");
     }
   }).finally(() => {
     isSaving.value = false;
@@ -314,7 +314,7 @@ watchEffect(() => {
 <template>
   <form @submit.prevent="addRecipient" class="space-y-6 sm:min-w-md">
     <p v-if="isFetchingDeliveryOptions" role="status" class="flex items-center gap-2 text-sm/6 text-gray-500"><Spinner class="size-4" aria-hidden="true" /> Loading branches...</p>
-    <InlineFailure :message="deliveryOptionsFailure" retryLabel="Try again" @retry="loadSubDeliveryOptions(lastDeliveryOption)" />
+    <InlineFailure :message="deliveryOptionsFailure" retryLabel="Reintentar" @retry="loadSubDeliveryOptions(lastDeliveryOption)" />
     <div v-for="attribute in payoutChannel.attributes" :key="attribute.id">
       <template v-if="(componentMap[attribute.type] || componentMap['default']) === AccountNumberInput">
         <AccountNumberInput v-bind:attribute="attribute" :id="attribute.attribute">
@@ -380,7 +380,7 @@ watchEffect(() => {
         Relation
         <span class="ml-0.5 text-danger-600">*</span>
       </label>
-      <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">Please select your relation with the recipient.</p>
+      <p class="mb-2 mt-1 text-xs/5 text-gray-500 tracking-wider">Indica tu relación con el beneficiario.</p>
       <RelationshipInput v-bind:relationships="relationships" v-on:recipient:relationship:updated="updateRelationship" />
       <p v-if="errors?.relationship_id?.length > 0" class="mt-2 mb-3 text-danger-600 text-sm/6">{{ errors.relationship_id[0] }}</p>
     </div>
@@ -389,7 +389,7 @@ watchEffect(() => {
         <Spinner :class="'w-5 h-5 mr-3'"/>
         <span>Saving...</span>
       </span>
-      <span v-else>Save Recipient</span>
+      <span v-else>Guardar beneficiario</span>
     </button>
     <InlineFailure :message="saveFailure" />
   </form>

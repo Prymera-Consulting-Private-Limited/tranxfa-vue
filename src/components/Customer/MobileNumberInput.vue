@@ -54,7 +54,7 @@ async function updateMobileNumber() {
       errors.value = e.response.data.errors;
     } else {
       logRequestFailure(e, 'mobile-number');
-      saveFailure.value = failureMessage(e, "We couldn't save your mobile number. Please try again.");
+      saveFailure.value = failureMessage(e, "No hemos podido guardar tu número de móvil. Inténtalo de nuevo.");
     }
     isSaving.value = false;
   }
