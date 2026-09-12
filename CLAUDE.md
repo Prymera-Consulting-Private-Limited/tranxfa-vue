@@ -13,6 +13,10 @@ product mainline; every `<brand>_staging` / `<brand>_production` branch is a
 long-lived fork for one deployment. Read `docs/tenant-branches.md` before
 merging, cherry-picking, or "just fixing it on staging".
 
+Copy is **not** written in templates: it lives in `src/locales`, and a brand
+ships a locale file rather than editing components. Read
+`docs/localisation.md` before adding any user-facing words.
+
 Architecture lives in `docs/architecture.md`. The API surface the SPA actually
 uses is enumerated in `docs/api-surface.md` (the API *itself* is documented in
 the console's API Documentation page, which is authoritative). Local end-to-end

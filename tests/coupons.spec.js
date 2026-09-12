@@ -1,4 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
+import en from '@/locales/en.json';
 import {readFileSync} from 'node:fs';
 import QuoteCoupon from '@/models/quote_coupon.js';
 import TransactionQuote from '@/models/transaction_quote.js';
@@ -63,7 +64,9 @@ describe('the confirm step', () => {
   it('reprices exclusively from the apply and remove responses', () => {
     expect(s).toMatch(/const response = await couponUtils\.apply\(quote\.data\.id, couponCode\.value\.trim\(\)\);\n\s*replaceQuote\(response\.data\);/);
     expect(s).toMatch(/const response = await couponUtils\.remove\(quote\.data\.id\);\n\s*replaceQuote\(response\.data\);/);
-    expect(s).toContain('Remove code');
+    // SD-1079: the words live in the catalogue; the screen asks for the key.
+    expect(s).toContain("transfer.wizard.removeCode");
+    expect(en.transfer.wizard.removeCode).toBe('Remove code');
   });
 });
 

@@ -134,11 +134,11 @@ function closePaymentModal() {
   <CustomerLayout>
     <div>
       <div class="mx-auto max-w-3xl lg:max-w-full">
-        <h1 class="sr-only">Make payment</h1>
+        <h1 class="sr-only">{{ $t('transfer.payment.makePayment') }}</h1>
         <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
           <div class="text-center" v-if="isLoading">
             <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-500"></span>
-            <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">Please wait…</h2>
+            <h2 class="text-2xl font-semibold text-gray-600 mb-5 mt-5">{{ $t('transfer.payment.pleaseWait') }}</h2>
           </div>
         </div>
       </div>
@@ -161,14 +161,14 @@ function closePaymentModal() {
               <div class="py-0 sm:pb-6 px-0 sm:px-2">
                 <div class="mt-3 text-center sm:mt-5">
                   <div v-if="retryLimitReached" class="text-center">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5">We've paused this transfer</h2>
-                    <p class="text-base text-gray-600 mb-2">The payment did not go through after three attempts. Nothing has been charged.</p>
-                    <p class="text-sm/6 text-gray-500 mb-6">Please <router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">contact support</router-link> and quote transfer #{{ transaction?.transactionNumber }}. Taking you to your transfer&hellip;</p>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.wevePausedThisTransfer') }}</h2>
+                    <p class="text-base text-gray-600 mb-2">{{ $t('transfer.payment.thePaymentDidNotGo') }}</p>
+                    <p class="text-sm/6 text-gray-500 mb-6">{{ $t('transfer.payment.please') }}<router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">{{ $t('transfer.payment.contactSupport') }}</router-link>{{ $t('transfer.payment.andQuoteTransferTransactionnumberTaking', {transactionNumber: transaction?.transactionNumber}) }}</p>
                   </div>
                   <div v-else-if="transaction && ! isKnownProvider" class="text-center">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5">This way to pay isn't available in the app yet</h2>
-                    <p class="text-base text-gray-600 mb-2">Nothing has been charged. Please choose another way to pay, or contact support and quote transfer #{{ transaction.transactionNumber }}.</p>
-                    <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="mt-4 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800">Go to your transfer</router-link>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.thisWayToPayIsnt') }}</h2>
+                    <p class="text-base text-gray-600 mb-2">{{ $t('transfer.payment.nothingHasBeenChargedPlease', {transactionNumber: transaction.transactionNumber}) }}</p>
+                    <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="mt-4 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800">{{ $t('transfer.payment.goToYourTransfer') }}</router-link>
                   </div>
                   <div v-else-if="transaction" class="text-center">
                     <InlineFailure :message="retryFailure" class="mb-4" />
@@ -185,9 +185,9 @@ function closePaymentModal() {
                     <WalletPayment :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'WALLET'" v-bind:transaction="transaction"  />
                   </div>
                   <div v-else-if="loadFailed" class="text-center">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5">We couldn't load your payment</h2>
-                    <p class="text-base text-gray-600 mb-6">Please check your connection and try again.</p>
-                    <button @click="loadTransaction" class="mt-2 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Try again</button>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.weCouldntLoadYourPayment') }}</h2>
+                    <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.pleaseCheckYourConnectionAnd') }}</p>
+                    <button @click="loadTransaction" class="mt-2 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('common.tryAgain') }}</button>
                   </div>
                 </div>
               </div>
