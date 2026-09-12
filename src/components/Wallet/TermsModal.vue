@@ -143,7 +143,7 @@ function close() {
 
               <template v-else>
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">
-                  {{ mode === 'reaccept' ? 'Updated wallet terms' : 'Wallet terms' }}
+                  {{ mode === 'reaccept' ? $t('wallet.updatedWalletTerms') : $t('wallet.walletTerms') }}
                 </DialogTitle>
                 <p v-if="mode === 'reaccept'" class="mt-2 rounded-md bg-brand-50 px-4 py-3 text-sm/6 text-brand-800">{{ $t('wallet.weveUpdatedTheWalletTerms') }}</p>
                 <p v-else class="mt-1 text-sm/6 text-gray-500">{{ $t('wallet.pleaseReadAndAcceptThe') }}</p>
@@ -169,7 +169,7 @@ function close() {
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>{{ $t('calculator.saving') }}</span>
                     </span>
-                    <span v-else>{{ mode === 'reaccept' ? 'Accept and continue' : 'Accept and activate' }}</span>
+                    <span v-else>{{ mode === 'reaccept' ? $t('wallet.acceptAndContinue') : $t('wallet.acceptAndActivate') }}</span>
                   </button>
                 </template>
               </template>

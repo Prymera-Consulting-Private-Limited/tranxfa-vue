@@ -31,7 +31,7 @@ const activeIsBlocking = computed(() => active.value !== null && ! status.isAvai
     <div class="mx-auto flex max-w-7xl items-start gap-3 px-4 py-3 sm:px-6 lg:px-8">
       <ExclamationTriangleIcon class="mt-0.5 size-5 shrink-0 text-warning-600" aria-hidden="true" />
       <div class="text-sm/6 text-warning-800">
-        <p class="font-semibold">{{ active.message || 'We are doing some maintenance right now.' }}</p>
+        <p class="font-semibold">{{ active.message || $t('account.weAreDoingSome') }}</p>
         <p v-if="active.expectedToEndAt">{{ $t('account.serviceBackAround', {expectedToEndAt: when(active.expectedToEndAt)}) }}</p>
         <p v-else>{{ $t('account.serviceCheckAgain') }}</p>
       </div>

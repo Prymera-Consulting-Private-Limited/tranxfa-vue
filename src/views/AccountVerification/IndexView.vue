@@ -77,7 +77,7 @@ onMounted(load);
                   <p class="text-sm/6 font-semibold text-warning-800">{{ $t('verification.idMismatch') }}</p>
                   <p class="mt-1 text-sm/6 text-warning-800">{{ $t('verification.idMismatchFix') }}</p>
                   <p v-if="applyPoiFailure" class="mt-2 text-sm/6 text-danger-700">{{ applyPoiFailure }}</p>
-                  <button type="button" @click="applyInfoFromPoi" :disabled="isApplyingPoi" class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isApplyingPoi ? 'Updating…' : 'Use the details from my ID' }}</button>
+                  <button type="button" @click="applyInfoFromPoi" :disabled="isApplyingPoi" class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isApplyingPoi ? $t('verification.updating') : $t('verification.useMyIdDetails') }}</button>
                 </div>
                 <div class="mt-6 border-t border-b border-gray-200 py-6 w-full">
                   <ul v-if="customerStore.isLoaded === true" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

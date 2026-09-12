@@ -389,7 +389,7 @@ function search() {
             <ComboboxLabel class="block text-xs/5 text-gray-500">{{ $t('travel.destination') }}</ComboboxLabel>
             <ComboboxInput
                 class="w-full truncate border-0 p-0 text-sm/6 font-medium text-gray-900 placeholder:font-normal placeholder:text-gray-500 focus:outline-0"
-                :placeholder="region ?? 'Where to?'"
+                :placeholder="region ?? $t('travel.whereTo')"
                 :display-value="option => option?.name ?? region ?? ''"
                 autocomplete="off"
                 @change="onDestinationQuery($event.target.value)"

@@ -689,7 +689,7 @@ const canContinue = computed(() => {
                       <p class="mt-1 text-sm/6 text-warning-800">{{ $t('transfer.wizard.itMayAlreadyExistWere') }}</p>
                       <p v-if="reconcileFailure" class="mt-2 text-sm/6 text-danger-700">{{ reconcileFailure }}</p>
                       <div class="mt-3 flex flex-wrap gap-3">
-                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? 'Checking…' : 'Check again' }}</button>
+                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? $t('transfer.wizard.checking') : $t('transfer.wizard.checkAgain') }}</button>
                         <router-link :to="{name: 'transactions'}" class="inline-flex min-h-11 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50">{{ $t('transfer.wizard.seeMyTransfers') }}</router-link>
                       </div>
                     </div>
@@ -834,11 +834,11 @@ const canContinue = computed(() => {
                       <template v-else>
                         <div class="mt-2 flex gap-2">
                           <input id="coupon-code" v-model="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="255" :placeholder="$t('transfer.wizard.enterCode')" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 uppercase focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" @keydown.enter.prevent="previewCoupon" />
-                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? 'Checking…' : 'Check code' }}</button>
+                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? $t('transfer.wizard.checking') : $t('transfer.wizard.checkCode') }}</button>
                         </div>
                         <p v-if="couponFailure" role="alert" class="mt-2 text-sm/6 text-danger-700">{{ couponFailure }}</p>
                         <div v-if="couponPreview" role="status" class="mt-2 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
-                          <p class="font-semibold">{{ couponPreview.info_text || 'This code applies to your transfer.' }}</p>
+                          <p class="font-semibold">{{ couponPreview.info_text || $t('transfer.wizard.thisCodeAppliesTo') }}</p>
                           <p v-if="couponPreview.discount_amount">{{ $t('transfer.wizard.savesDiscountAmountIsoalphaOn', {discount_amount: couponPreview.discount_amount, isoAlpha: quote.data.paymentCurrency?.isoAlpha ?? ''}) }}</p>
                           <p v-else-if="couponPreview.adjusted_exchange_rate">{{ $t('transfer.wizard.improvesYourRateToAdjusted', {adjusted_exchange_rate: couponPreview.adjusted_exchange_rate}) }}</p>
                           <p v-if="couponPreview.terms_text" class="text-xs/5 text-info-700">{{ couponPreview.terms_text }}</p>
@@ -931,7 +931,7 @@ const canContinue = computed(() => {
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>{{ $t('transfer.wizard.saving') }}</span>
                   </span>
-                  <span v-else>{{ snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? 'Pay with Wallet' : 'Continue' }}</span>
+                  <span v-else>{{ snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? $t('transfer.wizard.payWithWallet') : $t('common.continue') }}</span>
                 </button>
               </div>
             </section>

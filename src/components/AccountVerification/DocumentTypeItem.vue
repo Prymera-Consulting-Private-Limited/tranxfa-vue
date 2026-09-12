@@ -172,7 +172,7 @@ async function closeSdk() {
               <div v-if="sdkRejected" role="alert" class="p-10 text-center">
                 <ExclamationTriangleIcon class="mx-auto size-12 text-warning-500" />
                 <h3 class="mt-4 text-sm/6 font-medium text-gray-900">{{ $t('verification.thisDocumentWasNotAccepted') }}</h3>
-                <p class="mt-2 text-sm/6 text-gray-500">{{ sdkRejectionReason || 'The check did not pass. You can try again with a clearer photo, or a different document.' }}</p>
+                <p class="mt-2 text-sm/6 text-gray-500">{{ sdkRejectionReason || $t('verification.theCheckDidNot') }}</p>
                 <div class="mt-6 flex justify-center gap-3">
                   <button v-on:click="retrySdk" type="button" class="rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-medium text-white hover:bg-brand-800 transition cursor-pointer">{{ $t('verification.tryAnotherDocument') }}</button>
                   <button v-on:click="closeSdk" type="button" class="rounded-xl border border-gray-300 px-4 py-2 text-sm/6 font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">{{ $t('verification.close') }}</button>

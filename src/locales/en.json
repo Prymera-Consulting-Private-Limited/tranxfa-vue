@@ -7,6 +7,7 @@
     "emailPlaceholder": "example{'@'}email.com",
     "fileTooLarge": "This file is too large (max {maxMb} MB). Try a smaller photo or take a new one.",
     "hidePassword": "Hide password",
+    "listJoin": " and ",
     "password": "Password",
     "passwordPlaceholder": "••••••••",
     "passwordRulesFailed": "We couldn't load the password rules.",
@@ -32,7 +33,8 @@
       "forgotPassword": "Forgot password?",
       "noAccount": "Don’t have an account?",
       "signUpInstead": "Sign up instead",
-      "connectionFailed": "We couldn't sign you in. Please check your internet connection and try again."
+      "connectionFailed": "We couldn't sign you in. Please check your internet connection and try again.",
+      "getCode": "Get Code"
     },
     "forgotPassword": {
       "title": "Forgot Password",
@@ -141,7 +143,12 @@
       "noResultsFound": "No results found for {query}.",
       "reviewAndAccep": "Review and accept",
       "addMone": "Add money",
-      "activateWalle": "Activate wallet"
+      "activateWalle": "Activate wallet",
+      "thisCodeAppliesTo": "This code applies to your transfer.",
+      "payWithWallet": "Pay with Wallet",
+      "checkAgain": "Check again",
+      "checkCode": "Check code",
+      "checking": "Checking…"
     }
   },
   "payment": {
@@ -198,7 +205,9 @@
       "thisIsTakingLongerThan4": "This is taking longer than usual. Nothing has been charged. You can keep waiting, or {value} and try the payment again later.",
       "thisIsTakingLongerThan5": "This is taking longer than usual. Nothing has been charged. You can keep waiting, or {value} and try the payment again later.",
       "sendExactlyAmount": "Send exactly {amount}.",
-      "pleasePayByTime": "Please pay by {time} (your local time). If we do not see your money by then, this transfer is cancelled and nothing is charged."
+      "pleasePayByTime": "Please pay by {time} (your local time). If we do not see your money by then, this transfer is cancelled and nothing is charged.",
+      "thisPaymentWasCancelled": "This payment was cancelled",
+      "thisPaymentHasExpired": "This payment has expired"
     }
   },
   "calculator": {
@@ -215,7 +224,8 @@
     "yourAbilityToSendMoney": "Your ability to send money is temporarily restricted.",
     "pleaseReachOutToOur": "Please reach out to our customer support team for assistance or to understand the reason behind this restriction.",
     "kycVerification": "KYC verification",
-    "isRequiredBeforeYouCan": "is required before you can send money. This is a one-time process to ensure your account and transactions are secure."
+    "isRequiredBeforeYouCan": "is required before you can send money. This is a one-time process to ensure your account and transactions are secure.",
+    "pleaseSelect": "Please Select"
   },
   "recipient": {
     "aBusinessRecipient": "A business recipient",
@@ -257,7 +267,8 @@
     "selectRecipientCountry": "Select Recipient Country",
     "selectRecipientType": "Select Recipient Type",
     "selectRelationHint": "Please select your relation with the recipient.",
-    "yourRecipients": "Your Recipients"
+    "yourRecipients": "Your Recipients",
+    "youHaveNotSent": "You have not sent any transaction yet."
   },
   "verification": {
     "addYourAddress": "Add your address",
@@ -306,9 +317,11 @@
     "resendingTheCode": "Resending the code ...",
     "selectDocumentType": "Select document type for your {title}",
     "statusLoadFailure": "We couldn't load your verification status",
+    "theCheckDidNot": "The check did not pass. You can try again with a clearer photo, or a different document.",
     "thisDocumentWasNotAccepted": "This document was not accepted",
     "tryAnotherDocument": "Try another document",
     "underReview": "Under review",
+    "updating": "Updating…",
     "upload": "Upload",
     "uploadAnotherDocument": "Upload another document",
     "uploadAnotherHint": "Please upload another document, or a clearer photo of this one. Transfers stay on hold until a document is accepted.",
@@ -316,6 +329,7 @@
     "uploadFormats": "JPEG, PNG, WebP or PDF, up to {MAX_UPLOAD_MB} MB each. Take a photo of the whole document with no glare. For a card, add the front (photo side) and the back.",
     "uploadPhotoHint": "Take a photo of the whole document with no glare, so every detail is readable. JPEG, PNG or WebP, up to {MAX_UPLOAD_MB} MB each. \"Front\" is the side with your photo.",
     "uploading": "Uploading ...",
+    "useMyIdDetails": "Use the details from my ID",
     "verificationCouldNotStart": "Verification could not start",
     "verificationHeading": "Account Verification",
     "verificationIntro": "To keep your account secure and compliant, we just need to verify a few details.",
@@ -472,7 +486,11 @@
     "youSent": "You sent",
     "yourDevices": "Your Devices",
     "yourTransactions": "Your transactions",
-    "yourTransfers": "Your Transfers"
+    "yourTransfers": "Your Transfers",
+    "signingOut": "Signing out...",
+    "signOut": "Sign Out",
+    "weAreDoingSome": "We are doing some maintenance right now.",
+    "saveChanges": "Save Changes"
   },
   "wallet": {
     "aDeclarationStaysOpenFor": "A declaration stays open for 72 hours. A deposit that arrives late or with a different amount isn't lost — our support team takes care of it.",
@@ -534,7 +552,12 @@
     "weveUpdatedTheWalletTerms2": "We've updated the wallet terms. Your balance is safe and visible, but adding and spending money is paused until you accept the new version.",
     "yourMoneyReadyToSend": "Your money, ready to send",
     "yourWalletIsActivatedOnce": "Your wallet is activated once you accept its terms.",
-    "yourWalletIsActive": "Your wallet is active"
+    "yourWalletIsActive": "Your wallet is active",
+    "cancelTopUp": "Cancel top-up",
+    "updatedWalletTerms": "Updated wallet terms",
+    "acceptAndContinue": "Accept and continue",
+    "acceptAndActivate": "Accept and activate",
+    "walletTerms": "Wallet terms"
   },
   "travel": {
     "addRoom": "Add room",
@@ -543,8 +566,14 @@
     "allStatuses": "All statuses",
     "amenities": "Amenities",
     "andChargedIn": "and charged in {currencies}",
+    "askingTheHotel": "Asking the hotel…",
     "backToResults": "Back to results",
+    "bookAndContinueTo": "Book and continue to payment",
+    "bookAtThisPrice": "Book at this price",
     "booked": "Booked",
+    "booking2": "Booking…",
+    "bookingRefused": "We couldn't complete this booking",
+    "bookingYourRoom": "Booking your room…",
     "cancelBooking": "Cancel booking",
     "cancelThisBooking": "Cancel this booking",
     "cancellation": "Cancellation",
@@ -575,6 +604,7 @@
     "forBestResultsWithMultiple": "For best results with multiple rooms, use the same number of guests per room.",
     "from": "from",
     "guests": "Guests",
+    "holdingThisPrice": "Holding this price…",
     "hotelResults": "Hotel results",
     "houseRules": "House rules",
     "howWouldYouLikeTo": "How would you like to pay?",
@@ -590,6 +620,8 @@
     "nextPage": "Next page",
     "nextPhoto": "Next photo",
     "nightsNightSMiddotCurrencyprefixed": "{nights} night{s} · {currencyPrefixed} / night",
+    "noBookingsMatchThese": "No bookings match these filters",
+    "noBookingsYet": "No bookings yet",
     "noDestinationsFound": "No destinations found",
     "noHotelsMatchYourFilters": "No hotels match your filters",
     "noPhotoAvailable": "No photo available",
@@ -610,6 +642,8 @@
     "popularDestinations": "Popular destinations",
     "previousPage": "Previous page",
     "previousPhoto": "Previous photo",
+    "priceHoldExplained": "We hold a price for 15 minutes. Search again to see what is available now.",
+    "priceNoLongerHeld": "This price is no longer held",
     "pricesAreForYourWhole": "Prices are for your whole stay. Each option has its own cancellation terms.",
     "pricesShownAreTheLowest": "Prices shown are the lowest available for your dates, for the whole stay.",
     "refundOwedToYou": "Refund owed to you",
@@ -619,8 +653,11 @@
     "searchAgain": "Search again",
     "searchingDestinations": "Searching destinations…",
     "searchingForHotels": "Searching for hotels…",
+    "select": "Select",
     "selectRoom": "Select room",
+    "selected": "Selected",
     "showAllLengthPhotos": "Show all {length} photos",
+    "showLess": "Show less",
     "showingFromToOfTotal": "Showing {from}–{to} of {total} hotel{s}",
     "showingLengthOfTheTotalhotelslabel": "Showing {length} of the {totalHotelsLabel} hotels the supplier had for your dates.",
     "soTheseAreNotPart": ", so these are not part of your total.",
@@ -632,6 +669,7 @@
     "sort": "Sort:",
     "starRating": "Star rating",
     "startWithADestination": "Start with a destination",
+    "takingYouToPay": "Taking you to pay…",
     "thatRoomHasJustGone": "That room has just gone. Choose another from the list.",
     "thePriceHasChanged": "The price has changed",
     "thereAreNoPaymentMethods": "There are no payment methods available for this booking. Please get in touch and we'll sort it out.",
@@ -642,6 +680,7 @@
     "totalPaid": "Total paid",
     "totalPrice": "Total price",
     "travelIsntAvailableOnThis": "Travel isn't available on this app.",
+    "tryClearingAFilter": "Try clearing a filter to see the rest of your bookings.",
     "tryPayingAgain": "Try paying again",
     "typeAtLeastRegionQuery": "Type at least {REGION_QUERY_MIN} characters to find a destination",
     "upcomingOnly": "Upcoming only",
@@ -659,10 +698,13 @@
     "wellSendTheConfirmationTo": "We'll send the confirmation to your email. The hotel needs a phone number for the booking, and will only use it if they have to reach you.",
     "whatThisPlaceOffers": "What this place offers",
     "whatYouPaidFor": "What you paid for",
+    "whenYouBookA": "When you book a hotel with us it will appear here, along with everything you'll need for your stay.",
     "whereDoYouWantTo": "Where do you want to stay?",
+    "whereTo": "Where to?",
     "whereToReachYou": "Where to reach you",
     "whoIsStaying": "Who is staying",
     "workedOutFreshEachTime": "Worked out fresh each time this page is opened, since it changes as your stay approaches.",
+    "yesCancelThisBooking": "Yes, cancel this booking",
     "youCanCloseThePayment": "You can close the payment page once it's done — we'll pick the result up either way.",
     "youWouldGetBack": "You would get back",
     "youllApproveThisInYour": "You'll approve this in your own banking app. We never see your bank details.",

@@ -155,7 +155,7 @@ const requestedOn = computed(() => {
                 class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-danger-600 px-4 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-danger-700 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
             >
               <Spinner v-if="isCancelling" class="size-4" />
-              {{ isCancelling ? 'Asking the hotel…' : 'Yes, cancel this booking' }}
+              {{ isCancelling ? $t('travel.askingTheHotel') : $t('travel.yesCancelThisBooking') }}
             </button>
             <button
                 type="button"

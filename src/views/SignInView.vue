@@ -252,7 +252,7 @@ function updateIsdCode(updated) {
               >
                 <span class="inline-flex items-center justify-center gap-2">
                   <i v-if="isLoading" class="pi pi-spin pi-spinner text-sm/6"></i>
-                  {{ authChannel === 'MOBILE_NUMBER' ? 'Get Code' : 'Continue' }}
+                  {{ authChannel === 'MOBILE_NUMBER' ? $t('auth.signIn.getCode') : $t('common.continue') }}
                   <i v-if="!isLoading" class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>

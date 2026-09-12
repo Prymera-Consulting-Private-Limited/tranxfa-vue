@@ -29,6 +29,7 @@ them. That produced, on the one brand that needed it:
 | `scripts/i18n-extract.py` | Moves a component's copy into the catalogue, leaving anything it cannot place confidently |
 | `scripts/i18n-render-check.py` | Proves a migration changed no rendered English, by comparing the text each template renders before and after |
 | `scripts/i18n-compose.py` | Puts a sentence the markup split back together as one `<i18n-t>` message with a slot per styled part |
+| `scripts/i18n-expression-sweep.py` | Lists copy hiding inside a template expression, where a text sweep cannot see it |
 
 English is both source and fallback, so a half-translated brand reads in
 English rather than showing raw keys. That matters: a missing translation must
@@ -153,9 +154,11 @@ carrying copy and merges from `main` stop conflicting on it.
 - **An interpolation can contain `>`.** An arrow function inside `{{ }}` used
   to break the extractor's idea of where a text node ends. It now leaves any
   node whose braces do not balance; if you write one, check the result.
-- **A literal inside an attribute expression** (`:aria-label="open ? 'Hide' :
-  'Show'"`) is invisible to the extractor and to a text sweep. Only reading
-  finds those.
+- **A literal inside an expression** (`{{ ok ? 'Yes' : 'No' }}`, `:aria-label="open ? 'Hide' : 'Show'"`)
+  is not a text node, so no extractor will find it. The catalogue guard now
+  fails on these, and `scripts/i18n-expression-sweep.py` lists them. It knows
+  the difference between copy and a Tailwind class list, an icon class, a date
+  format, an enum and a value being compared against.
 
 ## Where the migration stands
 

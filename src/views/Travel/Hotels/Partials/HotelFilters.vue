@@ -208,7 +208,7 @@ function formatPrice(amount) {
             type="button"
             @click="showAllAmenities = !showAllAmenities"
             class="mt-2 cursor-pointer text-xs/5 font-medium text-brand-700 transition hover:text-brand-800"
-        >{{ showAllAmenities ? 'Show less' : `Show all ${facets.amenities.length}` }}</button>
+        >{{ showAllAmenities ? $t('travel.showLess') : `Show all ${facets.amenities.length}` }}</button>
       </section>
     </div>
   </aside>

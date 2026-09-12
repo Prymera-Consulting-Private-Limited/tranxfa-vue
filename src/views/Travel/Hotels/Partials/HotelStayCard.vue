@@ -106,7 +106,7 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
         class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-3.5 text-sm/6 font-semibold text-white shadow-xs transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
     >
       <Spinner v-if="isHolding" class="size-4" />
-      {{ isHolding ? 'Holding this price…' : 'Continue' }}
+      {{ isHolding ? $t('travel.holdingThisPrice') : $t('common.continue') }}
     </button>
     <p class="text-center text-xs/5 text-gray-500">{{ $t('travel.wellHoldThisPriceFor') }}</p>
   </div>

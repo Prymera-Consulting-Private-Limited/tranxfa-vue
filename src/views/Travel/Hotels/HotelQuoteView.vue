@@ -178,10 +178,10 @@ onUnmounted(() => clearInterval(clock));
             <ClockIcon class="size-7" aria-hidden="true" />
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">
-            {{ bookingRefused ? "We couldn't complete this booking" : 'This price is no longer held' }}
+            {{ bookingRefused ? $t('travel.bookingRefused') : $t('travel.priceNoLongerHeld') }}
           </h1>
           <p class="mt-2 max-w-md text-sm/6 text-gray-500">
-            {{ failureMessage ?? 'We hold a price for 15 minutes. Search again to see what is available now.' }}
+            {{ failureMessage ?? $t('travel.priceHoldExplained') }}
           </p>
           <RouterLink
               :to="{name: 'hotels'}"

@@ -211,3 +211,62 @@ describe('the migrated files', () => {
     expect(bare, `${file} still spells out: ${bare.join(' | ')}`).toEqual([]);
   });
 });
+
+// SD-1105: copy also hides inside expressions, where neither the extractor nor
+// the bare-text guard could see it: `{{ ok ? 'Yes' : 'No' }}`. The sign-in
+// button read English in an otherwise Spanish app for exactly this reason.
+describe('copy does not hide in an expression', () => {
+  const TAILWIND = /^[a-z0-9:/[\]().%!,-]+$/;
+  const UTILITY = /^(?:flex|grid|block|inline|hidden|absolute|relative|fixed|sticky|w|h|min|max|p[xytblr]?|m[xytblr]?|gap|text|bg|border|ring|rounded|shadow|opacity|z|top|left|right|bottom|size|space|divide|justify|items|self|order|col|row|overflow|truncate|whitespace|cursor|transition|duration|ease|animate|group|peer|sr|not|font|leading|tracking|uppercase|underline|antialiased|object|aspect|fill|stroke|from|via|to|backdrop|outline|accent|pointer|select|scale|rotate|translate|origin|list|table|sm|md|lg|xl|hover|focus|active|disabled|first|last|odd|even|dark|print)\b/;
+  const MOMENT = /^[DMYHhmsAaZz\W]{3,}$/;
+  const ICON = /^(?:pi|fa|bi|mdi)[\s-]/;
+  const COMPARED = /(?:[=!]==?\s*|\.(?:includes|startsWith|endsWith|indexOf|split|match)\(\s*)$/;
+
+  const isClassList = (text) => {
+    const tokens = text.split(/\s+/);
+    if (tokens.length < 2) return TAILWIND.test(text) && UTILITY.test(text);
+    return tokens.every(t => TAILWIND.test(t) && (UTILITY.test(t) || t.includes('-') || t.includes(':')));
+  };
+
+  const looksLikeCopy = (text) => {
+    if (text.length < 3) return false;
+    if (isClassList(text) || MOMENT.test(text) || ICON.test(text)) return false;
+    if (text.includes('.') && !text.includes(' ')) return false;   // a key or a file
+    if (/^[A-Z0-9_]+$/.test(text)) return false;                    // an enum
+    if (/^[a-z][\w-]*$/.test(text)) return false;                   // a slug
+    if (!/[A-Za-z]{2,}/.test(text)) return false;
+    return /[A-Z]/.test(text) || text.includes(' ');
+  };
+
+  const literalsIn = (expr) => {
+    const out = [];
+    const quoted = /'([^'\\\n]{3,200})'|"([^"\\\n]{3,200})"/g;
+    let m;
+    while ((m = quoted.exec(expr)) !== null) {
+      if (COMPARED.test(expr.slice(0, m.index))) continue;
+      out.push(m[1] !== undefined ? m[1] : m[2]);
+    }
+    return out;
+  };
+
+  it.each(MIGRATED)('%s spells no sentence inside an expression', (file) => {
+    const source = read(file);
+    const open = source.match(/^<template[^>]*>/m);
+    if (!open) return;
+    const body = source.slice(open.index + open[0].length, source.lastIndexOf('\n</template>'));
+
+    const found = [];
+    // An expression that already calls $t is not exempt: one branch of a
+    // ternary is often migrated while the other is still English, which is
+    // exactly how the sign-in button kept saying Continue.
+    const stripCalls = (expr) => expr.replace(/\$?t\(\s*(?:'[^']*'|"[^"]*")\s*(?:,[^()]*)?\)/g, ' ');
+    for (const [, expr] of body.matchAll(/\{\{([\s\S]*?)\}\}/g)) {
+      found.push(...literalsIn(stripCalls(expr)).filter(looksLikeCopy));
+    }
+    for (const [, expr] of body.matchAll(/(?::|v-bind:)[\w.-]+="([^"]*)"/g)) {
+      found.push(...literalsIn(stripCalls(expr)).filter(looksLikeCopy));
+    }
+
+    expect(found, `${file} spells copy inside an expression: ${found.join(', ')}`).toEqual([]);
+  });
+});

@@ -94,7 +94,7 @@ const handleDelete = async () => {
           class="text-sm/6 text-danger-600 hover:text-danger-700 font-medium hover:underline cursor-pointer"
           :disabled="isDeleting"
         >
-          {{ isDeleting ? 'Signing out...' : 'Sign Out' }}
+          {{ isDeleting ? $t('account.signingOut') : $t('account.signOut') }}
         </button>
       </div>
       <InlineFailure :message="signOutFailure" />
@@ -129,7 +129,7 @@ const handleDelete = async () => {
                       @click="handleDelete"
                       :disabled="isDeleting"
                     >
-                      {{ isDeleting ? 'Deleting...' : 'Sign Out' }}
+                      {{ isDeleting ? 'Deleting...' : $t('account.signOut') }}
                     </button>
                     <button
                       type="button"

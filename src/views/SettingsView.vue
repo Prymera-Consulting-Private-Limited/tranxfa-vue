@@ -207,7 +207,7 @@ const passwordChanged = async () => {
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`"
                       v-bind:showLoading="showLoading"
-                      v-bind:saveBtnText="'Save Changes'"
+                      v-bind:saveBtnText="$t('account.saveChanges')"
                       v-on:customer:attribute_category:updated="identityUpdated"
                       v-on:customer:attribute_category:update_failed="identityUpdateFailed"
                   />
@@ -238,7 +238,7 @@ const passwordChanged = async () => {
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
                       v-bind:showLoading="showLoading"
-                      v-bind:saveBtnText="'Save Changes'"
+                      v-bind:saveBtnText="$t('account.saveChanges')"
                       v-on:customer:attribute_category:updated="addressUpdated"
                       v-on:customer:attribute_category:update_failed="addressUpdateFailed"
                   />
@@ -272,7 +272,7 @@ const passwordChanged = async () => {
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
                   <button type="button" class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer" @click="closeWallet" :disabled="isClosingWallet">
-                    {{ isClosingWallet ? 'Closing...' : 'Close Wallet' }}
+                    {{ isClosingWallet ? 'Closing...' : $t('account.closeWallet') }}
                   </button>
                   <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="isCloseWalletModalOpen = false" :disabled="isClosingWallet">{{ $t('account.keepWallet') }}</button>
                 </div>

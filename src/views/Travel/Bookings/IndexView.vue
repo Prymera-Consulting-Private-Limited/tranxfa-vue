@@ -164,10 +164,10 @@ const isFiltered = computed(() => upcoming.value || state.value !== null);
               <BuildingOffice2Icon class="size-7" aria-hidden="true" />
             </div>
             <h2 class="mt-6 text-base font-semibold text-gray-900">
-              {{ isFiltered ? 'No bookings match these filters' : 'No bookings yet' }}
+              {{ isFiltered ? $t('travel.noBookingsMatchThese') : $t('travel.noBookingsYet') }}
             </h2>
             <p class="mt-2 max-w-md text-sm/6 text-gray-500">
-              {{ isFiltered ? 'Try clearing a filter to see the rest of your bookings.' : "When you book a hotel with us it will appear here, along with everything you'll need for your stay." }}
+              {{ isFiltered ? $t('travel.tryClearingAFilter') : $t('travel.whenYouBookA') }}
             </p>
             <RouterLink
                 v-if="!isFiltered"
