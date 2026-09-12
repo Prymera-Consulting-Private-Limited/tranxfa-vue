@@ -1,4 +1,5 @@
 import {describe, expect, it} from "vitest";
+import en from '@/locales/en.json';
 import router from "@/router/index.js";
 
 // An unknown address rendered an empty RouterView with the tab titled
@@ -8,7 +9,10 @@ describe('an address nothing matches', () => {
         const resolved = router.resolve('/this-page-does-not-exist');
 
         expect(resolved.name).toBe('notFound');
-        expect(resolved.meta.title).toBe('Page not found');
+        // SD-1103: the tab title is copy, so the route names a key and the
+        // words live in the catalogue.
+        expect(resolved.meta.titleKey).toBe('routes.pageNotFound');
+        expect(en.routes.pageNotFound).toBe('Page not found');
     });
 
     it('still lets the real routes through', () => {

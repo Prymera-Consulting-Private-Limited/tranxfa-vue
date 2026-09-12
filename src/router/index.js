@@ -1,4 +1,5 @@
 import {hotelsEnabled, walletEnabled} from '@/feature_flags.js'
+import i18n from '@/i18n.js';
 import { createRouter, createWebHistory } from 'vue-router'
 import SignUpView from "@/views/SignUpView.vue";
 import SignInView from "@/views/SignInView.vue";
@@ -15,7 +16,7 @@ const router = createRouter({
       name: 'signIn',
       component: SignInView,
       meta: {
-        title: 'Sign in',
+        titleKey: 'routes.signIn',
         description: 'Login into your account',
       },
     }, {
@@ -23,7 +24,7 @@ const router = createRouter({
       name: 'multiFactorAuth',
       component: () => import('@/views/MultifactorAuthenticationView.vue'),
       meta: {
-        title: 'More authentication required',
+        titleKey: 'routes.moreAuthenticationRequired',
         description: 'More authentication required',
       },
     }, {
@@ -31,7 +32,7 @@ const router = createRouter({
       name: 'forgotPassword',
       component: () => import('@/views/ForgotPasswordView.vue'),
       meta: {
-        title: 'Forgot Password',
+        titleKey: 'routes.forgotPassword',
         description: 'Forgot Password',
       },
     }, {
@@ -40,7 +41,7 @@ const router = createRouter({
       name: 'resetPassword',
       component: () => import('@/views/ResetPasswordView.vue'),
       meta: {
-        title: 'Reset Password',
+        titleKey: 'routes.resetPassword',
         description: 'Reset Password',
       },
     }, {
@@ -48,7 +49,7 @@ const router = createRouter({
       name: 'authByOtp',
       component: () => import('@/views/AuthByOtp.vue'),
       meta: {
-        title: 'Secure Login Verification',
+        titleKey: 'routes.secureLoginVerification',
         description: 'Verify your identity with a one-time password to continue securely.',
       },
     }, {
@@ -56,7 +57,7 @@ const router = createRouter({
       name: 'signUp',
       component: SignUpView,
       meta: {
-        title: 'Sign up',
+        titleKey: 'routes.signUp',
         description: 'Register your account',
       },
     }, {
@@ -64,7 +65,7 @@ const router = createRouter({
       name: 'onboardingWorkflow',
       component: () => import('@/views/OnboardingWorkflowView.vue'),
       meta: {
-        title: 'Complete Signup',
+        titleKey: 'routes.completeSignup',
         description: 'Complete your profile with us.',
       },
     }, {
@@ -72,7 +73,7 @@ const router = createRouter({
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),
       meta: {
-        title: 'Dashboard',
+        titleKey: 'routes.dashboard',
         description: '',
       },
     },
@@ -84,7 +85,7 @@ const router = createRouter({
       name: 'hotels',
       component: () => import('@/views/Travel/Hotels/IndexView.vue'),
       meta: {
-        title: 'Hotels',
+        titleKey: 'routes.hotels',
         description: '',
       },
     }, {
@@ -93,7 +94,7 @@ const router = createRouter({
       props: route => ({ id: route.params.id, slug: route.params.slug, search: route.query.search }),
       component: () => import('@/views/Travel/Hotels/HotelView.vue'),
       meta: {
-        title: 'View Hotel',
+        titleKey: 'routes.viewHotel',
         description: '',
       },
     }, {
@@ -103,7 +104,7 @@ const router = createRouter({
       props: route => ({ quoteId: route.params.id }),
       component: () => import('@/views/Travel/Hotels/HotelQuoteView.vue'),
       meta: {
-        title: 'Your Price',
+        titleKey: 'routes.yourPrice',
         description: '',
       },
     }, {
@@ -112,7 +113,7 @@ const router = createRouter({
       name: 'travelBookings',
       component: () => import('@/views/Travel/Bookings/IndexView.vue'),
       meta: {
-        title: 'Your Bookings',
+        titleKey: 'routes.yourBookings',
         description: '',
       },
     }, {
@@ -124,7 +125,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/PaymentStatusView.vue'),
       meta: {
-        title: 'Your Payment',
+        titleKey: 'routes.yourPayment',
         description: '',
       },
     }, {
@@ -135,7 +136,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/PaymentView.vue'),
       meta: {
-        title: 'Pay for Your Booking',
+        titleKey: 'routes.payForYourBooking',
         description: '',
       },
     }, {
@@ -144,7 +145,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/ItemView.vue'),
       meta: {
-        title: 'Booking',
+        titleKey: 'routes.booking',
         description: '',
       },
     }] : []),
@@ -154,7 +155,7 @@ const router = createRouter({
       props: route => ({ id: route.params.quoteId }),
       component: () => import('@/views/Transfer/IndexView.vue'),
       meta: {
-        title: 'Send Money',
+        titleKey: 'routes.sendMoney',
         description: '',
       },
     }, {
@@ -163,7 +164,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transfer/PaymentView.vue'),
       meta: {
-        title: 'Make Payment',
+        titleKey: 'routes.makePayment',
         description: '',
       },
     }, {
@@ -172,7 +173,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transfer/PaymentCallbackView.vue'),
       meta: {
-        title: 'Processing Payment',
+        titleKey: 'routes.processingPayment',
         description: '',
       },
     }, {
@@ -180,7 +181,7 @@ const router = createRouter({
       name: 'transactions',
       component: () => import('@/views/Transaction/IndexView.vue'),
       meta: {
-        title: 'Transactions',
+        titleKey: 'routes.transactions',
         description: '',
       },
     }, {
@@ -189,7 +190,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transaction/ItemView.vue'),
       meta: {
-        title: 'Transactions',
+        titleKey: 'routes.transactions',
         description: '',
       },
     }, {
@@ -197,7 +198,7 @@ const router = createRouter({
       name: 'recipients',
       component: () => import('@/views/Recipient/IndexView.vue'),
       meta: {
-        title: 'Recipients',
+        titleKey: 'routes.recipients',
         description: '',
       },
     }, {
@@ -206,7 +207,7 @@ const router = createRouter({
       props: route => ({ id: route.params.id }),
       component: () => import('@/views/Recipient/ItemView.vue'),
       meta: {
-        title: 'Recipients',
+        titleKey: 'routes.recipients',
         description: '',
       },
     }, {
@@ -214,7 +215,7 @@ const router = createRouter({
       name: 'accountVerification',
       component: () => import('@/views/AccountVerification/IndexView.vue'),
       meta: {
-        title: 'Account Verification',
+        titleKey: 'routes.accountVerification',
         description: '',
       },
     }, {
@@ -223,7 +224,7 @@ const router = createRouter({
       props: route => ({ id: route.params.category }),
       component: () => import('@/views/AccountVerification/CategoryView.vue'),
       meta: {
-        title: 'Account Verification',
+        titleKey: 'routes.accountVerification',
         description: '',
       },
     }, {
@@ -231,7 +232,7 @@ const router = createRouter({
       name: 'settings',
       component: () => import('@/views/SettingsView.vue'),
       meta: {
-        title: 'Settings',
+        titleKey: 'routes.settings',
         description: '',
       },
     }, {
@@ -239,7 +240,7 @@ const router = createRouter({
       name: 'devices',
       component: () => import('@/views/DeviceView.vue'),
       meta: {
-        title: 'Devices',
+        titleKey: 'routes.devices',
         description: '',
       },
     },
@@ -250,7 +251,7 @@ const router = createRouter({
       name: 'wallet',
       component: () => import('@/views/Wallet/IndexView.vue'),
       meta: {
-        title: 'Wallet',
+        titleKey: 'routes.wallet',
         description: '',
       },
     }, {
@@ -258,7 +259,7 @@ const router = createRouter({
       name: 'walletStatement',
       component: () => import('@/views/Wallet/StatementView.vue'),
       meta: {
-        title: 'Wallet Statement',
+        titleKey: 'routes.walletStatement',
         description: '',
       },
     }] : []),
@@ -269,7 +270,7 @@ const router = createRouter({
       name: 'notFound',
       component: () => import('@/views/NotFoundView.vue'),
       meta: {
-        title: 'Page not found',
+        titleKey: 'routes.pageNotFound',
         description: '',
       },
     }
@@ -307,7 +308,9 @@ router.beforeEach((to) => {
 })
 
 router.beforeEach((to, from) => {
-  document.title = to.meta?.title ?? APP_NAME
+  // The tab title is copy too, so it comes from the catalogue and follows the
+  // brand's language rather than staying English.
+  document.title = to.meta?.titleKey ? i18n.global.t(to.meta.titleKey) : APP_NAME
 })
 
 router.afterEach(() => {
