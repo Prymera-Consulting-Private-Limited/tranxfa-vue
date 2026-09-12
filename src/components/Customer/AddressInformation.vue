@@ -50,12 +50,8 @@ const editPersonalInformation = () => {
         <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">Address Details</h2>
-      <p class="text-md text-[#B7A3C1] mb-8 text-left">
-        Please provide your full residential address in
-        <span class="font-semibold text-brand-700">{{ customer?.data?.country?.commonName }}</span>.
-        Accurate address information is required to comply with financial regulations.
-      </p>
+      <h2 class="text-2xl font-semibold text-black mb-4 mt-14 sm:mt-8">{{ $t('onboarding.addressDetails') }}</h2>
+      <p class="text-md text-[#B7A3C1] mb-8 text-left"><i18n-t keypath="onboarding.addressIntro" scope="global"><template #country><span class="font-semibold text-brand-700">{{ customer?.data?.country?.commonName }}</span></template></i18n-t></p>
       <!-- Form -->
       <CustomerAttributeForm
           v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
@@ -63,7 +59,7 @@ const editPersonalInformation = () => {
           v-on:customer:attribute_category:updated="addressUpdated"
       />
       <div class="text-center mt-12">
-        <a @click="editPersonalInformation" class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline" href="javascript:">Edit Personal Information</a>
+        <a @click="editPersonalInformation" class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline" href="javascript:">{{ $t('onboarding.editPersonalInformation') }}</a>
       </div>
     </div>
   </div>

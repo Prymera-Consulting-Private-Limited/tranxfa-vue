@@ -20,7 +20,8 @@ describe('412 more_authentication_required', () => {
     const s = read('src/views/MultifactorAuthenticationView.vue');
     expect(s).toContain("query.reason === 'session'");
     expect(s).toMatch(/if \(isSessionReverify\) \{\n\s*customerUtils\.resendMfaOtp\(\)/);
-    expect(s).toContain('nothing you were doing is lost');
+    expect(s).toContain("$t('onboarding.mfaIntro'");
+    expect(en.onboarding.mfaIntro).toContain('nothing you were doing is lost');
   });
 
   it('the wizard keeps the confirm choices and confirms the same quote again', () => {

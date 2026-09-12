@@ -65,8 +65,8 @@ onMounted(loadSources);
         <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left  mt-14 sm:mt-8">Where Do You Live?</h2>
-      <p class="text-md text-[#B7A3C1] mb-8 text-left">To provide you with the best service, we need to know your country of residence. Please select your country to continue.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left  mt-14 sm:mt-8">{{ $t('onboarding.whereDoYouLive') }}</h2>
+      <p class="text-md text-[#B7A3C1] mb-8 text-left">{{ $t('onboarding.countryStepHint') }}</p>
       <ul v-if="countryUtils.sources.value?.length > 0" role="list" class="mt-3 grid grid-cols-1 gap-4 xl:grid-cols-2 sm:gap-5">
         <template v-for="country in countryUtils.sources.value" :key="country.id">
           <li
@@ -85,7 +85,7 @@ onMounted(loadSources);
           </li>
         </template>
       </ul>
-      <LoadFailurePanel v-else-if="loadFailure" title="We couldn't load the list of countries" :message="loadFailure" retryLabel="Try again" @retry="loadSources" class="mt-0" />
+      <LoadFailurePanel v-else-if="loadFailure" :title="$t('onboarding.countryListFailure')" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="loadSources" class="mt-0" />
       <ul v-else role="list" class="mt-3 grid grid-cols-1 gap-4 xl:grid-cols-2 sm:gap-5">
         <template v-for="i in 4" :key="i">
           <li class="col-span-1 flex overflow-hidden rounded-2xl border border-gray-200">
