@@ -34,6 +34,23 @@ English is both source and fallback, so a half-translated brand reads in
 English rather than showing raw keys. That matters: a missing translation must
 never be a customer's problem.
 
+## Outside a component
+
+A composable, the router or a store has no `useI18n()`. It reaches the same
+catalogue through the global instance:
+
+```js
+import i18n from "@/i18n.js";
+
+const t = (...args) => i18n.global.t(...args);
+
+// a count chooses between the two forms, separated by | in the message
+t('common.tooManyTriesSeconds', seconds, {count: seconds});
+```
+
+Route titles work this way too: a route names `meta.titleKey` and the
+navigation guard resolves it, so the browser tab follows the brand's language.
+
 ## Using it in a component
 
 ```vue
@@ -144,7 +161,9 @@ carrying copy and merges from `main` stop conflicting on it.
 
 Every component in `src/` that holds copy now reads it from the catalogue, and
 `tests/i18n-catalogue.spec.js` names all of them, so a new sentence in a
-template fails the build. What stays outside the catalogue on purpose:
+template fails the build. So do the modules that are not components: the
+failure-message defaults, the upload rules, the verification-step labels and
+the route titles. What stays outside the catalogue on purpose:
 
 - Text the back office sends: transfer statuses, document categories,
   purposes, relationship names. Translated in the console.

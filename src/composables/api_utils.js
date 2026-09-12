@@ -1,3 +1,9 @@
+import i18n from '@/i18n.js';
+
+// A module, not a component, so it reaches the catalogue through the global
+// instance rather than through useI18n().
+const t = (...args) => i18n.global.t(...args);
+
 /**
  * Surfaces a failure that is ours rather than the api's.
  *
@@ -159,7 +165,7 @@ export function retryAfterSeconds(error) {
 
 export function failureMessage(error, fallback) {
     if (error?.request && ! error?.response) {
-        return "No hemos podido conectar. Comprueba tu conexión a internet e inténtalo de nuevo.";
+        return t('common.connectionFailed');
     }
 
     const status = error?.response?.status;
@@ -167,14 +173,14 @@ export function failureMessage(error, fallback) {
     if (status === 429) {
         const seconds = retryAfterSeconds(error);
         if (seconds !== null) {
-            return `Too many tries. Please wait ${seconds} second${seconds === 1 ? '' : 's'} and try again.`;
+            return t('common.tooManyTriesSeconds', seconds, {count: seconds});
         }
 
-        return 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.';
+        return t('common.tooManyTries');
     }
 
     if (status === 401 || status === 419) {
-        return 'Tu sesión ha finalizado. Vuelve a iniciar sesión.';
+        return t('common.sessionEnded');
     }
 
     if (status === 422) {

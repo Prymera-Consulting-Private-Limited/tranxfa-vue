@@ -1,3 +1,7 @@
+import i18n from '@/i18n.js';
+
+const t = (...args) => i18n.global.t(...args);
+
 /**
  * What a customer may upload as an identity document.
  *
@@ -20,15 +24,15 @@ export const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
  */
 export function validateUpload(file, {types = DOCUMENT_TYPES, maxMb = MAX_UPLOAD_MB} = {}) {
     if (! file) {
-        return 'Elige un archivo para subir.';
+        return t('common.chooseAFile');
     }
     if (! types.includes(file.type)) {
         return types.includes('application/pdf')
-            ? 'Sube una foto en JPEG, PNG o WebP, o un PDF.'
-            : 'Sube una foto en JPEG, PNG o WebP.';
+            ? t('common.uploadPhotoOrPdf')
+            : t('common.uploadPhoto');
     }
     if (file.size > maxMb * 1024 * 1024) {
-        return `This file is too large (max ${maxMb} MB). Try a smaller photo or take a new one.`;
+        return t('common.fileTooLarge', {maxMb});
     }
 
     return null;
