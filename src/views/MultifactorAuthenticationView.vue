@@ -106,10 +106,10 @@ onMounted(async () => {
         <a href="javascript:" class="mx-auto"><BrandLogo class="mb-5 mx-auto" /></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">More authentication needed</h2>
-      <p v-if="isSessionReverify" class="text-md text-[#B7A3C1] mb-2 text-center">To keep going we need to check it's you. We've sent a one time password to {{ customer.data?.account?.email }}; nothing you were doing is lost.</p>
-      <p v-else class="text-md text-[#B7A3C1] mb-2 text-center">Please enter the one time password we have sent to your email {{ customer.data?.account?.email }}</p>
-      <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">Please note, it may take up to a minute for the email to arrive. If you don't see it in your inbox, be sure to check your Junk or Spam folder as well.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">{{ $t('onboarding.mfaHeading') }}</h2>
+      <p v-if="isSessionReverify" class="text-md text-[#B7A3C1] mb-2 text-center">{{ $t('onboarding.mfaIntro', {email: customer.data?.account?.email}) }}</p>
+      <p v-else class="text-md text-[#B7A3C1] mb-2 text-center">{{ $t('onboarding.enterEmailCode', {email: customer.data?.account?.email}) }}</p>
+      <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">{{ $t('verification.emailCodeDelay') }}</p>
       <!-- Form -->
       <form @submit.prevent="authenticate" class="space-y-10">
         <div v-if="otpError" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
@@ -136,14 +136,10 @@ onMounted(async () => {
           >
             <template v-if="isVerifying">
               <span class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
-                <Spinner :class="'size-4'" />
-                Please wait...
-              </span>
+                <Spinner :class="'size-4'" />{{ $t('recipient.pleaseWait') }}</span>
             </template>
             <template v-else>
-              <span class="inline-flex items-center justify-center gap-2">
-                Login
-                <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
+              <span class="inline-flex items-center justify-center gap-2">{{ $t('onboarding.login') }}<i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
               </span>
             </template>
           </button>
@@ -151,16 +147,14 @@ onMounted(async () => {
         <template v-if="! isLoading && ! isVerifying">
           <p v-if="resentMessage" role="status" class="mb-3 rounded-lg bg-success-50 px-3 py-2 text-center text-sm/6 text-success-700">{{ resentMessage }}</p>
           <p v-if="resendFailure" role="alert" class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-center text-sm/6 text-danger-700">{{ resendFailure }}</p>
-          <div v-if="! isResendingOtp" class="text-sm/6 text-gray-500 text-center">
-            Didn't receive OTP?
-            <a
+          <div v-if="! isResendingOtp" class="text-sm/6 text-gray-500 text-center">{{ $t('onboarding.didntReceiveOtp') }} <a
               v-if="showResendButton"
               @click="resend"
               class="ml-1 inline-flex cursor-pointer items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
-            >Resend code</a>
-            <template v-else> Resend in {{ countdown }}s</template>
+            >{{ $t('verification.resendCode') }}</a>
+            <template v-else>{{ $t('verification.resendInCountdownS', {countdown: countdown}) }}</template>
           </div>
-          <div v-else class="text-sm/6 text-gray-500 text-center animate-pulse">Resending one time password to your email {{ customer.data?.account?.email }} ...</div>
+          <div v-else class="text-sm/6 text-gray-500 text-center animate-pulse">{{ $t('onboarding.resendingEmailCode', {email: customer.data?.account?.email}) }}</div>
         </template>
       </form>
     </div>

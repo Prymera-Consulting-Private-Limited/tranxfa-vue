@@ -60,6 +60,20 @@ const MIGRATED = [
   'src/views/AccountVerification/IndexView.vue',
   'src/views/Recipient/IndexView.vue',
   'src/views/Recipient/ItemView.vue',
+  // slice 4, sign-up, onboarding and profile
+  'src/components/Customer/AddressInformation.vue',
+  'src/components/Customer/CustomerAttributeForm.vue',
+  'src/components/Customer/EmailInput.vue',
+  'src/components/Customer/EmploymentInformation.vue',
+  'src/components/Customer/IdentityInformation.vue',
+  'src/components/Customer/MobileNumberInput.vue',
+  'src/components/Customer/OnboardingFlow.vue',
+  'src/components/Customer/OriginCountrySelection.vue',
+  'src/components/Customer/Task.vue',
+  'src/views/AuthByOtp.vue',
+  'src/views/MultifactorAuthenticationView.vue',
+  'src/views/OnboardingWorkflowView.vue',
+  'src/views/SignUpView.vue',
 ];
 
 const flatten = (node, prefix = '') =>

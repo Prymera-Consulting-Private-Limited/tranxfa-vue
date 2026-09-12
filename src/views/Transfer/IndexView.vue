@@ -727,7 +727,7 @@ const canContinue = computed(() => {
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
                       <h3 class="text-gray-900 mb-4 font-semibold">{{ $t('transfer.wizard.provideYourAddress') }}</h3>
-                      <p class="text-gray-500 text-sm/6 mb-3 -mt-2">{{ $t('transfer.wizard.pleaseProvideYourFullResidential') }}<span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span>.
+                      <p class="text-gray-500 text-sm/6 mb-3 -mt-2"><i18n-t keypath="onboarding.addressIntroShort" scope="global"><template #country><span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span></template></i18n-t>
                       </p>
                       <p class="text-gray-500 text-sm/6 mb-6 -mt-2">
                         <span>{{ $t('transfer.wizard.accurateAddressInformationIsRequired') }}</span>
