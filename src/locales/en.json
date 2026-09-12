@@ -4,7 +4,7 @@
     "password": "Password",
     "continue": "Continue",
     "tryAgain": "Try again",
-    "emailPlaceholder": "example@email.com",
+    "emailPlaceholder": "example{'@'}email.com",
     "passwordPlaceholder": "••••••••",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
