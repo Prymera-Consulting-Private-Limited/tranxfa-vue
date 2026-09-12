@@ -80,7 +80,10 @@ describe('the app-level fallback', () => {
         const Broken = defineComponent({setup() { return () => { throw new TypeError("Cannot read properties of null (reading 'code')"); }; }});
         const {default: App} = await import('@/App.vue');
 
-        const wrapper = mount(App, {global: {stubs: {FirstLoadAnimation: true, RouterView: Broken}}});
+        // The fallback's words come from the catalogue now, so the plugin
+        // has to be there: this asserts the wiring as well as the copy.
+        const {default: i18n} = await import('@/i18n.js');
+        const wrapper = mount(App, {global: {plugins: [i18n], stubs: {FirstLoadAnimation: true, RouterView: Broken}}});
         await nextTick();
 
         expect(wrapper.text()).toContain('This page stopped working');

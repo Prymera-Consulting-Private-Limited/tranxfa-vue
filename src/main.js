@@ -7,6 +7,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import i18n from '@/i18n.js'
 import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
 import {MFA_REQUIRED_TYPE} from "@/composables/checkout_safety.js";
 import {installErrorHandling} from "@/error_handling.js";
@@ -20,6 +21,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(i18n)
 installErrorHandling(app, router)
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_URL

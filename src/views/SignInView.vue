@@ -3,6 +3,7 @@ import {getCustomerMessage, logRequestFailure} from "@/composables/api_utils.js"
 import BrandLogo from "@/components/BrandLogo.vue";
 import ServiceStatusBanner from "@/components/ServiceStatusBanner.vue";
 import {onMounted, reactive, ref} from "vue";
+import {useI18n} from "vue-i18n";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import router from "@/router/index.js";
 import {safeRedirect} from "@/router/guards.js";
@@ -15,6 +16,7 @@ const authChannel = import.meta.env.VITE_AUTH_CHANNEL ??  'EMAIL';
 
 const showPassword = ref(false);
 const rememberMe = ref(false);
+const {t} = useI18n();
 const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
 const form = reactive({});
@@ -65,7 +67,7 @@ async function login() {
     }).catch((e) => {
       // A network failure has no response, and an empty message meant the error
       // box never rendered: the customer pressed the button and nothing happened.
-      loginError.value = getCustomerMessage(e) ?? "We couldn't sign you in. Please check your internet connection and try again.";
+      loginError.value = getCustomerMessage(e) ?? t('auth.signIn.connectionFailed');
       logRequestFailure(e, 'sign-in');
     }).finally(() => {
       isLoading.value = false;
@@ -81,7 +83,7 @@ async function login() {
     }).catch((e) => {
       // A network failure has no response, and an empty message meant the error
       // box never rendered: the customer pressed the button and nothing happened.
-      loginError.value = getCustomerMessage(e) ?? "We couldn't sign you in. Please check your internet connection and try again.";
+      loginError.value = getCustomerMessage(e) ?? t('auth.signIn.connectionFailed');
       logRequestFailure(e, 'sign-in');
     }).finally(() => {
       isLoading.value = false;
@@ -105,7 +107,7 @@ function updateIsdCode(updated) {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/login.webp" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/login.webp" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
@@ -128,28 +130,28 @@ function updateIsdCode(updated) {
               <a href="javascript:"><BrandLogo class="mb-5 -ml-2" /></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-2">Love to see you again</h2>
-            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">Send your money transfer easy and Fun!</p>
+            <h2 class="text-2xl font-bold text-black mb-2">{{ $t('auth.signIn.title') }}</h2>
+            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">{{ $t('auth.signIn.subtitle') }}</p>
             <!-- Form -->
             <!-- The service-status endpoint answers on the app token, so a maintenance notice can show before sign-in. -->
             <ServiceStatusBanner class="mb-6 rounded-2xl border" />
             <form @submit.prevent="login" class="space-y-5">
               <div v-if="loginError" class="rounded-2xl bg-danger-50 border border-danger-100 px-4 py-3">
-                <h3 class="text-sm/6 font-medium text-danger-800">Login failed</h3>
+                <h3 class="text-sm/6 font-medium text-danger-800">{{ $t('auth.signIn.failed') }}</h3>
                 <p class="mt-1 text-sm/6 text-danger-700">{{ loginError }}</p>
               </div>
               <div v-if="router.currentRoute.value.query?.referer" class="rounded-2xl bg-blue-50 border border-blue-100 px-4 py-3">
                 <p v-if="router.currentRoute.value.query.referer === 'change-password'" class="text-sm/6 text-blue-700">
-                  Your password has been successfully changed. Please log in using your new password.
+                  {{ $t('auth.signIn.passwordChanged') }}
                 </p>
                 <p v-if="router.currentRoute.value.query.referer === 'reset-password'" class="text-sm/6 text-blue-700">
-                  Your password has been successfully reset. Please log in using your new password.
+                  {{ $t('auth.signIn.passwordReset') }}
                 </p>
               </div>
 
               <template v-if="authChannel === 'MOBILE_NUMBER'">
                 <div v-if="! isLoading" class="space-y-3">
-                  <label for="mobile-number" class="block mb-1 text-base font-medium text-brand-700">Mobile Number</label>
+                  <label for="mobile-number" class="block mb-1 text-base font-medium text-brand-700">{{ $t('auth.signIn.mobileNumber') }}</label>
                   <div class="space-y-3">
                     <IsdCodeInput v-bind:countries="countries" v-bind:fetchCountries="false" :class="['min-w-36 sm:min-w-40']" v-bind:modelValue="form.country" v-bind:itemLabelGenerator="itemLabelGenerator" v-on:update:modelValue="updateIsdCode" />
                     <div
@@ -161,7 +163,7 @@ function updateIsdCode(updated) {
                         type="tel"
                         v-model="form.mobile_number"
                         class="w-full rounded-2xl border-0 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-500"
-                        placeholder="Mobile Number"
+                        :placeholder="$t('auth.signIn.mobileNumberPlaceholder')"
                         @focus="mobileFocused = true"
                         @blur="mobileFocused = false"
                       />
@@ -171,7 +173,7 @@ function updateIsdCode(updated) {
               </template>
               <template v-else-if="authChannel === 'EMAIL'">
                 <div>
-                  <label for="email" class="block text-brand-700 mb-2 font-medium">Email</label>
+                  <label for="email" class="block text-brand-700 mb-2 font-medium">{{ $t('common.email') }}</label>
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
                     :class="emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300'"
@@ -180,7 +182,7 @@ function updateIsdCode(updated) {
                       type="email"
                       id="email"
                       v-model="form.email"
-                      placeholder="example@email.com"
+                      :placeholder="$t('common.emailPlaceholder')"
                       class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                       @focus="emailFocused = true"
                       @blur="emailFocused = false"
@@ -193,7 +195,7 @@ function updateIsdCode(updated) {
 
                 <!-- Password Field -->
                 <div>
-                  <label for="password" class="block text-brand-700 mb-2 font-medium">Password</label>
+                  <label for="password" class="block text-brand-700 mb-2 font-medium">{{ $t('common.password') }}</label>
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
                     :class="passwordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300'"
@@ -202,7 +204,7 @@ function updateIsdCode(updated) {
                       :type="showPassword ? 'text' : 'password'"
                       id="password"
                       v-model="form.password"
-                      placeholder="••••••••"
+                      :placeholder="$t('common.passwordPlaceholder')"
                       class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                       @focus="passwordFocused = true"
                       @blur="passwordFocused = false"
@@ -210,7 +212,7 @@ function updateIsdCode(updated) {
                     <button
                       type="button"
                       class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
-                      :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                      :aria-label="showPassword ? $t('common.hidePassword') : $t('common.showPassword')"
                       @click="showPassword = !showPassword"
                     >
                       <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
@@ -231,13 +233,13 @@ function updateIsdCode(updated) {
                       v-model="rememberMe"
                       class="h-4 w-4 rounded border-gray-300 text-brand-700 accent-brand-700 outline-none focus:ring-0"
                     >
-                    Remember me
+                    {{ $t('auth.signIn.rememberMe') }}
                   </label>
                   <router-link
                     :to="{name: 'forgotPassword'}"
                     class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50"
                   >
-                    Forgot password?
+                    {{ $t('auth.signIn.forgotPassword') }}
                   </router-link>
                 </div>
               </template>
@@ -257,12 +259,12 @@ function updateIsdCode(updated) {
 
               <!-- Sign Up Link -->
               <p class="mt-2 text-center text-sm/6 text-gray-600">
-                Don’t have an account?
+                {{ $t('auth.signIn.noAccount') }}
                 <router-link
                   :to="{name: 'signUp'}"
                   class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
                 >
-                  Sign up instead
+                  {{ $t('auth.signIn.signUpInstead') }}
                 </router-link>
               </p>
             </form>

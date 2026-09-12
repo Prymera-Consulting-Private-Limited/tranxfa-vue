@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import en from '@/locales/en.json';
 import {mount} from '@vue/test-utils';
 import {readFileSync} from 'node:fs';
 import {failureMessage} from '@/composables/api_utils.js';
@@ -98,7 +99,9 @@ describe('every silent catch on the money path now speaks', () => {
 describe('sign-in and auth pages', () => {
   it('says something when sign-in fails without a response', () => {
     const s = read('src/views/SignInView.vue');
-    expect(s).toContain('getCustomerMessage(e) ?? "We couldn\'t sign you in. Please check your internet connection and try again."');
+    // SD-1076: the sentence moved to the catalogue; the guard follows it there.
+    expect(s).toContain("getCustomerMessage(e) ?? t('auth.signIn.connectionFailed')");
+    expect(en.auth.signIn.connectionFailed).toBe("We couldn't sign you in. Please check your internet connection and try again.");
     expect(s).not.toMatch(/loginError\.value = e\.response\?\.data\?\.message;/);
   });
 
