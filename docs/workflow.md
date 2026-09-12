@@ -13,6 +13,11 @@ pull requests target `main`. Brand branches are deploys, not review targets.
    problem, what will change, and a "Done when" list the PR can be checked
    against. Nothing is branched, committed or opened without a ticket
    number. Set the ETA before the ticket goes to in progress.
+   **Assign it to Dhruv Patel**, who owns this repository: in Rover the
+   record is `Dhruv`, `dhruv@remitso.com`. Assignment is a separate call
+   (`rover_assign`) and worth reading back, because a ticket created with an
+   assignee field the server does not recognise is created unassigned and
+   then sits in nobody's queue. This holds for a ticket raised mid-task too.
 2. **Branch from `main`.** `feature/sd-<n>-<short-slug>`, always cut from a
    fresh `origin/main`. One ticket, one branch; a stack of dependent PRs uses
    one ticket and numbered slugs (`feature/sd-512-guard-1-router`,
