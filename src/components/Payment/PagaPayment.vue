@@ -121,16 +121,16 @@ const payByFormatted = computed(() => {
 <template>
   <template v-if="transaction.payment.state.code === PaymentState.PENDING">
     <div>
-      <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">Complete your payment</h2>
+      <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">{{ $t('payment.card.completeYourPayment') }}</h2>
       <p v-if="transaction.payment.clientPaymentAccount" class="text-base font-normal text-sm/6 text-gray-600 mb-6 text-left">{{ transaction.payment.clientPaymentAccount?.instruction }}</p>
       <div v-if="transaction.payment.clientPaymentAccount" class="mb-6 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
-        <p v-if="transaction.payment.clientPaymentAccount.paymentReference">Put the <strong>Payment reference</strong> in the reference or description box at your bank. Without it we cannot match your money to this transfer.</p>
-        <p>Send exactly <strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong>.</p>
-        <p v-if="payByFormatted">Please pay by <strong>{{ payByFormatted }}</strong> (your local time). If we do not see your money by then, this transfer is cancelled and nothing is charged.</p>
+        <p v-if="transaction.payment.clientPaymentAccount.paymentReference"><i18n-t keypath="payment.provider.putTheInTheReference2" scope="global"><template #value><strong>{{ $t('account.paymentReference') }}</strong></template></i18n-t></p>
+        <i18n-t keypath="payment.provider.sendExactlyAmount" tag="p" scope="global"><template #amount><strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong></template></i18n-t>
+        <i18n-t v-if="payByFormatted" keypath="payment.provider.pleasePayByTime" tag="p" scope="global"><template #time><strong>{{ payByFormatted }}</strong></template></i18n-t>
       </div>
       <template v-if="transaction.payment.clientPaymentAccount">
         <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" /><div class="text-left my-5">
-        <label :for="`payment-amount`" class="block text-sm/6 font-medium text-gray-900">Payment amount</label>
+        <label :for="`payment-amount`" class="block text-sm/6 font-medium text-gray-900">{{ $t('payment.provider.paymentAmount') }}</label>
         <UseClipboard v-slot="{ copy, copied }" :source="transaction.payment.totalPaymentAmountFormatted">
           <div class="mt-2 flex">
             <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
@@ -140,15 +140,15 @@ const payByFormatted = computed(() => {
               <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
             </button>
           </div>
-          <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">Copied.</p>
+          <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">{{ $t('account.copied') }}</p>
         </UseClipboard>
       </div>
         <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
-          <button @click="iHaveMadePayment" :disabled="isConfirmingPayment" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 cursor-pointer">I've made payment</button>
+          <button @click="iHaveMadePayment" :disabled="isConfirmingPayment" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 cursor-pointer">{{ $t('payment.provider.iveMadePayment') }}</button>
           <InlineFailure :message="confirmFailure" />
         </div>
         <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
-          <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
+          <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>
         </div>
       </template>
     </div>
@@ -156,47 +156,47 @@ const payByFormatted = computed(() => {
 
   <template v-else-if="status === 'pending'">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait…</h2>
-    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.pleaseWait') }}</h2>
+    <p class="text-base text-gray-600 mb-6">{{ $t('payment.card.pleaseWaitWhileWeAre') }}</p>
   </template>
 
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">We're watching for your payment</h2>
-    <p class="text-base text-gray-600 mb-2">Thanks for letting us know. Bank transfers usually arrive within a few minutes, but can take up to one business day. This page updates as soon as your money lands.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.wereWatchingForYourPayment') }}</h2>
+    <p class="text-base text-gray-600 mb-2">{{ $t('payment.provider.thanksForLettingUsKnow') }}</p>
     <p v-if="transaction.payment.clientPaymentAccount?.waitTimeMessage" class="text-sm/6 text-gray-500 mb-6">{{ transaction.payment.clientPaymentAccount.waitTimeMessage }}</p>
     <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
-      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>
     </div>
   </template>
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
-    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment received</h2>
-    <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
+    <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">{{ $t('transfer.payment.paymentReceived') }}</h2>
+    <p class="text-lg text-gray-600 mb-6">{{ $t('transfer.payment.yourPaymentHasBeenSuccessfully') }}</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment failed</h2>
-    <p class="text-base text-danger-600">We couldn't take your payment and no money has left your account. You can try again or choose another way to pay.</p>
+    <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">{{ $t('transfer.payment.paymentFailed') }}</h2>
+    <p class="text-base text-danger-600">{{ $t('transfer.payment.weCouldntTakeYourPayment') }}</p>
   </template>
 
   <!-- Expired, cancelled and refunded payments rendered an empty modal here. -->
   <template v-else-if="status === 'cancelled'">
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
-    <p class="text-base text-gray-600 mb-6">No money has moved. You can start the transfer again whenever you're ready.</p>
+    <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
-      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>
     </div>
   </template>
 
   <template v-else-if="status === 'refunded'">
-    <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment refunded</h2>
-    <p class="text-base text-gray-600 mb-6">This payment was returned to you. Check the transfer for details.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.paymentRefunded') }}</h2>
+    <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.thisPaymentWasReturnedTo') }}</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
-      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
+      <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>
     </div>
   </template>
 </template>

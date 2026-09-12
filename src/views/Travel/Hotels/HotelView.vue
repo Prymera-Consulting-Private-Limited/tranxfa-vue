@@ -189,9 +189,7 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <!-- Back to results -->
         <RouterLink :to="resultsLink" class="inline-flex items-center gap-1 text-sm/6 font-medium text-gray-500 transition hover:text-gray-900">
-          <ChevronLeftIcon class="size-4" aria-hidden="true" />
-          Back to results
-        </RouterLink>
+          <ChevronLeftIcon class="size-4" aria-hidden="true" />{{ $t('travel.backToResults') }}</RouterLink>
         <div class="mt-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-6">
           <!-- Hotel -->
           <div class="lg:col-span-2">
@@ -202,13 +200,13 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
               <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
                 <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
               </div>
-              <h2 class="mt-6 text-base font-semibold text-gray-900">We couldn't load this hotel</h2>
+              <h2 class="mt-6 text-base font-semibold text-gray-900">{{ $t('travel.weCouldntLoadThisHotel') }}</h2>
               <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
-              <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong while contacting our travel partner. Please try again in a moment.</p>
+              <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('travel.somethingWentWrongWhileContacting') }}</p>
               <RouterLink
                   :to="resultsLink"
                   class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
-              >Back to results</RouterLink>
+              >{{ $t('travel.backToResults') }}</RouterLink>
             </div>
             <!-- Hotel -->
             <template v-else-if="hotel">
@@ -223,7 +221,7 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
                     @select="selectRate"
                 />
                 <section v-if="hotel.amenities.length">
-                  <h2 class="text-lg font-semibold tracking-tight text-gray-900">What this place offers</h2>
+                  <h2 class="text-lg font-semibold tracking-tight text-gray-900">{{ $t('travel.whatThisPlaceOffers') }}</h2>
                   <div class="mt-3 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
                     <HotelAmenities :amenities="hotel.amenities" :labels="labels" :limit="hotel.amenities.length" />
                   </div>

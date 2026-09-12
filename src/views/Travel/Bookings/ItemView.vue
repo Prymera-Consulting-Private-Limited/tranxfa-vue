@@ -173,9 +173,7 @@ onUnmounted(() => {
             :to="{name: 'travelBookings'}"
             class="inline-flex items-center gap-1 text-sm/6 font-medium text-gray-500 transition hover:text-gray-900"
         >
-          <ChevronLeftIcon class="size-4" aria-hidden="true" />
-          All bookings
-        </RouterLink>
+          <ChevronLeftIcon class="size-4" aria-hidden="true" />{{ $t('travel.allBookings') }}</RouterLink>
         <!-- Loading -->
         <div v-if="isLoading" class="mt-6 animate-pulse space-y-4">
           <div class="h-32 rounded-2xl border border-gray-200 bg-white" />
@@ -186,9 +184,9 @@ onUnmounted(() => {
           <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
             <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
           </div>
-          <h1 class="mt-6 text-base font-semibold text-gray-900">We couldn't load this booking</h1>
+          <h1 class="mt-6 text-base font-semibold text-gray-900">{{ $t('travel.weCouldntLoadThisBooking') }}</h1>
           <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
-          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">Something went wrong on our side. Please try again in a moment.</p>
+          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('travel.somethingWentWrongOnOur') }}</p>
         </div>
         <template v-else-if="order">
           <!-- Heading -->
@@ -205,7 +203,7 @@ onUnmounted(() => {
                 </p>
               </div>
               <div class="shrink-0 text-right">
-                <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">Total paid</p>
+                <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('travel.totalPaid') }}</p>
                 <p class="mt-1 text-2xl font-semibold tracking-tight text-gray-900">{{ order.total.currencyPrefixed }}</p>
               </div>
             </div>
@@ -218,38 +216,38 @@ onUnmounted(() => {
             <!-- Stay -->
             <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
               <header class="border-b border-gray-100 px-5 py-4">
-                <h2 class="text-sm/6 font-semibold text-gray-900">Your stay</h2>
+                <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.yourStay') }}</h2>
               </header>
               <dl class="divide-y divide-gray-100">
                 <div v-if="stay" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
-                  <dt class="text-sm/6 text-gray-500">Dates</dt>
+                  <dt class="text-sm/6 text-gray-500">{{ $t('travel.dates') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">
                     {{ stay }}
                     <span v-if="order.nights" class="font-normal text-gray-500">· {{ order.nights }} night{{ order.nights === 1 ? '' : 's' }}</span>
                   </dd>
                 </div>
                 <div v-if="order.roomName" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
-                  <dt class="text-sm/6 text-gray-500">Room</dt>
+                  <dt class="text-sm/6 text-gray-500">{{ $t('travel.room') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">{{ order.roomName }}</dd>
                 </div>
                 <div v-if="guests.length" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
-                  <dt class="text-sm/6 text-gray-500">Occupancy</dt>
+                  <dt class="text-sm/6 text-gray-500">{{ $t('travel.occupancy') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">{{ guests.join(' · ') }}</dd>
                 </div>
                 <div v-if="guestNames.length" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
-                  <dt class="text-sm/6 text-gray-500">Guests</dt>
+                  <dt class="text-sm/6 text-gray-500">{{ $t('travel.guests') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">{{ guestNames.join(', ') }}</dd>
                 </div>
                 <div v-if="order.contact?.email || order.contact?.phone" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
-                  <dt class="text-sm/6 text-gray-500">Contact</dt>
+                  <dt class="text-sm/6 text-gray-500">{{ $t('travel.contact') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">{{ [order.contact.email, order.contact.phone].filter(Boolean).join(' · ') }}</dd>
                 </div>
                 <div v-if="order.bookedAt" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
-                  <dt class="text-sm/6 text-gray-500">Booked</dt>
+                  <dt class="text-sm/6 text-gray-500">{{ $t('travel.booked') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">{{ moment(order.bookedAt).format('D MMM YYYY, HH:mm') }}</dd>
                 </div>
                 <div v-if="order.confirmedAt" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
-                  <dt class="text-sm/6 text-gray-500">Confirmed by the hotel</dt>
+                  <dt class="text-sm/6 text-gray-500">{{ $t('travel.confirmedByTheHotel') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">{{ moment(order.confirmedAt).format('D MMM YYYY, HH:mm') }}</dd>
                 </div>
               </dl>
@@ -257,7 +255,7 @@ onUnmounted(() => {
             <!-- What was charged, as written when the booking was made -->
             <section v-if="order.breakdown.length" class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
               <header class="border-b border-gray-100 px-5 py-4">
-                <h2 class="text-sm/6 font-semibold text-gray-900">What you paid for</h2>
+                <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.whatYouPaidFor') }}</h2>
               </header>
               <dl class="divide-y divide-gray-100">
                 <div v-for="line in order.breakdown" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
@@ -265,7 +263,7 @@ onUnmounted(() => {
                   <dd class="shrink-0 text-sm/6 text-gray-900 tabular-nums">{{ line.amount.currencyPrefixed }}</dd>
                 </div>
                 <div class="flex items-baseline justify-between gap-4 bg-gray-50/70 px-5 py-3">
-                  <dt class="text-sm/6 font-semibold text-gray-900">Total</dt>
+                  <dt class="text-sm/6 font-semibold text-gray-900">{{ $t('account.total') }}</dt>
                   <dd class="text-sm/6 font-semibold text-gray-900 tabular-nums">{{ order.total.currencyPrefixed }}</dd>
                 </div>
               </dl>

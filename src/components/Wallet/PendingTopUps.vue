@@ -91,8 +91,8 @@ async function cancelTopup() {
 
 <template>
   <div class="rounded-lg bg-white border border-gray-100 px-4 py-4 sm:px-6">
-    <h2 class="text-base font-semibold text-gray-900">Pending top-ups</h2>
-    <p class="mt-0.5 text-sm/6 text-gray-500">Waiting for your bank transfer to arrive — remember, the amount must match exactly.</p>
+    <h2 class="text-base font-semibold text-gray-900">{{ $t('wallet.pendingTopUps') }}</h2>
+    <p class="mt-0.5 text-sm/6 text-gray-500">{{ $t('wallet.waitingForYourBankTransfer') }}</p>
     <ul role="list" class="mt-2 divide-y divide-gray-100">
       <li v-for="topup in topups" :key="topup.id" class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
@@ -100,8 +100,8 @@ async function cancelTopup() {
           <p class="mt-1 text-xs/5 text-gray-500">Expires {{ expiresIn(topup) }} &middot; {{ moment(topup.expiresAt).format('MMM D, YYYY h:mm A') }}</p>
         </div>
         <div class="flex shrink-0 items-center gap-x-4">
-          <a href="javascript:" @click="emit('view', topup)" class="text-sm/6 font-semibold text-brand-700 hover:text-brand-800">View details</a>
-          <a href="javascript:" @click="openCancelModal(topup)" class="text-sm/6 font-medium text-danger-600 hover:text-danger-600">Cancel</a>
+          <a href="javascript:" @click="emit('view', topup)" class="text-sm/6 font-semibold text-brand-700 hover:text-brand-800">{{ $t('wallet.viewDetails') }}</a>
+          <a href="javascript:" @click="openCancelModal(topup)" class="text-sm/6 font-medium text-danger-600 hover:text-danger-600">{{ $t('recipient.cancel') }}</a>
         </div>
       </li>
     </ul>
@@ -121,11 +121,9 @@ async function cancelTopup() {
                   <ExclamationTriangleIcon class="h-6 w-6 text-danger-600" aria-hidden="true" />
                 </div>
                 <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                  <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Cancel this top-up</DialogTitle>
+                  <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">{{ $t('wallet.cancelThisTopUp') }}</DialogTitle>
                   <div class="mt-2">
-                    <DialogDescription class="text-sm/6 text-gray-500">
-                      This withdraws your declaration of {{ topupToCancel?.amountFormatted }}. If you've already made the bank transfer, don't cancel — the money is on its way and will be matched when it arrives.
-                    </DialogDescription>
+                    <DialogDescription class="text-sm/6 text-gray-500">{{ $t('wallet.thisWithdrawsYourDeclarationOf', {amountFormatted: topupToCancel?.amountFormatted}) }}</DialogDescription>
                   </div>
                   <p v-if="cancelError" class="mt-2 text-sm/6 text-danger-600">{{ cancelError }}</p>
                 </div>
@@ -134,9 +132,7 @@ async function cancelTopup() {
                 <button type="button" class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer" @click="cancelTopup" :disabled="isCancelling">
                   {{ isCancelling ? 'Cancelling...' : 'Cancel top-up' }}
                 </button>
-                <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="topupToCancel = null" :disabled="isCancelling">
-                  Keep it
-                </button>
+                <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="topupToCancel = null" :disabled="isCancelling">{{ $t('wallet.keepIt') }}</button>
               </div>
             </DialogPanel>
           </TransitionChild>

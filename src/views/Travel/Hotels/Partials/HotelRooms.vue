@@ -55,15 +55,15 @@ const bestToken = computed(() => {
 
 <template>
   <section>
-    <h2 class="text-lg font-semibold tracking-tight text-gray-900">Choose your room</h2>
-    <p class="mt-1 text-sm/6 text-gray-500">Prices are for your whole stay. Each option has its own cancellation terms.</p>
+    <h2 class="text-lg font-semibold tracking-tight text-gray-900">{{ $t('travel.chooseYourRoom') }}</h2>
+    <p class="mt-1 text-sm/6 text-gray-500">{{ $t('travel.pricesAreForYourWhole') }}</p>
     <div class="mt-4 space-y-4">
       <article v-for="group in groups" :key="group.name" class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300">
         <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 pt-5 pb-4">
           <h3 class="min-w-0 text-base font-semibold tracking-tight text-gray-900">{{ group.name }}</h3>
           <!-- A single rate already shows its own price, so this would only repeat it. -->
           <p v-if="group.rates.length > 1" class="shrink-0 text-right">
-            <span class="block text-xs/5 text-gray-500">from</span>
+            <span class="block text-xs/5 text-gray-500">{{ $t('travel.from') }}</span>
             <span class="text-base font-semibold tracking-tight text-gray-900 tabular-nums">{{ group.from.currencyPrefixed }}</span>
           </p>
         </header>
@@ -80,13 +80,13 @@ const bestToken = computed(() => {
             <span v-if="rate.token === selectedToken" class="absolute inset-y-0 left-0 w-1 bg-brand-600" aria-hidden="true" />
             <div class="min-w-0 flex-1 space-y-2">
               <div class="flex flex-wrap items-center gap-2">
-                <span v-if="rate.token && rate.token === bestToken" class="inline-flex items-center rounded-lg bg-brand-600 px-2.5 py-1 text-xs/5 font-semibold text-white">Lowest price</span>
+                <span v-if="rate.token && rate.token === bestToken" class="inline-flex items-center rounded-lg bg-brand-600 px-2.5 py-1 text-xs/5 font-semibold text-white">{{ $t('travel.lowestPrice') }}</span>
                 <HotelMealBadge :meal="rate.meal" :labels="labels" />
                 <!-- Each rate's own terms, never the hotel's or another rate's. -->
                 <HotelCancellationBadge :cancellation="rate.cancellation" />
                 <HotelAvailability :allotment="rate.allotment" />
               </div>
-              <p v-if="rate.payableAtProperty.isStated" class="text-xs/5 text-warning-700">Plus {{ rate.payableAtProperty.currencyPrefixed }} payable at the property</p>
+              <p v-if="rate.payableAtProperty.isStated" class="text-xs/5 text-warning-700">{{ $t('travel.plusCurrencyprefixedPayableAtThe', {currencyPrefixed: rate.payableAtProperty.currencyPrefixed}) }}</p>
             </div>
             <!-- Price rail, so every row lines up on the number and the button. -->
             <div class="flex shrink-0 items-end justify-between gap-4 sm:w-48 sm:flex-col sm:items-stretch sm:gap-3 sm:border-l sm:border-gray-100 sm:pl-6">
@@ -106,7 +106,7 @@ const bestToken = computed(() => {
                     'cursor-pointer rounded-xl px-4 py-2.5 text-sm/6 font-semibold shadow-xs transition focus-visible:outline-0',
                   ]"
               >{{ rate.token === selectedToken ? 'Selected' : 'Select' }}</button>
-              <span v-else class="rounded-xl bg-gray-100 px-4 py-2 text-center text-sm/6 font-medium text-gray-500">Not available</span>
+              <span v-else class="rounded-xl bg-gray-100 px-4 py-2 text-center text-sm/6 font-medium text-gray-500">{{ $t('travel.notAvailable') }}</span>
             </div>
           </li>
         </ul>

@@ -102,8 +102,8 @@ function close() {
           <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
             <DialogPanel class="relative w-full transform overflow-hidden rounded-2xl bg-white p-4 text-left shadow-xl transition-all sm:my-8 sm:max-w-lg sm:p-6">
               <ModalCloseButton @close="close" />
-              <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Confirm your wallet payment</DialogTitle>
-              <p class="mt-1 text-sm/6 text-gray-500">We've emailed you a 6-digit code for this payment. It's valid for 10 minutes. It may take a minute to arrive — check your spam folder too.</p>
+              <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">{{ $t('wallet.confirmYourWalletPayment') }}</DialogTitle>
+              <p class="mt-1 text-sm/6 text-gray-500">{{ $t('wallet.weveEmailedYouADigit') }}</p>
 
               <form @submit.prevent="submit" class="mt-5">
                 <div v-if="error" class="mb-4 rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
@@ -132,17 +132,15 @@ function close() {
                 <button type="submit" :disabled="isSubmitting || otp.length !== 6" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                   <span v-if="isSubmitting" class="flex justify-center items-center">
                     <Spinner :class="'w-4 h-4 mr-2'" />
-                    <span>Confirming ...</span>
+                    <span>{{ $t('wallet.confirming') }}</span>
                   </span>
-                  <span v-else>Confirm payment</span>
+                  <span v-else>{{ $t('wallet.confirmPayment') }}</span>
                 </button>
                 <template v-if="! isSubmitting">
-                  <div v-if="! isResending" class="mt-4 text-sm/6 text-gray-500 text-center">
-                    Didn't receive the code?
-                    <a v-if="showResendButton" @click="resend" class="ml-1 inline-flex cursor-pointer items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline">Resend code</a>
-                    <template v-else> Resend in {{ countdown }}s</template>
+                  <div v-if="! isResending" class="mt-4 text-sm/6 text-gray-500 text-center">{{ $t('verification.didntReceiveTheCode') }} <a v-if="showResendButton" @click="resend" class="ml-1 inline-flex cursor-pointer items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline">{{ $t('verification.resendCode') }}</a>
+                    <template v-else>{{ $t('verification.resendInCountdownS', {countdown: countdown}) }}</template>
                   </div>
-                  <div v-else class="mt-4 text-sm/6 text-gray-500 text-center animate-pulse">Sending a new code to your email ...</div>
+                  <div v-else class="mt-4 text-sm/6 text-gray-500 text-center animate-pulse">{{ $t('wallet.sendingANewCodeTo') }}</div>
                 </template>
               </form>
             </DialogPanel>
