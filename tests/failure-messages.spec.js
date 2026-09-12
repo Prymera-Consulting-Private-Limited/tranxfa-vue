@@ -149,10 +149,12 @@ describe('sign-in and auth pages', () => {
     expect(s).not.toMatch(/const changePassword = async \(\) => \{\n\s*isLoading\.value = true;/);
   });
 
-  it('counts the MFA resend against the clock and clears it on unmount', () => {
+  // SD-1072 moved this timer into a composable that every resend screen shares;
+  // the clock-counting and the unmount cleanup are asserted in
+  // tests/resend-countdown.spec.js, against behaviour rather than source.
+  it('takes the MFA resend countdown from the shared composable', () => {
     const s = read('src/views/MultifactorAuthenticationView.vue');
-    expect(s).toContain('const end = Date.now() + 30000;');
-    expect(s).toMatch(/onUnmounted\(\(\) => \{\n\s*if \(resendInterval\) \{\n\s*clearInterval\(resendInterval\);/);
+    expect(s).toContain('useResendCountdown()');
     expect(s).not.toContain('p-timeout');
   });
 });
