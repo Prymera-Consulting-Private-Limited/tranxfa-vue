@@ -892,21 +892,21 @@ const canContinue = computed(() => {
                           <template v-if="walletStore.requiresReacceptance">
                             <div class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
                               <p class="text-sm/6 text-warning-700">{{ $t('transfer.wizard.weveUpdatedTheWalletTerms') }}</p>
-                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">{{ $t('transfer.wizard.reviewAndAcceptRarr') }}</button>
+                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">{{ $t('transfer.wizard.reviewAndAccep') }} <span aria-hidden="true">→</span></button>
                             </div>
                           </template>
                           <p v-else class="mt-2 text-xs/5 text-gray-500">{{ $t('transfer.wizard.youllConfirmThisPaymentWith') }}</p>
                           <div v-if="walletShortMessage" class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
                             <p class="text-sm/6 text-warning-700">{{ walletShortMessage }}</p>
                             <div class="mt-2 flex items-center gap-x-4">
-                              <button type="button" @click="isWalletTopUpOpen = true" class="text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">{{ $t('transfer.wizard.addMoneyRarr') }}</button>
+                              <button type="button" @click="isWalletTopUpOpen = true" class="text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">{{ $t('transfer.wizard.addMone') }} <span aria-hidden="true">→</span></button>
                               <span class="text-xs/5 text-warning-700">{{ $t('transfer.wizard.orChooseAnotherWayTo') }}</span>
                             </div>
                           </div>
                         </template>
                         <template v-else>
                           <p class="text-sm/6 text-gray-600">{{ $t('transfer.wizard.activateYourWalletToPay') }}</p>
-                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">{{ $t('transfer.wizard.activateWalletRarr') }}</button>
+                          <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">{{ $t('transfer.wizard.activateWalle') }} <span aria-hidden="true">→</span></button>
                         </template>
                       </div>
                     </template>

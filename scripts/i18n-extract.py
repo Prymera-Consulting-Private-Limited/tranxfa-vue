@@ -98,6 +98,11 @@ def migrate(repo, prefix, files, apply):
             # data, not copy, and a node whose own words are one short fragment
             # ("in", "using") is half a sentence the markup split across
             # elements; both need a person, so leave them where they are.
+            # An interpolation can hold `>` (an arrow function, a comparison),
+            # so a match that opens more braces than it closes is half an
+            # expression, not a text node. Rewriting it produces broken markup.
+            if text.count('{{') != text.count('}}'):
+                return m.group(0)
             own = re.sub(r'\{\{.+?\}\}', ' ', text)
             if SKIP_TEXT.match(text) or not re.search(r'[A-Za-z]{2,}', own):
                 return m.group(0)

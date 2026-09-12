@@ -71,8 +71,8 @@ function withPopper(dropdownList, component, { width }) {
 <template>
   <v-select v-model="selectedEarningRange" append-to-body :calculate-position="withPopper" :options="currencySalaryRange.ranges" :placeholder="`Please select`" key-by="id" :label="attr.label">
     <template v-slot:no-options="{ search, searching }">
-      <template class="text-sm/6 text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
-      <em class="text-sm/6 text-gray-500 opacity-50" v-else>Start typing to search ...</em>
+      <template class="text-sm/6 text-gray-300" v-if="searching"><i18n-t keypath="transfer.wizard.noResultsFound" scope="global"><template #query><em>{{ search }}</em></template></i18n-t></template>
+      <em class="text-sm/6 text-gray-500 opacity-50" v-else>{{ $t('transfer.wizard.startTypingToSearch') }}</em>
     </template>
     <template #selected-option-container="{ option, deselect, multiple, disabled }">
       <div class="vs__selected">

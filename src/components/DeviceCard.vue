@@ -87,9 +87,7 @@ const handleDelete = async () => {
       </div>
 
       <div class="flex items-center justify-between mt-4">
-        <div v-if="device.isCurrent" class="inline-flex items-center text-sm/6 font-medium text-success-700">
-          This Device
-        </div>
+        <div v-if="device.isCurrent" class="inline-flex items-center text-sm/6 font-medium text-success-700">{{ $t('account.thisDevice') }}</div>
         <button 
           v-if="!device.isCurrent" 
           @click="isConfirmDeleteModalOpen = true" 
@@ -118,11 +116,9 @@ const handleDelete = async () => {
                       <ExclamationTriangleIcon class="h-6 w-6 text-danger-600" aria-hidden="true" />
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                      <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Sign out from device</DialogTitle>
+                      <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">{{ $t('account.signOutFromDevice') }}</DialogTitle>
                       <div class="mt-2">
-                        <DialogDescription class="text-sm/6 text-gray-500">
-                          Are you sure you want to sign out from this device? This will immediately log you out from this device and you'll need to sign in again to access your account.
-                        </DialogDescription>
+                        <DialogDescription class="text-sm/6 text-gray-500">{{ $t('account.confirmDeviceSignOut') }}</DialogDescription>
                       </div>
                     </div>
                   </div>
@@ -140,9 +136,7 @@ const handleDelete = async () => {
                       class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer"
                       @click="isConfirmDeleteModalOpen = false"
                       :disabled="isDeleting"
-                    >
-                      Cancel
-                    </button>
+                    >{{ $t('recipient.cancel') }}</button>
                   </div>
                 </DialogPanel>
               </TransitionChild>

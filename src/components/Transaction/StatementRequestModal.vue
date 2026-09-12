@@ -246,12 +246,8 @@ async function submit() {
             <DialogPanel
               class="relative w-full transform overflow-hidden rounded-2xl bg-white px-5 pb-6 pt-5 text-left shadow-xl transition-all sm:my-8 sm:max-w-lg sm:p-6"
             >
-              <DialogTitle class="text-lg font-semibold text-gray-900">
-                Download transaction statement
-              </DialogTitle>
-              <p class="mt-1 text-sm/6 text-gray-600">
-                Choose a date range and format. We will email the statement when it is ready — it is not downloaded here.
-              </p>
+              <DialogTitle class="text-lg font-semibold text-gray-900">{{ $t('account.downloadTransactionStatement') }}</DialogTitle>
+              <p class="mt-1 text-sm/6 text-gray-600">{{ $t('account.statementModalHint') }}</p>
 
               <form class="mt-6 space-y-5" @submit.prevent="submit">
                 <p
@@ -263,7 +259,7 @@ async function submit() {
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label class="block text-sm/6 font-medium text-gray-700">Start date</label>
+                    <label class="block text-sm/6 font-medium text-gray-700">{{ $t('account.startDate') }}</label>
                     <div class="statement-date-picker mt-2">
                       <VueDatePicker
                         v-model="form.startDate"
@@ -275,7 +271,7 @@ async function submit() {
                         auto-apply
                         teleport="body"
                         position="left"
-                        placeholder="Select start date"
+                        :placeholder="$t('account.selectStartDate')"
                       />
                     </div>
                     <p
@@ -287,7 +283,7 @@ async function submit() {
                     </p>
                   </div>
                   <div>
-                    <label class="block text-sm/6 font-medium text-gray-700">End date</label>
+                    <label class="block text-sm/6 font-medium text-gray-700">{{ $t('account.endDate') }}</label>
                     <div class="statement-date-picker mt-2">
                       <VueDatePicker
                         v-model="form.endDate"
@@ -299,7 +295,7 @@ async function submit() {
                         auto-apply
                         teleport="body"
                         position="left"
-                        placeholder="Select end date"
+                        :placeholder="$t('account.selectEndDate')"
                       />
                     </div>
                     <p
@@ -313,7 +309,7 @@ async function submit() {
                 </div>
 
                 <div>
-                  <span class="block text-sm/6 font-medium text-gray-700">Format</span>
+                  <span class="block text-sm/6 font-medium text-gray-700">{{ $t('account.format') }}</span>
                   <div class="mt-2 flex gap-3">
                     <label class="inline-flex cursor-pointer items-center gap-2">
                       <input
@@ -322,7 +318,7 @@ async function submit() {
                         value="pdf"
                         class="border-gray-300 text-brand-600 focus:ring-brand-600"
                       />
-                      <span class="text-sm/6 text-gray-900">PDF</span>
+                      <span class="text-sm/6 text-gray-900">{{ $t('account.pdf') }}</span>
                     </label>
                     <label class="inline-flex cursor-pointer items-center gap-2">
                       <input
@@ -331,7 +327,7 @@ async function submit() {
                         value="csv"
                         class="border-gray-300 text-brand-600 focus:ring-brand-600"
                       />
-                      <span class="text-sm/6 text-gray-900">CSV</span>
+                      <span class="text-sm/6 text-gray-900">{{ $t('account.csv') }}</span>
                     </label>
                   </div>
                   <p
@@ -344,8 +340,7 @@ async function submit() {
                 </div>
 
                 <div>
-                  <label for="statement-currency" class="block text-sm/6 font-medium text-gray-700">
-                    Currency <span class="font-normal text-gray-500">(optional)</span>
+                  <label for="statement-currency" class="block text-sm/6 font-medium text-gray-700">{{ $t('account.currency') }} <span class="font-normal text-gray-500">{{ $t('account.optional') }}</span>
                   </label>
                   <select
                     id="statement-currency"
@@ -353,7 +348,7 @@ async function submit() {
                     :disabled="isLoadingCurrencies"
                     class="mt-2 block w-full rounded-xl border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm/6 disabled:bg-gray-50"
                   >
-                    <option value="">All currencies</option>
+                    <option value="">{{ $t('account.allCurrencies') }}</option>
                     <option v-for="currency in currencies" :key="currency.id" :value="currency.id">
                       {{ currency.iconUnicode }} {{ currency.code }} — {{ currency.commonName }}
                     </option>
@@ -368,15 +363,14 @@ async function submit() {
                 </div>
 
                 <div>
-                  <label for="statement-email" class="block text-sm/6 font-medium text-gray-700">
-                    Additional email <span class="font-normal text-gray-500">(optional)</span>
+                  <label for="statement-email" class="block text-sm/6 font-medium text-gray-700">{{ $t('account.additionalEmail') }} <span class="font-normal text-gray-500">{{ $t('account.optional') }}</span>
                   </label>
                   <input
                     id="statement-email"
                     v-model="form.email"
                     type="email"
                     autocomplete="email"
-                    placeholder="name@example.com"
+                    :placeholder="$t('account.emailPlaceholder')"
                     class="mt-2 block w-full rounded-xl border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm/6"
                   />
                   <p
@@ -394,17 +388,13 @@ async function submit() {
                     class="inline-flex justify-center rounded-xl bg-white px-4 py-2.5 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     :disabled="isSubmitting"
                     @click="close"
-                  >
-                    Cancel
-                  </button>
+                  >{{ $t('recipient.cancel') }}</button>
                   <button
                     type="submit"
                     class="inline-flex justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
                     :disabled="isSubmitting || isLoadingCurrencies"
                   >
-                    <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2" aria-hidden="true" />
-                    Request statement
-                  </button>
+                    <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2" aria-hidden="true" />{{ $t('account.requestStatement') }}</button>
                 </div>
               </form>
             </DialogPanel>
