@@ -91,12 +91,11 @@ onUnmounted(() => {
 <template>
   <div class="px-6 py-6" v-if="accessToken">
     <p class="text-gray-600 text-sm/6 mb-6">
-      To continue, you'll be redirected to our trusted verification partner.
-      Please complete the process to verify your identity securely.
+      Para continuar, te llevaremos a nuestro proveedor de verificación de confianza. Completa el proceso para verificar tu identidad de forma segura.
     </p>
     <div class="flex justify-end gap-3">
       <button type="button" @click="emit('sdkCancelled')" class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 px-3 text-sm/6 text-gray-700 hover:bg-gray-100">
-        Not now
+        Ahora no
       </button>
       <a :href="accessToken"
          class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-800 text-sm/6">

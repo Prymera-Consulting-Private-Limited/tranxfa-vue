@@ -282,7 +282,7 @@ const setRecipient =  async (recipient) => {
     send({ type: 'PROCEED' });
   }).catch((e) => {
     logRequestFailure(e, 'quote-set-recipient');
-    stepFailure.value = failureMessage(e, "We couldn't add that recipient to this transfer. Please choose them again.");
+    stepFailure.value = failureMessage(e, "No hemos podido añadir ese beneficiario a este envío. Vuelve a seleccionarlo.");
   });
   isLoading.value = false;
 }
@@ -379,7 +379,7 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "missing_recipient") {
         // The quote has no recipient any more (deleted, or a stale tab).
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = error.response.data.message || 'Please choose who to send this transfer to.';
+        preconditionFailedMessage.value = error.response.data.message || 'Elige a quién quieres enviar este envío.';
         await send({ type: 'SELECT_RECIPIENT' });
       } else if (fixFor(error.response.data.type, router.currentRoute.value.fullPath)) {
         // Something on the profile has to be finished first: a mobile number
@@ -439,7 +439,7 @@ async function documentUploaded() {
     }
   }).catch((e) => {
     logRequestFailure(e, 'quote-after-upload');
-    stepFailure.value = failureMessage(e, "Your document was received, but we couldn't refresh this transfer. Please reload the page.");
+    stepFailure.value = failureMessage(e, "Hemos recibido tu documento, pero no hemos podido actualizar este envío. Vuelve a cargar la página.");
   });
   selectedUploadDocumentCategory.value = null;
   isLoading.value = false;
@@ -497,7 +497,7 @@ const applyInfoFromPoiDocument = async () => {
     confirmQuote();
   }).catch((e) => {
     logRequestFailure(e, 'apply-poi-details');
-    applyPoiFailure.value = failureMessage(e, "We couldn't copy the details from your document. Please try again or update your details by hand.");
+    applyPoiFailure.value = failureMessage(e, "No hemos podido copiar los datos de tu documento. Inténtalo de nuevo o introduce tus datos manualmente.");
   }).finally(() => {
     isApplyingInfoFromPoiDocument.value = false;
   });
@@ -556,7 +556,7 @@ function loadPoiCategory() {
     send({ type: 'PROCEED' });
   }).catch((e) => {
     logRequestFailure(e, 'poi-category');
-    stepFailure.value = failureMessage(e, "We couldn't load the document upload. Please try again.");
+    stepFailure.value = failureMessage(e, "No hemos podido cargar la subida de documentos. Inténtalo de nuevo.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -606,7 +606,7 @@ const requestWalletSpendCode = async () => {
     isSpendOtpModalOpen.value = true;
   }).catch((error) => {
     isStepProcessing.value = false;
-    preconditionFailedMessage.value = error.response?.data?.message ?? 'Something went wrong. Please try again.';
+    preconditionFailedMessage.value = error.response?.data?.message ?? 'Algo no ha funcionado. Inténtalo de nuevo.';
   });
 }
 
@@ -674,7 +674,7 @@ const canContinue = computed(() => {
                   </div>
                   <LoadFailurePanel
                     v-else-if="quoteFailure"
-                    title="We couldn't load this transfer"
+                    title="No hemos podido cargar este envío"
                     :message="typeof quoteFailure === 'string' ? quoteFailure : null"
                     :backTo="{name: 'dashboard'}"
                     backLabel="Start a new transfer"
@@ -751,8 +751,8 @@ const canContinue = computed(() => {
                       <template v-if="selectedUploadDocumentCategory">
                         <CategoryDescription v-bind:category="selectedUploadDocumentCategory" />
                         <div v-if="documentInReview" role="status" class="mb-5 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
-                          <p class="font-semibold">Thanks, we have your {{ documentInReview }}.</p>
-                          <p>We are checking it now. We will email you when it is done, and your transfer will carry on from here.</p>
+                          <p class="font-semibold">Gracias, ya tenemos tu {{ documentInReview }}.</p>
+                          <p>Lo estamos revisando. Te avisaremos por correo cuando esté listo y tu envío continuará desde aquí.</p>
                         </div>
                         <ul v-if="selectedUploadDocumentCategory.documentTypes?.length > 0" role="list" class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                           <li v-for="documentType in selectedUploadDocumentCategory.documentTypes" :key="documentType.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg text-center shadow-sm bg-white transition-transform transform hover:scale-105">
@@ -853,7 +853,7 @@ const canContinue = computed(() => {
                       </template>
                     </div>
 
-                    <fieldset aria-label="Payment Method" class="mt-6 mb-4">
+                    <fieldset aria-label="Método de pago" class="mt-6 mb-4">
                       <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Método de pago <span class="text-danger-600">*</span></label>
                       <p class="mb-4 text-sm/6 text-gray-500">Por favor, seleccione cómo desea pagar.</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
@@ -897,21 +897,21 @@ const canContinue = computed(() => {
                           </div>
                           <template v-if="walletStore.requiresReacceptance">
                             <div class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
-                              <p class="text-sm/6 text-warning-700">We've updated the wallet terms — accept the new version to pay with your wallet.</p>
-                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Review and accept &rarr;</button>
+                              <p class="text-sm/6 text-warning-700">Hemos actualizado las condiciones del monedero: acepta la nueva versión para pagar con tu monedero.</p>
+                              <button type="button" @click="walletTermsMode = 'reaccept'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Revisar y aceptar &rarr;</button>
                             </div>
                           </template>
-                          <p v-else class="mt-2 text-xs/5 text-gray-500">You'll confirm this payment with a code we email you.</p>
+                          <p v-else class="mt-2 text-xs/5 text-gray-500">Confirmarás este pago con un código que te enviaremos por correo.</p>
                           <div v-if="walletShortMessage" class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
                             <p class="text-sm/6 text-warning-700">{{ walletShortMessage }}</p>
                             <div class="mt-2 flex items-center gap-x-4">
                               <button type="button" @click="isWalletTopUpOpen = true" class="text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">Add money &rarr;</button>
-                              <span class="text-xs/5 text-warning-700">or choose another way to pay above</span>
+                              <span class="text-xs/5 text-warning-700">o elige arriba otra forma de pago</span>
                             </div>
                           </div>
                         </template>
                         <template v-else>
-                          <p class="text-sm/6 text-gray-600">Activate your wallet to pay this way — read and accept the terms, then load money by bank transfer.</p>
+                          <p class="text-sm/6 text-gray-600">Activa tu monedero para pagar así: lee y acepta las condiciones y luego carga saldo por transferencia bancaria.</p>
                           <button type="button" @click="walletTermsMode = 'enrol'; isWalletTermsModalOpen = true" class="mt-2 text-sm/6 font-semibold text-brand-700 hover:text-brand-800 cursor-pointer">Activate wallet &rarr;</button>
                         </template>
                       </div>

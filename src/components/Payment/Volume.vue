@@ -123,7 +123,7 @@ const retryPayment = async () => {
 
   <template v-else-if="transaction.payment.state.code === PaymentState.PENDING">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Complete your payment</h2>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Completa tu pago</h2>
     <p class="text-base text-gray-600 mb-6">Your transfer is waiting for payment. Choose your bank to continue.</p>
     <div class="mt-6 mb-10">
       <div id="volume-element-container"></div>
@@ -133,27 +133,27 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'pending'">
     <AwaitingPending class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Please wait…</h2>
-    <p class="text-base text-gray-600 mb-6">Please wait while we are setting up the payment.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Espera un momento…</h2>
+    <p class="text-base text-gray-600 mb-6">Espera un momento mientras preparamos el pago.</p>
   </template>
 
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
-    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">We're watching for your payment</h2>
+    <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">Estamos pendientes de tu pago</h2>
     <p class="text-base text-gray-600 mb-6">We have opened a new browser window for you to complete the payment.</p>
   </template>
 
   <template v-else-if="status === 'completed'">
     <PaymentCompleted class="-mt-10" />
     <h2 class="text-xl font-semibold text-success-700 mb-5 -mt-10">Payment received</h2>
-    <p class="text-lg text-gray-600 mb-6">Your payment has been successfully received.</p>
+    <p class="text-lg text-gray-600 mb-6">Hemos recibido tu pago correctamente.</p>
   </template>
 
   <template v-else-if="status === 'failed'">
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment failed</h2>
     <p class="text-base text-danger-600">We couldn't take your payment and no money has left your account. You can try again or choose another way to pay.</p>
-    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Try the payment again</button>
+    <button @click="retryPayment" class="mt-5 px-4 md:px-6 lg:px-8 bg-brand-700 text-white text-center py-2.5 rounded-xl font-medium hover:bg-brand-800 transition cursor-pointer text-sm/6 outline-none ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Reintentar el pago</button>
   </template>
 
   <!-- Expired, cancelled and refunded payments rendered an empty modal here. -->
@@ -168,7 +168,7 @@ const retryPayment = async () => {
 
   <template v-else-if="status === 'refunded'">
     <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment refunded</h2>
-    <p class="text-base text-gray-600 mb-6">This payment was returned to you. Check the transfer for details.</p>
+    <p class="text-base text-gray-600 mb-6">Este pago se te ha devuelto. Consulta el envío para ver los detalles.</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">View transfer</router-link>
     </div>

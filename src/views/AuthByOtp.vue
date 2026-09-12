@@ -52,7 +52,7 @@ async function authenticate() {
       otpError.value = e.response.data.message;
     } else {
       logRequestFailure(e, 'otp-sign-in');
-      otpError.value = failureMessage(e, "We couldn't check that code. Please try again.");
+      otpError.value = failureMessage(e, "No hemos podido comprobar ese código. Inténtalo de nuevo.");
     }
   }).finally(() => {
     isLoading.value = false;
@@ -96,7 +96,7 @@ async function resend() {
     resentMessage.value = "We've sent a new code by SMS. It can take a minute to arrive.";
   }).catch(async (e) => {
     logRequestFailure(e, 'otp-sign-in');
-    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
+    resendFailure.value = failureMessage(e, "No hemos podido enviar un código nuevo. Inténtalo de nuevo.");
   }).finally(() => {
     isResendingOtp.value = false;
   });

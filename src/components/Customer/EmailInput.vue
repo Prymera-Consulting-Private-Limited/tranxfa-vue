@@ -51,7 +51,7 @@ async function updateEmail() {
       errors.value = Object.values(e.response.data.errors ?? {}).flat();
     } else {
       logRequestFailure(e, 'email-address');
-      saveFailure.value = failureMessage(e, "We couldn't save your email address. Please try again.");
+      saveFailure.value = failureMessage(e, "No hemos podido guardar tu correo electrónico. Inténtalo de nuevo.");
     }
     isSaving.value = false;
   });
@@ -75,12 +75,12 @@ onMounted( async () => {
       <div class="hidden md:block flex items-center justify-center w-full">
         <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Enter Your Email</h2>
-      <p class="text-md text-gray-900 mb-8 text-left">Please provide your email address to continue.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left mt-14 sm:mt-8">Introduce tu correo electrónico</h2>
+      <p class="text-md text-gray-900 mb-8 text-left">Introduce tu correo electrónico para continuar.</p>
       <!-- Form -->
       <form @submit.prevent="updateEmail" class="mt-12 space-y-5">
         <div>
-          <label for="email" class="mb-2 block font-medium text-brand-700">Email</label>
+          <label for="email" class="mb-2 block font-medium text-brand-700">Correo electrónico</label>
           <div
             class="relative rounded-2xl border bg-white transition-all duration-200"
             :class="errors.length > 0 ? 'border-danger-500' : (emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
@@ -90,7 +90,7 @@ onMounted( async () => {
               id="email"
               required
               v-model="email"
-              placeholder="enter your email"
+              placeholder="introduce tu correo electrónico"
               class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
               @focus="emailFocused = true"
               @blur="emailFocused = false"
@@ -134,7 +134,7 @@ onMounted( async () => {
           @click="editPersonalInformation"
           class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
           href="javascript:"
-        >Edit Personal Information</a>
+        >Editar datos personales</a>
       </div>
     </div>
   </div>

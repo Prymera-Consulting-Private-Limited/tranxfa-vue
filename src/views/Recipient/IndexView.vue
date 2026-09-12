@@ -43,7 +43,7 @@ async function getRecipients(page = null) {
     pagination.value = response.data.pagination;
   }).catch((e) => {
     logRequestFailure(e, 'recipients');
-    loadFailure.value = failureMessage(e, "We couldn't load your recipients.");
+    loadFailure.value = failureMessage(e, "No hemos podido cargar tus beneficiarios.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -73,7 +73,7 @@ const recipientCreated = (recipient) => {
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Your Recipients</h1>
+        <h1 class="sr-only">Tus beneficiarios</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
@@ -97,7 +97,7 @@ const recipientCreated = (recipient) => {
                 </ul>
               </template>
               <template v-else-if="loadFailure">
-                <LoadFailurePanel title="We couldn't load your recipients" :message="loadFailure" retryLabel="Try again" @retry="getRecipients()" class="mt-6" />
+                <LoadFailurePanel title="No hemos podido cargar tus beneficiarios" :message="loadFailure" retryLabel="Reintentar" @retry="getRecipients()" class="mt-6" />
               </template>
               <template v-else>
                 <template v-if="recipients.length > 0">

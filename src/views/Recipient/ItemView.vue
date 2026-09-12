@@ -62,7 +62,7 @@ const handleDelete = async () => {
     await router.replace({name: 'recipients'});
   } catch (error) {
     logRequestFailure(error, 'recipient-delete');
-    deleteFailure.value = failureMessage(error, "We couldn't remove this recipient. Please try again.");
+    deleteFailure.value = failureMessage(error, "No hemos podido eliminar este beneficiario. Inténtalo de nuevo.");
     isDeleting.value = false;
   }
 };
@@ -73,10 +73,10 @@ const handleDelete = async () => {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Your Recipients</h1>
+        <h1 class="sr-only">Tus beneficiarios</h1>
         <LoadFailurePanel
           v-if="failure"
-          title="We couldn't load this recipient"
+          title="No hemos podido cargar este beneficiario"
           :message="typeof failure === 'string' ? failure : null"
           :backTo="{name: 'recipients'}"
           backLabel="All recipients"
@@ -94,12 +94,12 @@ const handleDelete = async () => {
                   <div class="flex-1">
                     <h2 class="text-base font-semibold text-gray-900">{{ recipient?.wholeName }}</h2>
                     <p class="mt-1 text-sm/6 text-gray-500">
-                      {{ recipient?.channel?.payoutMethod?.title }} in
-                      {{ recipient?.channel?.country?.commonName }} for receiving {{ recipient?.channel?.currency?.isoAlpha }}
+                      {{ recipient?.channel?.payoutMethod?.title }} en
+                      {{ recipient?.channel?.country?.commonName }} para recibir {{ recipient?.channel?.currency?.isoAlpha }}
                     </p>
                   </div>
                   <div class="flex-none mt-3">
-                    <button @click="isConfirmDeleteModalOpen = true" type="button" class="ml-3 rounded-sm px-5 py-2 font-medium text-sm/6 text-white shadow-xs ring-1 ring-danger-600 ring-inset bg-danger-600 hover:bg-danger-500 cursor-pointer">Delete</button>
+                    <button @click="isConfirmDeleteModalOpen = true" type="button" class="ml-3 rounded-sm px-5 py-2 font-medium text-sm/6 text-white shadow-xs ring-1 ring-danger-600 ring-inset bg-danger-600 hover:bg-danger-500 cursor-pointer">Eliminar</button>
                   </div>
                 </div>
               </div>
@@ -110,7 +110,7 @@ const handleDelete = async () => {
                 <div v-else>
                   <dl class="mt-6 divide-y divide-gray-100 border-t border-gray-200 text-sm/6">
                     <div class="py-6 sm:flex">
-                      <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Name</dt>
+                      <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Nombre</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                         <div class="text-gray-900">{{ recipient?.wholeName }}</div>
                       </dd>
@@ -122,13 +122,13 @@ const handleDelete = async () => {
                       </dd>
                     </div>
                     <div class="py-6 sm:flex" v-if="recipient?.email">
-                      <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Email</dt>
+                      <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Correo electrónico</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                         <div class="text-gray-900">{{ recipient?.email }}</div>
                       </dd>
                     </div>
                     <div class="py-6 sm:flex">
-                      <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Recent Transaction</dt>
+                      <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Última transacción</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                         <div class="text-gray-900">{{ lastSentOn || 'You have not sent any transaction yet.' }}</div>
                       </dd>
@@ -171,7 +171,7 @@ const handleDelete = async () => {
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4" v-if="!isLoading">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Send Money</h2>
+              <h2 class="sr-only" id="section-2-title">Enviar dinero</h2>
               <div class="rounded-lg bg-white p-5 pb-8 border border-dashed border-gray-300 border-1">
                 <Calculator v-bind:recipient="recipient" />
               </div>
@@ -194,10 +194,10 @@ const handleDelete = async () => {
                     <ExclamationTriangleIcon class="h-6 w-6 text-danger-600" aria-hidden="true" />
                   </div>
                   <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                    <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Delete Recipient?</DialogTitle>
+                    <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">¿Eliminar beneficiario?</DialogTitle>
                     <div class="mt-2">
                       <DialogDescription class="text-sm/6 text-gray-500">
-                        Are you sure, you want to delete this recipient?
+                        ¿Seguro que quieres eliminar este beneficiario?
                       </DialogDescription>
                     </div>
                   </div>
@@ -210,7 +210,7 @@ const handleDelete = async () => {
                       @click="handleDelete"
                       :disabled="isDeleting"
                   >
-                    {{ isDeleting ? 'Deleting...' : 'Delete' }}
+                    {{ isDeleting ? 'Deleting...' : 'Eliminar' }}
                   </button>
                   <button
                       type="button"
@@ -218,7 +218,7 @@ const handleDelete = async () => {
                       @click="isConfirmDeleteModalOpen = false"
                       :disabled="isDeleting"
                   >
-                    Cancel
+                    Cancelar
                   </button>
                 </div>
               </DialogPanel>

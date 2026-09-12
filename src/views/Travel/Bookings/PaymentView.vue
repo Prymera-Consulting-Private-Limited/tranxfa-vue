@@ -217,7 +217,7 @@ function providerName(method) {
               type="button"
               @click="load"
               class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
-          >Try again</button>
+          >Reintentar</button>
         </div>
         <template v-else-if="order">
           <!-- The room is booked; this is only about paying for it. -->

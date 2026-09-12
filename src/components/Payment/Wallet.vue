@@ -84,6 +84,6 @@ onUnmounted(() => clearTimeout(redirectTimeoutId));
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-danger-600 mb-5 -mt-10">Payment failed</h2>
     <p class="text-base text-danger-600 mb-6">Your wallet payment could not be completed. Please try again.</p>
-    <button @click="emit('retryPayment')" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Try the payment again</button>
+    <button @click="emit('retryPayment')" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">Reintentar el pago</button>
   </template>
 </template>

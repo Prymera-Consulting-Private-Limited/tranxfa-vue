@@ -4,7 +4,7 @@
       <li>
         <a href="javascript:" class="flex items-center text-brand-700 font-medium hover:text-brand-800">
           <i class="pi pi-home text-base mr-2"></i>
-          Dashboard
+          Inicio
         </a>
       </li>
       <li>
@@ -16,13 +16,13 @@
       <li>
         <a href="javascript:" class="flex items-center text-gray-700 hover:text-brand-800">
           <i class="pi pi-users text-base mr-2"></i>
-          Your Recipients
+          Tus beneficiarios
         </a>
       </li>
       <li>
         <a href="javascript:" class="flex items-center text-gray-700 hover:text-brand-800">
           <i class="pi pi-shield text-base mr-2"></i>
-          Account Verification
+          Verificación de cuenta
         </a>
       </li>
       <li>
@@ -39,7 +39,7 @@
       </li>
     </ul>
     <div class="mt-8">
-      <button class="w-full bg-brand-700 text-white py-3.5 px-4 rounded-xl hover:bg-brand-800">Send Money</button>
+      <button class="w-full bg-brand-700 text-white py-3.5 px-4 rounded-xl hover:bg-brand-800">Enviar dinero</button>
     </div>
   </aside>
 </template>

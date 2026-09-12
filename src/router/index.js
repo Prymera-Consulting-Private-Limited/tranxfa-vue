@@ -15,8 +15,8 @@ const router = createRouter({
       name: 'contact',
       component: () => import('@/views/ContactView.vue'),
       meta: {
-        title: 'Contact Support',
-        description: 'Reach us via WhatsApp or Email.',
+        title: 'Contactar con soporte',
+        description: 'Escríbenos por WhatsApp o correo electrónico.',
       },
     },
     {
@@ -24,24 +24,24 @@ const router = createRouter({
       name: 'signIn',
       component: SignInView,
       meta: {
-        title: 'Sign in',
-        description: 'Login into your account',
+        title: 'Iniciar sesión',
+        description: 'Inicia sesión en tu cuenta',
       },
     }, {
       path: '/mfa',
       name: 'multiFactorAuth',
       component: () => import('@/views/MultifactorAuthenticationView.vue'),
       meta: {
-        title: 'More authentication required',
-        description: 'More authentication required',
+        title: 'Se requiere autenticación adicional',
+        description: 'Se requiere autenticación adicional',
       },
     }, {
       path: '/forgot-password',
       name: 'forgotPassword',
       component: () => import('@/views/ForgotPasswordView.vue'),
       meta: {
-        title: 'Forgot Password',
-        description: 'Forgot Password',
+        title: 'He olvidado mi contraseña',
+        description: 'He olvidado mi contraseña',
       },
     }, {
       path: '/reset-password/:token',
@@ -49,39 +49,39 @@ const router = createRouter({
       name: 'resetPassword',
       component: () => import('@/views/ResetPasswordView.vue'),
       meta: {
-        title: 'Reset Password',
-        description: 'Reset Password',
+        title: 'Restablecer contraseña',
+        description: 'Restablecer contraseña',
       },
     }, {
       path: '/secure-login',
       name: 'authByOtp',
       component: () => import('@/views/AuthByOtp.vue'),
       meta: {
-        title: 'Secure Login Verification',
-        description: 'Verify your identity with a one-time password to continue securely.',
+        title: 'Verificación de inicio de sesión seguro',
+        description: 'Verifica tu identidad con un código de un solo uso para continuar de forma segura.',
       },
     }, {
       path: '/sign-up',
       name: 'signUp',
       component: SignUpView,
       meta: {
-        title: 'Sign up',
-        description: 'Register your account',
+        title: 'Crear cuenta',
+        description: 'Registra tu cuenta',
       },
     }, {
       path: '/workflow/onboarding',
       name: 'onboardingWorkflow',
       component: () => import('@/views/OnboardingWorkflowView.vue'),
       meta: {
-        title: 'Complete Signup',
-        description: 'Complete your profile with us.',
+        title: 'Completar registro',
+        description: 'Completa tu perfil con nosotros.',
       },
     }, {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),
       meta: {
-        title: 'Dashboard',
+        title: 'Inicio',
         description: '',
       },
     },
@@ -102,7 +102,7 @@ const router = createRouter({
       props: route => ({ id: route.params.id, slug: route.params.slug, search: route.query.search }),
       component: () => import('@/views/Travel/Hotels/HotelView.vue'),
       meta: {
-        title: 'View Hotel',
+        title: 'Ver hotel',
         description: '',
       },
     }, {
@@ -112,7 +112,7 @@ const router = createRouter({
       props: route => ({ quoteId: route.params.id }),
       component: () => import('@/views/Travel/Hotels/HotelQuoteView.vue'),
       meta: {
-        title: 'Your Price',
+        title: 'Tu precio',
         description: '',
       },
     }, {
@@ -121,7 +121,7 @@ const router = createRouter({
       name: 'travelBookings',
       component: () => import('@/views/Travel/Bookings/IndexView.vue'),
       meta: {
-        title: 'Your Bookings',
+        title: 'Tus reservas',
         description: '',
       },
     }, {
@@ -133,7 +133,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/PaymentStatusView.vue'),
       meta: {
-        title: 'Your Payment',
+        title: 'Tu pago',
         description: '',
       },
     }, {
@@ -144,7 +144,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/PaymentView.vue'),
       meta: {
-        title: 'Pay for Your Booking',
+        title: 'Paga tu reserva',
         description: '',
       },
     }, {
@@ -163,7 +163,7 @@ const router = createRouter({
       props: route => ({ id: route.params.quoteId }),
       component: () => import('@/views/Transfer/IndexView.vue'),
       meta: {
-        title: 'Send Money',
+        title: 'Enviar dinero',
         description: '',
       },
     }, {
@@ -172,7 +172,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transfer/PaymentView.vue'),
       meta: {
-        title: 'Make Payment',
+        title: 'Realizar el pago',
         description: '',
       },
     }, {
@@ -181,7 +181,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transfer/PaymentCallbackView.vue'),
       meta: {
-        title: 'Processing Payment',
+        title: 'Procesando el pago',
         description: '',
       },
     }, {
@@ -189,7 +189,7 @@ const router = createRouter({
       name: 'transactions',
       component: () => import('@/views/Transaction/IndexView.vue'),
       meta: {
-        title: 'Transactions',
+        title: 'Transacciones',
         description: '',
       },
     }, {
@@ -198,7 +198,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transaction/ItemView.vue'),
       meta: {
-        title: 'Transactions',
+        title: 'Transacciones',
         description: '',
       },
     }, {
@@ -206,7 +206,7 @@ const router = createRouter({
       name: 'recipients',
       component: () => import('@/views/Recipient/IndexView.vue'),
       meta: {
-        title: 'Recipients',
+        title: 'Beneficiarios',
         description: '',
       },
     }, {
@@ -215,7 +215,7 @@ const router = createRouter({
       props: route => ({ id: route.params.id }),
       component: () => import('@/views/Recipient/ItemView.vue'),
       meta: {
-        title: 'Recipients',
+        title: 'Beneficiarios',
         description: '',
       },
     }, {
@@ -223,7 +223,7 @@ const router = createRouter({
       name: 'accountVerification',
       component: () => import('@/views/AccountVerification/IndexView.vue'),
       meta: {
-        title: 'Account Verification',
+        title: 'Verificación de cuenta',
         description: '',
       },
     }, {
@@ -232,7 +232,7 @@ const router = createRouter({
       props: route => ({ id: route.params.category }),
       component: () => import('@/views/AccountVerification/CategoryView.vue'),
       meta: {
-        title: 'Account Verification',
+        title: 'Verificación de cuenta',
         description: '',
       },
     }, {
@@ -240,7 +240,7 @@ const router = createRouter({
       name: 'settings',
       component: () => import('@/views/SettingsView.vue'),
       meta: {
-        title: 'Settings',
+        title: 'Configuración',
         description: '',
       },
     }, {
@@ -259,7 +259,7 @@ const router = createRouter({
       name: 'wallet',
       component: () => import('@/views/Wallet/IndexView.vue'),
       meta: {
-        title: 'Wallet',
+        title: 'Monedero',
         description: '',
       },
     }, {
@@ -267,7 +267,7 @@ const router = createRouter({
       name: 'walletStatement',
       component: () => import('@/views/Wallet/StatementView.vue'),
       meta: {
-        title: 'Wallet Statement',
+        title: 'Extracto del monedero',
         description: '',
       },
     }] : []),
@@ -278,7 +278,7 @@ const router = createRouter({
       name: 'notFound',
       component: () => import('@/views/NotFoundView.vue'),
       meta: {
-        title: 'Page not found',
+        title: 'Página no encontrada',
         description: '',
       },
     }

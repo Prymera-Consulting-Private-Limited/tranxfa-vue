@@ -67,7 +67,7 @@ const movements = computed(() => {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 flex flex-col gap-4">
-        <h1 class="sr-only">Wallet Statement</h1>
+        <h1 class="sr-only">Extracto del monedero</h1>
         <div class="rounded-lg border border-gray-100 bg-white px-4 py-4 sm:px-6">
           <router-link :to="{name: 'wallet'}" class="inline-flex items-center gap-x-1.5 text-sm/6 font-medium text-gray-500 hover:text-gray-700">
             <ArrowLongLeftIcon class="size-5" aria-hidden="true" />
@@ -102,7 +102,7 @@ const movements = computed(() => {
             </div>
           </template>
           <template v-else-if="loadFailure">
-            <LoadFailurePanel title="We couldn't load your wallet activity" :message="loadFailure" retryLabel="Try again" @retry="getMovements()" class="mt-0" />
+            <LoadFailurePanel title="We couldn't load your wallet activity" :message="loadFailure" retryLabel="Reintentar" @retry="getMovements()" class="mt-0" />
           </template>
           <template v-else>
             <div class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white shadow-lg">

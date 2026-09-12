@@ -170,7 +170,7 @@ async function getQuote() {
     } else {
       // Says something rather than leaving the last good quote on screen
       // looking current.
-      quoteFailureReason.value = 'We could not price this transfer just now. Please check your connection and try again.';
+      quoteFailureReason.value = 'No hemos podido calcular este envío en este momento. Comprueba tu conexión e inténtalo de nuevo.';
       console.error(e);
     }
   }).finally(() => {
@@ -272,7 +272,7 @@ async function saveQuote() {
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
     }).catch((e) => {
       isSavingQuote.value = false;
-      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
+      saveFailure.value = failureMessage(e, "No hemos podido iniciar tu envío. No se ha enviado nada. Inténtalo de nuevo.");
     });
   } else {
     quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
@@ -280,7 +280,7 @@ async function saveQuote() {
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
     }).catch((e) => {
       isSavingQuote.value = false;
-      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
+      saveFailure.value = failureMessage(e, "No hemos podido iniciar tu envío. No se ha enviado nada. Inténtalo de nuevo.");
     });
   }
 

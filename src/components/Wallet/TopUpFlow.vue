@@ -121,7 +121,7 @@ async function declare() {
       amountErrors.value = e.response.data.errors?.amount ?? [e.response.data.message];
     } else {
       generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
-      generalError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+      generalError.value = e.response?.data?.message ?? 'Algo no ha funcionado. Inténtalo de nuevo.';
     }
   }).finally(() => {
     isSubmitting.value = false;

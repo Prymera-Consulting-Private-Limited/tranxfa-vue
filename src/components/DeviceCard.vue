@@ -58,7 +58,7 @@ const handleDelete = async () => {
     }, 300); // Wait for fade-out animation to complete
   } catch (error) {
     logRequestFailure(error, 'device-sign-out');
-    signOutFailure.value = failureMessage(error, "We couldn't sign that device out. Please try again.");
+    signOutFailure.value = failureMessage(error, "No hemos podido cerrar la sesión en ese dispositivo. Inténtalo de nuevo.");
     isDeleting.value = false;
   }
 };
@@ -88,7 +88,7 @@ const handleDelete = async () => {
 
       <div class="flex items-center justify-between mt-4">
         <div v-if="device.isCurrent" class="inline-flex items-center text-sm/6 font-medium text-success-700">
-          This Device
+          Este dispositivo
         </div>
         <button 
           v-if="!device.isCurrent" 
@@ -118,10 +118,10 @@ const handleDelete = async () => {
                       <ExclamationTriangleIcon class="h-6 w-6 text-danger-600" aria-hidden="true" />
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                      <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Sign out from device</DialogTitle>
+                      <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Cerrar sesión en el dispositivo</DialogTitle>
                       <div class="mt-2">
                         <DialogDescription class="text-sm/6 text-gray-500">
-                          Are you sure you want to sign out from this device? This will immediately log you out from this device and you'll need to sign in again to access your account.
+                          ¿Seguro que quieres cerrar la sesión en este dispositivo? Se cerrará de inmediato y tendrás que volver a iniciar sesión para acceder a tu cuenta.
                         </DialogDescription>
                       </div>
                     </div>
@@ -141,7 +141,7 @@ const handleDelete = async () => {
                       @click="isConfirmDeleteModalOpen = false"
                       :disabled="isDeleting"
                     >
-                      Cancel
+                      Cancelar
                     </button>
                   </div>
                 </DialogPanel>

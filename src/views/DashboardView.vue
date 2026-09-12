@@ -160,7 +160,7 @@ async function getTransactions(page = null) {
     transactionsData.value = response.data;
   }).catch((e) => {
     logRequestFailure(e, 'dashboard-transactions');
-    transactionsFailure.value = failureMessage(e, "We couldn't load your transfers.");
+    transactionsFailure.value = failureMessage(e, "No hemos podido cargar tus envíos.");
   }).finally(() => {
     isTransactionLoading.value = false;
   });
@@ -207,7 +207,7 @@ const recipientCreated = (recipient) => {
                   <ListShimmer />
                 </template>
                 <template v-else-if="transactionsFailure">
-                  <LoadFailurePanel title="We couldn't load your transfers" :message="transactionsFailure" retryLabel="Try again" @retry="getTransactions()" class="mt-0" />
+                  <LoadFailurePanel title="No hemos podido cargar tus envíos" :message="transactionsFailure" retryLabel="Reintentar" @retry="getTransactions()" class="mt-0" />
                 </template>
                 <template v-else>
                   <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">

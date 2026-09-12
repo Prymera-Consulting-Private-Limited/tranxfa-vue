@@ -159,7 +159,7 @@ export function retryAfterSeconds(error) {
 
 export function failureMessage(error, fallback) {
     if (error?.request && ! error?.response) {
-        return "We couldn't connect. Check your internet connection and try again.";
+        return "No hemos podido conectar. Comprueba tu conexión a internet e inténtalo de nuevo.";
     }
 
     const status = error?.response?.status;
@@ -170,11 +170,11 @@ export function failureMessage(error, fallback) {
             return `Too many tries. Please wait ${seconds} second${seconds === 1 ? '' : 's'} and try again.`;
         }
 
-        return 'Too many tries. Please wait a minute and try again.';
+        return 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.';
     }
 
     if (status === 401 || status === 419) {
-        return 'Your session has ended. Please sign in again.';
+        return 'Tu sesión ha finalizado. Vuelve a iniciar sesión.';
     }
 
     if (status === 422) {

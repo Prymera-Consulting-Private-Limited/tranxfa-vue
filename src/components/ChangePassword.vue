@@ -94,7 +94,7 @@ const changePassword = async () => {
       }
     } else {
       logRequestFailure(error, 'change-password');
-      changeFailure.value = failureMessage(error, "We couldn't change your password. Your old password still works. Please try again.");
+      changeFailure.value = failureMessage(error, "No hemos podido cambiar tu contraseña. Tu contraseña anterior sigue siendo válida. Inténtalo de nuevo.");
     }
   }).finally(() => {
     isSaving.value = false;
@@ -135,7 +135,7 @@ const changePassword = async () => {
                 <p v-if="formErrors.password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.password[0] }}</p>
             </div>
         </div>
-        <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">We couldn't load the password rules. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Try again</button></p>
+        <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">No hemos podido cargar los requisitos de la contraseña. <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">Reintentar</button></p>
         <ul role="list" class="space-y-2">
             <li v-for="validatedPasswordPolicyRule in validatedPasswordPolicies.rules">
                 <div class="relative">

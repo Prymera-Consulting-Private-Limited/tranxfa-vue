@@ -89,7 +89,7 @@ const uploadFile = async (fileObj) => {
     preSignedUrl = await getPreSignedUrl(fileObj.file);
   } catch (e) {
     fileObj.status = 'failed';
-    fileObj.reason = failureMessage(e, "We couldn't prepare this file for upload.");
+    fileObj.reason = failureMessage(e, "No hemos podido preparar este archivo para subirlo.");
     return;
   }
   fileObj.status = 'uploading';
@@ -99,7 +99,7 @@ const uploadFile = async (fileObj) => {
     fileObj.status = 'completed';
   } catch (e) {
     fileObj.status = 'failed';
-    fileObj.reason = "The upload was interrupted. Check your connection and try again.";
+    fileObj.reason = "La subida se ha interrumpido. Comprueba tu conexión e inténtalo de nuevo.";
   }
 };
 
@@ -152,7 +152,7 @@ async function save() {
     emit('sdkApplicantStatusChanged', response.data);
   }).catch((e) => {
     logRequestFailure(e, 'upload-document');
-    saveFailure.value = failureMessage(e, "We couldn't attach these files to your account. Your files are still here, so please try again.");
+    saveFailure.value = failureMessage(e, "No hemos podido adjuntar estos archivos a tu cuenta. Los archivos siguen aquí, inténtalo de nuevo.");
   }).finally(() => {
     isSaving.value = false;
   });
@@ -200,7 +200,7 @@ async function save() {
             'text-danger-700': file.status === 'failed'
           }" class="truncate text-sm/6 max-w-xs">{{ file.name }}</span>
         </div>
-        <button v-if="file.status === 'failed'" type="button" @click="uploadFile(file)" class="ml-2 inline-flex min-h-11 shrink-0 items-center rounded-lg px-2 text-sm/6 font-semibold text-danger-800 underline underline-offset-2">Try again</button>
+        <button v-if="file.status === 'failed'" type="button" @click="uploadFile(file)" class="ml-2 inline-flex min-h-11 shrink-0 items-center rounded-lg px-2 text-sm/6 font-semibold text-danger-800 underline underline-offset-2">Reintentar</button>
         <button @click="removeFile(index)" class="text-gray-500 text-sm/6 hover:text-gray-700 cursor-pointer">
           <TrashIcon class="w-4 h-4" />
         </button>

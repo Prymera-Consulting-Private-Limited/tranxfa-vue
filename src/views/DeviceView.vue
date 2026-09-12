@@ -26,7 +26,7 @@ async function refreshDevices() {
     response.value = await customerUtils.devices();
   } catch (e) {
     logRequestFailure(e, 'devices');
-    loadFailure.value = failureMessage(e, "We couldn't load the devices signed in to your account.");
+    loadFailure.value = failureMessage(e, "No hemos podido cargar los dispositivos con sesión iniciada en tu cuenta.");
   } finally {
     isLoading.value = false;
   }
@@ -48,7 +48,7 @@ async function refreshDevices() {
                 <CardShimmer v-for="i in 3" :key="i" />
               </template>
               <template v-else-if="loadFailure">
-                <LoadFailurePanel title="We couldn't load your devices" :message="loadFailure" retryLabel="Try again" @retry="refreshDevices" class="mt-0 md:col-span-2 lg:col-span-3" />
+                <LoadFailurePanel title="No hemos podido cargar tus dispositivos" :message="loadFailure" retryLabel="Reintentar" @retry="refreshDevices" class="mt-0 md:col-span-2 lg:col-span-3" />
               </template>
               <template v-else>
                 <DeviceCard v-for="device in devices" :key="device.id" :device="device" @deviceDeleted="refreshDevices" />

@@ -64,7 +64,7 @@ async function save() {
     emit('sdkApplicantStatusChanged', response.data);
   }).catch((e) => {
     logRequestFailure(e, 'upload-document');
-    saveFailure.value = failureMessage(e, "We couldn't attach these photos to your account. They are still here, so please try again.");
+    saveFailure.value = failureMessage(e, "No hemos podido adjuntar estas fotos a tu cuenta. Siguen aquí, inténtalo de nuevo.");
   }).finally(() => {
     isSaving.value = false;
   });
@@ -122,7 +122,7 @@ const canSave = computed(() => {
             Uploading ...
           </span>
         </template>
-        <template v-else>Upload</template>
+        <template v-else>Subir</template>
       </button>
       <InlineFailure :message="saveFailure" />
     </form>

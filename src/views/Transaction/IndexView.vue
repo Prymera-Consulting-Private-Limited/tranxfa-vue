@@ -29,7 +29,7 @@ async function getTransactions(page = null) {
     data.value = response.data;
   }).catch((e) => {
     logRequestFailure(e, 'transactions');
-    loadFailure.value = failureMessage(e, "We couldn't load your transfers.");
+    loadFailure.value = failureMessage(e, "No hemos podido cargar tus envíos.");
   }).finally(() => {
     isLoading.value = false;
   });
@@ -55,7 +55,7 @@ const transactions = computed(() => {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 grid xl:grid-cols-3 gap-8">
-        <h1 class="sr-only">Transactions</h1>
+        <h1 class="sr-only">Transacciones</h1>
         <div class="lg:col-span-2 flex flex-col gap-4">
           <div
             class="flex flex-col gap-3 rounded-lg border border-gray-100 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -84,7 +84,7 @@ const transactions = computed(() => {
             </div>
           </template>
           <template v-else-if="loadFailure">
-            <LoadFailurePanel title="We couldn't load your transfers" :message="loadFailure" retryLabel="Try again" @retry="getTransactions()" class="mt-0 lg:col-span-2" />
+            <LoadFailurePanel title="No hemos podido cargar tus envíos" :message="loadFailure" retryLabel="Reintentar" @retry="getTransactions()" class="mt-0 lg:col-span-2" />
           </template>
           <template v-else>
             <template v-if="transactions?.length > 0">

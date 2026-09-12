@@ -418,7 +418,7 @@ function search() {
                 @mousedown.prevent
                 @click="retryRegions"
                 class="mt-2 cursor-pointer text-xs/5 font-medium text-brand-700 transition hover:text-brand-800"
-            >Try again</button>
+            >Reintentar</button>
           </li>
           <li v-else-if="showTypePrompt" class="px-4 py-3 text-sm/6 text-gray-500">Type at least {{ REGION_QUERY_MIN }} characters to find a destination</li>
           <li v-else-if="regions.length === 0" class="px-4 py-3 text-sm/6 text-gray-500">No destinations found</li>
