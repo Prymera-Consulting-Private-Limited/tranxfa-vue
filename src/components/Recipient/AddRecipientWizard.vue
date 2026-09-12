@@ -212,7 +212,7 @@ function updateChildComponentLoadingState(newState) {
     <InlineFailure v-else-if="loadFailure" :message="loadFailure" retryLabel="Reintentar" @retry="retry" class="mt-0 mb-4" />
     <template v-else>
       <template v-if="snapshot?.value === 'addRecipientForm'">
-        <h4 class="text-base text-gray-800 font-semibold">Detalles de la destinataria</h4>
+        <h4 class="text-base text-gray-800 font-semibold">Datos del beneficiario</h4>
         <p class="mt-1 text-sm/6 text-gray-700 mb-5">Para recepción <span class="text-brand-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span> en <span class="text-brand-700 font-semibold">{{ recipient.country?.commonName }}</span> usando <span class="text-brand-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></p>
         <AttributeCollection
             v-bind:country="recipient.country"

@@ -103,7 +103,7 @@ onMounted(load);
                               <template v-if="document.statusCode === KycDocumentStatus.APPROVED">
                                 <dt class="sr-only">Información</dt>
                                 <dd class="mt-3 text-sm/6 text-success-700">
-                                  <p>Su {{ document.documentType.title }} ha sido verificado correctamente.</p>
+                                  <p>Tu {{ document.documentType.title }} se ha verificado correctamente.</p>
                                 </dd>
                                 <dt class="sr-only">Verificada</dt>
                                 <dd class="mt-3 text-sm/6">

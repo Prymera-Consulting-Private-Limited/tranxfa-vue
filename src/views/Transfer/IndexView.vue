@@ -728,9 +728,9 @@ const canContinue = computed(() => {
                       </template>
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
-                      <h3 class="text-gray-900 mb-4 font-semibold">Proporcione su dirección</h3>
+                      <h3 class="text-gray-900 mb-4 font-semibold">Indica tu dirección</h3>
                       <p class="text-gray-500 text-sm/6 mb-3 -mt-2">
-                        Por favor, proporcione su dirección residencial completa en
+                        Indica tu domicilio completo en
                         <span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span>.
                       </p>
                       <p class="text-gray-500 text-sm/6 mb-6 -mt-2">
@@ -805,7 +805,7 @@ const canContinue = computed(() => {
                 <template v-else>
                   <div class="px-3 sm:px-0">
                     <label for="purpose" class="text-sm/6 font-semibold text-gray-900">Selecciona el motivo <span class="text-danger-600">*</span></label>
-                    <p class="mb-4 text-sm/6 text-gray-500">Por favor, indique al destinatario el motivo de su transferencia.</p>
+                    <p class="mb-4 text-sm/6 text-gray-500">Indica al beneficiario el motivo de tu transferencia.</p>
                     <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Por favor, seleccione`" key-by="id" label="title">
                       <template v-slot:no-options="{ search, searching }">
                         <template class="text-sm/6 text-gray-300" v-if="searching">No se encontraron resultados para <em>{{ search }}</em>.</template>
@@ -855,7 +855,7 @@ const canContinue = computed(() => {
 
                     <fieldset aria-label="Método de pago" class="mt-6 mb-4">
                       <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">Método de pago <span class="text-danger-600">*</span></label>
-                      <p class="mb-4 text-sm/6 text-gray-500">Por favor, seleccione cómo desea pagar.</p>
+                      <p class="mb-4 text-sm/6 text-gray-500">Elige cómo quieres pagar.</p>
                       <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
                         <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
                           <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
