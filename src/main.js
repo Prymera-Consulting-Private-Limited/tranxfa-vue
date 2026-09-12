@@ -5,6 +5,14 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+import moment from "moment";
+import "moment/dist/locale/es";
+
+// The brand ships in one language, so the date library follows it. Without
+// this every weekday, month and relative time renders in English next to
+// Spanish copy: "Thursday", "Sep 12, 2026", "2:39 AM".
+moment.locale(String(import.meta.env.VITE_APP_LOCALE ?? 'en').trim().toLowerCase());
+
 import App from './App.vue'
 import router from './router'
 import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
