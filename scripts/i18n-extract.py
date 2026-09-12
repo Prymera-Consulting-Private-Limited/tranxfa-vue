@@ -33,6 +33,18 @@ def param_name(expression):
     parts = [p for p in parts if p not in ('data', 'value', 'props')]
     return parts[-1] if parts else 'value'
 
+def spots_only_fragment(text, own):
+    """True when a node's own words are a fragment beside its interpolations.
+
+    `For receiving {{ x }}` is a sentence; `in` next to `{{ y }}` is the middle
+    of one, and a catalogue entry for it cannot be reordered by a translator.
+    """
+    if '{{' not in text:
+        return False
+    words = re.findall(r"[A-Za-z']+", own)
+    return len(words) < 3
+
+
 def walk(catalogue, path):
     node = catalogue
     for part in path.split('.'):
@@ -56,10 +68,13 @@ def migrate(repo, prefix, files, apply):
         source = open(path, encoding='utf-8').read()
         # Only the template block: a <style> section after it holds CSS that
         # looks like text, and rewriting that produces invalid declarations.
-        if '<template>' not in source or '</template>' not in source:
+        # The root block can carry attributes (`<template v-if="...">`), so find
+        # it by its position at the start of a line rather than by exact text.
+        opening = re.search(r'^<template[^>]*>', source, re.M)
+        if not opening or '\n</template>' not in source:
             skipped.append((rel, 'no template')); continue
-        start = source.index('<template>') + len('<template>')
-        end = source.rindex('</template>')
+        start = opening.end()
+        end = source.rindex('\n</template>') + 1
         head, rest, tail = source[:start], source[start:end], source[end:]
         sep = ''
         used = set(walk(catalogue, prefix).keys())
@@ -78,7 +93,15 @@ def migrate(repo, prefix, files, apply):
         def text_node(m):
             raw = m.group(2)
             text = ' '.join(raw.split())
-            if SKIP_TEXT.match(text) or not re.search(r'[A-Za-z]{2,}', text):
+            # The letter test runs on what is left after the interpolations are
+            # taken out. A node that is only interpolations and punctuation is
+            # data, not copy, and a node whose own words are one short fragment
+            # ("in", "using") is half a sentence the markup split across
+            # elements; both need a person, so leave them where they are.
+            own = re.sub(r'\{\{.+?\}\}', ' ', text)
+            if SKIP_TEXT.match(text) or not re.search(r'[A-Za-z]{2,}', own):
+                return m.group(0)
+            if spots_only_fragment(text, own):
                 return m.group(0)
             spots = list(re.finditer(r'\{\{(.+?)\}\}', text))
             if not spots:

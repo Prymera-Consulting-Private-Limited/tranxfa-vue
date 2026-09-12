@@ -87,18 +87,11 @@ onUnmounted(() => {
 
 <template>
   <div class="px-6 py-6" v-if="accessToken">
-    <p class="text-gray-600 text-sm/6 mb-6">
-      To continue, you’ll be redirected to our trusted verification partner.
-      Please complete the process to verify your identity securely.
-    </p>
+    <p class="text-gray-600 text-sm/6 mb-6">{{ $t('verification.redirectToPartner') }}</p>
     <div class="flex justify-end gap-3">
-      <button type="button" @click="emit('sdkCancelled')" class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 px-3 text-sm/6 text-gray-700 hover:bg-gray-100">
-        Not now
-      </button>
+      <button type="button" @click="emit('sdkCancelled')" class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 px-3 text-sm/6 text-gray-700 hover:bg-gray-100">{{ $t('verification.notNow') }}</button>
       <a :href="accessToken" target="_blank"
-         class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-800 text-sm/6">
-        Continue
-      </a>
+         class="px-2.5 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-800 text-sm/6">{{ $t('common.continue') }}</a>
     </div>
   </div>
 </template>

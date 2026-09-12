@@ -687,9 +687,9 @@ const canContinue = computed(() => {
                     <div v-if="outcomeUnknown" role="alert" class="border-l-4 border-warning-400 bg-warning-50 p-4 mb-5">
                       <p class="text-sm/6 font-semibold text-warning-800">{{ $t('transfer.wizard.weDidntGetAnAnswer') }}</p>
                       <p class="mt-1 text-sm/6 text-warning-800">{{ $t('transfer.wizard.itMayAlreadyExistWere') }}</p>
-                      <p v-if="reconcileFailure" class="mt-2 text-sm/6 text-danger-700">{{ $t('transfer.wizard.reconcilefailure', {reconcileFailure: reconcileFailure}) }}</p>
+                      <p v-if="reconcileFailure" class="mt-2 text-sm/6 text-danger-700">{{ reconcileFailure }}</p>
                       <div class="mt-3 flex flex-wrap gap-3">
-                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ $t('transfer.wizard.again', {again: isReconciling ? 'Checking…' : 'Check again'}) }}</button>
+                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? 'Checking…' : 'Check again' }}</button>
                         <router-link :to="{name: 'transactions'}" class="inline-flex min-h-11 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50">{{ $t('transfer.wizard.seeMyTransfers') }}</router-link>
                       </div>
                     </div>
@@ -699,7 +699,7 @@ const canContinue = computed(() => {
                           <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                         </div>
                         <div class="ml-3">
-                          <p class="text-sm/6 text-warning-700">{{ $t('transfer.wizard.preconditionfailedmessage', {preconditionFailedMessage: preconditionFailedMessage}) }}</p>
+                          <p class="text-sm/6 text-warning-700">{{ preconditionFailedMessage }}</p>
                         </div>
                       </div>
                     </div>
@@ -727,7 +727,7 @@ const canContinue = computed(() => {
                     </template>
                     <template v-if="snapshot.value === 'provideAddress'">
                       <h3 class="text-gray-900 mb-4 font-semibold">{{ $t('transfer.wizard.provideYourAddress') }}</h3>
-                      <p class="text-gray-500 text-sm/6 mb-3 -mt-2">{{ $t('transfer.wizard.pleaseProvideYourFullResidential') }}<span class="font-semibold text-brand-700">{{ $t('transfer.wizard.commonname', {commonName: customer.data?.country?.commonName}) }}</span>.
+                      <p class="text-gray-500 text-sm/6 mb-3 -mt-2">{{ $t('transfer.wizard.pleaseProvideYourFullResidential') }}<span class="font-semibold text-brand-700">{{ customer.data?.country?.commonName }}</span>.
                       </p>
                       <p class="text-gray-500 text-sm/6 mb-6 -mt-2">
                         <span>{{ $t('transfer.wizard.accurateAddressInformationIsRequired') }}</span>
@@ -765,7 +765,7 @@ const canContinue = computed(() => {
                         <ul v-if="quote.data.pendingDocuments[0].documentTypes?.length > 0" role="list" class="grid grid-cols-1 gap-6">
                           <li v-for="pendingCategory in quote.data?.pendingDocuments" :key="pendingCategory.id" class="col-span-1 flex rounded-lg bg-white items-start border-1 border-gray-200 hover:shadow-sm transition-transform transform hover:scale-105 px-6 py-3">
                             <div class="text-left pl-3 py-3">
-                              <h3 class="text-sm/6 font-medium text-gray-900">{{ $t('calculator.title', {title: pendingCategory.title}) }}</h3>
+                              <h3 class="text-sm/6 font-medium text-gray-900">{{ pendingCategory.title }}</h3>
                               <dl v-if="pendingCategory.description" class="mt-0 flex grow flex-col justify-between">
                                 <dt class="sr-only">{{ $t('transfer.wizard.information') }}</dt>
                                 <dd class="mt-1 text-sm/6 text-gray-500">
@@ -802,21 +802,21 @@ const canContinue = computed(() => {
                     <p class="mb-4 text-sm/6 text-gray-500">{{ $t('transfer.wizard.pleaseProvideThePurposeOf') }}</p>
                     <v-select v-model="purpose" :calculate-position="withPopper" :options="quote.data.purposes" :placeholder="`Please select`" key-by="id" :label="$t('transfer.wizard.title')">
                       <template v-slot:no-options="{ search, searching }">
-                        <template class="text-sm/6 text-gray-300" v-if="searching">{{ $t('transfer.wizard.noResultsFoundFor') }}<em>{{ $t('transfer.wizard.search', {search: search}) }}</em>.</template>
+                        <template class="text-sm/6 text-gray-300" v-if="searching"><i18n-t keypath="transfer.wizard.noResultsFound" scope="global"><template #query><em>{{ search }}</em></template></i18n-t></template>
                         <em class="text-sm/6 text-gray-500 opacity-50" v-else>{{ $t('transfer.wizard.startTypingToSearch') }}</em>
                       </template>
                       <template #selected-option-container="{ option, deselect, multiple, disabled }">
                         <div class="vs__selected">
                           <div class="flex items-center w-auto">
                             <div class="text-sm/6 flex items-center w-full gap-x-2">
-                              <span class="lg:max-w-sm xl:max-w-md truncate">{{ $t('calculator.title', {title: option.title}) }}</span>
+                              <span class="lg:max-w-sm xl:max-w-md truncate">{{ option.title }}</span>
                             </div>
                           </div>
                         </div>
                       </template>
                       <template #option="option">
                         <div class="text-sm/6 flex items-center w-full gap-x-3 truncate">
-                          <span class="truncate">{{ $t('calculator.title', {title: option.title}) }}</span>
+                          <span class="truncate">{{ option.title }}</span>
                         </div>
                       </template>
                     </v-select>
@@ -826,22 +826,22 @@ const canContinue = computed(() => {
                       <template v-if="quote.data.coupon">
                         <div role="status" class="mt-2 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-sm/6 text-success-800">
                           <p class="font-semibold">{{ $t('transfer.wizard.codeCodeApplied', {code: quote.data.coupon.code}) }}<template v-if="quote.data.coupon.discountAmountCurrencyPrefixed">{{ $t('transfer.wizard.youSaveDiscountamountcurrencyprefixed', {discountAmountCurrencyPrefixed: quote.data.coupon.discountAmountCurrencyPrefixed}) }}</template><template v-else-if="quote.data.coupon.exchangeRateBeforeCouponFormatted">{{ $t('transfer.wizard.rateWasExchangeratebeforecouponformattedNowExchangerateformatted', {exchangeRateBeforeCouponFormatted: quote.data.coupon.exchangeRateBeforeCouponFormatted, exchangeRateFormatted: quote.data.exchangeRateFormatted}) }}</template>.</p>
-                          <p v-if="quote.data.coupon.infoText">{{ $t('transfer.wizard.infotext', {infoText: quote.data.coupon.infoText}) }}</p>
-                          <p v-if="quote.data.coupon.termsText" class="text-xs/5 text-success-700">{{ $t('transfer.wizard.termstext', {termsText: quote.data.coupon.termsText}) }}</p>
+                          <p v-if="quote.data.coupon.infoText">{{ quote.data.coupon.infoText }}</p>
+                          <p v-if="quote.data.coupon.termsText" class="text-xs/5 text-success-700">{{ quote.data.coupon.termsText }}</p>
                           <button type="button" @click="removeCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold underline underline-offset-2 disabled:opacity-60">{{ $t('transfer.wizard.removeCode') }}</button>
                         </div>
                       </template>
                       <template v-else>
                         <div class="mt-2 flex gap-2">
                           <input id="coupon-code" v-model="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="255" :placeholder="$t('transfer.wizard.enterCode')" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 uppercase focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" @keydown.enter.prevent="previewCoupon" />
-                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ $t('transfer.wizard.code', {code: isCouponBusy ? 'Checking…' : 'Check code'}) }}</button>
+                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? 'Checking…' : 'Check code' }}</button>
                         </div>
-                        <p v-if="couponFailure" role="alert" class="mt-2 text-sm/6 text-danger-700">{{ $t('transfer.wizard.couponfailure', {couponFailure: couponFailure}) }}</p>
+                        <p v-if="couponFailure" role="alert" class="mt-2 text-sm/6 text-danger-700">{{ couponFailure }}</p>
                         <div v-if="couponPreview" role="status" class="mt-2 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
-                          <p class="font-semibold">{{ $t('transfer.wizard.transfer', {transfer: couponPreview.info_text || 'This code applies to your transfer.'}) }}</p>
+                          <p class="font-semibold">{{ couponPreview.info_text || 'This code applies to your transfer.' }}</p>
                           <p v-if="couponPreview.discount_amount">{{ $t('transfer.wizard.savesDiscountAmountIsoalphaOn', {discount_amount: couponPreview.discount_amount, isoAlpha: quote.data.paymentCurrency?.isoAlpha ?? ''}) }}</p>
                           <p v-else-if="couponPreview.adjusted_exchange_rate">{{ $t('transfer.wizard.improvesYourRateToAdjusted', {adjusted_exchange_rate: couponPreview.adjusted_exchange_rate}) }}</p>
-                          <p v-if="couponPreview.terms_text" class="text-xs/5 text-info-700">{{ $t('transfer.wizard.termsText', {terms_text: couponPreview.terms_text}) }}</p>
+                          <p v-if="couponPreview.terms_text" class="text-xs/5 text-info-700">{{ couponPreview.terms_text }}</p>
                           <button type="button" @click="applyCoupon" :disabled="isCouponBusy" class="mt-2 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ $t('transfer.wizard.useThisCode') }}</button>
                         </div>
                       </template>
@@ -855,8 +855,8 @@ const canContinue = computed(() => {
                           <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
                           <span class="flex flex-1">
                             <span class="flex flex-col">
-                              <span class="block text-sm/6 font-medium text-gray-900">{{ $t('calculator.title', {title: paymentMethod.title}) }}</span>
-                              <!--<span class="mt-1 flex items-center text-sm/6 text-gray-500">{{ $t('calculator.description', {description: paymentMethod.description}) }}</span>-->
+                              <span class="block text-sm/6 font-medium text-gray-900">{{ paymentMethod.title }}</span>
+                              <!--<span class="mt-1 flex items-center text-sm/6 text-gray-500">{{ paymentMethod.description }}</span>-->
                             </span>
                           </span>
                             <CheckCircleIcon v-if="checked" :class="[!checked ? 'text-gray-400' : 'text-brand-600', 'size-5']" aria-hidden="true" />
@@ -869,11 +869,11 @@ const canContinue = computed(() => {
                     <template v-if="paymentMethod?.providers[0]?.paymentDataAttributes?.length > 0">
                       <template v-for="attribute in paymentMethod?.providers[0].paymentDataAttributes">
                         <div class="mb-4">
-                          <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ $t('transfer.wizard.label', {label: attribute.label}) }}<span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
-                          <p v-if="attribute.info" class="mb-4 text-sm/6 text-gray-500">{{ $t('transfer.wizard.info', {info: attribute.info}) }}</p>
+                          <label :for="`payment-data-${attribute.attribute}`" :class="[confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="text-sm/6 font-semibold">{{ attribute.label }}<span class="text-danger-600" v-if="attribute.isRequired">*</span></label>
+                          <p v-if="attribute.info" class="mb-4 text-sm/6 text-gray-500">{{ attribute.info }}</p>
                           <input v-if="attribute.type === 'text'" v-model="paymentData.data[attribute.attribute].value" :inputmode="attribute.inputMode" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
                           <input v-else-if="attribute.type === 'email'" v-model="paymentData.data[attribute.attribute].value" :required="attribute.isRequired" :id="`payment-data-${attribute.attribute}`" type="email" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
-                          <p v-if="confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ $t('transfer.wizard.attribute', {attribute: confirmFormErrors[`payment_data.${attribute.attribute}`][0]}) }}</p>
+                          <p v-if="confirmFormErrors[`payment_data.${attribute.attribute}`]?.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ confirmFormErrors[`payment_data.${attribute.attribute}`][0] }}</p>
                         </div>
                       </template>
                     </template>
@@ -883,11 +883,11 @@ const canContinue = computed(() => {
                         <template v-if="walletStore.isEnrolled">
                           <div class="flex items-center justify-between text-sm/6 text-gray-600">
                             <span>{{ $t('transfer.wizard.walletBalance') }}</span>
-                            <span class="font-semibold text-gray-900">{{ $t('transfer.wizard.amountformatted', {amountFormatted: walletCheckoutBalance?.amountFormatted ?? '—'}) }}</span>
+                            <span class="font-semibold text-gray-900">{{ walletCheckoutBalance?.amountFormatted ?? '—' }}</span>
                           </div>
                           <div class="mt-1 flex items-center justify-between text-sm/6 text-gray-600">
                             <span>{{ $t('transfer.wizard.thisTransfer') }}</span>
-                            <span class="font-semibold text-gray-900">{{ $t('transfer.wizard.totalamountcurrencyprefixed', {totalAmountCurrencyPrefixed: quote.data.totalAmountCurrencyPrefixed}) }}</span>
+                            <span class="font-semibold text-gray-900">{{ quote.data.totalAmountCurrencyPrefixed }}</span>
                           </div>
                           <template v-if="walletStore.requiresReacceptance">
                             <div class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
@@ -897,7 +897,7 @@ const canContinue = computed(() => {
                           </template>
                           <p v-else class="mt-2 text-xs/5 text-gray-500">{{ $t('transfer.wizard.youllConfirmThisPaymentWith') }}</p>
                           <div v-if="walletShortMessage" class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
-                            <p class="text-sm/6 text-warning-700">{{ $t('transfer.wizard.walletshortmessage', {walletShortMessage: walletShortMessage}) }}</p>
+                            <p class="text-sm/6 text-warning-700">{{ walletShortMessage }}</p>
                             <div class="mt-2 flex items-center gap-x-4">
                               <button type="button" @click="isWalletTopUpOpen = true" class="text-sm/6 font-semibold text-warning-800 hover:text-warning-900 cursor-pointer">{{ $t('transfer.wizard.addMoneyRarr') }}</button>
                               <span class="text-xs/5 text-warning-700">{{ $t('transfer.wizard.orChooseAnotherWayTo') }}</span>
@@ -914,7 +914,7 @@ const canContinue = computed(() => {
                     <!-- Checkbox -->
                     <div v-if="thirdPartyDeclaration" class="flex items-start space-x-2">
                       <input type="checkbox" id="third-party-declaration-accepted" v-model="thirdPartyDeclarationAccepted" class="mt-1.5 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
-                      <label for="third-party-declaration-accepted" class="text-sm/6 text-gray-700">{{ $t('transfer.wizard.thirdpartydeclaration', {thirdPartyDeclaration: thirdPartyDeclaration}) }}</label>
+                      <label for="third-party-declaration-accepted" class="text-sm/6 text-gray-700">{{ thirdPartyDeclaration }}</label>
                     </div>
 
                   </div>
@@ -922,7 +922,7 @@ const canContinue = computed(() => {
               </template>
               <div v-if="confirmGeneralErrors.length > 0" class="mx-3 sm:mx-0 rounded-md bg-danger-50 p-4" role="alert">
                 <ul role="list" class="list-disc space-y-1 pl-5 text-sm/6 text-danger-700">
-                  <li v-for="(message, index) in confirmGeneralErrors" :key="index">{{ $t('transfer.wizard.message', {message: message}) }}</li>
+                  <li v-for="(message, index) in confirmGeneralErrors" :key="index">{{ message }}</li>
                 </ul>
               </div>
               <div class="py-4 px-3 sm:px-0">
@@ -931,7 +931,7 @@ const canContinue = computed(() => {
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>{{ $t('transfer.wizard.saving') }}</span>
                   </span>
-                  <span v-else>{{ $t('transfer.wizard.continue', {Continue: snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? 'Pay with Wallet' : 'Continue'}) }}</span>
+                  <span v-else>{{ snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? 'Pay with Wallet' : 'Continue' }}</span>
                 </button>
               </div>
             </section>

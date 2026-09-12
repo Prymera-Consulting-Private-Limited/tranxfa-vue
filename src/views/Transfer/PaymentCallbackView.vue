@@ -200,7 +200,7 @@ function closePaymentModal() {
 
                   <template v-else-if="status === 'cancelled'">
                     <Failed class="-mt-20" />
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.cancelled', {cancelled: transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled'}) }}</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
                     <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
                   </template>
 

@@ -1,6 +1,7 @@
 import {describe, expect, it} from 'vitest';
 import {readFileSync} from 'node:fs';
 import KycDocumentStatus from '@/enums/kyc_document_status.js';
+import en from '@/locales/en.json';
 
 // SD-1038: the KYC spec's states and its rule that the way forward from
 // rejected or invalidated is a new document.
@@ -19,12 +20,14 @@ describe('the verification page', () => {
   it('offers a new upload from a rejected or invalidated document', () => {
     expect(s).toContain('document.statusCode === KycDocumentStatus.REJECTED || document.statusCode === KycDocumentStatus.INVALIDATED');
     expect(s).toMatch(/<router-link v-if="document\.documentCategory\?\.id" :to="\{name: 'categoryView', params: \{category: document\.documentCategory\.id\}\}"/);
-    expect(s).toContain('Upload another document');
-    expect(s).not.toContain('We were unable to verify your document');
+    expect(s).toContain("$t('verification.uploadAnotherDocument')");
+    expect(en.verification.uploadAnotherDocument).toBe('Upload another document');
+    expect(en.verification.documentNotAccepted).not.toContain('We were unable to verify your document');
   });
 
   it('tells review-required apart from a document a provider is still checking', () => {
-    expect(s).toContain('is with our compliance team. We will email you when it is done.');
+    expect(s).toContain('keypath="verification.documentWithCompliance"');
+    expect(en.verification.documentWithCompliance).toContain('is with our compliance team. We will email you when it is done.');
     expect(s).toMatch(/v-else-if="document\.statusCode === KycDocumentStatus\.PENDING_VERIFICATION \|\| document\.statusCode === KycDocumentStatus\.PROCESSING"/);
   });
 });

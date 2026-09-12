@@ -162,8 +162,8 @@ async function save() {
 <template>
   <div class="max-w-xl mx-auto p-6 bg-white">
     <h2 class="text-lg font-semibold text-gray-900 mb-2">Upload {{ documentType.title }}</h2>
-    <p class="text-sm/6 text-gray-500 mb-1">Please upload clear images of your <span class="text-brand-700">{{ documentType.title }}</span>.</p>
-    <p class="text-sm/6 text-gray-500 mb-4">JPEG, PNG, WebP or PDF, up to {{ MAX_UPLOAD_MB }} MB each. Take a photo of the whole document with no glare. For a card, add the front (photo side) and the back.</p>
+    <i18n-t keypath="verification.uploadClearImages" tag="p" scope="global" class="text-sm/6 text-gray-500 mb-1"><template #document><span class="text-brand-700">{{ documentType.title }}</span></template></i18n-t>
+    <p class="text-sm/6 text-gray-500 mb-4">{{ $t('verification.uploadFormats', {MAX_UPLOAD_MB: MAX_UPLOAD_MB}) }}</p>
 
     <div
         :class="{
@@ -175,7 +175,7 @@ async function save() {
         @dragleave.prevent="isDragging = false" @drop="handleDrop" @click="$refs.fileInput.click()">
       <input ref="fileInput" type="file" multiple :accept="accept" class="hidden" @change="handleFileSelect" />
       <ArrowUpTrayIcon class="mx-auto h-10 w-10 text-gray-500" />
-      <p class="text-gray-600 mt-2">Drag & drop files here, or click to browse</p>
+      <p class="text-gray-600 mt-2">{{ $t('verification.dragAndDrop') }}</p>
     </div>
     <p v-if="uploadError" class="mt-2 text-sm/6 text-danger-600" role="alert">{{ uploadError }}</p>
 
@@ -200,7 +200,7 @@ async function save() {
             'text-danger-700': file.status === 'failed'
           }" class="truncate text-sm/6 max-w-xs">{{ file.name }}</span>
         </div>
-        <button v-if="file.status === 'failed'" type="button" @click="uploadFile(file)" class="ml-2 inline-flex min-h-11 shrink-0 items-center rounded-lg px-2 text-sm/6 font-semibold text-danger-800 underline underline-offset-2">Try again</button>
+        <button v-if="file.status === 'failed'" type="button" @click="uploadFile(file)" class="ml-2 inline-flex min-h-11 shrink-0 items-center rounded-lg px-2 text-sm/6 font-semibold text-danger-800 underline underline-offset-2">{{ $t('common.tryAgain') }}</button>
         <button @click="removeFile(index)" class="text-gray-500 text-sm/6 hover:text-gray-700 cursor-pointer">
           <TrashIcon class="w-4 h-4" />
         </button>
@@ -217,23 +217,19 @@ async function save() {
           <input :id="`document-number-${documentType.id}`" v-model.trim="documentNumber" type="text" autocomplete="off" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
         </div>
         <div>
-          <label :for="`expiry-date-${documentType.id}`" class="block text-sm/6 font-medium text-gray-900">Expiry date <span class="font-normal text-gray-500">(if the document has one)</span></label>
+          <label :for="`expiry-date-${documentType.id}`" class="block text-sm/6 font-medium text-gray-900">{{ $t('verification.expiryDate') }} <span class="font-normal text-gray-500">{{ $t('verification.expiryDateOptional') }}</span></label>
           <input :id="`expiry-date-${documentType.id}`" v-model="expiryDate" type="date" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
         </div>
       </div>
       <button :disabled="isUploading || isSaving || !files.length" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3.5 rounded-xl font-medium transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
-            <Spinner class="size-4 mr-2" />
-            Uploading ...
-          </span>
+            <Spinner class="size-4 mr-2" />{{ $t('verification.uploading') }}</span>
         </template>
         <template v-else-if="isUploading">
-          <span class="flex items-center justify-center whitespace-nowrap">
-            Please wait...
-          </span>
+          <span class="flex items-center justify-center whitespace-nowrap">{{ $t('recipient.pleaseWait') }}</span>
         </template>
-        <template v-else>Upload</template>
+        <template v-else>{{ $t('verification.upload') }}</template>
       </button>
       <InlineFailure :message="saveFailure" />
     </form>

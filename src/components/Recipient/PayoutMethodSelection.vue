@@ -27,8 +27,8 @@ const payoutMethodSelected = (payoutMethod) => {
 </script>
 
 <template>
-  <h2 class="text-base font-semibold text-gray-900">Select a Payout Method</h2>
-  <p class="mt-1 text-sm/6 text-gray-500">For your recipient in {{ country.commonName }} to receive {{ currency.isoAlpha }}</p>
+  <h2 class="text-base font-semibold text-gray-900">{{ $t('recipient.selectAPayoutMethod') }}</h2>
+  <p class="mt-1 text-sm/6 text-gray-500">{{ $t('recipient.payoutMethodHint', {commonName: country.commonName, isoAlpha: currency.isoAlpha}) }}</p>
   <ul role="list" class="mt-0 grid grid-cols-1 gap-6 py-6 sm:grid-cols-2">
     <li class="flow-root" v-for="(payoutMethod, index) in payoutMethods" :key="index">
       <a href="javascript:" @click="payoutMethodSelected(payoutMethod)" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-0 hover:bg-gray-50">

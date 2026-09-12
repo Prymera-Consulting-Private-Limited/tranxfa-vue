@@ -21,6 +21,45 @@ const MIGRATED = [
   'src/views/Transfer/IndexView.vue',
   'src/views/Transfer/PaymentView.vue',
   'src/views/Transfer/PaymentCallbackView.vue',
+  // slice 3, recipients and verification
+  'src/components/AccountVerification/AwsRekognitionLivenessCheck.vue',
+  'src/components/AccountVerification/CategoryDescription.vue',
+  'src/components/AccountVerification/DocumentTypeItem.vue',
+  'src/components/AccountVerification/MultiFileUpload.vue',
+  'src/components/AccountVerification/PoiFileUpload.vue',
+  'src/components/AccountVerification/Provider/Persona.vue',
+  'src/components/AccountVerification/Provider/Shufti.vue',
+  'src/components/AccountVerification/Provider/Sumsub.vue',
+  'src/components/AccountVerification/Provider/System.vue',
+  'src/components/AccountVerification/Provider/UpPass.vue',
+  'src/components/AccountVerification/SingleFileUpload.vue',
+  'src/components/Customer/EmailVerification.vue',
+  'src/components/Customer/MobileNumberVerification.vue',
+  'src/components/Recipient/AddRecipientCard.vue',
+  'src/components/Recipient/AddRecipientWizard.vue',
+  'src/components/Recipient/Attribute/AccountNumberInput.vue',
+  'src/components/Recipient/Attribute/DeliveryOptionInput.vue',
+  'src/components/Recipient/Attribute/EmailInput.vue',
+  'src/components/Recipient/Attribute/MobileNumberInput.vue',
+  'src/components/Recipient/Attribute/NameInput.vue',
+  'src/components/Recipient/Attribute/PhoneNumberInput.vue',
+  'src/components/Recipient/Attribute/RelationshipInput.vue',
+  'src/components/Recipient/Attribute/SecondNameInput.vue',
+  'src/components/Recipient/Attribute/SelectInput.vue',
+  'src/components/Recipient/Attribute/SubDeliveryOptionInput.vue',
+  'src/components/Recipient/Attribute/TextInput.vue',
+  'src/components/Recipient/Attribute/ThirdNameInput.vue',
+  'src/components/Recipient/AttributeCollection.vue',
+  'src/components/Recipient/PayoutMethodSelection.vue',
+  'src/components/Recipient/RecipientCard.vue',
+  'src/components/Recipient/RecipientCardShimmer.vue',
+  'src/components/Recipient/RecipientTypeSelection.vue',
+  'src/components/Recipient/TargetSelection.vue',
+  'src/components/Transaction/RecipientListing.vue',
+  'src/views/AccountVerification/CategoryView.vue',
+  'src/views/AccountVerification/IndexView.vue',
+  'src/views/Recipient/IndexView.vue',
+  'src/views/Recipient/ItemView.vue',
 ];
 
 const flatten = (node, prefix = '') =>
@@ -50,9 +89,14 @@ describe('the English catalogue', () => {
 describe('the migrated files', () => {
   it.each(MIGRATED)('%s asks for keys the catalogue can answer', (file) => {
     const source = read(file);
-    const used = [...source.matchAll(/\$?t\(\s*'([a-zA-Z][\w.]*)'/g)].map(m => m[1]);
+    // A call, not the tail of a longer name: `emit('sdkInitialized')` ends in
+    // `t(` too. A file with no copy of its own asks for nothing, and that is
+    // fine; the guard below is what keeps text out of it.
+    const used = [
+      ...[...source.matchAll(/(?<![\w$.])\$?t\(\s*'([a-zA-Z][\w.]*)'/g)].map(m => m[1]),
+      ...[...source.matchAll(/keypath="([a-zA-Z][\w.]*)"/g)].map(m => m[1]),
+    ];
 
-    expect(used.length, `${file} uses no keys`).toBeGreaterThan(0);
     for (const key of used) {
       expect(KEYS.has(key), `${file} asks for ${key}, which the catalogue does not have`).toBe(true);
     }

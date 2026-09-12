@@ -61,21 +61,21 @@ onMounted(load);
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Account Verification</h1>
+        <h1 class="sr-only">{{ $t('verification.verificationHeading') }}</h1>
 
-        <LoadFailurePanel v-if="loadFailure" title="We couldn't load your verification status" :message="loadFailure" retryLabel="Try again" @retry="load" class="mt-0" />
+        <LoadFailurePanel v-if="loadFailure" :title="$t('verification.statusLoadFailure')" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="load" class="mt-0" />
         <!-- Main 3 column grid -->
         <div v-else class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Account Verification</h2>
+              <h2 class="sr-only" id="section-2-title">{{ $t('verification.verificationHeading') }}</h2>
               <div>
-                <h2 class="text-base font-semibold text-gray-900">One Time Verification</h2>
-                <p class="mt-1 text-sm/6 text-gray-500">To keep your account secure and compliant, we just need to verify a few details.<br />This is a quick, one-time process - please follow the steps below to continue.</p>
+                <h2 class="text-base font-semibold text-gray-900">{{ $t('verification.oneTimeVerification') }}</h2>
+                <p class="mt-1 text-sm/6 text-gray-500">{{ $t('verification.verificationIntro') }}<br />{{ $t('verification.verificationIntroDetail') }}</p>
                 <div v-if="poiMismatch" role="alert" class="mt-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3">
-                  <p class="text-sm/6 font-semibold text-warning-800">The name or date of birth on your ID is different from your profile.</p>
-                  <p class="mt-1 text-sm/6 text-warning-800">We can update your profile to match your ID, or you can upload a document that matches your profile below. Transfers stay on hold until one of these is done.</p>
+                  <p class="text-sm/6 font-semibold text-warning-800">{{ $t('verification.idMismatch') }}</p>
+                  <p class="mt-1 text-sm/6 text-warning-800">{{ $t('verification.idMismatchFix') }}</p>
                   <p v-if="applyPoiFailure" class="mt-2 text-sm/6 text-danger-700">{{ applyPoiFailure }}</p>
                   <button type="button" @click="applyInfoFromPoi" :disabled="isApplyingPoi" class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isApplyingPoi ? 'Updating…' : 'Use the details from my ID' }}</button>
                 </div>
@@ -101,60 +101,58 @@ onMounted(load);
                           }" class="mt-6 text-sm/6 font-medium">{{ document.documentCategory.title }}</h3>
                             <dl v-if="document.documentCategory.description" class="mt-1 flex grow flex-col justify-between">
                               <template v-if="document.statusCode === KycDocumentStatus.APPROVED">
-                                <dt class="sr-only">Information</dt>
+                                <dt class="sr-only">{{ $t('transfer.wizard.information') }}</dt>
                                 <dd class="mt-3 text-sm/6 text-success-700">
-                                  <p>Your {{ document.documentType.title }} has been successfully verified.</p>
+                                  <p>{{ $t('verification.documentVerified', {title: document.documentType.title}) }}</p>
                                 </dd>
-                                <dt class="sr-only">Verified</dt>
+                                <dt class="sr-only">{{ $t('verification.verified') }}</dt>
                                 <dd class="mt-3 text-sm/6">
-                                  <a class="text-success-700 font-semibold">Verified</a>
+                                  <a class="text-success-700 font-semibold">{{ $t('verification.verified') }}</a>
                                 </dd>
                               </template>
                               <template v-else-if="document.statusCode === KycDocumentStatus.REVIEW_REQUIRED">
-                                <dt class="sr-only">Information</dt>
+                                <dt class="sr-only">{{ $t('transfer.wizard.information') }}</dt>
                                 <dd class="mt-3 text-sm/6 text-gray-700">
-                                  <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is with our compliance team. We will email you when it is done. You do not need to do anything else for now.</p>
+                                  <i18n-t keypath="verification.documentWithCompliance" tag="p" scope="global"><template #document><span class="font-semibold">{{ document.documentType.title }}</span></template></i18n-t>
                                 </dd>
-                                <dt class="sr-only">Under review</dt>
+                                <dt class="sr-only">{{ $t('verification.underReview') }}</dt>
                                 <dd class="mt-3 text-sm/6">
-                                  <a class="text-blue-700 font-semibold">Under review</a>
+                                  <a class="text-blue-700 font-semibold">{{ $t('verification.underReview') }}</a>
                                 </dd>
                               </template>
                               <template v-else-if="document.statusCode === KycDocumentStatus.PENDING_VERIFICATION || document.statusCode === KycDocumentStatus.PROCESSING">
-                                <dt class="sr-only">Information</dt>
+                                <dt class="sr-only">{{ $t('transfer.wizard.information') }}</dt>
                                 <dd class="mt-3 text-sm/6 text-gray-700">
-                                  <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is currently under verification.</p>
+                                  <i18n-t keypath="verification.documentUnderVerification" tag="p" scope="global"><template #document><span class="font-semibold">{{ document.documentType.title }}</span></template></i18n-t>
                                 </dd>
-                                <dt class="sr-only">Verifying</dt>
+                                <dt class="sr-only">{{ $t('verification.verifying') }}</dt>
                                 <dd class="mt-3 text-sm/6">
-                                  <a class="text-blue-700 font-semibold">Verifying</a>
+                                  <a class="text-blue-700 font-semibold">{{ $t('verification.verifying') }}</a>
                                 </dd>
                               </template>
                               <!-- rejected and invalidated cannot be re-decided; the KYC spec's way
                                    forward from either is a new document, so that is what is offered. -->
                               <template v-else-if="document.statusCode === KycDocumentStatus.REJECTED || document.statusCode === KycDocumentStatus.INVALIDATED">
-                                <dt class="sr-only">Information</dt>
+                                <dt class="sr-only">{{ $t('transfer.wizard.information') }}</dt>
                                 <dd class="mt-3 text-sm/6 text-danger-700">
-                                  <p v-if="document.statusCode === KycDocumentStatus.INVALIDATED">Your <span class="font-semibold">{{ document.documentType.title }}</span> was accepted, but that acceptance has since been withdrawn.</p>
-                                  <p v-else>We couldn't accept your <span class="font-semibold">{{ document.documentType.title }}</span>.</p>
-                                  <p class="mt-1 text-gray-700">Please upload another document, or a clearer photo of this one. Transfers stay on hold until a document is accepted.</p>
+                                  <i18n-t v-if="document.statusCode === KycDocumentStatus.INVALIDATED" keypath="verification.documentAcceptanceWithdrawn" tag="p" scope="global"><template #document><span class="font-semibold">{{ document.documentType.title }}</span></template></i18n-t>
+                                  <i18n-t v-else keypath="verification.documentNotAccepted" tag="p" scope="global"><template #document><span class="font-semibold">{{ document.documentType.title }}</span></template></i18n-t>
+                                  <p class="mt-1 text-gray-700">{{ $t('verification.uploadAnotherHint') }}</p>
                                 </dd>
-                                <dt class="sr-only">Next step</dt>
+                                <dt class="sr-only">{{ $t('verification.nextStep') }}</dt>
                                 <dd class="mt-3 text-sm/6">
-                                  <router-link v-if="document.documentCategory?.id" :to="{name: 'categoryView', params: {category: document.documentCategory.id}}" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800">Upload another document</router-link>
-                                  <span v-else class="text-danger-700 font-semibold">{{ document.statusTitle || 'Not accepted' }}</span>
+                                  <router-link v-if="document.documentCategory?.id" :to="{name: 'categoryView', params: {category: document.documentCategory.id}}" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800">{{ $t('verification.uploadAnotherDocument') }}</router-link>
+                                  <span v-else class="text-danger-700 font-semibold">{{ document.statusTitle || $t('verification.notAccepted') }}</span>
                                 </dd>
                               </template>
                               <!-- A status this app does not know. The API filters the ones it can produce
                                    and we cannot render, but a blank card is the failure nobody reports. -->
                               <template v-else>
-                                <dt class="sr-only">Information</dt>
+                                <dt class="sr-only">{{ $t('transfer.wizard.information') }}</dt>
                                 <dd class="mt-3 text-sm/6 text-gray-700">
-                                  <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is marked <span class="font-semibold">{{ document.statusTitle || document.statusCode }}</span>.</p>
+                                  <i18n-t keypath="verification.documentMarkedStatus" tag="p" scope="global"><template #document><span class="font-semibold">{{ document.documentType.title }}</span></template><template #status><span class="font-semibold">{{ document.statusTitle || document.statusCode }}</span></template></i18n-t>
                                 </dd>
-                                <dd class="mt-3 text-sm/6 text-gray-700">
-                                  If you are not sure what this means, <router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">contact support</router-link> and quote the document name.
-                                </dd>
+                                <dd class="mt-3 text-sm/6 text-gray-700"><i18n-t keypath="verification.notSureContactSupport" tag="span" scope="global"><template #support><router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">{{ $t('transfer.payment.contactSupport') }}</router-link></template></i18n-t></dd>
                               </template>
                             </dl>
                           </div>
@@ -167,13 +165,13 @@ onMounted(load);
                           <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-brand-700" />
                           <h3 class="mt-6 text-sm/6 font-medium text-gray-900">{{ pendingCategory.title }}</h3>
                           <dl v-if="pendingCategory.description" class="mt-1 flex grow flex-col justify-between">
-                            <dt class="sr-only">Information</dt>
+                            <dt class="sr-only">{{ $t('transfer.wizard.information') }}</dt>
                             <dd class="mt-3 text-sm/6 text-gray-500">
                               <p>{{ pendingCategory.description }}</p>
                             </dd>
-                            <dt class="sr-only">Start Verification</dt>
+                            <dt class="sr-only">{{ $t('transfer.wizard.startVerification') }}</dt>
                             <dd class="mt-3 text-sm/6 text-gray-500">
-                              <router-link :to="{name: 'categoryView', params: {category: pendingCategory.id}}" class="text-brand-700 font-semibold hover:underline">Start Verification</router-link>
+                              <router-link :to="{name: 'categoryView', params: {category: pendingCategory.id}}" class="text-brand-700 font-semibold hover:underline">{{ $t('transfer.wizard.startVerification') }}</router-link>
                             </dd>
                           </dl>
                         </div>

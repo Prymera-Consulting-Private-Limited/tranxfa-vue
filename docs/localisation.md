@@ -27,6 +27,7 @@ them. That produced, on the one brand that needed it:
 | `tests/setup.js` | Installs the plugin for every mounted component, so specs need not know |
 | `tests/i18n-catalogue.spec.js` | The ratchet: per migrated file, every key must exist and no bare sentence may remain |
 | `scripts/i18n-extract.py` | Moves a component's copy into the catalogue, leaving anything it cannot place confidently |
+| `scripts/i18n-render-check.py` | Proves a migration changed no rendered English, by comparing the text each template renders before and after |
 
 English is both source and fallback, so a half-translated brand reads in
 English rather than showing raw keys. That matters: a missing translation must
@@ -51,6 +52,42 @@ failure.value = t('transfer.wizard.confirmFailed');
 
 Templates get `$t` for free. Script code takes `t` from `useI18n()`.
 
+## A sentence the markup splits
+
+Markup often wraps one value of a sentence in its own element:
+
+```vue
+<p>Your <span class="font-semibold">{{ document.title }}</span> is under review.</p>
+```
+
+Three text nodes, so three keys, and a translator cannot reorder them. Use
+vue-i18n's own component instead. One message, one slot per styled value:
+
+```vue
+<i18n-t keypath="verification.documentUnderVerification" tag="p" scope="global">
+  <template #document><span class="font-semibold">{{ document.title }}</span></template>
+</i18n-t>
+```
+
+with `"documentUnderVerification": "Your {document} is under review."`. The slot
+keeps the styling, the message keeps the word order. `scope="global"` is needed
+because the catalogue is global and the component has no local messages.
+
+## Proving nothing changed on screen
+
+A migration must not change a single rendered word in English. Run:
+
+```sh
+python3 scripts/i18n-render-check.py HEAD <file> [file...]
+```
+
+It renders each template's text before and after, with tags removed and
+whitespace collapsed, and prints every difference. Expect none. It exists
+because of a defect no unit test sees: `Expiry date <span>` renders with a
+space, `{{ $t('...') }}<span>` renders without one, and the space was part of
+the sentence. Run it on the files from earlier slices too; it found four of
+those spaces already lost.
+
 ## Adding a language
 
 1. Copy `src/locales/en.json` to `src/locales/<code>.json` and translate the
@@ -74,6 +111,14 @@ carrying copy and merges from `main` stop conflicting on it.
 - **Keys are generated, then read.** `scripts/i18n-extract.py` names a key from
   the first few words. Rename anything that reads badly before you commit; the
   guard does not care, humans do.
+- **A message that is only a placeholder is not copy.** `"{amount}"` as a
+  catalogue entry sends a runtime value on a round trip through the translator's
+  file, where it can be edited or broken. Leave the interpolation in the
+  template.
+- **A lost space is invisible to the suite.** See the render check above. It is
+  the only thing that catches it.
+- **The same sentence twice** with a straight and a curly apostrophe are two
+  entries and two translations. Pick one and use the key in both places.
 
 ## Migrating another area
 
