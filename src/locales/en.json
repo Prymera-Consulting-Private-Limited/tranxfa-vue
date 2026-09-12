@@ -1,14 +1,22 @@
 {
   "common": {
-    "email": "Email",
-    "password": "Password",
+    "chooseAFile": "Choose a file to upload.",
+    "connectionFailed": "We couldn't connect. Check your internet connection and try again.",
     "continue": "Continue",
-    "tryAgain": "Try again",
+    "email": "Email",
     "emailPlaceholder": "example{'@'}email.com",
-    "passwordPlaceholder": "••••••••",
-    "showPassword": "Show password",
+    "fileTooLarge": "This file is too large (max {maxMb} MB). Try a smaller photo or take a new one.",
     "hidePassword": "Hide password",
-    "passwordRulesFailed": "We couldn't load the password rules."
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "passwordRulesFailed": "We couldn't load the password rules.",
+    "sessionEnded": "Your session has ended. Please sign in again.",
+    "showPassword": "Show password",
+    "tooManyTries": "Too many tries. Please wait a minute and try again.",
+    "tooManyTriesSeconds": "Too many tries. Please wait {count} second and try again. | Too many tries. Please wait {count} seconds and try again.",
+    "tryAgain": "Try again",
+    "uploadPhoto": "Please upload a JPEG, PNG or WebP photo.",
+    "uploadPhotoOrPdf": "Please upload a JPEG, PNG or WebP photo, or a PDF."
   },
   "auth": {
     "signIn": {
@@ -252,6 +260,7 @@
     "yourRecipients": "Your Recipients"
   },
   "verification": {
+    "addYourAddress": "Add your address",
     "addressCategoryHint": "To verify your address, please upload a recent utility bill, bank statement, or government-issued document showing your name and address.",
     "backToVerification": "Account verification",
     "cameraAccessNeeded": "We Need Camera Access",
@@ -259,6 +268,7 @@
     "changeIt": "Change it",
     "close": "Close",
     "codeDelay": "It can take up to a minute to arrive.",
+    "completeYourDetails": "Complete your details",
     "didntReceiveEmailCode": "Didn't receive verification code?",
     "didntReceiveTheCode": "Didn't receive the code?",
     "documentAcceptanceWithdrawn": "Your {document} was accepted, but that acceptance has since been withdrawn.",
@@ -314,6 +324,7 @@
     "verify": "Verify",
     "verifyEmail": "Verify Email",
     "verifyYourEmail": "Verify your Email!",
+    "verifyYourIdentity": "Verify your identity",
     "verifyYourMobileNumber": "Verify your mobile number",
     "verifying": "Verifying",
     "verifyingEmail": "Verifying Email ...",
@@ -663,5 +674,33 @@
     "yourRoom": "Your room",
     "yourRoomIsBooked": "Your room is booked",
     "yourStay": "Your stay"
+  },
+  "routes": {
+    "accountVerification": "Account Verification",
+    "booking": "Booking",
+    "completeSignup": "Complete Signup",
+    "dashboard": "Dashboard",
+    "devices": "Devices",
+    "forgotPassword": "Forgot Password",
+    "hotels": "Hotels",
+    "makePayment": "Make Payment",
+    "moreAuthenticationRequired": "More authentication required",
+    "pageNotFound": "Page not found",
+    "payForYourBooking": "Pay for Your Booking",
+    "processingPayment": "Processing Payment",
+    "recipients": "Recipients",
+    "resetPassword": "Reset Password",
+    "secureLoginVerification": "Secure Login Verification",
+    "sendMoney": "Send Money",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "transactions": "Transactions",
+    "viewHotel": "View Hotel",
+    "wallet": "Wallet",
+    "walletStatement": "Wallet Statement",
+    "yourBookings": "Your Bookings",
+    "yourPayment": "Your Payment",
+    "yourPrice": "Your Price"
   }
 }

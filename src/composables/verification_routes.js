@@ -1,3 +1,7 @@
+import i18n from '@/i18n.js';
+
+const t = (...args) => i18n.global.t(...args);
+
 /**
  * Which screen clears a 412 the customer can act on.
  *
@@ -34,15 +38,15 @@ export function fixFor(type, returnTo = null) {
     const query = returnTo ? {redirect: returnTo} : {};
 
     if (ONBOARDING_TYPES.has(type)) {
-        return {route: {name: 'onboardingWorkflow', query}, label: 'Completa tus datos'};
+        return {route: {name: 'onboardingWorkflow', query}, label: t('verification.completeYourDetails')};
     }
 
     if (ADDRESS_TYPES.has(type)) {
-        return {route: {name: 'onboardingWorkflow', query}, label: 'Agrega tu dirección'};
+        return {route: {name: 'onboardingWorkflow', query}, label: t('verification.addYourAddress')};
     }
 
     if (IDENTITY_TYPES.has(type)) {
-        return {route: {name: 'accountVerification', query}, label: 'Verifica tu identidad'};
+        return {route: {name: 'accountVerification', query}, label: t('verification.verifyYourIdentity')};
     }
 
     return null;

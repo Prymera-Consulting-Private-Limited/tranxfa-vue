@@ -1,4 +1,5 @@
 import {hotelsEnabled, walletEnabled} from '@/feature_flags.js'
+import i18n from '@/i18n.js';
 import { createRouter, createWebHistory } from 'vue-router'
 import SignUpView from "@/views/SignUpView.vue";
 import SignInView from "@/views/SignInView.vue";
@@ -10,12 +11,13 @@ import { useCustomerUtils } from '@/composables/customer_utils.js'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // Xenvia only: a contact page the other brands do not have.
     {
       path: '/contact',
       name: 'contact',
       component: () => import('@/views/ContactView.vue'),
       meta: {
-        title: 'Contactar con soporte',
+        titleKey: 'routes.contact',
         description: 'Escríbenos por WhatsApp o correo electrónico.',
       },
     },
@@ -24,24 +26,24 @@ const router = createRouter({
       name: 'signIn',
       component: SignInView,
       meta: {
-        title: 'Iniciar sesión',
-        description: 'Inicia sesión en tu cuenta',
+        titleKey: 'routes.signIn',
+        description: 'Login into your account',
       },
     }, {
       path: '/mfa',
       name: 'multiFactorAuth',
       component: () => import('@/views/MultifactorAuthenticationView.vue'),
       meta: {
-        title: 'Se requiere autenticación adicional',
-        description: 'Se requiere autenticación adicional',
+        titleKey: 'routes.moreAuthenticationRequired',
+        description: 'More authentication required',
       },
     }, {
       path: '/forgot-password',
       name: 'forgotPassword',
       component: () => import('@/views/ForgotPasswordView.vue'),
       meta: {
-        title: 'He olvidado mi contraseña',
-        description: 'He olvidado mi contraseña',
+        titleKey: 'routes.forgotPassword',
+        description: 'Forgot Password',
       },
     }, {
       path: '/reset-password/:token',
@@ -49,39 +51,39 @@ const router = createRouter({
       name: 'resetPassword',
       component: () => import('@/views/ResetPasswordView.vue'),
       meta: {
-        title: 'Restablecer contraseña',
-        description: 'Restablecer contraseña',
+        titleKey: 'routes.resetPassword',
+        description: 'Reset Password',
       },
     }, {
       path: '/secure-login',
       name: 'authByOtp',
       component: () => import('@/views/AuthByOtp.vue'),
       meta: {
-        title: 'Verificación de inicio de sesión seguro',
-        description: 'Verifica tu identidad con un código de un solo uso para continuar de forma segura.',
+        titleKey: 'routes.secureLoginVerification',
+        description: 'Verify your identity with a one-time password to continue securely.',
       },
     }, {
       path: '/sign-up',
       name: 'signUp',
       component: SignUpView,
       meta: {
-        title: 'Crear cuenta',
-        description: 'Registra tu cuenta',
+        titleKey: 'routes.signUp',
+        description: 'Register your account',
       },
     }, {
       path: '/workflow/onboarding',
       name: 'onboardingWorkflow',
       component: () => import('@/views/OnboardingWorkflowView.vue'),
       meta: {
-        title: 'Completar registro',
-        description: 'Completa tu perfil con nosotros.',
+        titleKey: 'routes.completeSignup',
+        description: 'Complete your profile with us.',
       },
     }, {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),
       meta: {
-        title: 'Inicio',
+        titleKey: 'routes.dashboard',
         description: '',
       },
     },
@@ -93,7 +95,7 @@ const router = createRouter({
       name: 'hotels',
       component: () => import('@/views/Travel/Hotels/IndexView.vue'),
       meta: {
-        title: 'Hotels',
+        titleKey: 'routes.hotels',
         description: '',
       },
     }, {
@@ -102,7 +104,7 @@ const router = createRouter({
       props: route => ({ id: route.params.id, slug: route.params.slug, search: route.query.search }),
       component: () => import('@/views/Travel/Hotels/HotelView.vue'),
       meta: {
-        title: 'Ver hotel',
+        titleKey: 'routes.viewHotel',
         description: '',
       },
     }, {
@@ -112,7 +114,7 @@ const router = createRouter({
       props: route => ({ quoteId: route.params.id }),
       component: () => import('@/views/Travel/Hotels/HotelQuoteView.vue'),
       meta: {
-        title: 'Tu precio',
+        titleKey: 'routes.yourPrice',
         description: '',
       },
     }, {
@@ -121,7 +123,7 @@ const router = createRouter({
       name: 'travelBookings',
       component: () => import('@/views/Travel/Bookings/IndexView.vue'),
       meta: {
-        title: 'Tus reservas',
+        titleKey: 'routes.yourBookings',
         description: '',
       },
     }, {
@@ -133,7 +135,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/PaymentStatusView.vue'),
       meta: {
-        title: 'Tu pago',
+        titleKey: 'routes.yourPayment',
         description: '',
       },
     }, {
@@ -144,7 +146,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/PaymentView.vue'),
       meta: {
-        title: 'Paga tu reserva',
+        titleKey: 'routes.payForYourBooking',
         description: '',
       },
     }, {
@@ -153,7 +155,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/ItemView.vue'),
       meta: {
-        title: 'Booking',
+        titleKey: 'routes.booking',
         description: '',
       },
     }] : []),
@@ -163,7 +165,7 @@ const router = createRouter({
       props: route => ({ id: route.params.quoteId }),
       component: () => import('@/views/Transfer/IndexView.vue'),
       meta: {
-        title: 'Enviar dinero',
+        titleKey: 'routes.sendMoney',
         description: '',
       },
     }, {
@@ -172,7 +174,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transfer/PaymentView.vue'),
       meta: {
-        title: 'Realizar el pago',
+        titleKey: 'routes.makePayment',
         description: '',
       },
     }, {
@@ -181,7 +183,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transfer/PaymentCallbackView.vue'),
       meta: {
-        title: 'Procesando el pago',
+        titleKey: 'routes.processingPayment',
         description: '',
       },
     }, {
@@ -189,7 +191,7 @@ const router = createRouter({
       name: 'transactions',
       component: () => import('@/views/Transaction/IndexView.vue'),
       meta: {
-        title: 'Transacciones',
+        titleKey: 'routes.transactions',
         description: '',
       },
     }, {
@@ -198,7 +200,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transaction/ItemView.vue'),
       meta: {
-        title: 'Transacciones',
+        titleKey: 'routes.transactions',
         description: '',
       },
     }, {
@@ -206,7 +208,7 @@ const router = createRouter({
       name: 'recipients',
       component: () => import('@/views/Recipient/IndexView.vue'),
       meta: {
-        title: 'Beneficiarios',
+        titleKey: 'routes.recipients',
         description: '',
       },
     }, {
@@ -215,7 +217,7 @@ const router = createRouter({
       props: route => ({ id: route.params.id }),
       component: () => import('@/views/Recipient/ItemView.vue'),
       meta: {
-        title: 'Beneficiarios',
+        titleKey: 'routes.recipients',
         description: '',
       },
     }, {
@@ -223,7 +225,7 @@ const router = createRouter({
       name: 'accountVerification',
       component: () => import('@/views/AccountVerification/IndexView.vue'),
       meta: {
-        title: 'Verificación de cuenta',
+        titleKey: 'routes.accountVerification',
         description: '',
       },
     }, {
@@ -232,7 +234,7 @@ const router = createRouter({
       props: route => ({ id: route.params.category }),
       component: () => import('@/views/AccountVerification/CategoryView.vue'),
       meta: {
-        title: 'Verificación de cuenta',
+        titleKey: 'routes.accountVerification',
         description: '',
       },
     }, {
@@ -240,7 +242,7 @@ const router = createRouter({
       name: 'settings',
       component: () => import('@/views/SettingsView.vue'),
       meta: {
-        title: 'Configuración',
+        titleKey: 'routes.settings',
         description: '',
       },
     }, {
@@ -248,7 +250,7 @@ const router = createRouter({
       name: 'devices',
       component: () => import('@/views/DeviceView.vue'),
       meta: {
-        title: 'Devices',
+        titleKey: 'routes.devices',
         description: '',
       },
     },
@@ -259,7 +261,7 @@ const router = createRouter({
       name: 'wallet',
       component: () => import('@/views/Wallet/IndexView.vue'),
       meta: {
-        title: 'Monedero',
+        titleKey: 'routes.wallet',
         description: '',
       },
     }, {
@@ -267,7 +269,7 @@ const router = createRouter({
       name: 'walletStatement',
       component: () => import('@/views/Wallet/StatementView.vue'),
       meta: {
-        title: 'Extracto del monedero',
+        titleKey: 'routes.walletStatement',
         description: '',
       },
     }] : []),
@@ -278,7 +280,7 @@ const router = createRouter({
       name: 'notFound',
       component: () => import('@/views/NotFoundView.vue'),
       meta: {
-        title: 'Página no encontrada',
+        titleKey: 'routes.pageNotFound',
         description: '',
       },
     }
@@ -316,7 +318,9 @@ router.beforeEach((to) => {
 })
 
 router.beforeEach((to, from) => {
-  document.title = to.meta?.title ?? APP_NAME
+  // The tab title is copy too, so it comes from the catalogue and follows the
+  // brand's language rather than staying English.
+  document.title = to.meta?.titleKey ? i18n.global.t(to.meta.titleKey) : APP_NAME
 })
 
 router.afterEach(() => {

@@ -121,11 +121,17 @@
     "zero": "Sin comisión"
   },
   "common": {
+    "chooseAFile": "Elige un archivo para subir.",
+    "connectionFailed": "No hemos podido conectar. Comprueba tu conexión a internet e inténtalo de nuevo.",
     "continue": "Continuar",
     "email": "Correo electrónico",
     "password": "Contraseña",
     "passwordRulesFailed": "No hemos podido cargar los requisitos de la contraseña.",
-    "tryAgain": "Reintentar"
+    "sessionEnded": "Tu sesión ha finalizado. Vuelve a iniciar sesión.",
+    "tooManyTries": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
+    "tryAgain": "Reintentar",
+    "uploadPhoto": "Sube una foto en JPEG, PNG o WebP.",
+    "uploadPhotoOrPdf": "Sube una foto en JPEG, PNG o WebP, o un PDF."
   },
   "notFound": {
     "backToDashboard": "Volver al panel",
@@ -220,6 +226,32 @@
     "selectRelationHint": "Indica tu relación con el beneficiario.",
     "yourRecipients": "Tus beneficiarios"
   },
+  "routes": {
+    "accountVerification": "Verificación de cuenta",
+    "completeSignup": "Completar registro",
+    "dashboard": "Inicio",
+    "devices": "Dispositivos",
+    "forgotPassword": "He olvidado mi contraseña",
+    "makePayment": "Realizar el pago",
+    "moreAuthenticationRequired": "Se requiere autenticación adicional",
+    "pageNotFound": "Página no encontrada",
+    "payForYourBooking": "Paga tu reserva",
+    "processingPayment": "Procesando el pago",
+    "recipients": "Beneficiarios",
+    "resetPassword": "Restablecer contraseña",
+    "secureLoginVerification": "Verificación de inicio de sesión seguro",
+    "sendMoney": "Enviar dinero",
+    "settings": "Configuración",
+    "signIn": "Iniciar sesión",
+    "signUp": "Crear cuenta",
+    "transactions": "Transacciones",
+    "viewHotel": "Ver hotel",
+    "wallet": "Monedero",
+    "walletStatement": "Extracto del monedero",
+    "yourBookings": "Tus reservas",
+    "yourPayment": "Tu pago",
+    "yourPrice": "Tu precio"
+  },
   "transfer": {
     "payment": {
       "contactSupport": "Contactar con soporte",
@@ -288,11 +320,13 @@
     "yourPrice": "Tu precio"
   },
   "verification": {
+    "addYourAddress": "Agrega tu dirección",
     "addressCategoryHint": "Para verificar tu domicilio, sube una factura de servicios reciente, un extracto bancario o un documento oficial donde aparezcan tu nombre y tu dirección.",
     "backToVerification": "Verificación de cuenta",
     "cameraAccessNeeded": "Necesitamos acceso a la cámara",
     "categoryLoadFailure": "No hemos podido cargar este paso de la verificación.",
     "close": "Cerrar",
+    "completeYourDetails": "Completa tus datos",
     "didntReceiveEmailCode": "¿No recibiste el código de verificación?",
     "dragAndDrop": "Arrastra y suelta archivos aquí, o haz clic para buscarlos.",
     "emailCodeDelay": "Ten en cuenta que el correo puede tardar hasta un minuto en llegar. Si no lo ves en tu bandeja de entrada, revisa también tu carpeta de spam o correo no deseado.",
@@ -321,6 +355,7 @@
     "verificationHeading": "Verificación de cuenta",
     "verifyEmail": "Verificar correo",
     "verifyYourEmail": "¡Verifica tu correo!",
+    "verifyYourIdentity": "Verifica tu identidad",
     "verifyingEmail": "Verificando correo..."
   },
   "wallet": {
