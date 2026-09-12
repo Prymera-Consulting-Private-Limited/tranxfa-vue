@@ -26,17 +26,17 @@ const props = defineProps({
 const reviewItems = [
   {
     icon: UserCircleIcon,
-    label: 'Beneficiaria',
+    label: 'Recipient',
     value: props.quote.recipient.wholeName,
   },
   {
     icon: FlagIcon,
-    label: 'País de pago',
+    label: 'Payout Country',
     value: props.quote.payoutCountry.commonName,
   },
   {
     icon: TruckIcon,
-    label: 'Método de pago',
+    label: 'Payout Method',
     value: props.quote.payoutMethod.title,
   }
 ];
@@ -71,24 +71,24 @@ for (let i = 0; i < props.quote.recipient.accountDetailHashMap.length; i++) {
 }
 reviewItems.push({
   icon: PaperAirplaneIcon,
-  label: 'Importe a enviar',
+  label: 'Sending Amount',
   value: props.quote.localAmountCurrencyPrefixed,
 });
 reviewItems.push({
   icon: BanknotesIcon,
-  label: 'Tasa de cambio',
+  label: 'Exchange Rate',
   value: props.quote.exchangeRateFormatted,
 });
 if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCouponFormatted) {
   reviewItems.push({
     icon: PercentBadgeIcon,
-    label: `Tasa antes del cupón ${props.quote.coupon.code}`,
+    label: `Rate before coupon ${props.quote.coupon.code}`,
     value: props.quote.coupon.exchangeRateBeforeCouponFormatted,
   });
 }
 reviewItems.push({
   icon: WalletIcon,
-  label: 'El beneficiario recibe',
+  label: 'Recipient Gets',
   value: props.quote.foreignAmountCurrencyPrefixed,
 });
 if (props.quote.payoutMethod.promo) {
@@ -102,24 +102,24 @@ if (props.quote.payoutMethod.promo) {
 }
 reviewItems.push({
   icon: PlusIcon,
-  label: 'Honorarios',
+  label: 'Fees',
   value: props.quote.baseFeesCurrencyPrefixed,
 });
 if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
   reviewItems.push({
     icon: PercentBadgeIcon,
-    label: `Cupón ${props.quote.coupon.code}`,
+    label: `Coupon ${props.quote.coupon.code}`,
     value: `- ${props.quote.coupon.discountAmountCurrencyPrefixed}`,
   });
 }
 reviewItems.push({
   icon: CalculatorIcon,
-  label: 'Total parcial',
+  label: 'Subtotal',
   value: props.quote.subTotalAmountCurrencyPrefixed,
 });
 reviewItems.push({
   icon: WalletIcon,
-  label: 'Total a pagar',
+  label: 'Total Due',
   value: props.quote.totalAmountCurrencyPrefixed,
 });
 </script>

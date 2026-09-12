@@ -69,7 +69,7 @@ async function resend() {
     resentMessage.value = "We've sent a new code by SMS. It can take a minute to arrive.";
   }).catch((e) => {
     logRequestFailure(e, 'resend-mobile-code');
-    resendFailure.value = failureMessage(e, "No hemos podido enviar un código nuevo. Inténtalo de nuevo.");
+    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
   }).finally(() => {
     isResendingToken.value = false;
   });

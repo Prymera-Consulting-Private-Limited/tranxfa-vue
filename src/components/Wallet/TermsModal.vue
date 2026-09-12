@@ -94,7 +94,7 @@ async function accept() {
     } else if (e.response?.status === 422) {
       generalError.value = e.response.data.message;
     } else {
-      generalError.value = 'Algo no ha funcionado. Inténtalo de nuevo.';
+      generalError.value = 'Something went wrong. Please try again.';
     }
   }).finally(() => {
     isSubmitting.value = false;

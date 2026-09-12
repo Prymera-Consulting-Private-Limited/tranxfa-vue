@@ -12,11 +12,11 @@ const props = defineProps({
 const items = computed(() => {
   const items = [];
   items.push({
-    label: 'Destino',
+    label: 'Destination',
     value: props.quote.payoutCountry.commonName
   });
   items.push({
-    label: 'Método de entrega',
+    label: 'Payout Method',
     value: props.quote.payoutMethod.title
   });
   if (props.quote.payoutMethod.instructions) {
@@ -26,39 +26,39 @@ const items = computed(() => {
     });
   }
   items.push({
-    label: 'Monto',
+    label: 'Amount',
     value: props.quote.localAmountCurrencyPrefixed
   });
   items.push({
-    label: 'Nuestra tasa',
+    label: 'Our Rate',
     value: props.quote.exchangeRateFormatted
   });
   if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCouponFormatted) {
     items.push({
-      label: `Tasa antes del cupón ${props.quote.coupon.code}`,
+      label: `Rate before coupon ${props.quote.coupon.code}`,
       value: props.quote.coupon.exchangeRateBeforeCouponFormatted
     });
   }
   items.push({
-    label: ( props.quote.recipient?.wholeName || 'Beneficiaria' ) + ' Obtiene',
+    label: ( props.quote.recipient?.wholeName || 'Recipient' ) + ' Gets',
     value: props.quote.foreignAmountCurrencyPrefixed
   });
   items.push({
-    label: 'Comisión',
+    label: 'Our Fees',
     value: props.quote.baseFeesCurrencyPrefixed
   });
   if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
     items.push({
-      label: `Cupón ${props.quote.coupon.code}`,
+      label: `Coupon ${props.quote.coupon.code}`,
       value: `- ${props.quote.coupon.discountAmountCurrencyPrefixed}`
     });
   }
   items.push({
-    label: 'Total parcial',
+    label: 'Subtotal',
     value: props.quote.subTotalAmountCurrencyPrefixed
   });
   items.push({
-    label: 'Total a pagar',
+    label: 'Total Due',
     value: props.quote.totalAmountCurrencyPrefixed
   });
 
