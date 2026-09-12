@@ -43,7 +43,7 @@ const createRecipientClicked = () => {
         <RecipientCard v-bind:cardColor="colors[index%6]" v-bind:recipient="recipient">
           <dd class="text-gray-500 text-sm/6 truncate">{{ recipient.accountDetail?.institution?.title }}</dd>
           <dd class="text-gray-500 text-sm/6 tracking-wider break-all">{{ recipient.accountDetail?.accountNumber }}</dd>
-          <dt class="sr-only">Relation</dt>
+          <dt class="sr-only">Relación</dt>
           <dd class="mt-3">
             <span class="inline-flex items-center rounded-full bg-success-50 px-2 py-1 text-xs/5 font-medium text-success-700 ring-1 ring-success-600/20 ring-inset">{{ recipient.relationship.title }}</span>
           </dd>

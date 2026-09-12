@@ -119,7 +119,7 @@ const canSave = computed(() => {
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
             <Spinner class="size-4 mr-2" />
-            Uploading ...
+            Subiendo...
           </span>
         </template>
         <template v-else>Subir</template>

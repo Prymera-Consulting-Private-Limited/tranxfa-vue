@@ -156,7 +156,7 @@ function closePaymentModal() {
   <CustomerLayout>
     <div>
       <div class="mx-auto max-w-3xl lg:max-w-full">
-        <h1 class="sr-only">Processing payment</h1>
+        <h1 class="sr-only">Procesando el pago</h1>
         <div class="flex items-center justify-center gap-4 lg:gap-8 bg-white rounded-t-lg p-4 md:px-6 md:py-8 min-h-148">
           <div class="text-center" v-if="isLoading">
             <span class="text-6xl pi pi-spinner-dotted pi-spin text-gray-500"></span>
@@ -205,7 +205,7 @@ function closePaymentModal() {
                   </template>
 
                   <template v-else-if="status === 'refunded'">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-5">Payment refunded</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-5">Pago reembolsado</h2>
                     <p class="text-base text-gray-600 mb-6">Este pago se te ha devuelto. Consulta el envío para ver los detalles.</p>
                   </template>
 

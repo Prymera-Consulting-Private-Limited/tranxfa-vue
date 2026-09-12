@@ -150,7 +150,7 @@ onMounted(load);
                               <template v-else>
                                 <dt class="sr-only">Información</dt>
                                 <dd class="mt-3 text-sm/6 text-gray-700">
-                                  <p>Your <span class="font-semibold">{{ document.documentType.title }}</span> is marked <span class="font-semibold">{{ document.statusTitle || document.statusCode }}</span>.</p>
+                                  <p>Tu <span class="font-semibold">{{ document.documentType.title }}</span> está marcado como <span class="font-semibold">{{ document.statusTitle || document.statusCode }}</span>.</p>
                                 </dd>
                                 <dd class="mt-3 text-sm/6 text-gray-700">
                                   Si no sabes qué significa esto, <router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">contacta con soporte</router-link> e indica el nombre del documento.
