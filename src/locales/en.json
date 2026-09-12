@@ -1,0 +1,59 @@
+{
+  "common": {
+    "email": "Email",
+    "password": "Password",
+    "continue": "Continue",
+    "tryAgain": "Try again",
+    "emailPlaceholder": "example{'@'}email.com",
+    "passwordPlaceholder": "••••••••",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "passwordRulesFailed": "We couldn't load the password rules."
+  },
+  "auth": {
+    "signIn": {
+      "backgroundAlt": "Login Background",
+      "title": "Love to see you again",
+      "subtitle": "Send your money transfer easy and Fun!",
+      "failed": "Login failed",
+      "passwordChanged": "Your password has been successfully changed. Please log in using your new password.",
+      "passwordReset": "Your password has been successfully reset. Please log in using your new password.",
+      "mobileNumber": "Mobile Number",
+      "mobileNumberPlaceholder": "Mobile Number",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don’t have an account?",
+      "signUpInstead": "Sign up instead",
+      "connectionFailed": "We couldn't sign you in. Please check your internet connection and try again."
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "intro": "Forgot your password? No problem. Enter the email linked to your account and click \"Send Reset Link.\" We'll email you a secure link to reset your password.",
+      "submit": "Send Reset Link",
+      "changedMind": "Changed mind?",
+      "signInInstead": "Sign in instead",
+      "failed": "We couldn't send the reset link. Please try again."
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "chooseLabel": "Choose Password",
+      "confirmLabel": "Confirm Password",
+      "imageAlt": "Full Size Image",
+      "failed": "We couldn't reset your password. Please try again.",
+      "requirementsToggle": "View password requirements",
+      "requirementsMet": "All requirements met"
+    }
+  },
+  "notFound": {
+    "eyebrow": "Page not found",
+    "title": "We couldn't find that page",
+    "body": "The link may be out of date, or the address may have been typed incorrectly. Nothing has changed on your account.",
+    "backToDashboard": "Back to dashboard"
+  },
+  "appError": {
+    "eyebrow": "Something went wrong",
+    "title": "This page stopped working",
+    "body": "Nothing has changed on your account. Reload the page to carry on; if it keeps happening, contact support.",
+    "reload": "Reload page"
+  }
+}
