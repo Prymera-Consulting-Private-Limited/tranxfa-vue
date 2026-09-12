@@ -3,10 +3,10 @@ import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
-import pTimeout from 'p-timeout';
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import Spinner from "@/components/Spinner.vue";
+import {useResendCountdown} from "@/composables/resend_countdown.js";
 
 const emailVerificationCode = ref('');
 const isLoading = ref(false);
@@ -42,30 +42,7 @@ async function verifyEmailAddress() {
   emit('emailVerified');
 }
 
-const showResendButton = ref(false);
-const countdown = ref(30);
-
-async function startResendOtpTimer() {
-  showResendButton.value = false;
-  countdown.value = 30;
-
-  try {
-    const timer = new Promise((resolve) => {
-      const interval = setInterval(() => {
-        countdown.value -= 1;
-        if (countdown.value === 0) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 1000);
-    });
-
-    await pTimeout(timer, { milliseconds: 30000 });
-    showResendButton.value = true;
-  } catch (error) {
-    console.log("Timeout error:", error);
-  }
-}
+const {countdown, showResendButton, start: startResendOtpTimer} = useResendCountdown();
 
 const resentMessage = ref('');
 const resendFailure = ref('');

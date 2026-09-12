@@ -1,11 +1,11 @@
 <script setup>
-import {onUnmounted, ref, watch} from "vue";
+import {ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import VOtpInput from "vue3-otp-input";
-import pTimeout from 'p-timeout';
 import ModalCloseButton from "@/components/ModalCloseButton.vue";
 import Spinner from "@/components/Spinner.vue";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
+import {useResendCountdown} from "@/composables/resend_countdown.js";
 
 const props = defineProps({
   open: {
@@ -42,40 +42,7 @@ const isResending = ref(false);
 const resendError = ref('');
 const resentMessage = ref('');
 
-const showResendButton = ref(false);
-const countdown = ref(30);
-
-let countdownIntervalId = null;
-
-function clearCountdownInterval() {
-  if (countdownIntervalId) {
-    clearInterval(countdownIntervalId);
-    countdownIntervalId = null;
-  }
-}
-
-async function startResendOtpTimer() {
-  clearCountdownInterval();
-  showResendButton.value = false;
-  countdown.value = 30;
-
-  try {
-    const timer = new Promise((resolve) => {
-      countdownIntervalId = setInterval(() => {
-        countdown.value -= 1;
-        if (countdown.value === 0) {
-          clearCountdownInterval();
-          resolve();
-        }
-      }, 1000);
-    });
-
-    await pTimeout(timer, { milliseconds: 30000 });
-    showResendButton.value = true;
-  } catch (error) {
-    console.log("Timeout error:", error);
-  }
-}
+const {countdown, showResendButton, start: startResendOtpTimer, stop: clearCountdownInterval} = useResendCountdown();
 
 watch(() => props.open, (open) => {
   if (open) {
@@ -94,9 +61,6 @@ watch(() => props.error, (error) => {
   }
 });
 
-onUnmounted(() => {
-  clearCountdownInterval();
-});
 
 function submit() {
   if (props.isSubmitting || otp.value.length !== 6) return;

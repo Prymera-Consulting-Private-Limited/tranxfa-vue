@@ -1,13 +1,14 @@
 <script setup>
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
-import {onMounted, onUnmounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import Spinner from "@/components/Spinner.vue";
 import router from "@/router/index.js";
 import {safeRedirect} from "@/router/guards.js";
+import {useResendCountdown} from "@/composables/resend_countdown.js";
 
 // The redirect sign-in was carrying, if it is still a path on this site.
 const onward = () => {
@@ -52,34 +53,7 @@ async function authenticate() {
   });
 }
 
-const showResendButton = ref(false);
-const countdown = ref(30);
-let resendInterval = null;
-
-// Counts against the clock rather than ticks: a background tab throttles
-// timers, and the old one-second decrement could sit on "Resend in 12s" for
-// minutes. Any earlier interval is cleared so a double resend cannot race.
-function startResendOtpTimer() {
-  if (resendInterval) {
-    clearInterval(resendInterval);
-  }
-
-  showResendButton.value = false;
-
-  const end = Date.now() + 30000;
-
-  resendInterval = setInterval(() => {
-    const remaining = Math.ceil((end - Date.now()) / 1000);
-
-    countdown.value = Math.max(0, remaining);
-
-    if (remaining <= 0) {
-      clearInterval(resendInterval);
-      resendInterval = null;
-      showResendButton.value = true;
-    }
-  }, 250);
-}
+const {countdown, showResendButton, start: startResendOtpTimer} = useResendCountdown();
 
 const resentMessage = ref('');
 const resendFailure = ref('');
@@ -119,11 +93,6 @@ onMounted(async () => {
   await startResendOtpTimer();
 });
 
-onUnmounted(() => {
-  if (resendInterval) {
-    clearInterval(resendInterval);
-  }
-});
 </script>
 <template>
   <!-- Form Section -->
