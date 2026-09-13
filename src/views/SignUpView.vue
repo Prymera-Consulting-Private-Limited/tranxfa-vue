@@ -200,10 +200,10 @@ const totalPasswordRulesCount = computed(() => validatedPasswordPolicies.rules.l
 
 const passwordRequirementsSummary = computed(() => {
   if (!form.password) {
-    return 'View password requirements';
+    return t('onboarding.viewPasswordRequirements');
   }
   if (allPasswordRulesMet.value) {
-    return 'All requirements met';
+    return t('onboarding.allPasswordRequirementsMet');
   }
   return t('onboarding.unmetpasswordrulescountOfTotalpasswordrulescountNot2', {unmetPasswordRulesCount: unmetPasswordRulesCount.value, totalPasswordRulesCount: totalPasswordRulesCount.value});
 });

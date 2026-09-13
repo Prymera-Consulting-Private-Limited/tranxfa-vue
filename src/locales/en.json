@@ -442,7 +442,9 @@
     "weCouldntCheckThat": "We couldn't check that code. Please try again.",
     "weveSentANew3": "We've sent a new code. It can take a minute to arrive.",
     "weCouldntSendA2": "We couldn't send a new code. Use Resend code below.",
-    "unmetpasswordrulescountOfTotalpasswordrulescountNot2": "{unmetPasswordRulesCount} of {totalPasswordRulesCount} not met"
+    "unmetpasswordrulescountOfTotalpasswordrulescountNot2": "{unmetPasswordRulesCount} of {totalPasswordRulesCount} not met",
+    "viewPasswordRequirements": "View password requirements",
+    "allPasswordRequirementsMet": "All requirements met"
   },
   "account": {
     "accountSettings": "Account Settings",
@@ -875,7 +877,30 @@
     "checkOutByCheckoutuntil": "check out by {checkOutUntil}",
     "upToMaxAdults": "Up to {mAX_ADULTS} adults per room.",
     "upToMaxChildren": "Up to {mAX_CHILDREN} children per room.",
-    "upToMaxRoom": "Up to {mAX_ROOM_GUESTS} guests per room."
+    "upToMaxRoom": "Up to {mAX_ROOM_GUESTS} guests per room.",
+    "cancellationAccepted": "The hotel accepted this cancellation and your room has been released.",
+    "cancellationRefused": "The hotel refused this cancellation, so your booking is still live and your room is still held.",
+    "cancellationUnanswered": "We asked the hotel to cancel this booking and haven't had an answer we can act on. We're chasing it — your room is still held in the meantime.",
+    "cancellationAwaitingHotel": "We've asked the hotel to cancel this booking and are waiting for their answer.",
+    "paymentAttemptFailed": "This attempt didn't go through. You haven't been charged for it.",
+    "paymentAttemptTimedOut": "This attempt timed out before it completed.",
+    "paymentAttemptCancelled": "This attempt was cancelled.",
+    "paymentRefundedInFull": "This payment has been refunded in full.",
+    "paymentPartlyRefunded": "Part of this payment has been refunded.",
+    "paymentWentThrough": "Your payment has gone through",
+    "paymentDidNotGoThrough": "That payment didn't go through",
+    "finishingYourPayment": "Finishing your payment",
+    "waitingForYourPayment": "Waiting for your payment",
+    "bookingCancelledRefundFollows": "This booking was cancelled. Any refund due follows the hotel's cancellation policy and is sent separately.",
+    "roomBookedAndPaidFor": "Your room is booked and paid for. The hotel confirms it separately, which can take a minute or two.",
+    "notChargedRoomStillBooked": "You haven't been charged. Your room is still booked, so you can try paying again.",
+    "waitingForYourBank": "We're waiting for your bank to finish. You can leave this page open — it updates on its own.",
+    "updatesOnItsOwn": "This updates on its own once your payment settles. You don't need to do anything.",
+    "couldNotLoadThisPage": "We couldn't load this page",
+    "soldOut": "Sold out",
+    "partlyRefundable": "Partly refundable",
+    "cancellationTermsAtNextStep": "Cancellation terms at the next step",
+    "selectDates": "Select dates"
   },
   "routes": {
     "accountVerification": "Account Verification",
