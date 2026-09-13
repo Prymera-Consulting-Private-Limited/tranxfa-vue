@@ -589,3 +589,44 @@ describe('every locale compiles and keeps the English placeholders', () => {
     expect(wrong, `${locale} renames placeholders, so they never resolve:\n  ${wrong.join('\n  ')}`).toEqual([]);
   });
 });
+
+// SD-1141. `travel.*` and `wallet.*` belong to products the licence can switch
+// off (SD-1074). When it does, those screens are unreachable and their
+// translations stop being worth commissioning - which is fine until a screen
+// that IS reachable borrows a key from one of them.
+//
+// QuoteDisplay.vue did exactly that: it labelled the transfer wizard's quote
+// summary with `travel.destination` and `wallet.amount`. On Xenvia the licence
+// returns no products at all, so those two namespaces were untranslated on
+// purpose - and a customer sending money read "Destination" and "Amount" in
+// English on the last screen before paying. Found by walking the deployed app;
+// no count of translated keys could have shown it.
+describe('a reachable screen does not borrow copy from a product namespace', () => {
+  const PRODUCT_NAMESPACES = ['travel', 'wallet'];
+
+  // Where each product's own screens live. A file under one of these may of
+  // course use its own namespace.
+  const OWNS = {
+    travel: [/^src\/views\/Travel\//],
+    wallet: [/^src\/views\/Wallet\//, /^src\/components\/Wallet\//],
+  };
+
+  const filesUnder = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return filesUnder(path);
+    return /\.(vue|js)$/.test(entry.name) ? [path] : [];
+  });
+
+  it.each(PRODUCT_NAMESPACES)('%s keys are only asked for by that product', (namespace) => {
+    const asks = new RegExp(`(?<![\\w$.])\\$?t\\(\\s*'${namespace}\\.`);
+    const owns = OWNS[namespace];
+
+    const borrowers = filesUnder('src')
+      .filter(file => ! file.startsWith('src/locales/'))
+      .filter(file => ! owns.some(pattern => pattern.test(file)))
+      .filter(file => asks.test(read(file)));
+
+    expect(borrowers, `these are reachable when ${namespace} is unlicensed, and would read English:\n  ${borrowers.join('\n  ')}`)
+      .toEqual([]);
+  });
+});
