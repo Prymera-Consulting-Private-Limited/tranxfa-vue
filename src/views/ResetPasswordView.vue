@@ -133,7 +133,7 @@ const passwordRequirementsSummary = computed(() => {
   if (allPasswordRulesMet.value) {
     return t('auth.resetPassword.requirementsMet');
   }
-  return `${unmetPasswordRulesCount.value} of ${totalPasswordRulesCount.value} not met`;
+  return t('auth.resetPassword.unmetpasswordrulescountOfTotalpasswordrulescountNot', {unmetPasswordRulesCount: unmetPasswordRulesCount.value, totalPasswordRulesCount: totalPasswordRulesCount.value});
 });
 
 const passwordRequirementsHeaderClass = computed(() => {

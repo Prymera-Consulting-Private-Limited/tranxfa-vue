@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import {acceptFor, DOCUMENT_TYPES, MAX_UPLOAD_MB, validateUpload} from "@/composables/upload_rules.js";
@@ -89,7 +93,7 @@ const uploadFile = async (fileObj) => {
     preSignedUrl = await getPreSignedUrl(fileObj.file);
   } catch (e) {
     fileObj.status = 'failed';
-    fileObj.reason = failureMessage(e, "We couldn't prepare this file for upload.");
+    fileObj.reason = failureMessage(e, t('verification.weCouldntPrepareThis'));
     return;
   }
   fileObj.status = 'uploading';
@@ -99,7 +103,7 @@ const uploadFile = async (fileObj) => {
     fileObj.status = 'completed';
   } catch (e) {
     fileObj.status = 'failed';
-    fileObj.reason = "The upload was interrupted. Check your connection and try again.";
+    fileObj.reason = t('verification.theUploadWasInterrupted');
   }
 };
 
@@ -152,7 +156,7 @@ async function save() {
     emit('sdkApplicantStatusChanged', response.data);
   }).catch((e) => {
     logRequestFailure(e, 'upload-document');
-    saveFailure.value = failureMessage(e, "We couldn't attach these files to your account. Your files are still here, so please try again.");
+    saveFailure.value = failureMessage(e, t('verification.weCouldntAttachThese'));
   }).finally(() => {
     isSaving.value = false;
   });

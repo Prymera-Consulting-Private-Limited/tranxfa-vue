@@ -29,6 +29,8 @@ them. That produced, on the one brand that needed it:
 | `scripts/i18n-extract.py` | Moves a component's copy into the catalogue, leaving anything it cannot place confidently |
 | `scripts/i18n-render-check.py` | Proves a migration changed no rendered English, by comparing the text each template renders before and after |
 | `scripts/i18n-compose.py` | Puts a sentence the markup split back together as one `<i18n-t>` message with a slot per styled part |
+| `scripts/i18n-expression-sweep.py` | Lists copy hiding inside a template expression, where a text sweep cannot see it |
+| `scripts/i18n-script-sweep.py` | Lists copy in a component's script block: navigation labels, failure fallbacks, toasts |
 
 English is both source and fallback, so a half-translated brand reads in
 English rather than showing raw keys. That matters: a missing translation must
@@ -133,6 +135,23 @@ carrying copy and merges from `main` stop conflicting on it.
 - **Dates and numbers are not strings** and never appear in a sweep. They
   follow the locale set in `src/main.js`. A brand that forgets this renders
   "Thursday" beside its own language.
+- **A spelled-out date format is a decision that belongs to the language.**
+  `MMM D, YYYY h:mm A` gives "septiembre 12, 2026 02:39 AM": the month
+  translates, the order and the clock do not. Ask by meaning instead, with the
+  formats each locale defines for itself, and Spanish reads "12 de septiembre
+  de 2026, 2:39".
+
+  | Ask for | English | Spanish |
+  | --- | --- | --- |
+  | `ll` | Sep 12, 2026 | 12 de sep. de 2026 |
+  | `lll` | Sep 12, 2026 2:39 AM | 12 de sep. de 2026 2:39 |
+  | `LLL` | September 12, 2026 2:39 AM | 12 de septiembre de 2026 2:39 |
+  | `LT` | 2:39 AM | 2:39 |
+
+  `scripts/i18n-date-formats.py` does the swap and lists what it kept. A format
+  sent to an API, such as `YYYY-MM-DD`, is not display and stays. A day and
+  month without a year has no localised equivalent, so those stay too and are
+  the ones to look at if a language needs a different order.
 - **Text the back office sends** (transfer statuses, document categories,
   purposes, relationships) is not in the catalogue and cannot be. It is
   translated in the console, by whoever owns that environment.
@@ -153,9 +172,74 @@ carrying copy and merges from `main` stop conflicting on it.
 - **An interpolation can contain `>`.** An arrow function inside `{{ }}` used
   to break the extractor's idea of where a text node ends. It now leaves any
   node whose braces do not balance; if you write one, check the result.
-- **A literal inside an attribute expression** (`:aria-label="open ? 'Hide' :
-  'Show'"`) is invisible to the extractor and to a text sweep. Only reading
-  finds those.
+- **A literal inside an expression** (`{{ ok ? 'Yes' : 'No' }}`, `:aria-label="open ? 'Hide' : 'Show'"`)
+  is not a text node, so no extractor will find it. The catalogue guard now
+  fails on these, and `scripts/i18n-expression-sweep.py` lists them. It knows
+  the difference between copy and a Tailwind class list, an icon class, a date
+  format, an enum and a value being compared against.
+
+### A guard rule that rejects too much
+
+`\s*` crosses a newline. Two rules in the script sweep and its guard used it to
+mean "beside", and so rejected far more than they were written to reject:
+
+```python
+if re.search(r'[+\w)\]]\s*$', before):   # meant for  x + 'foo'
+if re.match(r'\s*[+\w]', after[:12]):     # meant for  'foo' + x
+```
+
+`return 'Sold out'` matched the first rule on the `n` of `return`, so **every
+returned sentence in every script block was invisible to both the sweep and the
+guard**, which is how a computed label is usually written. The second rule did
+the same job from the other side: a literal at the end of a line was skipped
+whenever the next line happened to start with a word character. The sweep
+reported zero literals and was believed.
+
+A concatenation means a `+` beside the literal **on the same line**:
+
+```python
+if re.search(r'\+[ \t]*$', before):
+if re.match(r'[ \t]*\+', after[:12]):
+```
+
+The lesson generalises: when a guard reports nothing, prove it can still fail.
+Reintroduce the thing it is supposed to catch, in the shape real code uses.
+
+## The four places copy hides
+
+Each needed its own tool, because each is invisible to the one before:
+
+1. **A text node or a known attribute.** `scripts/i18n-extract.py`.
+2. **A sentence the markup split** around a link or a bold value.
+   `scripts/i18n-compose.py`, rendered with `<i18n-t>`.
+3. **A literal inside a template expression**, `{{ ok ? 'Yes' : 'No' }}`.
+   `scripts/i18n-expression-sweep.py`.
+4. **A literal in the script block**, rendered as data: the navigation labels,
+   the failure fallbacks, a computed label, a returned sentence.
+   `scripts/i18n-script-sweep.py`, which reads every `<script>` block in the
+   file - a component written as `<script>` plus `<script setup>` used to be
+   half scanned.
+
+A fifth thing has to hold, and for a while it did not: **a `t(...)` call is
+only as good as the `t` the file can reach.** A sweep that replaces a literal
+and forgets the import leaves a `ReferenceError: t is not defined` on a branch
+that may go unrendered for weeks - which is exactly what happened on the
+dashboard, the wallet, sign-up and the KYC toasts. `scripts/i18n-scope-check.py`
+reports any file whose code calls `t(` with nothing named `t` in scope, and
+`tests/i18n-catalogue.spec.js` fails on the same condition. A component reaches
+`t` through `const {t} = useI18n()`; a module reaches it through the instance
+(see **Outside a component**). Run the scope check after every sweep, not only
+after a migration slice: it costs nothing and it is the one guard that catches a
+crash rather than a wrong word.
+
+The catalogue guard covers all four. Each sweep knows what is not copy: a
+Tailwind class list, an icon class, a date format, a media query, an enum, a
+slug, an event name, a compound written as one word, a developer log line, a
+value being compared against, a string being concatenated, a default for an
+environment variable such as `import.meta.env.VITE_APP_NAME || 'Payvel'`, which
+is configuration and not copy, and a default inside `defineProps`, which cannot
+call `t()` because Vue hoists it above `setup()`.
+Every one of those rules was paid for by a mistake this migration made.
 
 ## Where the migration stands
 

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import InlineFailure from "@/components/InlineFailure.vue";
 import {fixFor} from "@/composables/verification_routes.js";
 import {findTransactionForQuote, isOutcomeUnknown, MFA_REQUIRED_TYPE, saveCheckoutDraft, takeCheckoutDraft} from "@/composables/checkout_safety.js";
@@ -177,10 +181,10 @@ async function reconcileOutcome() {
       return;
     }
     outcomeUnknown.value = false;
-    preconditionFailedMessage.value = 'Your transfer was not created. Nothing has been charged. You can confirm it again.';
+    preconditionFailedMessage.value = t('transfer.wizard.yourTransferWasNot');
   } catch (e) {
     logRequestFailure(e, 'confirm-reconcile');
-    reconcileFailure.value = "We still couldn't reach the server. Check your transfers before confirming again.";
+    reconcileFailure.value = t('transfer.wizard.weStillCouldntReach');
   } finally {
     isReconciling.value = false;
   }
@@ -216,11 +220,11 @@ async function previewCoupon() {
       couponPreview.value = response.data;
     } else {
       // Soft-fail by design: the reason is written for the customer.
-      couponFailure.value = response.data?.failure_reason || "This code can't be used on this transfer.";
+      couponFailure.value = response.data?.failure_reason || t('transfer.wizard.thisCodeCantBe');
     }
   } catch (e) {
     logRequestFailure(e, 'coupon-validate');
-    couponFailure.value = failureMessage(e, "We couldn't check that code. Please try again.");
+    couponFailure.value = failureMessage(e, t('onboarding.weCouldntCheckThat'));
   } finally {
     isCouponBusy.value = false;
   }
@@ -238,7 +242,7 @@ async function applyCoupon() {
   } catch (e) {
     logRequestFailure(e, 'coupon-apply');
     // A 422 carries the same customer wording Validate returns.
-    couponFailure.value = failureMessage(e, "We couldn't apply that code. Please try again.");
+    couponFailure.value = failureMessage(e, t('transfer.wizard.weCouldntApplyThat'));
     couponPreview.value = null;
   } finally {
     isCouponBusy.value = false;
@@ -254,7 +258,7 @@ async function removeCoupon() {
     replaceQuote(response.data);
   } catch (e) {
     logRequestFailure(e, 'coupon-remove');
-    couponFailure.value = failureMessage(e, "We couldn't remove the code. Please try again.");
+    couponFailure.value = failureMessage(e, t('transfer.wizard.weCouldntRemoveThe'));
   } finally {
     isCouponBusy.value = false;
   }
@@ -282,7 +286,7 @@ const setRecipient =  async (recipient) => {
     send({ type: 'PROCEED' });
   }).catch((e) => {
     logRequestFailure(e, 'quote-set-recipient');
-    stepFailure.value = failureMessage(e, "We couldn't add that recipient to this transfer. Please choose them again.");
+    stepFailure.value = failureMessage(e, t('transfer.wizard.weCouldntAddThat'));
   });
   isLoading.value = false;
 }
@@ -333,7 +337,7 @@ const confirmQuote = async () => {
         // The rail already holds a deposit for this exact figure. Retrying
         // the same amount is refused again; a different amount goes through.
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = (error.response.data.message || 'You already have a transfer open for this exact amount.') + ' Change the amount and confirm again.';
+        preconditionFailedMessage.value = (error.response.data.message || t('transfer.wizard.youAlreadyHaveA')) + ' Change the amount and confirm again.';
       } else if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
@@ -379,7 +383,7 @@ const confirmQuote = async () => {
       } else if (error.response.data.type === "missing_recipient") {
         // The quote has no recipient any more (deleted, or a stale tab).
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = error.response.data.message || 'Please choose who to send this transfer to.';
+        preconditionFailedMessage.value = error.response.data.message || t('transfer.wizard.pleaseChooseWhoTo');
         await send({ type: 'SELECT_RECIPIENT' });
       } else if (fixFor(error.response.data.type, router.currentRoute.value.fullPath)) {
         // Something on the profile has to be finished first: a mobile number
@@ -389,7 +393,7 @@ const confirmQuote = async () => {
         await router.push(fixFor(error.response.data.type, router.currentRoute.value.fullPath).route);
       } else {
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = error.response.data.message || 'We could not confirm this transfer. Please try again.';
+        preconditionFailedMessage.value = error.response.data.message || t('transfer.wizard.weCouldNotConfirm');
       }
     } else if (error.response?.status === 422) {
       confirmFormErrors.value = error.response.data.errors;
@@ -403,7 +407,7 @@ const confirmQuote = async () => {
       await reconcileOutcome();
     } else {
       isStepProcessing.value = false;
-      preconditionFailedMessage.value = failureMessage(error, 'We could not confirm this transfer. Please try again.');
+      preconditionFailedMessage.value = failureMessage(error, t('transfer.wizard.weCouldNotConfirm'));
     }
   }
 }
@@ -439,7 +443,7 @@ async function documentUploaded() {
     }
   }).catch((e) => {
     logRequestFailure(e, 'quote-after-upload');
-    stepFailure.value = failureMessage(e, "Your document was received, but we couldn't refresh this transfer. Please reload the page.");
+    stepFailure.value = failureMessage(e, t('transfer.wizard.yourDocumentWasReceived'));
   });
   selectedUploadDocumentCategory.value = null;
   isLoading.value = false;
@@ -497,7 +501,7 @@ const applyInfoFromPoiDocument = async () => {
     confirmQuote();
   }).catch((e) => {
     logRequestFailure(e, 'apply-poi-details');
-    applyPoiFailure.value = failureMessage(e, "We couldn't copy the details from your document. Please try again or update your details by hand.");
+    applyPoiFailure.value = failureMessage(e, t('transfer.wizard.weCouldntCopyThe2'));
   }).finally(() => {
     isApplyingInfoFromPoiDocument.value = false;
   });
@@ -556,7 +560,7 @@ function loadPoiCategory() {
     send({ type: 'PROCEED' });
   }).catch((e) => {
     logRequestFailure(e, 'poi-category');
-    stepFailure.value = failureMessage(e, "We couldn't load the document upload. Please try again.");
+    stepFailure.value = failureMessage(e, t('transfer.wizard.weCouldntLoadThe10'));
   }).finally(() => {
     isLoading.value = false;
   });
@@ -606,7 +610,7 @@ const requestWalletSpendCode = async () => {
     isSpendOtpModalOpen.value = true;
   }).catch((error) => {
     isStepProcessing.value = false;
-    preconditionFailedMessage.value = error.response?.data?.message ?? 'Something went wrong. Please try again.';
+    preconditionFailedMessage.value = error.response?.data?.message ?? t('account.somethingWentWrongPlease');
   });
 }
 
@@ -689,7 +693,7 @@ const canContinue = computed(() => {
                       <p class="mt-1 text-sm/6 text-warning-800">{{ $t('transfer.wizard.itMayAlreadyExistWere') }}</p>
                       <p v-if="reconcileFailure" class="mt-2 text-sm/6 text-danger-700">{{ reconcileFailure }}</p>
                       <div class="mt-3 flex flex-wrap gap-3">
-                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? 'Checking…' : 'Check again' }}</button>
+                        <button type="button" @click="reconcileOutcome" :disabled="isReconciling" class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 text-sm/6 font-semibold text-white hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed">{{ isReconciling ? $t('transfer.wizard.checking') : $t('transfer.wizard.checkAgain') }}</button>
                         <router-link :to="{name: 'transactions'}" class="inline-flex min-h-11 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50">{{ $t('transfer.wizard.seeMyTransfers') }}</router-link>
                       </div>
                     </div>
@@ -834,11 +838,11 @@ const canContinue = computed(() => {
                       <template v-else>
                         <div class="mt-2 flex gap-2">
                           <input id="coupon-code" v-model="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="255" :placeholder="$t('transfer.wizard.enterCode')" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 uppercase focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" @keydown.enter.prevent="previewCoupon" />
-                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? 'Checking…' : 'Check code' }}</button>
+                          <button type="button" @click="previewCoupon" :disabled="isCouponBusy || ! couponCode.trim()" class="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 px-4 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">{{ isCouponBusy ? $t('transfer.wizard.checking') : $t('transfer.wizard.checkCode') }}</button>
                         </div>
                         <p v-if="couponFailure" role="alert" class="mt-2 text-sm/6 text-danger-700">{{ couponFailure }}</p>
                         <div v-if="couponPreview" role="status" class="mt-2 rounded-lg border border-info-200 bg-info-50 px-4 py-3 text-sm/6 text-info-800">
-                          <p class="font-semibold">{{ couponPreview.info_text || 'This code applies to your transfer.' }}</p>
+                          <p class="font-semibold">{{ couponPreview.info_text || $t('transfer.wizard.thisCodeAppliesTo') }}</p>
                           <p v-if="couponPreview.discount_amount">{{ $t('transfer.wizard.savesDiscountAmountIsoalphaOn', {discount_amount: couponPreview.discount_amount, isoAlpha: quote.data.paymentCurrency?.isoAlpha ?? ''}) }}</p>
                           <p v-else-if="couponPreview.adjusted_exchange_rate">{{ $t('transfer.wizard.improvesYourRateToAdjusted', {adjusted_exchange_rate: couponPreview.adjusted_exchange_rate}) }}</p>
                           <p v-if="couponPreview.terms_text" class="text-xs/5 text-info-700">{{ couponPreview.terms_text }}</p>
@@ -931,7 +935,7 @@ const canContinue = computed(() => {
                     <Spinner :class="'w-5 h-5 mr-3'"/>
                     <span>{{ $t('transfer.wizard.saving') }}</span>
                   </span>
-                  <span v-else>{{ snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? 'Pay with Wallet' : 'Continue' }}</span>
+                  <span v-else>{{ snapshot.value === 'confirm' && paymentMethod?.code === 'WALLET' ? $t('transfer.wizard.payWithWallet') : $t('common.continue') }}</span>
                 </button>
               </div>
             </section>

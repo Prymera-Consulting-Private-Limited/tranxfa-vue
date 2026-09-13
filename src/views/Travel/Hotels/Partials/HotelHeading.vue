@@ -2,11 +2,12 @@
 import {computed} from 'vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import {ArrowTopRightOnSquareIcon, ClockIcon, MapPinIcon} from '@heroicons/vue/24/outline';
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const props = defineProps({
-  /**
-   * @type {HotelDetail}
-   */
+  
   hotel: {
     type: Object,
     required: true,
@@ -20,11 +21,11 @@ const times = computed(() => {
   const parts = [];
 
   if (props.hotel.checkInFrom) {
-    parts.push(`Check in from ${props.hotel.checkInFrom}`);
+    parts.push(t('travel.checkInFromCheckinfrom', {checkInFrom: props.hotel.checkInFrom}));
   }
 
   if (props.hotel.checkOutUntil) {
-    parts.push(`check out by ${props.hotel.checkOutUntil}`);
+    parts.push(t('travel.checkOutByCheckoutuntil', {checkOutUntil: props.hotel.checkOutUntil}));
   }
 
   return parts.length ? parts.join(' · ') : null;

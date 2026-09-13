@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import moment from "moment";
 import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
@@ -79,7 +83,7 @@ const iHaveMadePayment = async () => {
   } catch (e) {
     props.transaction.payment.state.code = previousState;
     reportUnexpectedError(e, 'payment-sent');
-    confirmFailure.value = failureMessage(e, "We couldn't record that you've paid. Your transfer is still open, so please try again.");
+    confirmFailure.value = failureMessage(e, t('payment.provider.weCouldntRecordThat'));
   } finally {
     isConfirmingPayment.value = false;
   }
@@ -114,7 +118,7 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
 // Only the api knows whether this payment has a deadline; null means it
 // does not, and the line is left out rather than guessed.
 const payByFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('MMM D, YYYY h:mm A') : '';
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
 });
 </script>
 
@@ -185,7 +189,7 @@ const payByFormatted = computed(() => {
   <!-- Expired, cancelled and refunded payments rendered an empty modal here. -->
   <template v-else-if="status === 'cancelled'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
+    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? $t('payment.provider.thisPaymentHasExpired') : $t('payment.provider.thisPaymentWasCancelled') }}</h2>
     <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>

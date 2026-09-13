@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
@@ -52,7 +56,7 @@ async function authenticate() {
       otpError.value = e.response.data.message;
     } else {
       logRequestFailure(e, 'otp-sign-in');
-      otpError.value = failureMessage(e, "We couldn't check that code. Please try again.");
+      otpError.value = failureMessage(e, t('onboarding.weCouldntCheckThat'));
     }
   }).finally(() => {
     isLoading.value = false;
@@ -70,10 +74,10 @@ async function resend() {
   resentMessage.value = '';
   resendFailure.value = '';
   customerUtils.getLoginOtp(otpData.country.id, otpData.number).then(() => {
-    resentMessage.value = "We've sent a new code by SMS. It can take a minute to arrive.";
+    resentMessage.value = t('onboarding.weveSentANew');
   }).catch(async (e) => {
     logRequestFailure(e, 'otp-sign-in');
-    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
+    resendFailure.value = failureMessage(e, t('onboarding.weCouldntSendA'));
   }).finally(() => {
     isResendingOtp.value = false;
   });

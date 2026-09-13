@@ -1,5 +1,8 @@
 <script setup>
 import moment from 'moment';
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const props = defineProps({
   /**
@@ -22,19 +25,19 @@ const props = defineProps({
 function note(payment) {
   switch (payment.state) {
     case 'FAILED':
-      return "This attempt didn't go through. You haven't been charged for it.";
+      return t('travel.paymentAttemptFailed');
 
     case 'TIMED-OUT':
-      return 'This attempt timed out before it completed.';
+      return t('travel.paymentAttemptTimedOut');
 
     case 'CANCELLED':
-      return 'This attempt was cancelled.';
+      return t('travel.paymentAttemptCancelled');
 
     case 'REFUNDED':
-      return 'This payment has been refunded in full.';
+      return t('travel.paymentRefundedInFull');
 
     case 'PART-REFUNDED':
-      return 'Part of this payment has been refunded.';
+      return t('travel.paymentPartlyRefunded');
 
     default:
       return null;
@@ -84,7 +87,7 @@ function classes(payment) {
             <span v-if="payment.method" class="text-sm/6 text-gray-600">{{ payment.method }}</span>
           </div>
           <p v-if="note(payment)" class="mt-1.5 text-xs/5 text-gray-500">{{ note(payment) }}</p>
-          <p v-if="payment.attemptedAt" class="mt-1 text-xs/5 text-gray-500">{{ moment(payment.attemptedAt).format('D MMM YYYY, HH:mm') }}</p>
+          <p v-if="payment.attemptedAt" class="mt-1 text-xs/5 text-gray-500">{{ moment(payment.attemptedAt).format('lll') }}</p>
         </div>
         <p class="shrink-0 text-sm/6 font-medium text-gray-900 tabular-nums">{{ payment.amount.currencyPrefixed }}</p>
       </li>

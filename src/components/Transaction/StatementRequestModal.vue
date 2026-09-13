@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import { computed, reactive, ref, watch } from "vue";
 import moment from "moment";
 import VueDatePicker from "@vuepic/vue-datepicker";
@@ -77,28 +81,28 @@ function validateClient() {
   const end = formatDateForApi(form.endDate);
 
   if (!start) {
-    formErrors.start_date = ["Please select a start date."];
+    formErrors.start_date = [t('account.pleaseSelectAStart')];
     valid = false;
   } else if (moment(start).isAfter(today.value, "day")) {
-    formErrors.start_date = ["Start date cannot be in the future."];
+    formErrors.start_date = [t('account.startDateCannotBe')];
     valid = false;
   }
 
   if (!end) {
-    formErrors.end_date = ["Please select an end date."];
+    formErrors.end_date = [t('account.pleaseSelectAnEnd')];
     valid = false;
   } else if (moment(end).isAfter(today.value, "day")) {
-    formErrors.end_date = ["End date cannot be in the future."];
+    formErrors.end_date = [t('account.endDateCannotBe')];
     valid = false;
   }
 
   if (start && end && moment(start).isAfter(end, "day")) {
-    formErrors.end_date = ["End date must be on or after the start date."];
+    formErrors.end_date = [t('account.endDateMustBe')];
     valid = false;
   }
 
   if (form.email.trim() && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email.trim())) {
-    formErrors.email = ["Please enter a valid email address."];
+    formErrors.email = [t('account.pleaseEnterAValid')];
     valid = false;
   }
 
@@ -160,12 +164,12 @@ async function submit() {
     const response = await statementUtils.requestStatement(payload);
     const message =
       response.data?.message ??
-      "Statement generation started successfully. Please check your email shortly.";
+      t('account.statementGenerationStartedSuccessfully');
 
     notify(
       {
         group: "customer",
-        title: "Statement requested",
+        title: t('account.statementRequested'),
         text: message,
         type: "success",
       },
@@ -178,11 +182,11 @@ async function submit() {
     if (status === 412) {
       formErrors.general =
         error.response?.data?.message ??
-        "Your account must be fully verified to download statements.";
+        t('account.yourAccountMustBe');
       notify(
         {
           group: "customer",
-          title: "Verification required",
+          title: t('account.verificationRequired'),
           text: formErrors.general,
           type: "warning",
         },
@@ -205,12 +209,12 @@ async function submit() {
         !formErrors.email.length &&
         !formErrors.currency.length
       ) {
-        formErrors.general = error.response?.data?.message ?? "Please check the form and try again.";
+        formErrors.general = error.response?.data?.message ?? t('account.pleaseCheckTheForm');
       }
       return;
     }
 
-    formErrors.general = "Something went wrong. Please try again.";
+    formErrors.general = t('account.somethingWentWrongPlease');
   } finally {
     isSubmitting.value = false;
   }

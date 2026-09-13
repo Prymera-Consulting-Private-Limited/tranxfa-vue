@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed} from 'vue';
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 
@@ -19,10 +23,10 @@ const label = computed(() => {
   }
 
   if (props.allotment <= 0) {
-    return 'Sold out';
+    return t('travel.soldOut');
   }
 
-  return props.allotment === 1 ? 'Last room' : null;
+  return props.allotment === 1 ? t('travel.lastRoom') : null;
 });
 
 const classes = computed(() => {

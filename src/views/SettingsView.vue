@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import { UserIcon, HomeIcon, PhoneIcon, LockClosedIcon, DevicePhoneMobileIcon, WalletIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
@@ -41,17 +45,17 @@ const closeWallet = async () => {
     notify(
         {
           group: 'customer',
-          title: 'Wallet Closed',
-          text: 'Your wallet subscription has been closed.',
+          title: t('account.walletClosed'),
+          text: t('account.yourWalletSubscriptionHas'),
           type: 'success',
         },
         -1,
     )
   }).catch((e) => {
     if (e.response?.data?.type === WalletRefusalType.BALANCE_MUST_BE_ZERO) {
-      closeWalletError.value = (e.response.data.message ?? 'Your wallet still holds money.') + ' Spend or withdraw the balance first, then close the wallet.';
+      closeWalletError.value = (e.response.data.message ?? t('account.yourWalletStillHolds')) + ' Spend or withdraw the balance first, then close the wallet.';
     } else {
-      closeWalletError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+      closeWalletError.value = e.response?.data?.message ?? t('account.somethingWentWrongPlease');
     }
   }).finally(() => {
     isClosingWallet.value = false;
@@ -76,8 +80,8 @@ const identityUpdated = () => {
   notify(
       {
         group: 'customer',
-        title: 'Personal Details Updated',
-        text: 'Your personal information has been successfully updated.',
+        title: t('account.personalDetailsUpdated'),
+        text: t('account.yourPersonalInformationHas'),
         type: 'success',
       },
       -1,
@@ -89,8 +93,8 @@ const addressUpdated = () => {
   notify(
       {
         group: 'customer',
-        title: 'Address Updated',
-        text: 'Your address details have been successfully updated.',
+        title: t('account.addressUpdated'),
+        text: t('account.yourAddressDetailsHave'),
         type: 'success',
       },
       -1,
@@ -207,7 +211,7 @@ const passwordChanged = async () => {
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.IDENTITY}`"
                       v-bind:showLoading="showLoading"
-                      v-bind:saveBtnText="'Save Changes'"
+                      v-bind:saveBtnText="$t('account.saveChanges')"
                       v-on:customer:attribute_category:updated="identityUpdated"
                       v-on:customer:attribute_category:update_failed="identityUpdateFailed"
                   />
@@ -238,7 +242,7 @@ const passwordChanged = async () => {
                   <CustomerAttributeForm
                       v-bind:categories="`${CustomerAttributeCategory.ADDRESS}`"
                       v-bind:showLoading="showLoading"
-                      v-bind:saveBtnText="'Save Changes'"
+                      v-bind:saveBtnText="$t('account.saveChanges')"
                       v-on:customer:attribute_category:updated="addressUpdated"
                       v-on:customer:attribute_category:update_failed="addressUpdateFailed"
                   />
@@ -272,7 +276,7 @@ const passwordChanged = async () => {
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row">
                   <button type="button" class="inline-flex w-full justify-center rounded-md bg-danger-600 px-3 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-danger-500 sm:mr-3 sm:w-auto cursor-pointer" @click="closeWallet" :disabled="isClosingWallet">
-                    {{ isClosingWallet ? 'Closing...' : 'Close Wallet' }}
+                    {{ isClosingWallet ? 'Closing...' : $t('account.closeWallet') }}
                   </button>
                   <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm/6 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cursor-pointer" @click="isCloseWalletModalOpen = false" :disabled="isClosingWallet">{{ $t('account.keepWallet') }}</button>
                 </div>

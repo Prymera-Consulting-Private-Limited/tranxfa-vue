@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {CheckIcon} from "@heroicons/vue/24/outline";
 import {computed} from "vue";
 import TransactionQuote from "@/models/transaction_quote.js";
@@ -23,48 +27,48 @@ const props = defineProps({
 const steps = [
   {
     id: 'selectRecipient',
-    name: 'Choose your recipient',
-    description: 'Tell us who you are sending money to by providing their name and transfer information.',
+    name: t('account.chooseYourRecipient'),
+    description: t('account.tellUsWhoYou'),
     show: true,
     stepCommand: 'SELECT_RECIPIENT',
     isMain: true,
   },
   {
     id: 'addRecipient',
-    name: 'Add Recipient Details',
-    description: 'Tell us who you are sending money to by providing their name and transfer information.',
+    name: t('account.addRecipientDetails'),
+    description: t('account.tellUsWhoYou'),
     show: false,
     stepCommand: 'ADD_RECIPIENT',
     isMain: false,
   },
   {
     id: 'provideAddress',
-    name: 'Provide Your Address',
-    description: 'For security and compliance, we need your address details before proceeding.',
+    name: t('transfer.wizard.provideYourAddress'),
+    description: t('account.forSecurityAndCompliance2'),
     show: false,
     stepCommand: null,
     isMain: false,
   },
   {
     id: 'accountVerification',
-    name: 'Account verification',
-    description: 'For security and compliance, please verify your account before proceeding with the transaction.',
+    name: t('verification.backToVerification'),
+    description: t('account.forSecurityAndCompliance'),
     show: false,
     stepCommand: null,
     isMain: false,
   },
   {
     id: 'confirm',
-    name: 'Review & Confirm',
-    description: 'Double-check all details before finalizing your transfer.',
+    name: t('transfer.wizard.reviewConfirm'),
+    description: t('account.doubleCheckAllDetails'),
     show: true,
     stepCommand: null,
     isMain: true,
   },
   {
     id: 'makePayment',
-    name: 'Make Payment',
-    description: 'Complete your transfer by choosing a payment method and sending the funds.',
+    name: t('routes.makePayment'),
+    description: t('account.completeYourTransferBy'),
     show: true,
     stepCommand: null,
     isMain: true,
@@ -107,7 +111,7 @@ const progress = computed(() => {
     
     // Update step name if needed
     const name = step.id === 'checkRecipients' && props.quote 
-      ? `Transfer to ${props.quote?.payoutCountry?.commonName}`
+      ? t('account.transferToCommonname', {commonName: props.quote?.payoutCountry?.commonName})
       : step.name;
     
     return {
