@@ -11,17 +11,61 @@
 import {flag} from '@/feature_flags.js';
 
 /**
- * Collect the customer's residential address during onboarding.
+ * How onboarding treats the customer's residential address.
  *
- * Turning this off does not mean the address is never collected: the transfer
- * wizard still asks for it when the backend answers 412
- * incomplete_customer_address on confirm. It only decides whether onboarding
- * asks up front.
+ * Three deployments already wanted three different answers, and a boolean can
+ * only hold two - which is why one of them stopped using the flag and edited
+ * the state machine on a branch instead:
+ *
+ *   required   ask for it, and do not let the customer past until it is given.
+ *              tranxfa's behaviour, and the default.
+ *   optional   ask for it, and offer "Skip for now". quiqsend built exactly
+ *              this by hand on its branch, down to the button and the copy.
+ *   omitted    never ask. payvel, which has no AddressInformation component at
+ *              all - targeting the step there would render nothing.
+ *
+ * None of these mean the address is never collected. The transfer wizard still
+ * asks when the backend answers 412 `incomplete_customer_address` on confirm.
+ * This only decides what onboarding does up front.
+ *
+ * @returns {'required'|'optional'|'omitted'}
+ */
+export function addressCollection() {
+    const mode = import.meta.env.VITE_ONBOARDING_ADDRESS;
+
+    if (['required', 'optional', 'omitted'].includes(mode)) {
+        return mode;
+    }
+
+    // The boolean this replaces. payvel's Amplify environment sets it to false
+    // today, and payvel cannot render an address step, so ignoring it here
+    // would point that deployment at a screen that does not exist. It keeps
+    // working until every environment has moved to VITE_ONBOARDING_ADDRESS.
+    const legacy = import.meta.env.VITE_ONBOARDING_COLLECT_ADDRESS;
+
+    if (legacy !== undefined && legacy !== '') {
+        return flag(legacy, true) ? 'required' : 'omitted';
+    }
+
+    return 'required';
+}
+
+/**
+ * Whether the address step can appear at all. False only for `omitted`.
  *
  * @returns {boolean}
  */
 export function collectsAddress() {
-    return flag(import.meta.env.VITE_ONBOARDING_COLLECT_ADDRESS, true);
+    return addressCollection() !== 'omitted';
+}
+
+/**
+ * Whether the customer may leave the address step without completing it.
+ *
+ * @returns {boolean}
+ */
+export function addressIsSkippable() {
+    return addressCollection() === 'optional';
 }
 
 /**

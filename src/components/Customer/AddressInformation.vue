@@ -7,6 +7,7 @@ import {useCountriesStore} from "@/stores/countries.js";
 import CustomerAttributeForm from "@/components/Customer/CustomerAttributeForm.vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import {useCountryUtils} from "@/composables/country_utils.js";
+import {addressIsSkippable} from "@/onboarding_config.js";
 
 const isLoading = ref(false)
 const customerStore = useCustomerStore()
@@ -29,10 +30,18 @@ const showLoading = computed(() => {
   return isLoading.value || customerStore.isLoaded === false || countriesStore.isLoaded === false;
 })
 
-const emit = defineEmits(['addressUpdated', 'editPersonalInformationRequested'])
+const emit = defineEmits(['addressUpdated', 'editPersonalInformationRequested', 'addressSkipped'])
 
 const addressUpdated = () => {
   emit('addressUpdated')
+}
+
+// Only offered where the deployment marks the address optional. The workflow
+// treats it as an ordinary PROCEED - nothing is saved, and the transfer wizard
+// asks for the address later when the backend answers 412
+// incomplete_customer_address.
+const skip = () => {
+  emit('addressSkipped');
 }
 
 const editPersonalInformation = () => {
@@ -58,6 +67,21 @@ const editPersonalInformation = () => {
           v-bind:showLoading="showLoading"
           v-on:customer:attribute_category:updated="addressUpdated"
       />
+      <!-- Only where the deployment marks the address optional. The hint says
+           where it will be asked for instead, so skipping does not read as
+           dodging something that never comes back. -->
+      <div v-if="addressIsSkippable()" class="mt-6">
+        <p class="text-center text-sm/6 text-gray-500">{{ $t('onboarding.addressSkipHint') }}</p>
+        <button
+            @click="skip"
+            :disabled="showLoading"
+            :class="{'opacity-70': showLoading}"
+            type="button"
+            class="mt-3 block min-h-11 w-full cursor-pointer rounded-xl bg-gray-100 px-6 py-3 text-sm/6 font-semibold text-gray-700 transition hover:bg-gray-200">
+          {{ $t('onboarding.skipForNow') }}
+        </button>
+      </div>
+
       <div class="text-center mt-12">
         <a @click="editPersonalInformation" class="inline-flex items-center rounded-full px-3 py-1.5 text-sm/6 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline" href="javascript:">{{ $t('onboarding.editPersonalInformation') }}</a>
       </div>
