@@ -71,11 +71,24 @@ caught only by reading the result afterwards:
 
 Neither a build nor a test suite catches that class. Reading the file does.
 
-The exception is the checked-in tooling that exists to rewrite files -
-`scripts/i18n-extract.py` and the sweeps beside it. Those are reviewed code with
-a job. Using one does not excuse you from reading every file it touched before
-the change is committed, and `scripts/i18n-render-check.py` has to show the
-rendered output did not move.
+There is no exception. The eight Python tools written for the localisation work
+- the extractor, the composer, the date rewriter, the three sweeps, the scope
+check and the render check, plus `reapply-brand-copy.py` - are deleted. They
+existed to do at scale the thing this rule forbids, and they were themselves the
+source of several defects: a sweep that could not see `return 'copy'`, one that
+keyed a CSS animation value as a sentence, an extractor that exempted the button
+a customer presses to move their money.
+
+What they detected is not lost. It is in the suite, where it runs on every
+change instead of when somebody remembers to run a script:
+`tests/i18n-catalogue.spec.js` holds the guards for bare text nodes, copy in an
+expression, copy in a script block, a word beside an interpolation, a `t()` with
+no `t` in scope, a catalogue that does not compile and a translation that
+renames a placeholder; `tests/tailwind-classes.spec.js` holds the one for a
+class built at runtime.
+
+Moving copy into a catalogue is now what it should always have been: open the
+file, move the string, run the suite.
 
 ## Layering (do not short-circuit it)
 
