@@ -118,7 +118,7 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
 // Only the api knows whether this payment has a deadline; null means it
 // does not, and the line is left out rather than guessed.
 const payByFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('MMM D, YYYY h:mm A') : '';
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
 });
 </script>
 

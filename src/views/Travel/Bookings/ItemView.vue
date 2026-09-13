@@ -35,7 +35,7 @@ const stay = computed(() => {
     return null;
   }
 
-  return `${moment(order.value.checkIn).format('ddd D MMM YYYY')} – ${moment(order.value.checkOut).format('ddd D MMM YYYY')}`;
+  return `${moment(order.value.checkIn).format('llll')} – ${moment(order.value.checkOut).format('llll')}`;
 });
 
 const guests = computed(() => {
@@ -248,11 +248,11 @@ onUnmounted(() => {
                 </div>
                 <div v-if="order.bookedAt" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
                   <dt class="text-sm/6 text-gray-500">{{ $t('travel.booked') }}</dt>
-                  <dd class="text-sm/6 font-medium text-gray-900">{{ moment(order.bookedAt).format('D MMM YYYY, HH:mm') }}</dd>
+                  <dd class="text-sm/6 font-medium text-gray-900">{{ moment(order.bookedAt).format('lll') }}</dd>
                 </div>
                 <div v-if="order.confirmedAt" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
                   <dt class="text-sm/6 text-gray-500">{{ $t('travel.confirmedByTheHotel') }}</dt>
-                  <dd class="text-sm/6 font-medium text-gray-900">{{ moment(order.confirmedAt).format('D MMM YYYY, HH:mm') }}</dd>
+                  <dd class="text-sm/6 font-medium text-gray-900">{{ moment(order.confirmedAt).format('lll') }}</dd>
                 </div>
               </dl>
             </section>

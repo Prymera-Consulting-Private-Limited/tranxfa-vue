@@ -86,7 +86,7 @@ const requestClasses = computed(() => {
 const isOwedMoney = computed(() => isCancelled.value && (request.value?.refundOwed?.amount ?? 0) > 0);
 
 const requestedOn = computed(() => {
-  return request.value?.requestedAt ? moment(request.value.requestedAt).format('D MMM YYYY, HH:mm') : null;
+  return request.value?.requestedAt ? moment(request.value.requestedAt).format('lll') : null;
 });
 </script>
 

@@ -229,7 +229,7 @@ function close() {
                   <ClientPaymentAccount v-bind:account="account" />
                 </template>
 
-                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.thisDeclarationExpiresFromnowA', {fromNow: moment(declaration.expiresAt).fromNow(), A: moment(declaration.expiresAt).format('MMMM D, YYYY h:mm A')}) }}</p>
+                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.thisDeclarationExpiresFromnowA', {fromNow: moment(declaration.expiresAt).fromNow(), A: moment(declaration.expiresAt).format('LLL')}) }}</p>
 
                 <button type="button" @click="close" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">{{ $t('wallet.done') }}</button>
               </template>
