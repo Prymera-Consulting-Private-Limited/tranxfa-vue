@@ -92,7 +92,7 @@ const bestToken = computed(() => {
             <div class="flex shrink-0 items-end justify-between gap-4 sm:w-48 sm:flex-col sm:items-stretch sm:gap-3 sm:border-l sm:border-gray-100 sm:pl-6">
               <div class="sm:text-right">
                 <p class="text-lg font-semibold tracking-tight text-gray-900 tabular-nums">{{ rate.total.currencyPrefixed }}</p>
-                <p v-if="rate.perNight.isStated && nights" class="mt-0.5 text-xs/5 text-gray-500">{{ rate.perNight.currencyPrefixed }} / night</p>
+                <p v-if="rate.perNight.isStated && nights" class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.pricePerNight', {currencyPrefixed: rate.perNight.currencyPrefixed}) }}</p>
               </div>
               <!-- A rate with no token cannot be taken forward, so it is shown priced but not offered. -->
               <button

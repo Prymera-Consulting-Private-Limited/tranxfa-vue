@@ -69,7 +69,7 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
         <CalendarDaysIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
         <span>
           {{ stay }}
-          <span v-if="search?.nights" class="text-gray-500">· {{ search.nights }} night{{ search.nights === 1 ? '' : 's' }}</span>
+          <span v-if="search?.nights" class="text-gray-500">· {{ $t('travel.nightCount', search.nights, {count: search.nights}) }}</span>
         </span>
       </p>
       <p v-if="guests.length" class="flex items-start gap-2 text-gray-700">
@@ -82,7 +82,7 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
         <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('travel.yourRoom') }}</p>
         <p class="mt-1 text-sm/6 font-medium text-gray-900">{{ selected.roomName }}</p>
         <p class="mt-3 text-2xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ selected.total.currencyPrefixed }}</p>
-        <p v-if="selected.perNight.isStated" class="mt-0.5 text-xs/5 text-gray-500">{{ selected.perNight.currencyPrefixed }} / night</p>
+        <p v-if="selected.perNight.isStated" class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.pricePerNight', {currencyPrefixed: selected.perNight.currencyPrefixed}) }}</p>
         <div class="mt-3">
           <HotelCancellationBadge :cancellation="selected.cancellation" />
         </div>

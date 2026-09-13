@@ -145,7 +145,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown));
       <div class="fixed inset-0 bg-gray-950/90 backdrop-blur-sm" aria-hidden="true" />
       <div class="fixed inset-0 flex flex-col items-center justify-center gap-4 p-4 sm:p-8">
         <DialogPanel class="flex w-full max-w-6xl flex-col items-center gap-4">
-          <DialogTitle class="sr-only">{{ name }} photos</DialogTitle>
+          <DialogTitle class="sr-only">{{ $t('travel.hotelPhotos', {name: name}) }}</DialogTitle>
           <div class="relative w-full">
             <img v-if="current" :src="current.xlarge ?? current.large" :alt="name" class="max-h-[70vh] w-full rounded-2xl object-contain">
             <template v-if="photos.length > 1">

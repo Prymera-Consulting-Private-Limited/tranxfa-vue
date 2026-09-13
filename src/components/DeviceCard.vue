@@ -103,7 +103,7 @@ const handleDelete = async () => {
       </div>
       <InlineFailure :message="signOutFailure" />
 
-      <p class="text-xs/5 mt-0.5">Last used {{ timeUtils.getNiceTime(device.touchedAt) }}</p>
+      <p class="text-xs/5 mt-0.5">{{ $t('account.lastUsed', {touchedAt: timeUtils.getNiceTime(device.touchedAt)}) }}</p>
 
       <TransitionRoot as="template" :show="isConfirmDeleteModalOpen">
         <Dialog as="div" class="relative z-10" @close="isConfirmDeleteModalOpen = false">

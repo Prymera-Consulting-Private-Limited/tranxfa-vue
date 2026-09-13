@@ -115,14 +115,14 @@ function formatPrice(amount) {
     >
       <span class="flex items-center gap-2 text-sm/6 font-semibold text-gray-900">
         <AdjustmentsHorizontalIcon class="size-5 text-gray-400" aria-hidden="true" />{{ $t('travel.filters') }}</span>
-      <span class="text-xs/5 text-gray-500">{{ matchCount }} of {{ totalCount }}</span>
+      <span class="text-xs/5 text-gray-500">{{ $t('travel.matchOfTotal', {matchCount: matchCount, totalCount: totalCount}) }}</span>
     </button>
     <div :class="[isOpen ? 'mt-3 block' : 'hidden', 'divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white shadow-xs lg:sticky lg:top-6 lg:mt-0 lg:block']">
       <!-- Heading -->
       <header class="flex items-baseline justify-between gap-3 px-4 py-3">
         <div>
           <h3 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.filters') }}</h3>
-          <p class="mt-0.5 text-xs/5 text-gray-500">{{ matchCount }} of {{ totalCount }} hotel{{ totalCount === 1 ? '' : 's' }}</p>
+          <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.matchOfTotalHotels', totalCount, {matchCount: matchCount, totalCount: totalCount}) }}</p>
         </div>
         <button
             v-if="isActive"
@@ -135,9 +135,7 @@ function formatPrice(amount) {
       <section v-if="hasPriceRange" class="px-4 py-3">
         <div class="flex items-baseline justify-between gap-2">
           <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">{{ $t('travel.totalPrice') }}</h4>
-          <p class="text-xs/5 font-medium text-gray-900">
-            up to {{ facets.price.currency }} {{ formatPrice(maxPrice) }}
-          </p>
+          <p class="text-xs/5 font-medium text-gray-900">{{ $t('travel.upToPrice', {currency: facets.price.currency, maxPrice: formatPrice(maxPrice)}) }}</p>
         </div>
         <input
             type="range"

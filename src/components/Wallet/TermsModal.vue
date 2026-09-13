@@ -163,7 +163,7 @@ function close() {
                 </div>
                 <template v-else-if="terms">
                   <div class="mt-4 max-h-64 overflow-y-auto whitespace-pre-line rounded-md border border-gray-200 bg-gray-50 p-4 text-sm/6 text-gray-700">{{ terms.content }}</div>
-                  <p class="mt-2 text-xs/5 text-gray-500">Version {{ terms.version }}</p>
+                  <p class="mt-2 text-xs/5 text-gray-500">{{ $t('account.termsVersion', {version: terms.version}) }}</p>
                   <div class="mt-4 flex items-start space-x-2">
                     <input type="checkbox" id="wallet-terms-accepted" v-model="accepted" class="mt-1 w-4 h-4 min-w-4 min-h-4 text-brand-700 border-gray-300 rounded focus:ring-brand-700 focus:ring-0 outline-none accent-brand-700" />
                     <label for="wallet-terms-accepted" class="text-sm/6 text-gray-700">{{ $t('wallet.iHaveReadAndAccept') }}</label>

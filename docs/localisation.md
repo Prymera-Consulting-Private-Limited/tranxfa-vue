@@ -178,6 +178,42 @@ carrying copy and merges from `main` stop conflicting on it.
   the difference between copy and a Tailwind class list, an icon class, a date
   format, an enum and a value being compared against.
 
+### A word beside an interpolation
+
+`Pay {{ amount }}` is one word of its own. The extractor skipped a text node
+with fewer than three of its own words when an interpolation sat beside it, and
+the guard skipped the same shape, so the button a customer presses to move their
+money read English through the whole migration - along with
+`Welcome {{ name }}`, `Upload {{ document }}` and `Payout in {{ country }}`.
+42 nodes on tranxfa, 56 on payvel.
+
+Word count was the wrong question. A message with a named placeholder can always
+be reordered - `"Pay {amount}"` can become `"{amount} a pagar"`. What cannot be
+reordered is a sentence spread across sibling elements, because each piece is
+its own message. So the test is whether the node **opens or closes with a
+connective** (`in`, `via`, `to`, `of`...), which means the sentence carries on in
+the element next door; those go to `scripts/i18n-compose.py`.
+
+Two shapes still need a person, and the extractor now says so rather than
+skipping them silently:
+
+- **A plural spelled with a ternary**, `night{{ n === 1 ? '' : 's' }}`. Keying it
+  would hand a translator an `s` to place. Use vue-i18n pluralisation:
+  `t('travel.nightCount', n, {count: n})` against `"{count} night | {count} nights"`.
+- **A sentence built from template literals**, as the maintenance banner was.
+  Write one whole message per case and choose between them in a computed.
+
+### Copy inside a $t call's own arguments
+
+```js
+$t('calculator.recipientGets', {Recipient: recipient?.wholeName || 'Recipient'})
+```
+
+Both sweeps used to blank out a whole `$t(...)` call before scanning, so a
+default *inside* one was invisible. On the Xenvia deploy this rendered
+**"Recipient Gets"** in the middle of an otherwise Spanish calculator. They now
+blank only the key argument and read the rest.
+
 ### A guard rule that rejects too much
 
 `\s*` crosses a newline. Two rules in the script sweep and its guard used it to

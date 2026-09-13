@@ -21,6 +21,18 @@ describe('the Spanish build', () => {
                 'Verificación de cuenta', 'Configuración', 'Contactar con el soporte técnico', 'Cerrar sesión']);
   });
 
+  it('says the payment button in Spanish', () => {
+    // The reason for this merge. On the previous deploy this button read
+    // "Pay €45.00" on an otherwise Spanish screen - the last control a
+    // customer touches before their money moves.
+    expect(t('payment.card.payTotalpaymentamountcurrencyprefixed', {totalPaymentAmountCurrencyPrefixed: '€45.00'}))
+      .toBe('Pagar €45.00');
+    expect(t('account.welcomeCustomer', {name: 'Ana'})).toBe('Hola, Ana');
+    expect(t('account.transactionNumber', {transactionNumber: 'UAT-XE-9160110'}))
+      .toBe('Transacción n.º UAT-XE-9160110');
+    expect(t('account.payoutInCountry', {commonName: 'Venezuela'})).toBe('Pago en Venezuela');
+  });
+
   it('titles the contact page rather than printing its key', () => {
     expect(t('routes.contact')).toBe('Contactar con el soporte técnico');
     expect(t('routes.contact')).not.toBe('routes.contact');
@@ -42,6 +54,6 @@ describe('the Spanish build', () => {
     const done = Object.keys(flat(es)).length;
 
     console.log(`[es] ${done} of ${total} keys translated, ${total - done} fall back to English`);
-    expect(done).toBeGreaterThanOrEqual(403);   // 403 of 900 at this merge
+    expect(done).toBeGreaterThanOrEqual(427);   // 427 of 934 at this merge
   });
 });
