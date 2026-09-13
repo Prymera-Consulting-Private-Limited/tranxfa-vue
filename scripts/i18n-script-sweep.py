@@ -29,7 +29,12 @@ ICON = re.compile(r'^(?:pi|fa|bi|mdi)[\s-]')
 MEDIA = re.compile(r'^\(\s*(?:min|max|prefers)-')
 KEYISH = re.compile(r'^[A-Z0-9_]+$|^[a-z][\w-]*$')
 COMPARED = re.compile(r"""(?:[=!]==?\s*|\.(?:includes|startsWith|endsWith|indexOf|split|match)\(\s*|import\s+.*from\s*|require\(\s*)$""")
-WIRING = re.compile(r'\.(?:listen|stopListening|emit|on|off|once)\(\s*$|\$emit\(\s*$')
+# An analytics event name is wiring, not copy: fbq('trackCustom', 'KYCApproved')
+# and fbq('track', 'Purchase', {...}) are names Meta matches on, and moving one
+# into the catalogue stops the conversion being counted without changing a word
+# on screen. gtag is here for the same reason; only the brand branches call either.
+WIRING = re.compile(r'\.(?:listen|stopListening|emit|on|off|once)\(\s*$|\$emit\(\s*$'
+                    r'|\b(?:fbq|gtag)\??\.?\(\s*$|\b(?:fbq|gtag)\??\.?\([^)]*,\s*$')
 NOISE = re.compile(r'console\.\w+\(\s*$|(?:useMediaQuery|matchMedia)\(\s*$')
 # `import.meta.env.VITE_APP_NAME || 'Payvel'` is a default for a missing
 # environment variable. It is configuration, and translating it would rename
