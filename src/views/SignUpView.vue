@@ -9,6 +9,9 @@ import {usePasswordPolicyUtils} from "@/composables/password_policy_utils.js";
 import axios from "axios";
 import IsdCodeInput from "@/components/IsdCodeInput.vue";
 import {useCountryUtils} from "@/composables/country_utils.js";
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const authChannel = import.meta.env.VITE_AUTH_CHANNEL ??  'EMAIL';
 const thirdPartyDeclaration = import.meta.env.VITE_THIRD_PARTY_SIGNUP_DECLARATION;
@@ -200,12 +203,12 @@ const totalPasswordRulesCount = computed(() => validatedPasswordPolicies.rules.l
 
 const passwordRequirementsSummary = computed(() => {
   if (!form.password) {
-    return 'View password requirements';
+    return t('onboarding.viewPasswordRequirements');
   }
   if (allPasswordRulesMet.value) {
-    return 'All requirements met';
+    return t('onboarding.allPasswordRequirementsMet');
   }
-  return `${unmetPasswordRulesCount.value} of ${totalPasswordRulesCount.value} not met`;
+  return t('onboarding.unmetpasswordrulescountOfTotalpasswordrulescountNot2', {unmetPasswordRulesCount: unmetPasswordRulesCount.value, totalPasswordRulesCount: totalPasswordRulesCount.value});
 });
 
 const passwordRequirementsHeaderClass = computed(() => {
@@ -339,7 +342,7 @@ watch(
                       <button
                         type="button"
                         class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
-                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                        :aria-label="showPassword ? $t('common.hidePassword') : $t('common.showPassword')"
                         @click="showPassword = !showPassword"
                       >
                         <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
@@ -434,7 +437,7 @@ watch(
                     <button
                       type="button"
                       class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
-                      :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+                      :aria-label="showConfirmPassword ? $t('common.hidePassword') : $t('common.showPassword')"
                       @click="showConfirmPassword = !showConfirmPassword"
                     >
                       <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
@@ -471,7 +474,7 @@ watch(
                 class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span class="inline-flex items-center justify-center gap-2">
-                  {{ authChannel === 'MOBILE_NUMBER' ? 'Get Code' : 'Continue' }}
+                  {{ authChannel === 'MOBILE_NUMBER' ? $t('auth.signIn.getCode') : $t('common.continue') }}
                   <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>

@@ -641,7 +641,7 @@ export function useHotelUtils() {
     });
 
     const stayLabel = computed(() => {
-        return `${moment(criteria.value.checkin).format('D MMM')} – ${moment(criteria.value.checkout).format('D MMM YYYY')}`;
+        return `${moment(criteria.value.checkin).format('D MMM')} – ${moment(criteria.value.checkout).format('ll')}`;
     });
 
     const guestBreakdown = computed(() => getGuestBreakdown(criteria.value.guests));

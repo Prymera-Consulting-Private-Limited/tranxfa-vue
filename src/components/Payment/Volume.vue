@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
 import {computed, onMounted, onUnmounted, ref, watch, watchEffect} from "vue";
@@ -91,7 +95,7 @@ const initPayment = async () => {
     },
     errorConsumer: (error) => {
       console.error('[payment: volume] the sdk reported an error', error);
-      sdkFailure.value = "Your bank connection didn't start. No money has moved. Reload this page to try again, or choose another way to pay.";
+      sdkFailure.value = t('payment.provider.yourBankConnectionDidnt');
     },
   });
   volume.createPayment({
@@ -159,7 +163,7 @@ const retryPayment = async () => {
   <!-- Expired, cancelled and refunded payments rendered an empty modal here. -->
   <template v-else-if="status === 'cancelled'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
+    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? $t('payment.provider.thisPaymentHasExpired') : $t('payment.provider.thisPaymentWasCancelled') }}</h2>
     <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>

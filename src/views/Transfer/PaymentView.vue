@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {isOutcomeUnknown} from "@/composables/checkout_safety.js";
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
@@ -95,14 +99,14 @@ const retryPayment = async (paymentData = null) => {
       try {
         const fresh = await transactionUtils.getTransaction(props.id);
         transaction.value = Transaction.getInstance(fresh.data);
-        retryFailure.value = "We didn't get an answer from the server, so we've refreshed this page. If it still shows a failed payment, you can try again.";
+        retryFailure.value = t('transfer.wizard.weDidntGetAn');
       } catch (refreshError) {
         logRequestFailure(refreshError, 'retry-payment-reconcile');
-        retryFailure.value = "We couldn't reach the server. Check your transfers before trying again, so you are not charged twice.";
+        retryFailure.value = t('transfer.wizard.weCouldntReachThe');
       }
     } else {
       logRequestFailure(e, 'retry-payment');
-      retryFailure.value = failureMessage(e, "We couldn't start a new payment. Please try again.");
+      retryFailure.value = failureMessage(e, t('transfer.wizard.weCouldntStartA2'));
     }
   }).finally(() => {
     isLoading.value = false;

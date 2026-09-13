@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import InlineFailure from "@/components/InlineFailure.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import Calculator from "@/components/Calculator.vue";
@@ -58,11 +62,11 @@ const handleDelete = async () => {
     deleteFailure.value = null;
     await recipientUtils.deleteRecipient(props.id);
     isDeleted.value = true;
-    notify({group: 'customer', title: 'Recipient removed', text: `${recipient.value?.wholeName ?? 'This recipient'} is no longer in your list.`, type: 'success'}, 6000);
+    notify({group: 'customer', title: t('recipient.recipientRemoved'), text: t('recipient.recipientIsNoLonger', {recipient: recipient.value?.wholeName ?? t('recipient.thisRecipient')}), type: 'success'}, 6000);
     await router.replace({name: 'recipients'});
   } catch (error) {
     logRequestFailure(error, 'recipient-delete');
-    deleteFailure.value = failureMessage(error, "We couldn't remove this recipient. Please try again.");
+    deleteFailure.value = failureMessage(error, t('recipient.weCouldntRemoveThis'));
     isDeleting.value = false;
   }
 };
@@ -127,7 +131,7 @@ const handleDelete = async () => {
                     <div class="py-6 sm:flex">
                       <dt class="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">{{ $t('recipient.recentTransaction') }}</dt>
                       <dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                        <div class="text-gray-900">{{ lastSentOn || 'You have not sent any transaction yet.' }}</div>
+                        <div class="text-gray-900">{{ lastSentOn || $t('recipient.youHaveNotSent') }}</div>
                       </dd>
                     </div>
                   </dl>
@@ -205,7 +209,7 @@ const handleDelete = async () => {
                       @click="handleDelete"
                       :disabled="isDeleting"
                   >
-                    {{ isDeleting ? 'Deleting...' : 'Delete' }}
+                    {{ isDeleting ? 'Deleting...' : $t('recipient.delete') }}
                   </button>
                   <button
                       type="button"

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -43,7 +47,7 @@ async function getRecipients(page = null) {
     pagination.value = response.data.pagination;
   }).catch((e) => {
     logRequestFailure(e, 'recipients');
-    loadFailure.value = failureMessage(e, "We couldn't load your recipients.");
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadYour3'));
   }).finally(() => {
     isLoading.value = false;
   });

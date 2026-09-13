@@ -12,15 +12,16 @@ import ServiceStatusBanner from "@/components/ServiceStatusBanner.vue";
 import {NotificationGroup, Notification, notify} from 'notiwind';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
 import { XMarkIcon } from '@heroicons/vue/20/solid'
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const walletStore = useWalletStore();
 const walletUtils = useWalletUtils();
 
-/**
- * @type {{data: Customer | null}}
- */
+
 const customer = customerStore.customer;
 
 onMounted(async () => {
@@ -44,7 +45,7 @@ onMounted(async () => {
               {
                 group: 'customer',
                 title: `${category} - Received`,
-                text: `We have received your ${document}.`,
+                text: t('account.weHaveReceivedYour', {document: document}),
                 type: 'info',
               },
               -1,
@@ -61,7 +62,7 @@ onMounted(async () => {
               {
                 group: 'customer',
                 title: `${category} - Accepted`,
-                text: `Your ${document} has been accepted by our compliance team.`,
+                text: t('account.yourDocumentHasBeen', {document: document}),
                 type: 'success',
               },
               -1,
@@ -75,7 +76,7 @@ onMounted(async () => {
               {
                 group: 'customer',
                 title: `${category} - Rejected`,
-                text: `We couldn't accept your ${document}. Open Account verification to see why and upload it again.`,
+                text: t('account.weCouldntAcceptYour', {document: document}),
                 type: 'danger',
               },
               -1,

@@ -105,7 +105,7 @@ const bestToken = computed(() => {
                       : 'bg-brand-700 text-white hover:bg-brand-800',
                     'cursor-pointer rounded-xl px-4 py-2.5 text-sm/6 font-semibold shadow-xs transition focus-visible:outline-0',
                   ]"
-              >{{ rate.token === selectedToken ? 'Selected' : 'Select' }}</button>
+              >{{ rate.token === selectedToken ? $t('travel.selected') : $t('travel.select') }}</button>
               <span v-else class="rounded-xl bg-gray-100 px-4 py-2 text-center text-sm/6 font-medium text-gray-500">{{ $t('travel.notAvailable') }}</span>
             </div>
           </li>

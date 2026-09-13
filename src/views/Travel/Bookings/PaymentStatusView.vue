@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from 'vue';
 import CustomerLayout from '@/components/CustomerLayout.vue';
 import Processing from '@/components/Payment/State/Processing.vue';
@@ -61,19 +65,19 @@ const status = computed(() => {
 const heading = computed(() => {
   switch (status.value) {
     case 'refunded':
-      return payment.value.isPartlyRefunded ? 'Part of your payment has been refunded' : 'Your payment has been refunded';
+      return payment.value.isPartlyRefunded ? t('travel.partOfYourPayment') : t('travel.yourPaymentHasBeen');
 
     case 'paid':
-      return 'Your payment has gone through';
+      return t('travel.paymentWentThrough');
 
     case 'failed':
-      return "That payment didn't go through";
+      return t('travel.paymentDidNotGoThrough');
 
     case 'processing':
-      return 'Finishing your payment';
+      return t('travel.finishingYourPayment');
 
     default:
-      return 'Waiting for your payment';
+      return t('travel.waitingForYourPayment');
   }
 });
 
@@ -83,31 +87,31 @@ const note = computed(() => {
       // What was kept is the hotel's rule rather than ours, and the booking screen
       // is where the cancellation quote that explains it lives.
       return payment.value.isPartlyRefunded
-          ? "This booking was cancelled and part of what you paid has been returned. The rest was kept under the hotel's cancellation policy. Your bank can take a few days to show it."
-          : 'This booking was cancelled and what you paid has been returned. Your bank can take a few days to show it.';
+          ? t('travel.thisBookingWasCancelled')
+          : t('travel.thisBookingWasCancelled2');
 
     case 'paid':
       // A cancelled booking can still hold a captured payment for a while, since
       // the refund is worked out and sent after the cancellation itself.
       if (order.value?.isCancelled) {
-        return "This booking was cancelled. Any refund due follows the hotel's cancellation policy and is sent separately.";
+        return t('travel.bookingCancelledRefundFollows');
       }
 
-      return 'Your room is booked and paid for. The hotel confirms it separately, which can take a minute or two.';
+      return t('travel.roomBookedAndPaidFor');
 
     case 'failed':
       // The room outlives the payment, which is the one thing worth saying here.
-      return "You haven't been charged. Your room is still booked, so you can try paying again.";
+      return t('travel.notChargedRoomStillBooked');
 
     case 'processing':
-      return "We're waiting for your bank to finish. You can leave this page open — it updates on its own.";
+      return t('travel.waitingForYourBank');
 
     default:
       // True the moment the Volume hand-off is wired. Until then nothing takes
       // the customer to their bank, so a Volume payment rests here for good.
       // Left as it reads rather than rewritten for a gap that closes when the
       // api starts sending what the sdk needs — see PaymentView's pay().
-      return "This updates on its own once your payment settles. You don't need to do anything.";
+      return t('travel.updatesOnItsOwn');
   }
 });
 
@@ -147,7 +151,7 @@ async function load(quiet = false) {
   await getOrder(props.orderId).then((response) => {
     order.value = Order.getInstance(response.data);
   }).catch((error) => {
-    reportUnexpectedError(error, 'travel payment status');
+    reportUnexpectedError(error, t('travel.travelPaymentStatus'));
 
     // A poll that fails is not worth tearing the page down for — the payment is
     // settling regardless of whether this tab can see it.

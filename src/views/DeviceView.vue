@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -26,7 +30,7 @@ async function refreshDevices() {
     response.value = await customerUtils.devices();
   } catch (e) {
     logRequestFailure(e, 'devices');
-    loadFailure.value = failureMessage(e, "We couldn't load the devices signed in to your account.");
+    loadFailure.value = failureMessage(e, t('account.weCouldntLoadThe9'));
   } finally {
     isLoading.value = false;
   }

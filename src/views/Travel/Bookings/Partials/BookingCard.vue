@@ -21,7 +21,7 @@ const stay = computed(() => {
     return null;
   }
 
-  return `${moment(props.order.checkIn).format('D MMM')} – ${moment(props.order.checkOut).format('D MMM YYYY')}`;
+  return `${moment(props.order.checkIn).format('D MMM')} – ${moment(props.order.checkOut).format('ll')}`;
 });
 
 // The occupancy is the same room-by-room shape the search criteria use, so it

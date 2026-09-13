@@ -151,6 +151,10 @@ const MIGRATED = [
   'src/views/Travel/Hotels/Partials/HotelStayCard.vue',
   'src/views/Travel/Hotels/Partials/PriceChangeDialog.vue',
   'src/views/Travel/Hotels/Partials/SearchBar.vue',
+  // SD-1113: the sweep could not see a returned sentence, so these two were
+  // never listed. They are listed now.
+  'src/views/Travel/Hotels/Partials/HotelAvailability.vue',
+  'src/views/Travel/Hotels/Partials/HotelCancellationBadge.vue',
   'src/views/Wallet/IndexView.vue',
   'src/views/Wallet/StatementView.vue',
 ];
@@ -209,5 +213,223 @@ describe('the migrated files', () => {
       .filter(text => /[A-Za-z]{3,}/.test(text));
 
     expect(bare, `${file} still spells out: ${bare.join(' | ')}`).toEqual([]);
+  });
+});
+
+// SD-1105: copy also hides inside expressions, where neither the extractor nor
+// the bare-text guard could see it: `{{ ok ? 'Yes' : 'No' }}`. The sign-in
+// button read English in an otherwise Spanish app for exactly this reason.
+describe('copy does not hide in an expression', () => {
+  const TAILWIND = /^[a-z0-9:/[\]().%!,@-]+$/;
+  const UTILITY = /^(?:flex|grid|block|inline|hidden|absolute|relative|fixed|sticky|w|h|min|max|p[xytblr]?|m[xytblr]?|gap|text|bg|border|ring|rounded|shadow|opacity|z|top|left|right|bottom|size|space|divide|justify|items|self|order|col|row|overflow|truncate|whitespace|cursor|transition|duration|ease|animate|group|peer|sr|not|font|leading|tracking|uppercase|underline|antialiased|object|aspect|fill|stroke|from|via|to|backdrop|outline|accent|pointer|select|scale|rotate|translate|origin|list|table|sm|md|lg|xl|hover|focus|active|disabled|first|last|odd|even|dark|print)\b/;
+  const MOMENT = /^[DMYHhmsAaZz\W]{3,}$/;
+  const ICON = /^(?:pi|fa|bi|mdi)[\s-]/;
+  const COMPARED = /(?:[=!]==?\s*|\.(?:includes|startsWith|endsWith|indexOf|split|match)\(\s*)$/;
+
+  const isClassList = (text) => {
+    const tokens = text.trim().split(/\s+/);
+    if (tokens.length < 2) return TAILWIND.test(text) && UTILITY.test(text);
+    return tokens.every(t => TAILWIND.test(t) && (UTILITY.test(t) || t.includes('-') || t.includes(':')));
+  };
+
+  const looksLikeCopy = (text) => {
+    if (text.length < 3) return false;
+    if (isClassList(text) || MOMENT.test(text) || ICON.test(text)) return false;
+    if (text.includes('.') && !text.includes(' ')) return false;   // a key or a file
+    if (/^[A-Z0-9_]+$/.test(text)) return false;                    // an enum
+    if (/^[a-z][\w-]*$/.test(text)) return false;                   // a slug
+    if (!/[A-Za-z]{2,}/.test(text)) return false;
+    return /[A-Z]/.test(text) || text.includes(' ');
+  };
+
+  const literalsIn = (expr) => {
+    const out = [];
+    const quoted = /'([^'\\\n]{3,200})'|"([^"\\\n]{3,200})"/g;
+    let m;
+    while ((m = quoted.exec(expr)) !== null) {
+      if (COMPARED.test(expr.slice(0, m.index))) continue;
+      out.push(m[1] !== undefined ? m[1] : m[2]);
+    }
+    return out;
+  };
+
+  it.each(MIGRATED)('%s spells no sentence inside an expression', (file) => {
+    const source = read(file);
+    const open = source.match(/^<template[^>]*>/m);
+    if (!open) return;
+    const body = source.slice(open.index + open[0].length, source.lastIndexOf('\n</template>'));
+
+    const found = [];
+    // An expression that already calls $t is not exempt: one branch of a
+    // ternary is often migrated while the other is still English, which is
+    // exactly how the sign-in button kept saying Continue.
+    const stripCalls = (expr) => expr.replace(/\$?t\(\s*(?:'[^']*'|"[^"]*")\s*(?:,[^()]*)?\)/g, ' ');
+    for (const [, expr] of body.matchAll(/\{\{([\s\S]*?)\}\}/g)) {
+      found.push(...literalsIn(stripCalls(expr)).filter(looksLikeCopy));
+    }
+    for (const [, expr] of body.matchAll(/(?::|v-bind:)[\w.-]+="([^"]*)"/g)) {
+      found.push(...literalsIn(stripCalls(expr)).filter(looksLikeCopy));
+    }
+
+    expect(found, `${file} spells copy inside an expression: ${found.join(', ')}`).toEqual([]);
+  });
+});
+
+// SD-1109: and copy also hides in a component's script block, as data the
+// template renders. The navigation read English on every page for exactly
+// this reason: a plain array of names, no text node in sight.
+describe('copy does not hide in a script block', () => {
+  const IDENTIFIER = /^[A-Z0-9_]+$|^[a-z][\w-]*$/;
+  const COMPARED = /(?:[=!]==?\s*|\.(?:includes|startsWith|endsWith|indexOf|split|match)\(\s*|from\s*|require\(\s*)$/;
+  // An analytics event name is wiring, not copy: fbq('trackCustom', 'KYCApproved')
+  // and fbq('track', 'Purchase', {...}) are names Meta matches on, and translating
+  // one stops the conversion being counted without changing a word on screen.
+  const WIRING = /\.(?:listen|stopListening|emit|on|off|once)\(\s*$|\$emit\(\s*$|\bt\(\s*$|\b(?:fbq|gtag)\??\.?\(\s*$|\b(?:fbq|gtag)\??\.?\([^)]*,\s*$/;
+  // A developer log and a media query are not copy, and neither is anything
+  // this codebase tags with a bracketed prefix.
+  const NOISE = /console\.\w+\(\s*$|(?:useMediaQuery|matchMedia)\(\s*$/;
+  // A default for a missing environment variable is configuration, not copy:
+  // translating it would rename the brand. Only an env read counts, so
+  // `props.label || 'Continue'` is still caught.
+  const ENV_DEFAULT = /import\.meta\.env\.\w+\s*(?:\|\||\?\?)\s*$/;
+
+  const isCopy = (text) => {
+    if (text.length < 3 || text.includes('/') || text.includes('@')) return false;
+    const tokens = text.trim().split(/\s+/);
+    const classy = (tok) => /^[a-z0-9:/[\]().%!,@-]+$/.test(tok);
+    if (tokens.length > 1 ? tokens.every(t => classy(t) && (/-|:/.test(t))) : classy(text) && /-|:/.test(text)) {
+      return false;                                                  // a class list
+    }
+    if (/^[DdMYyHhmsSAaZzXxWwEeQGgkTt\W]{3,}$/.test(text)) return false;  // a date format
+    if (/^(?:pi|fa|bi|mdi)[\s-]/.test(text)) return false;           // an icon
+    if (/^\(\s*(?:min|max|prefers)-/.test(text)) return false;        // a media query
+    if (text.startsWith('[')) return false;                          // a tagged log line
+    if (text.includes('.') && !text.includes(' ')) return false;     // a key
+    if (IDENTIFIER.test(text)) return false;
+    if (!text.includes(' ') && /[:_.\-]/.test(text)) return false;   // an event name
+    if (!text.includes(' ') && /[a-z][A-Z]/.test(text)) return false; // PascalCase
+    if (!/[A-Za-z]{2,}/.test(text)) return false;
+    return /[A-Z]/.test(text) || text.includes(' ');
+  };
+
+  // defineProps is hoisted above setup(), so a default there cannot call t().
+  // Those components resolve their own default with a computed instead.
+  const insideCall = (code, index, name) => {
+    const open = code.lastIndexOf(`${name}(`, index);
+    if (open < 0) return false;
+    let depth = 0;
+    for (let i = open + name.length; i < code.length; i += 1) {
+      if (code[i] === '(') depth += 1;
+      else if (code[i] === ')') {
+        depth -= 1;
+        if (depth === 0) return open < index && index < i;
+      }
+    }
+    return false;
+  };
+
+
+  // Walking the characters, not matching a pattern: in `'+' + code + ' '` a
+  // regex happily returns the gap between two strings as though it were copy.
+  const stringsIn = (code) => {
+    const out = [];
+    let i = 0;
+    while (i < code.length) {
+      const c = code[i];
+      if (c === "'" || c === '"' || c === '`') {
+        const quote = c;
+        const start = i;
+        i += 1;
+        while (i < code.length) {
+          if (code[i] === '\\') { i += 2; continue; }
+          if (code[i] === quote) break;
+          if (quote !== '`' && code[i] === '\n') break;
+          i += 1;
+        }
+        if (code[i] === quote && quote !== '`') {
+          out.push({start, quoted: code.slice(start, i + 1), text: code.slice(start + 1, i)});
+        }
+        i += 1;
+        continue;
+      }
+      if (c === '/' && code[i + 1] === '/') {
+        const nl = code.indexOf('\n', i);
+        if (nl < 0) break;
+        i = nl;
+        continue;
+      }
+      if (c === '/' && code[i + 1] === '*') {
+        const close = code.indexOf('*/', i);
+        if (close < 0) break;
+        i = close + 2;
+        continue;
+      }
+      i += 1;
+    }
+    return out;
+  };
+
+  it.each(MIGRATED)('%s keeps no sentence in its script', (file) => {
+    const source = read(file);
+    // Every script block: a component written as <script> plus <script setup>
+    // was half scanned while this looked only for the setup block.
+    const blocks = [...source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+    if (blocks.length === 0) return;
+    const body = blocks.join('\n');
+
+    const found = [];
+    for (const {start, quoted, text} of stringsIn(body)) {
+      const before = body.slice(Math.max(0, start - 40), start);
+      if (COMPARED.test(before) || WIRING.test(before) || NOISE.test(before)) continue;
+      if (ENV_DEFAULT.test(before)) continue;
+      // A concatenation means a + beside the literal on the same line. These
+      // rules used to allow \s* to cross a newline, so `return 'copy'` matched
+      // on the n of return and every returned sentence went unseen.
+      if (/\+[ \t]*$/.test(before)) continue;
+      if (/^[ \t]*\+/.test(body.slice(start + quoted.length, start + quoted.length + 12))) continue;
+      if (insideCall(body, start, 'defineProps') || insideCall(body, start, 'defineEmits')) continue;
+      if (isCopy(text)) found.push(text);
+    }
+
+    expect(found, `${file} keeps copy in its script: ${found.join(', ')}`).toEqual([]);
+  });
+});
+
+// SD-1112: the guards above prove a key exists and that no literal is left
+// behind. Neither proved the caller could reach t, so a file that gained a
+// t(...) call without the import threw ReferenceError on any branch no spec
+// happened to render - on the dashboard, the wallet, sign-up and the KYC
+// toasts, with the suites green over it.
+describe('every t() call can reach a t', () => {
+  const CALL = /(?<![\w$.])t\(/g;
+  const IN_SCOPE = [
+    /\bconst\s*\{[^}]*\bt\b[^}]*\}\s*=\s*useI18n\(/,   // a component
+    /\bconst\s+t\s*=/,                                   // a module
+    /\bfunction\s+t\s*\(/,
+    /\bimport\s*\{[^}]*\bt\b[^}]*\}\s*from/,
+  ];
+
+  const sourceFiles = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return sourceFiles(path);
+    return /\.(?:js|vue)$/.test(entry.name) ? [path] : [];
+  });
+
+  it('holds for every file under src', () => {
+    const offenders = [];
+
+    for (const file of sourceFiles('src')) {
+      const source = read(file);
+      // Only a script block runs as code; a template reaches t another way.
+      const code = file.endsWith('.vue')
+        ? [...source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n')
+        : source;
+
+      if (!code.match(CALL)) continue;
+      if (IN_SCOPE.some(pattern => pattern.test(code))) continue;
+      offenders.push(file);
+    }
+
+    expect(offenders, `these call t() with no t in scope: ${offenders.join(', ')}`).toEqual([]);
   });
 });

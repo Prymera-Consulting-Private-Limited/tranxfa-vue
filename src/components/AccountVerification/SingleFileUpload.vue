@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import {acceptFor, IMAGE_TYPES, validateUpload} from "@/composables/upload_rules.js";
 import {reactive, ref} from "vue";
@@ -81,7 +85,7 @@ const processFile = async () => {
   } catch (e) {
     // The most common failure of all used to leave the overlay pulsing forever.
     logRequestFailure(e, 'upload-token');
-    error.value = failureMessage(e, "We couldn't prepare this photo for upload. Please try again.");
+    error.value = failureMessage(e, t('verification.weCouldntPrepareThis2'));
     file.status = "failed";
     return;
   }
@@ -92,7 +96,7 @@ const processFile = async () => {
     file.path = response.data.object_key ?? new URL(response.data.token).pathname.split("/").slice(2).join("/");
     file.status = "completed";
   }).catch(() => {
-    error.value = "The upload was interrupted. Check your connection and choose the photo again.";
+    error.value = t('verification.theUploadWasInterrupted2');
     file.status = "failed";
   });
 };

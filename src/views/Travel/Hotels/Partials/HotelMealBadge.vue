@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed} from 'vue';
 import {prettifyLabel} from "@/composables/travel/hotels/hotel_utils.js";
 
@@ -21,13 +25,13 @@ const props = defineProps({
 // own lowercase strings. Search meals are our codes and always in labels, so
 // this goes when those endpoints are rebuilt.
 const LEGACY_LABELS = {
-  'nomeal': 'Room only',
-  'breakfast': 'Breakfast included',
-  'breakfast-buffet': 'Buffet breakfast',
-  'breakfast-for-1': 'Breakfast for 1',
-  'half-board': 'Half board',
-  'full-board': 'Full board',
-  'all-inclusive': 'All inclusive',
+  'nomeal': t('travel.roomOnly'),
+  'breakfast': t('travel.breakfastIncluded'),
+  'breakfast-buffet': t('travel.buffetBreakfast'),
+  'breakfast-for-1': t('travel.breakfastFor'),
+  'half-board': t('travel.halfBoard'),
+  'full-board': t('travel.fullBoard'),
+  'all-inclusive': t('travel.allInclusive'),
 };
 
 // A meal the api could not recognise arrives null rather than as a guess, so

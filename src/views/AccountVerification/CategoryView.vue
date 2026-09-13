@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
@@ -44,7 +48,7 @@ async function load() {
       await customerUtils.refresh();
     } catch (e) {
       logRequestFailure(e, 'verification-category');
-      loadFailure.value = failureMessage(e, "We couldn't load this verification step.");
+      loadFailure.value = failureMessage(e, t('verification.weCouldntLoadThis'));
       return;
     }
   }
