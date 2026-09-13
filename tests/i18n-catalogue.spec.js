@@ -281,7 +281,10 @@ describe('copy does not hide in an expression', () => {
 describe('copy does not hide in a script block', () => {
   const IDENTIFIER = /^[A-Z0-9_]+$|^[a-z][\w-]*$/;
   const COMPARED = /(?:[=!]==?\s*|\.(?:includes|startsWith|endsWith|indexOf|split|match)\(\s*|from\s*|require\(\s*)$/;
-  const WIRING = /\.(?:listen|stopListening|emit|on|off|once)\(\s*$|\$emit\(\s*$|\bt\(\s*$/;
+  // An analytics event name is wiring, not copy: fbq('trackCustom', 'KYCApproved')
+  // and fbq('track', 'Purchase', {...}) are names Meta matches on, and translating
+  // one stops the conversion being counted without changing a word on screen.
+  const WIRING = /\.(?:listen|stopListening|emit|on|off|once)\(\s*$|\$emit\(\s*$|\bt\(\s*$|\b(?:fbq|gtag)\??\.?\(\s*$|\b(?:fbq|gtag)\??\.?\([^)]*,\s*$/;
   // A developer log and a media query are not copy, and neither is anything
   // this codebase tags with a bracketed prefix.
   const NOISE = /console\.\w+\(\s*$|(?:useMediaQuery|matchMedia)\(\s*$/;
