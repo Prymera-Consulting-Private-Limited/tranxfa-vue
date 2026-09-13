@@ -29,7 +29,15 @@ describe('packaging', () => {
     });
 
     it('runs CI on the stacked feature PRs as well as main', () => {
-        expect(read('.github/workflows/ci.yml')).toMatch(/pull_request:[\s\S]*branches: \[main, 'feature\/\*\*'\]/);
+        expect(read('.github/workflows/ci.yml')).toMatch(/pull_request:[\s\S]*branches: \[main, 'feature\/\*\*', salvtech_staging\]/);
+    });
+
+    // SD-1134, brand-only. On this branch a push IS the deploy, so a check that
+    // runs only for main never runs where it matters most - a red build would
+    // be found by a customer. The other brands stay excluded until they carry
+    // the suite; this one does.
+    it('runs CI on the brand branch it deploys from', () => {
+        expect(read('.github/workflows/ci.yml')).toMatch(/branches: \[[^\]]*\bsalvtech_staging\b[^\]]*\]/);
     });
 });
 

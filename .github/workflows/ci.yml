@@ -3,16 +3,21 @@ name: CI
 # Amplify builds on push, which is after the merge - by then a red build is
 # already deployed. This runs before, on the PR.
 #
-# Deliberately not run on the brand branches: most forked before the test suite
+# Most brand branches are still excluded: they forked before the test suite
 # existed and have no tests/ directory, so this would be permanently red on
-# branches nobody can fix quickly. Add a brand branch here once it has the
-# suite.
+# branches nobody can fix quickly. A brand branch joins the list once it has
+# the suite.
+#
+# salvtech_staging is the first that does - after five merges it carries the
+# whole suite and a brand-only spec of its own - and it is the branch where a
+# check earns the most, because a push to it IS the deploy. Without this, a red
+# build is found by a customer.
 
 on:
   pull_request:
     # feature/** so a stacked PR (base = the previous feature branch) is
     # checked before it is retargeted onto main.
-    branches: [main, 'feature/**']
+    branches: [main, 'feature/**', salvtech_staging]
   push:
     branches: [main]
 
