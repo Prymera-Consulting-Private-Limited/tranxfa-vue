@@ -118,26 +118,25 @@ Use the `port-to-tenant-branches` skill. The rules it enforces:
 6. **Staging before production.** `<brand>_staging` gets the pick and a smoke
    test before `<brand>_production`.
 
-## Re-applying a brand's copy after a merge
+## A brand's copy after a merge
 
-A translated brand (salvtech is the first) carries its Spanish as edits to
-the templates themselves, so a merge of `main` into `<brand>_staging`
-conflicts on every translated file. Resolve those files `--theirs` (main's
-version) and let `scripts/reapply-brand-copy.py` put the brand's words back:
+This used to be the hardest part of a brand merge and it is not any more.
 
-```
-git checkout --theirs -- <the translation-only files>
-python3 scripts/reapply-brand-copy.py --base <merge-base> --brand origin/<brand>_production \
-    --main origin/main --files-from /tmp/translation-only.txt --report /tmp/copy-report.md
-```
+A translated brand carried its words as edits to the templates themselves, so
+a merge of `main` conflicted on every translated file, and a script
+(`reapply-brand-copy.py`, deleted with SD-1131) spliced the brand's words back
+into main's lines.
 
-It matches each brand edit to main's line by markup skeleton and the English
-words, splices the Spanish into main's line (so main's classes survive), and
-never replaces a bare substring. The report lists (a) what it applied, (b)
-what it could not match, with the closest current line, for a person to do,
-and (c) every English string main introduced since the base: the
-translator's list. `--dry-run` writes the report only; `--self-test` checks
-the matching without git.
+A brand's words live in `src/locales/<lang>.json` now. A merge from `main`
+touches the catalogue as a data file and the templates not at all, so there is
+nothing to re-apply: resolve the ordinary way, then add the keys `main`
+introduced to the brand's catalogue **in the same pull request**, or those
+screens silently fall back to English. The fourth Xenvia merge had exactly one
+conflict, in a file where the brand still held copy in markup, and resolving it
+moved that copy into the catalogue for good.
+
+If a brand branch still holds copy in a template, that is the thing to fix -
+move it into the brand's catalogue - not a merge to automate.
 
 ## Starting a new brand
 

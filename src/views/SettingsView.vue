@@ -5,7 +5,7 @@ const {t} = useI18n();
 
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import { UserIcon, HomeIcon, PhoneIcon, LockClosedIcon, DevicePhoneMobileIcon, WalletIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
+import { UserIcon, HomeIcon, PhoneIcon, LockClosedIcon, DevicePhoneMobileIcon, WalletIcon, ExclamationTriangleIcon , XMarkIcon} from '@heroicons/vue/24/outline';
 import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {computed, onMounted, ref} from "vue";
 import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
@@ -173,7 +173,7 @@ const passwordChanged = async () => {
         </div>
       </div>
     </main>
-    <TransitionRoot as="div" :show="isChangePasswordModalOpen">
+    <TransitionRoot as="template" :show="isChangePasswordModalOpen">
       <Dialog class="relative z-10" @close="isChangePasswordModalOpen = false">
         <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
           <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
@@ -182,6 +182,13 @@ const passwordChanged = async () => {
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full min-w-sm md:min-w-md sm:max-w-2xl px-5 sm:px-6 lg:px-8 py-8">
+                <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4">
+                  <DialogTitle class="text-base/6 font-semibold text-gray-900">{{ $t('account.changePasswordTitle') }}</DialogTitle>
+                  <button type="button" class="-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-md text-gray-500 hover:text-gray-700 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700" @click="isChangePasswordModalOpen = false">
+                    <span class="sr-only">{{ $t('common.close') }}</span>
+                    <XMarkIcon class="size-5" aria-hidden="true" />
+                  </button>
+                </div>
                 <ChangePassword
                     v-on:account:password:changed="passwordChanged"
                 />
@@ -191,7 +198,7 @@ const passwordChanged = async () => {
         </div>
       </Dialog>
     </TransitionRoot>
-    <TransitionRoot as="div" :show="isPersonalDetailsModalOpen">
+    <TransitionRoot as="template" :show="isPersonalDetailsModalOpen">
       <Dialog class="relative z-10" @close="isPersonalDetailsModalOpen = false">
         <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
           <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
@@ -200,7 +207,14 @@ const passwordChanged = async () => {
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
-                <div class="rounded-t-md bg-brand-50 p-4">
+                <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4">
+                  <DialogTitle class="text-base/6 font-semibold text-gray-900">{{ $t('account.personalDetailsTitle') }}</DialogTitle>
+                  <button type="button" class="-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-md text-gray-500 hover:text-gray-700 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700" @click="isPersonalDetailsModalOpen = false">
+                    <span class="sr-only">{{ $t('common.close') }}</span>
+                    <XMarkIcon class="size-5" aria-hidden="true" />
+                  </button>
+                </div>
+                <div class="bg-brand-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
                       <p class="text-xs/5 text-brand-700 max-w-sm">{{ $t('account.reverifyPersonalWarning') }}</p>
@@ -222,7 +236,7 @@ const passwordChanged = async () => {
         </div>
       </Dialog>
     </TransitionRoot>
-    <TransitionRoot as="div" :show="isAddressModalOpen">
+    <TransitionRoot as="template" :show="isAddressModalOpen">
       <Dialog class="relative z-10" @close="isAddressModalOpen = false">
         <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
           <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
@@ -231,7 +245,14 @@ const passwordChanged = async () => {
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="div" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl min-w-sm">
-                <div class="rounded-t-md bg-brand-50 p-4">
+                <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4">
+                  <DialogTitle class="text-base/6 font-semibold text-gray-900">{{ $t('account.addressTitle') }}</DialogTitle>
+                  <button type="button" class="-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-md text-gray-500 hover:text-gray-700 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700" @click="isAddressModalOpen = false">
+                    <span class="sr-only">{{ $t('common.close') }}</span>
+                    <XMarkIcon class="size-5" aria-hidden="true" />
+                  </button>
+                </div>
+                <div class="bg-brand-50 p-4">
                   <div class="flex">
                     <div class="ml-3 flex-1 md:flex md:justify-between">
                       <p class="text-xs/5 text-brand-700 max-w-sm">{{ $t('account.reverifyAddressWarning') }}</p>

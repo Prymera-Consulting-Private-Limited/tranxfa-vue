@@ -9,7 +9,7 @@ import {findTransactionForQuote, isOutcomeUnknown, MFA_REQUIRED_TYPE, saveChecko
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import {CUSTOMER_ACTIONS, refreshServiceStatus, useServiceStatus} from "@/composables/service_status.js";
 import {useCouponUtils} from "@/composables/coupon_utils.js";
-import {couponsEnabled} from "@/feature_flags.js";
+import {PRODUCT} from "@/licensed_products.js";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {useQuoteUtils} from "@/composables/quote_utils.js";
@@ -193,12 +193,12 @@ async function reconcileOutcome() {
 const serviceStatus = useServiceStatus();
 
 // Promotion coupons (Client API reference, "Promotion Coupons"), behind
-// VITE_COUPONS_ENABLED. Validate previews a code and soft-fails with a
+// the PROMOTIONAL-COUPONS licence. Validate previews a code and soft-fails with a
 // customer-written reason; Apply reprices the quote and every later quote
 // response carries the coupon block, so the quote is always taken from the
 // response rather than remembered.
 const couponUtils = useCouponUtils();
-const hasCoupons = couponsEnabled();
+const hasCoupons = computed(() => serviceStatus.offers(PRODUCT.COUPONS));
 const couponCode = ref('');
 const couponPreview = ref(null);
 const couponFailure = ref(null);

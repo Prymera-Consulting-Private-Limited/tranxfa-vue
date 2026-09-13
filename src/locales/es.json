@@ -4,15 +4,17 @@
     "additionalEmail": "Correo electrónico adicional",
     "address": "Dirección",
     "addressHint": "Asegúrate de que los datos de tu dirección estén actualizados.",
+    "addressTitle": "Tu dirección",
     "allCurrencies": "Todas las monedas",
     "amountToRecipient": "{amount} a {recipient}",
+    "changePasswordTitle": "Cambiar tu contraseña",
     "closeMenu": "Cerrar menú",
     "closeWallet": "Cerrar monedero",
     "closeWalletCondition": "Solo puedes cerrarlo con saldo cero: gasta lo que quede o contacta con soporte para que te lo devuelvan antes. Tu número de monedero se dará de baja de forma definitiva; si vuelves a darte de alta más adelante, recibirás uno nuevo.",
     "closeYourWallet": "Cerrar tu monedero",
     "collectionPin": "PIN de cobro:",
     "confirmDeviceSignOut": "¿Seguro que quieres cerrar la sesión en este dispositivo? Se cerrará de inmediato y tendrás que volver a iniciar sesión para acceder a tu cuenta.",
-    "copyright": "© 2025 {appName}.",
+    "copyright": "© {year} {appName}.",
     "country": "País",
     "currency": "Moneda",
     "currentPassword": "Contraseña actual",
@@ -43,6 +45,7 @@
     "passwordHint": "Cambia tu contraseña para mantener tu cuenta segura.",
     "payoutInCountry": "Pago en {commonName}",
     "personalDetailsHint": "Consulta y actualiza tu nombre, correo electrónico y otros datos personales.",
+    "personalDetailsTitle": "Tus datos personales",
     "pleaseCheckTheForm": "Revisa el formulario e inténtalo de nuevo.",
     "pleaseEnterAValid": "Introduce un correo electrónico válido.",
     "pleaseSelectAStart": "Selecciona una fecha inicial.",
@@ -150,6 +153,7 @@
   },
   "common": {
     "chooseAFile": "Elige un archivo para subir.",
+    "close": "Cerrar",
     "connectionFailed": "No hemos podido conectar. Comprueba tu conexión a internet e inténtalo de nuevo.",
     "continue": "Continuar",
     "email": "Correo electrónico",
@@ -322,6 +326,26 @@
     "yourBookings": "Tus reservas",
     "yourPayment": "Tu pago",
     "yourPrice": "Tu precio"
+  },
+  "support": {
+    "title": "Soporte",
+    "heading": "Contactar con el soporte técnico",
+    "intro": "¿Necesitas ayuda? Contáctanos por WhatsApp o correo electrónico.",
+    "phone": {
+      "title": "Llamar a soporte",
+      "body": "Hable directamente con nuestro equipo de soporte para recibir asistencia inmediata.",
+      "action": "Llame ahora"
+    },
+    "whatsapp": {
+      "title": "Chat de WhatsApp",
+      "body": "Chatea con nosotras al instante a través de WhatsApp.",
+      "action": "Chatear ahora"
+    },
+    "email": {
+      "title": "Soporte por correo electrónico",
+      "body": "Soporte por correo electrónico para consultas detalladas o problemas que no requieran asistencia inmediata.",
+      "action": "Enviar correo"
+    }
   },
   "transfer": {
     "payment": {

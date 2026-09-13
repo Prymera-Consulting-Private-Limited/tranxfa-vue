@@ -48,6 +48,54 @@ Carried over from `console.remitso`, where they were learned the hard way:
   looks like a finished feature.
 - A push to a brand branch **is a deploy** (Amplify builds on push). Verify
   before pushing, not after.
+- **Edit source files one at a time, by hand.** See below; this is the rule
+  most easily broken in a hurry.
+- **`docs/mistakes.md` is the register of process mistakes** — flaws in how the
+  code gets built, as `docs/tech-debt.md` would track flaws in the code. Add an
+  entry the moment a pattern is caught, with a checkable SOP rather than a
+  resolution to be careful. Skim it before a brand deploy: these are the
+  mistakes that survive a green suite.
+- **A convention worth keeping gets a test, not a comment.** See
+  `.claude/skills/fitness-tests`, and prove the test fails before trusting it.
+
+## Source files are read and edited one at a time
+
+No `sed`, no `re.sub`, no blanket `str.replace`, no scripted rewrite across a
+set of files. Open the file, make the change, open the next one. If that is slow
+for thirty files, thirty files is the size of the task - not a reason to
+automate the edit.
+
+The reason is not neatness. A pattern edit is fast and reviews as one line; a
+*wrong* pattern edit reviews as one line too, and the compiler will not tell you
+which you wrote. Both of these shipped into a branch on 13 Sep 2026 and were
+caught only by reading the result afterwards:
+
+- A loop meant to tag hotel routes `PRODUCT.HOTELS` and wallet routes
+  `PRODUCT.WALLETS` tagged **every** route `HOTELS`, because it guessed the
+  block from its first 200 characters. Valid code, wrong meaning.
+- A blanket `'] : []),' -> ']),'` across the router closed the wrong spreads and
+  left `/wallet/statement` outside its own array. It still parsed.
+
+Neither a build nor a test suite catches that class. Reading the file does.
+
+There is no exception. The eight Python tools written for the localisation work
+- the extractor, the composer, the date rewriter, the three sweeps, the scope
+check and the render check, plus `reapply-brand-copy.py` - are deleted. They
+existed to do at scale the thing this rule forbids, and they were themselves the
+source of several defects: a sweep that could not see `return 'copy'`, one that
+keyed a CSS animation value as a sentence, an extractor that exempted the button
+a customer presses to move their money.
+
+What they detected is not lost. It is in the suite, where it runs on every
+change instead of when somebody remembers to run a script:
+`tests/i18n-catalogue.spec.js` holds the guards for bare text nodes, copy in an
+expression, copy in a script block, a word beside an interpolation, a `t()` with
+no `t` in scope, a catalogue that does not compile and a translation that
+renames a placeholder; `tests/tailwind-classes.spec.js` holds the one for a
+class built at runtime.
+
+Moving copy into a catalogue is now what it should always have been: open the
+file, move the string, run the suite.
 
 ## Layering (do not short-circuit it)
 

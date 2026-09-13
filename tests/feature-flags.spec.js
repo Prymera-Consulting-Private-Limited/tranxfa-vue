@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
-import {couponsEnabled, flag, flightsEnabled, hotelsEnabled, serviceStatusEnabled, walletEnabled} from "@/feature_flags.js";
+import {flag, serviceStatusEnabled} from "@/feature_flags.js";
 
 describe('flag', () => {
     it.each([
@@ -15,42 +15,53 @@ describe('flag', () => {
     });
 });
 
-// Value-added services are licensed per deployment and the API tells the app
-// nothing about it; visibility is env only, one flag per product (SD-1036).
-// Off unless the deployment says so: a flag that is on without the licence
-// shows entry points that lead to 404s.
-describe('value-added service flags', () => {
+// SD-1074: product visibility left this module. It was one hand-set flag per
+// product per installation, and those drifted from the licence in both
+// directions. The licence decides now, from value_added_services on
+// service-status, so what is asserted here is that the flags are gone - not
+// merely unused, gone - and that the one flag left means only what it says.
+describe('the product flags are gone', () => {
     afterEach(() => vi.unstubAllEnvs());
 
-    it.each([
-        ['VITE_HOTELS_ENABLED', hotelsEnabled],
-        ['VITE_FLIGHTS_ENABLED', flightsEnabled],
-        ['VITE_COUPONS_ENABLED', couponsEnabled],
-        ['VITE_SERVICE_STATUS_ENABLED', serviceStatusEnabled],
-    ])('%s is off unless set, and reads every spelling', (name, read) => {
-        vi.stubEnv(name, '');
-        expect(read()).toBe(false);
+    it.each(['hotelsEnabled', 'flightsEnabled', 'walletEnabled', 'couponsEnabled', 'travelEnabled'])(
+        '%s is not exported any more', async (name) => {
+            const flags = await import('@/feature_flags.js');
+
+            expect(flags[name], `${name} still exists, so a deployment can still contradict the licence`)
+                .toBeUndefined();
+        });
+
+    it('no source file reads a product flag from the environment', async () => {
+        const {readdirSync, readFileSync} = await import('node:fs');
+        const walk = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((e) => {
+            const path = `${dir}/${e.name}`;
+            return e.isDirectory() ? walk(path) : (/\.(?:js|vue)$/.test(e.name) ? [path] : []);
+        });
+        // A read, not a mention: this module names them on purpose, to say so.
+        const gone = /import\.meta\.env\.VITE_(?:HOTELS|FLIGHTS|WALLET|COUPONS|TRAVEL)_ENABLED/;
+
+        const offenders = walk('src').filter(f => gone.test(readFileSync(f, 'utf8')));
+
+        expect(offenders, 'these still read a flag the licence replaced').toEqual([]);
+    });
+});
+
+// The one flag left. It used to decide whether service-status was called at
+// all; the same call carries the licence now, so it always runs and this
+// decides only whether the maintenance banner renders.
+describe('the maintenance banner flag', () => {
+    afterEach(() => vi.unstubAllEnvs());
+
+    it('is off unless set, and reads every spelling', () => {
+        vi.stubEnv('VITE_SERVICE_STATUS_ENABLED', '');
+        expect(serviceStatusEnabled()).toBe(false);
         for (const raw of ['0', 'no', 'off', 'false']) {
-            vi.stubEnv(name, raw);
-            expect(read()).toBe(false);
+            vi.stubEnv('VITE_SERVICE_STATUS_ENABLED', raw);
+            expect(serviceStatusEnabled()).toBe(false);
         }
         for (const raw of ['1', 'yes', 'on', 'true']) {
-            vi.stubEnv(name, raw);
-            expect(read()).toBe(true);
+            vi.stubEnv('VITE_SERVICE_STATUS_ENABLED', raw);
+            expect(serviceStatusEnabled()).toBe(true);
         }
-    });
-
-    // The wallet has the documented probe as its runtime guard; the flag is
-    // the hard off-switch in front of it, so it stays on by default.
-    it('the wallet switch is on unless turned off', () => {
-        vi.stubEnv('VITE_WALLET_ENABLED', '');
-        expect(walletEnabled()).toBe(true);
-        vi.stubEnv('VITE_WALLET_ENABLED', 'false');
-        expect(walletEnabled()).toBe(false);
-    });
-
-    it('the old single travel flag is gone', async () => {
-        const flags = await import('@/feature_flags.js');
-        expect(flags.travelEnabled).toBeUndefined();
     });
 });

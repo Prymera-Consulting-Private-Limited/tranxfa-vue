@@ -1,6 +1,6 @@
 ---
 name: translate-a-slice
-description: Move one area's copy out of the templates into src/locales/en.json, using scripts/i18n-extract.py and the catalogue guard. Use when asked to "migrate the next slice", "move this screen to i18n", "translate a component", "add a language", or when a new component is written and its copy needs to go in the catalogue rather than the markup.
+description: Move one area's copy out of the templates into src/locales/en.json, one file at a time by hand, checked by the catalogue guard. Use when asked to "migrate the next slice", "move this screen to i18n", "translate a component", "add a language", or when a new component is written and its copy needs to go in the catalogue rather than the markup.
 ---
 
 # Migrating a slice of copy
@@ -24,60 +24,65 @@ Ticket first, branch `feature/sd-<n>-i18n-slice-<k>` from `main`
 
 ## Procedure
 
-```sh
-# dry run first: prints the files and how many keys it would add
-python3 scripts/i18n-extract.py . transfer.wizard src/views/Transfer/IndexView.vue
+**Open one file. Move its copy. Open the next one.** There is no script for
+this and there is not going to be one: the eight that existed were deleted with
+SD-1131, because a pattern that rewrites thirty files reviews as one line
+whether it is right or wrong. See `CLAUDE.md`.
 
-# then apply
-python3 scripts/i18n-extract.py . transfer.wizard src/views/Transfer/IndexView.vue --apply
-```
+Work through a file top to bottom and move every one of these:
 
-The script handles whole text nodes, the text attributes, and text nodes with
-interpolations in them (`Thanks, we have your {{ x }}` becomes a message with a
-named parameter). It touches only the template block. Everything else it leaves
-and reports, which is the part you do by hand:
-
-- **String literals in `<script setup>`** — failure messages, computed labels.
-  Add `import {useI18n} from "vue-i18n";` and `const {t} = useI18n();`, then
-  replace the literal with `t('key')`. **Add the two lines before you replace
-  the literal, not after.** Forgetting them does not fail the build and does not
-  fail the suite; it leaves `ReferenceError: t is not defined` on a branch that
-  may go unrendered for weeks. `python3 scripts/i18n-scope-check.py` is the
-  cheapest check in this runbook and the only one that catches a crash rather
-  than a wrong word — run it after every sweep.
+- **Whole text nodes and the text attributes** (`placeholder`, `title`, `alt`,
+  `aria-label`, `label`). `<p>Send money</p>` becomes
+  `<p>{{ $t('transfer.wizard.sendMoney') }}</p>`.
+- **A text node with an interpolation in it.** `Thanks, we have your {{ x }}`
+  becomes one message with a named parameter, not two keys around a hole.
+  **A single word counts**: `Pay {{ amount }}` is the button a customer presses
+  to move their money, and it read English through the whole migration because
+  a rule exempted it.
+- **String literals in `<script setup>`** — failure messages, computed labels,
+  navigation names. Add `import {useI18n} from "vue-i18n";` and
+  `const {t} = useI18n();` **before** you replace the literal, not after.
+  Forgetting them fails neither the build nor the suite; it leaves
+  `ReferenceError: t is not defined` on a branch that may go unrendered for
+  weeks.
+- **Literals inside a template expression**, including inside a `$t()` call's
+  own arguments: `$t('k', {name: x || 'Recipient'})` renders "Recipient" in
+  the middle of an otherwise translated screen.
 - **Sentences split across tags**, where a link or a bold value sits
-  mid-sentence. Run `python3 scripts/i18n-compose.py . <prefix> <files>`
-  first: it rewrites the runs it can rebuild safely and tells you which ones
-  it left, with the reason. The rest are yours. Do not leave these as three keys: a translator cannot reorder
+  mid-sentence. Do not leave these as three keys - a translator cannot reorder
   them and the spaces between them are gone. Use `<i18n-t keypath="..." tag="p"
   scope="global">` with one `<template #name>` per styled part, and one message
   holding `{name}`. `docs/localisation.md` has the shape.
-- **Keys whose message is only a placeholder** (`"{amount}"`). The script no
-  longer makes them, but earlier slices did. Put the interpolation back in the
-  template and delete the key.
-- **Anything with an `@` in it.** Escape as `{'@'}` or message compilation
-  fails at render, not at build.
+- **A plural spelled with a ternary**, `night{{ n === 1 ? '' : 's' }}`. Use
+  vue-i18n pluralisation: `t('travel.nightCount', n, {count: n})` against
+  `"{count} night | {count} nights"`. Handing a translator an `s` to place is
+  meaningless in a language that pluralises differently.
 
-Check the messages for HTML entities as well (`&rarr;`, `&mdash;`,
-`&middot;`): those are markup, so write the character, and keep a decorative
-arrow in the template rather than in the message.
+What is **not** copy, and stays where it is: a Tailwind class list, an icon
+class, a date format, a media query, an enum or slug, an event name, an
+analytics event name (`fbq('track', 'Purchase')` - translating it stops the
+conversion being counted), a developer log line, a value being compared
+against, and a default for an environment variable.
 
-Then read the generated keys and rename the ones that read badly. Check the
-name is not already used elsewhere in the catalogue before you write it by
-hand; one collision silently changed a screen the slice never touched. The script
-names from the first few words, which gives `thanksWeHaveYourDocumentinreview`
-where `documentReceived` was meant.
+Two more per-message rules: **anything with an `@`** is escaped as `{'@'}` or
+message compilation fails at render rather than at build; and an **HTML entity**
+(`&rarr;`, `&mdash;`, `&middot;`) is markup, so write the character and keep a
+decorative arrow in the template rather than in the message.
+
+Name each key for what it says, not for its first few words. **Check the name is
+free before you write it** - one collision silently changed a screen the slice
+never touched.
 
 ## Finish the slice
 
 1. Add every migrated file to `MIGRATED` in `tests/i18n-catalogue.spec.js`.
    The guard then requires that each key exists and that the file spells out no
    sentence of its own. Run it; it will find what you missed.
-2. `python3 scripts/i18n-render-check.py HEAD <the files>`. It must print no
-   differences: the English on screen has to be identical, down to the spaces
-   between a label and the element beside it. Every difference it prints is a
-   defect you introduced, except one you meant to fix, and then say so in the
-   pull request.
+2. **Read your own diff, file by file.** The English on screen has to be
+   identical, down to the spaces between a label and the element beside it -
+   a lost space where copy sat next to a styled span was the commonest defect
+   of this whole migration. Any difference is one you introduced, except one
+   you meant, and then say so in the pull request.
 3. `npm run build` and `npx vitest run`.
 4. Existing specs that assert the English will fail. That is the point: move
    each one to read the catalogue (`expect(en.transfer.wizard.x).toBe(...)`)

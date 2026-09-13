@@ -1,4 +1,3 @@
-import {hotelsEnabled, walletEnabled} from '@/feature_flags.js'
 import i18n from '@/i18n.js';
 import { createRouter, createWebHistory } from 'vue-router'
 import SignUpView from "@/views/SignUpView.vue";
@@ -7,6 +6,8 @@ import NProgress from 'nprogress'
 import { createAuthGuard } from '@/router/guards.js'
 import { useCustomerStore } from '@/stores/customer.js'
 import { useCustomerUtils } from '@/composables/customer_utils.js'
+import { PRODUCT } from '@/licensed_products.js'
+import { offersProduct, productsSettled } from '@/composables/service_status.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,14 +88,17 @@ const router = createRouter({
         description: '',
       },
     },
-    // Hotels are licensed per deployment and the API answers 404 without the
-    // licence; the routes exist only when VITE_HOTELS_ENABLED says so, so a
-    // deep link on a brand without hotels reaches the not-found page.
-    ...(hotelsEnabled() ? [{
+    // Hotels are licensed per installation and the API answers 404 without the
+    // licence. The routes exist at all times now and carry the product they
+    // need: the licence arrives from service-status a moment after launch, so
+    // it cannot decide which routes to build (SD-1074). A deep link is judged
+    // in the guard, once the answer has settled.
+    ...([{
       path: '/travel/hotels',
       name: 'hotels',
       component: () => import('@/views/Travel/Hotels/IndexView.vue'),
       meta: {
+        requiresProduct: PRODUCT.HOTELS,
         titleKey: 'routes.hotels',
         description: '',
       },
@@ -104,6 +108,7 @@ const router = createRouter({
       props: route => ({ id: route.params.id, slug: route.params.slug, search: route.query.search }),
       component: () => import('@/views/Travel/Hotels/HotelView.vue'),
       meta: {
+        requiresProduct: PRODUCT.HOTELS,
         titleKey: 'routes.viewHotel',
         description: '',
       },
@@ -114,6 +119,7 @@ const router = createRouter({
       props: route => ({ quoteId: route.params.id }),
       component: () => import('@/views/Travel/Hotels/HotelQuoteView.vue'),
       meta: {
+        requiresProduct: PRODUCT.HOTELS,
         titleKey: 'routes.yourPrice',
         description: '',
       },
@@ -123,6 +129,7 @@ const router = createRouter({
       name: 'travelBookings',
       component: () => import('@/views/Travel/Bookings/IndexView.vue'),
       meta: {
+        requiresProduct: PRODUCT.HOTELS,
         titleKey: 'routes.yourBookings',
         description: '',
       },
@@ -135,6 +142,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/PaymentStatusView.vue'),
       meta: {
+        requiresProduct: PRODUCT.HOTELS,
         titleKey: 'routes.yourPayment',
         description: '',
       },
@@ -146,6 +154,7 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/PaymentView.vue'),
       meta: {
+        requiresProduct: PRODUCT.HOTELS,
         titleKey: 'routes.payForYourBooking',
         description: '',
       },
@@ -155,10 +164,11 @@ const router = createRouter({
       props: route => ({ orderId: route.params.id }),
       component: () => import('@/views/Travel/Bookings/ItemView.vue'),
       meta: {
+        requiresProduct: PRODUCT.HOTELS,
         titleKey: 'routes.booking',
         description: '',
       },
-    }] : []),
+    }]),
     {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
@@ -255,12 +265,13 @@ const router = createRouter({
       },
     },
     // The wallet's own runtime guard is the documented probe of GET
-    // /wallet/subscription; this is the deployment's hard off-switch.
-    ...(walletEnabled() ? [{
+    // /wallet/subscription; the licence decides whether that probe happens.
+    ...([{
       path: '/wallet',
       name: 'wallet',
       component: () => import('@/views/Wallet/IndexView.vue'),
       meta: {
+        requiresProduct: PRODUCT.WALLETS,
         titleKey: 'routes.wallet',
         description: '',
       },
@@ -269,10 +280,11 @@ const router = createRouter({
       name: 'walletStatement',
       component: () => import('@/views/Wallet/StatementView.vue'),
       meta: {
+        requiresProduct: PRODUCT.WALLETS,
         titleKey: 'routes.walletStatement',
         description: '',
       },
-    }] : []),
+    }]),
     {
       // Anything unmatched. Without this an unknown address rendered an
       // empty RouterView titled "Default Title".
@@ -315,6 +327,19 @@ router.beforeEach((to) => {
     refresh: () => useCustomerUtils().refresh({skipAuthRedirect: true}),
   })
   return guard(to)
+})
+
+// A route that needs a licensed product waits for the first service-status
+// answer, then is judged against it. Waiting is what makes a deep link honest:
+// judged against an empty list, every product page would 404 on a cold start.
+router.beforeEach(async (to) => {
+  const product = to.meta?.requiresProduct
+  if (! product) {
+    return true
+  }
+  await productsSettled()
+
+  return offersProduct(product) ? true : {name: 'notFound'}
 })
 
 router.beforeEach((to, from) => {

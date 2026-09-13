@@ -17,7 +17,8 @@ import {
 } from "@headlessui/vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {hotelsEnabled, walletEnabled} from '@/feature_flags.js';
+import {useServiceStatus} from '@/composables/service_status.js';
+import {PRODUCT} from '@/licensed_products.js';
 import {useWalletStore} from "@/stores/wallet.js";
 import {computed, onMounted, ref} from "vue";
 import router from "@/router/index.js";
@@ -30,16 +31,20 @@ const walletStore = useWalletStore();
  */
 const customer = customerStore.customer;
 
-const hasTravel = hotelsEnabled();
-const hasWallet = walletEnabled();
+// The licence arrives from GET /client/v1/service-status a moment after the
+// first render, so these are computed rather than read once: the entry points
+// appear when the answer does, and never before it.
+const {offers} = useServiceStatus();
+const hasTravel = computed(() => offers(PRODUCT.HOTELS));
+const hasWallet = computed(() => offers(PRODUCT.WALLETS));
 
 const navigation = computed(() => [
   { name: t('nav.home'), href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
-  ...(hasWallet && walletStore.isAvailable ? [
+  ...(hasWallet.value && walletStore.isAvailable ? [
     { name: t('nav.wallet'), href: 'wallet', current: router.currentRoute.value.name === 'wallet' },
   ] : []),
   { name: t('nav.transfers'), href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
-  ...(hasTravel ? [
+  ...(hasTravel.value ? [
     { name: t('nav.hotels'), href: 'hotels', current: router.currentRoute.value.name === 'hotels' },
     { name: t('nav.bookings'), href: 'travelBookings', current: router.currentRoute.value.name === 'travelBookings' },
   ] : []),
@@ -61,6 +66,13 @@ const userNavigation = [
   { name: t('nav.settings'), href: 'settings' },
   { name: t('nav.signOut'), action: logout },
 ]
+
+// The mobile panel shows the main navigation and the user menu one after the
+// other, so anything in both would appear twice. Desktop keeps the full user
+// menu: there the two lists are never on screen together.
+const userOnlyNavigation = computed(
+  () => userNavigation.filter(item => !navigation.value.some(link => link.href === item.href)),
+);
 
 const isLoading = ref(false);
 
@@ -174,7 +186,7 @@ onMounted(async () => {
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                  <template v-for="item in userNavigation" :key="item.name">
+                  <template v-for="item in userOnlyNavigation" :key="item.name">
                     <a v-if="item.action" href="javascript:" @click="item.action" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</a>
                     <router-link v-else :to="{name: item.href}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</router-link>
                   </template>

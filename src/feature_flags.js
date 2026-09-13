@@ -20,45 +20,27 @@ export function flag(value, fallback) {
 }
 
 /**
- * Which value-added services this deployment shows.
+ * Value-added product visibility no longer lives here.
  *
- * The backend licenses each service separately (HOTELS, FLIGHTS, WALLETS,
- * PROMOTIONAL-COUPONS, ...) and tells the customer app nothing about it: an
- * unlicensed feature's routes simply answer 404. Visibility here is decided
- * by env only, one flag per product, all off unless the deployment says
- * otherwise (decision on SD-1036). A flag that is on for a service the
- * deployment does not hold shows entry points that lead to 404s, so set them
- * from the licence, not from hope.
+ * It came from one hand-set flag per product per installation, and those
+ * drifted from the licence in both directions: a product switched on in the
+ * licence stayed invisible until somebody edited a flag, and a product whose
+ * term had ended stayed on the menu offering screens that answer 404.
+ * GET /client/v1/service-status carries value_added_services, so the licence
+ * decides. See src/licensed_products.js (SD-1074).
  *
- * VITE_TRAVEL_ENABLED (default on) is gone; a brand that had it set must move
- * to VITE_HOTELS_ENABLED.
+ * VITE_HOTELS_ENABLED, VITE_FLIGHTS_ENABLED, VITE_WALLET_ENABLED and
+ * VITE_COUPONS_ENABLED are gone. A deployment that still sets them is setting
+ * nothing; the licence is the switch.
  */
-
-/** Hotels: the search, hotel page, price hold and bookings. */
-export function hotelsEnabled() {
-    return flag(import.meta.env.VITE_HOTELS_ENABLED, false);
-}
-
-/** Flights: reserved for the flights UI; nothing renders yet. */
-export function flightsEnabled() {
-    return flag(import.meta.env.VITE_FLIGHTS_ENABLED, false);
-}
 
 /**
- * The customer wallet. A hard off-switch in front of the documented probe:
- * with this on, the wallet appears only when GET /wallet/subscription says
- * the deployment offers it; with it off, nothing is asked or shown.
+ * Whether the maintenance-window banner renders.
+ *
+ * This used to decide whether GET /client/v1/service-status was called at all.
+ * The same call now carries the licence, so it always runs; this decides only
+ * whether the banner is shown.
  */
-export function walletEnabled() {
-    return flag(import.meta.env.VITE_WALLET_ENABLED, true);
-}
-
-/** Promotion coupons on the quote and receipt (SD-1037). */
-export function couponsEnabled() {
-    return flag(import.meta.env.VITE_COUPONS_ENABLED, false);
-}
-
-/** The maintenance-window banner fed by GET /client/v1/service-status. */
 export function serviceStatusEnabled() {
     return flag(import.meta.env.VITE_SERVICE_STATUS_ENABLED, false);
 }
