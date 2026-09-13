@@ -22,7 +22,8 @@
     "plannedMaintenance": "Planned maintenance.",
     "plannedMaintenanceFrom": "Planned maintenance from {from}.",
     "plannedMaintenanceUntil": "Planned maintenance until around {until}.",
-    "plannedMaintenanceFromUntil": "Planned maintenance from {from} until around {until}."
+    "plannedMaintenanceFromUntil": "Planned maintenance from {from} until around {until}.",
+    "close": "Close"
   },
   "auth": {
     "signIn": {
@@ -614,7 +615,10 @@
     "welcomeCustomer": "Welcome {name}",
     "copyright": "© 2025 {appName}",
     "sentAmountViaMethod": "Sent {foreignAmountCurrencyPrefixed} via {title}",
-    "amountToRecipient": "{amount} to {recipient}"
+    "amountToRecipient": "{amount} to {recipient}",
+    "changePasswordTitle": "Change your password",
+    "personalDetailsTitle": "Your personal details",
+    "addressTitle": "Your address"
   },
   "wallet": {
     "aDeclarationStaysOpenFor": "A declaration stays open for 72 hours. A deposit that arrives late or with a different amount isn't lost — our support team takes care of it.",
