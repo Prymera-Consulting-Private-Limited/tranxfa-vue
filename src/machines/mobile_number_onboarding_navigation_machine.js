@@ -1,6 +1,6 @@
 import { createMachine } from 'xstate';
 import { useCustomerStore } from '@/stores/customer.js';
-import { collectsAddress } from '@/onboarding_config.js';
+import { addressCollection, collectsAddress } from '@/onboarding_config.js';
 
 const customerStore = useCustomerStore();
 
@@ -41,13 +41,16 @@ function requiresAddressInformation() {
         !!customer?.addressInformationRequired?.();
 }
 
-// Reads "nothing further is owed for the address", so a deployment that does
-// not collect one is complete by definition - otherwise the email steps after
-// it, which all chain through this, would be unreachable.
-function addressInformationCompleted() {
+// Reads "the address no longer stands between the customer and the next step".
+//
+// Not the same as "an address was given": a deployment that omits the step is
+// settled by definition, and so is one where it is skippable - otherwise the
+// email steps after it, which all chain through this, would be unreachable for
+// a customer who skipped.
+function addressSettled() {
     const customer = getCustomer();
 
-    if (! collectsAddress()) {
+    if (addressCollection() !== 'required') {
         return employmentInformationCompleted();
     }
 
@@ -64,7 +67,7 @@ function hasEmail() {
 function doesNotHaveEmail() {
     const customer = getCustomer();
 
-    return addressInformationCompleted() &&
+    return addressSettled() &&
         ! (!!customer?.account?.email);
 }
 
@@ -74,7 +77,7 @@ function doesNotHaveEmail() {
 function emailVerified() {
     const customer = getCustomer();
 
-    return addressInformationCompleted() &&
+    return addressSettled() &&
         !!customer?.account?.isEmailVerified;
 }
 
@@ -84,7 +87,7 @@ function emailVerified() {
 function emailVerificationRequired() {
     const customer = getCustomer();
 
-    return addressInformationCompleted() &&
+    return addressSettled() &&
         hasEmail() &&
         !customer?.account?.isEmailVerified;
 }
