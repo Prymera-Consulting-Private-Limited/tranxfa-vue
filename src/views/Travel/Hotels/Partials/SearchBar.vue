@@ -167,7 +167,7 @@ const months = computed(() => (isWide.value && !props.stacked ? 2 : 1));
 
 const stayLabel = computed(() => {
   if (!nights.value) {
-    return 'Select dates';
+    return t('travel.selectDates');
   }
 
   const checkin = moment(dates.value[0]).format('ddd, D MMM');

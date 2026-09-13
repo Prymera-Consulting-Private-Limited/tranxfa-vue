@@ -12,6 +12,9 @@ import ServiceStatusBanner from "@/components/ServiceStatusBanner.vue";
 import {NotificationGroup, Notification, notify} from 'notiwind';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
 import { XMarkIcon } from '@heroicons/vue/20/solid'
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();

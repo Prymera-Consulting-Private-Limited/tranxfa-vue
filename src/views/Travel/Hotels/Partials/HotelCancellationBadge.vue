@@ -36,7 +36,7 @@ const label = computed(() => {
           : t('travel.freeCancellation');
 
     case CANCELLATION_STATUS.partial:
-      return 'Partly refundable';
+      return t('travel.partlyRefundable');
 
     case CANCELLATION_STATUS.nonRefundable:
       return 'Non-refundable';
@@ -45,7 +45,7 @@ const label = computed(() => {
     // answered is the only honest thing to put here — hiding the rate loses a
     // real result, and guessing either way is a promise we cannot keep.
     case CANCELLATION_STATUS.unknown:
-      return 'Cancellation terms at the next step';
+      return t('travel.cancellationTermsAtNextStep');
 
     default:
       return null;

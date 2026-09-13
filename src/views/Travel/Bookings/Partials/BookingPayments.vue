@@ -1,5 +1,8 @@
 <script setup>
 import moment from 'moment';
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const props = defineProps({
   /**
@@ -22,19 +25,19 @@ const props = defineProps({
 function note(payment) {
   switch (payment.state) {
     case 'FAILED':
-      return "This attempt didn't go through. You haven't been charged for it.";
+      return t('travel.paymentAttemptFailed');
 
     case 'TIMED-OUT':
-      return 'This attempt timed out before it completed.';
+      return t('travel.paymentAttemptTimedOut');
 
     case 'CANCELLED':
-      return 'This attempt was cancelled.';
+      return t('travel.paymentAttemptCancelled');
 
     case 'REFUNDED':
-      return 'This payment has been refunded in full.';
+      return t('travel.paymentRefundedInFull');
 
     case 'PART-REFUNDED':
-      return 'Part of this payment has been refunded.';
+      return t('travel.paymentPartlyRefunded');
 
     default:
       return null;

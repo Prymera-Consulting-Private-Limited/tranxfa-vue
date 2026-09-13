@@ -47,7 +47,7 @@ const hasFailed = computed(() => orderFailed.value || methodsFailed.value);
 // load as a payment configuration problem.
 const failureTitle = computed(() => {
   if (orderFailed.value && methodsFailed.value) {
-    return "We couldn't load this page";
+    return t('travel.couldNotLoadThisPage');
   }
 
   return orderFailed.value ? t('travel.weCouldntLoadYour5') : t('travel.weCouldntLoadYour4');
