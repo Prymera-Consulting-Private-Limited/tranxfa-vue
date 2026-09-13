@@ -212,12 +212,12 @@ const isShowPaymentAccountModalOpen = ref(false);
               <div class="sm:pr-4 col-span-2 sm:col-span-1">
                 <dt class="inline text-gray-500">{{ $t('account.date') }}</dt>
                 {{  }}
-                <dd class="inline text-gray-700"><time :datetime="transaction.data.createdAt">{{ moment(transaction.data.createdAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
+                <dd class="inline text-gray-700"><time :datetime="transaction.data.createdAt">{{ moment(transaction.data.createdAt).format('LLL') }}</time></dd>
               </div>
               <div class="mt-2 sm:mt-0 sm:pl-4 col-span-2 sm:col-span-1">
                 <dt class="inline text-gray-500">{{ $t('account.updatedOn') }}</dt>
                 {{ ' ' }}
-                <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('MMMM D, YYYY hh:mm A') }}</time></dd>
+                <dd class="inline text-gray-700"><time :datetime="transaction.data.updatedAt">{{ moment(transaction.data.updatedAt).format('LLL') }}</time></dd>
               </div>
               <div class="mt-6 border-t border-gray-900/5 pt-6 sm:pr-4 col-span-2 sm:col-span-1">
                 <dt class="font-semibold text-gray-900"><i18n-t keypath="account.sendingFromCountry" scope="global"><template #country><span class="text-brand-700">{{ transaction.data.paymentCountry.commonName }}</span></template></i18n-t></dt>

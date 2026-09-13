@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ClipboardIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
@@ -98,7 +102,7 @@ async function fetchInstructions() {
     }
   }).catch((e) => {
     generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
-    generalError.value = e.response?.data?.message ?? 'We were unable to load your deposit details. Please try again.';
+    generalError.value = e.response?.data?.message ?? t('wallet.weWereUnableTo2');
   });
 }
 
@@ -121,7 +125,7 @@ async function declare() {
       amountErrors.value = e.response.data.errors?.amount ?? [e.response.data.message];
     } else {
       generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
-      generalError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+      generalError.value = e.response?.data?.message ?? t('account.somethingWentWrongPlease');
     }
   }).finally(() => {
     isSubmitting.value = false;
@@ -225,7 +229,7 @@ function close() {
                   <ClientPaymentAccount v-bind:account="account" />
                 </template>
 
-                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.thisDeclarationExpiresFromnowA', {fromNow: moment(declaration.expiresAt).fromNow(), A: moment(declaration.expiresAt).format('MMMM D, YYYY h:mm A')}) }}</p>
+                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.thisDeclarationExpiresFromnowA', {fromNow: moment(declaration.expiresAt).fromNow(), A: moment(declaration.expiresAt).format('LLL')}) }}</p>
 
                 <button type="button" @click="close" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">{{ $t('wallet.done') }}</button>
               </template>

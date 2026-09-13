@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import InlineFailure from "@/components/InlineFailure.vue";
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
@@ -94,7 +98,7 @@ const changePassword = async () => {
       }
     } else {
       logRequestFailure(error, 'change-password');
-      changeFailure.value = failureMessage(error, "We couldn't change your password. Your old password still works. Please try again.");
+      changeFailure.value = failureMessage(error, t('account.weCouldntChangeYour'));
     }
   }).finally(() => {
     isSaving.value = false;
@@ -185,7 +189,7 @@ const changePassword = async () => {
             <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.confirm_password[0] }}</p>
         </div>
         <!-- Submit Button -->
-        <button :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-center py-3.5 font-medium text-white rounded-xl transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">{{ isSaving ? 'Changing...' : 'Change Password' }}</button>
+        <button :disabled="isSaving" type="submit" class="block w-full bg-brand-700 text-center py-3.5 font-medium text-white rounded-xl transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">{{ isSaving ? 'Changing...' : $t('account.changePassword') }}</button>
         <InlineFailure :message="changeFailure" />
     </form>
 </template>

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from 'vue';
 import moment from 'moment';
 import {useRouter} from 'vue-router';
@@ -71,7 +75,7 @@ const stay = computed(() => {
     return null;
   }
 
-  return `${moment(quote.value.checkIn).format('ddd D MMM')} – ${moment(quote.value.checkOut).format('ddd D MMM YYYY')}`;
+  return `${moment(quote.value.checkIn).format('ddd D MMM')} – ${moment(quote.value.checkOut).format('llll')}`;
 });
 
 const guests = computed(() => (quote.value ? getGuestBreakdown(quote.value.rooms) : []));
@@ -92,7 +96,7 @@ async function load() {
   await getQuote(props.quoteId).then((response) => {
     quote.value = TravelQuote.getInstance(response.data);
   }).catch((error) => {
-    reportUnexpectedError(error, 'travel quote');
+    reportUnexpectedError(error, t('travel.travelQuote'));
     quote.value = null;
     hasExpired.value = error.response?.status === 410;
     hasFailed.value = !hasExpired.value;
@@ -146,7 +150,7 @@ async function book(payload) {
       bookingValidation.value = error.response?.data?.errors ?? null;
       bookingError.value = getCustomerMessage(error);
     } else {
-      bookingError.value = getCustomerMessage(error) ?? 'We could not book this room. Please try again in a moment.';
+      bookingError.value = getCustomerMessage(error) ?? t('travel.weCouldNotBook');
     }
 
     isBooking.value = false;
@@ -178,10 +182,10 @@ onUnmounted(() => clearInterval(clock));
             <ClockIcon class="size-7" aria-hidden="true" />
           </div>
           <h1 class="mt-6 text-base font-semibold text-gray-900">
-            {{ bookingRefused ? "We couldn't complete this booking" : 'This price is no longer held' }}
+            {{ bookingRefused ? $t('travel.bookingRefused') : $t('travel.priceNoLongerHeld') }}
           </h1>
           <p class="mt-2 max-w-md text-sm/6 text-gray-500">
-            {{ failureMessage ?? 'We hold a price for 15 minutes. Search again to see what is available now.' }}
+            {{ failureMessage ?? $t('travel.priceHoldExplained') }}
           </p>
           <RouterLink
               :to="{name: 'hotels'}"

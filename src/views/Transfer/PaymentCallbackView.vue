@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -141,7 +145,7 @@ const retryPayment = async () => {
     router.push({ name: 'makePayment', params: { transactionId: transaction.value.id } });
   }).catch((e) => {
     logRequestFailure(e, 'retry-payment');
-    retryFailure.value = failureMessage(e, "We couldn't start a new payment. Nothing has been charged. Please try again.");
+    retryFailure.value = failureMessage(e, t('transfer.wizard.weCouldntStartA'));
   }).finally(() => {
     isLoading.value = false;
   });
@@ -200,7 +204,7 @@ function closePaymentModal() {
 
                   <template v-else-if="status === 'cancelled'">
                     <Failed class="-mt-20" />
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? $t('payment.provider.thisPaymentHasExpired') : $t('payment.provider.thisPaymentWasCancelled') }}</h2>
                     <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
                   </template>
 

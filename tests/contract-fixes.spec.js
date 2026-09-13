@@ -1,4 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
+import en from '@/locales/en.json';
 import {readFileSync} from 'node:fs';
 import {createPinia, setActivePinia} from 'pinia';
 import {failureMessage, retryAfterSeconds} from '@/composables/api_utils.js';
@@ -99,6 +100,7 @@ describe('the Belmoney awaiting state without the flag', () => {
   it('offers Apply Info From POI proactively on the verification page', () => {
     const s = read('src/views/AccountVerification/IndexView.vue');
     expect(s).toContain("customerStore.customer.data?.poiInfoCheck === 'failed'");
-    expect(s).toContain('Use the details from my ID');
+    expect(s).toContain("$t('verification.useMyIdDetails')");
+    expect(en.verification.useMyIdDetails).toBe('Use the details from my ID');
   });
 });

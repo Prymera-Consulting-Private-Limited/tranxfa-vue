@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import { computed, ref } from 'vue';
@@ -58,7 +62,7 @@ const handleDelete = async () => {
     }, 300); // Wait for fade-out animation to complete
   } catch (error) {
     logRequestFailure(error, 'device-sign-out');
-    signOutFailure.value = failureMessage(error, "We couldn't sign that device out. Please try again.");
+    signOutFailure.value = failureMessage(error, t('account.weCouldntSignThat'));
     isDeleting.value = false;
   }
 };
@@ -94,7 +98,7 @@ const handleDelete = async () => {
           class="text-sm/6 text-danger-600 hover:text-danger-700 font-medium hover:underline cursor-pointer"
           :disabled="isDeleting"
         >
-          {{ isDeleting ? 'Signing out...' : 'Sign Out' }}
+          {{ isDeleting ? $t('account.signingOut') : $t('account.signOut') }}
         </button>
       </div>
       <InlineFailure :message="signOutFailure" />
@@ -129,7 +133,7 @@ const handleDelete = async () => {
                       @click="handleDelete"
                       :disabled="isDeleting"
                     >
-                      {{ isDeleting ? 'Deleting...' : 'Sign Out' }}
+                      {{ isDeleting ? 'Deleting...' : $t('account.signOut') }}
                     </button>
                     <button
                       type="button"

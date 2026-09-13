@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -28,7 +32,7 @@ async function getMovements(page = 1) {
     data.value = response.data;
   }).catch((e) => {
     logRequestFailure(e, 'wallet-statement');
-    loadFailure.value = failureMessage(e, "We couldn't load your wallet activity.");
+    loadFailure.value = failureMessage(e, t('wallet.weCouldntLoadYour6'));
   }).finally(() => {
     isLoading.value = false;
   });

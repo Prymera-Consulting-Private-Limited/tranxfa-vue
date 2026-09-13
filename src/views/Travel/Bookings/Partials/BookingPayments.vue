@@ -84,7 +84,7 @@ function classes(payment) {
             <span v-if="payment.method" class="text-sm/6 text-gray-600">{{ payment.method }}</span>
           </div>
           <p v-if="note(payment)" class="mt-1.5 text-xs/5 text-gray-500">{{ note(payment) }}</p>
-          <p v-if="payment.attemptedAt" class="mt-1 text-xs/5 text-gray-500">{{ moment(payment.attemptedAt).format('D MMM YYYY, HH:mm') }}</p>
+          <p v-if="payment.attemptedAt" class="mt-1 text-xs/5 text-gray-500">{{ moment(payment.attemptedAt).format('lll') }}</p>
         </div>
         <p class="shrink-0 text-sm/6 font-medium text-gray-900 tabular-nums">{{ payment.amount.currencyPrefixed }}</p>
       </li>

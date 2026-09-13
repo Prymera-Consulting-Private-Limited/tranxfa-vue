@@ -81,7 +81,7 @@ const hasAnything = computed(() => props.rules.length > 0 || props.charges.lengt
     <div v-if="charges.length" class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
       <header class="border-b border-gray-100 px-5 py-4">
         <h3 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.paidAtTheProperty') }}</h3>
-        <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.collectedByTheHotelRather') }}<template v-if="currencies.length"> {{ $t('travel.andChargedIn', {currencies: currencies.join(' and ')}) }}</template>{{ $t('travel.soTheseAreNotPart') }}</p>
+        <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.collectedByTheHotelRather') }}<template v-if="currencies.length"> {{ $t('travel.andChargedIn', {currencies: currencies.join($t('common.listJoin'))}) }}</template>{{ $t('travel.soTheseAreNotPart') }}</p>
       </header>
       <ul class="divide-y divide-gray-100">
         <li v-for="charge in charges" :key="charge.type" class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3">

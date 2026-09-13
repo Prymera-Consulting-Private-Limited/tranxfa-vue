@@ -69,7 +69,7 @@ const expiresIn = computed(() => {
 });
 
 const expiresAtFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('MMM D, YYYY h:mm A') : '';
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
 });
 
 // PENDING alone is not payable — the hosted payment URL can arrive later than
@@ -138,7 +138,7 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
   <template v-else-if="status === 'processing'">
     <Processing class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.wereWatchingForYourPayment') }}</h2>
-    <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage || 'This usually takes under a minute. You can close this page; we will email you when it is done.' }}</p>
+    <p class="text-base text-gray-600 mb-6">{{ transaction.payment.clientPaymentAccount?.waitTimeMessage || $t('payment.provider.thisUsuallyTakesUnderA') }}</p>
     <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>
     </div>
@@ -159,7 +159,7 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
 
   <template v-else-if="status === 'cancelled'">
     <Failed class="-mt-20" />
-    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? 'This payment has expired' : 'This payment was cancelled' }}</h2>
+    <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? $t('payment.provider.thisPaymentHasExpired') : $t('payment.provider.thisPaymentWasCancelled') }}</h2>
     <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>

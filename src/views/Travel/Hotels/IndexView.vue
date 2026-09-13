@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onMounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -210,14 +214,14 @@ async function getHotels() {
     searchId.value = resolved?.id ?? null;
     nights.value = response.data.nights ?? resolved?.nights ?? 0;
   }).catch((error) => {
-    reportUnexpectedError(error, 'travel search');
+    reportUnexpectedError(error, t('travel.travelSearch'));
     hotels.value = [];
     totalHotels.value = 0;
     hasFailed.value = true;
     // A 404 without a message is the licence being absent rather than anything
     // going wrong, so it must not read as an outage somebody could wait out.
     failureMessage.value = getCustomerMessage(error)
-        ?? (error.response?.status === 404 ? "Travel isn't available on this app." : null);
+        ?? (error.response?.status === 404 ? t('travel.travelIsntAvailableOnThis') : null);
     searchId.value = null;
   }).finally(() => {
     isLoading.value = false;

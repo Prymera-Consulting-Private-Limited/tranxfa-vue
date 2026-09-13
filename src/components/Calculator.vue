@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import {
@@ -170,7 +174,7 @@ async function getQuote() {
     } else {
       // Says something rather than leaving the last good quote on screen
       // looking current.
-      quoteFailureReason.value = 'We could not price this transfer just now. Please check your connection and try again.';
+      quoteFailureReason.value = t('calculator.weCouldNotPrice');
       console.error(e);
     }
   }).finally(() => {
@@ -272,7 +276,7 @@ async function saveQuote() {
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
     }).catch((e) => {
       isSavingQuote.value = false;
-      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
+      saveFailure.value = failureMessage(e, t('calculator.weCouldntStartYour'));
     });
   } else {
     quoteUtil.saveQuote(quoteUtil.quote.data).then((response) => {
@@ -280,7 +284,7 @@ async function saveQuote() {
       router.push({name: 'transferWizard', params: {quoteId: quote.id}});
     }).catch((e) => {
       isSavingQuote.value = false;
-      saveFailure.value = failureMessage(e, "We couldn't start your transfer. Nothing has been sent. Please try again.");
+      saveFailure.value = failureMessage(e, t('calculator.weCouldntStartYour'));
     });
   }
 
@@ -440,7 +444,7 @@ async function saveQuote() {
                             <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
                               <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
                                 <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || 'Please Select' }}</p>
+                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || $t('calculator.pleaseSelect') }}</p>
                               </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
                                 <span class="sr-only">{{ $t('calculator.selectOrChangeDeliveryMethod') }}</span>

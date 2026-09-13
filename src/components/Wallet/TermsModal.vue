@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {CheckCircleIcon, ClipboardIcon} from "@heroicons/vue/24/outline/index.js";
@@ -53,7 +57,7 @@ async function fetchTerms() {
   await walletUtils.getTerms().then((response) => {
     terms.value = WalletTerms.getInstance(response.data);
   }).catch((e) => {
-    generalError.value = e.response?.data?.message ?? 'We were unable to load the wallet terms. Please try again.';
+    generalError.value = e.response?.data?.message ?? t('wallet.weWereUnableTo');
   }).finally(() => {
     isLoadingTerms.value = false;
   });
@@ -69,8 +73,8 @@ async function accept() {
       notify(
           {
             group: 'customer',
-            title: 'Wallet Restored',
-            text: 'Thanks — the updated terms are accepted and your wallet is back in action.',
+            title: t('wallet.walletRestored'),
+            text: t('wallet.thanksTheUpdatedTerms'),
             type: 'success',
           },
           -1,
@@ -94,7 +98,7 @@ async function accept() {
     } else if (e.response?.status === 422) {
       generalError.value = e.response.data.message;
     } else {
-      generalError.value = 'Something went wrong. Please try again.';
+      generalError.value = t('account.somethingWentWrongPlease');
     }
   }).finally(() => {
     isSubmitting.value = false;
@@ -143,7 +147,7 @@ function close() {
 
               <template v-else>
                 <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">
-                  {{ mode === 'reaccept' ? 'Updated wallet terms' : 'Wallet terms' }}
+                  {{ mode === 'reaccept' ? $t('wallet.updatedWalletTerms') : $t('wallet.walletTerms') }}
                 </DialogTitle>
                 <p v-if="mode === 'reaccept'" class="mt-2 rounded-md bg-brand-50 px-4 py-3 text-sm/6 text-brand-800">{{ $t('wallet.weveUpdatedTheWalletTerms') }}</p>
                 <p v-else class="mt-1 text-sm/6 text-gray-500">{{ $t('wallet.pleaseReadAndAcceptThe') }}</p>
@@ -169,7 +173,7 @@ function close() {
                       <Spinner :class="'w-4 h-4 mr-2'" />
                       <span>{{ $t('calculator.saving') }}</span>
                     </span>
-                    <span v-else>{{ mode === 'reaccept' ? 'Accept and continue' : 'Accept and activate' }}</span>
+                    <span v-else>{{ mode === 'reaccept' ? $t('wallet.acceptAndContinue') : $t('wallet.acceptAndActivate') }}</span>
                   </button>
                 </template>
               </template>

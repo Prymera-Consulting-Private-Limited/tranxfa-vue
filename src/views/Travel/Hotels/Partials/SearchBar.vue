@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from 'vue';
 import moment from 'moment';
 import VueDatePicker from '@vuepic/vue-datepicker';
@@ -30,9 +34,7 @@ const props = defineProps({
     default: null,
   },
 
-  /**
-   * @type {Region[]}
-   */
+  
   regions: {
     type: Array,
     default: () => [],
@@ -48,37 +50,25 @@ const props = defineProps({
     default: false,
   },
 
-  /**
-   * Display text for region kind codes.
-   */
+  
   regionLabels: {
     type: Object,
     default: () => ({}),
   },
 
-  /**
-   * Whether the list is the operator's curated one rather than search results.
-   */
+  
   regionsFeatured: {
     type: Boolean,
     default: false,
   },
 
-  /**
-   * Either "failed" — the lookup was rejected, which must not read the same as
-   * answering with nothing, since "no destinations found" during an outage tells
-   * a customer their city does not exist — or "unavailable", meaning travel is
-   * not part of this product at all.
-   */
+  
   regionsError: {
     type: String,
     default: null,
   },
 
-  /**
-   * Keeps the fields in one column at every width, for the hotel page where the
-   * bar lives in a sidebar instead of across the top.
-   */
+  
   stacked: {
     type: Boolean,
     default: false,
@@ -90,22 +80,12 @@ const emit = defineEmits([
   'region-search',
 ]);
 
-/**
- * Null until the customer picks one, in which case the destination shown is the
- * region name the parent resolved from the results.
- *
- * @type {import('vue').Ref<Region|null>}
- */
+
 const selectedRegion = ref(null);
 
 const dates = ref([props.criteria.checkin, props.criteria.checkout]);
 
-/**
- * Occupancy is per room, since the supplier prices each room on its own adults
- * and the individual ages of its children.
- *
- * @type {import('vue').Ref<Array<{adults: number, children: number[]}>>}
- */
+
 const guests = ref(getRooms(props.criteria.guests));
 
 // Keep the bar in sync when the parent changes the search criteria, which the
@@ -118,12 +98,7 @@ watch(() => props.criteria.guests, rooms => {
   guests.value = getRooms(rooms);
 });
 
-/**
- * The criteria belong to the parent, so the picker always works on its own copy.
- *
- * @param {Array} rooms
- * @returns {Array<{adults: number, children: number[]}>}
- */
+
 function getRooms(rooms) {
   if (!Array.isArray(rooms) || rooms.length === 0) {
     return [{adults: 2, children: []}];
@@ -166,10 +141,7 @@ function retryRegions() {
   emit('region-search', lastQuery.value);
 }
 
-/**
- * @param {Region} region
- * @returns {string}
- */
+
 function regionDescription(region) {
   return [props.regionLabels[region.kind], region.country].filter(Boolean).join(' · ');
 }
@@ -205,23 +177,16 @@ const stayLabel = computed(() => {
 });
 
 const OCCUPANCY = [
-  {key: 'adults', label: 'Adults', hint: '18+'},
-  {key: 'children', label: 'Children', hint: `0–${MAX_CHILD_AGE}`},
+  {key: 'adults', label: t('travel.adults'), hint: '18+'},
+  {key: 'children', label: t('travel.children'), hint: `0–${MAX_CHILD_AGE}`},
 ];
 
-/**
- * @param {{adults: number, children: number[]}} room
- * @returns {number}
- */
+
 function roomGuests(room) {
   return room.adults + room.children.length;
 }
 
-/**
- * @param {{adults: number, children: number[]}} room
- * @param {string} key
- * @returns {number}
- */
+
 function countOf(room, key) {
   return key === 'adults' ? room.adults : room.children.length;
 }
@@ -238,10 +203,7 @@ function canIncrease(room, key) {
   return key === 'adults' ? room.adults < MAX_ADULTS : room.children.length < MAX_CHILDREN;
 }
 
-/**
- * Children are counted by their ages, so a new one starts on the age the rest of
- * the app assumes when no age is known.
- */
+
 function step(room, key, amount) {
   if (amount > 0 ? !canIncrease(room, key) : !canDecrease(room, key)) {
     return;
@@ -262,11 +224,7 @@ function step(room, key, amount) {
   room.children.pop();
 }
 
-/**
- * @param {{adults: number, children: number[]}} room
- * @param {number} index
- * @param {number} amount
- */
+
 function stepAge(room, index, amount) {
   const age = (room.children[index] ?? 0) + amount;
 
@@ -296,24 +254,18 @@ function removeRoom(index) {
   guests.value.splice(index, 1);
 }
 
-/**
- * The counters cannot break these, so this only catches a criteria object that
- * arrived with more guests than the supplier accepts.
- *
- * @param {{adults: number, children: number[]}} room
- * @returns {string|null}
- */
+
 function roomWarning(room) {
   if (room.adults > MAX_ADULTS) {
-    return `Up to ${MAX_ADULTS} adults per room.`;
+    return t('travel.upToMaxAdults', {mAX_ADULTS: MAX_ADULTS});
   }
 
   if (room.children.length > MAX_CHILDREN) {
-    return `Up to ${MAX_CHILDREN} children per room.`;
+    return t('travel.upToMaxChildren', {mAX_CHILDREN: MAX_CHILDREN});
   }
 
   if (roomGuests(room) > MAX_ROOM_GUESTS) {
-    return `Up to ${MAX_ROOM_GUESTS} guests per room.`;
+    return t('travel.upToMaxRoom', {mAX_ROOM_GUESTS: MAX_ROOM_GUESTS});
   }
 
   return null;
@@ -389,7 +341,7 @@ function search() {
             <ComboboxLabel class="block text-xs/5 text-gray-500">{{ $t('travel.destination') }}</ComboboxLabel>
             <ComboboxInput
                 class="w-full truncate border-0 p-0 text-sm/6 font-medium text-gray-900 placeholder:font-normal placeholder:text-gray-500 focus:outline-0"
-                :placeholder="region ?? 'Where to?'"
+                :placeholder="region ?? $t('travel.whereTo')"
                 :display-value="option => option?.name ?? region ?? ''"
                 autocomplete="off"
                 @change="onDestinationQuery($event.target.value)"

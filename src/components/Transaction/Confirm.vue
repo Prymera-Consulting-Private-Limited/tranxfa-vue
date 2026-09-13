@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import TransactionQuote from "@/models/transaction_quote.js";
 import {
   PaperAirplaneIcon,
@@ -26,17 +30,17 @@ const props = defineProps({
 const reviewItems = [
   {
     icon: UserCircleIcon,
-    label: 'Recipient',
+    label: t('recipient.recipient'),
     value: props.quote.recipient.wholeName,
   },
   {
     icon: FlagIcon,
-    label: 'Payout Country',
+    label: t('account.payoutCountry'),
     value: props.quote.payoutCountry.commonName,
   },
   {
     icon: TruckIcon,
-    label: 'Payout Method',
+    label: t('recipient.payoutMethod'),
     value: props.quote.payoutMethod.title,
   }
 ];
@@ -71,24 +75,24 @@ for (let i = 0; i < props.quote.recipient.accountDetailHashMap.length; i++) {
 }
 reviewItems.push({
   icon: PaperAirplaneIcon,
-  label: 'Sending Amount',
+  label: t('account.sendingAmount'),
   value: props.quote.localAmountCurrencyPrefixed,
 });
 reviewItems.push({
   icon: BanknotesIcon,
-  label: 'Exchange Rate',
+  label: t('account.exchangeRate'),
   value: props.quote.exchangeRateFormatted,
 });
 if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCouponFormatted) {
   reviewItems.push({
     icon: PercentBadgeIcon,
-    label: `Rate before coupon ${props.quote.coupon.code}`,
+    label: t('account.rateBeforeCouponCode2', {code: props.quote.coupon.code}),
     value: props.quote.coupon.exchangeRateBeforeCouponFormatted,
   });
 }
 reviewItems.push({
   icon: WalletIcon,
-  label: 'Recipient Gets',
+  label: t('account.recipientGets2'),
   value: props.quote.foreignAmountCurrencyPrefixed,
 });
 if (props.quote.payoutMethod.promo) {
@@ -102,7 +106,7 @@ if (props.quote.payoutMethod.promo) {
 }
 reviewItems.push({
   icon: PlusIcon,
-  label: 'Fees',
+  label: t('calculator.fees'),
   value: props.quote.baseFeesCurrencyPrefixed,
 });
 if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
@@ -114,12 +118,12 @@ if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyP
 }
 reviewItems.push({
   icon: CalculatorIcon,
-  label: 'Subtotal',
+  label: t('account.subtotal'),
   value: props.quote.subTotalAmountCurrencyPrefixed,
 });
 reviewItems.push({
   icon: WalletIcon,
-  label: 'Total Due',
+  label: t('account.totalDue'),
   value: props.quote.totalAmountCurrencyPrefixed,
 });
 </script>

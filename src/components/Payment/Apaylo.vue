@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
 import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
@@ -112,7 +116,7 @@ const iHaveMadePayment = async () => {
     router.push({name: 'viewTransaction', params: {transactionId: props.transaction.id}});
   } catch (e) {
     reportUnexpectedError(e, 'payment-sent');
-    confirmFailure.value = failureMessage(e, "We couldn't record that you've paid. Your transfer is still open, so please try again.");
+    confirmFailure.value = failureMessage(e, t('payment.provider.weCouldntRecordThat'));
   } finally {
     isConfirmingPayment.value = false;
   }

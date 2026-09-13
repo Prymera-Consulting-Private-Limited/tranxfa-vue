@@ -47,7 +47,8 @@ describe('never risk a double payment', () => {
     const s = read('src/views/Transfer/PaymentView.vue');
     expect(s).not.toContain('Nothing has been charged. Please try again.');
     expect(s).toMatch(/else if \(isOutcomeUnknown\(e\)\) \{[\s\S]*?transactionUtils\.getTransaction\(props\.id\)/);
-    expect(s).toContain("we've refreshed this page");
+    expect(s).toContain("transfer.wizard.weDidntGetAn");
+    expect(en.transfer.wizard.weDidntGetAn).toContain("we've refreshed this page");
   });
 
   it('payment_amount_collides gets its own message and a nudge to change the amount', () => {
