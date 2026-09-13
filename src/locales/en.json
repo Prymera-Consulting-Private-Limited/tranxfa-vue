@@ -613,7 +613,7 @@
     "lastUsed": "Last used {touchedAt}",
     "termsVersion": "Version {version}",
     "welcomeCustomer": "Welcome {name}",
-    "copyright": "© 2025 {appName}",
+    "copyright": "© {year} {appName}.",
     "sentAmountViaMethod": "Sent {foreignAmountCurrencyPrefixed} via {title}",
     "amountToRecipient": "{amount} to {recipient}",
     "changePasswordTitle": "Change your password",

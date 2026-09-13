@@ -60,6 +60,13 @@ const userNavigation = [
   { name: t('nav.signOut'), action: logout },
 ]
 
+// The mobile panel shows the main navigation and the user menu one after the
+// other, so anything in both would appear twice. Desktop keeps the full user
+// menu: there the two lists are never on screen together.
+const userOnlyNavigation = computed(
+  () => userNavigation.filter(item => !navigation.value.some(link => link.href === item.href)),
+);
+
 const isLoading = ref(false);
 
 onMounted(async () => {
@@ -172,7 +179,7 @@ onMounted(async () => {
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                  <template v-for="item in userNavigation" :key="item.name">
+                  <template v-for="item in userOnlyNavigation" :key="item.name">
                     <a v-if="item.action" href="javascript:" @click="item.action" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</a>
                     <router-link v-else :to="{name: item.href}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</router-link>
                   </template>
