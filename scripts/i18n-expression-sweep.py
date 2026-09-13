@@ -50,12 +50,16 @@ def looks_like_copy(text):
 COMPARED = re.compile(r"""(?:[=!]==?\s*|\.(?:includes|startsWith|endsWith|indexOf|split|match)\(\s*)$""")
 
 
-CALL = re.compile(r"""\$?t\(\s*(?:'[^']*'|"[^"]*")\s*(?:,[^()]*)?\)""")
+# Only the key argument. Blanking the whole call hid the copy inside it:
+# `$t('calculator.recipientGets', {recipient: name || 'Recipient'})` rendered
+# "Recipient Gets" in the middle of a Spanish calculator, and no sweep could
+# see the default because it sat inside the call this pattern erased.
+CALL_KEY = re.compile(r"""\$?t\(\s*(?:'[^']*'|"[^"]*")""")
 
 
 def strip_calls(expr):
-    """Blank out the $t() calls so their key arguments are not read as copy."""
-    return CALL.sub(' ', expr)
+    """Blank out a $t() call's key, leaving its other arguments to be read."""
+    return CALL_KEY.sub('t(', expr)
 
 
 QUOTED = re.compile(r"""'([^'\\\n]{3,200})'|"([^"\\\n]{3,200})\"""")

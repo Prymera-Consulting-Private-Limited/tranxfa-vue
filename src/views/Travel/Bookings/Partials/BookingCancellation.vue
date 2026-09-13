@@ -106,7 +106,7 @@ const requestedOn = computed(() => {
         <div class="min-w-0">
           <p class="text-sm/6 font-medium text-gray-900">{{ request.stateLabel ?? request.state }}</p>
           <p class="mt-1 text-sm/6 text-gray-600">{{ requestNote }}</p>
-          <p v-if="requestedOn" class="mt-1.5 text-xs/5 text-gray-500">Requested {{ requestedOn }}</p>
+          <p v-if="requestedOn" class="mt-1.5 text-xs/5 text-gray-500">{{ $t('travel.cancellationRequested', {requestedOn: requestedOn}) }}</p>
         </div>
       </div>
       <dl v-if="isCancelled" class="mt-4 space-y-2 text-sm/6">

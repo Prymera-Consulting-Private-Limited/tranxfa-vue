@@ -214,6 +214,49 @@ describe('the migrated files', () => {
 
     expect(bare, `${file} still spells out: ${bare.join(' | ')}`).toEqual([]);
   });
+
+  // SD-1117: the check above excludes any node holding `{` or `}`, so a text
+  // node with an interpolation in it was never read at all. That exempted
+  // `Pay {{ amount }}` - the button a customer presses to move their money -
+  // along with `Welcome {{ name }}` and `Payout in {{ country }}`, and the
+  // extractor skipped the same shape, so nothing ever reported them.
+  const CONNECTIVE = /^\W*(?:in|on|at|of|to|for|from|via|and|or|by|with|per)\b/i;
+
+  it.each(MIGRATED)('%s spells out no word beside an interpolation', (file) => {
+    const source = read(file);
+    const template = source
+      .replace(/<script\b[\s\S]*?<\/script>/g, '')
+      .replace(/<style\b[\s\S]*?<\/style>/g, '')
+      .replace(/<!--[\s\S]*?-->/g, '');
+
+    const found = [];
+    for (const match of template.matchAll(/>([^<>]*\{\{[^<>]*\}\}[^<>]*)</g)) {
+      const text = match[1].replace(/\s+/g, ' ').trim();
+
+      // An interpolation can hold `>` - an arrow function, a comparison - so a
+      // match whose braces do not balance is half an expression, not a node.
+      const opens = (text.match(/\{\{/g) || []).length;
+      const closes = (text.match(/\}\}/g) || []).length;
+      if (opens !== closes) continue;
+
+      const own = text.replace(/\{\{.*?\}\}/g, ' ');
+      if (!/[A-Za-z]{2,}/.test(own)) continue;
+
+      // A $t call is the migrated form, not copy.
+      if (/\$?t\(\s*'/.test(text)) continue;
+
+      // A connective at the very start or end means the sentence continues in
+      // the element next door; that is i18n-compose.py's problem, not a bare
+      // sentence. One between this node's own interpolations is fine.
+      const head = text.slice(0, text.indexOf('{{'));
+      const tail = text.slice(text.lastIndexOf('}}') + 2);
+      if (CONNECTIVE.test(head.trim()) || CONNECTIVE.test(tail.trim())) continue;
+
+      found.push(text);
+    }
+
+    expect(found, `${file} spells out beside an interpolation: ${found.join(' | ')}`).toEqual([]);
+  });
 });
 
 // SD-1105: copy also hides inside expressions, where neither the extractor nor

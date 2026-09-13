@@ -214,7 +214,7 @@ onUnmounted(() => clearInterval(clock));
           ]">
             <p class="flex items-center gap-2 text-sm/6 font-medium">
               <ClockIcon class="size-4 shrink-0" aria-hidden="true" />{{ $t('travel.thisPriceIsHeldFor') }}</p>
-            <p v-if="countdown" class="text-sm/6 font-semibold tabular-nums">{{ countdown }} left</p>
+            <p v-if="countdown" class="text-sm/6 font-semibold tabular-nums">{{ $t('travel.timeLeft', {countdown: countdown}) }}</p>
           </div>
           <!-- Hotel -->
           <header class="mt-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
@@ -231,7 +231,7 @@ onUnmounted(() => clearInterval(clock));
                 <CalendarDaysIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
                 <span>
                   {{ stay }}
-                  <span v-if="quote.nights" class="text-gray-500">· {{ quote.nights }} night{{ quote.nights === 1 ? '' : 's' }}</span>
+                  <span v-if="quote.nights" class="text-gray-500">· {{ $t('travel.nightCount', quote.nights, {count: quote.nights}) }}</span>
                 </span>
               </p>
               <p v-if="guests.length" class="flex items-start gap-2 text-gray-700">
@@ -262,7 +262,7 @@ onUnmounted(() => clearInterval(clock));
                 <dt class="text-sm/6 font-semibold text-gray-900">{{ $t('account.total') }}</dt>
                 <dd class="text-right">
                   <span class="block text-base font-semibold text-gray-900 tabular-nums">{{ quote.total.currencyPrefixed }}</span>
-                  <span v-if="quote.perNight.isStated" class="mt-0.5 block text-xs/5 font-normal text-gray-500">{{ quote.perNight.currencyPrefixed }} / night</span>
+                  <span v-if="quote.perNight.isStated" class="mt-0.5 block text-xs/5 font-normal text-gray-500">{{ $t('travel.pricePerNight', {currencyPrefixed: quote.perNight.currencyPrefixed}) }}</span>
                 </dd>
               </div>
             </dl>
@@ -293,7 +293,7 @@ onUnmounted(() => clearInterval(clock));
               @submit="book"
               class="mt-4"
           />
-          <p v-if="quote.reference" class="mt-6 text-center text-xs/5 text-gray-500">Reference {{ quote.reference }}</p>
+          <p v-if="quote.reference" class="mt-6 text-center text-xs/5 text-gray-500">{{ $t('travel.bookingReference', {reference: quote.reference}) }}</p>
         </template>
       </div>
     </main>

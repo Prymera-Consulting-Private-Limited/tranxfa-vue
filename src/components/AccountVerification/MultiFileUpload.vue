@@ -165,7 +165,7 @@ async function save() {
 
 <template>
   <div class="max-w-xl mx-auto p-6 bg-white">
-    <h2 class="text-lg font-semibold text-gray-900 mb-2">Upload {{ documentType.title }}</h2>
+    <h2 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('verification.uploadDocument', {title: documentType.title}) }}</h2>
     <i18n-t keypath="verification.uploadClearImages" tag="p" scope="global" class="text-sm/6 text-gray-500 mb-1"><template #document><span class="text-brand-700">{{ documentType.title }}</span></template></i18n-t>
     <p class="text-sm/6 text-gray-500 mb-4">{{ $t('verification.uploadFormats', {MAX_UPLOAD_MB: MAX_UPLOAD_MB}) }}</p>
 

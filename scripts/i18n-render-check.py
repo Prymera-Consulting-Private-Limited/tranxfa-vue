@@ -34,7 +34,17 @@ def placeholders(text):
 
 
 def message(keys, key):
-    return placeholders(keys.get(key, f'?{key}'))
+    """The message a key renders.
+
+    A pluralised message holds every form separated by `|`; vue-i18n picks one
+    at runtime, so compare against the first. Without this a plural reads as
+    the literal text "one night | many nights" and every pluralisation looks
+    like a regression.
+    """
+    text = keys.get(key, f'?{key}')
+    if '|' in text:
+        text = text.split('|')[0].strip()
+    return placeholders(text)
 
 
 def template(source):
@@ -58,9 +68,18 @@ def rendered(source, keys):
     # {{ $t('k') }} and {{ $t('k', {...}) }}: the message itself. An
     # interpolation that is not a $t call is a runtime value; both sides render
     # the same thing, so it collapses to one marker.
-    body = re.sub(r"\{\{\s*\$?t\(\s*'([\w.]+)'.*?\}\}",
-                  lambda m: message(keys, m.group(1)), body, flags=re.S)
-    body = re.sub(r'\{\{.*?\}\}', '\x00', body, flags=re.S)
+    # {{ $t('k') }}, {{ $t('k', {...}) }}, and a $t call anywhere inside an
+    # interpolation - `{{ cond ? $t('a') : $t('b') }}` renders one of two
+    # messages, and reading only a call at the very start of the interpolation
+    # made that whole branch vanish from the comparison.
+    def calls(m):
+        inner = m.group(1)
+        found = re.findall(r"\$?t\(\s*'([\w.]+)'", inner)
+        if not found:
+            return '\x00'
+        return ' '.join(message(keys, key) for key in found)
+
+    body = re.sub(r'\{\{(.*?)\}\}', calls, body, flags=re.S)
     return strip(body)
 
 def strip(markup):

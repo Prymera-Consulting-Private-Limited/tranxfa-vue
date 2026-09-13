@@ -91,7 +91,7 @@ const canSave = computed(() => {
 
   <div class="px-6 py-8 space-y-6">
     <div>
-      <h1 class="text-lg font-bold">Upload {{ documentType.title }}</h1>
+      <h1 class="text-lg font-bold">{{ $t('verification.uploadDocument', {title: documentType.title}) }}</h1>
       <p class="text-sm/6 text-gray-600">{{ $t('verification.uploadPhotoHint', {MAX_UPLOAD_MB: MAX_UPLOAD_MB}) }}</p>
     </div>
     <div class="grid sm:grid-cols-2 items-center justify-center gap-5">

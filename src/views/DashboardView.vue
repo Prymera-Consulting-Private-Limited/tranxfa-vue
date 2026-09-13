@@ -199,7 +199,7 @@ const recipientCreated = (recipient) => {
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="sr-only">{{ $t('account.dashboard') }}</h1>
         <!-- Main 3 column grid -->
-        <h2 class="text-base font-semibold text-gray-900 mb-5">Welcome {{ customer.data?.name }}</h2>
+        <h2 class="text-base font-semibold text-gray-900 mb-5">{{ $t('account.welcomeCustomer', {name: customer.data?.name}) }}</h2>
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 lg:flex-row-reverse">
 
           <!-- Left column -->
