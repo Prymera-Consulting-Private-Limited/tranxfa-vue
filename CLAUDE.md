@@ -48,6 +48,34 @@ Carried over from `console.remitso`, where they were learned the hard way:
   looks like a finished feature.
 - A push to a brand branch **is a deploy** (Amplify builds on push). Verify
   before pushing, not after.
+- **Edit source files one at a time, by hand.** See below; this is the rule
+  most easily broken in a hurry.
+
+## Source files are read and edited one at a time
+
+No `sed`, no `re.sub`, no blanket `str.replace`, no scripted rewrite across a
+set of files. Open the file, make the change, open the next one. If that is slow
+for thirty files, thirty files is the size of the task - not a reason to
+automate the edit.
+
+The reason is not neatness. A pattern edit is fast and reviews as one line; a
+*wrong* pattern edit reviews as one line too, and the compiler will not tell you
+which you wrote. Both of these shipped into a branch on 13 Sep 2026 and were
+caught only by reading the result afterwards:
+
+- A loop meant to tag hotel routes `PRODUCT.HOTELS` and wallet routes
+  `PRODUCT.WALLETS` tagged **every** route `HOTELS`, because it guessed the
+  block from its first 200 characters. Valid code, wrong meaning.
+- A blanket `'] : []),' -> ']),'` across the router closed the wrong spreads and
+  left `/wallet/statement` outside its own array. It still parsed.
+
+Neither a build nor a test suite catches that class. Reading the file does.
+
+The exception is the checked-in tooling that exists to rewrite files -
+`scripts/i18n-extract.py` and the sweeps beside it. Those are reviewed code with
+a job. Using one does not excuse you from reading every file it touched before
+the change is committed, and `scripts/i18n-render-check.py` has to show the
+rendered output did not move.
 
 ## Layering (do not short-circuit it)
 
