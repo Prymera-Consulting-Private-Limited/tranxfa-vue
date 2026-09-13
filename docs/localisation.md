@@ -25,12 +25,17 @@ them. That produced, on the one brand that needed it:
 | `src/i18n.js` | Loads every catalogue in `src/locales`, picks one by `VITE_APP_LOCALE`, falls back to English |
 | `src/locales/en.json` | The source language. Nothing else is authoritative |
 | `tests/setup.js` | Installs the plugin for every mounted component, so specs need not know |
-| `tests/i18n-catalogue.spec.js` | The ratchet: per migrated file, every key must exist and no bare sentence may remain |
-| `scripts/i18n-extract.py` | Moves a component's copy into the catalogue, leaving anything it cannot place confidently |
-| `scripts/i18n-render-check.py` | Proves a migration changed no rendered English, by comparing the text each template renders before and after |
-| `scripts/i18n-compose.py` | Puts a sentence the markup split back together as one `<i18n-t>` message with a slot per styled part |
-| `scripts/i18n-expression-sweep.py` | Lists copy hiding inside a template expression, where a text sweep cannot see it |
-| `scripts/i18n-script-sweep.py` | Lists copy in a component's script block: navigation labels, failure fallbacks, toasts |
+| `tests/i18n-catalogue.spec.js` | The ratchet, and now the whole of the enforcement: per migrated file, every key exists, no bare sentence remains, none hides in an expression or a script block or beside an interpolation, every `t()` can reach a `t`, every catalogue compiles and keeps the English placeholder names |
+| `tests/tailwind-classes.spec.js` | No Tailwind class is assembled at runtime, which is how three avatar colours were never generated |
+
+There is no tooling. Eight Python scripts used to sit here - an extractor, a
+composer, a date rewriter, three sweeps, a scope check and a render check - and
+they were deleted with SD-1131. Copy moves by hand, one file at a time; see
+`CLAUDE.md` for why, and `.claude/skills/translate-a-slice` for how.
+
+What the scripts detected did not go with them. It moved into the suite above,
+where it runs on every change rather than when somebody remembers to run a
+script - which is the stronger place for it, and where it should have been.
 
 English is both source and fallback, so a half-translated brand reads in
 English rather than showing raw keys. That matters: a missing translation must
@@ -93,30 +98,28 @@ with `"documentUnderVerification": "Your {document} is under review."`. The slot
 keeps the styling, the message keeps the word order. `scope="global"` is needed
 because the catalogue is global and the component has no local messages.
 
-The tooling does this for you. `scripts/i18n-compose.py` finds runs of
-adjacent keys separated by inline elements and rewrites each as one message.
-It refuses a run it cannot rebuild safely, and says why:
+Two shapes look like a split sentence and are not, so read before you join:
 
-- **crosses a block boundary** — the run reached a `<p>` or a `<div>`, so it
-  is joining two sentences. Split them yourself.
-- **a marker, not a word** — one of the elements holds no word and no value,
-  such as the asterisk beside a required label. It is not part of the
-  sentence.
+- **A run that crosses a block boundary.** If it reaches a `<p>` or a `<div>`
+  you are joining two sentences, not rebuilding one. Leave them separate.
+- **A marker rather than a word.** The asterisk beside a required label, a
+  decorative arrow, a middot: these hold no word and no value and are not part
+  of the sentence. Leave them in the template.
 
 ## Proving nothing changed on screen
 
-A migration must not change a single rendered word in English. Run:
+A migration must not change a single rendered word in English. There is no
+script for this any more; read your own diff, file by file, and look at what
+the template renders rather than at what the line says.
 
-```sh
-python3 scripts/i18n-render-check.py HEAD <file> [file...]
-```
+The defect to look for is the one no unit test sees: `Expiry date <span>`
+renders with a space, `{{ $t('...') }}<span>` renders without one, and the
+space was part of the sentence. It was the commonest mistake of the whole
+migration - around twenty of them across the slices, four found in files that
+had already shipped.
 
-It renders each template's text before and after, with tags removed and
-whitespace collapsed, and prints every difference. Expect none. It exists
-because of a defect no unit test sees: `Expiry date <span>` renders with a
-space, `{{ $t('...') }}<span>` renders without one, and the space was part of
-the sentence. Run it on the files from earlier slices too; it found four of
-those spaces already lost.
+So wherever copy sat next to a styled element, check the space survived. If a
+screen is worth the doubt, open it.
 
 ## Adding a language
 
@@ -148,16 +151,18 @@ carrying copy and merges from `main` stop conflicting on it.
   | `LLL` | September 12, 2026 2:39 AM | 12 de septiembre de 2026 2:39 |
   | `LT` | 2:39 AM | 2:39 |
 
-  `scripts/i18n-date-formats.py` does the swap and lists what it kept. A format
-  sent to an API, such as `YYYY-MM-DD`, is not display and stays. A day and
+  Swap them by hand, one call at a time. A format sent to an API, such as
+  `YYYY-MM-DD`, is not display and stays. A day and
   month without a year has no localised equivalent, so those stay too and are
   the ones to look at if a language needs a different order.
 - **Text the back office sends** (transfer statuses, document categories,
   purposes, relationships) is not in the catalogue and cannot be. It is
   translated in the console, by whoever owns that environment.
-- **Keys are generated, then read.** `scripts/i18n-extract.py` names a key from
-  the first few words. Rename anything that reads badly before you commit; the
-  guard does not care, humans do.
+- **Name a key for what it says**, not for its first few words - and check the
+  name is free before you write it. A generated `travel.starRating` once
+  overwrote an existing filter heading of the same name, on a screen that
+  ticket never touched. The guard does not care; humans do, and so does the
+  screen next door.
 - **A message that is only a placeholder is not copy.** `"{amount}"` as a
   catalogue entry sends a runtime value on a round trip through the translator's
   file, where it can be edited or broken. Leave the interpolation in the
@@ -173,10 +178,38 @@ carrying copy and merges from `main` stop conflicting on it.
   to break the extractor's idea of where a text node ends. It now leaves any
   node whose braces do not balance; if you write one, check the result.
 - **A literal inside an expression** (`{{ ok ? 'Yes' : 'No' }}`, `:aria-label="open ? 'Hide' : 'Show'"`)
-  is not a text node, so no extractor will find it. The catalogue guard now
-  fails on these, and `scripts/i18n-expression-sweep.py` lists them. It knows
-  the difference between copy and a Tailwind class list, an icon class, a date
-  format, an enum and a value being compared against.
+  is not a text node, so a reader scanning for `>text<` walks straight past it.
+  The catalogue guard fails on these. When you read a file, read its
+  expressions too - including the arguments of a `$t()` call, where an English
+  default once rendered "Recipient Gets" in the middle of a Spanish
+  calculator.
+
+### A placeholder name is an identifier, not a word
+
+The translator writes what the placeholder *means*, because that is what a
+translator does with words:
+
+```json
+"recipient.methodInCountryForCurrency": "{payout method} en {country} para recibir {currency}"
+```
+
+Every one of those is wrong, and the two kinds fail differently.
+
+**A name with a space does not compile.** vue-i18n throws
+`Unterminated closing brace` while building the message, and the component
+rendering it dies - the customer gets the error boundary, not a wrong word.
+Five of these reached the Xenvia deploy; one crashed the recipient page and
+another sat on the card payment screen.
+
+**A renamed placeholder compiles and never resolves.** `{country}` where the
+English says `{commonName}` leaves the literal text `{country}` on screen.
+
+So a placeholder is copied, never translated. `tests/i18n-catalogue.spec.js`
+holds two guards over every `src/locales/*.json`: one compiles every message
+with vue-i18n's own compiler, one requires the placeholder names to match the
+English. Neither reads the language, so both work for a locale nobody here
+speaks - which is the point, because nobody here could have caught these by
+reading.
 
 ### A word beside an interpolation
 
@@ -192,10 +225,10 @@ be reordered - `"Pay {amount}"` can become `"{amount} a pagar"`. What cannot be
 reordered is a sentence spread across sibling elements, because each piece is
 its own message. So the test is whether the node **opens or closes with a
 connective** (`in`, `via`, `to`, `of`...), which means the sentence carries on in
-the element next door; those go to `scripts/i18n-compose.py`.
+the element next door; rebuild those as one `<i18n-t>`.
 
-Two shapes still need a person, and the extractor now says so rather than
-skipping them silently:
+Two shapes need particular care, because keying them naively produces something
+a translator cannot use:
 
 - **A plural spelled with a ternary**, `night{{ n === 1 ? '' : 's' }}`. Keying it
   would hand a translator an `s` to place. Use vue-i18n pluralisation:
@@ -243,25 +276,27 @@ Reintroduce the thing it is supposed to catch, in the shape real code uses.
 
 ## The four places copy hides
 
-Each needed its own tool, because each is invisible to the one before:
+Each is invisible to a reader looking for the one before it, which is why every
+one of them shipped English to a customer at some point. Read a file with all
+four in mind:
 
-1. **A text node or a known attribute.** `scripts/i18n-extract.py`.
-2. **A sentence the markup split** around a link or a bold value.
-   `scripts/i18n-compose.py`, rendered with `<i18n-t>`.
-3. **A literal inside a template expression**, `{{ ok ? 'Yes' : 'No' }}`.
-   `scripts/i18n-expression-sweep.py`.
+1. **A text node or a known attribute** - `placeholder`, `title`, `alt`,
+   `aria-label`, `label`.
+2. **A sentence the markup split** around a link or a bold value. One
+   `<i18n-t>`, not three keys.
+3. **A literal inside a template expression**, `{{ ok ? 'Yes' : 'No' }}` -
+   including inside a `$t()` call's own arguments.
 4. **A literal in the script block**, rendered as data: the navigation labels,
-   the failure fallbacks, a computed label, a returned sentence.
-   `scripts/i18n-script-sweep.py`, which reads every `<script>` block in the
-   file - a component written as `<script>` plus `<script setup>` used to be
-   half scanned.
+   the failure fallbacks, a computed label, a returned sentence. Read **every**
+   `<script>` block; a component written as `<script>` plus `<script setup>`
+   has two.
 
 A fifth thing has to hold, and for a while it did not: **a `t(...)` call is
-only as good as the `t` the file can reach.** A sweep that replaces a literal
-and forgets the import leaves a `ReferenceError: t is not defined` on a branch
-that may go unrendered for weeks - which is exactly what happened on the
-dashboard, the wallet, sign-up and the KYC toasts. `scripts/i18n-scope-check.py`
-reports any file whose code calls `t(` with nothing named `t` in scope, and
+only as good as the `t` the file can reach.** Replacing a literal and forgetting
+the import leaves a `ReferenceError: t is not defined` on a branch that may go
+unrendered for weeks - which is exactly what happened on the dashboard, the
+wallet, sign-up and the KYC toasts. Add the import and the destructure *before*
+you replace the literal, and
 `tests/i18n-catalogue.spec.js` fails on the same condition. A component reaches
 `t` through `const {t} = useI18n()`; a module reaches it through the instance
 (see **Outside a component**). Run the scope check after every sweep, not only

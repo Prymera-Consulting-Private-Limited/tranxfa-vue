@@ -1,7 +1,7 @@
 import {computed, reactive, readonly} from "vue";
 import axios from "axios";
-import {serviceStatusEnabled} from "@/feature_flags.js";
 import {logRequestFailure} from "@/composables/api_utils.js";
+import {rememberProducts, rememberedProducts} from "@/licensed_products.js";
 
 /**
  * GET /client/v1/service-status: whether the platform is taking customer
@@ -14,8 +14,12 @@ import {logRequestFailure} from "@/composables/api_utils.js";
  * objects are for what is shown around that decision. expected_to_end_at is
  * an expectation, never a promise: nothing here counts down to it.
  *
- * Behind VITE_SERVICE_STATUS_ENABLED (default off): with the flag off nothing
- * is requested and the banner never renders.
+ * This call is not optional any more. It also carries value_added_services,
+ * the products the installation is licensed to serve, which is how the app
+ * decides what to offer (SD-1074). VITE_SERVICE_STATUS_ENABLED used to decide
+ * whether to ask at all; it now decides only whether the maintenance banner
+ * renders, because a deployment that hides the banner still has to know what
+ * it may show.
  */
 
 // The customer actions a window can name. Absent from a legacy record means
@@ -36,6 +40,11 @@ const state = reactive({
     isAvailable: true,
     activeWindow: null,
     upcomingWindow: null,
+    // Empty until an answer arrives. Offering nothing is the safe direction:
+    // a product that appears late is a missing extra, a product that appears
+    // without a licence is a screen that 404s.
+    products: [],
+    productsKnown: false,
 });
 
 let inFlight = null;
@@ -57,6 +66,35 @@ export function parseWindow(raw) {
         // every customer action.
         affectedActions: Array.isArray(raw.affected_actions) ? raw.affected_actions : null,
     };
+}
+
+/**
+ * Whether this installation is licensed to serve a product right now.
+ *
+ * False until an answer arrives, and false for a code the list does not carry.
+ * There is deliberately no third state: a customer is never shown that a
+ * product exists but their operator's licence for it has ended.
+ *
+ * @param {string} code one of PRODUCT
+ * @returns {boolean}
+ */
+export function offersProduct(code) {
+    return state.products.includes(code);
+}
+
+/**
+ * Resolves once the first read has settled, either with an answer or with the
+ * remembered one. The router waits on this so a deep link into a product page
+ * is judged against a licence rather than against an empty list.
+ *
+ * @returns {Promise<void>}
+ */
+export function productsSettled() {
+    if (state.productsKnown) {
+        return Promise.resolve();
+    }
+
+    return (inFlight ?? refreshServiceStatus()).catch(() => {});
 }
 
 /**
@@ -86,6 +124,14 @@ export function applyServiceStatus(data) {
     state.isAvailable = data?.is_available !== false;
     state.activeWindow = parseWindow(data?.active_window);
     state.upcomingWindow = parseWindow(data?.upcoming_window);
+
+    // Every code the installation holds arrives, including ones that drive
+    // operator-side work only. Unknown codes are products this app has no
+    // screens for, so they are carried and simply never asked about.
+    const codes = Array.isArray(data?.value_added_services) ? data.value_added_services : [];
+    state.products = codes;
+    state.productsKnown = true;
+    rememberProducts(codes);
 }
 
 /**
@@ -96,9 +142,6 @@ export function applyServiceStatus(data) {
  * @returns {Promise<void>}
  */
 export async function refreshServiceStatus() {
-    if (! serviceStatusEnabled()) {
-        return;
-    }
     if (inFlight) {
         return inFlight;
     }
@@ -109,12 +152,32 @@ export async function refreshServiceStatus() {
         })
         .catch((e) => {
             logRequestFailure(e, 'service-status');
+            fallBackToRememberedProducts();
         })
         .finally(() => {
             inFlight = null;
         });
 
     return inFlight;
+}
+
+/**
+ * The launch where the call could not be reached at all.
+ *
+ * The choice is made in licensed_products.js and made once: honour the last
+ * answer this browser had from this installation while it is still credible,
+ * and otherwise offer nothing. Only fills a gap - a live answer is never
+ * replaced by a remembered one.
+ */
+function fallBackToRememberedProducts() {
+    if (state.productsKnown) {
+        return;
+    }
+    const remembered = rememberedProducts();
+    if (remembered) {
+        state.products = remembered;
+        state.productsKnown = true;
+    }
 }
 
 function scheduleRecheck() {
@@ -140,7 +203,7 @@ function onVisibilityChange() {
  * Start watching: one read now, one on every return to the tab. Idempotent.
  */
 export function startServiceStatusWatch() {
-    if (started || ! serviceStatusEnabled()) {
+    if (started) {
         return;
     }
     started = true;
@@ -163,6 +226,8 @@ export function resetServiceStatus() {
     state.isAvailable = true;
     state.activeWindow = null;
     state.upcomingWindow = null;
+    state.products = [];
+    state.productsKnown = false;
 }
 
 export function useServiceStatus() {
@@ -172,6 +237,9 @@ export function useServiceStatus() {
         activeWindow: computed(() => state.activeWindow),
         upcomingWindow: computed(() => state.upcomingWindow),
         isFrozen: (action) => isActionFrozen(action),
+        products: computed(() => state.products),
+        offers: offersProduct,
+        productsKnown: computed(() => state.productsKnown),
         refresh: refreshServiceStatus,
         start: startServiceStatusWatch,
     };

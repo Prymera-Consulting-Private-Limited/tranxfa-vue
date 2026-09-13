@@ -7,7 +7,8 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useWalletStore} from "@/stores/wallet.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 import WalletAvailability from "@/enums/wallet_availability.js";
-import {walletEnabled} from "@/feature_flags.js";
+import {offersProduct} from "@/composables/service_status.js";
+import {PRODUCT} from "@/licensed_products.js";
 import ServiceStatusBanner from "@/components/ServiceStatusBanner.vue";
 import {NotificationGroup, Notification, notify} from 'notiwind';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
@@ -30,7 +31,7 @@ onMounted(async () => {
   }
   // The documented probe (GET /wallet/subscription answers 404 with
   // wallet_offered when the deployment has no wallet), behind the env switch.
-  if (walletEnabled() && walletStore.availability === WalletAvailability.UNKNOWN) {
+  if (offersProduct(PRODUCT.WALLETS) && walletStore.availability === WalletAvailability.UNKNOWN) {
     walletUtils.probe();
   }
   if (customer.data?.id) {

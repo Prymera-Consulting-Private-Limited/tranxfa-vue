@@ -25,13 +25,14 @@ const recipientUtils = useRecipientUtils();
 const isLoading = ref(true);
 const recipients = ref([]);
 const pagination = ref(null);
-const colors = [
-  "pink",
-  "indigo",
-  "yellow",
-  "green",
-  "blue",
-  "blue",
+// Written out in full so Tailwind can see them, and taken from the brand ramp
+// so a white label's palette applies here too. Four shades, not six with one
+// repeated, so no two neighbours in the list look the same.
+const AVATAR_TINTS = [
+  'bg-brand-500',
+  'bg-brand-600',
+  'bg-brand-700',
+  'bg-brand-800',
 ]
 
 const loadFailure = ref(null);
@@ -106,7 +107,7 @@ const recipientCreated = (recipient) => {
                   <ul  role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-gray-200 py-6">
                     <li v-for="(recipient, index) in recipients" :key="recipient.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center transition-transform transform hover:scale-105 shadow-sm hover:shadow-md">
                       <router-link :to="{ name: 'viewRecipient', params: { id: recipient.id } }" class="cursor-pointer">
-                        <RecipientCard v-bind:cardColor="colors[index%6]" v-bind:recipient="recipient" />
+                        <RecipientCard v-bind:tintClass="AVATAR_TINTS[index % AVATAR_TINTS.length]" v-bind:recipient="recipient" />
                       </router-link>
                     </li>
                   </ul>

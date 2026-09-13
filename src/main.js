@@ -19,6 +19,7 @@ import i18n from '@/i18n.js'
 import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
 import {MFA_REQUIRED_TYPE} from "@/composables/checkout_safety.js";
 import {installErrorHandling} from "@/error_handling.js";
+import {startServiceStatusWatch} from "@/composables/service_status.js";
 import axios from "axios";
 
 import Echo from 'laravel-echo';
@@ -81,6 +82,12 @@ axios.interceptors.response.use((response) => {
 })
 
 app.provide('axios', axios)
+
+// On launch, before anything renders a product entry point. The answer carries
+// what this installation is licensed to serve (SD-1074), so it can no longer
+// wait for a banner component to mount inside the authenticated layout - a
+// signed-out customer's first screen has to know too.
+startServiceStatusWatch()
 
 app.mount('#app')
 

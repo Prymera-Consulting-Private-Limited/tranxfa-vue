@@ -1,8 +1,9 @@
 <script setup>
-import {computed, onMounted} from "vue";
+import {computed} from "vue";
 import moment from "moment";
 import {ExclamationTriangleIcon, InformationCircleIcon} from "@heroicons/vue/24/outline";
 import {useServiceStatus} from "@/composables/service_status.js";
+import {serviceStatusEnabled} from "@/feature_flags.js";
 import {useI18n} from "vue-i18n";
 
 /**
@@ -12,9 +13,12 @@ import {useI18n} from "vue-i18n";
  * available and nothing is planned, and nothing at all when the deployment
  * has not turned the feature on.
  */
-const {status, start} = useServiceStatus();
+const {status} = useServiceStatus();
 
-onMounted(start);
+// The watch starts in main.js now: the same call carries the licensed products
+// and cannot wait for this component. What the flag still decides is whether
+// the maintenance banner is shown at all.
+const showsBanner = serviceStatusEnabled();
 
 
 const {t} = useI18n();
@@ -41,7 +45,7 @@ const maintenanceLine = computed(() => {
 // A window that only stops internal work reports is_available true with an
 // active window: the reference says not to block anyone then, so it is shown
 // as information, not as a warning.
-const activeIsBlocking = computed(() => active.value !== null && ! status.isAvailable);
+const activeIsBlocking = computed(() => showsBanner && active.value !== null && ! status.isAvailable);
 </script>
 
 <template>
@@ -55,7 +59,7 @@ const activeIsBlocking = computed(() => active.value !== null && ! status.isAvai
       </div>
     </div>
   </div>
-  <div v-else-if="upcoming" role="status" class="border-b border-info-200 bg-info-50">
+  <div v-else-if="showsBanner && upcoming" role="status" class="border-b border-info-200 bg-info-50">
     <div class="mx-auto flex max-w-7xl items-start gap-3 px-4 py-3 sm:px-6 lg:px-8">
       <InformationCircleIcon class="mt-0.5 size-5 shrink-0 text-info-600" aria-hidden="true" />
       <div class="text-sm/6 text-info-800">

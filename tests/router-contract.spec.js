@@ -66,7 +66,13 @@ describe('router contract', () => {
     });
 
     it('registers no route this table does not know about', () => {
-        const known = new Set([...Object.keys(ROUTES), ...Object.keys(WALLET_ROUTES)]);
+        // Hotel routes join the table: they used to be absent unless a flag
+        // built them, and are now always registered and guarded by licence.
+        const known = new Set([
+            ...Object.keys(ROUTES),
+            ...Object.keys(WALLET_ROUTES),
+            ...Object.keys(HOTEL_ROUTES),
+        ]);
         const surprises = routes.map(r => r.path).filter(p => !known.has(p));
 
         expect(surprises, 'add it to the table, deliberately').toEqual([]);
@@ -89,32 +95,34 @@ describe('router contract', () => {
 describe('value-added routes by env', () => {
     afterEach(() => vi.unstubAllEnvs());
 
-    it('does not register the hotel routes unless VITE_HOTELS_ENABLED is on', () => {
-        const paths = new Set(router.getRoutes().map(r => r.path));
-        for (const path of Object.keys(HOTEL_ROUTES)) {
-            expect(paths.has(path), `${path} should not exist with hotels off`).toBe(false);
-        }
-    });
+    // SD-1074: these used to assert that a flag decided which routes were
+    // built. The licence arrives from service-status after module load, so it
+    // cannot; every product route is registered and the guard judges it. The
+    // assertions move to the two things that now carry the rule.
+    it('registers every hotel route, and marks each with the product it needs', () => {
+        const byPath = new Map(router.getRoutes().map(r => [r.path, r]));
 
-    it('registers every hotel route when VITE_HOTELS_ENABLED is on', async () => {
-        vi.stubEnv('VITE_HOTELS_ENABLED', 'true');
-        vi.resetModules();
-        setActivePinia(createPinia());
-        const {default: withHotels} = await import("@/router/index.js");
-        const byPath = new Map(withHotels.getRoutes().map(r => [r.path, r]));
         for (const [path, name] of Object.entries(HOTEL_ROUTES)) {
             expect(byPath.get(path)?.name, path).toBe(name);
+            expect(byPath.get(path)?.meta?.requiresProduct, `${path} must name its product`).toBe('HOTELS');
         }
     });
 
-    it('drops the wallet routes when VITE_WALLET_ENABLED is off', async () => {
-        vi.stubEnv('VITE_WALLET_ENABLED', 'false');
-        vi.resetModules();
-        setActivePinia(createPinia());
-        const {default: withoutWallet} = await import("@/router/index.js");
-        const paths = new Set(withoutWallet.getRoutes().map(r => r.path));
-        for (const path of Object.keys(WALLET_ROUTES)) {
-            expect(paths.has(path), path).toBe(false);
+    it('registers every wallet route, and marks each with the product it needs', () => {
+        const byPath = new Map(router.getRoutes().map(r => [r.path, r]));
+
+        for (const [path, name] of Object.entries(WALLET_ROUTES)) {
+            expect(byPath.get(path)?.name, path).toBe(name);
+            expect(byPath.get(path)?.meta?.requiresProduct, `${path} must name its product`).toBe('WALLETS');
         }
+    });
+
+    it('leaves no product route unguarded', () => {
+        const guarded = new Set([...Object.keys(HOTEL_ROUTES), ...Object.keys(WALLET_ROUTES)]);
+        const missing = router.getRoutes()
+            .filter(r => guarded.has(r.path) && ! r.meta?.requiresProduct)
+            .map(r => r.path);
+
+        expect(missing, 'a product route with no requiresProduct is a 404 waiting to happen').toEqual([]);
     });
 });

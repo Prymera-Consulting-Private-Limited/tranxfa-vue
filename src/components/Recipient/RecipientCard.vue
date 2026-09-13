@@ -9,7 +9,9 @@ const props = defineProps({
     type: Recipient,
     required: true,
   },
-  cardColor: {
+  // A complete Tailwind class, not a colour name to interpolate: a class built
+  // at runtime is one Tailwind never generates.
+  tintClass: {
     type: String,
     required: true,
   }
@@ -33,7 +35,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-1 flex-col px-4 py-5">
-    <div :class="[`bg-${cardColor}-500`]" class="flex items-center justify-center mx-auto size-10 shrink-0 rounded-full text-white tracking-wider text-sm/6">
+    <div :class="tintClass" class="flex items-center justify-center mx-auto size-10 shrink-0 rounded-full text-white tracking-wider text-sm/6">
       {{ recipient.name.charAt(0) }}
     </div>
     <h3 class="mt-6 text-sm/6 font-medium text-gray-900 break-words">{{ recipient.wholeName }}</h3>

@@ -29,13 +29,19 @@ describe('service status', () => {
   });
   afterEach(() => vi.unstubAllEnvs());
 
-  it('asks nothing when the deployment has not turned it on', async () => {
+  // SD-1074: this used to assert that a deployment with the banner turned off
+  // asked nothing. The call carries value_added_services now, which is how the
+  // app knows what it may offer, so it always runs; the flag decides only
+  // whether the banner renders. The assertion moves rather than goes.
+  it('asks even when the banner is turned off, because the licence rides along', async () => {
     vi.stubEnv('VITE_SERVICE_STATUS_ENABLED', '');
-    const {refreshServiceStatus, startServiceStatusWatch, useServiceStatus} = await load();
-    startServiceStatusWatch();
+    axios.get.mockResolvedValue({data: {is_available: true, active_window: null, upcoming_window: null, value_added_services: ['HOTELS']}});
+    const {refreshServiceStatus, useServiceStatus} = await load();
+
     await refreshServiceStatus();
-    expect(axios.get).not.toHaveBeenCalled();
-    expect(useServiceStatus().isAvailable.value).toBe(true);
+
+    expect(axios.get).toHaveBeenCalledWith('/client/v1/service-status', {skipAuthRedirect: true, skipMfaRedirect: true});
+    expect(useServiceStatus().products.value).toEqual(['HOTELS']);
   });
 
   it('reads the answer and frozen actions from the active window', async () => {
@@ -73,10 +79,13 @@ describe('service status', () => {
     const {startServiceStatusWatch, resetServiceStatus} = await load();
     startServiceStatusWatch();
     await new Promise((r) => setTimeout(r, 0));
+    const onLaunch = axios.get.mock.calls.length;
     Object.defineProperty(document, 'visibilityState', {value: 'visible', configurable: true});
     document.dispatchEvent(new Event('visibilitychange'));
     await new Promise((r) => setTimeout(r, 0));
-    expect(axios.get).toHaveBeenCalledTimes(2);
+
+    // One more than the launch read, whatever the launch read cost.
+    expect(axios.get).toHaveBeenCalledTimes(onLaunch + 1);
     resetServiceStatus();
   });
 });
@@ -88,9 +97,14 @@ describe('ServiceStatusBanner', () => {
   });
   afterEach(() => vi.unstubAllEnvs());
 
+  // The banner renders state; it does not fetch it. Starting the watch moved to
+  // main.js when the same call became how the app learns which products it may
+  // offer (SD-1074), so the read happens here instead of on mount.
   async function mountBanner(payload) {
     axios.get.mockResolvedValue({data: payload});
     vi.resetModules();
+    const {refreshServiceStatus} = await import('@/composables/service_status.js');
+    await refreshServiceStatus();
     const {default: Banner} = await import('@/components/ServiceStatusBanner.vue');
     const wrapper = mount(Banner);
     await new Promise((r) => setTimeout(r, 0));

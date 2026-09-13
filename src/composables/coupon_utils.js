@@ -11,7 +11,8 @@ import axios from "axios";
  * its original pricing; a quote with no coupon answers 422.
  *
  * On a deployment without the licence the routes answer 404; the screens
- * are behind VITE_COUPONS_ENABLED so that is never reached in practice.
+ * are shown only when the installation is licensed for PROMOTIONAL-COUPONS,
+ * so that is never reached in practice.
  */
 export function useCouponUtils() {
     const validate = async (quoteId, couponCode) => {
