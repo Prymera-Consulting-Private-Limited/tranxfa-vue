@@ -50,6 +50,13 @@ Carried over from `console.remitso`, where they were learned the hard way:
   before pushing, not after.
 - **Edit source files one at a time, by hand.** See below; this is the rule
   most easily broken in a hurry.
+- **`docs/mistakes.md` is the register of process mistakes** — flaws in how the
+  code gets built, as `docs/tech-debt.md` would track flaws in the code. Add an
+  entry the moment a pattern is caught, with a checkable SOP rather than a
+  resolution to be careful. Skim it before a brand deploy: these are the
+  mistakes that survive a green suite.
+- **A convention worth keeping gets a test, not a comment.** See
+  `.claude/skills/fitness-tests`, and prove the test fails before trusting it.
 
 ## Source files are read and edited one at a time
 

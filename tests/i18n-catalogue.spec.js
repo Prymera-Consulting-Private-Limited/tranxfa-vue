@@ -158,6 +158,35 @@ const MIGRATED = [
   'src/views/Travel/Hotels/Partials/HotelCancellationBadge.vue',
   'src/views/Wallet/IndexView.vue',
   'src/views/Wallet/StatementView.vue',
+  // SD-1132: the last twenty-five. None held copy - they are shimmers, icons,
+  // small inputs and payment state panels - so listing them costs nothing and
+  // means the list below can assert it covers every component, instead of
+  // quietly covering the ones somebody remembered.
+  'src/components/AccountVerification/Provider/Didit.vue',
+  'src/components/BrandLogo.vue',
+  'src/components/CardShimmer.vue',
+  'src/components/InlineFailure.vue',
+  'src/components/IsdCodeInput.vue',
+  'src/components/ItemDescriptionShimmer.vue',
+  'src/components/ModalCloseButton.vue',
+  'src/components/MoneyInput.vue',
+  'src/components/MoneyInputShimmer.vue',
+  'src/components/PageHeadingShimmer.vue',
+  'src/components/Payment/State/AwaitingPending.vue',
+  'src/components/Payment/State/Failed.vue',
+  'src/components/Payment/State/PaymentCompleted.vue',
+  'src/components/Payment/State/Processing.vue',
+  'src/components/QuoteDisplay.vue',
+  'src/components/Spinner.vue',
+  'src/components/Transaction/Confirm.vue',
+  'src/components/Transaction/ListShimmer.vue',
+  'src/components/Wallet/MovementListItem.vue',
+  'src/views/Travel/Bookings/Partials/BookingSkeleton.vue',
+  'src/views/Travel/Hotels/Partials/EmptyHotels.vue',
+  'src/views/Travel/Hotels/Partials/HotelCard.vue',
+  'src/views/Travel/Hotels/Partials/HotelDetailSkeleton.vue',
+  'src/views/Travel/Hotels/Partials/HotelMealBadge.vue',
+  'src/views/Travel/Hotels/Partials/HotelSkeleton.vue',
 ];
 
 const flatten = (node, prefix = '') =>
@@ -165,6 +194,36 @@ const flatten = (node, prefix = '') =>
     typeof value === 'string' ? [prefix + key] : flatten(value, `${prefix}${key}.`));
 
 const KEYS = new Set(flatten(en));
+
+// SD-1132: MIGRATED is a list somebody typed, and every guard below iterates
+// it. Two files were missing from it for weeks, so those guards passed while
+// never looking at them, and the copy in them was found by correcting a sweep
+// instead. A hand-written list needs a discovery arm or it silently covers less
+// than it claims - see .claude/skills/fitness-tests.
+describe('MIGRATED covers every component', () => {
+  const componentsUnder = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return componentsUnder(path);
+    return entry.name.endsWith('.vue') ? [path] : [];
+  });
+
+  it('leaves no .vue file unaccounted for', () => {
+    const listed = new Set(MIGRATED);
+
+    const unaccounted = componentsUnder('src').filter(file => !listed.has(file));
+
+    expect(unaccounted, 'a component in neither MIGRATED nor this list is one nobody is checking')
+      .toEqual([]);
+  });
+
+  it('lists nothing that no longer exists', () => {
+    const present = new Set(componentsUnder('src'));
+
+    const stale = MIGRATED.filter(file => !present.has(file));
+
+    expect(stale, 'MIGRATED names a file that has been deleted or moved').toEqual([]);
+  });
+});
 
 describe('the English catalogue', () => {
   it('is the source language and has no empty entries', () => {
