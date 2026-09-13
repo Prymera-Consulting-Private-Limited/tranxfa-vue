@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import BrandLogo from "@/components/BrandLogo.vue";
 import {Bars3Icon, XMarkIcon} from "@heroicons/vue/24/outline/index.js";
 import {
@@ -30,18 +34,18 @@ const hasTravel = hotelsEnabled();
 const hasWallet = walletEnabled();
 
 const navigation = computed(() => [
-  { name: 'Home', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
+  { name: t('nav.home'), href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
   ...(hasWallet && walletStore.isAvailable ? [
-    { name: 'Wallet', href: 'wallet', current: router.currentRoute.value.name === 'wallet' },
+    { name: t('nav.wallet'), href: 'wallet', current: router.currentRoute.value.name === 'wallet' },
   ] : []),
-  { name: 'Transfers', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
+  { name: t('nav.transfers'), href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
   ...(hasTravel ? [
-    { name: 'Hotels', href: 'hotels', current: router.currentRoute.value.name === 'hotels' },
-    { name: 'Bookings', href: 'travelBookings', current: router.currentRoute.value.name === 'travelBookings' },
+    { name: t('nav.hotels'), href: 'hotels', current: router.currentRoute.value.name === 'hotels' },
+    { name: t('nav.bookings'), href: 'travelBookings', current: router.currentRoute.value.name === 'travelBookings' },
   ] : []),
-  { name: 'Recipients', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
-  { name: 'Account Verification', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
-  { name: 'Settings', href: 'settings', current: router.currentRoute.value.name === 'settings' },
+  { name: t('nav.recipients'), href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
+  { name: t('nav.accountVerification'), href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
+  { name: t('nav.settings'), href: 'settings', current: router.currentRoute.value.name === 'settings' },
 ])
 
 async function logout() {
@@ -51,9 +55,9 @@ async function logout() {
 }
 
 const userNavigation = [
-  { name: 'Account Verification', href: 'accountVerification' },
-  { name: 'Settings', href: 'settings' },
-  { name: 'Sign out', action: logout },
+  { name: t('nav.accountVerification'), href: 'accountVerification' },
+  { name: t('nav.settings'), href: 'settings' },
+  { name: t('nav.signOut'), action: logout },
 ]
 
 const isLoading = ref(false);

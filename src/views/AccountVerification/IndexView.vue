@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -28,7 +32,7 @@ async function applyInfoFromPoi() {
     customerUtils.updateStore(response.data);
   } catch (e) {
     logRequestFailure(e, 'apply-poi-details');
-    applyPoiFailure.value = failureMessage(e, "We couldn't copy the details from your document. Please try again, or upload another document below.");
+    applyPoiFailure.value = failureMessage(e, t('verification.weCouldntCopyThe'));
   } finally {
     isApplyingPoi.value = false;
   }
@@ -48,7 +52,7 @@ async function load() {
     await customerUtils.refresh();
   } catch (e) {
     logRequestFailure(e, 'verification');
-    loadFailure.value = failureMessage(e, "We couldn't load your verification status.");
+    loadFailure.value = failureMessage(e, t('verification.weCouldntLoadYour'));
   } finally {
     isLoading.value = false;
   }

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import InlineFailure from "@/components/InlineFailure.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import Calculator from "@/components/Calculator.vue";
@@ -58,11 +62,11 @@ const handleDelete = async () => {
     deleteFailure.value = null;
     await recipientUtils.deleteRecipient(props.id);
     isDeleted.value = true;
-    notify({group: 'customer', title: 'Recipient removed', text: `${recipient.value?.wholeName ?? 'This recipient'} is no longer in your list.`, type: 'success'}, 6000);
+    notify({group: 'customer', title: t('recipient.recipientRemoved'), text: t('recipient.recipientIsNoLonger', {recipient: recipient.value?.wholeName ?? t('recipient.thisRecipient')}), type: 'success'}, 6000);
     await router.replace({name: 'recipients'});
   } catch (error) {
     logRequestFailure(error, 'recipient-delete');
-    deleteFailure.value = failureMessage(error, "We couldn't remove this recipient. Please try again.");
+    deleteFailure.value = failureMessage(error, t('recipient.weCouldntRemoveThis'));
     isDeleting.value = false;
   }
 };

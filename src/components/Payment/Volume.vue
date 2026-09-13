@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
 import {computed, onMounted, onUnmounted, ref, watch, watchEffect} from "vue";
@@ -91,7 +95,7 @@ const initPayment = async () => {
     },
     errorConsumer: (error) => {
       console.error('[payment: volume] the sdk reported an error', error);
-      sdkFailure.value = "Your bank connection didn't start. No money has moved. Reload this page to try again, or choose another way to pay.";
+      sdkFailure.value = t('payment.provider.yourBankConnectionDidnt');
     },
   });
   volume.createPayment({

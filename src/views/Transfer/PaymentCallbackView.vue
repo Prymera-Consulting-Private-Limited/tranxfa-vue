@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -141,7 +145,7 @@ const retryPayment = async () => {
     router.push({ name: 'makePayment', params: { transactionId: transaction.value.id } });
   }).catch((e) => {
     logRequestFailure(e, 'retry-payment');
-    retryFailure.value = failureMessage(e, "We couldn't start a new payment. Nothing has been charged. Please try again.");
+    retryFailure.value = failureMessage(e, t('transfer.wizard.weCouldntStartA'));
   }).finally(() => {
     isLoading.value = false;
   });

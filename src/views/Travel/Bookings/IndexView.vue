@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import CustomerLayout from '@/components/CustomerLayout.vue';
@@ -75,7 +79,7 @@ async function getBookings({quiet = false} = {}) {
     bookings.value = Order.getCollection(response.data.data ?? []);
     pagination.value = response.data.pagination ?? null;
   }).catch((error) => {
-    reportUnexpectedError(error, 'travel bookings');
+    reportUnexpectedError(error, t('travel.travelBookings'));
 
     // Without the travel licence every route answers 404, which is the product
     // being absent rather than anything going wrong.
@@ -83,7 +87,7 @@ async function getBookings({quiet = false} = {}) {
     pagination.value = null;
     hasFailed.value = true;
     failureMessage.value = getCustomerMessage(error)
-        ?? (error.response?.status === 404 ? "Travel isn't available on this app." : null);
+        ?? (error.response?.status === 404 ? t('travel.travelIsntAvailableOnThis') : null);
   }).finally(() => {
     isLoading.value = false;
     schedulePoll();

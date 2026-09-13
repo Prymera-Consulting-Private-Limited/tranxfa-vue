@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import Country from "@/models/country.js";
@@ -151,7 +155,7 @@ function loadSubDeliveryOptions(deliveryOption) {
     });
   }).catch((e) => {
     logRequestFailure(e, 'sub-delivery-options');
-    deliveryOptionsFailure.value = failureMessage(e, "We couldn't load the branches for that choice.");
+    deliveryOptionsFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe8'));
   }).finally(() => {
     isFetchingDeliveryOptions.value = false;
   });
@@ -200,7 +204,7 @@ async function addRecipient() {
       }
     } else {
       logRequestFailure(e, 'recipient-add');
-      saveFailure.value = failureMessage(e, "We couldn't save this recipient. Please try again.");
+      saveFailure.value = failureMessage(e, t('recipient.weCouldntSaveThis'));
     }
   }).finally(() => {
     isSaving.value = false;

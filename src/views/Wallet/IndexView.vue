@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
@@ -64,7 +68,7 @@ async function loadWalletData() {
   isLoadingWallet.value = true;
   loadFailure.value = null;
   await Promise.all([
-    walletUtils.getWallet().catch((e) => noteFailure(e, 'wallet', 'your wallet')),
+    walletUtils.getWallet().catch((e) => noteFailure(e, 'wallet', t('wallet.yourWallet'))),
     refreshTopups(),
     refreshMovements(),
   ]).finally(() => {
@@ -76,13 +80,13 @@ async function refreshTopups() {
   await walletUtils.getTopups().then((response) => {
     const items = Array.isArray(response.data) ? response.data : (response.data?.data ?? []);
     topups.value = items.map(o => WalletTopup.getInstance(o));
-  }).catch((e) => noteFailure(e, 'wallet-topups', 'your pending deposits'));
+  }).catch((e) => noteFailure(e, 'wallet-topups', t('wallet.yourPendingDeposits')));
 }
 
 async function refreshMovements() {
   await walletUtils.getMovements().then((response) => {
     movementsData.value = response.data;
-  }).catch((e) => noteFailure(e, 'wallet-movements', 'your wallet activity'));
+  }).catch((e) => noteFailure(e, 'wallet-movements', t('wallet.yourWalletActivity')));
 }
 
 watch(() => walletStore.wallet.data, () => {

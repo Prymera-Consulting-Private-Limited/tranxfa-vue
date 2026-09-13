@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import InlineFailure from "@/components/InlineFailure.vue";
@@ -29,7 +33,7 @@ async function updateCountry(country) {
     emit('countryUpdated');
   } catch (e) {
     logRequestFailure(e, 'origin-country');
-    saveFailure.value = failureMessage(e, "We couldn't save your country. Please choose it again.");
+    saveFailure.value = failureMessage(e, t('onboarding.weCouldntSaveYour4'));
     isLoading.value = false;
     isSaving.value = false;
   }
@@ -45,7 +49,7 @@ async function loadSources() {
     await countryUtils.getSources();
   } catch (e) {
     logRequestFailure(e, 'source-countries');
-    loadFailure.value = failureMessage(e, "We couldn't load the list of countries.");
+    loadFailure.value = failureMessage(e, t('onboarding.weCouldntLoadThe3'));
   } finally {
     isLoading.value = false;
   }

@@ -1,12 +1,14 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed} from 'vue';
 import moment from "moment";
 import {CANCELLATION_STATUS} from "@/composables/travel/hotels/hotel_utils.js";
 
 const props = defineProps({
-  /**
-   * @type {RateCancellation|null}
-   */
+  
   cancellation: {
     type: Object,
     default: null,
@@ -30,8 +32,8 @@ const label = computed(() => {
   switch (status.value) {
     case CANCELLATION_STATUS.free:
       return freeUntil.value
-          ? `Free cancellation until ${moment(freeUntil.value).format('D MMM')}`
-          : 'Free cancellation';
+          ? t('travel.freeCancellationUntilMmm', {mMM: moment(freeUntil.value).format('D MMM')})
+          : t('travel.freeCancellation');
 
     case CANCELLATION_STATUS.partial:
       return 'Partly refundable';

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import TargetSelection from "@/components/Recipient/TargetSelection.vue";
@@ -71,7 +75,7 @@ async function fetchPayoutMethods() {
     payoutMethods.value = response.data.data.map((o) => PayoutMethod.getInstance(o));
   } catch (e) {
     logRequestFailure(e, 'recipient-payout-methods');
-    loadFailure.value = failureMessage(e, "We couldn't load the ways to send money to this country.");
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe5'));
     isLoading.value = false;
     return;
   }
@@ -104,7 +108,7 @@ async function fetchPayoutChannel() {
     });
   } catch (e) {
     logRequestFailure(e, 'recipient-payout-channel');
-    loadFailure.value = failureMessage(e, "We couldn't load the details this delivery method needs.");
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe6'));
     isLoading.value = false;
     return;
   }
@@ -134,7 +138,7 @@ async function fetchRelationships() {
     relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship))
   }).catch((e) => {
     logRequestFailure(e, 'recipient-relationships');
-    loadFailure.value = failureMessage(e, "We couldn't load the list of relationships, and a recipient needs one.");
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe4'));
   }).finally(() => {
     isLoading.value = false;
   });
@@ -167,7 +171,7 @@ onMounted(async () => {
       targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
     }).catch((e) => {
       logRequestFailure(e, 'recipient-targets');
-      loadFailure.value = failureMessage(e, "We couldn't load the countries you can send to.");
+      loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe7'));
     });
     if (targets.value.length === 1) {
       await updateRecipientTarget(targets.value[0]);

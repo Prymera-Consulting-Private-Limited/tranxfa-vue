@@ -87,7 +87,7 @@ const expiresIn = computed(() => {
 });
 
 const expiresAtFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('MMM D, YYYY h:mm A') : '';
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
 });
 
 // Payable only with a URL. A payment the provider is settling on its own is

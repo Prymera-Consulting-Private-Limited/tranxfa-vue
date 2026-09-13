@@ -15,13 +15,13 @@ import re, subprocess, sys
 WORDS = re.compile(r"^[A-Z][a-z]+(?: [A-Za-z',.!?-]+)*[.!?]?$|^[a-z]+(?: [a-z]+){1,}$")
 SKIP = re.compile(r'^[\w.]+$|^#|^/|^[a-z-]+(?: [a-z-]+)*$\Z')
 
-CLASSY = re.compile(r'^[a-z0-9:/\[\]().%!,-]+$')
+CLASSY = re.compile(r'^[a-z0-9:/\[\]().%!,@-]+$')  # @ for a container query
 UTILITY = re.compile(r'^(?:flex|grid|block|inline|hidden|absolute|relative|fixed|sticky|w|h|min|max|p[xytblr]?|m[xytblr]?|gap|text|bg|border|ring|rounded|shadow|opacity|z|top|left|right|bottom|size|space|divide|justify|items|self|order|col|row|overflow|truncate|whitespace|cursor|transition|duration|ease|animate|group|peer|sr|not|font|leading|tracking|uppercase|lowercase|capitalize|underline|antialiased|object|aspect|fill|stroke|from|via|to|backdrop|outline|accent|pointer|select|scale|rotate|translate|origin|list|table|sm|md|lg|xl|hover|focus|active|disabled|first|last|odd|even|dark|print)\b')
 
 
 def is_class_list(text):
     """A Tailwind class list, not a sentence: every token is lowercase markup."""
-    tokens = text.split()
+    tokens = text.strip().split()
     if len(tokens) < 2:
         return bool(CLASSY.fullmatch(text) and UTILITY.match(text))
     return all(CLASSY.fullmatch(tok) and (UTILITY.match(tok) or '-' in tok or ':' in tok)

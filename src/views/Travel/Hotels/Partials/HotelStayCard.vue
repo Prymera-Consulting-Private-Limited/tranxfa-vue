@@ -55,7 +55,7 @@ const stay = computed(() => {
     return null;
   }
 
-  return `${moment(props.search.checkIn).format('ddd D MMM')} – ${moment(props.search.checkOut).format('ddd D MMM YYYY')}`;
+  return `${moment(props.search.checkIn).format('ddd D MMM')} – ${moment(props.search.checkOut).format('llll')}`;
 });
 
 const guests = computed(() => (props.search ? getGuestBreakdown(props.search.rooms) : []));

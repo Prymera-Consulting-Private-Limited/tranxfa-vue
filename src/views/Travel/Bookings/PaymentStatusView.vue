@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {computed, onUnmounted, ref, watch} from 'vue';
 import CustomerLayout from '@/components/CustomerLayout.vue';
 import Processing from '@/components/Payment/State/Processing.vue';
@@ -61,7 +65,7 @@ const status = computed(() => {
 const heading = computed(() => {
   switch (status.value) {
     case 'refunded':
-      return payment.value.isPartlyRefunded ? 'Part of your payment has been refunded' : 'Your payment has been refunded';
+      return payment.value.isPartlyRefunded ? t('travel.partOfYourPayment') : t('travel.yourPaymentHasBeen');
 
     case 'paid':
       return 'Your payment has gone through';
@@ -83,8 +87,8 @@ const note = computed(() => {
       // What was kept is the hotel's rule rather than ours, and the booking screen
       // is where the cancellation quote that explains it lives.
       return payment.value.isPartlyRefunded
-          ? "This booking was cancelled and part of what you paid has been returned. The rest was kept under the hotel's cancellation policy. Your bank can take a few days to show it."
-          : 'This booking was cancelled and what you paid has been returned. Your bank can take a few days to show it.';
+          ? t('travel.thisBookingWasCancelled')
+          : t('travel.thisBookingWasCancelled2');
 
     case 'paid':
       // A cancelled booking can still hold a captured payment for a while, since
@@ -147,7 +151,7 @@ async function load(quiet = false) {
   await getOrder(props.orderId).then((response) => {
     order.value = Order.getInstance(response.data);
   }).catch((error) => {
-    reportUnexpectedError(error, 'travel payment status');
+    reportUnexpectedError(error, t('travel.travelPaymentStatus'));
 
     // A poll that fails is not worth tearing the page down for — the payment is
     // settling regardless of whether this tab can see it.

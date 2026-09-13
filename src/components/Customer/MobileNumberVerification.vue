@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
@@ -66,10 +70,10 @@ async function resend() {
   resentMessage.value = '';
   resendFailure.value = '';
   await customerUtils.resendMobileVerification().then(() => {
-    resentMessage.value = "We've sent a new code by SMS. It can take a minute to arrive.";
+    resentMessage.value = t('onboarding.weveSentANew');
   }).catch((e) => {
     logRequestFailure(e, 'resend-mobile-code');
-    resendFailure.value = failureMessage(e, "We couldn't send a new code. Please try again.");
+    resendFailure.value = failureMessage(e, t('onboarding.weCouldntSendA'));
   }).finally(() => {
     isResendingToken.value = false;
   });

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {CheckCircleIcon, ClipboardIcon} from "@heroicons/vue/24/outline/index.js";
@@ -53,7 +57,7 @@ async function fetchTerms() {
   await walletUtils.getTerms().then((response) => {
     terms.value = WalletTerms.getInstance(response.data);
   }).catch((e) => {
-    generalError.value = e.response?.data?.message ?? 'We were unable to load the wallet terms. Please try again.';
+    generalError.value = e.response?.data?.message ?? t('wallet.weWereUnableTo');
   }).finally(() => {
     isLoadingTerms.value = false;
   });
@@ -69,8 +73,8 @@ async function accept() {
       notify(
           {
             group: 'customer',
-            title: 'Wallet Restored',
-            text: 'Thanks — the updated terms are accepted and your wallet is back in action.',
+            title: t('wallet.walletRestored'),
+            text: t('wallet.thanksTheUpdatedTerms'),
             type: 'success',
           },
           -1,
@@ -94,7 +98,7 @@ async function accept() {
     } else if (e.response?.status === 422) {
       generalError.value = e.response.data.message;
     } else {
-      generalError.value = 'Something went wrong. Please try again.';
+      generalError.value = t('account.somethingWentWrongPlease');
     }
   }).finally(() => {
     isSubmitting.value = false;

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import moment from "moment";
 import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
@@ -79,7 +83,7 @@ const iHaveMadePayment = async () => {
   } catch (e) {
     props.transaction.payment.state.code = previousState;
     reportUnexpectedError(e, 'payment-sent');
-    confirmFailure.value = failureMessage(e, "We couldn't record that you've paid. Your transfer is still open, so please try again.");
+    confirmFailure.value = failureMessage(e, t('payment.provider.weCouldntRecordThat'));
   } finally {
     isConfirmingPayment.value = false;
   }
@@ -114,7 +118,7 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
 // Only the api knows whether this payment has a deadline; null means it
 // does not, and the line is left out rather than guessed.
 const payByFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('MMM D, YYYY h:mm A') : '';
+  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
 });
 </script>
 

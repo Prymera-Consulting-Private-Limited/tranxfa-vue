@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {onMounted, onUnmounted, ref} from "vue";
 import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
@@ -59,8 +63,8 @@ async function cancelTopup() {
     notify(
         {
           group: 'customer',
-          title: 'Top-up Cancelled',
-          text: 'The declaration has been withdrawn. No money has moved.',
+          title: t('wallet.topUpCancelled'),
+          text: t('wallet.theDeclarationHasBeen'),
           type: 'success',
         },
         -1,
@@ -73,7 +77,7 @@ async function cancelTopup() {
       notify(
           {
             group: 'customer',
-            title: 'Top-up Updated',
+            title: t('wallet.topUpUpdated'),
             text: e.response.data.message,
             type: 'info',
           },
@@ -81,7 +85,7 @@ async function cancelTopup() {
       );
       emit('cancelled');
     } else {
-      cancelError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+      cancelError.value = e.response?.data?.message ?? t('account.somethingWentWrongPlease');
     }
   }).finally(() => {
     isCancelling.value = false;
@@ -97,7 +101,7 @@ async function cancelTopup() {
       <li v-for="topup in topups" :key="topup.id" class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
           <p class="text-sm/6 font-semibold text-gray-900">{{ topup.amountFormatted }} <span class="ml-2 rounded-md bg-gray-100 px-2 py-0.5 text-xs/5 font-medium tracking-wider text-gray-600">{{ topup.reference }}</span></p>
-          <p class="mt-1 text-xs/5 text-gray-500">Expires {{ expiresIn(topup) }} &middot; {{ moment(topup.expiresAt).format('MMM D, YYYY h:mm A') }}</p>
+          <p class="mt-1 text-xs/5 text-gray-500">Expires {{ expiresIn(topup) }} &middot; {{ moment(topup.expiresAt).format('lll') }}</p>
         </div>
         <div class="flex shrink-0 items-center gap-x-4">
           <a href="javascript:" @click="emit('view', topup)" class="text-sm/6 font-semibold text-brand-700 hover:text-brand-800">{{ $t('wallet.viewDetails') }}</a>

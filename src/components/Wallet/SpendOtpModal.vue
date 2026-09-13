@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import VOtpInput from "vue3-otp-input";
@@ -75,9 +79,9 @@ async function resend() {
   otpInput.value?.clearInput();
   resentMessage.value = '';
   walletUtils.requestSpendOtp(props.quoteId).then(() => {
-    resentMessage.value = "We've sent a new code to your email. It can take a minute to arrive.";
+    resentMessage.value = t('wallet.weveSentANew2');
   }).catch((e) => {
-    resendError.value = e.response?.data?.message ?? 'We could not send a new code. Please try again.';
+    resendError.value = e.response?.data?.message ?? t('wallet.weCouldNotSend');
   }).finally(() => {
     isResending.value = false;
   });

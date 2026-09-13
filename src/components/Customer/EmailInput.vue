@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
 import InlineFailure from "@/components/InlineFailure.vue";
 import BrandLogo from "@/components/BrandLogo.vue";
@@ -51,7 +55,7 @@ async function updateEmail() {
       errors.value = Object.values(e.response.data.errors ?? {}).flat();
     } else {
       logRequestFailure(e, 'email-address');
-      saveFailure.value = failureMessage(e, "We couldn't save your email address. Please try again.");
+      saveFailure.value = failureMessage(e, t('onboarding.weCouldntSaveYour2'));
     }
     isSaving.value = false;
   });
