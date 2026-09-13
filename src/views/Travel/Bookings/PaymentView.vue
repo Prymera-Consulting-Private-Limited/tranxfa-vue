@@ -266,7 +266,7 @@ function providerName(method) {
                 <span class="min-w-0">
                   <span class="block text-sm/6 font-medium text-gray-900">
                     {{ method.title }}
-                    <span v-if="providerName(method)" class="font-normal text-gray-500">· via {{ providerName(method) }}</span>
+                    <span v-if="providerName(method)" class="font-normal text-gray-500">· {{ $t('travel.viaProvider', {provider: providerName(method)}) }}</span>
                   </span>
                   <span v-if="method.description" class="mt-0.5 block text-xs/5 text-gray-500">{{ method.description }}</span>
                 </span>

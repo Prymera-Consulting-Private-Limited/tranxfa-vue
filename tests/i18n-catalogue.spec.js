@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import {createI18n} from 'vue-i18n';
 import {readFileSync, readdirSync} from 'node:fs';
 import en from '@/locales/en.json';
 
@@ -213,6 +214,49 @@ describe('the migrated files', () => {
       .filter(text => /[A-Za-z]{3,}/.test(text));
 
     expect(bare, `${file} still spells out: ${bare.join(' | ')}`).toEqual([]);
+  });
+
+  // SD-1117: the check above excludes any node holding `{` or `}`, so a text
+  // node with an interpolation in it was never read at all. That exempted
+  // `Pay {{ amount }}` - the button a customer presses to move their money -
+  // along with `Welcome {{ name }}` and `Payout in {{ country }}`, and the
+  // extractor skipped the same shape, so nothing ever reported them.
+  const CONNECTIVE = /^\W*(?:in|on|at|of|to|for|from|via|and|or|by|with|per)\b/i;
+
+  it.each(MIGRATED)('%s spells out no word beside an interpolation', (file) => {
+    const source = read(file);
+    const template = source
+      .replace(/<script\b[\s\S]*?<\/script>/g, '')
+      .replace(/<style\b[\s\S]*?<\/style>/g, '')
+      .replace(/<!--[\s\S]*?-->/g, '');
+
+    const found = [];
+    for (const match of template.matchAll(/>([^<>]*\{\{[^<>]*\}\}[^<>]*)</g)) {
+      const text = match[1].replace(/\s+/g, ' ').trim();
+
+      // An interpolation can hold `>` - an arrow function, a comparison - so a
+      // match whose braces do not balance is half an expression, not a node.
+      const opens = (text.match(/\{\{/g) || []).length;
+      const closes = (text.match(/\}\}/g) || []).length;
+      if (opens !== closes) continue;
+
+      const own = text.replace(/\{\{.*?\}\}/g, ' ');
+      if (!/[A-Za-z]{2,}/.test(own)) continue;
+
+      // A $t call is the migrated form, not copy.
+      if (/\$?t\(\s*'/.test(text)) continue;
+
+      // A connective at the very start or end means the sentence continues in
+      // the element next door; that is i18n-compose.py's problem, not a bare
+      // sentence. One between this node's own interpolations is fine.
+      const head = text.slice(0, text.indexOf('{{'));
+      const tail = text.slice(text.lastIndexOf('}}') + 2);
+      if (CONNECTIVE.test(head.trim()) || CONNECTIVE.test(tail.trim())) continue;
+
+      found.push(text);
+    }
+
+    expect(found, `${file} spells out beside an interpolation: ${found.join(' | ')}`).toEqual([]);
   });
 });
 
@@ -431,5 +475,58 @@ describe('every t() call can reach a t', () => {
     }
 
     expect(offenders, `these call t() with no t in scope: ${offenders.join(', ')}`).toEqual([]);
+  });
+});
+
+// SD-1118: a translation is code, not prose. vue-i18n compiles every message,
+// and a placeholder name is an identifier: `{document name}` does not compile
+// at all - it throws "Unterminated closing brace" and kills the component that
+// renders it - while `{country}` where the English says `{commonName}`
+// compiles and then never resolves, so the customer reads the literal
+// "{country}". Five of the first kind and three of the second reached the
+// Xenvia deploy; one of them crashed the recipient page and another sat on the
+// card payment screen. Nothing here is about wording, so it holds for every
+// locale a brand ships, not only the ones we can read.
+describe('every locale compiles and keeps the English placeholders', () => {
+  const locales = readdirSync('src/locales')
+    .filter(name => name.endsWith('.json'))
+    .map(name => [name.replace(/\.json$/, ''), JSON.parse(read(`src/locales/${name}`))]);
+
+  const flat = (node, prefix = '') => Object.entries(node).reduce((out, [key, value]) =>
+    Object.assign(out, typeof value === 'string'
+      ? {[prefix + key]: value}
+      : flat(value, `${prefix}${key}.`)), {});
+
+  const names = text => [...text.matchAll(/\{([^}]*)\}/g)].map(m => m[1]).sort();
+
+  it.each(locales)('%s compiles every message', (locale, messages) => {
+    const i18n = createI18n({legacy: false, locale, fallbackLocale: locale, messages: {[locale]: messages}});
+    const broken = [];
+
+    for (const [key, text] of Object.entries(flat(messages))) {
+      try {
+        i18n.global.t(key, {}, {locale});
+      } catch (error) {
+        broken.push(`${key}: ${text} - ${error.message}`);
+      }
+    }
+
+    expect(broken, `${locale} holds messages vue-i18n cannot compile:\n  ${broken.join('\n  ')}`).toEqual([]);
+  });
+
+  it.each(locales.filter(([locale]) => locale !== 'en'))('%s keeps the English placeholder names', (locale, messages) => {
+    const english = flat(en);
+    const wrong = [];
+
+    for (const [key, text] of Object.entries(flat(messages))) {
+      if (!(key in english)) continue;
+      const want = names(english[key]);
+      const have = names(text);
+      if (want.join('|') !== have.join('|')) {
+        wrong.push(`${key}: en has {${want.join('} {')}}, ${locale} has {${have.join('} {')}}`);
+      }
+    }
+
+    expect(wrong, `${locale} renames placeholders, so they never resolve:\n  ${wrong.join('\n  ')}`).toEqual([]);
   });
 });

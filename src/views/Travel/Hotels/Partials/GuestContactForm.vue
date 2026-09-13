@@ -140,7 +140,7 @@ function submit() {
     </header>
     <div class="space-y-5 px-5 py-5">
       <div v-for="(room, roomIndex) in rooms" :key="roomIndex" class="space-y-4">
-        <p v-if="showRoomNumbers" class="text-sm/6 font-semibold text-gray-900">Room {{ room.number }}</p>
+        <p v-if="showRoomNumbers" class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.roomLabel', {number: room.number}) }}</p>
         <div v-for="(guest, guestIndex) in room.guests" :key="guestIndex">
           <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ guest.label }}</p>
           <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">

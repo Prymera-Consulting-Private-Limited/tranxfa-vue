@@ -3,6 +3,7 @@ import {computed, onMounted} from "vue";
 import moment from "moment";
 import {ExclamationTriangleIcon, InformationCircleIcon} from "@heroicons/vue/24/outline";
 import {useServiceStatus} from "@/composables/service_status.js";
+import {useI18n} from "vue-i18n";
 
 /**
  * The maintenance notice the Client API reference asks every client to show:
@@ -15,10 +16,27 @@ const {status, start} = useServiceStatus();
 
 onMounted(start);
 
+
+const {t} = useI18n();
+
 const when = (iso) => (iso ? moment(iso).format('llll') : null);
+
 
 const active = computed(() => status.activeWindow);
 const upcoming = computed(() => status.upcomingWindow);
+
+// One whole sentence per case rather than English fragments concatenated in
+// the template: a translator cannot move " from " and " until around " when
+// they arrive as separate template literals.
+const maintenanceLine = computed(() => {
+  const from = when(upcoming.value?.startsAt);
+  const until = when(upcoming.value?.expectedToEndAt);
+
+  if (from && until) return t('common.plannedMaintenanceFromUntil', {from: from, until: until});
+  if (from) return t('common.plannedMaintenanceFrom', {from: from});
+  if (until) return t('common.plannedMaintenanceUntil', {until: until});
+  return t('common.plannedMaintenance');
+});
 
 // A window that only stops internal work reports is_available true with an
 // active window: the reference says not to block anyone then, so it is shown
@@ -41,7 +59,7 @@ const activeIsBlocking = computed(() => active.value !== null && ! status.isAvai
     <div class="mx-auto flex max-w-7xl items-start gap-3 px-4 py-3 sm:px-6 lg:px-8">
       <InformationCircleIcon class="mt-0.5 size-5 shrink-0 text-info-600" aria-hidden="true" />
       <div class="text-sm/6 text-info-800">
-        <p class="font-semibold">Planned maintenance{{ upcoming.startsAt ? ` from ${when(upcoming.startsAt)}` : '' }}{{ upcoming.expectedToEndAt ? ` until around ${when(upcoming.expectedToEndAt)}` : '' }}.</p>
+        <p class="font-semibold">{{ maintenanceLine }}</p>
         <p v-if="upcoming.message">{{ upcoming.message }}</p>
       </div>
     </div>

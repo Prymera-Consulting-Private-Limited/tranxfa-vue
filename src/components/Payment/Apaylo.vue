@@ -139,7 +139,7 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
     <div>
       <h2 class="text-lg font-semibold text-gray-900 mb-5 pr-10 text-left">{{ $t('payment.provider.completeYourInteracPayment') }}</h2>
       <p class="text-sm/6 text-gray-600 mb-6 text-left">{{ $t('payment.provider.yourTransferIsAwaitingPayment') }}</p>
-      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-success-700 text-white text-center py-3 rounded-md font-medium hover:bg-success-800 transition cursor-pointer text-sm/6 outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Pay {{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</a>
+      <a :href="transaction.payment.paymentUrl" @click="redirectToPaymentUrl" target="_blank" class="block w-full px-4 md:px-6 lg:px-8 bg-success-700 text-white text-center py-3 rounded-md font-medium hover:bg-success-800 transition cursor-pointer text-sm/6 outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('payment.card.payTotalpaymentamountcurrencyprefixed', {totalPaymentAmountCurrencyPrefixed: transaction.payment.totalPaymentAmountCurrencyPrefixed}) }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">{{ $t('payment.provider.youWillBeRedirectedTo') }}</p>
     </div>
   </template>
