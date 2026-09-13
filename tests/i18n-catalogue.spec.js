@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import {createI18n} from 'vue-i18n';
 import {readFileSync, readdirSync} from 'node:fs';
 import en from '@/locales/en.json';
 
@@ -474,5 +475,58 @@ describe('every t() call can reach a t', () => {
     }
 
     expect(offenders, `these call t() with no t in scope: ${offenders.join(', ')}`).toEqual([]);
+  });
+});
+
+// SD-1119: a translation is code, not prose. vue-i18n compiles every message,
+// and a placeholder name is an identifier: `{document name}` does not compile
+// at all - it throws "Unterminated closing brace" and kills the component that
+// renders it - while `{country}` where the English says `{commonName}`
+// compiles and then never resolves, so the customer reads the literal
+// "{country}". Five of the first kind and three of the second reached the
+// Xenvia deploy; one of them crashed the recipient page and another sat on the
+// card payment screen. Nothing here is about wording, so it holds for every
+// locale a brand ships, not only the ones we can read.
+describe('every locale compiles and keeps the English placeholders', () => {
+  const locales = readdirSync('src/locales')
+    .filter(name => name.endsWith('.json'))
+    .map(name => [name.replace(/\.json$/, ''), JSON.parse(read(`src/locales/${name}`))]);
+
+  const flat = (node, prefix = '') => Object.entries(node).reduce((out, [key, value]) =>
+    Object.assign(out, typeof value === 'string'
+      ? {[prefix + key]: value}
+      : flat(value, `${prefix}${key}.`)), {});
+
+  const names = text => [...text.matchAll(/\{([^}]*)\}/g)].map(m => m[1]).sort();
+
+  it.each(locales)('%s compiles every message', (locale, messages) => {
+    const i18n = createI18n({legacy: false, locale, fallbackLocale: locale, messages: {[locale]: messages}});
+    const broken = [];
+
+    for (const [key, text] of Object.entries(flat(messages))) {
+      try {
+        i18n.global.t(key, {}, {locale});
+      } catch (error) {
+        broken.push(`${key}: ${text} - ${error.message}`);
+      }
+    }
+
+    expect(broken, `${locale} holds messages vue-i18n cannot compile:\n  ${broken.join('\n  ')}`).toEqual([]);
+  });
+
+  it.each(locales.filter(([locale]) => locale !== 'en'))('%s keeps the English placeholder names', (locale, messages) => {
+    const english = flat(en);
+    const wrong = [];
+
+    for (const [key, text] of Object.entries(flat(messages))) {
+      if (!(key in english)) continue;
+      const want = names(english[key]);
+      const have = names(text);
+      if (want.join('|') !== have.join('|')) {
+        wrong.push(`${key}: en has {${want.join('} {')}}, ${locale} has {${have.join('} {')}}`);
+      }
+    }
+
+    expect(wrong, `${locale} renames placeholders, so they never resolve:\n  ${wrong.join('\n  ')}`).toEqual([]);
   });
 });

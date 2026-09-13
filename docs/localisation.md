@@ -178,6 +178,33 @@ carrying copy and merges from `main` stop conflicting on it.
   the difference between copy and a Tailwind class list, an icon class, a date
   format, an enum and a value being compared against.
 
+### A placeholder name is an identifier, not a word
+
+The translator writes what the placeholder *means*, because that is what a
+translator does with words:
+
+```json
+"recipient.methodInCountryForCurrency": "{payout method} en {country} para recibir {currency}"
+```
+
+Every one of those is wrong, and the two kinds fail differently.
+
+**A name with a space does not compile.** vue-i18n throws
+`Unterminated closing brace` while building the message, and the component
+rendering it dies - the customer gets the error boundary, not a wrong word.
+Five of these reached the Xenvia deploy; one crashed the recipient page and
+another sat on the card payment screen.
+
+**A renamed placeholder compiles and never resolves.** `{country}` where the
+English says `{commonName}` leaves the literal text `{country}` on screen.
+
+So a placeholder is copied, never translated. `tests/i18n-catalogue.spec.js`
+holds two guards over every `src/locales/*.json`: one compiles every message
+with vue-i18n's own compiler, one requires the placeholder names to match the
+English. Neither reads the language, so both work for a locale nobody here
+speaks - which is the point, because nobody here could have caught these by
+reading.
+
 ### A word beside an interpolation
 
 `Pay {{ amount }}` is one word of its own. The extractor skipped a text node
