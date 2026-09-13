@@ -33,16 +33,56 @@ def param_name(expression):
     parts = [p for p in parts if p not in ('data', 'value', 'props')]
     return parts[-1] if parts else 'value'
 
-def spots_only_fragment(text, own):
-    """True when a node's own words are a fragment beside its interpolations.
+# A word that only ever joins two halves of a sentence. Alone at the start of a
+# node it means the rest of the sentence lives in a sibling element, which is
+# i18n-compose.py's problem, not this script's.
+CONNECTIVE = re.compile(r"^\W*(?:in|on|at|of|to|for|from|via|and|or|by|with|per)\b",
+                        re.IGNORECASE)
 
-    `For receiving {{ x }}` is a sentence; `in` next to `{{ y }}` is the middle
-    of one, and a catalogue entry for it cannot be reordered by a translator.
+
+def spots_only_fragment(text, own):
+    """True when a node holds only part of a sentence the markup split up.
+
+    This used to test `len(words) < 3`, and that was the wrong question. It
+    exempted `Pay {{ amount }}` - the button a customer presses to move their
+    money - along with `Welcome {{ name }}`, `Upload {{ document }}` and
+    `Payout in {{ country }}`, and every guard stayed green over them because
+    the guard skipped the same shape.
+
+    A message with a named placeholder can be reordered by a translator:
+    "Pay {amount}" can become "{amount} a pagar". What cannot be reordered is a
+    sentence spread over sibling elements, because each piece is its own
+    message. So the test is whether this node opens with a connective - which
+    means the sentence started in the element before it - not how many words it
+    has.
     """
     if '{{' not in text:
         return False
-    words = re.findall(r"[A-Za-z']+", own)
-    return len(words) < 3
+    if not re.search(r"[A-Za-z']", own):
+        return True
+
+    # A connective *between* this node's own interpolations is fine: the node
+    # still holds the whole phrase, and `{method} in {country}` is one message.
+    # It is a connective at the very start or the very end of the node that
+    # says the sentence continues in the element next door.
+    head = text[:text.index('{{')]
+    tail = text[text.rindex('}}') + 2:]
+    return bool(CONNECTIVE.match(head.strip()) or CONNECTIVE.search(tail.strip() + ' ')
+                and CONNECTIVE.match(tail.strip()))
+
+
+def decides_a_word(text):
+    """True when an interpolation picks an English word rather than a value.
+
+    `night{{ n === 1 ? '' : 's' }}` spells a plural in the template. Turning it
+    into a message with a parameter would hand the translator an `s` to place,
+    which is meaningless in a language that pluralises differently. These need
+    vue-i18n pluralisation and a person.
+    """
+    # A conditional that yields a string literal. A quote on its own is not
+    # enough: `moment(x).format('lll')` is a date format, not a word.
+    return any(re.search(r"""\?[^:]*['"]|:\s*['"]""", spot)
+               for spot in re.findall(r'\{\{(.+?)\}\}', text))
 
 
 def walk(catalogue, path):
@@ -61,7 +101,7 @@ def migrate(repo, prefix, files, apply):
     cat_path = os.path.join(repo, 'src/locales/en.json')
     catalogue = json.load(open(cat_path, encoding='utf-8'))
     by_text = {v: k for k, v in flat(catalogue).items()}
-    placed, skipped = 0, []
+    placed, rewritten, skipped = 0, 0, []
 
     for rel in files:
         path = os.path.join(repo, rel)
@@ -80,7 +120,8 @@ def migrate(repo, prefix, files, apply):
         used = set(walk(catalogue, prefix).keys())
 
         def key_for(text):
-            nonlocal placed
+            nonlocal placed, rewritten
+            rewritten += 1
             if text in by_text:
                 return by_text[text]
             name = slug(text, used)
@@ -106,7 +147,7 @@ def migrate(repo, prefix, files, apply):
             own = re.sub(r'\{\{.+?\}\}', ' ', text)
             if SKIP_TEXT.match(text) or not re.search(r'[A-Za-z]{2,}', own):
                 return m.group(0)
-            if spots_only_fragment(text, own):
+            if spots_only_fragment(text, own) or decides_a_word(text):
                 return m.group(0)
             spots = list(re.finditer(r'\{\{(.+?)\}\}', text))
             if not spots:
@@ -141,7 +182,8 @@ def migrate(repo, prefix, files, apply):
     if apply:
         json.dump(catalogue, open(cat_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
         open(cat_path, 'a', encoding='utf-8').write('\n')
-    print(('applied ' if apply else 'dry run: ') + f'{placed} keys under {prefix}')
+    print(('applied ' if apply else 'dry run: ')
+          + f'{rewritten} site(s) rewritten, {placed} new key(s) under {prefix}')
     for rel, why in skipped:
         print('  skipped', rel, why)
 

@@ -403,7 +403,9 @@ function viewHotel(hotel) {
             <h2 class="text-base font-semibold text-gray-900">
               <template v-if="!hasDestination">{{ $t('travel.whereDoYouWantTo') }}</template>
               <template v-else-if="isLoading">{{ $t('travel.searchingForHotels') }}</template>
-              <template v-else-if="filteredResults.length">{{ filteredResults.length }} hotel{{ filteredResults.length === 1 ? '' : 's' }} available<template v-if="region"> in {{ region }}</template></template>
+              <template v-else-if="filteredResults.length">{{ region
+                ? $t('travel.hotelsAvailableIn', filteredResults.length, {count: filteredResults.length, region: region})
+                : $t('travel.hotelsAvailable', filteredResults.length, {count: filteredResults.length}) }}</template>
               <template v-else>{{ $t('travel.noResults') }}</template>
             </h2>
             <p class="mt-1 text-sm/6 text-gray-500">

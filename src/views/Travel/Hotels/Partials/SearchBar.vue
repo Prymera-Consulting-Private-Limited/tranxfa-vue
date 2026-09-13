@@ -431,7 +431,7 @@ function search() {
           <div class="flex-1 divide-y divide-dashed divide-gray-200 overflow-y-auto px-4">
             <section v-for="(room, index) in guests" :key="index" class="py-3">
               <header class="flex items-baseline justify-between gap-3">
-                <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">Room {{ index + 1 }}</h4>
+                <h4 class="text-xs/5 font-semibold tracking-wide text-gray-500 uppercase">{{ $t('travel.roomIndexLabel', {index: index + 1}) }}</h4>
                 <button
                     v-if="guests.length > 1"
                     type="button"
@@ -470,9 +470,7 @@ function search() {
               <!-- Ages step like the counters above. -->
               <div v-if="room.children.length" class="mt-2 space-y-2">
                 <div v-for="(childAge, childIndex) in room.children" :key="childIndex" class="flex items-center justify-between gap-3">
-                  <p class="truncate text-sm/6 text-gray-500">
-                    Child {{ childIndex + 1 }}
-                    <span class="ml-0.5 text-xs/5 text-gray-500">{{ $t('travel.age') }}</span>
+                  <p class="truncate text-sm/6 text-gray-500">{{ $t('travel.childIndexLabel', {childIndex: childIndex + 1}) }} <span class="ml-0.5 text-xs/5 text-gray-500">{{ $t('travel.age') }}</span>
                   </p>
                   <div class="flex shrink-0 items-center gap-2.5">
                     <button

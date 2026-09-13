@@ -214,7 +214,7 @@ onUnmounted(() => {
             <div class="mt-4">
               <BookingStateBadge :order="order" />
             </div>
-            <p v-if="order.reference" class="mt-3 text-xs/5 text-gray-500">Reference {{ order.reference }}</p>
+            <p v-if="order.reference" class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.bookingReference', {reference: order.reference}) }}</p>
           </header>
           <div class="mt-4 space-y-4">
             <!-- Stay -->
@@ -227,7 +227,7 @@ onUnmounted(() => {
                   <dt class="text-sm/6 text-gray-500">{{ $t('travel.dates') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">
                     {{ stay }}
-                    <span v-if="order.nights" class="font-normal text-gray-500">· {{ order.nights }} night{{ order.nights === 1 ? '' : 's' }}</span>
+                    <span v-if="order.nights" class="font-normal text-gray-500">· {{ $t('travel.nightCount', order.nights, {count: order.nights}) }}</span>
                   </dd>
                 </div>
                 <div v-if="order.roomName" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">

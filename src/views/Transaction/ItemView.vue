@@ -134,7 +134,7 @@ const isShowPaymentAccountModalOpen = ref(false);
         <div v-else-if="transaction.data" class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           <!-- Invoice -->
           <div class="-mx-4 px-4 py-8 print:px-0 print:py-4 print:ring-0 print:shadow-none ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20">
-            <h2 class="text-base font-semibold text-gray-900">Transaction #{{ transaction.data.transactionNumber }}</h2>
+            <h2 class="text-base font-semibold text-gray-900">{{ $t('account.transactionNumber', {transactionNumber: transaction.data.transactionNumber}) }}</h2>
             <div v-if="transaction.data.state.code === TransactionState['PENDING-PAYMENT'] && transaction.data.payment.clientPaymentAccount">
               <div :style="{
                  backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
@@ -228,7 +228,7 @@ const isShowPaymentAccountModalOpen = ref(false);
                 </dd>
               </div>
               <div class="mt-8 sm:mt-6 sm:border-t sm:border-gray-900/5 sm:pt-6 sm:pl-4 col-span-2 sm:col-span-1">
-                <dt class="font-semibold text-gray-900">Payout in {{ transaction.data.payoutCountry.commonName }}</dt>
+                <dt class="font-semibold text-gray-900">{{ $t('account.payoutInCountry', {commonName: transaction.data.payoutCountry.commonName}) }}</dt>
                 <dd class="mt-2 text-gray-500 flex flex-col">
                   <span class="font-medium text-gray-900">{{ transaction.data.recipient.wholeName }}</span>
                   <span class="text-gray-900">{{ transaction.data.foreignAmountCurrencyPrefixed }} <span class="text-gray-700">@ {{ transaction.data.exchangeRateFormatted }}</span></span>
@@ -242,7 +242,7 @@ const isShowPaymentAccountModalOpen = ref(false);
               <div class="col-span-2 mt-8 sm:mt-6 border-t border-gray-900/5">
                 <div class="py-6">
                   <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.recipientInformation') }}</h2>
-                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">{{ transaction.data.payoutMethod.title }} in {{ transaction.data.payoutCountry.commonName }}</p>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">{{ $t('account.methodInCountry', {title: transaction.data.payoutMethod.title, commonName: transaction.data.payoutCountry.commonName}) }}</p>
                 </div>
                 <div class="">
                   <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">

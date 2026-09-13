@@ -18,7 +18,11 @@
     "tryAgain": "Try again",
     "uploadPhoto": "Please upload a JPEG, PNG or WebP photo.",
     "uploadPhotoOrPdf": "Please upload a JPEG, PNG or WebP photo, or a PDF.",
-    "yourEmail": "your email"
+    "yourEmail": "your email",
+    "plannedMaintenance": "Planned maintenance.",
+    "plannedMaintenanceFrom": "Planned maintenance from {from}.",
+    "plannedMaintenanceUntil": "Planned maintenance until around {until}.",
+    "plannedMaintenanceFromUntil": "Planned maintenance from {from} until around {until}."
   },
   "auth": {
     "signIn": {
@@ -235,7 +239,7 @@
     "ourRate": "Our Rate",
     "zero": "Zero",
     "fees": "Fees",
-    "recipientGets": "{Recipient} Gets",
+    "recipientGets": "{recipient} Gets",
     "deliveryMethod": "Delivery Method",
     "selectOrChangeDeliveryMethod": "Select or Change Delivery Method",
     "fastSecureTransfers": "Fast, Secure Transfers",
@@ -248,7 +252,8 @@
     "pleaseSelect": "Please Select",
     "weCouldNotPrice": "We could not price this transfer just now. Please check your connection and try again.",
     "weCouldntStartYour": "We couldn't start your transfer. Nothing has been sent. Please try again.",
-    "rateBeforeCouponCode": "Rate before coupon {code}"
+    "rateBeforeCouponCode": "Rate before coupon {code}",
+    "theRecipient": "Recipient"
   },
   "recipient": {
     "aBusinessRecipient": "A business recipient",
@@ -302,7 +307,8 @@
     "weCouldntRemoveThis": "We couldn't remove this recipient. Please try again.",
     "weCouldntSaveThis": "We couldn't save this recipient. Please try again.",
     "youHaveNotSent": "You have not sent any transaction yet.",
-    "yourRecipients": "Your Recipients"
+    "yourRecipients": "Your Recipients",
+    "confirmAttribute": "Confirm {label}"
   },
   "verification": {
     "addYourAddress": "Add your address",
@@ -391,7 +397,8 @@
     "weCouldntLoadThis": "We couldn't load this verification step.",
     "weCouldntCopyThe": "We couldn't copy the details from your document. Please try again, or upload another document below.",
     "weCouldntLoadYour": "We couldn't load your verification status.",
-    "weveSentANew4": "We've sent a new code to {email}. It can take a minute to arrive."
+    "weveSentANew4": "We've sent a new code to {email}. It can take a minute to arrive.",
+    "uploadDocument": "Upload {title}"
   },
   "onboarding": {
     "addressDetails": "Address Details",
@@ -598,7 +605,16 @@
     "yourDocumentHasBeen": "Your {document} has been accepted by our compliance team.",
     "weCouldntAcceptYour": "We couldn't accept your {document}. Open Account verification to see why and upload it again.",
     "rateBeforeCouponCode2": "Rate before coupon {code}",
-    "transferToCommonname": "Transfer to {commonName}"
+    "transferToCommonname": "Transfer to {commonName}",
+    "transactionNumber": "Transaction #{transactionNumber}",
+    "payoutInCountry": "Payout in {commonName}",
+    "methodInCountry": "{title} in {commonName}",
+    "lastUsed": "Last used {touchedAt}",
+    "termsVersion": "Version {version}",
+    "welcomeCustomer": "Welcome {name}",
+    "copyright": "© 2025 {appName}",
+    "sentAmountViaMethod": "Sent {foreignAmountCurrencyPrefixed} via {title}",
+    "amountToRecipient": "{amount} to {recipient}"
   },
   "wallet": {
     "aDeclarationStaysOpenFor": "A declaration stays open for 72 hours. A deposit that arrives late or with a different amount isn't lost — our support team takes care of it.",
@@ -900,7 +916,25 @@
     "soldOut": "Sold out",
     "partlyRefundable": "Partly refundable",
     "cancellationTermsAtNextStep": "Cancellation terms at the next step",
-    "selectDates": "Select dates"
+    "selectDates": "Select dates",
+    "bookingReference": "Reference {reference}",
+    "cancellationRequested": "Requested {requestedOn}",
+    "timeLeft": "{countdown} left",
+    "pricePerNight": "{currencyPrefixed} / night",
+    "roomOptionCount": "{rateCount} room options",
+    "amenitiesMore": "+{remaining} more",
+    "matchOfTotal": "{matchCount} of {totalCount}",
+    "upToPrice": "up to {currency} {maxPrice}",
+    "hotelPhotos": "{name} photos",
+    "roomLabel": "Room {number}",
+    "roomIndexLabel": "Room {index}",
+    "childIndexLabel": "Child {childIndex}",
+    "ratingStars": "{rating}-star",
+    "nightCount": "{count} night | {count} nights",
+    "matchOfTotalHotels": "{matchCount} of {totalCount} hotel | {matchCount} of {totalCount} hotels",
+    "hotelsAvailable": "{count} hotel available | {count} hotels available",
+    "hotelsAvailableIn": "{count} hotel available in {region} | {count} hotels available in {region}",
+    "viaProvider": "via {provider}"
   },
   "routes": {
     "accountVerification": "Account Verification",
