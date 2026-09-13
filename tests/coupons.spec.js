@@ -55,8 +55,12 @@ describe('the coupon endpoints', () => {
 describe('the confirm step', () => {
   const s = read('src/views/Transfer/IndexView.vue');
 
-  it('is behind the env flag and soft-fails with the API wording', () => {
-    expect(s).toContain('const hasCoupons = couponsEnabled();');
+  // SD-1074: coupons were behind VITE_COUPONS_ENABLED. The licence decides now,
+  // so the assertion follows it: the entry point reads the PROMOTIONAL-COUPONS
+  // product rather than an env flag, and reads it reactively, because the
+  // answer arrives after the first render.
+  it('is behind the licence and soft-fails with the API wording', () => {
+    expect(s).toContain("const hasCoupons = computed(() => serviceStatus.offers(PRODUCT.COUPONS));");
     expect(s).toContain('<div v-if="hasCoupons"');
     expect(s).toContain("couponFailure.value = response.data?.failure_reason ||");
   });
