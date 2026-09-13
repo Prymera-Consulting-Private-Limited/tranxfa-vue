@@ -13,6 +13,12 @@ a Tailwind class list, an icon class, a date format, a media query, an enum,
 a slug, an event name, a compound written as one word, a developer log line,
 a value being compared against, a string being concatenated, and a default
 inside defineProps, which cannot call t() because Vue hoists it above setup().
+
+A concatenation means a + beside the literal on the same line. The rule used to
+be `[+\w)\]]\s*$`, and \s* crossed a newline: `return 'copy'` matched on the n
+of return, so every returned sentence in every script block was invisible. Its
+mirror skipped any literal at the end of a line whose next line began with a
+word character. Both were written to catch `x + 'foo'` and caught most copy.
 """
 import re, subprocess
 
@@ -25,6 +31,10 @@ KEYISH = re.compile(r'^[A-Z0-9_]+$|^[a-z][\w-]*$')
 COMPARED = re.compile(r"""(?:[=!]==?\s*|\.(?:includes|startsWith|endsWith|indexOf|split|match)\(\s*|import\s+.*from\s*|require\(\s*)$""")
 WIRING = re.compile(r'\.(?:listen|stopListening|emit|on|off|once)\(\s*$|\$emit\(\s*$')
 NOISE = re.compile(r'console\.\w+\(\s*$|(?:useMediaQuery|matchMedia)\(\s*$')
+# `import.meta.env.VITE_APP_NAME || 'Payvel'` is a default for a missing
+# environment variable. It is configuration, and translating it would rename
+# the brand. Only an env read counts: `props.label || 'Continue'` is still copy.
+ENV_DEFAULT = re.compile(r'import\.meta\.env\.\w+\s*(?:\|\||\?\?)\s*$')
 CALL_ARG = re.compile(r'\$?t\(\s*$')
 
 
@@ -115,20 +125,20 @@ for path in subprocess.run(['git', 'ls-files', 'src'], capture_output=True, text
     if not path.endswith('.vue'):
         continue
     source = open(path, encoding='utf-8').read()
-    m = re.search(r'<script[^>]*>', source)
-    if not m:
+    bodies = re.findall(r'<script[^>]*>(.*?)</script>', source, re.S)
+    if not bodies:
         continue
-    end = source.find('</script>', m.end())
-    body = source[m.end():end if end > 0 else len(source)]
+    body = '\n'.join(bodies)
     for start, quoted, text in strings_in(body):
         if quoted.startswith('`'):
             continue
         before = body[:start][-40:]
-        if COMPARED.search(before) or WIRING.search(before) or NOISE.search(before) or CALL_ARG.search(before):
+        if COMPARED.search(before) or WIRING.search(before) or NOISE.search(before) \
+                or CALL_ARG.search(before) or ENV_DEFAULT.search(before):
             continue
-        if re.search(r'[+\w)\]]\s*$', before):
+        if re.search(r'\+[ \t]*$', before):
             continue
-        if re.match(r'\s*[+\w]', body[start + len(quoted):][:12]):
+        if re.match(r'[ \t]*\+', body[start + len(quoted):][:12]):
             continue
         if in_call(body, start, 'defineProps') or in_call(body, start, 'defineEmits') or \
                 in_call(body, start, 'defineOptions'):

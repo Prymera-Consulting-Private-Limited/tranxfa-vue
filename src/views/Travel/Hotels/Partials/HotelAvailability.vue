@@ -23,7 +23,7 @@ const label = computed(() => {
   }
 
   if (props.allotment <= 0) {
-    return 'Sold out';
+    return t('travel.soldOut');
   }
 
   return props.allotment === 1 ? t('travel.lastRoom') : null;

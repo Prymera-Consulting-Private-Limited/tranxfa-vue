@@ -3,6 +3,9 @@ import {computed, ref} from 'vue';
 import moment from 'moment';
 import Spinner from '@/components/Spinner.vue';
 import {CheckCircleIcon, ClockIcon, ExclamationTriangleIcon, XCircleIcon} from '@heroicons/vue/24/outline';
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const props = defineProps({
   /**
@@ -41,16 +44,16 @@ const isCancelled = computed(() => props.cancellation?.isCancelled ?? false);
 const requestNote = computed(() => {
   switch (request.value?.state) {
     case 'ACCEPTED':
-      return 'The hotel accepted this cancellation and your room has been released.';
+      return t('travel.cancellationAccepted');
 
     case 'REFUSED':
-      return 'The hotel refused this cancellation, so your booking is still live and your room is still held.';
+      return t('travel.cancellationRefused');
 
     case 'UNRESOLVED':
-      return "We asked the hotel to cancel this booking and haven't had an answer we can act on. We're chasing it — your room is still held in the meantime.";
+      return t('travel.cancellationUnanswered');
 
     default:
-      return "We've asked the hotel to cancel this booking and are waiting for their answer.";
+      return t('travel.cancellationAwaitingHotel');
   }
 });
 

@@ -178,6 +178,33 @@ carrying copy and merges from `main` stop conflicting on it.
   the difference between copy and a Tailwind class list, an icon class, a date
   format, an enum and a value being compared against.
 
+### A guard rule that rejects too much
+
+`\s*` crosses a newline. Two rules in the script sweep and its guard used it to
+mean "beside", and so rejected far more than they were written to reject:
+
+```python
+if re.search(r'[+\w)\]]\s*$', before):   # meant for  x + 'foo'
+if re.match(r'\s*[+\w]', after[:12]):     # meant for  'foo' + x
+```
+
+`return 'Sold out'` matched the first rule on the `n` of `return`, so **every
+returned sentence in every script block was invisible to both the sweep and the
+guard**, which is how a computed label is usually written. The second rule did
+the same job from the other side: a literal at the end of a line was skipped
+whenever the next line happened to start with a word character. The sweep
+reported zero literals and was believed.
+
+A concatenation means a `+` beside the literal **on the same line**:
+
+```python
+if re.search(r'\+[ \t]*$', before):
+if re.match(r'[ \t]*\+', after[:12]):
+```
+
+The lesson generalises: when a guard reports nothing, prove it can still fail.
+Reintroduce the thing it is supposed to catch, in the shape real code uses.
+
 ## The four places copy hides
 
 Each needed its own tool, because each is invisible to the one before:
@@ -188,8 +215,10 @@ Each needed its own tool, because each is invisible to the one before:
 3. **A literal inside a template expression**, `{{ ok ? 'Yes' : 'No' }}`.
    `scripts/i18n-expression-sweep.py`.
 4. **A literal in the script block**, rendered as data: the navigation labels,
-   the failure fallbacks, a template literal with a value in it.
-   `scripts/i18n-script-sweep.py`.
+   the failure fallbacks, a computed label, a returned sentence.
+   `scripts/i18n-script-sweep.py`, which reads every `<script>` block in the
+   file - a component written as `<script>` plus `<script setup>` used to be
+   half scanned.
 
 A fifth thing has to hold, and for a while it did not: **a `t(...)` call is
 only as good as the `t` the file can reach.** A sweep that replaces a literal
@@ -206,8 +235,10 @@ crash rather than a wrong word.
 The catalogue guard covers all four. Each sweep knows what is not copy: a
 Tailwind class list, an icon class, a date format, a media query, an enum, a
 slug, an event name, a compound written as one word, a developer log line, a
-value being compared against, a string being concatenated, and a default inside
-`defineProps`, which cannot call `t()` because Vue hoists it above `setup()`.
+value being compared against, a string being concatenated, a default for an
+environment variable such as `import.meta.env.VITE_APP_NAME || 'Payvel'`, which
+is configuration and not copy, and a default inside `defineProps`, which cannot
+call `t()` because Vue hoists it above `setup()`.
 Every one of those rules was paid for by a mistake this migration made.
 
 ## Where the migration stands

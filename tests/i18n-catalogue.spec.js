@@ -151,6 +151,10 @@ const MIGRATED = [
   'src/views/Travel/Hotels/Partials/HotelStayCard.vue',
   'src/views/Travel/Hotels/Partials/PriceChangeDialog.vue',
   'src/views/Travel/Hotels/Partials/SearchBar.vue',
+  // SD-1113: the sweep could not see a returned sentence, so these two were
+  // never listed. They are listed now.
+  'src/views/Travel/Hotels/Partials/HotelAvailability.vue',
+  'src/views/Travel/Hotels/Partials/HotelCancellationBadge.vue',
   'src/views/Wallet/IndexView.vue',
   'src/views/Wallet/StatementView.vue',
 ];
@@ -281,6 +285,10 @@ describe('copy does not hide in a script block', () => {
   // A developer log and a media query are not copy, and neither is anything
   // this codebase tags with a bracketed prefix.
   const NOISE = /console\.\w+\(\s*$|(?:useMediaQuery|matchMedia)\(\s*$/;
+  // A default for a missing environment variable is configuration, not copy:
+  // translating it would rename the brand. Only an env read counts, so
+  // `props.label || 'Continue'` is still caught.
+  const ENV_DEFAULT = /import\.meta\.env\.\w+\s*(?:\|\||\?\?)\s*$/;
 
   const isCopy = (text) => {
     if (text.length < 3 || text.includes('/') || text.includes('@')) return false;
@@ -360,16 +368,22 @@ describe('copy does not hide in a script block', () => {
 
   it.each(MIGRATED)('%s keeps no sentence in its script', (file) => {
     const source = read(file);
-    const open = source.match(/<script[^>]*setup[^>]*>/);
-    if (!open) return;
-    const body = source.slice(open.index + open[0].length, source.indexOf('</script>', open.index));
+    // Every script block: a component written as <script> plus <script setup>
+    // was half scanned while this looked only for the setup block.
+    const blocks = [...source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+    if (blocks.length === 0) return;
+    const body = blocks.join('\n');
 
     const found = [];
     for (const {start, quoted, text} of stringsIn(body)) {
       const before = body.slice(Math.max(0, start - 40), start);
       if (COMPARED.test(before) || WIRING.test(before) || NOISE.test(before)) continue;
-      if (/[+\w)\]]\s*$/.test(before)) continue;
-      if (/^\s*[+\w]/.test(body.slice(start + quoted.length, start + quoted.length + 12))) continue;
+      if (ENV_DEFAULT.test(before)) continue;
+      // A concatenation means a + beside the literal on the same line. These
+      // rules used to allow \s* to cross a newline, so `return 'copy'` matched
+      // on the n of return and every returned sentence went unseen.
+      if (/\+[ \t]*$/.test(before)) continue;
+      if (/^[ \t]*\+/.test(body.slice(start + quoted.length, start + quoted.length + 12))) continue;
       if (insideCall(body, start, 'defineProps') || insideCall(body, start, 'defineEmits')) continue;
       if (isCopy(text)) found.push(text);
     }
