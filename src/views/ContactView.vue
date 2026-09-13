@@ -54,7 +54,7 @@ const emailUrl = `mailto:${email}`;
                             <!-- WhatsApp Card -->
                             <a :href="whatsappUrl" target="_blank"
                                 class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8 cursor-pointer hover:shadow-md transition">
-                                <ChatBubbleBottomCenterTextIcon class="h-7 w-7 text-green-600 mb-2" />
+                                <ChatBubbleBottomCenterTextIcon class="h-7 w-7 text-whatsapp mb-2" />
                                 <h3 class="text-base font-semibold text-gray-900">
                                     {{ $t('support.whatsapp.title') }}
                                 </h3>
@@ -65,7 +65,7 @@ const emailUrl = `mailto:${email}`;
                                     {{ whatsappNumber }}
                                 </span>
                                 <span
-                                    class="mt-auto text-sm/6 inline-block font-semibold text-green-600 hover:text-green-500">
+                                    class="mt-auto text-sm/6 inline-block font-semibold text-whatsapp hover:text-whatsapp-hover">
                                     {{ $t('support.whatsapp.action') }} &rarr;
                                 </span>
                             </a>

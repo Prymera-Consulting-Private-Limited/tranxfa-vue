@@ -19,6 +19,22 @@
         --color-brand-800: #003366;
         --color-brand-900: #00264d;
 
+        /* WhatsApp's green on the WhatsApp card, and nothing else. It is not a
+           status and it is not the brand, so it belongs to neither ramp: a
+           customer reads it as the logo's colour.
+
+           These two values are exactly what Tailwind's green-600 and green-500
+           compile to, so naming them changed no pixel. Naming them is the
+           point - the CI colour gate blocks a literal `green` because outcome
+           colours belong to success/warning/danger, and it is right to. This
+           says out loud that the card is neither.
+
+           WhatsApp's own published green is #25D366 if the brand ever wants
+           the exact one; that would be a visible change and is a separate
+           decision. */
+        --color-whatsapp: oklch(0.627 0.194 149.214);
+        --color-whatsapp-hover: oklch(0.723 0.219 149.579);
+
         /* Status ramps for the badges the API drives through color_scheme.
            They are deliberately their own hues rather than steps of the brand:
            a status the same colour as the chrome is not a status.
