@@ -39,7 +39,12 @@ and reports, which is the part you do by hand:
 
 - **String literals in `<script setup>`** — failure messages, computed labels.
   Add `import {useI18n} from "vue-i18n";` and `const {t} = useI18n();`, then
-  replace the literal with `t('key')`.
+  replace the literal with `t('key')`. **Add the two lines before you replace
+  the literal, not after.** Forgetting them does not fail the build and does not
+  fail the suite; it leaves `ReferenceError: t is not defined` on a branch that
+  may go unrendered for weeks. `python3 scripts/i18n-scope-check.py` is the
+  cheapest check in this runbook and the only one that catches a crash rather
+  than a wrong word — run it after every sweep.
 - **Sentences split across tags**, where a link or a bold value sits
   mid-sentence. Run `python3 scripts/i18n-compose.py . <prefix> <files>`
   first: it rewrites the runs it can rebuild safely and tells you which ones

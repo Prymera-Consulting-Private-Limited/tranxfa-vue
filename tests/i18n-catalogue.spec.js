@@ -377,3 +377,42 @@ describe('copy does not hide in a script block', () => {
     expect(found, `${file} keeps copy in its script: ${found.join(', ')}`).toEqual([]);
   });
 });
+
+// SD-1112: the guards above prove a key exists and that no literal is left
+// behind. Neither proved the caller could reach t, so a file that gained a
+// t(...) call without the import threw ReferenceError on any branch no spec
+// happened to render - on the dashboard, the wallet, sign-up and the KYC
+// toasts, with the suites green over it.
+describe('every t() call can reach a t', () => {
+  const CALL = /(?<![\w$.])t\(/g;
+  const IN_SCOPE = [
+    /\bconst\s*\{[^}]*\bt\b[^}]*\}\s*=\s*useI18n\(/,   // a component
+    /\bconst\s+t\s*=/,                                   // a module
+    /\bfunction\s+t\s*\(/,
+    /\bimport\s*\{[^}]*\bt\b[^}]*\}\s*from/,
+  ];
+
+  const sourceFiles = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return sourceFiles(path);
+    return /\.(?:js|vue)$/.test(entry.name) ? [path] : [];
+  });
+
+  it('holds for every file under src', () => {
+    const offenders = [];
+
+    for (const file of sourceFiles('src')) {
+      const source = read(file);
+      // Only a script block runs as code; a template reaches t another way.
+      const code = file.endsWith('.vue')
+        ? [...source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n')
+        : source;
+
+      if (!code.match(CALL)) continue;
+      if (IN_SCOPE.some(pattern => pattern.test(code))) continue;
+      offenders.push(file);
+    }
+
+    expect(offenders, `these call t() with no t in scope: ${offenders.join(', ')}`).toEqual([]);
+  });
+});

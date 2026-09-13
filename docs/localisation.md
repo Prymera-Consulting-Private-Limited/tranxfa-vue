@@ -191,6 +191,18 @@ Each needed its own tool, because each is invisible to the one before:
    the failure fallbacks, a template literal with a value in it.
    `scripts/i18n-script-sweep.py`.
 
+A fifth thing has to hold, and for a while it did not: **a `t(...)` call is
+only as good as the `t` the file can reach.** A sweep that replaces a literal
+and forgets the import leaves a `ReferenceError: t is not defined` on a branch
+that may go unrendered for weeks - which is exactly what happened on the
+dashboard, the wallet, sign-up and the KYC toasts. `scripts/i18n-scope-check.py`
+reports any file whose code calls `t(` with nothing named `t` in scope, and
+`tests/i18n-catalogue.spec.js` fails on the same condition. A component reaches
+`t` through `const {t} = useI18n()`; a module reaches it through the instance
+(see **Outside a component**). Run the scope check after every sweep, not only
+after a migration slice: it costs nothing and it is the one guard that catches a
+crash rather than a wrong word.
+
 The catalogue guard covers all four. Each sweep knows what is not copy: a
 Tailwind class list, an icon class, a date format, a media query, an enum, a
 slug, an event name, a compound written as one word, a developer log line, a

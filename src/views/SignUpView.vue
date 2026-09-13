@@ -9,6 +9,9 @@ import {usePasswordPolicyUtils} from "@/composables/password_policy_utils.js";
 import axios from "axios";
 import IsdCodeInput from "@/components/IsdCodeInput.vue";
 import {useCountryUtils} from "@/composables/country_utils.js";
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const authChannel = import.meta.env.VITE_AUTH_CHANNEL ??  'EMAIL';
 const thirdPartyDeclaration = import.meta.env.VITE_THIRD_PARTY_SIGNUP_DECLARATION;
