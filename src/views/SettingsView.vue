@@ -53,7 +53,13 @@ const closeWallet = async () => {
     )
   }).catch((e) => {
     if (e.response?.data?.type === WalletRefusalType.BALANCE_MUST_BE_ZERO) {
-      closeWalletError.value = (e.response.data.message ?? t('account.yourWalletStillHolds')) + ' Spend or withdraw the balance first, then close the wallet.';
+      // The refusal is the back end's to word (SD-1111); the advice that follows
+      // it is ours, so it belongs in the catalogue. Joining two whole sentences
+      // is fine - it is gluing fragments that cannot be translated.
+      closeWalletError.value = [
+        e.response.data.message ?? t('account.yourWalletStillHolds'),
+        t('account.spendOrWithdrawTheBalance'),
+      ].join(' ');
     } else {
       closeWalletError.value = e.response?.data?.message ?? t('account.somethingWentWrongPlease');
     }
