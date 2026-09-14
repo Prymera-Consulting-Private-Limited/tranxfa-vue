@@ -337,7 +337,12 @@ const confirmQuote = async () => {
         // The rail already holds a deposit for this exact figure. Retrying
         // the same amount is refused again; a different amount goes through.
         isStepProcessing.value = false;
-        preconditionFailedMessage.value = (error.response.data.message || t('transfer.wizard.youAlreadyHaveA')) + ' Change the amount and confirm again.';
+        // The refusal is the back end's to word (SD-1111); the advice after it
+        // is ours, so it belongs in the catalogue rather than in this file.
+        preconditionFailedMessage.value = [
+          error.response.data.message || t('transfer.wizard.youAlreadyHaveA'),
+          t('transfer.wizard.changeTheAmountAndConfirm'),
+        ].join(' ');
       } else if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;

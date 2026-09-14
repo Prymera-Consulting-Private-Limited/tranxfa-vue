@@ -43,8 +43,14 @@ const items = computed(() => {
       value: props.quote.coupon.exchangeRateBeforeCouponFormatted
     });
   }
+  // SD-1193. This label used to concatenate a hardcoded ' Gets' onto the name,
+  // which put an English word beside a Spanish one - "Beneficiario Gets" - on
+  // the last screen before a customer pays. The catalogue already had the whole
+  // sentence, translated, and it was going unused.
   items.push({
-    label: ( props.quote.recipient?.wholeName || t('recipient.recipient') ) + ' Gets',
+    label: t('calculator.recipientGets', {
+      recipient: props.quote.recipient?.wholeName || t('recipient.recipient'),
+    }),
     value: props.quote.foreignAmountCurrencyPrefixed
   });
   items.push({
@@ -53,7 +59,7 @@ const items = computed(() => {
   });
   if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
     items.push({
-      label: `Coupon ${props.quote.coupon.code}`,
+      label: t('calculator.couponCode', {code: props.quote.coupon.code}),
       value: `- ${props.quote.coupon.discountAmountCurrencyPrefixed}`
     });
   }
