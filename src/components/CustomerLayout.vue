@@ -7,7 +7,7 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useWalletStore} from "@/stores/wallet.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 import WalletAvailability from "@/enums/wallet_availability.js";
-import {offersProduct} from "@/composables/service_status.js";
+import {offersProduct, productsSettled} from "@/composables/service_status.js";
 import {PRODUCT} from "@/licensed_products.js";
 import ServiceStatusBanner from "@/components/ServiceStatusBanner.vue";
 import {NotificationGroup, Notification, notify} from 'notiwind';
@@ -29,8 +29,21 @@ onMounted(async () => {
   if (customerStore.isLoaded === false) {
     await customerUtils.refresh();
   }
-  // The documented probe (GET /wallet/subscription answers 404 with
-  // wallet_offered when the deployment has no wallet), behind the env switch.
+  // The documented probe: GET /wallet/subscription answers 404 with
+  // wallet_offered when the deployment has no wallet.
+  //
+  // Wait for the licence before asking. offersProduct() reads a list that is
+  // empty until service-status answers, and the router only awaits that answer
+  // for routes declaring requiresProduct - which /dashboard, where every
+  // customer lands, does not. Asked too early the answer was always false, the
+  // probe never ran, and since nothing watches the list and onMounted runs
+  // once, availability stayed UNKNOWN for the whole session and the Wallet tab
+  // never rendered. The only link to /wallet is that tab, so the customer could
+  // not reach the one route that would have fixed the state (SD-1204).
+  //
+  // productsSettled() resolves immediately once the list is known and swallows
+  // its own failures, so a dead endpoint costs nothing extra here.
+  await productsSettled();
   if (offersProduct(PRODUCT.WALLETS) && walletStore.availability === WalletAvailability.UNKNOWN) {
     walletUtils.probe();
   }

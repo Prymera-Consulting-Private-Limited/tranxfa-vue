@@ -1,15 +1,18 @@
 <script setup>
 import {MagnifyingGlassIcon} from "@heroicons/vue/24/outline";
 
+// No default strings: a prop default is evaluated before any locale is in play,
+// so copy written there can never be translated. The template falls back to the
+// catalogue instead.
 defineProps({
   title: {
     type: String,
-    default: 'No hotels available',
+    default: null,
   },
 
   description: {
     type: String,
-    default: "We couldn't find any hotels for these dates. Try a different check-in date or a nearby destination.",
+    default: null,
   },
 });
 </script>
@@ -19,7 +22,7 @@ defineProps({
     <div class="flex size-14 items-center justify-center rounded-full bg-brand-50 text-brand-700">
       <MagnifyingGlassIcon class="size-7" aria-hidden="true" />
     </div>
-    <h3 class="mt-6 text-base font-semibold text-gray-900">{{ title }}</h3>
-    <p class="mt-2 max-w-md text-sm/6 text-gray-500">{{ description }}</p>
+    <h3 class="mt-6 text-base font-semibold text-gray-900">{{ title ?? $t('travel.noHotelsAvailable') }}</h3>
+    <p class="mt-2 max-w-md text-sm/6 text-gray-500">{{ description ?? $t('travel.noHotelsForTheseDates') }}</p>
   </section>
 </template>

@@ -17,7 +17,9 @@ defineProps({
   // what decides that; null falls through to our own wording.
   message: {type: String, default: null},
   backTo: {type: Object, default: null},
-  backLabel: {type: String, default: 'Go back'},
+  // No default string: a prop default is evaluated before any locale exists, so
+  // copy written here can never be translated. The template falls back instead.
+  backLabel: {type: String, default: null},
   // When the failure was a request that can simply be sent again.
   retryLabel: {type: String, default: null},
 })
@@ -55,7 +57,7 @@ defineEmits(['retry'])
       :to="backTo"
       class="mt-6 inline-flex items-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-medium text-white transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
     >
-      {{ backLabel }}
+      {{ backLabel ?? $t('common.goBack') }}
     </RouterLink>
   </div>
 </template>
