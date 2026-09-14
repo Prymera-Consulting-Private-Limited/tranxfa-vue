@@ -64,6 +64,29 @@ function retry() {
   retryLast();
 }
 
+// The first step used to retry by calling window.location.reload(). That is not
+// a retry: it throws away the whole application and brings the customer back at
+// the splash screen with the wizard gone. "Try again" on a failed fetch repeats
+// the fetch, like every other step here.
+async function fetchTargets() {
+  isLoading.value = true;
+  retryLast = fetchTargets;
+  try {
+    const response = await payoutChannelUtils.getTargets();
+    targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
+  } catch (e) {
+    logRequestFailure(e, 'recipient-targets');
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe7'));
+    isLoading.value = false;
+    return;
+  }
+  if (targets.value.length === 1) {
+    await updateRecipientTarget(targets.value[0]);
+  } else {
+    isLoading.value = false;
+  }
+}
+
 async function fetchPayoutMethods() {
   isLoading.value = true;
   retryLast = fetchPayoutMethods;
@@ -155,14 +178,45 @@ async function updatePayoutMethod(payoutMethod) {
 async function fetchRelationships() {
   isLoading.value = true;
   retryLast = fetchRelationships;
-  await resourceUtils.relationships(recipient.country?.id ?? null).then((response) => {
-    relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship))
-  }).catch((e) => {
+
+  const countryId = recipient.country?.id ?? null;
+  let loaded;
+
+  try {
+    loaded = await readRelationships(countryId);
+    // The country filter narrows the list to what the corridor permits. When it
+    // narrows it to nothing there is no corridor rule to honour - an empty
+    // permitted set would make the field unfillable - so fall back to the
+    // tenant's full list. The moment the back end has per-country rows this
+    // stops firing and the narrowing applies again.
+    if (loaded.length === 0 && countryId !== null) {
+      logRequestFailure(new Error('recipient-relationships-empty-for-country'), 'recipient-relationships');
+      loaded = await readRelationships(null);
+    }
+  } catch (e) {
     logRequestFailure(e, 'recipient-relationships');
     loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe4'));
-  }).finally(() => {
     isLoading.value = false;
-  });
+    return;
+  }
+
+  relationships.value = loaded;
+
+  // Relationship is required to save, so an empty list is not a valid state:
+  // the customer arrives at the last step and can never finish it. Before this,
+  // an empty list was silent - a picker that opened on nothing, a Save that
+  // could not pass validation, and no way to tell that anything had gone wrong.
+  if (relationships.value.length === 0) {
+    logRequestFailure(new Error('recipient-relationships-empty'), 'recipient-relationships');
+    loadFailure.value = t('recipient.weCouldntLoadThe4');
+  }
+
+  isLoading.value = false;
+}
+
+async function readRelationships(countryId) {
+  const response = await resourceUtils.relationships(countryId);
+  return response.data.data.map((relationship) => Relationship.getInstance(relationship));
 }
 
 async function updateRecipientType(type) {
@@ -187,18 +241,7 @@ onMounted(async () => {
     send({ type: "PROCEED" })
     await updatePayoutMethod(props.quote.payoutMethod);
   } else {
-    retryLast = () => window.location.reload();
-    await payoutChannelUtils.getTargets().then((response) => {
-      targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
-    }).catch((e) => {
-      logRequestFailure(e, 'recipient-targets');
-      loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe7'));
-    });
-    if (targets.value.length === 1) {
-      await updateRecipientTarget(targets.value[0]);
-    } else {
-      isLoading.value = false;
-    }
+    await fetchTargets();
   }
 })
 
