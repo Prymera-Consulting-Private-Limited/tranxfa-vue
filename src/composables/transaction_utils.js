@@ -8,10 +8,17 @@ export function useTransactionUtils() {
         return axios.post(`/client/v1/transaction/payment/${id}`, paymentData);
     }
 
-    const get = async (page = null) => {
+    /**
+     * @param {number|null} page
+     * @param {object} filters the documented List Transactions filters
+     *   (q, state_id, payout_method_id, payout_country_id, recipient_id,
+     *   start_date, end_date, limit); undefined values are not sent
+     */
+    const get = async (page = null, filters = {}) => {
         return axios.get(`/client/v1/transactions`, {
             params: {
                 page: page,
+                ...filters,
             },
         });
     }

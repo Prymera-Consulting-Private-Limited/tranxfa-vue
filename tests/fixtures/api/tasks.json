@@ -1,0 +1,20 @@
+[
+  {
+    "id": "has_identity_document",
+    "title": "Verify Identity",
+    "description": "Upload a valid ID to verify your identity.",
+    "status": "pending"
+  },
+  {
+    "id": "recipient_created",
+    "title": "Add Recipient",
+    "description": "Add a person you want to send money to.",
+    "status": "pending"
+  },
+  {
+    "id": "transaction_sent",
+    "title": "Send Money",
+    "description": "Make your first transfer.",
+    "status": "pending"
+  }
+]

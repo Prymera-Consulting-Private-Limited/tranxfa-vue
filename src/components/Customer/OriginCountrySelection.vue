@@ -1,4 +1,12 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
+import InlineFailure from "@/components/InlineFailure.vue";
+import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import {useCountryUtils} from "@/composables/country_utils.js";
 import FlagIcon from "vue3-flag-icons";
@@ -13,20 +21,41 @@ const isLoading = ref(true);
 const isSaving = ref(false);
 const emit = defineEmits(['countryUpdated']);
 
+const saveFailure = ref(null);
+const loadFailure = ref(null);
+
 async function updateCountry(country) {
   isLoading.value = true;
   isSaving.value = true;
-  await customerUtils.updateCountry(country);
-  emit('countryUpdated');
-}
-onMounted(async () => {
-  if (! customerStore.isLoaded) {
-    await customerUtils.refresh();
-  }
-  await countryUtils.getSources().finally(() => {
+  saveFailure.value = null;
+  try {
+    await customerUtils.updateCountry(country);
+    emit('countryUpdated');
+  } catch (e) {
+    logRequestFailure(e, 'origin-country');
+    saveFailure.value = failureMessage(e, t('onboarding.weCouldntSaveYour4'));
     isLoading.value = false;
-  });
-});
+    isSaving.value = false;
+  }
+}
+
+async function loadSources() {
+  isLoading.value = true;
+  loadFailure.value = null;
+  try {
+    if (! customerStore.isLoaded) {
+      await customerUtils.refresh();
+    }
+    await countryUtils.getSources();
+  } catch (e) {
+    logRequestFailure(e, 'source-countries');
+    loadFailure.value = failureMessage(e, t('onboarding.weCouldntLoadThe3'));
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(loadSources);
 </script>
 
 <template>
@@ -37,11 +66,11 @@ onMounted(async () => {
     <div v-show="! isLoading || isSaving" class="w-full max-w-xl">
       <!-- Logo at Top Left (Desktop)  -->
       <div class="hidden md:block flex items-center justify-center w-full">
-        <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+        <a href="javascript:"><BrandLogo class="mb-5" /></a>
       </div>
       <!-- Form Header -->
-      <h2 class="text-2xl font-semibold text-black mb-4 text-left  mt-14 sm:mt-8">Where Do You Live?</h2>
-      <p class="text-md text-[#B7A3C1] mb-8 text-left">To provide you with the best service, we need to know your country of residence. Please select your country to continue.</p>
+      <h2 class="text-2xl font-semibold text-black mb-4 text-left  mt-14 sm:mt-8">{{ $t('onboarding.whereDoYouLive') }}</h2>
+      <p class="text-md text-[#B7A3C1] mb-8 text-left">{{ $t('onboarding.countryStepHint') }}</p>
       <ul v-if="countryUtils.sources.value?.length > 0" role="list" class="mt-3 grid grid-cols-1 gap-4 xl:grid-cols-2 sm:gap-5">
         <template v-for="country in countryUtils.sources.value" :key="country.id">
           <li
@@ -52,7 +81,7 @@ onMounted(async () => {
               <FlagIcon :class="['text-2xl']" :code="country.iso2Alpha.toLowerCase()" circle  />
             </div>
             <div class="flex min-w-0 flex-1 items-center justify-between truncate py-3 pr-4">
-              <div class="min-w-0 flex-1 truncate text-sm">
+              <div class="min-w-0 flex-1 truncate text-sm/6">
                 <p class="truncate font-medium text-gray-900">{{ country.commonName }}</p>
                 <p class="truncate text-gray-500">{{ country.endonym ?? country.officialName }}</p>
               </div>
@@ -60,6 +89,7 @@ onMounted(async () => {
           </li>
         </template>
       </ul>
+      <LoadFailurePanel v-else-if="loadFailure" :title="$t('onboarding.countryListFailure')" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="loadSources" class="mt-0" />
       <ul v-else role="list" class="mt-3 grid grid-cols-1 gap-4 xl:grid-cols-2 sm:gap-5">
         <template v-for="i in 4" :key="i">
           <li class="col-span-1 flex overflow-hidden rounded-2xl border border-gray-200">
@@ -67,7 +97,7 @@ onMounted(async () => {
               <span class="size-10 animate-pulse rounded-full bg-gray-200"></span>
             </div>
             <div class="flex min-w-0 flex-1 items-center justify-between truncate bg-white py-3 pr-4">
-              <div class="min-w-0 flex-1 truncate text-sm">
+              <div class="min-w-0 flex-1 truncate text-sm/6">
                 <div class="h-4 w-24 animate-pulse bg-gray-200"></div>
                 <div class="mt-2 h-2 w-16 animate-pulse bg-gray-200"></div>
               </div>
@@ -75,6 +105,7 @@ onMounted(async () => {
           </li>
         </template>
       </ul>
+      <InlineFailure :message="saveFailure" />
     </div>
   </div>
 </template>

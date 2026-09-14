@@ -11,6 +11,9 @@ const WalletRefusalType = Object.freeze({
     INSUFFICIENT_BALANCE: 'insufficient_wallet_balance',
     AUTHORIZATION_REQUIRED: 'wallet_authorization_required',
     AUTHORIZATION_INVALID: 'wallet_authorization_invalid',
+    // Deposit instructions and declared loads answer this until the identity
+    // document is approved; the fix is the verification page.
+    ID_VERIFICATION_REQUIRED: 'wallet_id_verification_required',
 });
 
 export default WalletRefusalType;

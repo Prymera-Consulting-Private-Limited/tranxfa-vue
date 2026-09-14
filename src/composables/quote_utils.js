@@ -7,7 +7,13 @@ export function useQuoteUtils() {
         data: new Quote(),
     });
 
-    const getQuote = async (query = null) => {
+    /**
+     * @param {Object|null} query
+     * @param {Object} config extra axios config. The calculator passes an
+     *   AbortSignal: this function assigns quote.data itself, so a caller cannot
+     *   discard a stale reply after the fact - it has to not arrive.
+     */
+    const getQuote = async (query = null, config = {}) => {
         const params = {
             amount_type: query?.amountType,
             amount: query?.amount,
@@ -20,6 +26,7 @@ export function useQuoteUtils() {
         };
 
         await axios.get('/client/v1/quote', {
+            ...config,
             params: params,
         }).then((response) => {
             quote.data = Quote.getInstance(response.data);

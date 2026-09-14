@@ -1,5 +1,9 @@
 <script setup>
-import {onUnmounted, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {computed, onUnmounted, ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ClipboardIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import {UseClipboard} from "@vueuse/components";
@@ -11,6 +15,9 @@ import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import ClientPaymentAccountModel from "@/models/client_payment_account.js";
 import WalletTopup from "@/models/wallet_topup.js";
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
+import {fixForError} from "@/composables/verification_routes.js";
+import router from "@/router/index.js";
+import {CUSTOMER_ACTIONS, useServiceStatus} from "@/composables/service_status.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 
 const props = defineProps({
@@ -37,6 +44,10 @@ const amount = ref('');
 const amountErrors = ref([]);
 const collisionMessage = ref('');
 const generalError = ref('');
+const serviceStatus = useServiceStatus();
+const topupsFrozen = computed(() => serviceStatus.isFrozen(CUSTOMER_ACTIONS.WALLET_TOPUPS));
+// A 412 the customer can act on (verify identity first): where to go.
+const generalFix = ref(null);
 const isSubmitting = ref(false);
 
 const declaration = ref(null);
@@ -90,7 +101,8 @@ async function fetchInstructions() {
       account.value = instance;
     }
   }).catch((e) => {
-    generalError.value = e.response?.data?.message ?? 'We were unable to load your deposit details. Please try again.';
+    generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
+    generalError.value = e.response?.data?.message ?? t('wallet.weWereUnableTo2');
   });
 }
 
@@ -99,6 +111,7 @@ async function declare() {
   amountErrors.value = [];
   collisionMessage.value = '';
   generalError.value = '';
+  generalFix.value = null;
   isSubmitting.value = true;
   await walletUtils.declareTopup(amount.value).then((response) => {
     declaration.value = WalletTopup.getInstance(response.data);
@@ -111,7 +124,8 @@ async function declare() {
     } else if (e.response?.status === 422) {
       amountErrors.value = e.response.data.errors?.amount ?? [e.response.data.message];
     } else {
-      generalError.value = e.response?.data?.message ?? 'Something went wrong. Please try again.';
+      generalFix.value = fixForError(e, router.currentRoute.value.fullPath);
+      generalError.value = e.response?.data?.message ?? t('account.somethingWentWrongPlease');
     }
   }).finally(() => {
     isSubmitting.value = false;
@@ -138,34 +152,35 @@ function close() {
               <ModalCloseButton @close="close" />
 
               <template v-if="step === 'declare'">
-                <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Add money to your wallet</DialogTitle>
-                <p class="mt-1 text-sm text-gray-500">Declare the amount first, then transfer exactly that amount from your bank. The match is made on the amount, so it has to be spot on.</p>
+                <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">{{ $t('wallet.addMoneyToYourWallet') }}</DialogTitle>
+                <p class="mt-1 text-sm/6 text-gray-500">{{ $t('wallet.declareTheAmountFirstThen') }}</p>
 
-                <div v-if="generalError" class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">{{ generalError }}</div>
+                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }} <router-link v-if="generalFix" :to="generalFix.route" class="ml-1 font-semibold underline underline-offset-2 text-danger-800">{{ generalFix.label }}</router-link></div>
 
-                <div v-if="collisionMessage" class="mt-4 border-l-4 border-yellow-400 bg-yellow-50 p-4">
+                <div v-if="collisionMessage" class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <div class="flex">
                     <div class="shrink-0">
-                      <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+                      <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                     </div>
                     <div class="ml-3">
-                      <p class="text-sm text-yellow-700">{{ collisionMessage }}</p>
+                      <p class="text-sm/6 text-warning-700">{{ collisionMessage }}</p>
                     </div>
                   </div>
                 </div>
 
                 <form @submit.prevent="declare" class="mt-4">
-                  <label for="topup-amount" :class="[amountErrors.length > 0 ? 'text-red-600' : 'text-gray-900']" class="block text-sm/6 font-semibold">Amount <span class="text-red-500">*</span></label>
+                  <label for="topup-amount" :class="[amountErrors.length > 0 ? 'text-danger-600' : 'text-gray-900']" class="block text-sm/6 font-semibold">{{ $t('wallet.amount') }} <span class="text-danger-600">*</span></label>
                   <input v-model="amount" id="topup-amount" type="text" inputmode="decimal" placeholder="0.00" class="mt-2 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm text-base text-gray-900 focus:outline-none" />
                   <template v-for="(message, i) in amountErrors" :key="`amount-error-${i}`">
-                    <p class="mt-2 text-sm text-red-600">{{ message }}</p>
+                    <p class="mt-2 text-sm/6 text-danger-600">{{ message }}</p>
                   </template>
-                  <button type="submit" :disabled="isSubmitting || ! amount" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-600 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+                  <p v-if="topupsFrozen" role="status" class="mt-3 text-sm/6 text-warning-800">{{ $t('wallet.walletLoadsArePausedDuring') }}</p>
+                  <button type="submit" :disabled="isSubmitting || ! amount || topupsFrozen" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                     <span v-if="isSubmitting" class="flex justify-center items-center">
                       <Spinner :class="'w-4 h-4 mr-2'" />
-                      <span>Saving ...</span>
+                      <span>{{ $t('calculator.saving') }}</span>
                     </span>
-                    <span v-else>Continue</span>
+                    <span v-else>{{ $t('common.continue') }}</span>
                   </button>
                 </form>
               </template>
@@ -173,40 +188,40 @@ function close() {
               <template v-else-if="isProvisioning">
                 <div class="text-center">
                   <AwaitingPending class="-mt-6" />
-                  <h3 class="text-lg font-semibold text-gray-900 -mt-8">Getting your account ready</h3>
-                  <p class="mt-2 mb-4 text-sm text-gray-500">We're opening your personal deposit account. This usually takes a moment — your transfer details will appear automatically.</p>
+                  <h3 class="text-lg font-semibold text-gray-900 -mt-8">{{ $t('wallet.gettingYourAccountReady') }}</h3>
+                  <p class="mt-2 mb-4 text-sm/6 text-gray-500">{{ $t('wallet.wereOpeningYourPersonalDeposit') }}</p>
                 </div>
               </template>
 
               <template v-else-if="step === 'instructions'">
-                <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">Make your bank transfer</DialogTitle>
-                <p v-if="account?.instruction" class="mt-1 text-sm text-gray-600 leading-6">{{ account.instruction }}</p>
+                <DialogTitle as="h3" class="text-base font-semibold text-gray-900 pr-8">{{ $t('wallet.makeYourBankTransfer') }}</DialogTitle>
+                <p v-if="account?.instruction" class="mt-1 text-sm/6 text-gray-600">{{ account.instruction }}</p>
 
-                <div v-if="generalError" class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">{{ generalError }}</div>
+                <div v-if="generalError" class="mt-4 rounded-md bg-danger-50 px-4 py-3 text-sm/6 text-danger-600">{{ generalError }} <router-link v-if="generalFix" :to="generalFix.route" class="ml-1 font-semibold underline underline-offset-2 text-danger-800">{{ generalFix.label }}</router-link></div>
 
-                <div class="mt-4 border-l-4 border-yellow-400 bg-yellow-50 p-4">
+                <div class="mt-4 border-l-4 border-warning-400 bg-warning-50 p-4">
                   <div class="flex">
                     <div class="shrink-0">
-                      <ExclamationTriangleIcon class="size-5 text-yellow-400" aria-hidden="true" />
+                      <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
                     </div>
                     <div class="ml-3">
-                      <p class="text-sm text-yellow-700">Transfer exactly <strong>{{ declaration?.amountFormatted }}</strong> — this is how we match your deposit to your wallet. A different amount will not be credited automatically.</p>
+                      <p class="text-sm/6 text-warning-700"><i18n-t keypath="wallet.transferExactlyThisIsHow" scope="global"><template #value><strong>{{ declaration?.amountFormatted }}</strong></template></i18n-t></p>
                     </div>
                   </div>
                 </div>
 
                 <div class="text-left my-4">
-                  <label for="topup-declared-amount" class="block text-sm/6 font-medium text-gray-900">Transfer Amount</label>
+                  <label for="topup-declared-amount" class="block text-sm/6 font-medium text-gray-900">{{ $t('wallet.transferAmount') }}</label>
                   <UseClipboard v-slot="{ copy, copied }" :source="declaration?.amount">
                     <div class="mt-2 flex">
                       <div class="-mr-px grid grow grid-cols-1 focus-within:relative">
                         <input type="text" readonly :value="declaration?.amountFormatted" id="topup-declared-amount" class="col-start-1 row-start-1 block w-full rounded-l-md bg-gray-50 py-2.5 px-3 text-base font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6" />
                       </div>
-                      <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 cursor-pointer">
+                      <button @click="copy()" type="button" class="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-gray-100 px-3 py-2 text-sm/6 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 hover:bg-gray-50 cursor-pointer">
                         <ClipboardIcon class="-ml-0.5 size-4 text-gray-400" aria-hidden="true" />
                       </button>
                     </div>
-                    <p v-if="copied" class="text-green-600 mt-2 font-normal text-xs">Transfer Amount has been copied!</p>
+                    <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">{{ $t('wallet.transferAmountHasBeenCopied') }}</p>
                   </UseClipboard>
                 </div>
 
@@ -214,9 +229,9 @@ function close() {
                   <ClientPaymentAccount v-bind:account="account" />
                 </template>
 
-                <p v-if="declaration?.expiresAt" class="mt-4 text-xs text-gray-500">This declaration expires {{ moment(declaration.expiresAt).fromNow() }} ({{ moment(declaration.expiresAt).format('MMMM D, YYYY h:mm A') }}). A declaration that expires moves no money.</p>
+                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.thisDeclarationExpiresFromnowA', {fromNow: moment(declaration.expiresAt).fromNow(), A: moment(declaration.expiresAt).format('LLL')}) }}</p>
 
-                <button type="button" @click="close" class="mt-5 block w-full rounded-md bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-brand-600 cursor-pointer">Done</button>
+                <button type="button" @click="close" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">{{ $t('common.done') }}</button>
               </template>
             </DialogPanel>
           </TransitionChild>
