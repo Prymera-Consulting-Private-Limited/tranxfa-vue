@@ -75,9 +75,25 @@ describe('composable defects', () => {
     vi.doUnmock('axios');
   });
 
-  it('relationships are narrowed to the recipient country', () => {
-    expect(read('src/composables/resource_utils.js')).toContain("params: countryId ? {country_id: countryId} : {}");
-    expect(read('src/components/Recipient/AddRecipientWizard.vue')).toContain('resourceUtils.relationships(recipient.country?.id ?? null)');
+  // SD-1035 narrowed the relationships read by the recipient's country because
+  // the reference documented the parameter. Nobody checked there was data behind
+  // it: the back end joins a per-country mapping that is empty on every corridor
+  // of every tenant, so the read came back empty, and Relationship is required.
+  // No customer could add a recipient between 12 Sep and 14 Sep.
+  //
+  // SD-1182 takes the parameter back out. It returns once SD-1181 makes the back
+  // end fall back to the full list when a country has no mapping rows.
+  it('relationships are read unnarrowed until the back end falls back correctly', () => {
+    // Both files carry a comment naming the parameter and saying why it is off,
+    // so the guard has to read code rather than prose.
+    const codeOf = file => read(file)
+      .split('\n')
+      .filter(line => ! /^\s*(\/\/|\/\*|\*)/.test(line))
+      .join('\n');
+
+    expect(codeOf('src/composables/resource_utils.js')).not.toContain('country_id');
+    expect(codeOf('src/components/Recipient/AddRecipientWizard.vue')).not.toContain('country_id');
+    expect(read('src/components/Recipient/AddRecipientWizard.vue')).toContain('await resourceUtils.relationships();');
   });
 
   it('a malformed reset link no longer throws before the request', () => {

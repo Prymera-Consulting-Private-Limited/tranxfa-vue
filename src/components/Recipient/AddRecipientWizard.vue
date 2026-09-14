@@ -64,6 +64,29 @@ function retry() {
   retryLast();
 }
 
+// The first step used to retry by calling window.location.reload(). That is not
+// a retry: it throws away the whole application and brings the customer back at
+// the splash screen with the wizard gone. "Try again" on a failed fetch repeats
+// the fetch, like every other step here.
+async function fetchTargets() {
+  isLoading.value = true;
+  retryLast = fetchTargets;
+  try {
+    const response = await payoutChannelUtils.getTargets();
+    targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
+  } catch (e) {
+    logRequestFailure(e, 'recipient-targets');
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe7'));
+    isLoading.value = false;
+    return;
+  }
+  if (targets.value.length === 1) {
+    await updateRecipientTarget(targets.value[0]);
+  } else {
+    isLoading.value = false;
+  }
+}
+
 async function fetchPayoutMethods() {
   isLoading.value = true;
   retryLast = fetchPayoutMethods;
@@ -112,9 +135,30 @@ async function fetchPayoutChannel() {
     isLoading.value = false;
     return;
   }
-  if (recipient.payoutChannel.configuration.recipientType === RecipientType.INDIVIDUAL) {
+  // `configuration` is nullable on the model - PayoutChannel only populates it
+  // when the payload carries one - and this branch used to read through it
+  // without asking, outside the try above. A channel arriving without a
+  // configuration threw a TypeError that nothing caught: isLoading stayed true,
+  // no loadFailure was set, and the customer had a spinner with no message and
+  // no retry. That is the shape somebody reports as "adding a recipient
+  // freezes" - not an error, a screen that never finishes.
+  const configuration = recipient.payoutChannel?.configuration;
+
+  if (! configuration) {
+    // A code rather than a sentence: this is telemetry, it gets grepped, and
+    // the catalogue guard cannot tell a log string from copy - correctly, since
+    // it has no way to know which one a reader will see.
+    logRequestFailure(new Error('payout-channel-missing-configuration'), 'recipient-payout-channel');
+    loadFailure.value = t('recipient.weCouldntLoadThe6');
+    isLoading.value = false;
+    return;
+  }
+
+  // A null recipientType is not a fault: the channel does not dictate one, the
+  // machine is already on recipientTypeSelection, and the customer picks.
+  if (configuration.recipientType === RecipientType.INDIVIDUAL) {
     await updateRecipientType(RecipientType.INDIVIDUAL);
-  } else if (recipient.payoutChannel.configuration.recipientType === RecipientType.BUSINESS) {
+  } else if (configuration.recipientType === RecipientType.BUSINESS) {
     await updateRecipientType(RecipientType.BUSINESS);
   } else {
     isLoading.value = false;
@@ -134,14 +178,31 @@ async function updatePayoutMethod(payoutMethod) {
 async function fetchRelationships() {
   isLoading.value = true;
   retryLast = fetchRelationships;
-  await resourceUtils.relationships(recipient.country?.id ?? null).then((response) => {
-    relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship))
-  }).catch((e) => {
+
+  // One read, unnarrowed. The country filter stays off until the back end falls
+  // back to the full list on an empty mapping (SD-1181): narrowing by a mapping
+  // that is empty on every corridor of every tenant is what emptied this field
+  // in the first place.
+  try {
+    const response = await resourceUtils.relationships();
+    relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship));
+  } catch (e) {
     logRequestFailure(e, 'recipient-relationships');
     loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe4'));
-  }).finally(() => {
     isLoading.value = false;
-  });
+    return;
+  }
+
+  // Relationship is required to save, so an empty list is not a valid state:
+  // the customer arrives at the last step and can never finish it. Before this,
+  // an empty list was silent - a picker that opened on nothing, a Save that
+  // could not pass validation, and no way to tell that anything had gone wrong.
+  if (relationships.value.length === 0) {
+    logRequestFailure(new Error('recipient-relationships-empty'), 'recipient-relationships');
+    loadFailure.value = t('recipient.weCouldntLoadThe4');
+  }
+
+  isLoading.value = false;
 }
 
 async function updateRecipientType(type) {
@@ -166,18 +227,7 @@ onMounted(async () => {
     send({ type: "PROCEED" })
     await updatePayoutMethod(props.quote.payoutMethod);
   } else {
-    retryLast = () => window.location.reload();
-    await payoutChannelUtils.getTargets().then((response) => {
-      targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
-    }).catch((e) => {
-      logRequestFailure(e, 'recipient-targets');
-      loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe7'));
-    });
-    if (targets.value.length === 1) {
-      await updateRecipientTarget(targets.value[0]);
-    } else {
-      isLoading.value = false;
-    }
+    await fetchTargets();
   }
 })
 

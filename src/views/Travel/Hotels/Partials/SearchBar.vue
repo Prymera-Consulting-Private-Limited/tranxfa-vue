@@ -513,7 +513,7 @@ function search() {
                   type="button"
                   @click="close()"
                   class="cursor-pointer rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
-              >{{ $t('wallet.done') }}</button>
+              >{{ $t('common.done') }}</button>
             </div>
           </div>
         </PopoverPanel>

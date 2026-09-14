@@ -141,7 +141,7 @@ function close() {
                       <p v-if="copied" class="text-success-700 mt-2 font-normal text-xs/5">{{ $t('wallet.walletNumberHasBeenCopied') }}</p>
                     </UseClipboard>
                   </div>
-                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">{{ $t('wallet.done') }}</button>
+                  <button type="button" @click="emit('close')" class="mt-6 inline-flex justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">{{ $t('common.done') }}</button>
                 </div>
               </template>
 

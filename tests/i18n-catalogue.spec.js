@@ -594,3 +594,88 @@ describe('every locale compiles and keeps the English placeholders', () => {
     expect(wrong, `${locale} renames placeholders, so they never resolve:\n  ${wrong.join('\n  ')}`).toEqual([]);
   });
 });
+
+// SD-1141. `travel.*` and `wallet.*` belong to products the licence can switch
+// off (SD-1074). When it does, those screens are unreachable and their
+// translations stop being worth commissioning - which is fine until a screen
+// that IS reachable borrows a key from one of them.
+//
+// QuoteDisplay.vue did exactly that: it labelled the transfer wizard's quote
+// summary with `travel.destination` and `wallet.amount`. On Xenvia the licence
+// returns no products at all, so those two namespaces were untranslated on
+// purpose - and a customer sending money read "Destination" and "Amount" in
+// English on the last screen before paying. Found by walking the deployed app;
+// no count of translated keys could have shown it.
+describe('a reachable screen does not borrow copy from a product namespace', () => {
+  const PRODUCT_NAMESPACES = ['travel', 'wallet'];
+
+  // Where each product's own screens live. A file under one of these may of
+  // course use its own namespace.
+  const OWNS = {
+    travel: [/^src\/views\/Travel\//],
+    wallet: [/^src\/views\/Wallet\//, /^src\/components\/Wallet\//],
+  };
+
+  const filesUnder = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return filesUnder(path);
+    return /\.(vue|js)$/.test(entry.name) ? [path] : [];
+  });
+
+  it.each(PRODUCT_NAMESPACES)('%s keys are only asked for by that product', (namespace) => {
+    const asks = new RegExp(`(?<![\\w$.])\\$?t\\(\\s*'${namespace}\\.`);
+    const owns = OWNS[namespace];
+
+    const borrowers = filesUnder('src')
+      .filter(file => ! file.startsWith('src/locales/'))
+      .filter(file => ! owns.some(pattern => pattern.test(file)))
+      .filter(file => asks.test(read(file)));
+
+    expect(borrowers, `these are reachable when ${namespace} is unlicensed, and would read English:\n  ${borrowers.join('\n  ')}`)
+      .toEqual([]);
+  });
+});
+
+// SD-1179. vue-select's `label` prop names WHICH PROPERTY of an option to show
+// and to search. It is not copy. The i18n sweep read it as copy anyway and moved
+// six of them into the catalogue, so `transfer.wizard.title` existed only to hold
+// the literal string "title", and `account.demonym` only to hold "demonym".
+//
+// In English that round-trips and nothing looks wrong, which is why it survived.
+// In any other locale a translator is handed the bare word "title" with no
+// context; the moment one translates it the dropdown resolves a property that
+// does not exist, every option renders blank, and a required field cannot be
+// filled. Xenvia's Spanish catalogue carried both entries untranslated - one
+// edit away from it.
+describe('a dropdown reads its property name, not the catalogue', () => {
+  const under = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return under(path);
+    return /\.(vue|js)$/.test(entry.name) ? [path] : [];
+  });
+
+  it('no v-select takes its label from a translation call', () => {
+    const offenders = under('src').filter(file => (read(file).match(/<v-select\b[^>]*/gis) ?? [])
+      .some(tag => /(?::|v-bind:)label\s*=\s*"[^"]*\bt\(/.test(tag)));
+
+    expect(offenders, `label names a property of the option, so a translated one resolves to nothing:\n  ${offenders.join('\n  ')}`)
+      .toEqual([]);
+  });
+
+  // The discovery arm above only proves nothing is wrong today. This one proves
+  // the properties it names are real, so a renamed model field is caught too.
+  it('the properties those dropdowns name exist on what they are given', async () => {
+    const [{default: Relationship}, {default: Country}] = await Promise.all([
+      import('@/models/relationship.js'),
+      import('@/models/country.js'),
+    ]);
+
+    expect(Relationship.getInstance({id: 'r', title: 'Parent'}).title).toBe('Parent');
+    expect(Country.getInstance({id: 'c', demonym: 'Australian, Australia'}).demonym).toBe('Australian, Australia');
+  });
+
+  it('has no catalogue entry left whose whole value is a property name', () => {
+    expect(en.transfer.wizard.title).toBeUndefined();
+    expect(en.account.demonym).toBeUndefined();
+  });
+});

@@ -16,7 +16,7 @@ const props = defineProps({
 const items = computed(() => {
   const items = [];
   items.push({
-    label: t('travel.destination'),
+    label: t('calculator.destination'),
     value: props.quote.payoutCountry.commonName
   });
   items.push({
@@ -30,7 +30,7 @@ const items = computed(() => {
     });
   }
   items.push({
-    label: t('wallet.amount'),
+    label: t('calculator.amount'),
     value: props.quote.localAmountCurrencyPrefixed
   });
   items.push({

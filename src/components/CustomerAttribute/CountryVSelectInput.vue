@@ -95,7 +95,9 @@ function withPopper(dropdownList, component, { width }) {
 </script>
 
 <template>
-  <v-select v-model="selectedCountry" append-to-body :calculate-position="withPopper" :options="countries" :placeholder="`Please select`" key-by="id" :label="$t('account.demonym')">
+  <!-- `label` names which property of a country v-select shows and searches:
+       demonym reads "Australian, Australia", so typing either finds it. -->
+  <v-select v-model="selectedCountry" append-to-body :calculate-position="withPopper" :options="countries" :placeholder="`Please select`" key-by="id" label="demonym">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm/6 text-gray-300" v-if="searching"><i18n-t keypath="transfer.wizard.noResultsFound" scope="global"><template #query><em>{{ search }}</em></template></i18n-t></template>
       <em class="text-sm/6 text-gray-500 opacity-50" v-else>{{ $t('transfer.wizard.startTypingToSearch') }}</em>
