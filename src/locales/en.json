@@ -163,6 +163,7 @@
       "weCouldntAddThat": "We couldn't add that recipient to this transfer. Please choose them again.",
       "weCouldntLoadThe10": "We couldn't load the document upload. Please try again.",
       "youAlreadyHaveA": "You already have a transfer open for this exact amount.",
+      "changeTheAmountAndConfirm": "Change the amount and confirm again.",
       "weCouldNotConfirm": "We could not confirm this transfer. Please try again.",
       "weCouldntApplyThat": "We couldn't apply that code. Please try again.",
       "weCouldntRemoveThe": "We couldn't remove the code. Please try again.",
@@ -256,6 +257,7 @@
     "weCouldNotPrice": "We could not price this transfer just now. Please check your connection and try again.",
     "weCouldntStartYour": "We couldn't start your transfer. Nothing has been sent. Please try again.",
     "rateBeforeCouponCode": "Rate before coupon {code}",
+    "couponCode": "Coupon {code}",
     "theRecipient": "Recipient"
   },
   "recipient": {
@@ -603,6 +605,7 @@
     "yourAddressDetailsHave": "Your address details have been successfully updated.",
     "yourWalletSubscriptionHas": "Your wallet subscription has been closed.",
     "yourWalletStillHolds": "Your wallet still holds money.",
+    "spendOrWithdrawTheBalance": "Spend or withdraw the balance first, then close the wallet.",
     "personalDetailsUpdated": "Personal Details Updated",
     "addressUpdated": "Address Updated",
     "walletClosed": "Wallet Closed",

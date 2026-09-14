@@ -102,7 +102,12 @@
     "yourAccountMustBe": "Tu cuenta debe estar totalmente verificada para descargar extractos.",
     "youSent": "Tú enviaste",
     "yourDevices": "Tus dispositivos",
-    "yourTransactions": "Tus transacciones"
+    "yourTransactions": "Tus transacciones",
+    "ourFees": "Nuestra comisión",
+    "subtotal": "Subtotal",
+    "totalDue": "Total a pagar",
+    "chooseYourRecipient": "Elige tu beneficiario",
+    "spendOrWithdrawTheBalance": "Gasta o retira el saldo antes de cerrar la billetera."
   },
   "appError": {
     "body": "No ha cambiado nada en tu cuenta. Vuelve a cargar la página para continuar; si sigue ocurriendo, contacta con soporte.",
@@ -162,7 +167,8 @@
     "weCouldntStartYour": "No hemos podido iniciar tu envío. No se ha enviado nada. Inténtalo de nuevo.",
     "youSend": "Tú envías",
     "yourAbilityToSendMoney": "Tu posibilidad de enviar dinero está restringida temporalmente.",
-    "zero": "Sin comisión"
+    "zero": "Sin comisión",
+    "couponCode": "Cupón {code}"
   },
   "common": {
     "chooseAFile": "Elige un archivo para subir.",
@@ -438,7 +444,8 @@
       "youAlreadyHaveA": "Ya tienes una transferencia abierta por este mismo importe.",
       "youllConfirmThisPaymentWith": "Confirmarás este pago con un código que te enviaremos por correo.",
       "yourDocumentWasReceived": "Hemos recibido tu documento, pero no hemos podido actualizar este envío. Vuelve a cargar la página.",
-      "yourTransferWasNot": "Tu transferencia no se creó. No se ha realizado ningún cargo. Puedes confirmarla de nuevo."
+      "yourTransferWasNot": "Tu transferencia no se creó. No se ha realizado ningún cargo. Puedes confirmarla de nuevo.",
+      "changeTheAmountAndConfirm": "Cambia el importe y confirma de nuevo."
     }
   },
   "travel": {
