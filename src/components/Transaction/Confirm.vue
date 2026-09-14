@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import TransactionQuote from "@/models/transaction_quote.js";
 import {
   PaperAirplaneIcon,
@@ -26,17 +30,17 @@ const props = defineProps({
 const reviewItems = [
   {
     icon: UserCircleIcon,
-    label: 'Recipient',
+    label: t('recipient.recipient'),
     value: props.quote.recipient.wholeName,
   },
   {
     icon: FlagIcon,
-    label: 'Payout Country',
+    label: t('account.payoutCountry'),
     value: props.quote.payoutCountry.commonName,
   },
   {
     icon: TruckIcon,
-    label: 'Payout Method',
+    label: t('recipient.payoutMethod'),
     value: props.quote.payoutMethod.title,
   }
 ];
@@ -71,17 +75,24 @@ for (let i = 0; i < props.quote.recipient.accountDetailHashMap.length; i++) {
 }
 reviewItems.push({
   icon: PaperAirplaneIcon,
-  label: 'Sending Amount',
+  label: t('account.sendingAmount'),
   value: props.quote.localAmountCurrencyPrefixed,
 });
 reviewItems.push({
   icon: BanknotesIcon,
-  label: 'Exchange Rate',
+  label: t('account.exchangeRate'),
   value: props.quote.exchangeRateFormatted,
 });
+if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCouponFormatted) {
+  reviewItems.push({
+    icon: PercentBadgeIcon,
+    label: t('account.rateBeforeCouponCode2', {code: props.quote.coupon.code}),
+    value: props.quote.coupon.exchangeRateBeforeCouponFormatted,
+  });
+}
 reviewItems.push({
   icon: WalletIcon,
-  label: 'Recipient Gets',
+  label: t('account.recipientGets2'),
   value: props.quote.foreignAmountCurrencyPrefixed,
 });
 if (props.quote.payoutMethod.promo) {
@@ -89,23 +100,30 @@ if (props.quote.payoutMethod.promo) {
     icon: PercentBadgeIcon,
     label: null,
     value: props.quote.payoutMethod.promo,
-    color: 'bg-lime-50 border-lime-400 ',
-    textColor: 'text-lime-700',
+    color: 'bg-success-50 border-success-400 ',
+    textColor: 'text-success-700',
   });
 }
 reviewItems.push({
   icon: PlusIcon,
-  label: 'Fees',
+  label: t('calculator.fees'),
   value: props.quote.baseFeesCurrencyPrefixed,
 });
+if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
+  reviewItems.push({
+    icon: PercentBadgeIcon,
+    label: `Coupon ${props.quote.coupon.code}`,
+    value: `- ${props.quote.coupon.discountAmountCurrencyPrefixed}`,
+  });
+}
 reviewItems.push({
   icon: CalculatorIcon,
-  label: 'Subtotal',
+  label: t('account.subtotal'),
   value: props.quote.subTotalAmountCurrencyPrefixed,
 });
 reviewItems.push({
   icon: WalletIcon,
-  label: 'Total Due',
+  label: t('account.totalDue'),
   value: props.quote.totalAmountCurrencyPrefixed,
 });
 </script>
@@ -119,7 +137,7 @@ reviewItems.push({
             reviewItem.color ? reviewItem.color : 'bg-blue-50 border-blue-400 text-blue-700'
           ]" class="py-2 px-0 sm:px-5 flex space-x-6 flex-col sm:flex-row">
           <dt v-if="reviewItem.label" class="font-medium text-gray-900 sm:w-64 sm:flex-none">
-            <div class="flex justify-start items-center gap-4 text-sm/7">
+            <div class="flex justify-start items-center gap-4 text-sm/6">
               <component :is="reviewItem.icon" class="h-4.5 w-4.5 text-gray-600" />
               {{ reviewItem.label }}
             </div>

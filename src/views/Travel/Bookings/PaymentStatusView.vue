@@ -1,0 +1,224 @@
+<script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {computed, onUnmounted, ref, watch} from 'vue';
+import CustomerLayout from '@/components/CustomerLayout.vue';
+import Processing from '@/components/Payment/State/Processing.vue';
+import PaymentCompleted from '@/components/Payment/State/PaymentCompleted.vue';
+import AwaitingPending from '@/components/Payment/State/AwaitingPending.vue';
+import Failed from '@/components/Payment/State/Failed.vue';
+import Order from '@/models/travel/orders/order.js';
+import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
+import {PAYMENT_POLL_MS, useOrderUtils} from '@/composables/travel/order_utils.js';
+import {ExclamationTriangleIcon} from '@heroicons/vue/24/outline';
+
+const props = defineProps({
+  orderId: {
+    type: String,
+    required: true,
+  },
+});
+
+const {getOrder} = useOrderUtils();
+
+/**
+ * @type {import('vue').Ref<Order|null>}
+ */
+const order = ref(null);
+
+const isLoading = ref(true);
+const hasFailed = ref(false);
+const failureMessage = ref(null);
+
+const payment = computed(() => order.value?.latestPayment ?? null);
+
+/**
+ * Four states rather than every code the enum carries. A customer waiting on a
+ * payment wants to know whether it worked, not which of five machine states it
+ * passed through on the way.
+ */
+const status = computed(() => {
+  if (!payment.value) {
+    return 'waiting';
+  }
+
+  // Before the successful check, which counts a refunded payment as successful —
+  // it did succeed, and the money then went back. Telling somebody who cancelled
+  // that their payment has gone through is true and useless.
+  if (payment.value.isRefunded) {
+    return 'refunded';
+  }
+
+  if (payment.value.isSuccessful) {
+    return 'paid';
+  }
+
+  if (payment.value.hasFailed) {
+    return 'failed';
+  }
+
+  return payment.value.state === 'REDIRECTED' ? 'processing' : 'waiting';
+});
+
+const heading = computed(() => {
+  switch (status.value) {
+    case 'refunded':
+      return payment.value.isPartlyRefunded ? t('travel.partOfYourPayment') : t('travel.yourPaymentHasBeen');
+
+    case 'paid':
+      return t('travel.paymentWentThrough');
+
+    case 'failed':
+      return t('travel.paymentDidNotGoThrough');
+
+    case 'processing':
+      return t('travel.finishingYourPayment');
+
+    default:
+      return t('travel.waitingForYourPayment');
+  }
+});
+
+const note = computed(() => {
+  switch (status.value) {
+    case 'refunded':
+      // What was kept is the hotel's rule rather than ours, and the booking screen
+      // is where the cancellation quote that explains it lives.
+      return payment.value.isPartlyRefunded
+          ? t('travel.thisBookingWasCancelled')
+          : t('travel.thisBookingWasCancelled2');
+
+    case 'paid':
+      // A cancelled booking can still hold a captured payment for a while, since
+      // the refund is worked out and sent after the cancellation itself.
+      if (order.value?.isCancelled) {
+        return t('travel.bookingCancelledRefundFollows');
+      }
+
+      return t('travel.roomBookedAndPaidFor');
+
+    case 'failed':
+      // The room outlives the payment, which is the one thing worth saying here.
+      return t('travel.notChargedRoomStillBooked');
+
+    case 'processing':
+      return t('travel.waitingForYourBank');
+
+    default:
+      // True the moment the Volume hand-off is wired. Until then nothing takes
+      // the customer to their bank, so a Volume payment rests here for good.
+      // Left as it reads rather than rewritten for a gap that closes when the
+      // api starts sending what the sdk needs — see PaymentView's pay().
+      return t('travel.updatesOnItsOwn');
+  }
+});
+
+// Polling only, for now. The transfer flow watches a payment settle over a
+// broadcast, but the channel travel payments publish on has not been given to us
+// and a guessed channel name fails silently — it subscribes, is refused, and
+// waits for ever. Asking works today and the socket can shorten it later.
+let pollTimer = null;
+
+function stopPolling() {
+  clearTimeout(pollTimer);
+  pollTimer = null;
+}
+
+function schedulePoll() {
+  stopPolling();
+
+  if (payment.value?.isSettled) {
+    return;
+  }
+
+  pollTimer = setTimeout(() => load(true), PAYMENT_POLL_MS);
+}
+
+/**
+ * @param {boolean} quiet A poll leaves the screen alone rather than flashing it
+ * back to a skeleton every few seconds.
+ */
+async function load(quiet = false) {
+  if (!quiet) {
+    isLoading.value = true;
+  }
+
+  hasFailed.value = false;
+  failureMessage.value = null;
+
+  await getOrder(props.orderId).then((response) => {
+    order.value = Order.getInstance(response.data);
+  }).catch((error) => {
+    reportUnexpectedError(error, t('travel.travelPaymentStatus'));
+
+    // A poll that fails is not worth tearing the page down for — the payment is
+    // settling regardless of whether this tab can see it.
+    if (quiet) {
+      return;
+    }
+
+    hasFailed.value = true;
+    failureMessage.value = getCustomerMessage(error);
+  }).finally(() => {
+    isLoading.value = false;
+    schedulePoll();
+  });
+}
+
+watch(() => props.orderId, () => load(), {immediate: true});
+
+onUnmounted(stopPolling);
+</script>
+
+<template>
+  <CustomerLayout>
+    <main class="-mt-24 bg-gray-50 pb-12">
+      <div class="mx-auto max-w-2xl px-4 pt-8 sm:px-6 lg:px-8">
+        <!-- Loading -->
+        <div v-if="isLoading" class="h-80 animate-pulse rounded-3xl bg-white ring-1 ring-gray-200" />
+        <!-- Failed -->
+        <div v-else-if="hasFailed" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-danger-200">
+          <div class="flex size-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
+            <ExclamationTriangleIcon class="size-7" aria-hidden="true" />
+          </div>
+          <h1 class="mt-6 text-base font-semibold text-gray-900">{{ $t('transfer.payment.weCouldntCheckYourPayment') }}</h1>
+          <p v-if="failureMessage" class="mt-2 max-w-md text-sm/6 text-gray-500">{{ failureMessage }}</p>
+          <p v-else class="mt-2 max-w-md text-sm/6 text-gray-500">{{ $t('travel.yourBookingAndAnyPayment') }}</p>
+          <button
+              type="button"
+              @click="load()"
+              class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+          >{{ $t('common.tryAgain') }}</button>
+        </div>
+        <template v-else>
+          <div class="flex flex-col items-center rounded-3xl bg-white px-8 pt-6 pb-10 text-center ring-1 ring-gray-200">
+            <!-- The animations carry their own whitespace, which the crop removes. -->
+            <PaymentCompleted v-if="status === 'paid' || status === 'refunded'" class="-my-12" />
+            <Failed v-else-if="status === 'failed'" class="-my-12" />
+            <Processing v-else-if="status === 'processing'" class="-my-12" />
+            <AwaitingPending v-else class="-my-12" />
+            <h1 class="mt-6 text-lg font-semibold tracking-tight text-gray-900">{{ heading }}</h1>
+            <p class="mt-2 max-w-md text-sm/6 text-gray-500">{{ note }}</p>
+            <p v-if="payment" class="mt-4 text-sm/6 text-gray-700">
+              <span class="font-medium">{{ payment.amount.currencyPrefixed }}</span>
+              <span v-if="payment.method" class="text-gray-500"> · {{ payment.method }}</span>
+            </p>
+            <div class="mt-8 flex flex-col gap-2 sm:flex-row-reverse">
+              <RouterLink
+                  :to="{name: 'travelBooking', params: {id: orderId}}"
+                  class="cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
+              >{{ $t('travel.viewYourBooking') }}</RouterLink>
+              <RouterLink
+                  v-if="status === 'failed'"
+                  :to="{name: 'travelBookingPayment', params: {id: orderId}}"
+                  class="cursor-pointer rounded-xl px-5 py-2.5 text-sm/6 font-medium text-gray-600 ring-1 ring-gray-200 transition hover:text-gray-900 focus-visible:outline-0"
+              >{{ $t('travel.tryPayingAgain') }}</RouterLink>
+            </div>
+          </div>
+        </template>
+      </div>
+    </main>
+  </CustomerLayout>
+</template>

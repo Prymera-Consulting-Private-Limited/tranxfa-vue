@@ -13,7 +13,8 @@ class QuotePendingDocument extends DocumentCategory {
         category.code = data.code;
         category.title = data.title;
         category.description = data.description;
-        category.isRequired = data.is_required;
+        // The reference names it `required`; `is_required` was never sent.
+        category.isRequired = data.required ?? data.is_required ?? false;
         if (data.document_types) {
             category.documentTypes = data.document_types.map((data) => DocumentType.getInstance(data))
         }

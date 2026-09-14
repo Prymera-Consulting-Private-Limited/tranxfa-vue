@@ -1,5 +1,6 @@
 import { createMachine } from 'xstate';
 import { useCustomerStore } from '@/stores/customer.js';
+import { addressCollection, collectsAddress, verifiesMobileNumber } from '@/onboarding_config.js';
 
 const customerStore = useCustomerStore();
 
@@ -51,21 +52,55 @@ function employmentInformationCompleted() {
 function requiresAddressInformation() {
     const customer = getCustomer();
 
-    return employmentInformationCompleted() &&
+    return collectsAddress() &&
+        employmentInformationCompleted() &&
         !!customer?.addressInformationRequired?.();
+}
+
+// Reads "the address no longer stands between the customer and the next step".
+//
+// Not the same as "an address was given": a deployment that omits the step is
+// settled by definition, and so is one where the step is skippable - otherwise
+// every later step, which all chain through this, would be unreachable for a
+// customer who skipped.
+function addressSettled() {
+    const customer = getCustomer();
+
+    if (addressCollection() !== 'required') {
+        return employmentInformationCompleted();
+    }
+
+    return employmentInformationCompleted() &&
+        !customer?.addressInformationRequired?.();
 }
 
 function hasMobileNumber() {
     const customer = getCustomer();
 
-    // Address may be skipped during onboarding and collected later when sending money.
-    return employmentInformationCompleted() &&
+    return addressSettled() &&
         !!customer?.account?.mobileNumber;
 }
 
-function canEnterMobileNumber() {
-    return employmentInformationCompleted() &&
-        !hasMobileNumber();
+function requiresMobileNumberVerification() {
+    const customer = getCustomer();
+
+    return verifiesMobileNumber() &&
+        hasMobileNumber() &&
+        !customer?.account?.isMobileNumberVerified;
+}
+
+// The counterpart of isEmailVerified(): the last thing owed before onboarding
+// is done. Where the deployment does not verify numbers, having one is the
+// whole requirement.
+function mobileNumberSettled() {
+    const customer = getCustomer();
+
+    if (! verifiesMobileNumber()) {
+        return hasMobileNumber();
+    }
+
+    return hasMobileNumber() &&
+        !!customer?.account?.isMobileNumberVerified;
 }
 
 export const onboardingNavigationMachine = createMachine({
@@ -76,19 +111,28 @@ export const onboardingNavigationMachine = createMachine({
         emailVerification: {
             on: {
                 PROCEED: [
-                    // Returning users who already finished (e.g. skipped address) go to dashboard.
                     {
                         target: 'onboardingComplete',
-                        guard: hasMobileNumber,
+                        guard: mobileNumberSettled,
                     },
-                    // First-time path: offer address (skippable) before mobile.
+                    {
+                        target: 'mobileNumberVerification',
+                        guard: requiresMobileNumberVerification,
+                    },
+                    // Address is offered before mobile. The other two entry
+                    // points already order it this way; this one did not, and
+                    // in `optional` mode that difference decides whether the
+                    // step is ever seen - addressSettled() is true from the
+                    // start when the customer may skip, so a mobileNumberInput
+                    // branch placed first swallows the step entirely. quiqsend
+                    // hit this and reordered by hand on its branch.
                     {
                         target: 'addressInformation',
                         guard: requiresAddressInformation,
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: canEnterMobileNumber,
+                        guard: addressSettled,
                     },
                     {
                         target: 'employmentInformation',
@@ -128,11 +172,7 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: canEnterMobileNumber,
-                    },
-                    {
-                        target: 'onboardingComplete',
-                        guard: hasMobileNumber,
+                        guard: addressSettled,
                     },
                 ],
 
@@ -151,11 +191,7 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: canEnterMobileNumber,
-                    },
-                    {
-                        target: 'onboardingComplete',
-                        guard: hasMobileNumber,
+                        guard: addressSettled,
                     },
                 ],
 
@@ -167,15 +203,17 @@ export const onboardingNavigationMachine = createMachine({
 
         addressInformation: {
             on: {
-                // Allow proceed even when address is skipped; send-money will collect it later.
+                // In `optional` mode this fires on Skip as well as on Save:
+                // addressSettled() does not ask whether an address was given,
+                // only whether one still stands in the way.
                 PROCEED: [
-                    {
-                        target: 'mobileNumberInput',
-                        guard: canEnterMobileNumber,
-                    },
                     {
                         target: 'onboardingComplete',
                         guard: hasMobileNumber,
+                    },
+                    {
+                        target: 'mobileNumberInput',
+                        guard: addressSettled,
                     },
                 ],
 
@@ -187,13 +225,34 @@ export const onboardingNavigationMachine = createMachine({
 
         mobileNumberInput: {
             on: {
-                PROCEED: {
-                    target: 'onboardingComplete',
-                    guard: hasMobileNumber,
-                },
+                PROCEED: [
+                    {
+                        target: 'onboardingComplete',
+                        guard: mobileNumberSettled,
+                    },
+                    {
+                        target: 'mobileNumberVerification',
+                        guard: requiresMobileNumberVerification,
+                    },
+                ],
 
                 EDIT_PERSONAL_INFORMATION: {
                     target: 'identityInformation',
+                },
+            },
+        },
+
+        mobileNumberVerification: {
+            on: {
+                PROCEED: [
+                    {
+                        target: 'onboardingComplete',
+                        guard: mobileNumberSettled,
+                    },
+                ],
+
+                EDIT_MOBILE_NUMBER: {
+                    target: 'mobileNumberInput',
                 },
             },
         },

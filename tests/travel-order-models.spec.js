@@ -1,0 +1,521 @@
+import { describe, it, expect } from 'vitest'
+
+import Order from '@/models/travel/orders/order.js'
+import OrderHotel from '@/models/travel/orders/order_hotel.js'
+import OrderPayment from '@/models/travel/orders/order_payment.js'
+import OrderConfirmation from '@/models/travel/orders/order_confirmation.js'
+import OrderCancellation from '@/models/travel/orders/order_cancellation.js'
+import OrderCancellationQuote from '@/models/travel/orders/order_cancellation_quote.js'
+import OrderCancellationRequest from '@/models/travel/orders/order_cancellation_request.js'
+
+const requestPayload = (state, isCancelled, refundSent) => ({
+    state,
+    state_label: `${state} label`,
+    is_cancelled: isCancelled,
+    requested_at: '2026-08-18T10:02:00+00:00',
+    refund_sent: refundSent,
+    charged: 4860,
+    charged_formatted: '48.60',
+    charged_currency_prefixed: 'GBP 48.60',
+    refund_owed: 18140,
+    refund_owed_formatted: '181.40',
+    refund_owed_currency_prefixed: 'GBP 181.40',
+})
+
+const orderPayload = (overrides = {}) => ({
+    id: 'ord-1',
+    reference: 'VO-01J8XAQ4V2NP7WZK3RB9CDEF0',
+    state: 'CONFIRMED',
+    state_label: 'Confirmed',
+    state_description: 'Your booking has been placed and we are confirming it with the hotel.',
+    booked_at: '2026-08-17T09:14:02+00:00',
+    hotel: { id: 'hot-1', slug: 'the-mayfair-hotel', name: 'The Mayfair Hotel', address: 'Stratton Street, London', star_rating: 5 },
+    check_in: '2026-09-10',
+    check_out: '2026-09-12',
+    nights: 2,
+    room_name: 'Junior Suite',
+    meal: 'BREAKFAST',
+    occupancy: { rooms: [{ adults: 2, children_ages: [7] }] },
+    is_confirmed: true,
+    confirmed_at: '2026-08-17T09:14:48+00:00',
+    total: 23000,
+    total_formatted: '230.00',
+    total_currency_prefixed: 'GBP 230.00',
+    cancellation: null,
+    ...overrides,
+})
+
+describe('OrderHotel', () => {
+    it('maps the canonical hotel a booking links back to', () => {
+        const hotel = OrderHotel.getInstance(orderPayload().hotel)
+
+        expect(hotel.id).toBe('hot-1')
+        expect(hotel.slug).toBe('the-mayfair-hotel')
+        expect(hotel.address).toBe('Stratton Street, London')
+        expect(hotel.starRating).toBe(5)
+    })
+
+    it('keeps an unrated hotel null', () => {
+        expect(OrderHotel.getInstance({ id: 'h', name: 'H' }).starRating).toBeNull()
+    })
+})
+
+describe('OrderCancellationQuote', () => {
+    it('maps what cancelling would cost and give back', () => {
+        const quote = OrderCancellationQuote.getInstance({
+            is_free: false,
+            is_inside_free_window: false,
+            costs_now: 4860,
+            costs_now_formatted: '48.60',
+            costs_now_currency_prefixed: 'GBP 48.60',
+            refund_now: 18140,
+            refund_now_formatted: '181.40',
+            refund_now_currency_prefixed: 'GBP 181.40',
+        })
+
+        expect(quote.isFree).toBe(false)
+        expect(quote.isInsideFreeWindow).toBe(false)
+        expect(quote.costsNow.currencyPrefixed).toBe('GBP 48.60')
+        expect(quote.refundNow.amount).toBe(18140)
+    })
+})
+
+describe('OrderCancellationRequest', () => {
+    it('maps a request the hotel accepted', () => {
+        const request = OrderCancellationRequest.getInstance(requestPayload('ACCEPTED', true, true))
+
+        expect(request.state).toBe('ACCEPTED')
+        expect(request.isCancelled).toBe(true)
+        expect(request.refundSent).toBe(true)
+        expect(request.charged.currencyPrefixed).toBe('GBP 48.60')
+        expect(request.refundOwed.amount).toBe(18140)
+    })
+
+    it('keeps being owed money and having been sent it as separate facts', () => {
+        const request = OrderCancellationRequest.getInstance(requestPayload('ACCEPTED', true, false))
+
+        expect(request.refundOwed.amount).toBe(18140)
+        expect(request.refundSent).toBe(false)
+    })
+})
+
+describe('OrderCancellation', () => {
+    it('is not cancelled while nobody has asked', () => {
+        const cancellation = OrderCancellation.getInstance({ requested: null, can_cancel_now: true, quote: {
+            is_free: true, is_inside_free_window: true, costs_now: 0, refund_now: 23000,
+        } })
+
+        expect(cancellation.request).toBeNull()
+        expect(cancellation.canCancelNow).toBe(true)
+        expect(cancellation.quote).toBeInstanceOf(OrderCancellationQuote)
+        expect(cancellation.isCancelled).toBe(false)
+        expect(cancellation.isPending).toBe(false)
+    })
+
+    it('has no quote when cancelling is not possible, which is never free', () => {
+        const cancellation = OrderCancellation.getInstance({ requested: null, can_cancel_now: false, quote: null })
+
+        expect(cancellation.canCancelNow).toBe(false)
+        expect(cancellation.quote).toBeNull()
+    })
+
+    it('is cancelled only when the hotel accepted', () => {
+        const accepted = OrderCancellation.getInstance({ requested: requestPayload('ACCEPTED', true, true), can_cancel_now: false, quote: null })
+
+        expect(accepted.isCancelled).toBe(true)
+        expect(accepted.isPending).toBe(false)
+    })
+
+    it('leaves a refused booking live, however much it looks cancelled', () => {
+        const refused = OrderCancellation.getInstance({ requested: requestPayload('REFUSED', false, false), can_cancel_now: false, quote: null })
+
+        expect(refused.request).not.toBeNull()
+        expect(refused.isCancelled).toBe(false)
+        expect(refused.isPending).toBe(true)
+    })
+
+    it('leaves an unresolved request live too, since nobody has answered', () => {
+        const unresolved = OrderCancellation.getInstance({ requested: requestPayload('UNRESOLVED', false, false), can_cancel_now: false, quote: null })
+
+        expect(unresolved.isCancelled).toBe(false)
+        expect(unresolved.isPending).toBe(true)
+    })
+})
+
+describe('OrderPayment', () => {
+    it('maps an attempt with its state and amount', () => {
+        const payment = OrderPayment.getInstance({
+            reference: 'VO-…-P001',
+            state: 'CAPTURED',
+            state_label: 'Captured',
+            method: 'Debit Card',
+            attempted_at: '2026-08-17T09:15:10+00:00',
+            amount: 23000,
+            amount_formatted: '230.00',
+            amount_currency_prefixed: 'GBP 230.00',
+        })
+
+        expect(payment.state).toBe('CAPTURED')
+        expect(payment.stateLabel).toBe('Captured')
+        expect(payment.method).toBe('Debit Card')
+        expect(payment.amount.currencyPrefixed).toBe('GBP 230.00')
+    })
+
+    it('maps every attempt including the failed ones', () => {
+        const payments = OrderPayment.getCollection([
+            { reference: 'P1', state: 'FAILED', amount: 23000 },
+            { reference: 'P2', state: 'CAPTURED', amount: 23000 },
+        ])
+
+        expect(payments).toHaveLength(2)
+        expect(payments.map(payment => payment.state)).toEqual(['FAILED', 'CAPTURED'])
+    })
+
+    // The body the create call answers with, which carries the three things the
+    // sdk hand-off needs and the listed attempts do not.
+    const created = () => ({
+        id: 'a288e998-0000-4000-8000-000000000001',
+        reference: 'VO-01M0BD0FSVNNJ51ESVC0TZ08WK-P001',
+        shared_reference: 'VO-01M0BD0FSVNNJ51ESVC0TZ08WK-P001',
+        state: 'PENDING',
+        amount: 19640,
+        amount_decimal: '196.40',
+        amount_formatted: '196.40',
+        amount_currency_prefixed: 'GBP 196.40',
+        payment_method: { code: 'OPEN-BANKING', title: 'Pay with Your Bank App' },
+        provider: { code: 'VOLUME-PAYMENTS', title: 'Volume' },
+        payment_url: null,
+        failure_reason: null,
+    })
+
+    it('maps the created payment, id and shared reference included', () => {
+        const payment = OrderPayment.getInstance(created())
+
+        expect(payment.id).toBe('a288e998-0000-4000-8000-000000000001')
+        expect(payment.sharedReference).toBe('VO-01M0BD0FSVNNJ51ESVC0TZ08WK-P001')
+        expect(payment.paymentUrl).toBeNull()
+        expect(payment.provider).toEqual({ code: 'VOLUME-PAYMENTS', title: 'Volume' })
+        expect(payment.isVolume).toBe(true)
+    })
+
+    it('reads the method from an object here and a string on a listed attempt', () => {
+        expect(OrderPayment.getInstance(created()).method).toBe('Pay with Your Bank App')
+        expect(OrderPayment.getInstance({ method: 'Debit Card' }).method).toBe('Debit Card')
+    })
+
+    // The states the transfer flow renders as a blank modal. Travel emits all of
+    // them: swept unpaid payments cancel, and cancelling a booking refunds.
+    it('treats a refund as its own outcome rather than as plain success', () => {
+        const at = state => OrderPayment.getInstance({ ...created(), state })
+
+        expect(at('REFUNDED').isRefunded).toBe(true)
+        expect(at('PART-REFUNDED').isRefunded).toBe(true)
+        expect(at('PART-REFUNDED').isPartlyRefunded).toBe(true)
+        expect(at('REFUNDED').isPartlyRefunded).toBe(false)
+        expect(at('CAPTURED').isRefunded).toBe(false)
+
+        // Still successful and still settled — the money arrived and then went
+        // back, and neither is a reason to keep asking.
+        expect(at('PART-REFUNDED').isSuccessful).toBe(true)
+        expect(at('PART-REFUNDED').isSettled).toBe(true)
+        expect(at('CANCELLED').hasFailed).toBe(true)
+        expect(at('CANCELLED').isSettled).toBe(true)
+    })
+
+    it('is ready to pay only at PENDING', () => {
+        const at = state => OrderPayment.getInstance({ ...created(), state }).isReadyToPay
+
+        expect(at('PENDING')).toBe(true)
+        expect(at('CREATED')).toBe(false)
+        expect(at('INITIALIZED')).toBe(false)
+        expect(at('REDIRECTED')).toBe(false)
+    })
+
+    describe('majorAmount', () => {
+        it('takes the figure the api sends rather than deriving one', () => {
+            expect(OrderPayment.getInstance(created()).majorAmount).toBe(196.40)
+        })
+
+        it('needs no decimal places to be right for any currency', () => {
+            const at = decimal => OrderPayment.getInstance({ ...created(), amount_decimal: decimal }).majorAmount
+
+            // A zero-decimal currency, a three-decimal one, and a large amount
+            expect(at('19640')).toBe(19640)
+            expect(at('19.640')).toBe(19.640)
+            expect(at('1234567.89')).toBe(1234567.89)
+        })
+
+        it('refuses rather than guessing when the figure is missing', () => {
+            const data = created()
+            delete data.amount_decimal
+
+            expect(OrderPayment.getInstance(data).majorAmount).toBeNull()
+            expect(OrderPayment.getInstance({ ...created(), amount_decimal: null }).majorAmount).toBeNull()
+            expect(OrderPayment.getInstance({ ...created(), amount_decimal: '' }).majorAmount).toBeNull()
+        })
+
+        // parseFloat("1,234,567.89") is 1. Number() gives NaN instead, which this
+        // turns into a refusal — so a separated value can never be sent as a
+        // smaller one. It would only bite above a thousand, which is the worst
+        // possible distribution for a money bug.
+        it('refuses a separated figure instead of truncating it to a smaller one', () => {
+            const payment = OrderPayment.getInstance({ ...created(), amount_decimal: '1,234,567.89' })
+
+            expect(payment.majorAmount).toBeNull()
+            expect(payment.majorAmount).not.toBe(1)
+        })
+
+        it('is null when there is no amount at all', () => {
+            const data = created()
+            delete data.amount
+            delete data.amount_decimal
+
+            expect(OrderPayment.getInstance(data).majorAmount).toBeNull()
+        })
+    })
+})
+
+describe('OrderConfirmation', () => {
+    it('keeps its total a rendered string, being a record rather than a sum', () => {
+        const confirmation = OrderConfirmation.getInstance({
+            hotel: 'The Mayfair Hotel',
+            room_name: 'Junior Suite',
+            meal: 'BREAKFAST',
+            check_in: '2026-09-10',
+            check_out: '2026-09-12',
+            nights: 2,
+            total: 'GBP 230.00',
+            price_lines: [{ anything: true }],
+            cancellation_ladder: { anything: true },
+            confirmed_at: '2026-08-17T09:14:48+00:00',
+        })
+
+        expect(confirmation.hotel).toBe('The Mayfair Hotel')
+        expect(confirmation.total).toBe('GBP 230.00')
+        expect(confirmation.confirmedAt).toBe('2026-08-17T09:14:48+00:00')
+    })
+
+    it('carries the stored structures through untouched', () => {
+        const ladder = { policies: [{ start_at: null }] }
+        const confirmation = OrderConfirmation.getInstance({ price_lines: [1, 2], cancellation_ladder: ladder })
+
+        expect(confirmation.priceLines).toEqual([1, 2])
+        expect(confirmation.cancellationLadder).toBe(ladder)
+    })
+})
+
+describe('Order.getInstance', () => {
+    it('maps a booking from the list', () => {
+        const order = Order.getInstance(orderPayload())
+
+        expect(order.id).toBe('ord-1')
+        expect(order.reference).toBe('VO-01J8XAQ4V2NP7WZK3RB9CDEF0')
+        expect(order.state).toBe('CONFIRMED')
+        expect(order.stateLabel).toBe('Confirmed')
+        expect(order.stateDescription).toContain('confirming it with the hotel')
+        expect(order.hotel).toBeInstanceOf(OrderHotel)
+        expect(order.nights).toBe(2)
+        expect(order.total.currencyPrefixed).toBe('GBP 230.00')
+        expect(order.cancellation).toBeNull()
+    })
+
+    it('maps the parts only the single booking carries', () => {
+        const order = Order.getInstance(orderPayload({
+            guests: [{ first_name: 'Ada', last_name: 'Lovelace' }, { first_name: 'Grace', last_name: 'Hopper' }],
+            contact: { email: 'guest@example.com', phone: '+441234567890' },
+            confirmation: { hotel: 'The Mayfair Hotel', total: 'GBP 230.00' },
+            breakdown: [{ key: 'room', label: 'Room', amount: 20000, amount_formatted: '200.00', amount_currency_prefixed: 'GBP 200.00' }],
+            payments: [{ reference: 'P1', state: 'CAPTURED', amount: 23000 }],
+        }))
+
+        expect(order.guests).toEqual([
+            { firstName: 'Ada', lastName: 'Lovelace', isChild: false },
+            { firstName: 'Grace', lastName: 'Hopper', isChild: false },
+        ])
+        expect(order.contact).toEqual({ email: 'guest@example.com', phone: '+441234567890' })
+        expect(order.confirmation).toBeInstanceOf(OrderConfirmation)
+        expect(order.breakdown[0].amount.currencyPrefixed).toBe('GBP 200.00')
+        expect(order.payments[0]).toBeInstanceOf(OrderPayment)
+    })
+
+    it('leaves the single-booking parts empty on a list row', () => {
+        const order = Order.getInstance(orderPayload())
+
+        expect(order.guests).toEqual([])
+        expect(order.contact).toBeNull()
+        expect(order.confirmation).toBeNull()
+        expect(order.breakdown).toEqual([])
+        expect(order.payments).toEqual([])
+    })
+
+    it('is awaiting the hotel while placed but unconfirmed', () => {
+        const order = Order.getInstance(orderPayload({ is_confirmed: false, confirmed_at: null }))
+
+        expect(order.isConfirmed).toBe(false)
+        expect(order.confirmedAt).toBeNull()
+        expect(order.isAwaitingHotel).toBe(true)
+        expect(order.isSettled).toBe(false)
+    })
+
+    it('stops awaiting once nothing more will happen, confirmed or not', () => {
+        const states = ['CANCELLED', 'FAILED', 'FULFILLED']
+
+        states.forEach((state) => {
+            const order = Order.getInstance(orderPayload({ state, is_confirmed: false, confirmed_at: null }))
+
+            expect(order.isSettled).toBe(true)
+            expect(order.isAwaitingHotel).toBe(false)
+        })
+    })
+
+    it('is not awaiting the hotel once it has confirmed', () => {
+        expect(Order.getInstance(orderPayload()).isAwaitingHotel).toBe(false)
+    })
+
+    it('reads as cancelled from the state alone, which the list has to do', () => {
+        expect(Order.getInstance(orderPayload({ state: 'CANCELLED' })).isCancelled).toBe(true)
+    })
+
+    it('reads as cancelled from an accepted request', () => {
+        const order = Order.getInstance(orderPayload({
+            cancellation: { requested: requestPayload('ACCEPTED', true, true), can_cancel_now: false, quote: null },
+        }))
+
+        expect(order.isCancelled).toBe(true)
+    })
+
+    it('does not read as cancelled when the hotel refused', () => {
+        const order = Order.getInstance(orderPayload({
+            cancellation: { requested: requestPayload('REFUSED', false, false), can_cancel_now: false, quote: null },
+        }))
+
+        expect(order.cancellation).toBeInstanceOf(OrderCancellation)
+        expect(order.isCancelled).toBe(false)
+    })
+
+    it('maps a collection', () => {
+        const orders = Order.getCollection([orderPayload(), orderPayload({ id: 'ord-2' })])
+
+        expect(orders).toHaveLength(2)
+        expect(orders[1].id).toBe('ord-2')
+    })
+})
+
+/**
+ * Captured off the wire on the first run where this endpoint ever answered 200.
+ * Until then it had 404'd on a wrong id, so nothing here had run against a real
+ * order — and it threw on the first one it met.
+ *
+ * Guests arrive grouped by room rather than as the flat array the response-shapes
+ * document described, so mapping them with Array.prototype.map threw a TypeError
+ * inside the request's catch, which rendered as "something went wrong on our
+ * side" on a perfectly good 200.
+ */
+const liveOrderPayload = () => ({
+    id: 'a288e958-b35a-4f9f-a29d-e18d62c822d9',
+    reference: 'VO-01M0BD0FSVNNJ51ESVC0TZ08WK',
+    state: 'CONFIRMED',
+    state_label: 'Order Confirmed',
+    state_description: 'Your order has been confirmed and is being prepared for delivery.',
+    booked_at: '2026-08-18T21:39:01+00:00',
+    hotel: {
+        id: 'a274fd38-0000-4000-8000-000000000000',
+        slug: 'petit-marais',
+        name: 'Petit Marais',
+        address: '10 rue Saint Paul, 4th arr., 75004 Paris, France',
+        star_rating: 3,
+    },
+    check_in: '2026-08-20',
+    check_out: '2026-08-21',
+    nights: 1,
+    room_name: 'Junior Suite',
+    meal: 'NO-MEAL',
+    occupancy: { rooms: [{ adults: 2, children_ages: [] }] },
+    guests: {
+        rooms: [{
+            guests: [
+                { is_child: false, last_name: 'Lovelace', first_name: 'Ada' },
+                { is_child: false, last_name: 'Hopper', first_name: 'Grace' },
+            ],
+        }],
+    },
+    contact: { email: 'sd849.final@example.test', phone: '+442071838750' },
+    is_confirmed: false,
+    confirmed_at: null,
+    confirmation: null,
+    breakdown: [
+        { key: 'room', label: 'Room', amount: 18597, amount_formatted: '185.97', amount_currency_prefixed: 'GBP 185.97' },
+        { key: 'taxes_and_fees', label: 'Taxes and fees', amount: 0, amount_formatted: '0.00', amount_currency_prefixed: 'GBP 0.00' },
+        { key: 'convenience_fee', label: 'Convenience fee', amount: 1043, amount_formatted: '10.43', amount_currency_prefixed: 'GBP 10.43' },
+    ],
+    payments: [],
+    cancellation: {
+        requested: null,
+        can_cancel_now: true,
+        quote: {
+            is_free: true,
+            is_inside_free_window: true,
+            costs_now: 0, costs_now_formatted: '0.00', costs_now_currency_prefixed: 'GBP 0.00',
+            refund_now: 19640, refund_now_formatted: '196.40', refund_now_currency_prefixed: 'GBP 196.40',
+        },
+    },
+    total: 19640, total_formatted: '196.40', total_currency_prefixed: 'GBP 196.40',
+})
+
+describe('Order.getInstance, against a real order', () => {
+    it('maps the body that broke it, without throwing', () => {
+        expect(() => Order.getInstance(liveOrderPayload())).not.toThrow()
+    })
+
+    it('reads guests out of the rooms they are grouped into', () => {
+        const order = Order.getInstance(liveOrderPayload())
+
+        expect(order.guests).toEqual([
+            { firstName: 'Ada', lastName: 'Lovelace', isChild: false },
+            { firstName: 'Grace', lastName: 'Hopper', isChild: false },
+        ])
+    })
+
+    it('still reads the flat array the document described', () => {
+        const order = Order.getInstance(orderPayload({
+            guests: [{ first_name: 'Ada', last_name: 'Lovelace' }],
+        }))
+
+        expect(order.guests).toEqual([{ firstName: 'Ada', lastName: 'Lovelace', isChild: false }])
+    })
+
+    it('carries a child through from either shape', () => {
+        const order = Order.getInstance(orderPayload({
+            guests: { rooms: [{ guests: [{ first_name: 'Byron', last_name: 'Lovelace', is_child: true }] }] },
+        }))
+
+        expect(order.guests[0].isChild).toBe(true)
+    })
+
+    /**
+     * The emptiest form of each is the main path on the payment screen, which
+     * opens in the window before the hotel confirms and before anything is paid.
+     */
+    it('survives the state a booking is in when it is about to be paid for', () => {
+        const order = Order.getInstance(liveOrderPayload())
+
+        expect(order.confirmation).toBeNull()
+        expect(order.confirmedAt).toBeNull()
+        expect(order.isConfirmed).toBe(false)
+        expect(order.payments).toEqual([])
+        expect(order.latestPayment).toBeNull()
+        expect(order.isAwaitingHotel).toBe(true)
+    })
+
+    it('maps the rest of that order as it stands', () => {
+        const order = Order.getInstance(liveOrderPayload())
+
+        expect(order.hotel.name).toBe('Petit Marais')
+        expect(order.total.currencyPrefixed).toBe('GBP 196.40')
+        expect(order.breakdown).toHaveLength(3)
+        expect(order.contact).toEqual({ email: 'sd849.final@example.test', phone: '+442071838750' })
+        expect(order.cancellation.canCancelNow).toBe(true)
+        expect(order.cancellation.quote.isFree).toBe(true)
+        expect(order.cancellation.isCancelled).toBe(false)
+    })
+})

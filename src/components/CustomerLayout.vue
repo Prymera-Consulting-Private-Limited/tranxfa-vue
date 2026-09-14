@@ -7,25 +7,31 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {useWalletStore} from "@/stores/wallet.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 import WalletAvailability from "@/enums/wallet_availability.js";
+import {offersProduct} from "@/composables/service_status.js";
+import {PRODUCT} from "@/licensed_products.js";
+import ServiceStatusBanner from "@/components/ServiceStatusBanner.vue";
 import {NotificationGroup, Notification, notify} from 'notiwind';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
 import { XMarkIcon } from '@heroicons/vue/20/solid'
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
 const walletStore = useWalletStore();
 const walletUtils = useWalletUtils();
 
-/**
- * @type {{data: Customer | null}}
- */
+
 const customer = customerStore.customer;
 
 onMounted(async () => {
   if (customerStore.isLoaded === false) {
     await customerUtils.refresh();
   }
-  if (walletStore.availability === WalletAvailability.UNKNOWN) {
+  // The documented probe (GET /wallet/subscription answers 404 with
+  // wallet_offered when the deployment has no wallet), behind the env switch.
+  if (offersProduct(PRODUCT.WALLETS) && walletStore.availability === WalletAvailability.UNKNOWN) {
     walletUtils.probe();
   }
   if (customer.data?.id) {
@@ -40,7 +46,7 @@ onMounted(async () => {
               {
                 group: 'customer',
                 title: `${category} - Received`,
-                text: `We have received your ${document}.`,
+                text: t('account.weHaveReceivedYour', {document: document}),
                 type: 'info',
               },
               -1,
@@ -54,7 +60,7 @@ onMounted(async () => {
               {
                 group: 'customer',
                 title: `${category} - Accepted`,
-                text: `Your ${document} has been accepted by our compliance team.`,
+                text: t('account.yourDocumentHasBeen', {document: document}),
                 type: 'success',
               },
               -1,
@@ -68,7 +74,7 @@ onMounted(async () => {
               {
                 group: 'customer',
                 title: `${category} - Rejected`,
-                text: `We were unable to verify your ${document}.`,
+                text: t('account.weCouldntAcceptYour', {document: document}),
                 type: 'danger',
               },
               -1,
@@ -91,6 +97,7 @@ onUnmounted(async () => {
 
 <template>
   <div class="min-h-full">
+    <ServiceStatusBanner />
     <Header />
       <slot />
     <Footer />
@@ -111,17 +118,17 @@ onUnmounted(async () => {
               <div class="p-4 w-full">
                 <div class="flex items-start">
                   <div class="shrink-0">
-                    <CheckCircleIcon v-if="notification.type === 'success'" class="size-6 text-green-400" aria-hidden="true" />
-                    <ExclamationTriangleIcon v-else-if="notification.type === 'danger'" class="size-6 text-red-400" aria-hidden="true" />
+                    <CheckCircleIcon v-if="notification.type === 'success'" class="size-6 text-success-400" aria-hidden="true" />
+                    <ExclamationTriangleIcon v-else-if="notification.type === 'danger'" class="size-6 text-danger-400" aria-hidden="true" />
                     <InformationCircleIcon v-else class="size-6 text-gray-400" aria-hidden="true" />
                   </div>
                   <div class="ml-3 w-0 flex-1 pt-0.5">
-                    <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-                    <p class="mt-1 text-sm text-gray-500">{{ notification.text }}</p>
+                    <p class="text-sm/6 font-medium text-gray-900">{{ notification.title }}</p>
+                    <p class="mt-1 text-sm/6 text-gray-500">{{ notification.text }}</p>
                   </div>
                   <div class="ml-4 flex shrink-0">
-                    <button type="button" @click="close(notification.id)" class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-0 focus:outline-hidden">
-                      <span class="sr-only">Close</span>
+                    <button type="button" @click="close(notification.id)" class="inline-flex rounded-md bg-white text-gray-500 hover:text-gray-500 focus:ring-0 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
+                      <span class="sr-only">{{ $t('verification.close') }}</span>
                       <XMarkIcon class="size-5" aria-hidden="true" />
                     </button>
                   </div>
