@@ -8,18 +8,21 @@ import {fixture, fixtureResponse} from "./fixtures.js";
 
 vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn()}}));
 
-// SD-1178. Two faults in the same wizard, both found on payvel production.
+// SD-1178, then SD-1182. Two faults in the same wizard, both found on payvel
+// production.
 //
-// The last step asks for a relationship, and the field is required. The list is
-// fetched with `?country_id=<payout country>`; on every corridor of two live
-// tenants that call answered 200 with an empty array, while the same endpoint
-// without the filter answered with the tenant's ten relationships. Nothing in
-// the wizard treated an empty list as a problem, so the customer reached step 4,
-// opened a picker with nothing in it, and could never save. That is what a
-// customer reports as "adding a recipient freezes".
+// The last step asks for a relationship and the field is required. SD-1035 began
+// narrowing that read by the recipient's country because the API reference
+// documented the parameter; nobody checked there was data behind it. The back
+// end joins a per-country mapping that is empty on every corridor of both live
+// tenants, so the read came back empty, the customer reached step 4, opened a
+// picker with nothing in it and could never save. That is what gets reported as
+// "adding a recipient freezes". SD-1178 patched it by falling back to the
+// unfiltered read; SD-1182 removed the parameter instead, so there is one read
+// and the rule lives in the back end (SD-1181) rather than in every client.
 //
 // The first step had the opposite problem: it did notice its failure, but its
-// "Try again" was `window.location.reload()` - which does not retry anything, it
+// "Try again" was window.location.reload(), which does not retry anything - it
 // restarts the application at the splash screen and takes the wizard with it.
 
 const stubs = {
@@ -42,18 +45,13 @@ const channelPayload = () => ({
 });
 
 /**
- * Walk the wizard to its last step, deciding for each of the two relationship
- * reads - the one filtered by country and the one without a filter - whether it
- * answers with the tenant's list or with nothing.
+ * Walk the wizard to its last step, deciding whether the relationships read and
+ * the corridor read answer with something or with nothing.
  *
- * @param {{scoped: boolean, unscoped: boolean, targets?: boolean}} answers
+ * @param {{relationships?: boolean, targets?: boolean}} answers
  */
-function routeApi({scoped, unscoped, targets = true} = {}) {
-    const relationships = (full) => (full
-        ? fixtureResponse('resources-relationships')
-        : {status: 200, data: {data: []}});
-
-    axios.get.mockImplementation((url, config) => {
+function routeApi({relationships = true, targets = true} = {}) {
+    axios.get.mockImplementation((url) => {
         if (url.includes('/payout/targets')) {
             return targets
                 ? Promise.resolve({status: 200, data: {data: [target()]}})
@@ -66,7 +64,9 @@ function routeApi({scoped, unscoped, targets = true} = {}) {
             return Promise.resolve({status: 200, data: channelPayload()});
         }
         if (url.includes('/resources/relationships')) {
-            return Promise.resolve(relationships(config?.params?.country_id ? scoped : unscoped));
+            return Promise.resolve(relationships
+                ? fixtureResponse('resources-relationships')
+                : {status: 200, data: {data: []}});
         }
 
         return Promise.reject(new Error(`unrouted: ${url}`));
@@ -80,40 +80,29 @@ const mountWizard = async () => {
     return wrapper;
 };
 
-const relationshipReads = () => axios.get.mock.calls
-    .filter(([url]) => url.includes('/resources/relationships'))
-    .map(([, config]) => config?.params?.country_id ?? null);
+const relationshipReads = () => axios.get.mock.calls.filter(([url]) => url.includes('/resources/relationships'));
 
 describe('the relationship list the last step needs', () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it('uses the corridor list when the back end has one', async () => {
-        routeApi({scoped: true, unscoped: true});
+    // The narrowing is off deliberately. It comes back when SD-1181 makes the
+    // back end return the full list for a country with no mapping rows; until
+    // then, sending the country empties a required field.
+    it('is read once, with no country filter', async () => {
+        routeApi();
 
         const wrapper = await mountWizard();
 
-        expect(step(wrapper)).toBe('form');
-        expect(relationshipReads()).toEqual(['c-1']);
-        expect(wrapper.getComponent({name: 'AttributeCollection'}).props('relationships').length).toBeGreaterThan(0);
-    });
-
-    // The narrowing is the corridor's rule about which relationships it permits.
-    // Narrowed to nothing there is no rule to honour - a required field with no
-    // permitted value is not a restriction, it is a dead end - so the tenant's
-    // full list stands in. As soon as the back end has per-country rows the
-    // first read is non-empty and the fallback never runs.
-    it('falls back to the unfiltered list when the corridor list is empty', async () => {
-        routeApi({scoped: false, unscoped: true});
-
-        const wrapper = await mountWizard();
-
-        expect(relationshipReads()).toEqual(['c-1', null]);
+        expect(relationshipReads()).toHaveLength(1);
+        const [url, config] = relationshipReads()[0];
+        expect(url).toBe('/client/v1/resources/relationships');
+        expect(config?.params?.country_id, 'a country with no mapping rows comes back empty').toBeUndefined();
         expect(step(wrapper)).toBe('form');
         expect(wrapper.getComponent({name: 'AttributeCollection'}).props('relationships').length).toBeGreaterThan(0);
     });
 
-    it('says so rather than show an empty picker when there is no list at all', async () => {
-        routeApi({scoped: false, unscoped: false});
+    it('says so rather than show an empty picker when the list is empty', async () => {
+        routeApi({relationships: false});
 
         const wrapper = await mountWizard();
 
@@ -122,10 +111,10 @@ describe('the relationship list the last step needs', () => {
     });
 
     it('offers a retry that repeats the read', async () => {
-        routeApi({scoped: false, unscoped: false});
+        routeApi({relationships: false});
         const wrapper = await mountWizard();
 
-        routeApi({scoped: true, unscoped: true});
+        routeApi({relationships: true});
         await failure(wrapper).vm.$emit('retry');
         await flushPromises();
 
@@ -137,12 +126,12 @@ describe('retrying the first step', () => {
     beforeEach(() => vi.clearAllMocks());
 
     it('repeats the fetch instead of reloading the application', async () => {
-        routeApi({scoped: true, unscoped: true, targets: false});
+        routeApi({targets: false});
         const wrapper = await mountWizard();
 
         expect(failure(wrapper).props('message')).toBeTruthy();
 
-        routeApi({scoped: true, unscoped: true, targets: true});
+        routeApi({targets: true});
         await failure(wrapper).vm.$emit('retry');
         await flushPromises();
 
