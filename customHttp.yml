@@ -59,18 +59,14 @@ customHeaders:
           https://*.withpersona.com
 
   # Vite fingerprints everything under /assets, so the content behind a given URL
-  # can never change. A year, immutable.
+  # can never change. A year, immutable. The flags are in here too since SD-1180:
+  # they used to sit at /flags/<iso>.svg, unfingerprinted, on a week-long cache,
+  # which meant a corrected flag could not reach anyone still holding the broken
+  # one - the fix shipped, and the customer kept the fault for seven days.
   - pattern: '/assets/**'
     headers:
       - key: 'Cache-Control'
         value: 'public, max-age=31536000, immutable'
-
-  # Flags are not fingerprinted - the file name is the ISO country code. A week,
-  # revalidated after, so a corrected flag ships within one.
-  - pattern: '/flags/**'
-    headers:
-      - key: 'Cache-Control'
-        value: 'public, max-age=604800, stale-while-revalidate=86400'
 
   # The entry document names the hashed bundles, so it must never be held. This
   # is the one file that has to be re-fetched for a deploy to reach anyone.
