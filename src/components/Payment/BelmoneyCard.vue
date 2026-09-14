@@ -154,7 +154,13 @@ const retryPayment = async () => {
     <Processing class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('payment.card.wereConfirmingYourPayment') }}</h2>
     <p class="text-base text-gray-600 mb-6">{{ $t('payment.card.weAreConfirmingYourCard') }}</p>
-    <p v-if="isTakingLong" role="status" class="mb-6 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">{{ $t('payment.card.thisIsTakingLongerThan') }}<router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">{{ $t('payment.card.goToYourTransfer') }}</router-link>{{ $t('payment.card.andWeWillEmailYou') }}</p>
+    <!-- One key for the whole sentence, with the link as a slot. The three
+         fragments this replaces rendered "...keep waiting, orgo to your
+         transferand we will email you..." (SD-1203). payment.provider already
+         writes this shape with a {value} placeholder. -->
+    <i18n-t v-if="isTakingLong" keypath="payment.card.takingLongerWillEmail" tag="p" scope="global" role="status" class="mb-6 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
+      <template #link><router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">{{ $t('payment.card.goToYourTransfer') }}</router-link></template>
+    </i18n-t>
     <div v-if="showViewTransfer" class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>
     </div>
@@ -164,7 +170,9 @@ const retryPayment = async () => {
     <AwaitingPending class="-mt-10" />
     <h2 class="text-xl font-semibold text-gray-900 mb-5 -mt-10">{{ $t('transfer.payment.pleaseWait') }}</h2>
     <p class="text-base text-gray-600 mb-6">{{ $t('payment.card.pleaseWaitWhileWeAre') }}</p>
-    <p v-if="isTakingLong" role="status" class="mt-2 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">{{ $t('payment.card.thisIsTakingLongerThan2') }}<router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">{{ $t('payment.card.goToYourTransfer') }}</router-link>{{ $t('payment.card.andTryThePaymentAgain') }}</p>
+    <i18n-t v-if="isTakingLong" keypath="payment.card.takingLongerTryAgain" tag="p" scope="global" role="status" class="mt-2 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
+      <template #link><router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}" class="font-semibold underline underline-offset-2">{{ $t('payment.card.goToYourTransfer') }}</router-link></template>
+    </i18n-t>
   </template>
 
   <template v-else-if="status === 'processing'">

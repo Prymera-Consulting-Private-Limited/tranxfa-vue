@@ -573,7 +573,12 @@ async function saveQuote() {
         </div>
       </div>
     </form>
-    <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">{{ $t('calculator.kycVerification') }}</router-link>{{ $t('calculator.isRequiredBeforeYouCan') }}</p>
+    <!-- One sentence, one key. Split across two t() calls it rendered
+         "KYC verificationis required", and a translator had no way to know the
+         two fragments belonged to each other or in what order (SD-1203). -->
+    <i18n-t v-if="pendingPoi" keypath="calculator.kycVerificationIsRequired" tag="p" scope="global" class="mt-5 text-gray-700 text-sm/6 text-justify">
+      <template #link><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">{{ $t('calculator.kycVerification') }}</router-link></template>
+    </i18n-t>
   </template>
 </template>
 

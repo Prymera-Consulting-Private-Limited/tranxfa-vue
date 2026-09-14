@@ -762,3 +762,72 @@ describe('copy is never written as a prop default', () => {
     expect(en.calculator.pleaseSelect, 'the duplicate under calculator is gone').toBeUndefined();
   });
 });
+
+// SD-1203: a fifth shape, and the one every guard above is blind to. A sentence
+// split across two t() calls renders welded, because the space that joins them
+// lives in neither string and not in the template:
+//
+//   <router-link>{{ $t('calculator.kycVerification') }}</router-link>{{ $t('calculator.isRequiredBeforeYouCan') }}
+//   -> "KYC verificationis required before you can send money."
+//
+// The SD-1186 guard cannot see it: that one looks for a word spelled out beside
+// an interpolation, and deliberately skips a text node whose only content is
+// interpolations - which is exactly this shape.
+//
+// Spacing is the visible half. The half that matters is that a translator is
+// handed two fragments with nothing saying one follows the other, and in a
+// language that puts the link elsewhere in the sentence the split is wrong
+// however it is spaced. One `<i18n-t>` with the link as a named slot is the
+// shape that survives translation, which is what SD-1117 settled.
+describe('a sentence is never split across two translations', () => {
+  // Punctuation that follows a word with no space before it. A fragment opening
+  // with one of these is a continuation the writer meant to sit flush.
+  const FLUSH = /^\s*[,.;:!?)\]}%]/;
+
+  // Two interpolations with nothing between them, or with a single tag and
+  // nothing else. The tag may open or close: a sentence that wraps a link welds
+  // on both sides of it, `{{ please }}<router-link>{{ contactSupport }}` just as
+  // much as `{{ contactSupport }}</router-link>{{ andQuote }}`, and a version of
+  // this guard that allowed only the closing tag reported the second weld in
+  // PaymentView while walking straight past the first.
+  //
+  // Whitespace anywhere between the two is what a correctly written pair has, so
+  // the pattern tolerates none: `{{ a }} {{ b }}` renders with its space and is
+  // fine. `<br>` is excluded for the same reason - it renders a line break, so
+  // the two never touch.
+  //
+  // Both bodies are captured. The first decides whether this is a pair of
+  // catalogue reads at all, and an earlier version started at the closing
+  // braces, so the first body was never in the match and nothing ever failed.
+  // The second interpolation is a lookahead so the match does not consume it.
+  // A sentence wrapped around a link welds twice and the two pairs overlap on
+  // the middle fragment; consuming it reported the first weld and hid the
+  // second, which is half a bug report.
+  const ADJACENT = /\{\{([\s\S]*?)\}\}(?:<\/?(?!br\b)[\w.-]+[^>]*>)?(?=\{\{([\s\S]*?)\}\})/g;
+
+  it.each(MIGRATED)('%s does not weld two translations together', (file) => {
+    const template = read(file)
+      .replace(/<script\b[\s\S]*?<\/script>/g, '')
+      .replace(/<style\b[\s\S]*?<\/style>/g, '')
+      .replace(/<!--[\s\S]*?-->/g, '');
+
+    const found = [];
+    for (const match of template.matchAll(ADJACENT)) {
+      const [, first, second] = match;
+
+      // Only a pair of catalogue reads can weld two sentences. `{{ code }}{{ number }}`
+      // is a phone number, and wants no space.
+      if (! /\$?t\(/.test(first) || ! /\$?t\(/.test(second)) continue;
+
+      // The key names the string, so the string is what decides. A fragment that
+      // starts with punctuation is flush on purpose.
+      const key = second.match(/['"]([\w.]+)['"]/)?.[1];
+      const value = key?.split('.').reduce((cur, seg) => cur?.[seg], en);
+      if (typeof value === 'string' && FLUSH.test(value)) continue;
+
+      found.push(`${key ?? second.trim()} follows another translation with no separator`);
+    }
+
+    expect(found, `${file} welds two translations:\n  ${found.join('\n  ')}`).toEqual([]);
+  });
+});
