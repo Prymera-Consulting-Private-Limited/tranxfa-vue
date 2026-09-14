@@ -454,7 +454,7 @@ watch(
                 :class="termsAccepted ? 'border-brand-200 bg-brand-50' : ''"
               >
                 <input type="checkbox" id="terms" v-model="termsAccepted" class="mt-0.5 h-4 w-4 min-w-4 min-h-4 rounded border-gray-300 text-brand-700 accent-brand-700 outline-none focus:ring-0" />
-                <span class="text-sm/6 text-gray-700">{{ $t('onboarding.iAgreeTo') }} <a :href="privacyPolicyUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>{{ $t('onboarding.privacyPolicy') }}</a> & <a :href="userAgreementUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>{{ $t('onboarding.termsOfService') }}</a>.</span>
+                <span class="text-sm/6 text-gray-700">{{ $t('onboarding.iAgreeTo') }} <a :href="privacyPolicyUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>{{ $t('onboarding.privacyPolicy') }}</a> {{ $t('onboarding.and') }} <a :href="userAgreementUrl" target="_blank" class="font-medium text-brand-700 hover:text-brand-800 hover:underline" @click.stop>{{ $t('onboarding.termsOfService') }}</a>.</span>
               </label>
 
               <!-- Checkbox -->

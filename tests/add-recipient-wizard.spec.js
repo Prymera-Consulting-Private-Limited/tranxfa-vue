@@ -99,7 +99,10 @@ describe('AddRecipientWizard', () => {
             routeApi({targets: [target(1)], methods: [method(1)], recipientType: 'individual'});
             const wrapper = await mountWizard();
 
-            expect(axios.get).toHaveBeenCalledWith('/client/v1/resources/relationships', expect.objectContaining({params: expect.any(Object)}));
+            // No second argument: SD-1182 took the country filter back off, so
+            // the read carries no params. tests/recipient-relationships.spec.js
+            // holds the guard and the reason.
+            expect(axios.get).toHaveBeenCalledWith('/client/v1/resources/relationships');
             expect(wrapper.getComponent({name: 'AttributeCollection'}).props('relationships').length)
                 .toBeGreaterThan(0);
         });

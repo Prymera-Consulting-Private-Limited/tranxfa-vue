@@ -150,6 +150,8 @@
     "isRequiredBeforeYouCan": "es necesaria antes de que puedas enviar dinero. Es un proceso de una sola vez para mantener tu cuenta y tus transacciones seguras.",
     "kycVerification": "Verificación KYC",
     "ourRate": "Nuestra tasa",
+    "destination": "Destino",
+    "amount": "Importe",
     "pleaseReachOutToOur": "Contacta a nuestro equipo de soporte para recibir ayuda o conocer el motivo de esta restricción.",
     "recipientGets": "{recipient} recibe",
     "saving": "Guardando...",
@@ -184,7 +186,8 @@
     "tryAgain": "Reintentar",
     "uploadPhoto": "Sube una foto en JPEG, PNG o WebP.",
     "uploadPhotoOrPdf": "Sube una foto en JPEG, PNG o WebP, o un PDF.",
-    "yourEmail": "tu correo electrónico"
+    "yourEmail": "tu correo electrónico",
+    "done": "Listo"
   },
   "nav": {
     "accountVerification": "Verificación de cuenta",
@@ -242,7 +245,8 @@
     "weCouldntSaveYour4": "No pudimos guardar tu país. Elígelo de nuevo.",
     "weCouldntSendA": "No hemos podido enviar un código nuevo. Inténtalo de nuevo.",
     "weCouldntSendA2": "No pudimos enviar un nuevo código. Usa Reenviar código más abajo.",
-    "weveSentANew3": "Te hemos enviado un código nuevo. Puede tardar un minuto en llegar."
+    "weveSentANew3": "Te hemos enviado un código nuevo. Puede tardar un minuto en llegar.",
+    "and": "y los"
   },
   "payment": {
     "card": {

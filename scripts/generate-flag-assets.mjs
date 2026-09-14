@@ -53,7 +53,23 @@ for (const [, rawSelector, body] of rules) {
     // The package is not consistent: most flags are percent-encoded and quoted,
     // a handful (Guam) are base64 and unquoted. Miss one and it stays inline,
     // which is exactly how a 300 KB flag survived the first pass of this script.
-    const uri = body.match(/background-image:\s*url\(\s*"?data:image\/svg\+xml(;base64)?,([^")]*)"?\s*\)/);
+    //
+    // Terminate on the right character, and only the right character. This was
+    // one pattern with `([^")]*)` for the payload - "up to the quote or the
+    // closing paren" - which is wrong, because an SVG is full of parentheses:
+    // `clip-path='url(#lr-a)'`, `transform='translate(...)'`, `rgb(...)`. The
+    // capture stopped at the first one and 300 of the 540 variants were written
+    // to disk cut in half. Nothing failed. The stylesheet was valid, the file
+    // existed, it served 200, and it painted nothing - India, the United
+    // States, Kenya, Rwanda and 140 others were blank on every tenant until
+    // somebody looked at a screen.
+    //
+    // A quoted URI can only be ended by its quote. An unquoted one ends at the
+    // paren, which is safe because the only unquoted case is base64, and base64
+    // has no parentheses.
+    const uri =
+        body.match(/background-image:\s*url\(\s*"data:image\/svg\+xml(;base64)?,([^"]*)"\s*\)/) ??
+        body.match(/background-image:\s*url\(\s*data:image\/svg\+xml(;base64)?,([^)]*?)\s*\)/);
     const name = assetName(selector);
 
     if (!uri || !name) {
@@ -64,6 +80,19 @@ for (const [, rawSelector, body] of rules) {
     }
 
     const svg = uri[1] ? Buffer.from(uri[2], 'base64').toString('utf8') : decodeURIComponent(uri[2]);
+
+    // Never write a partial flag. The whole failure above was silent because a
+    // truncated file is still a file: it has a name, it has bytes, it returns
+    // 200, and the only place it shows up is a customer's screen. Refusing to
+    // write one turns that into a failed build.
+    if (! svg.trimEnd().endsWith('</svg>')) {
+        throw new Error(
+            `${name} decoded to ${svg.length} bytes that do not end in </svg> - the payload was ` +
+            `truncated, so the extraction pattern no longer matches how the package encodes flags. ` +
+            `Ends: ${JSON.stringify(svg.slice(-60))}`,
+        );
+    }
+
     fs.writeFileSync(path.join(FLAG_DIR, name), svg);
     out.push(`${selector}{background-image:url("/flags/${name}")}`);
     written++;

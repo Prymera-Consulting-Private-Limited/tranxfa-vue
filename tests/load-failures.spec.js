@@ -74,6 +74,28 @@ describe('wizard steps do not spin forever', () => {
     expect(en.common.tryAgain).toBe('Try again');
   });
 
+  // SD-1174. Every fetch in that wizard was guarded; the line between two of
+  // them was not. `payoutChannel.configuration` is nullable on the model - it is
+  // only populated when the payload carries one - and the branch that reads
+  // `configuration.recipientType` sat outside the try, so a channel without one
+  // threw a TypeError that nothing caught: isLoading stayed true, no loadFailure
+  // was set, and the customer had a spinner with no message and no retry.
+  it('the payout channel model really can arrive without a configuration', async () => {
+    const {default: PayoutChannel} = await import('@/models/payout_channel.js');
+
+    const channel = PayoutChannel.getInstance({id: 'a-channel'});
+
+    expect(channel.configuration, 'the guard below exists because of this').toBeNull();
+  });
+
+  it('the wizard surfaces a channel with no configuration instead of throwing', () => {
+    const s = read('src/components/Recipient/AddRecipientWizard.vue');
+
+    expect(s).toContain('const configuration = recipient.payoutChannel?.configuration;');
+    expect(s).toMatch(/if \(! configuration\) \{[\s\S]*?loadFailure\.value =[\s\S]*?isLoading\.value = false;[\s\S]*?return;/);
+    expect(s).not.toMatch(/payoutChannel\.configuration\.recipientType/);
+  });
+
   it('shows the branch fetch and its failure in the recipient form', () => {
     const s = read('src/components/Recipient/AttributeCollection.vue');
     expect(s).toContain('v-if="isFetchingDeliveryOptions" role="status"');

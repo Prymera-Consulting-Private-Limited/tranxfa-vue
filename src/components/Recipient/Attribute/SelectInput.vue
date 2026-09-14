@@ -72,7 +72,8 @@ function withPopper(dropdownList, component, { width }) {
 </script>
 
 <template>
-  <v-select v-on:option:selected="optionSelected" v-on:option:deselected="optionRemoved" :calculate-position="withPopper" v-model="selectedOption" :options="attribute.options" :placeholder="`${placeholder}`" key-by="id" :label="$t('transfer.wizard.title')">
+  <!-- `label` names which property of an option v-select shows and searches. -->
+  <v-select v-on:option:selected="optionSelected" v-on:option:deselected="optionRemoved" :calculate-position="withPopper" v-model="selectedOption" :options="attribute.options" :placeholder="`${placeholder}`" key-by="id" label="title">
     <template v-slot:no-options="{ search, searching }">
       <template class="text-sm/6 text-gray-300" v-if="searching"><i18n-t keypath="transfer.wizard.noResultsFound" scope="global"><template #query><em>{{ search }}</em></template></i18n-t></template>
       <em class="text-sm/6 text-gray-500 opacity-50" v-else>{{ $t('transfer.wizard.startTypingToSearch') }}</em>
