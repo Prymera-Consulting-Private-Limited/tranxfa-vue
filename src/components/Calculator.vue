@@ -444,7 +444,7 @@ async function saveQuote() {
                             <ListboxButton :class="['flex items-center justify-end rounded-l-none rounded-r-md bg-white px-2 py-3 outline-hidden outline-0 w-full']">
                               <div :class="[quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient ? '' : 'py-3']" class="flex items-center gap-x-1.5 rounded-l-md border-r-0 text-brand-700 px-1 bg-white w-full">
                                 <TruckIcon class="-ml-0.5 size-5" aria-hidden="true" />
-                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || $t('calculator.pleaseSelect') }}</p>
+                                <p class="text-sm/6 font-semibold ml-2">{{ selectedPayoutMethod?.title || $t('common.pleaseSelect') }}</p>
                               </div>
                               <template v-if="quoteUtil.quote?.data?.payoutMethods?.length > 0 && ! recipient" >
                                 <span class="sr-only">{{ $t('calculator.selectOrChangeDeliveryMethod') }}</span>
@@ -573,7 +573,12 @@ async function saveQuote() {
         </div>
       </div>
     </form>
-    <p v-if="pendingPoi" class="mt-5 text-gray-700 text-sm/6 text-justify"><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">{{ $t('calculator.kycVerification') }}</router-link>{{ $t('calculator.isRequiredBeforeYouCan') }}</p>
+    <!-- One sentence, one key. Split across two t() calls it rendered
+         "KYC verificationis required", and a translator had no way to know the
+         two fragments belonged to each other or in what order (SD-1203). -->
+    <i18n-t v-if="pendingPoi" keypath="calculator.kycVerificationIsRequired" tag="p" scope="global" class="mt-5 text-gray-700 text-sm/6 text-justify">
+      <template #link><router-link class="text-brand-700 hover:underline" :to="{name: 'accountVerification'}">{{ $t('calculator.kycVerification') }}</router-link></template>
+    </i18n-t>
   </template>
 </template>
 
