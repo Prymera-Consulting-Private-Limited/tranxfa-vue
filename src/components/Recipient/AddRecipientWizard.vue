@@ -179,28 +179,19 @@ async function fetchRelationships() {
   isLoading.value = true;
   retryLast = fetchRelationships;
 
-  const countryId = recipient.country?.id ?? null;
-  let loaded;
-
+  // One read, unnarrowed. The country filter stays off until the back end falls
+  // back to the full list on an empty mapping (SD-1181): narrowing by a mapping
+  // that is empty on every corridor of every tenant is what emptied this field
+  // in the first place.
   try {
-    loaded = await readRelationships(countryId);
-    // The country filter narrows the list to what the corridor permits. When it
-    // narrows it to nothing there is no corridor rule to honour - an empty
-    // permitted set would make the field unfillable - so fall back to the
-    // tenant's full list. The moment the back end has per-country rows this
-    // stops firing and the narrowing applies again.
-    if (loaded.length === 0 && countryId !== null) {
-      logRequestFailure(new Error('recipient-relationships-empty-for-country'), 'recipient-relationships');
-      loaded = await readRelationships(null);
-    }
+    const response = await resourceUtils.relationships();
+    relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship));
   } catch (e) {
     logRequestFailure(e, 'recipient-relationships');
     loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe4'));
     isLoading.value = false;
     return;
   }
-
-  relationships.value = loaded;
 
   // Relationship is required to save, so an empty list is not a valid state:
   // the customer arrives at the last step and can never finish it. Before this,
@@ -212,11 +203,6 @@ async function fetchRelationships() {
   }
 
   isLoading.value = false;
-}
-
-async function readRelationships(countryId) {
-  const response = await resourceUtils.relationships(countryId);
-  return response.data.data.map((relationship) => Relationship.getInstance(relationship));
 }
 
 async function updateRecipientType(type) {
