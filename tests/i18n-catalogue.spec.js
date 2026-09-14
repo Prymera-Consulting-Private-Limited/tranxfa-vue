@@ -723,3 +723,42 @@ describe('copy is never welded onto a translation', () => {
     expect(en.transfer.wizard.changeTheAmountAndConfirm).toBeTruthy();
   });
 });
+
+// A placeholder written as a prop default never reaches the catalogue:
+//
+//     placeholder: { type: String, default: 'Please Select' }
+//
+// A default is evaluated before any locale is in play, so there is no moment at
+// which it could be translated. Nine dropdowns carried one - four as a prop
+// default, five as a literal in the template - and every one of them read
+// "Please Select" in Spanish, on forms a customer has to fill in to send money.
+//
+// Neither earlier guard sees this. The migration check looks for bare text
+// between tags; the welded-copy check looks for a literal concatenated onto a
+// t() call. This is a third shape: copy sitting in a JavaScript default, which
+// is neither.
+describe('copy is never written as a prop default', () => {
+  const under = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return under(path);
+    return /\.(vue|js)$/.test(entry.name) ? [path] : [];
+  });
+
+  // A default whose value is a quoted string of real words. Single characters,
+  // codes and empty strings are not copy, so two letters and a space is the bar.
+  const COPY_DEFAULT = /default:\s*['"][A-Za-z][A-Za-z]+ [A-Za-z]/;
+
+  it('no prop default holds a sentence a customer reads', () => {
+    const offenders = under('src')
+      .filter(file => ! file.startsWith('src/locales/'))
+      .filter(file => COPY_DEFAULT.test(read(file)));
+
+    expect(offenders, `a prop default cannot be translated - it is evaluated before the locale exists:\n  ${offenders.join('\n  ')}`)
+      .toEqual([]);
+  });
+
+  it('the placeholder they share is one catalogue key', () => {
+    expect(en.common.pleaseSelect).toBe('Please Select');
+    expect(en.calculator.pleaseSelect, 'the duplicate under calculator is gone').toBeUndefined();
+  });
+});
