@@ -167,7 +167,12 @@ function closePaymentModal() {
                   <div v-if="retryLimitReached" class="text-center">
                     <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.wevePausedThisTransfer') }}</h2>
                     <p class="text-base text-gray-600 mb-2">{{ $t('transfer.payment.thePaymentDidNotGo') }}</p>
-                    <p class="text-sm/6 text-gray-500 mb-6">{{ $t('transfer.payment.please') }}<router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">{{ $t('transfer.payment.contactSupport') }}</router-link>{{ $t('transfer.payment.andQuoteTransferTransactionnumberTaking', {transactionNumber: transaction?.transactionNumber}) }}</p>
+                    <!-- Welded on both sides of the link before SD-1203:
+                         "Pleasecontact supportand quote transfer #123". -->
+                    <i18n-t keypath="transfer.payment.pleaseContactSupportAndQuote" tag="p" scope="global" class="text-sm/6 text-gray-500 mb-6">
+                      <template #link><router-link :to="{name: 'support'}" class="font-semibold text-brand-700 hover:underline">{{ $t('transfer.payment.contactSupport') }}</router-link></template>
+                      <template #transactionNumber>{{ transaction?.transactionNumber }}</template>
+                    </i18n-t>
                   </div>
                   <div v-else-if="transaction && ! isKnownProvider" class="text-center">
                     <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.thisWayToPayIsnt') }}</h2>
