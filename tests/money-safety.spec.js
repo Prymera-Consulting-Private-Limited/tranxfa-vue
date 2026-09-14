@@ -51,10 +51,15 @@ describe('never risk a double payment', () => {
     expect(en.transfer.wizard.weDidntGetAn).toContain("we've refreshed this page");
   });
 
+  // SD-1193 moved the nudge into the catalogue. It used to be a literal welded
+  // onto the translated refusal with `+`, which meant it stayed English in every
+  // locale - so the assertion moves with it rather than pinning the sentence to
+  // this file.
   it('payment_amount_collides gets its own message and a nudge to change the amount', () => {
     const s = read('src/views/Transfer/IndexView.vue');
     expect(s).toContain('error.response.data.type === "payment_amount_collides"');
-    expect(s).toContain('Change the amount and confirm again.');
+    expect(s).toContain("t('transfer.wizard.changeTheAmountAndConfirm')");
+    expect(en.transfer.wizard.changeTheAmountAndConfirm).toBe('Change the amount and confirm again.');
   });
 });
 

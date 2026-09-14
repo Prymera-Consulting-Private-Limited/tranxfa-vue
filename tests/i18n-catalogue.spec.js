@@ -674,3 +674,52 @@ describe('a dropdown reads its property name, not the catalogue', () => {
     expect(en.account.demonym).toBeUndefined();
   });
 });
+
+// SD-1193. The transfer summary built one of its labels like this:
+//
+//     label: ( quote.recipient?.wholeName || t('recipient.recipient') ) + ' Gets',
+//
+// A hardcoded English word concatenated onto a name. On Xenvia that rendered
+// "Beneficiario Gets" - a Spanish word beside an English one - on the last
+// screen before the customer pays. A translated key for the whole sentence
+// already existed and was going unused.
+//
+// Neither guard above could see it. The migration check looks for bare literals
+// in templates; the namespace check looks at which keys a t() call asks for.
+// Copy welded on with `+` is neither: it never reaches the catalogue at all, so
+// there is nothing for a translator to translate and nothing to notice missing.
+//
+// Two whole sentences joined by a space are fine - a translator gets both, and
+// each can be reordered inside itself. What this forbids is a fragment that
+// only exists in the source.
+describe('copy is never welded onto a translation', () => {
+  const under = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return under(path);
+    return /\.(vue|js)$/.test(entry.name) ? [path] : [];
+  });
+
+  // A quoted literal concatenated onto a t() call, on either side of the `+`.
+  const WELDED = [
+    /t\([^()]*\)\s*\)?\s*\+\s*['"][^'"]*[A-Za-z]{2}/,
+    /['"][^'"]*[A-Za-z]{2}[^'"]*['"]\s*\+\s*\$?t\(/,
+  ];
+
+  it('no label or message concatenates a literal onto a t() call', () => {
+    const offenders = under('src')
+      .filter(file => ! file.startsWith('src/locales/'))
+      .filter(file => WELDED.some(pattern => pattern.test(read(file))));
+
+    expect(offenders, `copy welded on with + never reaches the catalogue, so it stays English in every locale:\n  ${offenders.join('\n  ')}`)
+      .toEqual([]);
+  });
+
+  // The concatenation above is gone only because the key it should have used
+  // already existed. Prove it still does, and still carries the placeholder.
+  it('the whole-sentence key that replaced it is still there', () => {
+    expect(en.calculator.recipientGets).toBe('{recipient} Gets');
+    expect(en.calculator.couponCode).toBe('Coupon {code}');
+    expect(en.account.spendOrWithdrawTheBalance).toBeTruthy();
+    expect(en.transfer.wizard.changeTheAmountAndConfirm).toBeTruthy();
+  });
+});
