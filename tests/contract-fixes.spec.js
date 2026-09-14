@@ -75,9 +75,15 @@ describe('composable defects', () => {
     vi.doUnmock('axios');
   });
 
+  // SD-1178 moved the read behind a helper, so the wizard can repeat it without
+  // the country when the corridor's own list comes back empty. The first read is
+  // still narrowed; tests/recipient-relationships.spec.js asserts the order of
+  // the two reads and what the customer sees when both are empty.
   it('relationships are narrowed to the recipient country', () => {
     expect(read('src/composables/resource_utils.js')).toContain("params: countryId ? {country_id: countryId} : {}");
-    expect(read('src/components/Recipient/AddRecipientWizard.vue')).toContain('resourceUtils.relationships(recipient.country?.id ?? null)');
+    const wizard = read('src/components/Recipient/AddRecipientWizard.vue');
+    expect(wizard).toContain('const countryId = recipient.country?.id ?? null;');
+    expect(wizard).toContain('loaded = await readRelationships(countryId);');
   });
 
   it('a malformed reset link no longer throws before the request', () => {
