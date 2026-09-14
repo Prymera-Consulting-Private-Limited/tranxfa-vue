@@ -112,9 +112,30 @@ async function fetchPayoutChannel() {
     isLoading.value = false;
     return;
   }
-  if (recipient.payoutChannel.configuration.recipientType === RecipientType.INDIVIDUAL) {
+  // `configuration` is nullable on the model - PayoutChannel only populates it
+  // when the payload carries one - and this branch used to read through it
+  // without asking, outside the try above. A channel arriving without a
+  // configuration threw a TypeError that nothing caught: isLoading stayed true,
+  // no loadFailure was set, and the customer had a spinner with no message and
+  // no retry. That is the shape somebody reports as "adding a recipient
+  // freezes" - not an error, a screen that never finishes.
+  const configuration = recipient.payoutChannel?.configuration;
+
+  if (! configuration) {
+    // A code rather than a sentence: this is telemetry, it gets grepped, and
+    // the catalogue guard cannot tell a log string from copy - correctly, since
+    // it has no way to know which one a reader will see.
+    logRequestFailure(new Error('payout-channel-missing-configuration'), 'recipient-payout-channel');
+    loadFailure.value = t('recipient.weCouldntLoadThe6');
+    isLoading.value = false;
+    return;
+  }
+
+  // A null recipientType is not a fault: the channel does not dictate one, the
+  // machine is already on recipientTypeSelection, and the customer picks.
+  if (configuration.recipientType === RecipientType.INDIVIDUAL) {
     await updateRecipientType(RecipientType.INDIVIDUAL);
-  } else if (recipient.payoutChannel.configuration.recipientType === RecipientType.BUSINESS) {
+  } else if (configuration.recipientType === RecipientType.BUSINESS) {
     await updateRecipientType(RecipientType.BUSINESS);
   } else {
     isLoading.value = false;
