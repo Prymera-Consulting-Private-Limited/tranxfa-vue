@@ -18,11 +18,30 @@ import {existsSync, readFileSync, readdirSync} from 'node:fs';
 // file. This asserts the artifact as well, because the script only runs at
 // prebuild and a guard nobody runs is a comment.
 
-const FLAG_DIR = 'public/flags';
+// SD-1180 moved these under src/ so that Vite fingerprints them. Moving the
+// directory quietly disarmed the two guards below: they skip when the generator
+// has not run, `present` went false the moment public/flags stopped existing,
+// and a suite that had been protecting the money screens reported "2 skipped"
+// and a green tick.
+//
+// So the retired location is asserted gone. If this constant ever drifts from
+// the script again, something fails rather than something skips.
+const FLAG_DIR = 'src/assets/flags';
+const RETIRED_FLAG_DIR = 'public/flags';
 
 describe('the generated flag assets', () => {
     // Generated at prebuild and gitignored, so a bare checkout has none.
     const present = existsSync(FLAG_DIR) && readdirSync(FLAG_DIR).length > 0;
+
+    it('writes them where Vite will fingerprint them, not into public/', () => {
+        const script = readFileSync('scripts/generate-flag-assets.mjs', 'utf8');
+
+        expect(script).toContain("path.join(root, 'src', 'assets', 'flags')");
+        expect(script, 'an absolute URL is left alone by Vite, so the file never gets a hash')
+            .toContain('url("./flags/${name}")');
+        expect(existsSync(RETIRED_FLAG_DIR),
+            'a flag in public/ is copied out verbatim and keeps its name for ever').toBe(false);
+    });
 
     it.skipIf(!present)('writes every flag as a complete SVG', () => {
         const files = readdirSync(FLAG_DIR).filter((f) => f.endsWith('.svg'));

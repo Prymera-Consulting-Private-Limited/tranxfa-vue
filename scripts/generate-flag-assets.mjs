@@ -4,9 +4,19 @@
  * not paint until every flag the customer will never see has been parsed. It is 97%
  * of our CSS payload.
  *
- * This unpacks it. Each data URI becomes a file under public/flags/, and the
+ * This unpacks it. Each data URI becomes a file under src/assets/flags/, and the
  * generated stylesheet references them by URL, so the browser fetches only the four
  * or five flags actually on screen. 5.0 MB of blocking CSS becomes ~25 KB.
+ *
+ * SD-1180: these live under src/ rather than public/ so that Vite fingerprints
+ * them. A file in public/ is copied out verbatim and keeps its name for ever,
+ * which meant a corrected flag could not reach anyone still holding the old one -
+ * and /flags/** was cached for a week. Writing them here puts each flag at
+ * /assets/<name>-<hash>.svg, so fixing a flag changes its URL and the fix lands
+ * on the next load instead of in seven days.
+ *
+ * The reference has to stay relative for that to work: Vite rewrites url() it can
+ * resolve on disk, and an absolute /flags/... is left alone as a runtime path.
  *
  * Both outputs are generated, gitignored, and rebuilt by the pre* npm hooks - they
  * are a projection of whatever version of the package is installed, never a
@@ -18,7 +28,7 @@ import {fileURLToPath} from 'node:url';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = path.join(root, 'node_modules', 'vue3-flag-icons', 'dist', 'style.css');
-const FLAG_DIR = path.join(root, 'public', 'flags');
+const FLAG_DIR = path.join(root, 'src', 'assets', 'flags');
 const OUT_CSS = path.join(root, 'src', 'assets', 'flags.css');
 
 // The package scopes every selector to the data-v attribute of its own component.
@@ -94,7 +104,7 @@ for (const [, rawSelector, body] of rules) {
     }
 
     fs.writeFileSync(path.join(FLAG_DIR, name), svg);
-    out.push(`${selector}{background-image:url("/flags/${name}")}`);
+    out.push(`${selector}{background-image:url("./flags/${name}")}`);
     written++;
 }
 
@@ -110,5 +120,5 @@ fs.writeFileSync(OUT_CSS, generated);
 
 const sourceKb = (Buffer.byteLength(css) / 1024).toFixed(0);
 const outKb = (Buffer.byteLength(generated) / 1024).toFixed(0);
-console.log(`flags: ${written} files written to public/flags/`);
+console.log(`flags: ${written} files written to src/assets/flags/`);
 console.log(`flags: blocking CSS ${sourceKb} KB -> ${outKb} KB`);
