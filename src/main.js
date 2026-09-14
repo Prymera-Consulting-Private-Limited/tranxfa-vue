@@ -11,6 +11,7 @@ import i18n from '@/i18n.js'
 import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
 import {MFA_REQUIRED_TYPE} from "@/composables/checkout_safety.js";
 import {installErrorHandling} from "@/error_handling.js";
+import {installDropdownEscapeGuard} from "@/dropdown_escape.js";
 import {startServiceStatusWatch} from "@/composables/service_status.js";
 import axios from "axios";
 
@@ -24,6 +25,7 @@ app.use(createPinia())
 app.use(router)
 app.use(i18n)
 installErrorHandling(app, router)
+installDropdownEscapeGuard()
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_URL
 axios.defaults.withCredentials = true;
