@@ -1,5 +1,6 @@
 <script setup>
 import {computed, reactive, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
 import Spinner from '@/components/Spinner.vue';
 import {ExclamationTriangleIcon} from '@heroicons/vue/24/outline';
 
@@ -37,18 +38,22 @@ const props = defineProps({
 
 const emit = defineEmits(['submit']);
 
+const {t} = useI18n();
+
 // One slot per person the room was priced for, kept grouped in the room they
 // belong to — the booking is answering the same occupancy question the search
 // was asked, so it wants the same shape back.
 const roomSlots = computed(() => props.rooms.map((room, roomIndex) => {
     const guests = [];
 
+    // Slot labels come from the catalogue: as template literals they stayed
+    // English in every locale and no guard could see them (SD-1212).
     for (let adult = 0; adult < room.adults; adult += 1) {
-        guests.push({label: `Adult ${adult + 1}`, isChild: false});
+        guests.push({label: t('travel.adultIndexLabel', {index: adult + 1}), isChild: false});
     }
 
     room.children.forEach((age, child) => {
-        guests.push({label: `Child ${child + 1} (age ${age})`, isChild: true});
+        guests.push({label: t('travel.childIndexAgeLabel', {index: child + 1, age}), isChild: true});
     });
 
     return {number: roomIndex + 1, guests: guests};

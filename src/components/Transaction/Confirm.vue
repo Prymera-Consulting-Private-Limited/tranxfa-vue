@@ -19,6 +19,7 @@ import {
     PercentBadgeIcon
 } from "@heroicons/vue/24/outline";
 import RecipientDataType from "@/enums/recipient_data_type.js";
+import {computed} from "vue";
 
 const props = defineProps({
   quote: {
@@ -27,104 +28,118 @@ const props = defineProps({
   }
 })
 
-const reviewItems = [
-  {
-    icon: UserCircleIcon,
-    label: t('recipient.recipient'),
-    value: props.quote.recipient.wholeName,
-  },
-  {
-    icon: FlagIcon,
-    label: t('account.payoutCountry'),
-    value: props.quote.payoutCountry.commonName,
-  },
-  {
-    icon: TruckIcon,
-    label: t('recipient.payoutMethod'),
-    value: props.quote.payoutMethod.title,
-  }
-];
-if (props.quote.payoutMethod.instructions) {
-  reviewItems.push({
-    icon: InformationCircleIcon,
-    label: null,
-    value: props.quote.payoutMethod.instructions
-  });
-}
-for (let i = 0; i < props.quote.recipient.accountDetailHashMap.length; i++) {
-  const accountDetailHashmap = props.quote.recipient.accountDetailHashMap[i];
-  if (accountDetailHashmap.type === RecipientDataType.ACCOUNT_HOLDER_NAME) {
-    reviewItems.push({
+// A computed, not an array built once at setup. The wizard replaces the quote
+// under this component whenever a coupon is applied or removed, and a plain
+// array kept showing the old rate and payout beside a box that said the new
+// ones - on the last screen before the customer pays (SD-1213).
+const reviewItems = computed(() => {
+  const quote = props.quote;
+  const items = [
+    {
       icon: UserCircleIcon,
-      label: accountDetailHashmap.key,
-      value: accountDetailHashmap.value,
-    });
-  } else if (accountDetailHashmap.type === RecipientDataType.DELIVERY_OPTION) {
-    reviewItems.push({
-      icon: BuildingLibraryIcon,
-      label: accountDetailHashmap.key,
-      value: accountDetailHashmap.value,
-    });
-  } else if (accountDetailHashmap.type === RecipientDataType.ACCOUNT_NUMBER) {
-    reviewItems.push({
-      icon: DocumentCurrencyDollarIcon,
-      label: accountDetailHashmap.key,
-      value: accountDetailHashmap.value,
+      label: t('recipient.recipient'),
+      value: quote.recipient.wholeName,
+    },
+    {
+      icon: FlagIcon,
+      label: t('account.payoutCountry'),
+      value: quote.payoutCountry.commonName,
+    },
+    {
+      icon: TruckIcon,
+      label: t('recipient.payoutMethod'),
+      value: quote.payoutMethod.title,
+    }
+  ];
+  if (quote.payoutMethod.instructions) {
+    items.push({
+      icon: InformationCircleIcon,
+      label: null,
+      value: quote.payoutMethod.instructions
     });
   }
-}
-reviewItems.push({
-  icon: PaperAirplaneIcon,
-  label: t('account.sendingAmount'),
-  value: props.quote.localAmountCurrencyPrefixed,
-});
-reviewItems.push({
-  icon: BanknotesIcon,
-  label: t('account.exchangeRate'),
-  value: props.quote.exchangeRateFormatted,
-});
-if (props.quote.coupon?.isBetterRate && props.quote.coupon.exchangeRateBeforeCouponFormatted) {
-  reviewItems.push({
-    icon: PercentBadgeIcon,
-    label: t('account.rateBeforeCouponCode2', {code: props.quote.coupon.code}),
-    value: props.quote.coupon.exchangeRateBeforeCouponFormatted,
+  for (let i = 0; i < quote.recipient.accountDetailHashMap.length; i++) {
+    const accountDetailHashmap = quote.recipient.accountDetailHashMap[i];
+    if (accountDetailHashmap.type === RecipientDataType.ACCOUNT_HOLDER_NAME) {
+      items.push({
+        icon: UserCircleIcon,
+        label: accountDetailHashmap.key,
+        value: accountDetailHashmap.value,
+      });
+    } else if (accountDetailHashmap.type === RecipientDataType.DELIVERY_OPTION) {
+      items.push({
+        icon: BuildingLibraryIcon,
+        label: accountDetailHashmap.key,
+        value: accountDetailHashmap.value,
+      });
+    } else if (accountDetailHashmap.type === RecipientDataType.ACCOUNT_NUMBER) {
+      items.push({
+        icon: DocumentCurrencyDollarIcon,
+        label: accountDetailHashmap.key,
+        value: accountDetailHashmap.value,
+      });
+    }
+  }
+  items.push({
+    icon: PaperAirplaneIcon,
+    label: t('account.sendingAmount'),
+    value: quote.localAmountCurrencyPrefixed,
   });
-}
-reviewItems.push({
-  icon: WalletIcon,
-  label: t('account.recipientGets2'),
-  value: props.quote.foreignAmountCurrencyPrefixed,
-});
-if (props.quote.payoutMethod.promo) {
-  reviewItems.push({
-    icon: PercentBadgeIcon,
-    label: null,
-    value: props.quote.payoutMethod.promo,
-    color: 'bg-success-50 border-success-400 ',
-    textColor: 'text-success-700',
+  items.push({
+    icon: BanknotesIcon,
+    label: t('account.exchangeRate'),
+    value: quote.exchangeRateFormatted,
   });
-}
-reviewItems.push({
-  icon: PlusIcon,
-  label: t('calculator.fees'),
-  value: props.quote.baseFeesCurrencyPrefixed,
-});
-if (props.quote.coupon?.isMonetary && props.quote.coupon.discountAmountCurrencyPrefixed) {
-  reviewItems.push({
-    icon: PercentBadgeIcon,
-    label: `Coupon ${props.quote.coupon.code}`,
-    value: `- ${props.quote.coupon.discountAmountCurrencyPrefixed}`,
+  if (quote.coupon?.isBetterRate && quote.coupon.exchangeRateBeforeCouponFormatted) {
+    items.push({
+      icon: PercentBadgeIcon,
+      // Same key as QuoteDisplay: one sentence, one key. The duplicate under
+      // account went with SD-1212.
+      label: t('calculator.rateBeforeCouponCode', {code: quote.coupon.code}),
+      value: quote.coupon.exchangeRateBeforeCouponFormatted,
+    });
+  }
+  items.push({
+    icon: WalletIcon,
+    label: t('account.recipientGets2'),
+    value: quote.foreignAmountCurrencyPrefixed,
   });
-}
-reviewItems.push({
-  icon: CalculatorIcon,
-  label: t('account.subtotal'),
-  value: props.quote.subTotalAmountCurrencyPrefixed,
-});
-reviewItems.push({
-  icon: WalletIcon,
-  label: t('account.totalDue'),
-  value: props.quote.totalAmountCurrencyPrefixed,
+  if (quote.payoutMethod.promo) {
+    items.push({
+      icon: PercentBadgeIcon,
+      label: null,
+      value: quote.payoutMethod.promo,
+      color: 'bg-success-50 border-success-400 ',
+      textColor: 'text-success-700',
+    });
+  }
+  items.push({
+    icon: PlusIcon,
+    label: t('calculator.fees'),
+    value: quote.baseFeesCurrencyPrefixed,
+  });
+  if (quote.coupon?.isMonetary && quote.coupon.discountAmountCurrencyPrefixed) {
+    items.push({
+      icon: PercentBadgeIcon,
+      // Read from the catalogue like the row on QuoteDisplay. As a template
+      // literal this stayed English in every locale and no guard could see
+      // it (SD-1212).
+      label: t('calculator.couponCode', {code: quote.coupon.code}),
+      value: `- ${quote.coupon.discountAmountCurrencyPrefixed}`,
+    });
+  }
+  items.push({
+    icon: CalculatorIcon,
+    label: t('account.subtotal'),
+    value: quote.subTotalAmountCurrencyPrefixed,
+  });
+  items.push({
+    icon: WalletIcon,
+    label: t('account.totalDue'),
+    value: quote.totalAmountCurrencyPrefixed,
+  });
+
+  return items;
 });
 </script>
 
