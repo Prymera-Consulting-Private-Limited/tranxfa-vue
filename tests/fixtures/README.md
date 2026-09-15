@@ -107,6 +107,26 @@ happy paths.
 `account-verification-token-system` (presigned S3 upload shape),
 plus `signup` / `login` / `verify-email` / `update-*` success envelopes.
 
+## The hotel journey
+
+Four fixtures were captured from **payvel staging** rather than a local
+console, because hotels need a supplier the local stack does not have
+(SD-1218). They are the real answers to a Los Angeles search for 1-4 October
+2026, trimmed to what the specs read - two hotels of 246, two rates of 18,
+three photos of fifty - with nothing renamed:
+
+| Fixture | Endpoint |
+| ------- | -------- |
+| `travel-regions-los-angeles` | `GET /travel/regions?query=Los` - an envelope: `regions`, `labels`, `is_featured` |
+| `travel-hotels-search-region` | `POST /travel/hotels/search/region` - each hotel carries `rate_count` and one `cheapest_rate`, never a `rates[]` |
+| `travel-hotel-view` | `POST /travel/hotel/{search}/{hotel}` - the one place a `rates[]` with tokens exists |
+| `travel-quote-created` | `POST /travel/hotel/quote/{search}/{hotel}` - shaped from the quote contract; the hold itself was not taken out |
+
+`tests/hotel-journey.spec.js` mounts the real screens over these and walks
+lookup, results, hotel and hold. The two search fixtures are the shapes the
+payvel results list crashed on before SD-1218, so a re-capture that changes
+them should fail that spec rather than the mappers alone.
+
 ## Sanitisation
 
 Captures are scrubbed before they land here:
