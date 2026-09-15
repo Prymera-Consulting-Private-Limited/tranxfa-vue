@@ -325,6 +325,9 @@ forever on an unknown error — do not reintroduce that shape.
   single object, so `event` is `undefined` and both `console.error` calls always
   log `undefined`.
 - Background images are **not** centralised the way logos now are: five
-  hardcoded paths across four auth views, mixed `.webp`/`.png`. A brand that
-  ships `login.png` while the view asks for `login.webp` silently renders the
-  previous brand's background.
+  hardcoded paths across four auth views. A brand that ships `login.png` while
+  the view asks for `login.jpg` silently renders the previous brand's
+  background. **Never reference a `.webp` from a view**: Amplify's SPA rewrite
+  answers a `.webp` request with `index.html`, so the image simply never
+  renders on any brand (SD-1106). Main ships JPEG at quality 80 for the
+  photographs and PNG for the rest.

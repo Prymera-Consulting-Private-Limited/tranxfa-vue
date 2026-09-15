@@ -78,8 +78,11 @@ describe('pricing and the receipt', () => {
   it('show the savings line and the was/now rate', () => {
     for (const f of ['src/components/QuoteDisplay.vue', 'src/components/Transaction/Confirm.vue']) {
       const s = read(f);
-      expect(s, f).toContain('props.quote.coupon?.isMonetary');
-      expect(s, f).toContain('props.quote.coupon?.isBetterRate');
+      // SD-1213 made Confirm's rows a computed that reads the quote through a
+      // local, so this asserts the branch on the coupon type rather than the
+      // exact spelling of the property path.
+      expect(s, f).toMatch(/quote\.coupon\?\.isMonetary/);
+      expect(s, f).toMatch(/quote\.coupon\?\.isBetterRate/);
     }
     const receipt = read('src/views/Transaction/ItemView.vue');
     expect(receipt).toContain('transaction.data.couponDiscountAmountCurrencyPrefixed');

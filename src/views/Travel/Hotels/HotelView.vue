@@ -75,8 +75,6 @@ const failureMessage = ref(null);
  */
 const selectedRate = ref(null);
 
-const selectedToken = computed(() => selectedRate.value?.token ?? null);
-
 const isHolding = ref(false);
 const roomGone = ref(false);
 const holdFailureMessage = ref(null);
@@ -221,9 +219,19 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
                     :rates="rates"
                     :labels="labels"
                     :nights="resolvedSearch?.nights ?? 0"
-                    :selected-token="selectedToken"
+                    :selected="selectedRate"
                     @select="selectRate"
                 />
+                <!-- The supplier's own prose about the place, section by section as it was written (SD-1218). -->
+                <section v-if="hotel.description.length">
+                  <h2 class="text-lg font-semibold tracking-tight text-gray-900">{{ $t('travel.aboutThisHotel') }}</h2>
+                  <dl class="mt-3 space-y-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
+                    <div v-for="section in hotel.description" :key="section.title">
+                      <dt class="text-sm/6 font-semibold text-gray-900">{{ section.title }}</dt>
+                      <dd class="mt-1 text-sm/6 whitespace-pre-line text-gray-600">{{ section.body }}</dd>
+                    </div>
+                  </dl>
+                </section>
                 <section v-if="hotel.amenities.length">
                   <h2 class="text-lg font-semibold tracking-tight text-gray-900">{{ $t('travel.whatThisPlaceOffers') }}</h2>
                   <div class="mt-3 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
