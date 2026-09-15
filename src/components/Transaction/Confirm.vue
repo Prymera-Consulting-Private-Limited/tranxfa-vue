@@ -93,7 +93,9 @@ const reviewItems = computed(() => {
   if (quote.coupon?.isBetterRate && quote.coupon.exchangeRateBeforeCouponFormatted) {
     items.push({
       icon: PercentBadgeIcon,
-      label: t('account.rateBeforeCouponCode2', {code: quote.coupon.code}),
+      // Same key as QuoteDisplay: one sentence, one key. The duplicate under
+      // account went with SD-1212.
+      label: t('calculator.rateBeforeCouponCode', {code: quote.coupon.code}),
       value: quote.coupon.exchangeRateBeforeCouponFormatted,
     });
   }
@@ -119,7 +121,10 @@ const reviewItems = computed(() => {
   if (quote.coupon?.isMonetary && quote.coupon.discountAmountCurrencyPrefixed) {
     items.push({
       icon: PercentBadgeIcon,
-      label: `Coupon ${quote.coupon.code}`,
+      // Read from the catalogue like the row on QuoteDisplay. As a template
+      // literal this stayed English in every locale and no guard could see
+      // it (SD-1212).
+      label: t('calculator.couponCode', {code: quote.coupon.code}),
       value: `- ${quote.coupon.discountAmountCurrencyPrefixed}`,
     });
   }
