@@ -75,8 +75,6 @@ const failureMessage = ref(null);
  */
 const selectedRate = ref(null);
 
-const selectedToken = computed(() => selectedRate.value?.token ?? null);
-
 const isHolding = ref(false);
 const roomGone = ref(false);
 const holdFailureMessage = ref(null);
@@ -221,7 +219,7 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
                     :rates="rates"
                     :labels="labels"
                     :nights="resolvedSearch?.nights ?? 0"
-                    :selected-token="selectedToken"
+                    :selected="selectedRate"
                     @select="selectRate"
                 />
                 <section v-if="hotel.amenities.length">
