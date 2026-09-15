@@ -73,6 +73,14 @@ class HotelDetail {
     amenities = [];
 
     /**
+     * The supplier's own account of the place, section by section - location,
+     * what is at the hotel, what is in the room. Rendered as written.
+     *
+     * @type {Array<{title: string, body: string}>}
+     */
+    description = [];
+
+    /**
      * Prose the customer reads, kept apart from money they may be asked for.
      *
      * @type {Array<{title: string, body: string}>}
@@ -110,6 +118,10 @@ class HotelDetail {
         hotel.checkOutUntil = data.check_out_until ?? null;
         hotel.photos = data.photos ?? [];
         hotel.amenities = data.amenities ?? [];
+        hotel.description = (data.description ?? []).map(section => ({
+            title: section.title ?? null,
+            body: section.body ?? null,
+        }));
 
         if (data.house_rules) {
             hotel.houseRules = (data.house_rules.text ?? []).map(rule => ({
