@@ -75,8 +75,6 @@ const failureMessage = ref(null);
  */
 const selectedRate = ref(null);
 
-const selectedToken = computed(() => selectedRate.value?.token ?? null);
-
 const isHolding = ref(false);
 const roomGone = ref(false);
 const holdFailureMessage = ref(null);
@@ -221,7 +219,7 @@ watch([() => props.id, searchId], () => getHotelDetails(), {immediate: true});
                     :rates="rates"
                     :labels="labels"
                     :nights="resolvedSearch?.nights ?? 0"
-                    :selected-token="selectedToken"
+                    :selected="selectedRate"
                     @select="selectRate"
                 />
                 <!-- The supplier's own prose about the place, section by section as it was written (SD-1218). -->
