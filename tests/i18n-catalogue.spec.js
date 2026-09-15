@@ -768,6 +768,50 @@ describe('copy is never written as a prop default', () => {
   });
 });
 
+// SD-1212: a sixth shape. Copy written as a template literal in script and
+// handed to a template through an object property:
+//
+//     label: `Coupon ${props.quote.coupon.code}`,
+//
+// Confirm.vue carried that on the money path while QuoteDisplay rendered the
+// same row through the catalogue, so a Spanish customer with a coupon read
+// "Cupón X" on one screen and "Coupon X" on the next. It is none of the shapes
+// above: not bare text between tags, not a literal welded onto t(), not a prop
+// default, not two translations glued together. The guard for script-block
+// copy looks for quoted strings, and a backtick with an interpolation inside
+// is neither a quoted string nor a mustache.
+describe('copy is never a template literal handed to the template', () => {
+  const under = (dir) => readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    const path = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) return under(path);
+    return /\.(vue|js)$/.test(entry.name) ? [path] : [];
+  });
+
+  // A property a template prints, assigned a backtick string in which a word
+  // of real letters is followed by a space - "Coupon ${code}", "Room ${n}".
+  // The first draft of this demanded two words and walked straight past the
+  // very line it was written for, because the second "word" there is an
+  // interpolation. A lone interpolation, a code or a URL built from parts has
+  // no word-then-space and does not match.
+  const LITERAL_COPY = /\b(?:label|title|text|message|description|placeholder):\s*`[^`\n]*\b[A-Za-z]{2,} [^`\n]*`/;
+
+  it('no label, title, text or message is built as a template literal', () => {
+    const offenders = under('src')
+      .filter(file => ! file.startsWith('src/locales/'))
+      .map(file => ({file, line: read(file).split('\n').findIndex(l => LITERAL_COPY.test(l)) + 1}))
+      .filter(({line}) => line > 0)
+      .map(({file, line}) => `${file}:${line}`);
+
+    expect(offenders, `a template literal in script is never translated - read the catalogue with t() and interpolate there:\n  ${offenders.join('\n  ')}`)
+      .toEqual([]);
+  });
+
+  it('the was-rate row reads one key in both components', () => {
+    expect(en.calculator.rateBeforeCouponCode).toBe('Rate before coupon {code}');
+    expect(en.account.rateBeforeCouponCode2, 'the duplicate under account is gone').toBeUndefined();
+  });
+});
+
 // SD-1203: a fifth shape, and the one every guard above is blind to. A sentence
 // split across two t() calls renders welded, because the space that joins them
 // lives in neither string and not in the template:

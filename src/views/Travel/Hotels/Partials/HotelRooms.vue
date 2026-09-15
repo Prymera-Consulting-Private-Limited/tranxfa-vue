@@ -25,11 +25,15 @@ const props = defineProps({
   },
 
   /**
-   * The token of the chosen rate. A token is what identifies a rate here — it is
-   * the only thing on it that is unique and that the next step will accept.
+   * The chosen rate, the object itself. A rate is identified by which row it
+   * is, never by its token: the token is the supplier's match key for an
+   * offer, and several rows can carry the same one (SD-1219). Keying on it
+   * lit three rows at once.
+   *
+   * @type {HotelRate|null}
    */
-  selectedToken: {
-    type: String,
+  selected: {
+    type: Object,
     default: null,
   },
 });
@@ -42,14 +46,14 @@ const groups = computed(() => getRateGroups(props.rates));
 
 // The cheapest rate anywhere on the page, so the marker means "cheapest here"
 // rather than "cheapest in its own group", which would put one on every group.
-const bestToken = computed(() => {
+const best = computed(() => {
   const bookable = props.rates.filter(rate => rate.bookable && rate.token);
 
   if (bookable.length === 0) {
     return null;
   }
 
-  return bookable.reduce((cheapest, rate) => (rate.total.amount < cheapest.total.amount ? rate : cheapest)).token;
+  return bookable.reduce((cheapest, rate) => (rate.total.amount < cheapest.total.amount ? rate : cheapest));
 });
 </script>
 
@@ -68,19 +72,20 @@ const bestToken = computed(() => {
           </p>
         </header>
         <ul>
+          <!-- Keyed by position: rates sharing a token are distinct rows, and a token is not a row's identity. -->
           <li
-              v-for="rate in group.rates"
-              :key="rate.token ?? rate.roomName"
+              v-for="(rate, position) in group.rates"
+              :key="position"
               :class="[
-                rate.token === selectedToken ? 'bg-brand-50/60' : 'hover:bg-gray-50/70',
+                rate === selected ? 'bg-brand-50/60' : 'hover:bg-gray-50/70',
                 'relative flex flex-col gap-4 border-t border-gray-100 px-5 py-4 transition sm:flex-row sm:items-center',
               ]"
           >
             <!-- The chosen rate is marked on the edge as well, since the button alone is easy to lose in a long list. -->
-            <span v-if="rate.token === selectedToken" class="absolute inset-y-0 left-0 w-1 bg-brand-600" aria-hidden="true" />
+            <span v-if="rate === selected" class="absolute inset-y-0 left-0 w-1 bg-brand-600" aria-hidden="true" />
             <div class="min-w-0 flex-1 space-y-2">
               <div class="flex flex-wrap items-center gap-2">
-                <span v-if="rate.token && rate.token === bestToken" class="inline-flex items-center rounded-lg bg-brand-600 px-2.5 py-1 text-xs/5 font-semibold text-white">{{ $t('travel.lowestPrice') }}</span>
+                <span v-if="rate === best" class="inline-flex items-center rounded-lg bg-brand-600 px-2.5 py-1 text-xs/5 font-semibold text-white">{{ $t('travel.lowestPrice') }}</span>
                 <HotelMealBadge :meal="rate.meal" :labels="labels" />
                 <!-- Each rate's own terms, never the hotel's or another rate's. -->
                 <HotelCancellationBadge :cancellation="rate.cancellation" />
@@ -100,12 +105,12 @@ const bestToken = computed(() => {
                   type="button"
                   @click="emit('select', rate)"
                   :class="[
-                    rate.token === selectedToken
+                    rate === selected
                       ? 'bg-brand-800 text-white'
                       : 'bg-brand-700 text-white hover:bg-brand-800',
                     'cursor-pointer rounded-xl px-4 py-2.5 text-sm/6 font-semibold shadow-xs transition focus-visible:outline-0',
                   ]"
-              >{{ rate.token === selectedToken ? $t('travel.selected') : $t('travel.select') }}</button>
+              >{{ rate === selected ? $t('travel.selected') : $t('travel.select') }}</button>
               <span v-else class="rounded-xl bg-gray-100 px-4 py-2 text-center text-sm/6 font-medium text-gray-500">{{ $t('travel.notAvailable') }}</span>
             </div>
           </li>
