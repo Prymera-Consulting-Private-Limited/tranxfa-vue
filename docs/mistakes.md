@@ -197,3 +197,37 @@ merged badge alone.
 
 **Status:** adopted — every merge since has been checked this way, and it caught
 a second instance the same day.
+
+---
+
+## PM-008 — A build was verified on a working tree the commit did not match
+
+**What happened:** merging `main` into `quiqsend-staging` (PR #184, SD-1218)
+brought in main's stock `login.jpg` and `signup.jpg`. The follow-up commit
+`bef26ca` was meant to point `SignInView.vue` and `SignUpView.vue` at the
+brand's `login.png` and `signup.png` and delete the JPEGs. Only the deletions
+were committed. The commit message and the PR body both described the view
+change, and the PR reported `npm run build` exit 0. Amplify then failed both
+`quiqsend-staging` and `quiqsend_production` on
+`Rollup failed to resolve import "/images/backgrounds/signup.jpg"` (SD-1239).
+
+**Root cause:** the build and the suite ran in the working tree, which had the
+edited views. The commit did not. A green check proves the files on disk, not
+the commit that gets pushed, and a commit message describes what was intended
+rather than what was staged.
+
+**Cost or risk:** two Quiqsend deploys failed, and no fix could reach that
+brand until this was repaired. Had the missing file been one Vite does not
+resolve at build time, it would have shipped as a broken image with a green
+build.
+
+**SOP:** before opening a pull request into a brand branch:
+1. `git status --short` is empty, so nothing verified is left out of the commit.
+2. The build and `npm test` run on a clean checkout of the commit itself
+   (`git worktree add --detach <dir> HEAD`, then `npm ci`), not in the tree it
+   was made in.
+3. For every asset the branch deletes, `git grep -n <path> HEAD -- src index.html`
+   returns nothing.
+
+**Status:** open — adopted for SD-1239's own fix, which was built and tested
+from a clean export of the index.
