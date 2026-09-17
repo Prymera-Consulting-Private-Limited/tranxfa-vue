@@ -66,6 +66,7 @@ per brand:
 | `VITE_HOTELS_ENABLED`, `VITE_FLIGHTS_ENABLED`, `VITE_COUPONS_ENABLED` | **Default false.** One per licensed value-added service; the routes and nav items exist only when on. `VITE_TRAVEL_ENABLED` is gone |
 | `VITE_WALLET_ENABLED` | Default true. Hard off-switch in front of the wallet's own `GET /wallet/subscription` probe |
 | `VITE_SERVICE_STATUS_ENABLED` | Default false. Polls `/client/v1/service-status` and shows the maintenance banner (also before sign-in) |
+| `VITE_VERIFICATION_REQUIRED_ONLY` | Default false. The verification page lists only the document categories the console marks `required`, plus uploaded documents. Needs a console that sends the flag (SD-1223); older consoles hide nothing. Payvel sets it |
 | `VITE_VOLUME_PAYMENT_MERCHANT_ID` | Travel payments only. Unset means travel cannot take payment |
 | `VITE_VOLUME_PAYMENT_ENVIRONMENT` | `SANDBOX` \| `PRODUCTION`, `SANDBOX` when unset - a deployment that forgets it takes no money rather than the wrong money |
 | `VITE_PUSHER_APP_KEY` + host/cluster/scheme | Realtime. `VITE_APP_ENV` must **not** be `local`. |

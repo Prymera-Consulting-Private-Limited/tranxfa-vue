@@ -58,6 +58,14 @@ describe('DocumentCategory', () => {
         const category = DocumentCategory.getInstance({ id: 'dc-2' })
         expect(category.documentTypes).toEqual([])
     })
+
+    // SD-1223: null is "the console did not say", which must stay distinct from
+    // false - the verification page hides only an explicit false.
+    it('maps required, keeping an absent flag as null', () => {
+        expect(DocumentCategory.getInstance({ id: 'dc-3', required: true }).isRequired).toBe(true)
+        expect(DocumentCategory.getInstance({ id: 'dc-4', required: false }).isRequired).toBe(false)
+        expect(DocumentCategory.getInstance({ id: 'dc-5' }).isRequired).toBeNull()
+    })
 })
 
 describe('CustomerDocument', () => {
