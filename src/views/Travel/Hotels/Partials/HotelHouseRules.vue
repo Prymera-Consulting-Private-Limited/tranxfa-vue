@@ -1,6 +1,9 @@
 <script setup>
 import {computed} from 'vue';
+import {useI18n} from 'vue-i18n';
 import {prettifyLabel} from '@/composables/travel/hotels/hotel_utils.js';
+
+const {t} = useI18n();
 
 const props = defineProps({
   /**
@@ -27,6 +30,46 @@ const props = defineProps({
 
 function label(code) {
   return props.labels[code] ?? prettifyLabel(code);
+}
+
+/**
+ * Two charges of one type - breakfast and lunch - read alike without the
+ * detail, so it follows the type: "Meals · Breakfast". Its words come from the
+ * labels and never from matching the code, because the supplier writes these
+ * as free text and adds new ones without notice.
+ *
+ * @param {HouseRuleCharge} charge
+ * @returns {string}
+ */
+function name(charge) {
+  return [label(charge.type), charge.detail ? label(charge.detail) : null].filter(Boolean).join(' · ');
+}
+
+/**
+ * The same children's breakfast can cost 10.00 for ages 0-5 and 14.00 for
+ * 6-12, so the ages are what tell those two apart. A hotel that states only
+ * one end is quoted as it stated it.
+ *
+ * @param {HouseRuleCharge} charge
+ * @returns {string|null}
+ */
+function ages(charge) {
+  const from = charge.appliesFromAge;
+  const to = charge.appliesToAge;
+
+  if (from !== null && to !== null) {
+    return from === to ? t('travel.agesExactly', {age: from}) : t('travel.agesFromTo', {from: from, to: to});
+  }
+
+  if (from !== null) {
+    return t('travel.agesFrom', {age: from});
+  }
+
+  if (to !== null) {
+    return t('travel.agesUpTo', {age: to});
+  }
+
+  return null;
 }
 
 /**
@@ -84,8 +127,13 @@ const hasAnything = computed(() => props.rules.length > 0 || props.charges.lengt
         <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.collectedByTheHotelRather') }}<template v-if="currencies.length"> {{ $t('travel.andChargedIn', {currencies: currencies.join($t('common.listJoin'))}) }}</template>{{ $t('travel.soTheseAreNotPart') }}</p>
       </header>
       <ul class="divide-y divide-gray-100">
-        <li v-for="charge in charges" :key="charge.type" class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3">
-          <span class="text-sm/6 text-gray-700">{{ label(charge.type) }}</span>
+        <!-- By position: one type can carry several charges (two meals, two
+        shuttles), so the type is not an identity. -->
+        <li v-for="(charge, index) in charges" :key="index" class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3">
+          <span class="text-sm/6 text-gray-700">
+            {{ name(charge) }}
+            <span v-if="ages(charge)" class="text-gray-500">{{ ages(charge) }}</span>
+          </span>
           <span :class="[classes(charge), 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ description(charge) }}</span>
         </li>
       </ul>

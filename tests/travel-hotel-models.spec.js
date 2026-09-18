@@ -217,6 +217,30 @@ describe('HouseRuleCharge', () => {
         expect(charge.amount.isStated).toBe(false)
         expect(charge.currency).toBeNull()
     })
+
+    // SD-1256 on the console, SD-1259 here.
+    it('keeps which one of its kind a charge is, and the ages it covers', () => {
+        const charge = HouseRuleCharge.getInstance({
+            type: 'CHILDREN-MEAL',
+            detail: 'CHILDREN-MEAL-BREAKFAST',
+            applies_from_age: 0,
+            applies_to_age: 5,
+            inclusion: 'PAID',
+        })
+
+        expect(charge.detail).toBe('CHILDREN-MEAL-BREAKFAST')
+        // Zero is an age, not an absence.
+        expect(charge.appliesFromAge).toBe(0)
+        expect(charge.appliesToAge).toBe(5)
+    })
+
+    it('reads a console released before those fields as having none', () => {
+        const charge = HouseRuleCharge.getInstance({ type: 'MEAL', inclusion: 'PAID' })
+
+        expect(charge.detail).toBeNull()
+        expect(charge.appliesFromAge).toBeNull()
+        expect(charge.appliesToAge).toBeNull()
+    })
 })
 
 describe('HotelDetail.getInstance', () => {
