@@ -138,6 +138,18 @@ lookup, results, hotel and hold. The two search fixtures are the shapes the
 payvel results list crashed on before SD-1218, so a re-capture that changes
 them should fail that spec rather than the mappers alone.
 
+**`travel-hotel-view-extras` is not a capture either (SD-1259).** It is
+`travel-hotel-view` with `hotel.house_rules.charges` replaced by the 18 charges
+console PR #638 (SD-1256) lists for Conrad Los Angeles, built by its assembler
+from the supplier's sandbox dump: each with `detail`, `applies_from_age` and
+`applies_to_age`, and the euro, children's and late check-out charges the
+console used to drop. The `labels` added are the console's own wording
+(`HotelLabels::detail()`: a detail reads as its code without the type prefix,
+sentence-cased). The `inclusion` of the three deposits is `UNSPECIFIED` as in
+the capture, and `PAID` elsewhere, which is a guess. Re-capture it from the
+hotel page once staging has the console change and a catalog reload, and
+delete this note.
+
 ## Paying for a hotel by PayID or bank transfer (not captured)
 
 **These are not captures.** SD-1250 was built before the console's SD-1238 and
