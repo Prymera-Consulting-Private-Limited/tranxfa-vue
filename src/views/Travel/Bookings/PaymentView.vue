@@ -18,7 +18,7 @@ import DepositHolder from '@/models/deposit_holder.js';
 import OrderPaymentRefusalType from '@/enums/order_payment_refusal_type.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {useOrderUtils} from '@/composables/travel/order_utils.js';
-import {CheckCircleIcon, ExclamationTriangleIcon} from '@heroicons/vue/24/outline';
+import {CheckCircleIcon, ClockIcon, ExclamationTriangleIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
   orderId: {
@@ -386,12 +386,14 @@ function providerName(method) {
             <p v-if="order.stateLabel" class="mt-3 text-sm/6 font-medium text-gray-700">{{ $t('travel.bookingStatusIs', {state: order.stateLabel}) }}</p>
           </section>
           <template v-else>
-          <!-- The room is booked; this is only about paying for it. -->
-          <div class="flex items-start gap-3 rounded-2xl border border-success-200 bg-success-50 px-5 py-4">
-            <CheckCircleIcon class="mt-0.5 size-5 shrink-0 text-success-600" aria-hidden="true" />
+          <!-- The price is held; this is only about paying for it. Amber, as
+          "Price Locked" is everywhere else: green would read as done, and
+          nothing is paid yet. -->
+          <div class="flex items-start gap-3 rounded-2xl border border-warning-200 bg-warning-50 px-5 py-4">
+            <ClockIcon class="mt-0.5 size-5 shrink-0 text-warning-700" aria-hidden="true" />
             <div>
-              <p class="text-sm/6 font-medium text-success-900">{{ $t('travel.yourRoomIsBooked') }}</p>
-              <p class="mt-0.5 text-sm/6 text-success-800">{{ $t('travel.namePayNowToComplete', {name: order.hotel?.name}) }}</p>
+              <p class="text-sm/6 font-medium text-warning-900">{{ $t('travel.yourRoomPricingHasBeenLocked') }}</p>
+              <p class="mt-0.5 text-sm/6 text-warning-800">{{ $t('travel.namePayNowToComplete', {name: order.hotel?.name}) }}</p>
             </div>
           </div>
           <!-- A deposit rail is paid by sending money to the customer's own

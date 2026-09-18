@@ -95,6 +95,29 @@ describe('a hotel\'s extras', () => {
         expect(lines(wrapper)).toEqual([['Meals · Evening meal', 'USD 3.00']]);
     });
 
+    // The supplier marks Conrad's cot PAID at USD 0.00, and it read "Available at
+    // extra cost" beside a price of nothing.
+    it('says an extra the hotel prices at nothing is included', () => {
+        const {hotel, labels} = conrad();
+        const shown = lines(render(hotel.charges, labels));
+
+        expect(labels.PAID).toBe('Available at extra cost');
+        expect(shown).toContainEqual(['Cot', 'Included']);
+        expect(shown.filter(([, price]) => price === 'Available at extra cost')).toEqual([]);
+    });
+
+    // "Not available" and "Not stated" are answers of their own, and a zero
+    // riding along with them does not make the extra free.
+    it.each([
+        ['NOT-AVAILABLE', 'Not available'],
+        ['UNSPECIFIED', 'Not stated by the hotel'],
+    ])('keeps %s in its own words at a price of nothing', (inclusion, words) => {
+        const free = {amount: 0, amount_decimal: '0.00', amount_formatted: '0.00', amount_currency_prefixed: 'USD 0.00'};
+        const wrapper = render([charge({type: 'PETS', inclusion, ...free})], {PETS: 'Pets', [inclusion]: words});
+
+        expect(lines(wrapper)).toEqual([['Pets', words]]);
+    });
+
     it('quotes a hotel that states only one end of the ages as it stated it', () => {
         const labels = {'CHILDREN-MEAL': 'Children\'s meals', 'CHILDREN-MEAL-BREAKFAST': 'Breakfast'};
         const kids = (from, to) => charge({type: 'CHILDREN-MEAL', detail: 'CHILDREN-MEAL-BREAKFAST', applies_from_age: from, applies_to_age: to});
@@ -110,8 +133,8 @@ describe('a hotel\'s extras', () => {
         const wrapper = render(hotel.charges, labels);
         const prices = lines(wrapper).map(([, price]) => price);
 
-        // Ten USD charges, but the cot's is 0.00, which reads as its inclusion
-        // rather than as a price.
+        // Ten USD charges, but the cot's is 0.00, which reads "Included" rather
+        // than as a price.
         expect(prices.filter(price => price.startsWith('USD '))).toHaveLength(9);
         expect(prices.filter(price => price.startsWith('EUR '))).toHaveLength(8);
         // The header names both currencies, and there is a line per charge and
