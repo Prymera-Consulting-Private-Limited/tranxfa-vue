@@ -14,8 +14,9 @@ vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn(), delete: vi.fn(),
 // has succeeded (is_paid) and what the booking is waiting on the customer to
 // do (next_step), and words the state accordingly (SD-1230, console #646).
 //
-// The three travel-order-view fixtures here are written from the console's
-// code on develop, not captured - see tests/fixtures/README.md.
+// The price-locked and complete order views are captured from Payvel staging;
+// the awaiting-hotel one is written from the console's code, because that state
+// lasts a minute or two - see tests/fixtures/README.md.
 setActivePinia(createPinia());
 
 const axios = (await import('axios')).default;
@@ -45,9 +46,14 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
-// The payment the deposit-pending fixture is waiting on, moved onto another
-// booking: an open attempt, with its account details.
+// The price-locked booking was captured twice on Payvel staging: once while
+// a Bank Transfer payment waited on it (deposit-pending), and once after that
+// payment was cancelled (price-locked). These are its attempts the first time:
+// two that failed, then the open one, with its account details.
 const waitingPayments = () => fixture('travel-order-view-deposit-pending').payments;
+
+const LOCKED = '01a0a76b-3e9f-72db-98b0-89f04386670b';
+const WAITING_PAYMENT = '01a0b6a0-7dd0-71cd-bab0-d81a26ef6b1e';
 
 function orderOf(name, overrides = {}) {
     return Order.getInstance({...fixture(name), ...overrides});
@@ -115,11 +121,11 @@ describe('the booking, as the console now describes it', () => {
     });
 
     it('finds the payment waiting, from the list or from the booking', () => {
-        const fromList = Order.getInstance(fixture('travel-orders-open-payment').data[0]);
-        expect(fromList.waitingPayment.id).toBe('01a0afb1-fa90-71d6-ad4d-b68f6836ea2d');
+        const fromList = Order.getInstance(fixture('travel-orders-open-payment').data.find(row => row.open_payment));
+        expect(fromList.waitingPayment.id).toBe(WAITING_PAYMENT);
 
         const fromBooking = orderOf('travel-order-view-price-locked', {payments: waitingPayments()});
-        expect(fromBooking.waitingPayment.id).toBe('01a0b2c4-5d6e-7f80-9a1b-2c3d4e5f6a70');
+        expect(fromBooking.waitingPayment.id).toBe(WAITING_PAYMENT);
 
         expect(orderOf('travel-order-view-price-locked').waitingPayment).toBeNull();
         expect(orderOf('travel-order-view-complete').waitingPayment).toBeNull();
@@ -133,7 +139,7 @@ describe('the pay button', () => {
         const link = wrapper.find('a');
 
         expect(link.text()).toBe('Pay for Confirmation');
-        expect(link.attributes('href')).toBe('/travel/booking/01a0b2c0-4444-7555-8666-b77788899900/pay');
+        expect(link.attributes('href')).toBe(`/travel/booking/${LOCKED}/pay`);
     });
 
     // Paying again would be refused while the first payment holds the account,
@@ -142,7 +148,7 @@ describe('the pay button', () => {
         const order = orderOf('travel-order-view-price-locked', {payments: waitingPayments()});
         const wrapper = await mountWithRouter(BookingNextStep, {order});
 
-        expect(wrapper.find('a').attributes('href')).toBe('/travel/booking/01a0b2c0-4444-7555-8666-b77788899900/payment');
+        expect(wrapper.find('a').attributes('href')).toBe(`/travel/booking/${LOCKED}/payment`);
     });
 
     it('uses our own words when the console sends none', async () => {
@@ -164,8 +170,8 @@ describe('the pay button', () => {
     });
 
     it('is on the bookings list row, apart from the link that opens the booking', async () => {
-        const data = fixture('travel-orders-open-payment').data[0];
-        const order = Order.getInstance({...data, state: 'FULFILLED', is_paid: false, next_step: {code: 'pay', label: 'Pay for Confirmation'}});
+        const data = fixture('travel-orders-open-payment').data.find(row => row.open_payment);
+        const order = Order.getInstance(data);
         const wrapper = await mountWithRouter(BookingCard, {order});
 
         const links = wrapper.findAll('a');
@@ -218,7 +224,7 @@ describe('the booking page', () => {
         expect(text).toContain('The hotel has confirmed your room at this price. Please pay to complete your booking.');
 
         const pay = wrapper.findAll('a').find(link => link.text() === 'Pay for Confirmation');
-        expect(pay.attributes('href')).toBe('/travel/booking/01a0b2c0-4444-7555-8666-b77788899900/pay');
+        expect(pay.attributes('href')).toBe(`/travel/booking/${LOCKED}/pay`);
     });
 
     it('says paid once it is', async () => {
@@ -261,9 +267,9 @@ describe('the payment page', () => {
             ? Promise.resolve({status: 200, data: {data: METHODS}})
             : Promise.resolve(fixtureResponse('travel-order-view-price-locked'))));
 
-        const router = await routerAt('/travel/booking/01a0b2c0-4444-7555-8666-b77788899900/pay');
+        const router = await routerAt(`/travel/booking/${LOCKED}/pay`);
         const wrapper = mount(PaymentView, {
-            props: {orderId: '01a0b2c0-4444-7555-8666-b77788899900'},
+            props: {orderId: LOCKED},
             global: {plugins: [router], stubs: LAYOUT},
             attachTo: document.body,
         });
@@ -277,7 +283,7 @@ describe('the payment page', () => {
         const wrapper = await paymentPage();
 
         expect(wrapper.text()).not.toContain('confirm it with the hotel');
-        expect(wrapper.text()).toContain('Conrad Los Angeles — pay now to complete your booking.');
+        expect(wrapper.text()).toContain('Charming Duplex Home — pay now to complete your booking.');
         wrapper.unmount();
     });
 

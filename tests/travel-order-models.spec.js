@@ -238,16 +238,17 @@ describe('OrderPayment', () => {
         it('maps the account, its attributes in order, and the deadline', () => {
             const payment = OrderPayment.getInstance(fixture('travel-order-payment-pending-account'))
 
-            expect(payment.clientPaymentAccount.instruction).toContain('transfer funds to the PayID below')
-            expect(payment.clientPaymentAccount.paymentReference).toBe('SP4594760')
-            expect(payment.clientPaymentAccount.attributes.map(a => a.key)).toEqual(['Pay ID Name', 'Pay ID'])
-            expect(payment.expiresAt).toBe('2026-09-22T14:07:50+00:00')
+            expect(payment.clientPaymentAccount.instruction).toContain('transfer funds to the bank account listed below')
+            expect(payment.clientPaymentAccount.paymentReference).toBe('SP8518335')
+            expect(payment.clientPaymentAccount.attributes.map(a => a.key)).toEqual(['Account Name', 'BSB', 'Account Number'])
+            expect(payment.expiresAt).toBe('2026-09-23T22:26:06+00:00')
             expect(payment.hasAccountDetails).toBe(true)
             expect(payment.isSettingUp).toBe(false)
         })
 
         it('reads the same account off a listed attempt on the order', () => {
-            const payment = OrderPayment.getInstance(fixture('travel-order-view-deposit-pending').payments[0])
+            // The open attempt, after two that failed.
+            const payment = OrderPayment.getInstance(fixture('travel-order-view-deposit-pending').payments.find(p => p.state === 'PENDING'))
 
             expect(payment.clientPaymentAccount.attributes.map(a => a.key)).toEqual(['Account Name', 'BSB', 'Account Number'])
             expect(payment.hasAccountDetails).toBe(true)

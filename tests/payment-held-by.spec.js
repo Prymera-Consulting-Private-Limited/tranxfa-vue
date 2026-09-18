@@ -13,8 +13,9 @@ vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn(), delete: vi.fn(),
 // now names it (SD-1261): held_by on every account_held or same_amount refusal,
 // and open_payment on every row of the bookings list.
 //
-// The fixtures are written from the backend's handout and its code on develop,
-// not captured - see tests/fixtures/README.md.
+// The hotel refusal and the bookings list are captured from Payvel staging; the
+// transfer and wallet refusals are written from the backend's code on develop -
+// see tests/fixtures/README.md.
 setActivePinia(createPinia());
 
 const axios = (await import('axios')).default;
@@ -27,7 +28,9 @@ const {default: BookingPayments} = await import('@/views/Travel/Bookings/Partial
 const {default: PaymentView} = await import('@/views/Travel/Bookings/PaymentView.vue');
 const {default: ItemView} = await import('@/views/Travel/Bookings/ItemView.vue');
 
-const ORDER = '01a0b2c0-1111-7222-8333-944455566677';
+// The booking whose payment held the account on Payvel staging, captured
+// 2026-09-19: it is the holder in the refusal and the order the cancel is on.
+const ORDER = '01a0a76b-3e9f-72db-98b0-89f04386670b';
 const METHODS = [
     {id: 'pm-payid', code: 'PAYID', title: 'PayID', description: null, providers: [{id: 'pp-1', code: 'MONOOVA', title: 'Monoova'}]},
 ];
@@ -75,8 +78,8 @@ describe('what is holding the account', () => {
         expect(order).toBeInstanceOf(DepositHolder);
         expect(order.kind).toBe('service_order');
         expect(order.id).toBe(ORDER);
-        expect(order.reference).toBe('VO-01J8XAQ4V2NP7WZK3RB9CDEF0');
-        expect(order.paymentId).toBe('01a0afb1-fa90-71d6-ad4d-b68f6836ea2d');
+        expect(order.reference).toBe('VO-01M2KPPFMZH9Z51HHBRKAE41DE');
+        expect(order.paymentId).toBe('01a0b6a0-7dd0-71cd-bab0-d81a26ef6b1e');
         expect(order.service).toBe('HOTELS');
 
         const transfer = holderOf('error-412-checkout-collides-held-by-transfer');
@@ -126,7 +129,7 @@ describe('the button that opens it', () => {
 
         expect(link.text()).toBe('View your hotel booking');
         expect(link.attributes('href')).toBe(`/travel/booking/${ORDER}?returnTo=/transfer/quote-1`);
-        expect(wrapper.text()).toContain('VO-01J8XAQ4V2NP7WZK3RB9CDEF0');
+        expect(wrapper.text()).toContain('VO-01M2KPPFMZH9Z51HHBRKAE41DE');
     });
 
     it('opens the transfer', async () => {
@@ -247,20 +250,27 @@ describe('coming back after cancelling the payment in the way', () => {
 });
 
 describe('the bookings list', () => {
-    const rows = () => fixture('travel-orders-open-payment').data.map(row => Order.getInstance(row));
+    // The captured list: five bookings, one of them with a payment waiting.
+    const waitingRow = () => fixture('travel-orders-open-payment').data.find(row => row.open_payment);
+    const rows = () => {
+        const data = fixture('travel-orders-open-payment').data;
+
+        return [data.find(row => row.open_payment), data.find(row => !row.open_payment)].map(row => Order.getInstance(row));
+    };
 
     it('reads the payment still waiting on a booking, with the id the cancel takes', () => {
         const [waiting, settled] = rows();
 
-        expect(waiting.openPayment.id).toBe('01a0afb1-fa90-71d6-ad4d-b68f6836ea2d');
+        expect(waiting.openPayment.id).toBe('01a0b6a0-7dd0-71cd-bab0-d81a26ef6b1e');
         expect(waiting.openPayment.isOpen).toBe(true);
-        expect(waiting.openPayment.method).toBe('PayID');
-        expect(waiting.openPayment.amount.currencyPrefixed).toBe('AUD 1,650.36');
+        expect(waiting.openPayment.method).toBe('Bank Transfer');
+        expect(waiting.openPayment.amount.currencyPrefixed).toBe('AUD 151.81');
         expect(settled.openPayment).toBeNull();
+        expect(fixture('travel-orders-open-payment').data.filter(row => row.open_payment)).toHaveLength(1);
     });
 
     it('reads a console older than SD-1261, which sends no such key, as nothing waiting', () => {
-        const {open_payment: omitted, ...row} = fixture('travel-orders-open-payment').data[0];
+        const {open_payment: omitted, ...row} = waitingRow();
 
         expect(omitted).toBeTruthy();
         expect(Order.getInstance(row).openPayment).toBeNull();
@@ -270,7 +280,7 @@ describe('the bookings list', () => {
         const router = await routerAt('/travel/bookings');
         const [waiting, settled] = rows().map(order => mount(BookingCard, {props: {order}, global: {plugins: [router]}}));
 
-        expect(waiting.text()).toContain('Payment waiting: AUD 1,650.36');
+        expect(waiting.text()).toContain('Payment waiting: AUD 151.81');
         expect(waiting.text()).toContain('pay by');
         expect(settled.text()).not.toContain('Payment waiting');
     });
