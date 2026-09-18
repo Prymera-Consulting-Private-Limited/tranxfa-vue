@@ -391,7 +391,7 @@ function providerName(method) {
             <CheckCircleIcon class="mt-0.5 size-5 shrink-0 text-success-600" aria-hidden="true" />
             <div>
               <p class="text-sm/6 font-medium text-success-900">{{ $t('travel.yourRoomIsBooked') }}</p>
-              <p class="mt-0.5 text-sm/6 text-success-800">{{ $t('travel.namePayNowToConfirm', {name: order.hotel?.name}) }}</p>
+              <p class="mt-0.5 text-sm/6 text-success-800">{{ $t('travel.namePayNowToComplete', {name: order.hotel?.name}) }}</p>
             </div>
           </div>
           <!-- A deposit rail is paid by sending money to the customer's own
@@ -443,15 +443,21 @@ function providerName(method) {
                     :value="method.id"
                     v-model="selectedMethod"
                     :disabled="refusedMethods.includes(method.id)"
+                    :aria-labelledby="`payment-method-${method.id}-title`"
+                    :aria-describedby="`payment-method-${method.id}-detail`"
                     class="mt-0.5 size-4 shrink-0 cursor-pointer accent-brand-700 disabled:cursor-not-allowed"
                     name="payment-method"
                 />
+                <!-- The radio is named by the method's title alone, and the
+                provider and description are read after it as its description. -->
                 <span class="min-w-0">
                   <span class="block text-sm/6 font-medium text-gray-900">
-                    {{ method.title }}
-                    <span v-if="providerName(method)" class="font-normal text-gray-500">· {{ $t('travel.viaProvider', {provider: providerName(method)}) }}</span>
+                    <span :id="`payment-method-${method.id}-title`">{{ method.title }}</span>
+                    <span :id="`payment-method-${method.id}-detail`">
+                      <span v-if="providerName(method)" class="font-normal text-gray-500"> · {{ $t('travel.viaProvider', {provider: providerName(method)}) }}</span>
+                      <span v-if="method.description" class="mt-0.5 block text-xs/5 font-normal text-gray-500">{{ method.description }}</span>
+                    </span>
                   </span>
-                  <span v-if="method.description" class="mt-0.5 block text-xs/5 text-gray-500">{{ method.description }}</span>
                 </span>
               </label>
             </div>

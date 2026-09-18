@@ -2,6 +2,7 @@
 import {computed} from 'vue';
 import moment from 'moment';
 import {CalendarDaysIcon, ClockIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
+import BookingNextStep from '@/views/Travel/Bookings/Partials/BookingNextStep.vue';
 import BookingStateBadge from '@/views/Travel/Bookings/Partials/BookingStateBadge.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import {getGuestSummary, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
@@ -38,14 +39,18 @@ const openPaymentDeadline = computed(() => (props.order.openPayment?.expiresAt
 </script>
 
 <template>
-  <RouterLink
-      :to="{name: 'travelBooking', params: {id: order.id}}"
-      class="group block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xs transition duration-200 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-200/70"
-  >
+  <!-- The whole card opens the booking through the name's link, stretched over
+  it, so the pay button can sit on the card without being inside a link. -->
+  <article class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xs transition duration-200 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-200/70">
     <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
       <div class="min-w-0 flex-1">
         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <h3 class="text-base font-semibold text-gray-900 transition group-hover:text-brand-800">{{ order.hotel?.name }}</h3>
+          <h3 class="text-base font-semibold text-gray-900 transition group-hover:text-brand-800">
+            <RouterLink
+                :to="{name: 'travelBooking', params: {id: order.id}}"
+                class="after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+            >{{ order.hotel?.name }}</RouterLink>
+          </h3>
           <HotelRating :stars="order.hotel?.starRating" />
         </div>
         <p v-if="order.hotel?.address" class="mt-1.5 flex items-start gap-1 text-sm/6 text-gray-500">
@@ -67,7 +72,7 @@ const openPaymentDeadline = computed(() => (props.order.openPayment?.expiresAt
         <div class="mt-3">
           <BookingStateBadge :order="order" />
         </div>
-        <!-- Only the list carries this, and it says in words what the state means. -->
+        <!-- The api's own sentence for what the state means. -->
         <p v-if="order.stateDescription" class="mt-2 text-xs/5 text-gray-500">{{ order.stateDescription }}</p>
         <!-- A waiting payment holds the customer's deposit account, so the
         booking it belongs to has to be findable from the list. -->
@@ -81,7 +86,8 @@ const openPaymentDeadline = computed(() => (props.order.openPayment?.expiresAt
         <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('account.total') }}</p>
         <p class="mt-1 text-xl font-semibold tracking-tight text-gray-900">{{ order.total.currencyPrefixed }}</p>
         <p v-if="order.reference" class="mt-1 text-xs/5 text-gray-500">{{ order.reference }}</p>
+        <BookingNextStep :order="order" class="relative z-10 mt-3" />
       </div>
     </div>
-  </RouterLink>
+  </article>
 </template>

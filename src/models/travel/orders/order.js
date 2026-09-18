@@ -30,16 +30,37 @@ class Order {
     state = null;
 
     /**
+     * Where the booking stands for its customer, and unlike state it takes
+     * payment into account: a FULFILLED booking nobody has paid for reads
+     * "Price Locked", not "Order Complete" (SD-1230).
+     *
      * @type {string|null}
      */
     stateLabel = null;
 
     /**
-     * Only sent on the list.
+     * A sentence explaining stateLabel.
      *
      * @type {string|null}
      */
     stateDescription = null;
+
+    /**
+     * Whether a payment on this booking has succeeded. Null means a console too
+     * old to say, where the screens keep the words they always had. The total
+     * is what the booking costs, never evidence it was paid.
+     *
+     * @type {boolean|null}
+     */
+    isPaid = null;
+
+    /**
+     * What the booking is waiting on the customer to do, or null when nothing
+     * is. The label is the console's words for the button.
+     *
+     * @type {{code: string, label: string|null}|null}
+     */
+    nextStep = null;
 
     /**
      * @type {string|null}
@@ -157,6 +178,32 @@ class Order {
     }
 
     /**
+     * The payment the customer still has to finish, wherever this booking was
+     * read from: the list names it, and a booking read on its own has it as
+     * the last attempt. Paying again while it is open would be refused, so
+     * whatever asks the customer to pay sends them here instead.
+     *
+     * @returns {OrderPayment|null}
+     */
+    get waitingPayment() {
+        if (this.openPayment) {
+            return this.openPayment;
+        }
+
+        return this.latestPayment?.isOpen ? this.latestPayment : null;
+    }
+
+    /**
+     * The hotel has confirmed the room and nothing has been paid for it. The
+     * state alone says FULFILLED, which reads as done; it is not.
+     *
+     * @returns {boolean}
+     */
+    get isPriceLocked() {
+        return this.state === 'FULFILLED' && this.isPaid === false;
+    }
+
+    /**
      * Nothing more will happen to these on their own, so there is no point
      * asking again.
      *
@@ -191,6 +238,10 @@ class Order {
         order.state = data.state ?? null;
         order.stateLabel = data.state_label ?? null;
         order.stateDescription = data.state_description ?? null;
+        order.isPaid = typeof data.is_paid === 'boolean' ? data.is_paid : null;
+        order.nextStep = data.next_step?.code
+            ? {code: data.next_step.code, label: data.next_step.label ?? null}
+            : null;
         order.bookedAt = data.booked_at ?? null;
 
         if (data.hotel) {
