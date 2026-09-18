@@ -607,9 +607,11 @@ describe('a reachable screen does not borrow copy from a product namespace', () 
   const PRODUCT_NAMESPACES = ['travel', 'wallet'];
 
   // Where each product's own screens live. A file under one of these may of
-  // course use its own namespace.
+  // course use its own namespace. Travel's composables format its stays and
+  // occupancy (SD-1257), so they are its own too - which holds only while
+  // nothing outside travel imports them, pinned below.
   const OWNS = {
-    travel: [/^src\/views\/Travel\//],
+    travel: [/^src\/views\/Travel\//, /^src\/composables\/travel\//],
     wallet: [/^src\/views\/Wallet\//, /^src\/components\/Wallet\//],
   };
 
@@ -629,6 +631,17 @@ describe('a reachable screen does not borrow copy from a product namespace', () 
       .filter(file => asks.test(read(file)));
 
     expect(borrowers, `these are reachable when ${namespace} is unlicensed, and would read English:\n  ${borrowers.join('\n  ')}`)
+      .toEqual([]);
+  });
+
+  // A reachable screen that imported a travel composable would borrow its copy
+  // one step removed, where the check above cannot see it.
+  it('travel composables are only imported by travel', () => {
+    const importers = filesUnder('src')
+      .filter(file => ! OWNS.travel.some(pattern => pattern.test(file)))
+      .filter(file => /['"]@\/composables\/travel\//.test(read(file)));
+
+    expect(importers, `these reach travel's copy through its composables:\n  ${importers.join('\n  ')}`)
       .toEqual([]);
   });
 });
