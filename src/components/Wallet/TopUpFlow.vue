@@ -15,6 +15,7 @@ import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import ClientPaymentAccountModel from "@/models/client_payment_account.js";
 import WalletTopup from "@/models/wallet_topup.js";
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
+import PaymentCollisionReason from "@/enums/payment_collision_reason.js";
 import {fixForError} from "@/composables/verification_routes.js";
 import router from "@/router/index.js";
 import {CUSTOMER_ACTIONS, useServiceStatus} from "@/composables/service_status.js";
@@ -120,7 +121,18 @@ async function declare() {
     fetchInstructions();
   }).catch((e) => {
     if (e.response?.data?.type === WalletRefusalType.TOPUP_AMOUNT_COLLIDES) {
-      collisionMessage.value = e.response.data.message;
+      // Same two reasons as a transfer's payment_amount_collides (SD-1248),
+      // and the same rule: the back end's message already carries the advice
+      // that fits its reason, so it stands alone. Our own wording, chosen by
+      // reason, is only for a refusal that came without one - and only a
+      // same-amount collision is got round by another amount.
+      const reason = e.response.data.reason;
+      const wordings = {
+        [PaymentCollisionReason.SAME_AMOUNT]: [t('wallet.youAlreadyHaveADeposit'), t('wallet.changeTheAmountAndTry')],
+        [PaymentCollisionReason.ACCOUNT_HELD]: [t('wallet.anotherPaymentIsHoldingYour'), t('wallet.payOrCancelItOr')],
+      };
+      collisionMessage.value = e.response.data.message
+          || (wordings[reason] ?? [t('wallet.anotherPaymentIsStillOpen')]).join(' ');
     } else if (e.response?.status === 422) {
       amountErrors.value = e.response.data.errors?.amount ?? [e.response.data.message];
     } else {
