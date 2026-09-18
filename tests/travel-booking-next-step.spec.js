@@ -202,6 +202,18 @@ describe('the state badge', () => {
         expect(classes).toContain('bg-warning-50');
     });
 
+    // The console's label already says the hotel is being asked, so ours beside
+    // it said it twice. The dot stays, on the label, to show the page is live.
+    it('says once that the hotel has not answered, with the dot on it', () => {
+        const wrapper = mount(BookingStateBadge, {props: {order: orderOf('travel-order-view-awaiting-hotel')}});
+
+        expect(wrapper.text()).toBe('Awaiting Hotel Confirmation');
+        expect(wrapper.text()).not.toContain('Confirming with the hotel');
+        expect(wrapper.findAll(':scope > span')).toHaveLength(1);
+        expect(wrapper.find('.animate-ping').exists()).toBe(true);
+        expect(mount(BookingStateBadge, {props: {order: orderOf('travel-order-view-complete')}}).find('.animate-ping').exists()).toBe(false);
+    });
+
     it('is green once paid, and for an older console that cannot say', () => {
         expect(colourOf(orderOf('travel-order-view-complete'))).toContain('bg-success-50');
         expect(colourOf(withoutStatus('travel-order-view-price-locked'))).toContain('bg-success-50');
@@ -284,6 +296,19 @@ describe('the payment page', () => {
 
         expect(wrapper.text()).not.toContain('confirm it with the hotel');
         expect(wrapper.text()).toContain('Charming Duplex Home — pay now to complete your booking.');
+        wrapper.unmount();
+    });
+
+    // Nothing is paid on this page yet, so it says the price is held, in the
+    // amber "Price Locked" wears elsewhere, rather than a green "booked".
+    it('says the price is locked, not that the room is booked', async () => {
+        const wrapper = await paymentPage();
+        const banner = wrapper.findAll('p').find(p => p.text() === 'Your room pricing has been locked.');
+
+        expect(banner).toBeTruthy();
+        expect(wrapper.text()).not.toContain('Your room is booked');
+        expect(banner.element.closest('div.rounded-2xl').className).toContain('bg-warning-50');
+        expect(banner.element.closest('div.rounded-2xl').className).not.toMatch(/bg-success/);
         wrapper.unmount();
     });
 

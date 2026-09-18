@@ -86,7 +86,27 @@ function description(charge) {
     return [charge.amount.currencyPrefixed, label(charge.chargeUnit)].filter(Boolean).join(' ');
   }
 
+  // An extra the hotel offers at a stated price of nothing costs nothing: the
+  // supplier marks a free cot PAID at 0.00, and "Available at extra cost"
+  // would tell the customer otherwise.
+  if (isFree(charge)) {
+    return t('travel.included');
+  }
+
   return label(charge.inclusion);
+}
+
+/**
+ * Only for an extra the hotel offers. One it marks not available, or says
+ * nothing about, keeps those words whatever price rides along with them.
+ *
+ * @param {HouseRuleCharge} charge
+ * @returns {boolean}
+ */
+function isFree(charge) {
+  return ['PAID', 'INCLUDED'].includes(charge.inclusion)
+      && charge.amount.isStated
+      && charge.amount.amount === 0;
 }
 
 /**
@@ -94,6 +114,10 @@ function description(charge) {
  * @returns {string}
  */
 function classes(charge) {
+  if (isFree(charge)) {
+    return 'bg-success-50 text-success-700 ring-success-200';
+  }
+
   switch (charge.inclusion) {
     case 'INCLUDED':
       return 'bg-success-50 text-success-700 ring-success-200';
