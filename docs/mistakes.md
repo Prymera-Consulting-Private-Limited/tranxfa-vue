@@ -231,3 +231,38 @@ build.
 
 **Status:** open — adopted for SD-1239's own fix, which was built and tested
 from a clean export of the index.
+
+---
+
+## PM-009 — Advice was written around a backend message nobody had read
+
+**What happened:** the transfer wizard appended "Change the amount and confirm
+again." to the console's `payment_amount_collides` message (SD-1111, moved to
+the catalogue by SD-1193). The console's message already ends "...or send a
+slightly different amount.", so every customer who hit it was told the same
+thing twice. SD-1251's first draft repeated the pattern for the new
+`account_held` reason, appending "Pay or cancel that payment, or try again in
+an hour" after a message that already says "Please pay or cancel it, or try
+again in an hour." Both were green: the specs asserted our own invented
+messages, never the console's.
+
+**Root cause:** the advice was designed from the handout's description of the
+refusal, not from the words the console actually sends. A spec written with a
+made-up `message` can only prove our concatenation, never what the customer
+reads.
+
+**Cost or risk:** a duplicated instruction on the last screen before money
+moves. It is harmless-looking, which is why it survived two tickets, and it
+would have doubled again for every new reason.
+
+**SOP:** before writing any copy that is shown next to a backend `message`:
+1. Read the console's wording for every variant of that refusal
+   (`git grep -n '<message key>' origin/develop -- lang`), in every language
+   it ships.
+2. Specs for that refusal use the console's wording verbatim, not a
+   placeholder, so a duplicated sentence is visible in the assertion.
+3. Default to showing the backend `message` alone. The app's own sentence is
+   for a refusal that arrives without one.
+
+**Status:** adopted — SD-1251 shows the console message alone and keeps its own
+wording, chosen by `reason`, as the fallback. Its specs use the console's text.

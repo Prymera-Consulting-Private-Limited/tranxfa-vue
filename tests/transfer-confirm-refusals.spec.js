@@ -139,6 +139,68 @@ describe('Transfer wizard confirm refusals', () => {
         expect(wrapper.vm.preconditionFailedMessage).toBe('We could not confirm this transfer. Please try again.');
     });
 
+    // SD-1251. payment_amount_collides has two reasons, and only the
+    // same-amount one is got round by changing the amount. The console's
+    // message already says so for its own reason, so it is shown alone:
+    // adding our advice after it said everything twice. Our own wording, by
+    // reason, is only for a refusal that arrives without a message.
+    describe('payment_amount_collides', () => {
+        const collide = (extra) => ({response: {status: 412, data: {type: 'payment_amount_collides', ...extra}}});
+        // The console's own wording (lang/en/message.php), so the assertions
+        // read as what a customer actually sees.
+        const SAME_AMOUNT = 'You already have a pending payment or wallet load for exactly this amount. Please wait for it, cancel it, or send a slightly different amount.';
+        const ACCOUNT_HELD = 'Another payment is still holding your account while we wait for it. Please pay or cancel it, or try again in an hour.';
+
+        it('shows the console message alone for a same-amount collision, with no second nudge', async () => {
+            const wrapper = await mountWizard();
+            wrapper.vm.isStepProcessing = true;
+            axios.post.mockRejectedValue(collide({reason: 'same_amount', message: SAME_AMOUNT}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.isStepProcessing).toBe(false);
+            expect(wrapper.vm.preconditionFailedMessage).toBe(SAME_AMOUNT);
+        });
+
+        it('shows the console message alone when the account is held, never advising another amount', async () => {
+            const wrapper = await mountWizard();
+            axios.post.mockRejectedValue(collide({reason: 'account_held', message: ACCOUNT_HELD}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.preconditionFailedMessage).toBe(ACCOUNT_HELD);
+            expect(wrapper.vm.preconditionFailedMessage).not.toContain('Change the amount');
+        });
+
+        it('shows the message alone when the console sends no reason', async () => {
+            const wrapper = await mountWizard();
+            axios.post.mockRejectedValue(collide({message: SAME_AMOUNT}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.preconditionFailedMessage).toBe(SAME_AMOUNT);
+        });
+
+        it('words a same-amount collision itself, amount advice included, when the message is missing', async () => {
+            const wrapper = await mountWizard();
+            axios.post.mockRejectedValue(collide({reason: 'same_amount'}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.preconditionFailedMessage).toBe('You already have a transfer open for this exact amount. Change the amount and confirm again.');
+        });
+
+        it('words a held account itself, with no amount advice, when the message is missing', async () => {
+            const wrapper = await mountWizard();
+            axios.post.mockRejectedValue(collide({reason: 'account_held'}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.preconditionFailedMessage).toBe("Another payment is still holding your account while we wait for it. Pay or cancel that payment, or try again in an hour. Changing the amount won't help.");
+        });
+
+        it('gives neutral wording when there is neither a message nor a reason it knows', async () => {
+            const wrapper = await mountWizard();
+            axios.post.mockRejectedValue(collide({reason: 'something_new'}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.preconditionFailedMessage).toBe("Another payment on your account is still open, so this one can't start yet.");
+
+            axios.post.mockRejectedValue(collide({}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.preconditionFailedMessage).toBe("Another payment on your account is still open, so this one can't start yet.");
+        });
+    });
+
     // The API reference's double-payment rule: after a 5xx or a request that
     // never answered, the transfer may exist. The wizard checks the list
     // before it lets the customer press Confirm again.

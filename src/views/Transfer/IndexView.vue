@@ -42,6 +42,7 @@ import SpendOtpModal from "@/components/Wallet/SpendOtpModal.vue";
 import TermsModal from "@/components/Wallet/TermsModal.vue";
 import TopUpFlow from "@/components/Wallet/TopUpFlow.vue";
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
+import PaymentCollisionReason from "@/enums/payment_collision_reason.js";
 import {useWalletStore} from "@/stores/wallet.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 
@@ -334,15 +335,24 @@ const confirmQuote = async () => {
         saveDraft();
         isStepProcessing.value = false;
       } else if (error.response.data.type === "payment_amount_collides") {
-        // The rail already holds a deposit for this exact figure. Retrying
-        // the same amount is refused again; a different amount goes through.
+        // One type, two reasons (SD-1248). Either the rail is holding the
+        // customer's deposit account for another payment, whatever its amount,
+        // or another open payment already expects this exact figure. Only the
+        // second is got round by changing the amount; telling a held account
+        // to try another amount walks the customer into the same refusal.
         isStepProcessing.value = false;
-        // The refusal is the back end's to word (SD-1111); the advice after it
-        // is ours, so it belongs in the catalogue rather than in this file.
-        preconditionFailedMessage.value = [
-          error.response.data.message || t('transfer.wizard.youAlreadyHaveA'),
-          t('transfer.wizard.changeTheAmountAndConfirm'),
-        ].join(' ');
+        // The refusal is the back end's to word (SD-1111), and its message
+        // already carries the right advice for its reason - adding ours after
+        // it said the same thing twice. So the message stands alone, and our
+        // own wording, chosen by reason, is only for a refusal that came
+        // without one. A console older than 2026.09.2 sends no reason.
+        const reason = error.response.data.reason;
+        const wordings = {
+          [PaymentCollisionReason.SAME_AMOUNT]: [t('transfer.wizard.youAlreadyHaveA'), t('transfer.wizard.changeTheAmountAndConfirm')],
+          [PaymentCollisionReason.ACCOUNT_HELD]: [t('transfer.wizard.anotherPaymentIsHoldingYour'), t('transfer.wizard.payOrCancelItOr')],
+        };
+        preconditionFailedMessage.value = error.response.data.message
+            || (wordings[reason] ?? [t('transfer.wizard.anotherPaymentIsStillOpen')]).join(' ');
       } else if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
