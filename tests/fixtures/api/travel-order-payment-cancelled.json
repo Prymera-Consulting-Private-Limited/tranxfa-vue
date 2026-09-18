@@ -1,42 +1,46 @@
 {
-  "id": "01a0b2c4-5d6e-7f80-9a1b-2c3d4e5f6a70",
-  "reference": "VO-01J8XAQ4V2NP7WZK3RB9CDEF0-P001",
-  "shared_reference": "SP4594760",
-  "order_reference": "VO-01J8XAQ4V2NP7WZK3RB9CDEF0",
+  "id": "01a0b6a0-7dd0-71cd-bab0-d81a26ef6b1e",
+  "reference": "VO-01M2KPPFMZH9Z51HHBRKAE41DE-P003",
+  "shared_reference": "SP8518335",
+  "order_reference": "VO-01M2KPPFMZH9Z51HHBRKAE41DE",
   "state": "CANCELLED",
   "state_label": "Cancelled",
-  "amount": 48250,
-  "amount_decimal": "482.50",
-  "amount_formatted": "482.50",
-  "amount_currency_prefixed": "AUD 482.50",
+  "amount": 15181,
+  "amount_decimal": "151.81",
+  "amount_formatted": "151.81",
+  "amount_currency_prefixed": "AUD 151.81",
   "payment_method": {
-    "id": "01a0b2c4-0000-7000-8000-00000000pay1",
-    "code": "PAYID",
-    "title": "PayID"
+    "id": "358ac102-863f-496a-9ae8-e26af2590884",
+    "code": "BANK-TRANSFER",
+    "title": "Bank Transfer"
   },
   "provider": {
-    "id": "01a0b2c4-0000-7000-8000-00000000mon1",
+    "id": "b51e856b-0dbc-4caa-a323-b73db50f8491",
     "code": "MONOOVA",
     "title": "Monoova"
   },
   "payment_url": null,
   "client_payment_account": {
-    "id": "01a0afb1-fa90-71d6-ad4d-b68f6836ea2c",
+    "id": "a28cea63-77fb-4301-8361-37a3df6f3762",
     "institution_name": "Monoova",
-    "instruction_text": "To complete your transaction, please transfer funds to the PayID below. Use the payment reference so we can match your money.",
-    "wait_time_message": "Thank you for payment. We will process the transfer as soon as we receive the money, usually within a few minutes.",
-    "payment_reference": "SP4594760",
+    "instruction_text": "To complete your payment, please transfer funds to the bank account listed below. Please note that, it may take up to 24 hours, depending on your bank’s processing time.",
+    "wait_time_message": "Thank you for payment. We will process the transfer as soon as we receive the money. Please note that, it may take up to 24 hours, depending on your bank’s processing time.",
+    "payment_reference": "SP8518335",
     "attributes": [
       {
-        "key": "Pay ID Name",
+        "key": "Account Name",
         "value": "PAYVEL PTY LTD"
       },
       {
-        "key": "Pay ID",
-        "value": "customer@payid.test"
+        "key": "BSB",
+        "value": "802-985"
+      },
+      {
+        "key": "Account Number",
+        "value": "123456789"
       }
     ]
   },
-  "expires_at": "2026-09-22T14:07:50+00:00",
+  "expires_at": "2026-09-23T22:26:06+00:00",
   "failure_reason": null
 }

@@ -14,8 +14,9 @@ vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn(), delete: vi.fn(),
 // to send every such payment to the waiting screen, which never showed the
 // account, so the customer was never told where to pay.
 //
-// The fixtures are written from the backend's handout and the SD-1248 addendum,
-// not captured - see tests/fixtures/README.md.
+// The pending payment and its order view are captured from Payvel staging; the
+// setting-up, failed and refusal fixtures are written from the backend's
+// handout and the SD-1248 addendum - see tests/fixtures/README.md.
 setActivePinia(createPinia());
 
 const axios = (await import('axios')).default;
@@ -108,11 +109,12 @@ describe('paying by PayID or bank transfer', () => {
         const text = wrapper.text();
 
         expect(push).not.toHaveBeenCalled();
-        expect(text).toContain('please transfer funds to the PayID below');
-        // In the order the api gave them, and nothing about a PayID assumed.
-        expect(labels(wrapper)).toEqual(['Pay ID Name', 'Pay ID', 'Payment reference']);
-        expect(wrapper.find('#payment-reference').element.value).toBe('SP4594760');
-        expect(text).toContain('AUD 482.50');
+        expect(text).toContain('please transfer funds to the bank account listed below');
+        // In the order the api gave them, and nothing about the rail assumed.
+        expect(labels(wrapper)).toEqual(['Account Name', 'BSB', 'Account Number', 'Payment reference']);
+        expect(wrapper.find('#payment-reference').element.value).toBe('SP8518335');
+        // The amount of the payment, as Pay Order answered it.
+        expect(text).toContain('AUD 151.81');
         expect(text).toContain('Pay by');
         expect(text).not.toContain('How would you like to pay?');
     });
@@ -166,7 +168,8 @@ describe('the waiting screen', () => {
         const {wrapper} = await mountAt(PaymentStatusView, `/travel/booking/${ORDER}/payment?sent=1`);
 
         expect(wrapper.text()).toContain('Waiting for your payment');
-        expect(wrapper.text()).toContain('usually within a few minutes');
+        // The provider's own words, from the account's wait_time_message.
+        expect(wrapper.text()).toContain('it may take up to 24 hours');
         expect(wrapper.find('#payment-reference').exists()).toBe(false);
     });
 

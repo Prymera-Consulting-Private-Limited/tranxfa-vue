@@ -13,8 +13,8 @@ vi.mock('axios', () => ({default: {get: vi.fn(), post: vi.fn(), delete: vi.fn(),
 // "pay or cancel it" and offered no way to cancel a hotel payment. The console
 // now has one (SD-1261): POST /travel/order/{order}/payment/{payment}/cancel.
 //
-// The cancel fixtures are written from the backend's handout and its controller
-// on develop, not captured - see tests/fixtures/README.md.
+// The cancel fixtures are captured from Payvel staging - see
+// tests/fixtures/README.md.
 setActivePinia(createPinia());
 
 const axios = (await import('axios')).default;

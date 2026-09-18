@@ -150,56 +150,68 @@ the capture, and `PAID` elsewhere, which is a guess. Re-capture it from the
 hotel page once staging has the console change and a catalog reload, and
 delete this note.
 
-## Paying for a hotel by PayID or bank transfer (not captured)
+## Paying for a hotel by bank transfer, and cancelling it (captured)
 
-**These are not captures.** SD-1250 was built before the console's SD-1238 and
-SD-1248 reached Payvel staging, so these are written from the backend's
-handout, the SD-1248 addendum and the controllers on `develop`
-(`OrderPaymentsController::present()`, `OrderViewController::summarisePayment()`).
-Re-capture them from Payvel staging once both are deployed, with a bank
-transfer order under AUD 1,000; PayID cannot be captured, because the
-provider's sandbox refuses it.
+**Captured from Payvel staging on 19 September 2026**, by walking SD-1269 and
+SD-1270 in the browser against a console with SD-1238, SD-1248, SD-1261 and
+SD-1230 deployed. One story, in order:
+
+1. Charming Duplex Home (`01a0a76b-…`), a booking the hotel had confirmed
+   and nobody had paid for, was paid by Bank Transfer (AUD 151.81). Pay Order
+   answered `travel-order-payment-pending-account`, and the booking then read
+   as `travel-order-view-deposit-pending`, and the list as
+   `travel-orders-open-payment`.
+2. Paying another booking by Bank Transfer was refused:
+   `error-409-pay-order-account-held-by-order`, whose `held_by` names the
+   first booking and its payment.
+3. That payment was cancelled: `travel-order-payment-cancelled`. The booking
+   then read as `travel-order-view-price-locked`, and cancelling it again
+   answered `error-409-cancel-payment-not-open`.
+4. `travel-order-view-complete` is a booking on the same account that had been
+   paid.
+
+So the ids agree across them: the payment id in Pay Order, in the order view's
+`payments[]`, in `open_payment` and in `held_by.payment_id` is the same payment.
+No money moved, and both bookings were left unpaid.
 
 | Fixture | What it is |
 | ------- | ---------- |
-| `travel-order-payment-pending-account` | Pay Order, 201 `PENDING` with a PayID `client_payment_account` |
-| `travel-order-payment-created` | Pay Order, 201 `CREATED` with no account: the account is still being opened |
-| `travel-order-payment-failed` | Pay Order, 201 `FAILED`. Carries `failure_reason`, which the app never shows |
-| `travel-order-view-deposit-pending` | Order view whose payment waits on a bank transfer account |
-| `travel-order-view-deposit-setting-up` | Order view whose payment is still `CREATED` with no account |
-| `travel-order-view-deposit-failed` | Order view whose payment `FAILED`. No `failure_reason`: the order view never carries it |
-| `error-409-pay-order-*` | One Pay Order 409 per SD-1248 `type`, plus `untyped` for a console older than SD-1248. Messages are the customer wording the api sends for each type (`lang/en/message.php` on `develop`, through `ServicePaymentRefusal::customerMessageKey()`), corrected by SD-1269: they used to carry `PaymentRefused`'s internal wording, which is never sent. `untyped` keeps the old wording, as an old console would send it |
-| `error-409-pay-order-account-held-by-order` | The same `account_held` refusal with `held_by` naming a hotel order (SD-1261) |
-| `error-412-checkout-collides-held-by-transfer`, `error-412-wallet-topup-collides-held-by-topup` | The transfer confirm and wallet load collisions with `held_by`, one per remaining kind |
+| `travel-order-payment-pending-account` | Pay Order, 201 `PENDING` with a Monoova bank transfer `client_payment_account` |
+| `travel-order-view-deposit-pending` | Order view while that payment waits: two attempts that failed, then the open one |
+| `travel-orders-open-payment` | The bookings list, five rows: one whose `open_payment` names the waiting payment, and four where it is null (two paid, two price locked) |
+| `error-409-pay-order-account-held-by-order` | Pay Order 409 `account_held`, with `held_by` naming the booking in the way (SD-1261) |
 | `travel-order-payment-cancelled` | Cancel Order Payment, 200: the payment in Pay Order's shape, `CANCELLED` |
 | `error-409-cancel-payment-not-open` | Cancel Order Payment, 409 `payment_not_open` |
-| `travel-orders-open-payment` | The bookings list, two rows: one whose `open_payment` names a waiting PayID payment, one where it is null |
-
-**The payments in the three `travel-order-view-deposit-*` fixtures carry an
-`id`** since SD-1269, as the order view does from console #647. Cancel Order
-Payment takes that id, and every screen but the one straight after paying reads
-the order view, so without it a returning customer has nothing to cancel with.
-It is the same id as `travel-order-payment-pending-account`, because it is the
-same payment.
-
-## What a booking is waiting on (not captured)
-
-**These are not captures either.** They are written from console #646 (SD-1230)
-on `develop`: `HotelOrderPresenter::status()`, the wording in
-`lang/en/message.php`, and the order-state seeder for a paid booking. One
-booking at each of the three points a customer sees it:
-
-| Fixture | `state` | `state_label` | `is_paid` | `next_step` |
-| ------- | ------- | ------------- | --------- | ----------- |
-| `travel-order-view-awaiting-hotel` | `CONFIRMED` | Awaiting Hotel Confirmation | false | null |
-| `travel-order-view-price-locked` | `FULFILLED` | Price Locked | false | `pay`, "Pay for Confirmation" |
-| `travel-order-view-complete` | `FULFILLED` | Order Complete | true | null |
+| `travel-order-view-price-locked` | Order view of a booking the hotel has confirmed and nobody has paid for: `FULFILLED`, "Price Locked", `is_paid` false, `next_step` `pay` (SD-1230) |
+| `travel-order-view-complete` | Order view of a paid booking: `FULFILLED`, "Order Complete", `is_paid` true, `next_step` null |
 
 `FULFILLED` only says the hotel confirmed the room. Whether it is paid is
-`is_paid`, and the screens read that, never the state or the total. The
-console asks nothing of the customer while the hotel has not answered, paid or
-not. Re-capture them from Payvel staging once #646 is deployed, and delete this
-section.
+`is_paid`, and the screens read that, never the state or the total.
+
+## Written by hand, not captured
+
+These could not be captured on the walk above. Each is written from the
+backend's handout and its code on `develop`, and says so here until it is
+captured:
+
+| Fixture | What it is | Why it is not a capture |
+| ------- | ---------- | ----------------------- |
+| `travel-order-payment-created` | Pay Order, 201 `CREATED` with no account: the account is still being opened | Monoova answered with the account at once |
+| `travel-order-payment-failed` | Pay Order, 201 `FAILED`. Carries `failure_reason`, which the app never shows | Needs a failing provider |
+| `travel-order-view-deposit-setting-up` | Order view whose payment is still `CREATED` with no account | As `-created` |
+| `travel-order-view-deposit-failed` | Order view whose payment `FAILED`. No `failure_reason`: the order view never carries it | As `-failed` |
+| `error-409-pay-order-*`, other than `-account-held-by-order` | One Pay Order 409 per SD-1248 `type`, plus `untyped` for a console older than SD-1248. Messages are the customer wording the api sends for each type (`lang/en/message.php`, through `ServicePaymentRefusal::customerMessageKey()`); `untyped` keeps the old wording, as an old console would send it | Each needs its own refusal set up |
+| `error-412-checkout-collides-held-by-transfer`, `error-412-wallet-topup-collides-held-by-topup` | The transfer confirm and wallet load collisions with `held_by`, one per remaining kind | Needs a waiting transfer or wallet load |
+| `travel-order-view-awaiting-hotel` | Order view before the hotel has answered: `CONFIRMED`, "Awaiting Hotel Confirmation", `is_paid` false, `next_step` null (SD-1230) | Lasts a minute or two after booking |
+
+The two hand-written order views listed `guests` as a bare array of rooms.
+The api sends `{"rooms": [...]}`, as the capture shows, and they now do too;
+the model reads a bare array as a flat list of guests, so the old shape named
+nobody.
+
+PayID cannot be captured at all: the provider's sandbox refuses it. Nothing
+here is a PayID payment, and nothing in the app assumes which rail's
+attributes it is showing.
 
 ## Sanitisation
 
@@ -209,6 +221,7 @@ Captures are scrubbed before they land here:
 - Laravel debug bodies reduced to `message` / `type` / `exception`; stack
   traces and absolute paths removed.
 - Session tokens replaced.
+- The account number of a real receiving account replaced with `123456789`.
 
 `tests/fixtures-contract.spec.js` asserts no `AKIA…` key or `/Users/` path
 survives, so a careless re-capture fails the suite.

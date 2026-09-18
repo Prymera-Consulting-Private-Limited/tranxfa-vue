@@ -13,7 +13,7 @@
   "occupancy": {"rooms": [{"adults": 2, "children_ages": []}]},
   "is_confirmed": false,
   "confirmed_at": null,
-  "guests": [{"guests": [{"first_name": "Test", "last_name": "Customer", "is_child": false}]}],
+  "guests": {"rooms": [{"guests": [{"first_name": "Test", "last_name": "Customer", "is_child": false}]}]},
   "contact": {"email": "customer@example.test", "phone": null},
   "breakdown": [
     {"key": "room", "label": "Room", "amount": 48250, "amount_decimal": "482.50", "amount_formatted": "482.50", "amount_currency_prefixed": "AUD 482.50"}
