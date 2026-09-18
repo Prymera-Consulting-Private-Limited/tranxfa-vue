@@ -1,10 +1,9 @@
 <script setup>
 import {computed} from 'vue';
-import moment from 'moment';
 import {CalendarDaysIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 import BookingStateBadge from '@/views/Travel/Bookings/Partials/BookingStateBadge.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
-import {getGuestBreakdown} from '@/composables/travel/hotels/hotel_utils.js';
+import {getGuestSummary, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
 
 const props = defineProps({
   /**
@@ -16,23 +15,18 @@ const props = defineProps({
   },
 });
 
-const stay = computed(() => {
-  if (!props.order.checkIn || !props.order.checkOut) {
-    return null;
-  }
-
-  return `${moment(props.order.checkIn).format('D MMM')} – ${moment(props.order.checkOut).format('ll')}`;
-});
+const stay = computed(() => getStayLabel(props.order.checkIn, props.order.checkOut));
 
 // The occupancy is the same room-by-room shape the search criteria use, so it
-// reads through the same breakdown rather than a second implementation.
+// reads through the same summary rather than a second implementation. A card
+// in a list has room for one line, not one per room.
 const guests = computed(() => {
   const rooms = (props.order.occupancy?.rooms ?? []).map(room => ({
     adults: room.adults ?? 0,
     children: room.children_ages ?? [],
   }));
 
-  return rooms.length ? getGuestBreakdown(rooms).join(' · ') : null;
+  return getGuestSummary(rooms);
 });
 </script>
 

@@ -15,7 +15,7 @@ import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import Order from '@/models/travel/orders/order.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {CONFIRMATION_POLL_MS, useOrderUtils} from '@/composables/travel/order_utils.js';
-import {getGuestBreakdown} from '@/composables/travel/hotels/hotel_utils.js';
+import {getGuestBreakdown, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
 import {ChevronLeftIcon, ExclamationTriangleIcon, MapPinIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -49,13 +49,7 @@ const isLoading = ref(true);
 const hasFailed = ref(false);
 const failureMessage = ref(null);
 
-const stay = computed(() => {
-  if (!order.value?.checkIn || !order.value?.checkOut) {
-    return null;
-  }
-
-  return `${moment(order.value.checkIn).format('llll')} – ${moment(order.value.checkOut).format('llll')}`;
-});
+const stay = computed(() => getStayLabel(order.value?.checkIn, order.value?.checkOut));
 
 const guests = computed(() => {
   const rooms = (order.value?.occupancy?.rooms ?? []).map(room => ({
