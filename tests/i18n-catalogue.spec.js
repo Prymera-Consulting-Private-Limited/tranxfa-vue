@@ -129,6 +129,7 @@ const MIGRATED = [
   'src/views/Travel/Bookings/Partials/BookingCard.vue',
   'src/views/Travel/Bookings/Partials/BookingPayments.vue',
   'src/views/Travel/Bookings/Partials/BookingStateBadge.vue',
+  'src/views/Travel/Bookings/Partials/DepositAccountDetails.vue',
   'src/views/Travel/Bookings/Partials/VolumePayment.vue',
   'src/views/Travel/Bookings/PaymentStatusView.vue',
   'src/views/Travel/Bookings/PaymentView.vue',

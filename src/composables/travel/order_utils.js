@@ -119,11 +119,14 @@ export function useOrderUtils() {
      * Opens the payment with the provider in the same request, answering with a
      * payment_url wherever the provider uses one.
      *
-     * Volume, the only rail this deployment offers, uses none — it is sdk driven,
-     * so the url is null permanently and the hand-off is a call into
-     * window.Volume rather than a redirect. What that call needs is not on this
-     * response yet, so it is not wired; PaymentView's pay() records what is
-     * missing and why guessing at it would be worse than waiting.
+     * Two rails use none. Volume is sdk driven, so the url is null permanently
+     * and the hand-off is a call into window.Volume rather than a redirect. A
+     * PayID or bank transfer rail answers with client_payment_account instead —
+     * the customer's own account to send the money to — or, the first time they
+     * pay that way, CREATED with no account while it is opened.
+     *
+     * A 409 carries a type saying why the order cannot take the payment (see
+     * OrderPaymentRefusalType), and a message written for the customer.
      *
      * @param {string} orderId
      * @param {object} payload

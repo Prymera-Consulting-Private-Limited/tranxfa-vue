@@ -138,6 +138,26 @@ lookup, results, hotel and hold. The two search fixtures are the shapes the
 payvel results list crashed on before SD-1218, so a re-capture that changes
 them should fail that spec rather than the mappers alone.
 
+## Paying for a hotel by PayID or bank transfer (not captured)
+
+**These are not captures.** SD-1250 was built before the console's SD-1238 and
+SD-1248 reached Payvel staging, so these are written from the backend's
+handout, the SD-1248 addendum and the controllers on `develop`
+(`OrderPaymentsController::present()`, `OrderViewController::summarisePayment()`).
+Re-capture them from Payvel staging once both are deployed, with a bank
+transfer order under AUD 1,000; PayID cannot be captured, because the
+provider's sandbox refuses it.
+
+| Fixture | What it is |
+| ------- | ---------- |
+| `travel-order-payment-pending-account` | Pay Order, 201 `PENDING` with a PayID `client_payment_account` |
+| `travel-order-payment-created` | Pay Order, 201 `CREATED` with no account: the account is still being opened |
+| `travel-order-payment-failed` | Pay Order, 201 `FAILED`. Carries `failure_reason`, which the app never shows |
+| `travel-order-view-deposit-pending` | Order view whose payment waits on a bank transfer account |
+| `travel-order-view-deposit-setting-up` | Order view whose payment is still `CREATED` with no account |
+| `travel-order-view-deposit-failed` | Order view whose payment `FAILED`. No `failure_reason`: the order view never carries it |
+| `error-409-pay-order-*` | One Pay Order 409 per SD-1248 `type`, plus `untyped` for a console older than SD-1248. Messages are `PaymentRefused` on `develop`, verbatim, with the order reference, `cancelled` and `Hotels` filled in |
+
 ## Sanitisation
 
 Captures are scrubbed before they land here:

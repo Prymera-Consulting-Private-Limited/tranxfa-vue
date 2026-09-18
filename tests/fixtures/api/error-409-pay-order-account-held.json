@@ -1,0 +1,4 @@
+{
+  "type": "account_held",
+  "message": "Service order VO-01J8XAQ4V2NP7WZK3RB9CDEF0 cannot be paid for this way yet: another payment is still holding your deposit account. Pay or cancel that one, or try again in an hour."
+}
