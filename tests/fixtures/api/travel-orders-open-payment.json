@@ -1,0 +1,100 @@
+{
+  "data": [
+    {
+      "id": "01a0b2c0-1111-7222-8333-944455566677",
+      "reference": "VO-01J8XAQ4V2NP7WZK3RB9CDEF0",
+      "state": "CONFIRMED",
+      "state_label": "Confirmed",
+      "booked_at": "2026-09-17T09:14:02+00:00",
+      "hotel": {
+        "id": "01a0a6a6-da6b-7176-b2a8-e5326b9bc714",
+        "slug": "conrad-los-angeles",
+        "name": "Conrad Los Angeles",
+        "address": "100 S Grand Ave, Los Angeles",
+        "star_rating": 5
+      },
+      "check_in": "2026-10-01",
+      "check_out": "2026-10-04",
+      "nights": 3,
+      "room_name": "Standard Double room with balcony and with river view (full double bed)",
+      "occupancy": {
+        "rooms": [
+          {
+            "adults": 2,
+            "children_ages": []
+          }
+        ]
+      },
+      "is_confirmed": false,
+      "confirmed_at": null,
+      "cancellation": null,
+      "total": 48250,
+      "total_decimal": "482.50",
+      "total_formatted": "482.50",
+      "total_currency_prefixed": "AUD 482.50",
+      "state_description": null,
+      "open_payment": {
+        "id": "01a0afb1-fa90-71d6-ad4d-b68f6836ea2d",
+        "reference": "VO-01M2QV2W9A0KV57P3E3Q30XD97-P001",
+        "state": "PENDING",
+        "state_label": "Pending",
+        "payment_method": {
+          "code": "PAY-ID",
+          "title": "PayID"
+        },
+        "expires_at": "2026-09-22T14:07:50+00:00",
+        "amount": 165036,
+        "amount_decimal": "1650.36",
+        "amount_formatted": "1,650.36",
+        "amount_currency_prefixed": "AUD 1,650.36"
+      }
+    },
+    {
+      "id": "01a0b2c0-2222-7333-8444-955566677788",
+      "reference": "VO-01M2N4PE8JQKTZ92HDG7BS2VV5",
+      "state": "CONFIRMED",
+      "state_label": "Confirmed",
+      "booked_at": "2026-09-17T09:14:02+00:00",
+      "hotel": {
+        "id": "01a0a6a6-da6b-7176-b2a8-e5326b9bc714",
+        "slug": "conrad-los-angeles",
+        "name": "Conrad Los Angeles",
+        "address": "100 S Grand Ave, Los Angeles",
+        "star_rating": 5
+      },
+      "check_in": "2026-10-01",
+      "check_out": "2026-10-04",
+      "nights": 3,
+      "room_name": "Standard Double room with balcony and with river view (full double bed)",
+      "occupancy": {
+        "rooms": [
+          {
+            "adults": 2,
+            "children_ages": []
+          }
+        ]
+      },
+      "is_confirmed": false,
+      "confirmed_at": null,
+      "cancellation": null,
+      "total": 48250,
+      "total_decimal": "482.50",
+      "total_formatted": "482.50",
+      "total_currency_prefixed": "AUD 482.50",
+      "state_description": null,
+      "open_payment": null
+    }
+  ],
+  "pagination": {
+    "total": 2,
+    "count": 2,
+    "per_page": 10,
+    "current_page": 1,
+    "total_pages": 1,
+    "links": {
+      "self": "https://api.example.test/client/v1/travel/orders",
+      "next": null,
+      "prev": null
+    }
+  }
+}

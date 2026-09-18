@@ -149,7 +149,7 @@ describe('Transfer wizard confirm refusals', () => {
         // The console's own wording (lang/en/message.php), so the assertions
         // read as what a customer actually sees.
         const SAME_AMOUNT = 'You already have a pending payment or wallet load for exactly this amount. Please wait for it, cancel it, or send a slightly different amount.';
-        const ACCOUNT_HELD = 'Another payment is still holding your account while we wait for it. Please pay or cancel it, or try again in an hour.';
+        const ACCOUNT_HELD = 'Another payment is still holding your account while we wait for it. Please pay it or cancel it first, or try again later.';
 
         it('shows the console message alone for a same-amount collision, with no second nudge', async () => {
             const wrapper = await mountWizard();
@@ -186,7 +186,35 @@ describe('Transfer wizard confirm refusals', () => {
             const wrapper = await mountWizard();
             axios.post.mockRejectedValue(collide({reason: 'account_held'}));
             await wrapper.vm.confirmQuote();
-            expect(wrapper.vm.preconditionFailedMessage).toBe("Another payment is still holding your account while we wait for it. Pay or cancel that payment, or try again in an hour. Changing the amount won't help.");
+            expect(wrapper.vm.preconditionFailedMessage).toBe("Another payment is still holding your account while we wait for it. Pay or cancel that payment first, or try again later. Changing the amount won't help.");
+            // SD-1261: our own words never name a time.
+            expect(wrapper.vm.preconditionFailedMessage).not.toMatch(/hour/i);
+        });
+
+        // SD-1269. The message says to pay or cancel the other payment; held_by
+        // is how the customer finds it. The button itself is
+        // tests/payment-held-by.spec.js.
+        it('keeps what is holding the account, so the customer can be taken to it', async () => {
+            const wrapper = await mountWizard();
+            const heldBy = {kind: 'service_order', id: 'order-1', reference: 'VO-1', payment_id: 'payment-1', service: 'HOTELS'};
+            axios.post.mockRejectedValue(collide({reason: 'account_held', message: ACCOUNT_HELD, held_by: heldBy}));
+            await wrapper.vm.confirmQuote();
+
+            expect(wrapper.vm.preconditionFailedMessage).toBe(ACCOUNT_HELD);
+            expect(wrapper.vm.heldBy.kind).toBe('service_order');
+            expect(wrapper.vm.heldBy.id).toBe('order-1');
+            expect(wrapper.vm.heldBy.paymentId).toBe('payment-1');
+        });
+
+        it('forgets the holder when the next attempt is refused without one', async () => {
+            const wrapper = await mountWizard();
+            axios.post.mockRejectedValue(collide({reason: 'account_held', held_by: {kind: 'transfer', id: 'txn-1'}}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.heldBy.kind).toBe('transfer');
+
+            axios.post.mockRejectedValue(collide({reason: 'account_held'}));
+            await wrapper.vm.confirmQuote();
+            expect(wrapper.vm.heldBy).toBeNull();
         });
 
         it('gives neutral wording when there is neither a message nor a reason it knows', async () => {

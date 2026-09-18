@@ -13,13 +13,13 @@ const {default: TopUpFlow} = await import("@/components/Wallet/TopUpFlow.vue");
 // SD-1251. A wallet load answers 412 wallet_topup_amount_collides for the same
 // two reasons a transfer checkout does. Only a same-amount collision is got
 // round by declaring a different amount; a held account refuses every amount
-// for up to an hour. The console's message already gives the advice for its
+// until the other payment is paid or cancelled. The console's message already gives the advice for its
 // reason, so it is shown alone; our own wording is only for a refusal without
 // one. A console older than 2026.09.2 sends no reason at all.
 //
 // The console's own wording (lang/en/message.php).
 const SAME_AMOUNT = 'You already have a pending payment or load for exactly this amount. Please wait for it, cancel it, or choose a slightly different amount.';
-const ACCOUNT_HELD = 'Another payment is still holding your account while we wait for it. Please pay or cancel it, or try again in an hour.';
+const ACCOUNT_HELD = 'Another payment is still holding your account while we wait for it. Please pay it or cancel it first, or try again later.';
 async function declareAndCollide(data) {
     declareTopup.mockRejectedValue({response: {status: 412, data: {type: 'wallet_topup_amount_collides', ...data}}});
     const wrapper = mount(TopUpFlow, {
@@ -61,12 +61,38 @@ describe('a wallet load refused because the payment collides', () => {
         expect(sameAmount.text()).toContain('You already have a payment waiting for this exact amount. Change the amount and try again.');
 
         const held = await declareAndCollide({reason: 'account_held'});
-        expect(held.text()).toContain("Another payment is still holding your account while we wait for it. Pay or cancel that payment, or try again in an hour. Changing the amount won't help.");
+        expect(held.text()).toContain("Another payment is still holding your account while we wait for it. Pay or cancel that payment first, or try again later. Changing the amount won't help.");
+        // SD-1261: the hold lasts as long as the deployment sets, 30 hours on
+        // Payvel, so our own words never name a time.
+        expect(held.text()).not.toMatch(/hour/i);
         expect(held.text()).not.toContain('Change the amount and try again.');
     });
 
     it('gives neutral wording when there is neither a message nor a reason', async () => {
         const wrapper = await declareAndCollide({});
         expect(wrapper.text()).toContain("Another payment on your account is still open, so this deposit can't start yet.");
+    });
+
+    // SD-1269. Another wallet load is listed on the page behind this dialog,
+    // where it can already be cancelled, so closing the dialog is how it is
+    // reached. Any other holder is a screen to go to - see
+    // tests/payment-held-by.spec.js for the button.
+    it('closes onto the pending top-ups when another load is what holds the account', async () => {
+        const wrapper = await declareAndCollide({
+            reason: 'account_held',
+            message: ACCOUNT_HELD,
+            held_by: {kind: 'wallet_topup', id: 'topup-1', reference: 'WT2609180007', payment_id: null, service: null},
+        });
+        const view = wrapper.findAll('button').find(candidate => candidate.text() === 'View your wallet top-up');
+
+        expect(view).toBeTruthy();
+        await view.trigger('click');
+        expect(wrapper.emitted('close')).toHaveLength(1);
+    });
+
+    it('offers no such button when the refusal does not name a holder', async () => {
+        const wrapper = await declareAndCollide({reason: 'account_held', message: ACCOUNT_HELD});
+
+        expect(wrapper.findAll('button').some(candidate => candidate.text().startsWith('View your'))).toBe(false);
     });
 });

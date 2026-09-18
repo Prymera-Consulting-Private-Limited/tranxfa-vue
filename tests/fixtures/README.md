@@ -168,7 +168,19 @@ provider's sandbox refuses it.
 | `travel-order-view-deposit-pending` | Order view whose payment waits on a bank transfer account |
 | `travel-order-view-deposit-setting-up` | Order view whose payment is still `CREATED` with no account |
 | `travel-order-view-deposit-failed` | Order view whose payment `FAILED`. No `failure_reason`: the order view never carries it |
-| `error-409-pay-order-*` | One Pay Order 409 per SD-1248 `type`, plus `untyped` for a console older than SD-1248. Messages are `PaymentRefused` on `develop`, verbatim, with the order reference, `cancelled` and `Hotels` filled in |
+| `error-409-pay-order-*` | One Pay Order 409 per SD-1248 `type`, plus `untyped` for a console older than SD-1248. Messages are the customer wording the api sends for each type (`lang/en/message.php` on `develop`, through `ServicePaymentRefusal::customerMessageKey()`), corrected by SD-1269: they used to carry `PaymentRefused`'s internal wording, which is never sent. `untyped` keeps the old wording, as an old console would send it |
+| `error-409-pay-order-account-held-by-order` | The same `account_held` refusal with `held_by` naming a hotel order (SD-1261) |
+| `error-412-checkout-collides-held-by-transfer`, `error-412-wallet-topup-collides-held-by-topup` | The transfer confirm and wallet load collisions with `held_by`, one per remaining kind |
+| `travel-order-payment-cancelled` | Cancel Order Payment, 200: the payment in Pay Order's shape, `CANCELLED` |
+| `error-409-cancel-payment-not-open` | Cancel Order Payment, 409 `payment_not_open` |
+| `travel-orders-open-payment` | The bookings list, two rows: one whose `open_payment` names a waiting PayID payment, one where it is null |
+
+**The payments in the three `travel-order-view-deposit-*` fixtures carry an
+`id`** since SD-1269, as the order view does from console #647. Cancel Order
+Payment takes that id, and every screen but the one straight after paying reads
+the order view, so without it a returning customer has nothing to cancel with.
+It is the same id as `travel-order-payment-pending-account`, because it is the
+same payment.
 
 ## Sanitisation
 

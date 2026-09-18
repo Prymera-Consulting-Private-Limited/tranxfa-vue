@@ -12,6 +12,9 @@ import OrderPayment from '@/models/travel/orders/order_payment.js';
 import PaymentMethod from '@/models/payment_method.js';
 import VolumePayment from '@/views/Travel/Bookings/Partials/VolumePayment.vue';
 import DepositAccountDetails from '@/views/Travel/Bookings/Partials/DepositAccountDetails.vue';
+import CancelPaymentAction from '@/views/Travel/Bookings/Partials/CancelPaymentAction.vue';
+import HeldByAction from '@/components/Payment/HeldByAction.vue';
+import DepositHolder from '@/models/deposit_holder.js';
 import OrderPaymentRefusalType from '@/enums/order_payment_refusal_type.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {useOrderUtils} from '@/composables/travel/order_utils.js';
@@ -58,6 +61,19 @@ const failureTitle = computed(() => {
 const selectedMethod = ref(null);
 const isPaying = ref(false);
 const paymentError = ref(null);
+
+/**
+ * The other payment holding the customer's deposit account, when that is why
+ * this one was refused. The message says to pay or cancel it; this is how they
+ * find it.
+ *
+ * @type {import('vue').Ref<DepositHolder|null>}
+ */
+const heldBy = ref(null);
+
+// Said once, after the customer cancels a waiting payment and the methods come
+// back: without it the picker reappearing looks like the page has reset itself.
+const cancelledNotice = ref(null);
 
 /**
  * Methods the api has refused for this order since the page loaded, because
@@ -157,6 +173,8 @@ async function pay() {
 
   isPaying.value = true;
   paymentError.value = null;
+  cancelledNotice.value = null;
+  heldBy.value = null;
 
   await createPayment(props.orderId, {payment_method_id: selectedMethod.value}).then((response) => {
     const payment = OrderPayment.getInstance(response.data);
@@ -203,6 +221,9 @@ async function pay() {
     isPaying.value = false;
 
     if (error.response?.status === 409) {
+      // Only an account_held or same_amount refusal carries it, and it is
+      // null from a console older than SD-1261.
+      heldBy.value = DepositHolder.getInstance(error.response.data?.held_by);
       await refused(error.response.data?.type);
     }
   });
@@ -252,9 +273,9 @@ async function refused(type) {
       selectedMethod.value = methods.value.find(method => !refusedMethods.value.includes(method.id))?.id ?? null;
       break;
 
-    // ACCOUNT_HELD and SAME_AMOUNT: the message says what clears it — paying or
-    // cancelling the other payment, or waiting out the hour. Nothing here can,
-    // and a hotel price cannot change to get round it.
+    // ACCOUNT_HELD and SAME_AMOUNT: the message says what clears it, which is
+    // paying or cancelling the other payment. Nothing on this order can, and a
+    // hotel price cannot change to get round it.
     default:
       break;
   }
@@ -267,6 +288,29 @@ async function refused(type) {
  */
 function paid() {
   router.push({name: 'travelPaymentStatus', params: {id: props.orderId}, query: {sent: '1'}});
+}
+
+/**
+ * The customer let the waiting payment go. Their account is free at once, so
+ * the methods come back and they can pay another way. The order is re-read
+ * rather than patched, because it is what decides whether a payment is active.
+ */
+async function paymentCancelled() {
+  paymentError.value = null;
+  cancelledNotice.value = t('travel.thatPaymentIsCancelled');
+  await loadOrder();
+}
+
+/**
+ * Too late to cancel: it was paid, failed or cancelled while this page was
+ * open. The api's message says so, and the re-read order shows which.
+ *
+ * @param {string} message
+ */
+async function cancelRefused(message) {
+  cancelledNotice.value = null;
+  paymentError.value = message;
+  await loadOrder();
 }
 
 /**
@@ -368,7 +412,17 @@ function providerName(method) {
               @initiated="paymentInitiated"
               @failed="paymentFailed"
           />
-          <section v-else class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
+          <!-- A waiting payment holds the customer's deposit account, so the way
+          out of it sits beside it rather than on another screen. -->
+          <CancelPaymentAction
+              v-if="activePayment"
+              :order-id="orderId"
+              :payment="activePayment"
+              class="mt-4 text-center"
+              @cancelled="paymentCancelled"
+              @refused="cancelRefused"
+          />
+          <section v-if="!activePayment" class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
             <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-gray-100 px-5 py-4">
               <h1 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.howWouldYouLikeTo') }}</h1>
               <p class="text-base font-semibold text-gray-900 tabular-nums">{{ order.total.currencyPrefixed }}</p>
@@ -408,10 +462,15 @@ function providerName(method) {
             offered, because it is matched automatically and expires. -->
             <p v-else class="px-5 py-8 text-center text-sm/6 text-gray-500">{{ $t('travel.thereAreNoPaymentMethods') }}</p>
             <div v-if="hasMethods" class="border-t border-gray-100 px-5 py-5">
+              <div v-if="cancelledNotice" class="mb-3 flex items-start gap-2 rounded-xl border border-success-200 bg-success-50 p-3 text-sm/6 text-success-800">
+                <CheckCircleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <span>{{ cancelledNotice }}</span>
+              </div>
               <div v-if="paymentError" class="mb-3 flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700">
                 <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <span>{{ paymentError }}</span>
               </div>
+              <HeldByAction v-if="paymentError" :holder="heldBy" class="mb-3" />
               <button
                   type="button"
                   :disabled="!selectedMethod || isPaying"

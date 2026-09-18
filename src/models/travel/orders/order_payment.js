@@ -109,6 +109,17 @@ class OrderPayment {
     amount = null;
 
     /**
+     * Still waiting on the customer or the provider, which is also exactly when
+     * the api lets the customer cancel it (SD-1261). AUTHORIZED is deliberately
+     * not here: the money is held at the provider, and cancelling is refused.
+     *
+     * @returns {boolean}
+     */
+    get isOpen() {
+        return ['CREATED', 'INITIALIZED', 'PENDING', 'REDIRECTED'].includes(this.state);
+    }
+
+    /**
      * Nothing more will happen to this attempt on its own. A refund is a later
      * event against a payment that already succeeded, so those count as settled
      * too — the wait is over either way.

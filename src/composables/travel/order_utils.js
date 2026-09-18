@@ -136,6 +136,23 @@ export function useOrderUtils() {
     }
 
     /**
+     * Lets go of a payment the customer has not made. A PayID or bank transfer
+     * payment holds their deposit account until it is paid or cancelled, and
+     * every other payment into that account is refused meanwhile, so this is
+     * how they unblock themselves. The account is free the moment it answers.
+     *
+     * 200 is the payment, CANCELLED, in Pay Order's shape. A 409 with
+     * payment_not_open means it is too late: paid, failed, already cancelled,
+     * or held at the provider. Either way the order is re-read afterwards.
+     *
+     * @param {string} orderId
+     * @param {string} paymentId The payment's id, not its reference.
+     */
+    async function cancelPayment(orderId, paymentId) {
+        return await axios.post(`/client/v1/travel/order/${orderId}/payment/${paymentId}/cancel`);
+    }
+
+    /**
      * Asks the supplier to cancel. They can refuse, and an answer nobody can act
      * on leaves it unresolved for a while without anything being wrong, so this
      * settles nothing on its own — the order is re-read for the outcome.
@@ -160,6 +177,7 @@ export function useOrderUtils() {
         bookQuote,
         paymentMethods,
         createPayment,
+        cancelPayment,
         cancelOrder,
     }
 }

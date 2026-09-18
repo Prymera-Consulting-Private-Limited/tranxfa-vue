@@ -43,6 +43,8 @@ import TermsModal from "@/components/Wallet/TermsModal.vue";
 import TopUpFlow from "@/components/Wallet/TopUpFlow.vue";
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
 import PaymentCollisionReason from "@/enums/payment_collision_reason.js";
+import DepositHolder from "@/models/deposit_holder.js";
+import HeldByAction from "@/components/Payment/HeldByAction.vue";
 import {useWalletStore} from "@/stores/wallet.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 
@@ -303,6 +305,11 @@ const recipientAddedOnQuote = async (recipient)  => {
 
 const preconditionFailedMessage = ref('');
 
+// The other payment holding the customer's deposit account, when a collision
+// is why the confirm was refused (SD-1261). The message says to pay or cancel
+// it; this is how they find it, whether it is a booking, a transfer or a load.
+const heldBy = ref(null);
+
 const confirmFormErrors = ref([]);
 
 // Everything the confirm step refused that is not a payment-data field. Those
@@ -312,6 +319,7 @@ const confirmGeneralErrors = computed(() => fieldlessErrors(confirmFormErrors.va
 
 const confirmQuote = async () => {
   preconditionFailedMessage.value = '';
+  heldBy.value = null;
   resumedAfterMfa.value = false;
   attemptStartedAt = Date.now();
   try {
@@ -353,6 +361,7 @@ const confirmQuote = async () => {
         };
         preconditionFailedMessage.value = error.response.data.message
             || (wordings[reason] ?? [t('transfer.wizard.anotherPaymentIsStillOpen')]).join(' ');
+        heldBy.value = DepositHolder.getInstance(error.response.data.held_by);
       } else if (error.response.data.type === "incomplete_customer_address") {
         isAddressRequired.value = true;
         isStepProcessing.value = false;
@@ -719,6 +728,7 @@ const canContinue = computed(() => {
                         </div>
                         <div class="ml-3">
                           <p class="text-sm/6 text-warning-700">{{ preconditionFailedMessage }}</p>
+                          <HeldByAction :holder="heldBy" class="mt-3" />
                         </div>
                       </div>
                     </div>
