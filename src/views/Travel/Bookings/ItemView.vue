@@ -8,6 +8,7 @@ import {useRoute, useRouter} from 'vue-router';
 import {safeReturnTo} from '@/composables/return_to.js';
 import moment from 'moment';
 import CustomerLayout from '@/components/CustomerLayout.vue';
+import BookingNextStep from '@/views/Travel/Bookings/Partials/BookingNextStep.vue';
 import BookingStateBadge from '@/views/Travel/Bookings/Partials/BookingStateBadge.vue';
 import BookingCancellation from '@/views/Travel/Bookings/Partials/BookingCancellation.vue';
 import BookingPayments from '@/views/Travel/Bookings/Partials/BookingPayments.vue';
@@ -49,6 +50,10 @@ function paymentSent() {
 const isLoading = ref(true);
 const hasFailed = ref(false);
 const failureMessage = ref(null);
+
+// Only a console that says nothing was paid changes the words. One too old to
+// say keeps the ones this page always had (SD-1230).
+const isUnpaid = computed(() => order.value?.isPaid === false);
 
 const stay = computed(() => getStayLabel(order.value?.checkIn, order.value?.checkOut));
 
@@ -246,13 +251,15 @@ onUnmounted(() => {
                 </p>
               </div>
               <div class="shrink-0 text-right">
-                <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('travel.totalPaid') }}</p>
+                <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ isUnpaid ? $t('account.total') : $t('travel.totalPaid') }}</p>
                 <p class="mt-1 text-2xl font-semibold tracking-tight text-gray-900">{{ order.total.currencyPrefixed }}</p>
               </div>
             </div>
             <div class="mt-4">
               <BookingStateBadge :order="order" />
             </div>
+            <p v-if="order.stateDescription" class="mt-2 text-sm/6 text-gray-600">{{ order.stateDescription }}</p>
+            <BookingNextStep :order="order" class="mt-4" />
             <p v-if="order.reference" class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.bookingReference', {reference: order.reference}) }}</p>
           </header>
           <div class="mt-4 space-y-4">
@@ -299,7 +306,7 @@ onUnmounted(() => {
             <!-- What was charged, as written when the booking was made -->
             <section v-if="order.breakdown.length" class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
               <header class="border-b border-gray-100 px-5 py-4">
-                <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.whatYouPaidFor') }}</h2>
+                <h2 class="text-sm/6 font-semibold text-gray-900">{{ isUnpaid ? $t('travel.whatYourePayingFor') : $t('travel.whatYouPaidFor') }}</h2>
               </header>
               <dl class="divide-y divide-gray-100">
                 <div v-for="line in order.breakdown" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">

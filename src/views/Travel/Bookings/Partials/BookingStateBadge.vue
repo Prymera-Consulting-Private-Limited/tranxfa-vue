@@ -14,6 +14,12 @@ const props = defineProps({
 // The api writes the words; this only chooses the colour. A state we have not
 // met still renders, in neutral, rather than disappearing.
 const classes = computed(() => {
+  // FULFILLED only says the hotel confirmed the room. Unpaid, it is waiting on
+  // the customer, and green would tell them it is done (SD-1230).
+  if (props.order.isPriceLocked) {
+    return 'bg-warning-50 text-warning-800 ring-warning-200';
+  }
+
   switch (props.order.state) {
     case 'FULFILLED':
       return 'bg-success-50 text-success-700 ring-success-200';

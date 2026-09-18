@@ -182,6 +182,25 @@ the order view, so without it a returning customer has nothing to cancel with.
 It is the same id as `travel-order-payment-pending-account`, because it is the
 same payment.
 
+## What a booking is waiting on (not captured)
+
+**These are not captures either.** They are written from console #646 (SD-1230)
+on `develop`: `HotelOrderPresenter::status()`, the wording in
+`lang/en/message.php`, and the order-state seeder for a paid booking. One
+booking at each of the three points a customer sees it:
+
+| Fixture | `state` | `state_label` | `is_paid` | `next_step` |
+| ------- | ------- | ------------- | --------- | ----------- |
+| `travel-order-view-awaiting-hotel` | `CONFIRMED` | Awaiting Hotel Confirmation | false | null |
+| `travel-order-view-price-locked` | `FULFILLED` | Price Locked | false | `pay`, "Pay for Confirmation" |
+| `travel-order-view-complete` | `FULFILLED` | Order Complete | true | null |
+
+`FULFILLED` only says the hotel confirmed the room. Whether it is paid is
+`is_paid`, and the screens read that, never the state or the total. The
+console asks nothing of the customer while the hotel has not answered, paid or
+not. Re-capture them from Payvel staging once #646 is deployed, and delete this
+section.
+
 ## Sanitisation
 
 Captures are scrubbed before they land here:

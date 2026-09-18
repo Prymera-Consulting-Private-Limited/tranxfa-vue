@@ -1,0 +1,46 @@
+{
+  "id": "01a0b2c0-5555-7666-8777-c88899900011",
+  "reference": "VO-01M3B9D1F3H5K7M9P1R3T5V7X9",
+  "state": "FULFILLED",
+  "state_label": "Order Complete",
+  "state_description": "Your order has been delivered. Thank you for using our service.",
+  "is_paid": true,
+  "next_step": null,
+  "booked_at": "2026-09-19T08:02:11+00:00",
+  "hotel": {"id": "01a0a6a6-da6b-7176-b2a8-e5326b9bc714", "slug": "conrad-los-angeles", "name": "Conrad Los Angeles", "address": "100 S Grand Ave, Los Angeles", "star_rating": 5},
+  "check_in": "2026-10-01",
+  "check_out": "2026-10-04",
+  "nights": 3,
+  "room_name": "Standard Double room with balcony and with river view (full double bed)",
+  "meal": "NO-MEAL",
+  "occupancy": {"rooms": [{"adults": 2, "children_ages": []}]},
+  "is_confirmed": true,
+  "confirmed_at": "2026-09-19T08:03:40+00:00",
+  "confirmation": null,
+  "guests": {"rooms": [{"guests": [{"first_name": "Test", "last_name": "Customer", "is_child": false}, {"first_name": "Second", "last_name": "Guest", "is_child": false}]}]},
+  "contact": {"email": "customer@example.test", "phone": null},
+  "breakdown": [
+    {"key": "room", "label": "Room", "amount": 48250, "amount_decimal": "482.50", "amount_formatted": "482.50", "amount_currency_prefixed": "AUD 482.50"}
+  ],
+  "payments": [
+    {
+      "id": "01a0b2c4-6e7f-7091-8a2b-3c4d5e6f7a81",
+      "reference": "VO-01M3B9D1F3H5K7M9P1R3T5V7X9-P001",
+      "state": "CAPTURED",
+      "state_label": "Captured",
+      "method": "PayID",
+      "attempted_at": "2026-09-19T08:05:02+00:00",
+      "client_payment_account": null,
+      "expires_at": "2026-09-20T14:05:02+00:00",
+      "amount": 48250,
+      "amount_decimal": "482.50",
+      "amount_formatted": "482.50",
+      "amount_currency_prefixed": "AUD 482.50"
+    }
+  ],
+  "cancellation": null,
+  "total": 48250,
+  "total_decimal": "482.50",
+  "total_formatted": "482.50",
+  "total_currency_prefixed": "AUD 482.50"
+}
