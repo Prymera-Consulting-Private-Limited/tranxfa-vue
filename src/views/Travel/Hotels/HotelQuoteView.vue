@@ -11,6 +11,7 @@ import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import HotelMealBadge from '@/views/Travel/Hotels/Partials/HotelMealBadge.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
 import GuestContactForm from '@/views/Travel/Hotels/Partials/GuestContactForm.vue';
+import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
 import TravelQuote from '@/models/travel/quote.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {getGuestBreakdown, useHotelUtils} from '@/composables/travel/hotels/hotel_utils.js';
@@ -267,7 +268,7 @@ onUnmounted(() => clearInterval(clock));
               </div>
             </dl>
             <!-- Not part of the total: the hotel collects this on arrival. -->
-            <p v-if="quote.payableAtProperty.isStated" class="border-t border-gray-100 px-5 py-3 text-sm/6 text-warning-700">{{ $t('travel.plusCurrencyprefixedPayableAtThe', {currencyPrefixed: quote.payableAtProperty.currencyPrefixed}) }}</p>
+            <PayableAtProperty :charges="quote.payableAtProperty" class="border-t border-gray-100 px-5 py-3" />
           </section>
           <!-- What cancelling would give back, while the terms still say so. -->
           <section v-if="quote.cancellation?.refundNow?.isStated" class="mt-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">

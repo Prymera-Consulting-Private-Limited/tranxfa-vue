@@ -3,6 +3,7 @@ import {computed} from 'vue';
 import HotelMealBadge from '@/views/Travel/Hotels/Partials/HotelMealBadge.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
 import HotelAvailability from '@/views/Travel/Hotels/Partials/HotelAvailability.vue';
+import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
 import {getRateGroups} from '@/composables/travel/hotels/hotel_utils.js';
 
 const props = defineProps({
@@ -72,10 +73,11 @@ const best = computed(() => {
           </p>
         </header>
         <ul>
-          <!-- Keyed by position: rates sharing a token are distinct rows, and a token is not a row's identity. -->
+          <!-- Keyed by the rate's own id: rates sharing a token are distinct rows, and a token is not a row's identity.
+          Position only stands in for a rate that arrived without one. -->
           <li
               v-for="(rate, position) in group.rates"
-              :key="position"
+              :key="rate.id ?? `position-${position}`"
               :class="[
                 rate === selected ? 'bg-brand-50/60' : 'hover:bg-gray-50/70',
                 'relative flex flex-col gap-4 border-t border-gray-100 px-5 py-4 transition sm:flex-row sm:items-center',
@@ -91,7 +93,7 @@ const best = computed(() => {
                 <HotelCancellationBadge :cancellation="rate.cancellation" />
                 <HotelAvailability :allotment="rate.allotment" />
               </div>
-              <p v-if="rate.payableAtProperty.isStated" class="text-xs/5 text-warning-700">{{ $t('travel.plusCurrencyprefixedPayableAtThe', {currencyPrefixed: rate.payableAtProperty.currencyPrefixed}) }}</p>
+              <PayableAtProperty :charges="rate.payableAtProperty" dense class="max-w-xs" />
             </div>
             <!-- Price rail, so every row lines up on the number and the button. -->
             <div class="flex shrink-0 items-end justify-between gap-4 sm:w-48 sm:flex-col sm:items-stretch sm:gap-3 sm:border-l sm:border-gray-100 sm:pl-6">
