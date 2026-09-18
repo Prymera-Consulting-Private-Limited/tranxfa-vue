@@ -1,4 +1,4 @@
 {
   "type": "same_amount",
-  "message": "Service order VO-01J8XAQ4V2NP7WZK3RB9CDEF0 cannot be paid for this way yet: a payment of exactly the same amount is already expected on your account. Pay or cancel that one first."
+  "message": "You already have a payment waiting for exactly this amount. Please pay or cancel that one first."
 }

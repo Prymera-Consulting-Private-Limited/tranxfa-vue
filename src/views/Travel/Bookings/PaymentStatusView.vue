@@ -4,9 +4,10 @@ import {useI18n} from "vue-i18n";
 const {t} = useI18n();
 
 import {computed, onUnmounted, ref, watch} from 'vue';
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import CustomerLayout from '@/components/CustomerLayout.vue';
 import DepositAccountDetails from '@/views/Travel/Bookings/Partials/DepositAccountDetails.vue';
+import CancelPaymentAction from '@/views/Travel/Bookings/Partials/CancelPaymentAction.vue';
 import Processing from '@/components/Payment/State/Processing.vue';
 import PaymentCompleted from '@/components/Payment/State/PaymentCompleted.vue';
 import AwaitingPending from '@/components/Payment/State/AwaitingPending.vue';
@@ -43,7 +44,12 @@ const payment = computed(() => order.value?.latestPayment ?? null);
  * or told how long the money usually takes.
  */
 const route = useRoute();
+const router = useRouter();
 const declaredSent = ref(route.query.sent === '1');
+
+// Too late to cancel: what the api said, kept here because the payment it was
+// said about is re-read straight afterwards.
+const cancelRefusal = ref(null);
 
 /**
  * A handful of states rather than every code the enum carries. A customer
@@ -205,6 +211,24 @@ async function load(quiet = false) {
   });
 }
 
+/**
+ * The customer let the waiting payment go, so there is nothing left here to
+ * wait for. Their account is free at once, and the payment screen offers the
+ * methods again.
+ */
+function paymentCancelled() {
+  stopPolling();
+  router.push({name: 'travelBookingPayment', params: {id: props.orderId}});
+}
+
+/**
+ * @param {string} message The api's own words: paid, failed or already cancelled.
+ */
+function cancelRefused(message) {
+  cancelRefusal.value = message;
+  load(true);
+}
+
 watch(() => props.orderId, () => load(), {immediate: true});
 
 onUnmounted(stopPolling);
@@ -232,6 +256,14 @@ onUnmounted(stopPolling);
         </div>
         <template v-else-if="status === 'details'">
           <DepositAccountDetails :payment="payment" @paid="declaredSent = true" />
+          <p v-if="cancelRefusal" class="mt-4 text-center text-sm/6 text-danger-700">{{ cancelRefusal }}</p>
+          <CancelPaymentAction
+              :order-id="orderId"
+              :payment="payment"
+              class="mt-4 text-center"
+              @cancelled="paymentCancelled"
+              @refused="cancelRefused"
+          />
           <RouterLink
               :to="{name: 'travelBooking', params: {id: orderId}}"
               class="mt-4 block text-center text-sm/6 font-medium text-gray-500 transition hover:text-gray-900"
@@ -261,6 +293,18 @@ onUnmounted(stopPolling);
                   class="cursor-pointer rounded-xl px-5 py-2.5 text-sm/6 font-medium text-gray-600 ring-1 ring-gray-200 transition hover:text-gray-900 focus-visible:outline-0"
               >{{ $t('travel.tryPayingAgain') }}</RouterLink>
             </div>
+            <p v-if="cancelRefusal" class="mt-6 max-w-md text-sm/6 text-danger-700">{{ cancelRefusal }}</p>
+            <!-- Not once they have said the money is sent: cancelling then is the
+            one case that leaves a deposit unmatched, and the booking page still
+            offers it to somebody who really means to. -->
+            <CancelPaymentAction
+                v-if="payment && !declaredSent"
+                :order-id="orderId"
+                :payment="payment"
+                class="mt-6 w-full max-w-md"
+                @cancelled="paymentCancelled"
+                @refused="cancelRefused"
+            />
           </div>
         </template>
       </div>

@@ -1,4 +1,4 @@
 {
   "type": "order_already_paid",
-  "message": "Service order VO-01J8XAQ4V2NP7WZK3RB9CDEF0 has already been paid for."
+  "message": "This order has already been paid for."
 }

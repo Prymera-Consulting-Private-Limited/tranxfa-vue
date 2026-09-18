@@ -1,6 +1,7 @@
 <script setup>
 import {computed} from 'vue';
-import {CalendarDaysIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
+import moment from 'moment';
+import {CalendarDaysIcon, ClockIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 import BookingStateBadge from '@/views/Travel/Bookings/Partials/BookingStateBadge.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import {getGuestSummary, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
@@ -28,6 +29,12 @@ const guests = computed(() => {
 
   return getGuestSummary(rooms);
 });
+
+// A moment, unlike the stay's dates: the waiting payment really does lapse at
+// this time. Null means it never expires, and the line is left out.
+const openPaymentDeadline = computed(() => (props.order.openPayment?.expiresAt
+    ? moment(props.order.openPayment.expiresAt).format('lll')
+    : null));
 </script>
 
 <template>
@@ -62,6 +69,13 @@ const guests = computed(() => {
         </div>
         <!-- Only the list carries this, and it says in words what the state means. -->
         <p v-if="order.stateDescription" class="mt-2 text-xs/5 text-gray-500">{{ order.stateDescription }}</p>
+        <!-- A waiting payment holds the customer's deposit account, so the
+        booking it belongs to has to be findable from the list. -->
+        <p v-if="order.openPayment" class="mt-3 inline-flex flex-wrap items-center gap-x-1.5 rounded-lg bg-warning-50 px-2.5 py-1 text-xs/5 font-medium text-warning-800 ring-1 ring-warning-200 ring-inset">
+          <ClockIcon class="size-3.5 shrink-0" aria-hidden="true" />
+          {{ $t('travel.paymentWaiting', {amount: order.openPayment.amount.currencyPrefixed}) }}
+          <span v-if="openPaymentDeadline" class="font-normal">· {{ $t('travel.payByShort', {deadline: openPaymentDeadline}) }}</span>
+        </p>
       </div>
       <div class="shrink-0 sm:text-right">
         <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('account.total') }}</p>

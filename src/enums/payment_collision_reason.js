@@ -9,8 +9,10 @@
  * no reason at all, and that is the case to expect for a long while.
  */
 const PaymentCollisionReason = Object.freeze({
-    // Held for another payment whatever its amount, for up to an hour. A
-    // different amount is refused the same way.
+    // Held for another payment whatever its amount, until that one is paid or
+    // cancelled. A different amount is refused the same way. How long the
+    // provider holds it otherwise is the deployment's setting (30 hours on
+    // Payvel), so no screen promises a time (SD-1261).
     ACCOUNT_HELD: 'account_held',
     // Another open payment already expects exactly this figure.
     SAME_AMOUNT: 'same_amount',

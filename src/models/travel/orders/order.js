@@ -135,6 +135,17 @@ class Order {
     payments = [];
 
     /**
+     * The payment still waiting on this order, as the bookings list names it
+     * (SD-1261). There is at most one, and it is null when nothing is waiting.
+     * Only the list sends it: a booking read on its own lists every attempt in
+     * payments instead. It is how a customer told "another payment is holding
+     * your account" finds which booking that payment belongs to.
+     *
+     * @type {OrderPayment|null}
+     */
+    openPayment = null;
+
+    /**
      * The attempt currently worth watching — the last one made, since a customer
      * who was declined and paid again is waiting on the second, not the first.
      * The api sends them oldest first.
@@ -217,6 +228,7 @@ class Order {
         }));
 
         order.payments = OrderPayment.getCollection(data.payments ?? []);
+        order.openPayment = data.open_payment ? OrderPayment.getInstance(data.open_payment) : null;
 
         return order;
     }

@@ -4,7 +4,8 @@ import {useI18n} from "vue-i18n";
 const {t} = useI18n();
 
 import {computed, onUnmounted, ref, watch} from 'vue';
-import {useRouter} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
+import {safeReturnTo} from '@/composables/return_to.js';
 import moment from 'moment';
 import CustomerLayout from '@/components/CustomerLayout.vue';
 import BookingStateBadge from '@/views/Travel/Bookings/Partials/BookingStateBadge.vue';
@@ -143,6 +144,31 @@ async function load({quiet = false} = {}) {
     isLoading.value = false;
     schedulePoll();
   });
+}
+
+const route = useRoute();
+
+/**
+ * The customer let a waiting payment go, and their deposit account is free at
+ * once. Somebody sent here because this payment was holding the account goes
+ * back to the payment they were making (SD-1261). Anybody else is taken to
+ * where this booking's payment methods are, since it still has to be paid for
+ * and this page has no way to pay of its own.
+ */
+function paymentCancelled() {
+  router.push(safeReturnTo(route.query.returnTo) ?? {name: 'travelBookingPayment', params: {id: props.orderId}});
+}
+
+// Too late to cancel a payment: the api's own words, shown above the list the
+// re-read order then corrects.
+const paymentCancelRefusal = ref(null);
+
+/**
+ * @param {string} message
+ */
+function paymentCancelRefused(message) {
+  paymentCancelRefusal.value = message;
+  load({quiet: true});
 }
 
 const isCancelling = ref(false);
@@ -292,7 +318,13 @@ onUnmounted(() => {
                 :cancel-error="cancelError"
                 @cancel="cancel"
             />
-            <BookingPayments :payments="order.payments" />
+            <p v-if="paymentCancelRefusal" class="flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700">{{ paymentCancelRefusal }}</p>
+            <BookingPayments
+                :order-id="orderId"
+                :payments="order.payments"
+                @payment-cancelled="paymentCancelled"
+                @cancel-refused="paymentCancelRefused"
+            />
           </div>
         </template>
       </div>

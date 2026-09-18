@@ -1,10 +1,16 @@
 <script setup>
 import moment from 'moment';
 import {useI18n} from "vue-i18n";
+import CancelPaymentAction from '@/views/Travel/Bookings/Partials/CancelPaymentAction.vue';
 
 const {t} = useI18n();
 
 const props = defineProps({
+  orderId: {
+    type: String,
+    required: true,
+  },
+
   /**
    * @type {OrderPayment[]}
    */
@@ -13,6 +19,9 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+// Passed straight up: the booking page owns the order, and re-reads it.
+defineEmits(['paymentCancelled', 'cancelRefused']);
 
 /**
  * The api sends no reason a payment failed, on purpose — gateway wording is
@@ -90,6 +99,15 @@ function classes(payment) {
           <p v-if="payment.attemptedAt" class="mt-1 text-xs/5 text-gray-500">{{ moment(payment.attemptedAt).format('lll') }}</p>
         </div>
         <p class="shrink-0 text-sm/6 font-medium text-gray-900 tabular-nums">{{ payment.amount.currencyPrefixed }}</p>
+        <!-- A waiting payment holds the customer's deposit account, so it can
+        be let go from here. It renders nothing for a payment that is not open. -->
+        <CancelPaymentAction
+            :order-id="orderId"
+            :payment="payment"
+            class="w-full"
+            @cancelled="$emit('paymentCancelled', $event)"
+            @refused="$emit('cancelRefused', $event)"
+        />
       </li>
     </ul>
   </section>

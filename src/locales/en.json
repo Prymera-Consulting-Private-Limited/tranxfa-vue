@@ -166,7 +166,7 @@
       "youAlreadyHaveA": "You already have a transfer open for this exact amount.",
       "changeTheAmountAndConfirm": "Change the amount and confirm again.",
       "anotherPaymentIsHoldingYour": "Another payment is still holding your account while we wait for it.",
-      "payOrCancelItOr": "Pay or cancel that payment, or try again in an hour. Changing the amount won't help.",
+      "payOrCancelItOr": "Pay or cancel that payment first, or try again later. Changing the amount won't help.",
       "anotherPaymentIsStillOpen": "Another payment on your account is still open, so this one can't start yet.",
       "weCouldNotConfirm": "We could not confirm this transfer. Please try again.",
       "weCouldntApplyThat": "We couldn't apply that code. Please try again.",
@@ -180,6 +180,11 @@
     }
   },
   "payment": {
+    "heldBy": {
+      "viewYourHotelBooking": "View your hotel booking",
+      "viewYourTransfer": "View your transfer",
+      "viewYourWalletTopUp": "View your wallet top-up"
+    },
     "card": {
       "completeYourPayment": "Complete your payment",
       "yourTransferIsWaitingFor": "Your transfer is waiting for payment. Click the button below to pay by card.",
@@ -704,7 +709,7 @@
     "youAlreadyHaveADeposit": "You already have a payment waiting for this exact amount.",
     "changeTheAmountAndTry": "Change the amount and try again.",
     "anotherPaymentIsHoldingYour": "Another payment is still holding your account while we wait for it.",
-    "payOrCancelItOr": "Pay or cancel that payment, or try again in an hour. Changing the amount won't help.",
+    "payOrCancelItOr": "Pay or cancel that payment first, or try again later. Changing the amount won't help.",
     "anotherPaymentIsStillOpen": "Another payment on your account is still open, so this deposit can't start yet.",
     "yourPendingDeposits": "your pending deposits",
     "yourWalletActivity": "your wallet activity",
@@ -931,6 +936,17 @@
     "putTheReferenceAtYourBank": "Put the {value} in the reference or description box at your bank. Without it we cannot match your money to this booking.",
     "sendExactlyAmount": "Send exactly {value}. We match your money to this booking by its amount.",
     "payByDeadline": "Pay by {value} (your local time). After that, this payment can no longer be made.",
+    "paymentWaiting": "Payment waiting: {amount}",
+    "payByShort": "pay by {deadline}",
+    "cancelThisPayment": "Cancel this payment",
+    "cancelThisPaymentQuestion": "Cancel this payment?",
+    "onlyIfYouHaventSentTheMoney": "Only do this if you haven't sent the money yet. Money sent for a cancelled payment isn't matched to your booking automatically, and our support team has to place it.",
+    "yesCancelThisPayment": "Yes, cancel this payment",
+    "cancellingThisPayment": "Cancelling",
+    "keepThisPayment": "Keep this payment",
+    "thatPaymentIsCancelled": "That payment is cancelled and your account is free. Choose how you'd like to pay.",
+    "thisPaymentCanNoLonger": "This payment can no longer be cancelled.",
+    "weCouldNotCancelThatPayment": "We could not cancel that payment. Please try again.",
     "bookingCannotBePaid": "This booking can no longer be paid for",
     "bookingStatusIs": "Status: {state}",
     "bookingCancelledRefundFollows": "This booking was cancelled. Any refund due follows the hotel's cancellation policy and is sent separately.",

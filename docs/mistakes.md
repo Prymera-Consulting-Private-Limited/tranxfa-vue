@@ -266,3 +266,36 @@ would have doubled again for every new reason.
 
 **Status:** adopted — SD-1251 shows the console message alone and keeps its own
 wording, chosen by `reason`, as the fallback. Its specs use the console's text.
+
+---
+
+## PM-010 — A passing count was read from a test run that had failed
+
+**What happened:** while building SD-1269 the suite was run many times, and each
+time only the summary line was read: `Tests  2195 passed`. Two new cases in
+`tests/transfer-confirm-refusals.spec.js` rendered a component that needs a
+router in a screen mounted without one. Vitest reported four unhandled errors
+and **exited 1**, and it still counted every test as passed, because the errors
+landed after the assertions had run. The change was staged, reviewed and
+committed as green. PM-008's clean-checkout step caught it before the PR, only
+because that step prints the exit code.
+
+**Root cause:** the output was piped through `grep` for the summary line, which
+throws away both the exit code and the "Unhandled Errors" block. `CLAUDE.md`
+already says "verify by exit code"; the habit of grepping a long log made that
+rule quietly not apply.
+
+**Cost or risk:** a red CI run on a PR described as green, or worse, a real
+fault hidden the same way. Vitest's own warning says unhandled errors "might
+cause false positive tests".
+
+**SOP:** every suite run that a claim rests on records the exit code, not only
+the count:
+```bash
+npx vitest run > "$SCRATCH/test.log" 2>&1; echo "exit=$?"
+grep -E "Tests |Test Files|Unhandled" "$SCRATCH/test.log"
+```
+"N passed" is reported only beside `exit=0`. A count with a non-zero exit is a
+failed run, whatever the count says.
+
+**Status:** open — adopted during SD-1269; to be confirmed on the next ticket.

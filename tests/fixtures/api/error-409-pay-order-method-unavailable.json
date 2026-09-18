@@ -1,4 +1,4 @@
 {
   "type": "method_unavailable",
-  "message": "That payment method has no rail switched on, so there is nothing to take the money."
+  "message": "That payment method is not available right now. Please choose another."
 }

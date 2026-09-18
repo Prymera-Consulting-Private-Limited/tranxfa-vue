@@ -1,4 +1,4 @@
 {
   "type": "order_not_payable",
-  "message": "Service order VO-01J8XAQ4V2NP7WZK3RB9CDEF0 is cancelled and cannot be paid for."
+  "message": "This order is closed and can no longer be paid for."
 }
