@@ -78,10 +78,7 @@
         "per_night_decimal": "149.00",
         "per_night_formatted": "149.00",
         "per_night_currency_prefixed": "AUD 149.00",
-        "payable_at_property": null,
-        "payable_at_property_decimal": null,
-        "payable_at_property_formatted": null,
-        "payable_at_property_currency_prefixed": null
+        "payable_at_property": []
       }
     },
     {
@@ -151,10 +148,7 @@
         "per_night_decimal": "275.76",
         "per_night_formatted": "275.76",
         "per_night_currency_prefixed": "AUD 275.76",
-        "payable_at_property": null,
-        "payable_at_property_decimal": null,
-        "payable_at_property_formatted": null,
-        "payable_at_property_currency_prefixed": null
+        "payable_at_property": []
       }
     }
   ],

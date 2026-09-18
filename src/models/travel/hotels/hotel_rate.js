@@ -1,4 +1,5 @@
 import Money from "@/models/travel/money.js";
+import PropertyCharge from "@/models/travel/property_charge.js";
 import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
 
 /**
@@ -7,6 +8,16 @@ import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
  * formatted in the client.
  */
 class HotelRate {
+    /**
+     * Which row this is, and the one thing that identifies it: the token below is
+     * shared between near-identical rates and withheld from any that cannot be
+     * booked (SD-1220). Sent on the hotel page only, so a search result's cheapest
+     * rate has none.
+     *
+     * @type {string|null}
+     */
+    id = null;
+
     /**
      * The supplier's permission to proceed with this rate, issued on the hotel
      * page and nowhere else. Null means this rate cannot be taken forward. It
@@ -65,13 +76,12 @@ class HotelRate {
     perNight = null;
 
     /**
-     * What is owed to the hotel on arrival, on top of the total, converted into
-     * the same currency as everything else and never marked up. Unstated when
-     * nothing is owed.
+     * What the hotel collects on arrival, on top of the total, one entry per
+     * charge in the property's own currency. Empty when nothing is owed.
      *
-     * @type {Money|null}
+     * @type {PropertyCharge[]}
      */
-    payableAtProperty = null;
+    payableAtProperty = [];
 
     /**
      * @type {RateCancellation|null}
@@ -81,6 +91,7 @@ class HotelRate {
     static getInstance(data) {
         const rate = new HotelRate();
 
+        rate.id = data.id ?? null;
         rate.token = data.token ?? null;
         rate.roomName = data.room_name;
         rate.meal = data.meal ?? null;
@@ -97,7 +108,7 @@ class HotelRate {
 
         rate.total = Money.getInstance(data, 'total');
         rate.perNight = Money.getInstance(data, 'per_night');
-        rate.payableAtProperty = Money.getInstance(data, 'payable_at_property');
+        rate.payableAtProperty = PropertyCharge.getCollection(data.payable_at_property);
 
         if (data.cancellation) {
             rate.cancellation = RateCancellation.getInstance(data.cancellation);

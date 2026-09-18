@@ -61,10 +61,16 @@
   "per_night_decimal": "275.76",
   "per_night_formatted": "275.76",
   "per_night_currency_prefixed": "AUD 275.76",
-  "payable_at_property": 6700,
-  "payable_at_property_decimal": "67.00",
-  "payable_at_property_formatted": "67.00",
-  "payable_at_property_currency_prefixed": "AUD 67.00",
+  "payable_at_property": [
+    {
+      "name": "city_tax",
+      "currency": "USD",
+      "amount": 4400,
+      "amount_decimal": "44.00",
+      "amount_formatted": "44.00",
+      "amount_currency_prefixed": "USD 44.00"
+    }
+  ],
   "cancellation": {
     "status": "non_refundable",
     "free_until": null,

@@ -122,6 +122,17 @@ three photos of fifty - with nothing renamed:
 | `travel-hotel-view` | `POST /travel/hotel/{search}/{hotel}` - the one place a `rates[]` with tokens exists |
 | `travel-quote-created` | `POST /travel/hotel/quote/{search}/{hotel}` - shaped from the quote contract; the hold itself was not taken out |
 
+**Hand-migrated by SD-1249, pending re-capture.** SD-1245 turned
+`payable_at_property` into a list of charges in the property's own currency, and
+SD-1220 added `rates[].id` on the hotel page. Neither had reached payvel staging
+when these were last captured, so three fixtures were edited by hand to the new
+shape: the two captured `AUD 67.00` amounts became one `USD 44.00` `city_tax`
+entry, the search results' `null` became `[]`, and the two hotel-page rates
+gained ids (`rate-sd1249-*`). The amounts and ids are illustrative, not captured,
+and the totals still carry the old retail prices rather than SD-1245's net rate.
+Re-capture all four once staging runs a console with SD-1245, and delete this
+note.
+
 `tests/hotel-journey.spec.js` mounts the real screens over these and walks
 lookup, results, hotel and hold. The two search fixtures are the shapes the
 payvel results list crashed on before SD-1218, so a re-capture that changes
