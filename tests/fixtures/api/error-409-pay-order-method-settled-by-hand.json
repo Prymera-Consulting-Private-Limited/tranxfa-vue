@@ -1,0 +1,4 @@
+{
+  "type": "method_settled_by_hand",
+  "message": "Hotels cannot be paid for with Manual Payment: nobody closes those but a person, and a service is held against a price that lapses first."
+}

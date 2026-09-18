@@ -4,7 +4,9 @@ import {useI18n} from "vue-i18n";
 const {t} = useI18n();
 
 import {computed, onUnmounted, ref, watch} from 'vue';
+import {useRoute} from 'vue-router';
 import CustomerLayout from '@/components/CustomerLayout.vue';
+import DepositAccountDetails from '@/views/Travel/Bookings/Partials/DepositAccountDetails.vue';
 import Processing from '@/components/Payment/State/Processing.vue';
 import PaymentCompleted from '@/components/Payment/State/PaymentCompleted.vue';
 import AwaitingPending from '@/components/Payment/State/AwaitingPending.vue';
@@ -35,9 +37,18 @@ const failureMessage = ref(null);
 const payment = computed(() => order.value?.latestPayment ?? null);
 
 /**
- * Four states rather than every code the enum carries. A customer waiting on a
- * payment wants to know whether it worked, not which of five machine states it
- * passed through on the way.
+ * The customer has said they sent the money to the deposit account, here or on
+ * the payment screen. Nothing records it server-side — the money is matched
+ * when it arrives — so it only decides whether they are shown the account again
+ * or told how long the money usually takes.
+ */
+const route = useRoute();
+const declaredSent = ref(route.query.sent === '1');
+
+/**
+ * A handful of states rather than every code the enum carries. A customer
+ * waiting on a payment wants to know whether it worked, or what they still have
+ * to do, not which of five machine states it passed through on the way.
  */
 const status = computed(() => {
   if (!payment.value) {
@@ -59,6 +70,18 @@ const status = computed(() => {
     return 'failed';
   }
 
+  // A deposit rail waits on the customer, not on a provider: until they say
+  // they have sent it, the useful thing on this screen is where to send it.
+  if (payment.value.hasAccountDetails && !declaredSent.value) {
+    return 'details';
+  }
+
+  // The deposit account is still being opened. The poll below moves this on to
+  // the details, or to failed if the account could not be opened.
+  if (payment.value.isSettingUp) {
+    return 'setting-up';
+  }
+
   return payment.value.state === 'REDIRECTED' ? 'processing' : 'waiting';
 });
 
@@ -75,6 +98,9 @@ const heading = computed(() => {
 
     case 'processing':
       return t('travel.finishingYourPayment');
+
+    case 'setting-up':
+      return t('travel.gettingYourPaymentReady');
 
     default:
       return t('travel.waitingForYourPayment');
@@ -100,13 +126,25 @@ const note = computed(() => {
       return t('travel.roomBookedAndPaidFor');
 
     case 'failed':
-      // The room outlives the payment, which is the one thing worth saying here.
+      // Always our own words. The create answer carries the provider's reason,
+      // and it is written for integrators; the order this screen reads does
+      // not carry it at all, on purpose. The room outlives the payment, which
+      // is the one thing worth saying here.
       return t('travel.notChargedRoomStillBooked');
 
     case 'processing':
       return t('travel.waitingForYourBank');
 
+    case 'setting-up':
+      return t('travel.paymentDetailsAppearOnTheirOwn');
+
     default:
+      // Sent to a deposit account: how long the money usually takes is the
+      // rail's to say.
+      if (payment.value?.clientPaymentAccount?.waitTimeMessage) {
+        return payment.value.clientPaymentAccount.waitTimeMessage;
+      }
+
       // True the moment the Volume hand-off is wired. Until then nothing takes
       // the customer to their bank, so a Volume payment rests here for good.
       // Left as it reads rather than rewritten for a gap that closes when the
@@ -192,6 +230,13 @@ onUnmounted(stopPolling);
               class="mt-6 cursor-pointer rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0"
           >{{ $t('common.tryAgain') }}</button>
         </div>
+        <template v-else-if="status === 'details'">
+          <DepositAccountDetails :payment="payment" @paid="declaredSent = true" />
+          <RouterLink
+              :to="{name: 'travelBooking', params: {id: orderId}}"
+              class="mt-4 block text-center text-sm/6 font-medium text-gray-500 transition hover:text-gray-900"
+          >{{ $t('travel.viewThisBooking') }}</RouterLink>
+        </template>
         <template v-else>
           <div class="flex flex-col items-center rounded-3xl bg-white px-8 pt-6 pb-10 text-center ring-1 ring-gray-200">
             <!-- The animations carry their own whitespace, which the crop removes. -->

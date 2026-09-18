@@ -4,11 +4,13 @@ import {useI18n} from "vue-i18n";
 const {t} = useI18n();
 
 import {computed, onUnmounted, ref, watch} from 'vue';
+import {useRouter} from 'vue-router';
 import moment from 'moment';
 import CustomerLayout from '@/components/CustomerLayout.vue';
 import BookingStateBadge from '@/views/Travel/Bookings/Partials/BookingStateBadge.vue';
 import BookingCancellation from '@/views/Travel/Bookings/Partials/BookingCancellation.vue';
 import BookingPayments from '@/views/Travel/Bookings/Partials/BookingPayments.vue';
+import DepositAccountDetails from '@/views/Travel/Bookings/Partials/DepositAccountDetails.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import Order from '@/models/travel/orders/order.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
@@ -25,7 +27,24 @@ const props = defineProps({
 
 const {getOrder, cancelOrder} = useOrderUtils();
 
+const router = useRouter();
+
 const order = ref(null);
+
+/**
+ * An open payment waiting for the customer to send money to their deposit
+ * account. Repeated here because this is where somebody who closed the payment
+ * screen comes back to, and paying again would be refused while it is open.
+ */
+const waitingPayment = computed(() => {
+  const latest = order.value?.latestPayment ?? null;
+
+  return latest?.hasAccountDetails ? latest : null;
+});
+
+function paymentSent() {
+  router.push({name: 'travelPaymentStatus', params: {id: props.orderId}, query: {sent: '1'}});
+}
 const isLoading = ref(true);
 const hasFailed = ref(false);
 const failureMessage = ref(null);
@@ -217,6 +236,7 @@ onUnmounted(() => {
             <p v-if="order.reference" class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.bookingReference', {reference: order.reference}) }}</p>
           </header>
           <div class="mt-4 space-y-4">
+            <DepositAccountDetails v-if="waitingPayment" :payment="waitingPayment" @paid="paymentSent" />
             <!-- Stay -->
             <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
               <header class="border-b border-gray-100 px-5 py-4">

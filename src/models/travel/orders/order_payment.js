@@ -1,13 +1,16 @@
 import Money from "@/models/travel/money.js";
+import ClientPaymentAccount from "@/models/client_payment_account.js";
 
 /**
  * One attempt at paying for a booking. Failed attempts are listed too, on
  * purpose: somebody declined once who paid on the second try should see both
  * rather than wonder whether they were charged twice.
  *
- * Why an attempt failed is deliberately not sent — gateway wording is written for
- * integrators and reads to a customer as gibberish or as an accusation. The state
- * is what carries meaning.
+ * Why an attempt failed is not something the app shows. The order's list of
+ * attempts deliberately never carries it; the create answer still sends
+ * failure_reason, but that is the provider's own wording, written for
+ * integrators, and reads to a customer as gibberish or as an accusation. The
+ * state is what carries meaning. SD-1002 will replace the text with a code.
  */
 class OrderPayment {
     /**
@@ -41,6 +44,38 @@ class OrderPayment {
      * @type {string|null}
      */
     paymentUrl = null;
+
+    /**
+     * The customer's own account to pay into, on a PayID or bank transfer rail —
+     * the same object a transfer's payment carries, so it is read and rendered
+     * the same way. Null on every other rail, and null while the account is
+     * still being opened, which is what CREATED means on this rail.
+     *
+     * The order view carries it on every listed attempt as well as the create
+     * answer, because a customer who left cannot get it by paying again: a
+     * second attempt is refused while this one is open.
+     *
+     * @type {ClientPaymentAccount|null}
+     */
+    clientPaymentAccount = null;
+
+    /**
+     * When this payment stops being payable, the deadline the platform enforces.
+     * Five days on a deposit rail, not the price hold. Null means it never
+     * expires.
+     *
+     * @type {string|null}
+     */
+    expiresAt = null;
+
+    /**
+     * The provider's own wording for a FAILED payment, on the create answer
+     * only. Never shown to the customer and never branched on — see the class
+     * comment. Kept so the mapper does not quietly drop a field the api sends.
+     *
+     * @type {string|null}
+     */
+    failureReason = null;
 
     /**
      * @type {{code: string|null, title: string|null}|null}
@@ -144,6 +179,29 @@ class OrderPayment {
     }
 
     /**
+     * The customer pays by sending money to an account, and that account is
+     * ready. Decided by the answer rather than by the method, because the same
+     * method can route to a rail that redirects instead.
+     *
+     * @returns {boolean}
+     */
+    get hasAccountDetails() {
+        return this.isReadyToPay && this.clientPaymentAccount !== null;
+    }
+
+    /**
+     * The payment exists but there is nothing to act on yet — on a deposit rail,
+     * the customer's account is being opened, which takes a few seconds for
+     * somebody who has never paid this way. Reading the order again is how it
+     * moves on.
+     *
+     * @returns {boolean}
+     */
+    get isSettingUp() {
+        return this.state === 'CREATED' && this.clientPaymentAccount === null;
+    }
+
+    /**
      * What the Volume sdk is handed. The api sends this figure outright rather
      * than leaving it to be derived, so nothing here divides and nothing needs to
      * know how many places the currency takes.
@@ -168,6 +226,11 @@ class OrderPayment {
         payment.stateLabel = data.state_label ?? null;
         payment.attemptedAt = data.attempted_at ?? null;
         payment.amount = Money.getInstance(data, 'amount');
+        payment.clientPaymentAccount = data.client_payment_account
+            ? ClientPaymentAccount.getInstance(data.client_payment_account)
+            : null;
+        payment.expiresAt = data.expires_at ?? null;
+        payment.failureReason = data.failure_reason ?? null;
 
         // A listed attempt names its method as a string; the payment the create
         // call answers with sends the method and the provider as objects.

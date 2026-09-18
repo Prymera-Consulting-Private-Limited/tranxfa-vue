@@ -1,0 +1,52 @@
+{
+  "id": "01a0b2c0-1111-7222-8333-944455566677",
+  "reference": "VO-01J8XAQ4V2NP7WZK3RB9CDEF0",
+  "state": "CONFIRMED",
+  "state_label": "Confirmed",
+  "booked_at": "2026-09-17T09:14:02+00:00",
+  "hotel": {"id": "01a0a6a6-da6b-7176-b2a8-e5326b9bc714", "slug": "conrad-los-angeles", "name": "Conrad Los Angeles", "address": "100 S Grand Ave, Los Angeles", "star_rating": 5},
+  "check_in": "2026-10-01",
+  "check_out": "2026-10-04",
+  "nights": 3,
+  "room_name": "Standard Double room with balcony and with river view (full double bed)",
+  "meal": "NO-MEAL",
+  "occupancy": {"rooms": [{"adults": 2, "children_ages": []}]},
+  "is_confirmed": false,
+  "confirmed_at": null,
+  "guests": [{"guests": [{"first_name": "Test", "last_name": "Customer", "is_child": false}]}],
+  "contact": {"email": "customer@example.test", "phone": null},
+  "breakdown": [
+    {"key": "room", "label": "Room", "amount": 48250, "amount_decimal": "482.50", "amount_formatted": "482.50", "amount_currency_prefixed": "AUD 482.50"}
+  ],
+  "payments": [
+    {
+      "reference": "VO-01J8XAQ4V2NP7WZK3RB9CDEF0-P001",
+      "state": "PENDING",
+      "state_label": "Pending",
+      "method": "Bank transfer",
+      "attempted_at": "2026-09-17T09:15:10+00:00",
+      "client_payment_account": {
+        "id": "01a0afb1-fa90-71d6-ad4d-b68f6836ea2d",
+        "institution_name": "Monoova",
+        "instruction_text": "To complete your transaction, please transfer funds to the account below. Use the payment reference so we can match your money.",
+        "wait_time_message": "Thank you for payment. We will process the transfer as soon as we receive the money, usually within a few minutes.",
+        "payment_reference": "SP4594761",
+        "attributes": [
+          {"key": "Account Name", "value": "PAYVEL PTY LTD"},
+          {"key": "BSB", "value": "802-985"},
+          {"key": "Account Number", "value": "123456789"}
+        ]
+      },
+      "expires_at": "2026-09-22T09:15:10+00:00",
+      "amount": 48250,
+      "amount_decimal": "482.50",
+      "amount_formatted": "482.50",
+      "amount_currency_prefixed": "AUD 482.50"
+    }
+  ],
+  "cancellation": null,
+  "total": 48250,
+  "total_decimal": "482.50",
+  "total_formatted": "482.50",
+  "total_currency_prefixed": "AUD 482.50"
+}

@@ -1,0 +1,4 @@
+{
+  "type": "payment_waiting",
+  "message": "Service order VO-01J8XAQ4V2NP7WZK3RB9CDEF0 already has a payment waiting to be settled. Wait for it to be answered or cancelled before starting another."
+}
