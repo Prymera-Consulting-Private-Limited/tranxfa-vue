@@ -33,6 +33,9 @@ const wizardStubs = {
     VSelect: true,
     RadioGroup: true,
     RadioGroupOption: true,
+    // It links to the payment in the way, so it needs a router, and the wizard
+    // is mounted here without one. tests/payment-held-by.spec.js mounts it with.
+    HeldByAction: true,
 };
 
 const quotePayload = {
