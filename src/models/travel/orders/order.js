@@ -1,3 +1,5 @@
+import OrderFulfilmentState from "@/enums/order_fulfilment_state.js";
+import OrderNextStepCode from "@/enums/order_next_step_code.js";
 import Money from "@/models/travel/money.js";
 import OrderCancellation from "@/models/travel/orders/order_cancellation.js";
 import OrderConfirmation from "@/models/travel/orders/order_confirmation.js";
@@ -61,6 +63,15 @@ class Order {
      * @type {{code: string, label: string|null}|null}
      */
     nextStep = null;
+
+    /**
+     * How delivering the room is going (SD-1282). Null from a console that does
+     * not send it yet, and where no delivery was ever opened. The label is the
+     * operator's wording, so it is kept for nobody to show.
+     *
+     * @type {{state: string, label: string|null}|null}
+     */
+    fulfilment = null;
 
     /**
      * @type {string|null}
@@ -214,13 +225,36 @@ class Order {
     }
 
     /**
-     * The room is placed but the hotel has not answered yet, which is the
-     * ordinary state of a booking for its first minutes.
+     * Nothing is booked with the hotel until the customer pays (SD-1282), and the
+     * console says so by asking for the payment. The order is waiting on the
+     * customer, not on the hotel.
+     *
+     * @returns {boolean}
+     */
+    get isAwaitingPayment() {
+        return this.nextStep?.code === OrderNextStepCode.PAY;
+    }
+
+    /**
+     * The customer paid and the hotel could not provide the room. The order's
+     * own state cannot say so, which is what the fulfilment is for.
+     *
+     * @returns {boolean}
+     */
+    get isUndelivered() {
+        return this.fulfilment?.state === OrderFulfilmentState.UNDELIVERED;
+    }
+
+    /**
+     * We are placing the room, or the hotel is answering, which is the ordinary
+     * state of a paid booking for its first minutes. It is neither an unpaid
+     * order, which nothing has been sent for, nor a failed one, which no further
+     * asking will change: both would otherwise pulse and be polled for good.
      *
      * @returns {boolean}
      */
     get isAwaitingHotel() {
-        return !this.isConfirmed && !this.isSettled;
+        return !this.isConfirmed && !this.isSettled && !this.isAwaitingPayment && !this.isUndelivered;
     }
 
     /**
@@ -241,6 +275,9 @@ class Order {
         order.isPaid = typeof data.is_paid === 'boolean' ? data.is_paid : null;
         order.nextStep = data.next_step?.code
             ? {code: data.next_step.code, label: data.next_step.label ?? null}
+            : null;
+        order.fulfilment = data.fulfilment?.state
+            ? {state: data.fulfilment.state, label: data.fulfilment.state_label ?? null}
             : null;
         order.bookedAt = data.booked_at ?? null;
 

@@ -73,7 +73,7 @@ const openPaymentDeadline = computed(() => (props.order.openPayment?.expiresAt
           <BookingStateBadge :order="order" />
         </div>
         <!-- The api's own sentence for what the state means. -->
-        <p v-if="order.stateDescription" class="mt-2 text-xs/5 text-gray-500">{{ order.stateDescription }}</p>
+        <p v-if="order.stateDescription" :class="['mt-2 text-xs/5', order.isUndelivered ? 'font-medium text-danger-700' : 'text-gray-500']">{{ order.stateDescription }}</p>
         <!-- A waiting payment holds the customer's deposit account, so the
         booking it belongs to has to be findable from the list. -->
         <p v-if="order.openPayment" class="mt-3 inline-flex flex-wrap items-center gap-x-1.5 rounded-lg bg-warning-50 px-2.5 py-1 text-xs/5 font-medium text-warning-800 ring-1 ring-warning-200 ring-inset">

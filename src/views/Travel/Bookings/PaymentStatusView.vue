@@ -129,14 +129,16 @@ const note = computed(() => {
         return t('travel.bookingCancelledRefundFollows');
       }
 
-      return t('travel.roomBookedAndPaidFor');
+      // Paid, not yet booked: the room is placed once the payment arrives
+      // (SD-1282), and the hotel confirms it after that.
+      return t('travel.paymentReceivedRoomBeingBooked');
 
     case 'failed':
       // Always our own words. The create answer carries the provider's reason,
       // and it is written for integrators; the order this screen reads does
-      // not carry it at all, on purpose. The room outlives the payment, which
-      // is the one thing worth saying here.
-      return t('travel.notChargedRoomStillBooked');
+      // not carry it at all, on purpose. The order outlives the payment and can
+      // be paid again, which is the one thing worth saying here.
+      return t('travel.notChargedTryPayingAgain');
 
     case 'processing':
       return t('travel.waitingForYourBank');

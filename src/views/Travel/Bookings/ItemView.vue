@@ -258,7 +258,15 @@ onUnmounted(() => {
             <div class="mt-4">
               <BookingStateBadge :order="order" />
             </div>
-            <p v-if="order.stateDescription" class="mt-2 text-sm/6 text-gray-600">{{ order.stateDescription }}</p>
+            <!-- The order's own words say what happens next. For a paid booking the
+            hotel could not provide, that is the team getting in touch about the
+            refund, so it is set apart rather than read as one more line. -->
+            <p
+                v-if="order.stateDescription"
+                :class="order.isUndelivered
+                  ? 'mt-3 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700'
+                  : 'mt-2 text-sm/6 text-gray-600'"
+            >{{ order.stateDescription }}</p>
             <BookingNextStep :order="order" class="mt-4" />
             <p v-if="order.reference" class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.bookingReference', {reference: order.reference}) }}</p>
           </header>
@@ -321,6 +329,8 @@ onUnmounted(() => {
             </section>
             <BookingCancellation
                 :cancellation="order.cancellation"
+                :is-unpaid="order.isAwaitingPayment"
+                :has-waiting-payment="!!order.waitingPayment"
                 :is-cancelling="isCancelling"
                 :cancel-error="cancelError"
                 @cancel="cancel"

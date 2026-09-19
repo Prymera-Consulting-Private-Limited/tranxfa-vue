@@ -202,12 +202,23 @@ captured:
 | `travel-order-view-deposit-failed` | Order view whose payment `FAILED`. No `failure_reason`: the order view never carries it | As `-failed` |
 | `error-409-pay-order-*`, other than `-account-held-by-order` | One Pay Order 409 per SD-1248 `type`, plus `untyped` for a console older than SD-1248. Messages are the customer wording the api sends for each type (`lang/en/message.php`, through `ServicePaymentRefusal::customerMessageKey()`); `untyped` keeps the old wording, as an old console would send it | Each needs its own refusal set up |
 | `error-412-checkout-collides-held-by-transfer`, `error-412-wallet-topup-collides-held-by-topup` | The transfer confirm and wallet load collisions with `held_by`, one per remaining kind | Needs a waiting transfer or wallet load |
-| `travel-order-view-awaiting-hotel` | Order view before the hotel has answered: `CONFIRMED`, "Awaiting Hotel Confirmation", `is_paid` false, `next_step` null (SD-1230) | Lasts a minute or two after booking |
+| `travel-order-view-awaiting-hotel` | Order view before the hotel has answered: `CONFIRMED`, "Awaiting Hotel Confirmation", `is_paid` false, `next_step` null (SD-1230). The state of a booking made before SD-1282 | Lasts a minute or two after booking |
+| `travel-order-view-awaiting-payment` | Order view of an order opened and not paid: `CREATED`, "Awaiting Payment", `is_paid` false, `next_step` `pay` "Pay to Book", `fulfilment.state` `CREATED` (SD-1282) | Pay-first is not on staging yet |
+| `travel-order-view-booking-your-room` | Order view of a paid order being booked: `CONFIRMED`, "Booking Your Room", `is_paid` true, `fulfilment.state` `PROCESSING` | As above |
+| `travel-order-view-undelivered` | Order view of a paid order the hotel could not provide: `CONFIRMED`, "Booking Failed", `is_paid` true, `next_step` null, `fulfilment.state` `UNDELIVERED`. The order's `state` is the same as the one above; only `fulfilment` tells them apart | As above |
 
 The two hand-written order views listed `guests` as a bare array of rooms.
 The api sends `{"rooms": [...]}`, as the capture shows, and they now do too;
 the model reads a bare array as a flat list of guests, so the old shape named
 nobody.
+
+The three SD-1282 order views are written from the console's handout and its
+wording on `develop` (`lang/en/message.php`), and `fulfilment` is from the
+handout's state table: it is not merged or deployed yet, so it is the field most
+likely to differ. What the console sends in `cancellation` for an order it never
+booked is not known either: the fixture says `can_cancel_now` true with no quote,
+and the spec also tries a free quote. Re-capture all three once SD-1282 and its
+follow-up are on staging, and delete this note.
 
 PayID cannot be captured at all: the provider's sandbox refuses it. Nothing
 here is a PayID payment, and nothing in the app assumes which rail's

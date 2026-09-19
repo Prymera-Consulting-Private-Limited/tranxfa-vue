@@ -178,7 +178,10 @@ describe('the waiting screen', () => {
         const {wrapper} = await mountAt(PaymentStatusView, `/travel/booking/${ORDER}/payment`);
 
         expect(wrapper.text()).toContain("That payment didn't go through");
-        expect(wrapper.text()).toContain("You haven't been charged. Your room is still booked, so you can try paying again.");
+        // The room is only booked once a payment arrives (SD-1282), so it is not
+        // promised to somebody whose payment has just failed.
+        expect(wrapper.text()).toContain("You haven't been charged. You can try paying again.");
+        expect(wrapper.text()).not.toContain('still booked');
         expect(wrapper.text()).toContain('Try paying again');
     });
 });

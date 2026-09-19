@@ -113,9 +113,9 @@ const bookingValidation = ref(null);
 const bookingRefused = ref(false);
 
 /**
- * Turns the hold into a real booking. Payment is a separate step against the
- * order this creates — the room is held either way, and a payment page that
- * never opens should not cost the customer the booking.
+ * Turns the hold into an order to pay for (SD-1282). Nothing is booked with the
+ * hotel yet: the room is booked once the payment arrives, so the order is
+ * opened first and a payment page that never opens costs the customer nothing.
  *
  * @param {object} payload
  */
@@ -145,7 +145,7 @@ async function book(payload) {
       bookingValidation.value = error.response?.data?.errors ?? null;
       bookingError.value = getCustomerMessage(error);
     } else {
-      bookingError.value = getCustomerMessage(error) ?? t('travel.weCouldNotBook');
+      bookingError.value = getCustomerMessage(error) ?? t('travel.weCouldNotContinueWithThis');
     }
 
     isBooking.value = false;
