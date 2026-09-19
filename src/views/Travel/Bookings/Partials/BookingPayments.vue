@@ -1,4 +1,5 @@
 <script setup>
+import {computed} from 'vue';
 import moment from 'moment';
 import {useI18n} from "vue-i18n";
 import CancelPaymentAction from '@/views/Travel/Bookings/Partials/CancelPaymentAction.vue';
@@ -22,6 +23,16 @@ const props = defineProps({
 
 // Passed straight up: the booking page owns the order, and re-reads it.
 defineEmits(['paymentCancelled', 'cancelRefused']);
+
+// One payment is enough to say where the money stands: the one that paid for
+// the booking, or failing that the latest attempt. Every attempt used to be
+// listed, and a booking that took three tries read as a pile of failures above
+// the one line the customer came for. The api sends them oldest first.
+const shown = computed(() => {
+  const paid = props.payments.filter(payment => payment.isSuccessful);
+
+  return paid.length ? paid[paid.length - 1] : (props.payments[props.payments.length - 1] ?? null);
+});
 
 /**
  * The api sends no reason a payment failed, on purpose — gateway wording is
@@ -81,15 +92,12 @@ function classes(payment) {
 </script>
 
 <template>
-  <section v-if="payments.length" class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+  <section v-if="shown" class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
     <header class="border-b border-gray-100 px-5 py-4">
-      <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.payments') }}</h2>
-      <!-- Failed attempts are listed too: somebody declined once who paid on the
-      second try should see both rather than wonder if they paid twice. -->
-      <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.everyAttemptOnThisBooking') }}</p>
+      <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.payment') }}</h2>
     </header>
     <ul class="divide-y divide-gray-100">
-      <li v-for="payment in payments" :key="payment.reference" class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 py-4">
+      <li v-for="payment in [shown]" :key="payment.reference" class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 py-4">
         <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-2">
             <span :class="[classes(payment), 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ payment.stateLabel ?? payment.state }}</span>
