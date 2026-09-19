@@ -299,14 +299,17 @@ describe('the payment page', () => {
         wrapper.unmount();
     });
 
-    // Nothing is paid on this page yet, so it says the price is held, in the
-    // amber "Price Locked" wears elsewhere, rather than a green "booked".
+    // Nothing is paid on this page yet, and nothing is booked with the hotel: the
+    // amount is what is locked, so it says that in the amber "Price Locked" wears
+    // elsewhere, rather than a green "booked" (SD-1282, the owner's wording).
     it('says the price is locked, not that the room is booked', async () => {
         const wrapper = await paymentPage();
-        const banner = wrapper.findAll('p').find(p => p.text() === 'Your room pricing has been locked.');
+        const banner = wrapper.findAll('p').find(p => p.text().startsWith('The price you pay is locked.'));
 
         expect(banner).toBeTruthy();
+        expect(banner.text()).toBe('The price you pay is locked. We book your room as soon as your payment arrives, and refund you if the hotel can no longer offer it.');
         expect(wrapper.text()).not.toContain('Your room is booked');
+        expect(wrapper.text()).not.toContain('Your room pricing has been locked');
         expect(banner.element.closest('div.rounded-2xl').className).toContain('bg-warning-50');
         expect(banner.element.closest('div.rounded-2xl').className).not.toMatch(/bg-success/);
         wrapper.unmount();

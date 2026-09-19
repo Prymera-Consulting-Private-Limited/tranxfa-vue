@@ -392,7 +392,7 @@ function providerName(method) {
           <div class="flex items-start gap-3 rounded-2xl border border-warning-200 bg-warning-50 px-5 py-4">
             <ClockIcon class="mt-0.5 size-5 shrink-0 text-warning-700" aria-hidden="true" />
             <div>
-              <p class="text-sm/6 font-medium text-warning-900">{{ $t('travel.yourRoomPricingHasBeenLocked') }}</p>
+              <p class="text-sm/6 font-medium text-warning-900">{{ $t('travel.thePriceYouPayIsLocked') }}</p>
               <p class="mt-0.5 text-sm/6 text-warning-800">{{ $t('travel.namePayNowToComplete', {name: order.hotel?.name}) }}</p>
             </div>
           </div>

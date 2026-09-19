@@ -14,9 +14,16 @@ const props = defineProps({
 // The api writes the words; this only chooses the colour. A state we have not
 // met still renders, in neutral, rather than disappearing.
 const classes = computed(() => {
-  // FULFILLED only says the hotel confirmed the room. Unpaid, it is waiting on
-  // the customer, and green would tell them it is done (SD-1230).
-  if (props.order.isPriceLocked) {
+  // Paid, and the hotel could not provide the room. The order's own state says
+  // nothing went wrong, so this is the fulfilment's answer (SD-1282).
+  if (props.order.isUndelivered) {
+    return 'bg-danger-50 text-danger-700 ring-danger-200';
+  }
+
+  // Waiting on the customer to pay. FULFILLED only says the hotel confirmed the
+  // room, and green would tell them it is done (SD-1230); an order that has only
+  // been opened (SD-1282) is not done either.
+  if (props.order.isAwaitingPayment || props.order.isPriceLocked) {
     return 'bg-warning-50 text-warning-800 ring-warning-200';
   }
 
