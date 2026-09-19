@@ -91,7 +91,11 @@ describe('how delivering the room is going', () => {
 
         expect(order.fulfilment).toEqual({state: 'UNDELIVERED', label: 'Undelivered'});
         expect(OrderFulfilmentState.UNDELIVERED).toBe('UNDELIVERED');
-        expect(Object.values(OrderFulfilmentState)).toEqual(['CREATED', 'QUEUED', 'PROCESSING', 'SUCCESS', 'UNDELIVERED']);
+        // The whole list the console's documentation gives, hyphens and all.
+        expect(Object.values(OrderFulfilmentState)).toEqual([
+            'CREATED', 'QUEUED', 'PROCESSING', 'SENT', 'SUCCESS', 'FAILED',
+            'REVERSAL-REQUESTED', 'REVERSED', 'CANCELLED', 'UNDELIVERED',
+        ]);
     });
 
     // Null is "the console did not say", which a console from before SD-1282
