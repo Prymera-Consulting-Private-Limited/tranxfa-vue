@@ -168,7 +168,7 @@ watch(
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
-          <img src="/images/backgrounds/resetpassword.png" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/bg.png" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>

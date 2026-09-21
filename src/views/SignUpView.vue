@@ -243,9 +243,10 @@ watch(
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
-          <!-- JPEG, not WebP: Amplify's SPA rewrite answers a .webp request with
-               index.html, so the image never rendered on any brand (SD-1106). -->
-          <img src="/images/backgrounds/signup.jpg" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <!-- Xenvia's own background, the one file every auth screen uses on this
+               brand. main's signup.jpg is Tranxfa's. Never a .webp: Amplify's SPA
+               rewrite answers it with index.html (SD-1106). -->
+          <img src="/images/backgrounds/bg.png" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
