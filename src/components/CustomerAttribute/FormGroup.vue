@@ -40,11 +40,11 @@ const notifyOccupationUpdated = (attr, value) => {
 </script>
 
 <template>
-  <label :for="attr.attribute" :class="[attr.errors?.length > 0 ? 'text-red-700' : 'text-brand-700']" class="block text-sm font-medium mb-0">
+  <label :for="attr.attribute" :class="[attr.errors?.length > 0 ? 'text-danger-700' : 'text-brand-700']" class="block text-sm/6 font-medium mb-0">
     <span>{{ attr.label }}</span>
-    <span v-if="attr.isRequired === true" class="ml-0.5 text-red-500">*</span>
+    <span v-if="attr.isRequired === true" class="ml-0.5 text-danger-600">*</span>
   </label>
-  <p class="mt-2 mb-3 text-gray-400 text-xs">{{ attr.infoText }}</p>
+  <p class="mt-2 mb-3 text-gray-500 text-xs/5">{{ attr.infoText }}</p>
   <NameInput
       v-if="attr.attribute === 'name'"
       v-bind:attr="attr"
@@ -94,5 +94,5 @@ const notifyOccupationUpdated = (attr, value) => {
       :id="attr.attribute"
       class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
   />
-  <p v-if="attr.errors?.length > 0" class="mt-2 text-sm text-red-600 dark:text-red-500">{{ attr.errors[0] }}</p>
+  <p v-if="attr.errors?.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ attr.errors[0] }}</p>
 </template>

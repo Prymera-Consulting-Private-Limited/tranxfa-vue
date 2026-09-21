@@ -5,8 +5,22 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+import moment from "moment";
+import "moment/dist/locale/es";
+
+// The brand ships in one language, so the date library follows it. Without
+// this every weekday, month and relative time renders in English next to
+// Spanish copy: "Thursday", "Sep 12, 2026", "2:39 AM".
+moment.locale(String(import.meta.env.VITE_APP_LOCALE ?? 'en').trim().toLowerCase());
+
 import App from './App.vue'
 import router from './router'
+import i18n from '@/i18n.js'
+import {PUBLIC_ROUTES, redirectQueryFor} from "@/router/guards.js";
+import {MFA_REQUIRED_TYPE} from "@/composables/checkout_safety.js";
+import {installErrorHandling} from "@/error_handling.js";
+import {installDropdownEscapeGuard} from "@/dropdown_escape.js";
+import {startServiceStatusWatch} from "@/composables/service_status.js";
 import axios from "axios";
 
 import Echo from 'laravel-echo';
@@ -17,6 +31,9 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(i18n)
+installErrorHandling(app, router)
+installDropdownEscapeGuard()
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_URL
 axios.defaults.withCredentials = true;
@@ -24,8 +41,14 @@ axios.defaults.withXSRFToken = true;
 axios.interceptors.request.use((config) => {
     NProgress.start()
     config.headers['Accept'] = 'application/json'
-    config.headers['Accept-Language'] = import.meta.env.VITE_APP_LOCALE
-    config.headers['ngrok-skip-browser-warning'] = 'yes'
+    if (import.meta.env.VITE_APP_LOCALE) {
+        config.headers['Accept-Language'] = import.meta.env.VITE_APP_LOCALE
+    }
+    // Only a local API sits behind ngrok; in production the custom header
+    // just widens every preflight for nothing.
+    if (import.meta.env.VITE_APP_ENV === 'local') {
+        config.headers['ngrok-skip-browser-warning'] = 'yes'
+    }
 
     return config;
 })
@@ -38,12 +61,35 @@ axios.interceptors.response.use((response) => {
     NProgress.done()
     const shouldSkipAuthRedirect = e.config?.skipAuthRedirect === true;
     if (e.status === 401 && ! shouldSkipAuthRedirect) {
-        router.push({ name: 'signIn' });
+        // A session that expires mid-task comes back to that task after
+        // signing in again.
+        const current = router.currentRoute.value;
+        // Already on a public page (sign-in itself, say): keep the redirect it
+        // was carrying rather than replacing it with nothing.
+        const carried = typeof current.query?.redirect === 'string' ? {redirect: current.query.redirect} : {};
+        router.push({ name: 'signIn', query: PUBLIC_ROUTES.has(current.name) ? carried : redirectQueryFor(current) });
+    }
+    // A session that lost its MFA trust mid-task: any endpoint can answer
+    // 412 more_authentication_required. The MFA screen sends a fresh code
+    // and brings the customer back to where they were; what they had typed
+    // is the caller's to keep (the transfer wizard keeps a draft).
+    const shouldSkipMfaRedirect = e.config?.skipMfaRedirect === true;
+    if (e.response?.status === 412 && e.response?.data?.type === MFA_REQUIRED_TYPE && ! shouldSkipMfaRedirect) {
+        const current = router.currentRoute.value;
+        if (current.name !== 'multiFactorAuth') {
+            router.push({ name: 'multiFactorAuth', query: { ...redirectQueryFor(current), reason: 'session' } });
+        }
     }
     throw e;
 })
 
 app.provide('axios', axios)
+
+// On launch, before anything renders a product entry point. The answer carries
+// what this installation is licensed to serve (SD-1074), so it can no longer
+// wait for a banner component to mount inside the authenticated layout - a
+// signed-out customer's first screen has to know too.
+startServiceStatusWatch()
 
 app.mount('#app')
 

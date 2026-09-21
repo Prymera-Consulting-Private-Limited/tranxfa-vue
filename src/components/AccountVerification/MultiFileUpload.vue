@@ -1,4 +1,11 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
+import {acceptFor, DOCUMENT_TYPES, MAX_UPLOAD_MB, validateUpload} from "@/composables/upload_rules.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
@@ -11,7 +18,23 @@ const awsS3Utils = useAwsS3Utils();
 
 const customerUtils = useCustomerUtils();
 
-const MAX_FILE_SIZE_MB = 5;
+const accept = acceptFor(DOCUMENT_TYPES);
+
+// The last reason a file was refused, shown under the drop zone instead of a
+// browser alert.
+const uploadError = ref(null);
+
+const addFiles = (list) => {
+  uploadError.value = null;
+  Array.from(list).forEach((file) => {
+    const problem = validateUpload(file);
+    if (problem) {
+      uploadError.value = `${file.name}: ${problem}`;
+      return;
+    }
+    files.value.push({ file, name: file.name, size: file.size, status: 'pending', progress: 0 });
+  });
+};
 
 const props = defineProps({
   documentCategory: {
@@ -48,52 +71,63 @@ const pendingFiles = computed(() => {
 });
 
 const handleFileSelect = (event) => {
-  Array.from(event.target.files).forEach((file) => {
-    if (file.size / 1024 / 1024 > MAX_FILE_SIZE_MB) {
-      alert(`Upload Error! File ${file.name} exceeds the ${MAX_FILE_SIZE_MB}MB limit.`);
-      return;
-    }
-    files.value.push({ file, name: file.name, size: file.size, status: 'pending', progress: 0 });
-  });
+  addFiles(event.target.files);
   uploadFiles();
 };
 
 const handleDrop = (event) => {
   event.preventDefault();
   isDragging.value = false
-  Array.from(event.dataTransfer.files).forEach((file) => {
-    if (file.size / 1024 / 1024 > MAX_FILE_SIZE_MB) {
-      alert(`Upload Error! File ${file.name} exceeds the ${MAX_FILE_SIZE_MB}MB limit.`);
-      return;
-    }
-    files.value.push({ file, name: file.name, size: file.size, status: 'pending', progress: 0 });
-  });
+  addFiles(event.dataTransfer.files);
   uploadFiles();
+};
+
+// A red row with no words left the customer guessing whether to retry,
+// pick a smaller file or wait. Each failure now carries a reason and the
+// row can be retried on its own.
+const uploadFile = async (fileObj) => {
+  fileObj.status = 'preparing';
+  fileObj.reason = null;
+  let preSignedUrl;
+  try {
+    preSignedUrl = await getPreSignedUrl(fileObj.file);
+  } catch (e) {
+    fileObj.status = 'failed';
+    fileObj.reason = failureMessage(e, t('verification.weCouldntPrepareThis'));
+    return;
+  }
+  fileObj.status = 'uploading';
+  try {
+    await uploadToS3(preSignedUrl, fileObj);
+    fileObj.path = objectKeyFrom(tokenResponses.get(preSignedUrl), preSignedUrl);
+    fileObj.status = 'completed';
+  } catch (e) {
+    fileObj.status = 'failed';
+    fileObj.reason = t('verification.theUploadWasInterrupted');
+  }
 };
 
 const uploadFiles = async () => {
   for (let fileObj of pendingFiles.value) {
-    fileObj.status = 'preparing';
-    getPreSignedUrl(fileObj.file).then((preSignedUrl) => {
-      fileObj.status = 'uploading';
-      uploadToS3(preSignedUrl, fileObj).then(() => {
-        fileObj.path = new URL(preSignedUrl).pathname.split('/').slice(2).join('/');
-        fileObj.status = 'completed';
-      }).catch(() => {
-        fileObj.status = 'failed';
-      });
-    }).catch(() => {
-      fileObj.status = 'failed';
-    });
+    uploadFile(fileObj);
   }
 };
+
+// The object key used to be derived from the URL's path (everything after the
+// first two segments), which depends on the bucket's URL shape rather than on
+// the key layout. The API can send `object_key` beside `token`; when it does,
+// that wins.
+const objectKeyFrom = (response, url) => response.data.object_key ?? new URL(url).pathname.split('/').slice(2).join('/');
+
+const tokenResponses = new Map();
 
 const getPreSignedUrl = async (file) => {
   let accessToken = null;
   await customerUtils.getAccountVerificationToken(props.documentCategory, props.documentType, file).then((response) => {
     accessToken = response.data.token;
+    tokenResponses.set(accessToken, response);
   }).catch((e) => {
-    console.error(e);
+    logRequestFailure(e, 'upload-token');
     throw e;
   });
 
@@ -109,15 +143,20 @@ const isUploading = computed(() => {
 });
 
 const isSaving = ref(false);
+const saveFailure = ref(null);
+// The documented optional upload fields the type can ask for.
+const documentNumber = ref('');
+const expiryDate = ref('');
 
 const isDragging = ref(false);
 
 async function save() {
   isSaving.value = true;
-  customerUtils.uploadDocument(props.documentCategory, props.documentType, files.value.map((file) => file.path)).then((response) => {
+  customerUtils.uploadDocument(props.documentCategory, props.documentType, files.value.map((file) => file.path), {document_number: documentNumber.value, expiry_date: expiryDate.value}).then((response) => {
     emit('sdkApplicantStatusChanged', response.data);
   }).catch((e) => {
-    console.error(e);
+    logRequestFailure(e, 'upload-document');
+    saveFailure.value = failureMessage(e, t('verification.weCouldntAttachThese'));
   }).finally(() => {
     isSaving.value = false;
   });
@@ -126,8 +165,9 @@ async function save() {
 
 <template>
   <div class="max-w-xl mx-auto p-6 bg-white">
-    <h2 class="text-lg font-semibold text-gray-900 mb-2">Subir {{ documentType.title }}</h2>
-    <p class="text-sm text-gray-500 mb-4">Por favor, suba imágenes claras de su <span class="text-brand-700">{{ documentType.title }}</span>.</p>
+    <h2 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('verification.uploadDocument', {title: documentType.title}) }}</h2>
+    <i18n-t keypath="verification.uploadClearImages" tag="p" scope="global" class="text-sm/6 text-gray-500 mb-1"><template #document><span class="text-brand-700">{{ documentType.title }}</span></template></i18n-t>
+    <p class="text-sm/6 text-gray-500 mb-4">{{ $t('verification.uploadFormats', {MAX_UPLOAD_MB: MAX_UPLOAD_MB}) }}</p>
 
     <div
         :class="{
@@ -137,53 +177,65 @@ async function save() {
         class="border-2 border-dashed p-6 text-center cursor-pointer rounded-xl hover:border-gray-400 transition-all"
         @dragover.prevent="isDragging = true"
         @dragleave.prevent="isDragging = false" @drop="handleDrop" @click="$refs.fileInput.click()">
-      <input ref="fileInput" type="file" multiple class="hidden" @change="handleFileSelect" />
+      <input ref="fileInput" type="file" multiple :accept="accept" class="hidden" @change="handleFileSelect" />
       <ArrowUpTrayIcon class="mx-auto h-10 w-10 text-gray-500" />
-      <p class="text-gray-600 mt-2">Arrastra y suelta archivos aquí, o haz clic para buscarlos.</p>
+      <p class="text-gray-600 mt-2">{{ $t('verification.dragAndDrop') }}</p>
     </div>
+    <p v-if="uploadError" class="mt-2 text-sm/6 text-danger-600" role="alert">{{ uploadError }}</p>
 
     <div v-if="files.length" class="mt-4 space-y-3">
       <div v-for="(file, index) in files" :key="index"
            class="flex items-center justify-between p-3 rounded-lg transition-all duration-300 relative"
            :class="{
-             'bg-yellow-100 animate-pulse': (file.status === 'pending' || file.status === 'preparing'),
+             'bg-warning-100 animate-pulse': (file.status === 'pending' || file.status === 'preparing'),
              'bg-brand-700/20': file.status === 'uploading',
-             'bg-emerald-100': file.status === 'completed',
-             'bg-red-100': file.status === 'failed'
+             'bg-success-100': file.status === 'completed',
+             'bg-danger-100': file.status === 'failed'
            }">
         <div class="flex items-center space-x-3">
-          <ArrowPathIcon v-if="file.status === 'pending' || file.status === 'preparing'" class="w-5 h-5 mr-2 text-yellow-700 animate-spin" />
+          <ArrowPathIcon v-if="file.status === 'pending' || file.status === 'preparing'" class="w-5 h-5 mr-2 text-warning-700 animate-spin" />
           <Spinner v-if="file.status === 'uploading'" class="w-5 h-5 mr-2" />
-          <CheckCircleIcon v-else-if="file.status === 'completed'" class="text-emerald-700 w-5 h-5 mr-2" />
-          <XCircleIcon v-else-if="file.status === 'failed'" class="text-red-700 w-5 h-5 mr-2" />
+          <CheckCircleIcon v-else-if="file.status === 'completed'" class="text-success-700 w-5 h-5 mr-2" />
+          <XCircleIcon v-else-if="file.status === 'failed'" class="text-danger-700 w-5 h-5 mr-2" />
           <span :class="{
-            'text-yellow-700': file.status === 'pending',
+            'text-warning-700': file.status === 'pending',
             'text-brand-700': file.status === 'uploading',
-            'text-emerald-700': file.status === 'completed',
-            'text-red-700': file.status === 'failed'
-          }" class="truncate text-sm max-w-xs">{{ file.name }}</span>
+            'text-success-700': file.status === 'completed',
+            'text-danger-700': file.status === 'failed'
+          }" class="truncate text-sm/6 max-w-xs">{{ file.name }}</span>
         </div>
-        <button @click="removeFile(index)" class="text-gray-500 text-sm hover:text-gray-700 cursor-pointer">
+        <button v-if="file.status === 'failed'" type="button" @click="uploadFile(file)" class="ml-2 inline-flex min-h-11 shrink-0 items-center rounded-lg px-2 text-sm/6 font-semibold text-danger-800 underline underline-offset-2">{{ $t('common.tryAgain') }}</button>
+        <button @click="removeFile(index)" class="text-gray-500 text-sm/6 hover:text-gray-700 cursor-pointer">
           <TrashIcon class="w-4 h-4" />
         </button>
         <div v-if="file.status === 'uploading'" class="absolute bottom-0 left-0 h-1 bg-brand-700 transition-all" :style="{ width: file.progress + '%' }"></div>
       </div>
     </div>
+    <ul v-if="files.some((file) => file.status === 'failed' && file.reason)" class="mt-2 space-y-1" role="alert">
+      <li v-for="(file, index) in files.filter((file) => file.status === 'failed' && file.reason)" :key="`reason-${index}`" class="text-sm/6 text-danger-700">{{ file.name }}: {{ file.reason }}</li>
+    </ul>
     <form @submit.prevent="save">
-      <button :disabled="isUploading || isSaving || !files.length" :class="[{'opacity-70': isUploading || isSaving || !files.length}, (isUploading || isSaving || !files.length) ? 'cursor-not-allowed' : 'cursor-pointer' ]" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3 rounded-[10px] font-medium hover:bg-brand-800 transition">
+      <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div v-if="documentType.documentNumberLabel">
+          <label :for="`document-number-${documentType.id}`" class="block text-sm/6 font-medium text-gray-900">{{ documentType.documentNumberLabel }}</label>
+          <input :id="`document-number-${documentType.id}`" v-model.trim="documentNumber" type="text" autocomplete="off" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
+        </div>
+        <div>
+          <label :for="`expiry-date-${documentType.id}`" class="block text-sm/6 font-medium text-gray-900">{{ $t('verification.expiryDate') }} <span class="font-normal text-gray-500">{{ $t('verification.expiryDateOptional') }}</span></label>
+          <input :id="`expiry-date-${documentType.id}`" v-model="expiryDate" type="date" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
+        </div>
+      </div>
+      <button :disabled="isUploading || isSaving || !files.length" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3.5 rounded-xl font-medium transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
-            <Spinner class="size-4 mr-2" />
-            Subiendo ...
-          </span>
+            <Spinner class="size-4 mr-2" />{{ $t('verification.uploading') }}</span>
         </template>
         <template v-else-if="isUploading">
-          <span class="flex items-center justify-center whitespace-nowrap">
-           Un momento...
-          </span>
+          <span class="flex items-center justify-center whitespace-nowrap">{{ $t('recipient.pleaseWait') }}</span>
         </template>
-        <template v-else>Subir</template>
+        <template v-else>{{ $t('verification.upload') }}</template>
       </button>
+      <InlineFailure :message="saveFailure" />
     </form>
   </div>
 </template>

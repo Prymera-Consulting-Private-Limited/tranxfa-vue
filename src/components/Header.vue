@@ -1,4 +1,9 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import BrandLogo from "@/components/BrandLogo.vue";
 import {Bars3Icon, XMarkIcon} from "@heroicons/vue/24/outline/index.js";
 import {
   Menu,
@@ -12,24 +17,43 @@ import {
 } from "@headlessui/vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {onMounted, ref} from "vue";
+import {useServiceStatus} from '@/composables/service_status.js';
+import {PRODUCT} from '@/licensed_products.js';
+import {useWalletStore} from "@/stores/wallet.js";
+import {computed, onMounted, ref} from "vue";
 import router from "@/router/index.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
+const walletStore = useWalletStore();
 /**
  * @type {{data: Customer | null}}
  */
 const customer = customerStore.customer;
 
-const navigation = [
-  { name: 'Inicio', href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
-  { name: 'Transacciones', href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
-  { name: 'Beneficiarios', href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
-  { name: 'Verificación de cuenta', href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
-  { name: 'Configuración', href: 'settings', current: router.currentRoute.value.name === 'settings' },
-  { name: 'Contactar con el soporte técnico', href: 'contact', current: router.currentRoute.value.name === 'contact' },
-]
+// The licence arrives from GET /client/v1/service-status a moment after the
+// first render, so these are computed rather than read once: the entry points
+// appear when the answer does, and never before it.
+const {offers} = useServiceStatus();
+const hasTravel = computed(() => offers(PRODUCT.HOTELS));
+const hasWallet = computed(() => offers(PRODUCT.WALLETS));
+
+const navigation = computed(() => [
+  { name: t('nav.home'), href: 'dashboard', current: router.currentRoute.value.name === 'dashboard' },
+  ...(hasWallet.value && walletStore.isAvailable ? [
+    { name: t('nav.wallet'), href: 'wallet', current: router.currentRoute.value.name === 'wallet' },
+  ] : []),
+  { name: t('nav.transfers'), href: 'transactions', current: router.currentRoute.value.name === 'transactions' },
+  ...(hasTravel.value ? [
+    { name: t('nav.hotels'), href: 'hotels', current: router.currentRoute.value.name === 'hotels' },
+    { name: t('nav.bookings'), href: 'travelBookings', current: router.currentRoute.value.name === 'travelBookings' },
+  ] : []),
+  { name: t('nav.recipients'), href: 'recipients', current: router.currentRoute.value.name === 'recipients' },
+  { name: t('nav.accountVerification'), href: 'accountVerification', current: router.currentRoute.value.name === 'accountVerification' },
+  { name: t('nav.settings'), href: 'settings', current: router.currentRoute.value.name === 'settings' },
+  // Xenvia only: the other brands have no contact page.
+  { name: t('nav.contact'), href: 'contact', current: router.currentRoute.value.name === 'contact' },
+])
 
 async function logout() {
   await customerUtils.logout().finally(() => {
@@ -38,10 +62,17 @@ async function logout() {
 }
 
 const userNavigation = [
-  { name: 'Verificación de cuenta', href: 'accountVerification' },
-  { name: 'Configuración', href: 'settings' },
-  { name: 'Cerrar sesión', action: logout },
+  { name: t('nav.accountVerification'), href: 'accountVerification' },
+  { name: t('nav.settings'), href: 'settings' },
+  { name: t('nav.signOut'), action: logout },
 ]
+
+// The mobile panel shows the main navigation and the user menu one after the
+// other, so anything in both would appear twice. Desktop keeps the full user
+// menu: there the two lists are never on screen together.
+const userOnlyNavigation = computed(
+  () => userNavigation.filter(item => !navigation.value.some(link => link.href === item.href)),
+);
 
 const isLoading = ref(false);
 
@@ -54,14 +85,13 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <Popover as="header" class="bg-brand-700 pb-24 print:hidden" v-slot="{ open }">
-    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-      <div class="relative flex items-center justify-center py-10 md:py-8 lg:justify-between">
+  <Popover as="header" class="bg-brand-700 pb-24" v-slot="{ open }">
+    <div class="mx-auto max-w-3xl py-4 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+      <div class="relative flex items-center justify-center py-5 lg:justify-between">
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
-            <span class="sr-only">Xenvia</span>
-            <img class="h-10 md:h-12  w-auto" src="/images/logo-white.png" alt="RemitSo" />
+            <BrandLogo variant="light" size="header" />
           </a>
         </div>
 
@@ -71,9 +101,9 @@ onMounted(async () => {
           <!-- Profile dropdown -->
           <Menu as="div" class="relative ml-4 shrink-0">
             <div>
-              <MenuButton class="relative flex rounded-full bg-white text-sm ring-2 ring-white/20 focus:ring-white focus:outline-hidden cursor-pointer">
+              <MenuButton class="relative flex rounded-full bg-white text-sm/6 ring-2 ring-white/20 focus:ring-white focus:outline-hidden cursor-pointer">
                 <span class="absolute -inset-1.5" />
-                <span class="sr-only">Open user menu</span>
+                <span class="sr-only">{{ $t('account.openUserMenu') }}</span>
                 <div class="bg-gray-200 text-gray-500 size-8 rounded-full border border-gray-50 font-semibold flex items-center justify-center">
                   <template v-if="customer.data">{{ customer.data?.name?.slice(0, 1).toUpperCase() }}</template>
                   <template v-else>
@@ -87,8 +117,8 @@ onMounted(async () => {
             <transition leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
               <MenuItems class="absolute -right-2 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden tracking-wider">
                 <MenuItem as="div" v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                  <a v-if="item.action" href="javascript:" @click="item.action" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</a>
-                  <router-link v-else :to="{name: item.href}" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">{{ item.name }}</router-link>
+                  <a v-if="item.action" href="javascript:" @click="item.action" class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm/6 text-gray-700']">{{ item.name }}</a>
+                  <router-link v-else :to="{name: item.href}" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm/6 text-gray-700']">{{ item.name }}</router-link>
                 </MenuItem>
               </MenuItems>
             </transition>
@@ -98,9 +128,9 @@ onMounted(async () => {
         <!-- Menu button -->
         <div class="absolute right-0 shrink-0 lg:hidden  print:hidden">
           <!-- Mobile menu button -->
-          <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-transparent p-2 text-indigo-200 hover:bg-white/10 hover:text-white outline-none focus:ring-0 focus:ring-white focus:outline-hidden">
+          <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-transparent p-2 text-brand-200 hover:bg-white/10 hover:text-white outline-none focus:ring-0 focus:ring-white focus:outline-hidden">
             <span class="absolute -inset-0.5" />
-            <span class="sr-only">Open main menu</span>
+            <span class="sr-only">{{ $t('account.openMainMenu') }}</span>
             <Bars3Icon v-if="!open" class="block size-6" aria-hidden="true" />
             <XMarkIcon v-else class="block size-6" aria-hidden="true" />
           </PopoverButton>
@@ -108,9 +138,9 @@ onMounted(async () => {
       </div>
       <div class="hidden border-t border-brand-100/20 py-5 lg:block  print:hidden">
         <div class="grid grid-cols-3 items-center gap-8">
-          <div class="col-span-3">
+          <div class="col-span-2">
             <nav class="flex space-x-4">
-              <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-indigo-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
+              <router-link v-for="item in navigation" :key="item.name" :to="{name: item.href}" :class="[item.current ? 'text-white bg-white/10' : 'text-brand-100 hover:bg-white/10', 'rounded-md px-3 py-2 text-sm/6 font-medium  tracking-wider']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</router-link>
             </nav>
           </div>
         </div>
@@ -129,12 +159,12 @@ onMounted(async () => {
               <div class="pt-3 pb-2">
                 <div class="flex items-center justify-between px-4">
                   <div>
-                    <img class="h-8 w-auto" src="/images/logo.png" alt="RemitSo Inc" />
+                    <BrandLogo size="header" />
                   </div>
                   <div class="-mr-2">
-                    <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 outline-none focus:ring-0 focus:ring-brand-700 focus:outline-hidden focus:ring-inset">
+                    <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-500 outline-none focus:ring-0 focus:ring-brand-700 focus:outline-hidden focus:ring-inset">
                       <span class="absolute -inset-0.5" />
-                      <span class="sr-only">Close menu</span>
+                      <span class="sr-only">{{ $t('account.closeMenu') }}</span>
                       <XMarkIcon class="size-6" aria-hidden="true" />
                     </PopoverButton>
                   </div>
@@ -152,11 +182,11 @@ onMounted(async () => {
                   </div>
                   <div class="ml-3 min-w-0 flex-1">
                     <div class="truncate text-base font-medium text-gray-800 tracking-wider">{{ customer.data?.wholeName }}</div>
-                    <div class="truncate text-sm font-medium text-gray-500 tracking-wider">{{ customer.data?.account?.email }}</div>
+                    <div class="truncate text-sm/6 font-medium text-gray-500 tracking-wider">{{ customer.data?.account?.email }}</div>
                   </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                  <template v-for="item in userNavigation" :key="item.name">
+                  <template v-for="item in userOnlyNavigation" :key="item.name">
                     <a v-if="item.action" href="javascript:" @click="item.action" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</a>
                     <router-link v-else :to="{name: item.href}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 hover:text-gray-800 tracking-wider">{{ item.name }}</router-link>
                   </template>

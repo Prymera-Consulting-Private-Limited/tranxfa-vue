@@ -1,4 +1,10 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -19,22 +25,31 @@ const recipientUtils = useRecipientUtils();
 const isLoading = ref(true);
 const recipients = ref([]);
 const pagination = ref(null);
-const colors = [
-  "pink",
-  "indigo",
-  "yellow",
-  "green",
-  "blue",
-  "blue",
+// Written out in full so Tailwind can see them, and taken from the brand ramp
+// so a white label's palette applies here too. Four shades, not six with one
+// repeated, so no two neighbours in the list look the same.
+const AVATAR_TINTS = [
+  'bg-brand-500',
+  'bg-brand-600',
+  'bg-brand-700',
+  'bg-brand-800',
 ]
+
+const loadFailure = ref(null);
 
 async function getRecipients(page = null) {
   const query = {
     page: page
   };
+  isLoading.value = true;
+  loadFailure.value = null;
   await recipientUtils.get(query).then((response) => {
     recipients.value = response.data.data.map((recipient) => Recipient.getInstance(recipient));
     pagination.value = response.data.pagination;
+  }).catch((e) => {
+    logRequestFailure(e, 'recipients');
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadYour3'));
+  }).finally(() => {
     isLoading.value = false;
   });
 }
@@ -63,7 +78,7 @@ const recipientCreated = (recipient) => {
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Your Recipients</h1>
+        <h1 class="sr-only">{{ $t('recipient.yourRecipients') }}</h1>
         <!-- Main 3 column grid -->
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8">
           <!-- Left column -->
@@ -71,15 +86,11 @@ const recipientCreated = (recipient) => {
             <section aria-labelledby="section-2-title">
               <div class="flex justify-between items-center gap-3">
                 <div>
-                  <h2 class="text-base font-semibold text-gray-900">Tus beneficiarios</h2>
-                  <p class="mt-1 text-sm text-gray-500">Aquí puedes gestionar a todos tus   
-beneficiarios y realizar acciones como   
-agregar o eliminar.  </p>
+                  <h2 class="text-base font-semibold text-gray-900">{{ $t('recipient.yourRecipients') }}</h2>
+                  <p class="mt-1 text-sm/6 text-gray-500">{{ $t('recipient.recipientsIntro') }}</p>
                 </div>
-                <button @click="createRecipient" type="button" class="inline-flex w-auto whitespace-nowrap items-center rounded-md bg-brand-700 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-brand-700/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer ml-3">
-                  <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />
-                  Agregar beneficiario
-                </button>
+                <button @click="createRecipient" type="button" class="inline-flex w-auto whitespace-nowrap items-center rounded-xl bg-brand-700 px-3 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer ml-3">
+                  <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />{{ $t('recipient.addRecipient') }}</button>
               </div>
               <template v-if="isLoading">
                 <ul role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 border-t border-gray-200 py-6">
@@ -88,12 +99,15 @@ agregar o eliminar.  </p>
                   </li>
                 </ul>
               </template>
+              <template v-else-if="loadFailure">
+                <LoadFailurePanel :title="$t('recipient.listLoadFailure')" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="getRecipients()" class="mt-6" />
+              </template>
               <template v-else>
                 <template v-if="recipients.length > 0">
                   <ul  role="list" class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-gray-200 py-6">
                     <li v-for="(recipient, index) in recipients" :key="recipient.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center transition-transform transform hover:scale-105 shadow-sm hover:shadow-md">
                       <router-link :to="{ name: 'viewRecipient', params: { id: recipient.id } }" class="cursor-pointer">
-                        <RecipientCard v-bind:cardColor="colors[index%6]" v-bind:recipient="recipient" />
+                        <RecipientCard v-bind:tintClass="AVATAR_TINTS[index % AVATAR_TINTS.length]" v-bind:recipient="recipient" />
                       </router-link>
                     </li>
                   </ul>
@@ -110,13 +124,10 @@ agregar o eliminar.  </p>
                   <div  class="mt-6 border-t border-gray-200 py-6">
                     <div class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:ring-0 focus:ring-offset-0 focus:outline-hidden">
                       <UserPlusIcon class="mx-auto size-12 text-gray-400" />
-                      <span class="mt-4 block text-sm font-semibold text-gray-400">¡Vaya! Aún no tienes beneficiarios. ¡Agrega   
-                        uno!  </span>
+                      <span class="mt-4 block text-sm/6 font-semibold text-gray-500">{{ $t('recipient.noRecipientsYet') }}</span>
                       <div class="mt-6">
-                        <button @click="createRecipient" type="button" class="inline-flex items-center rounded-md bg-brand-700 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-brand-700/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer">
-                          <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />
-                          Beneficiario
-                        </button>
+                        <button @click="createRecipient" type="button" class="inline-flex items-center rounded-xl bg-brand-700 px-3 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800/80 focus-visible:outline-0 focus-visible:outline-offset-0 cursor-pointer">
+                          <PlusIcon class="mr-1.5 -ml-0.5 size-5" aria-hidden="true" />{{ $t('recipient.recipient') }}</button>
                       </div>
                     </div>
                   </div>

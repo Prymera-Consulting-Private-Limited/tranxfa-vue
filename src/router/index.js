@@ -1,17 +1,33 @@
+import i18n from '@/i18n.js';
 import { createRouter, createWebHistory } from 'vue-router'
 import SignUpView from "@/views/SignUpView.vue";
 import SignInView from "@/views/SignInView.vue";
 import NProgress from 'nprogress'
+import { createAuthGuard } from '@/router/guards.js'
+import { useCustomerStore } from '@/stores/customer.js'
+import { useCustomerUtils } from '@/composables/customer_utils.js'
+import { PRODUCT } from '@/licensed_products.js'
+import { offersProduct, productsSettled } from '@/composables/service_status.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // Xenvia only: a contact page the other brands do not have.
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('@/views/ContactView.vue'),
+      meta: {
+        titleKey: 'routes.contact',
+        description: 'Escríbenos por WhatsApp o correo electrónico.',
+      },
+    },
     {
       path: '/',
       name: 'signIn',
       component: SignInView,
       meta: {
-        title: 'Sign in',
+        titleKey: 'routes.signIn',
         description: 'Login into your account',
       },
     }, {
@@ -19,7 +35,7 @@ const router = createRouter({
       name: 'multiFactorAuth',
       component: () => import('@/views/MultifactorAuthenticationView.vue'),
       meta: {
-        title: 'More authentication required',
+        titleKey: 'routes.moreAuthenticationRequired',
         description: 'More authentication required',
       },
     }, {
@@ -27,7 +43,7 @@ const router = createRouter({
       name: 'forgotPassword',
       component: () => import('@/views/ForgotPasswordView.vue'),
       meta: {
-        title: 'Forgot Password',
+        titleKey: 'routes.forgotPassword',
         description: 'Forgot Password',
       },
     }, {
@@ -36,7 +52,7 @@ const router = createRouter({
       name: 'resetPassword',
       component: () => import('@/views/ResetPasswordView.vue'),
       meta: {
-        title: 'Reset Password',
+        titleKey: 'routes.resetPassword',
         description: 'Reset Password',
       },
     }, {
@@ -44,7 +60,7 @@ const router = createRouter({
       name: 'authByOtp',
       component: () => import('@/views/AuthByOtp.vue'),
       meta: {
-        title: 'Secure Login Verification',
+        titleKey: 'routes.secureLoginVerification',
         description: 'Verify your identity with a one-time password to continue securely.',
       },
     }, {
@@ -52,7 +68,7 @@ const router = createRouter({
       name: 'signUp',
       component: SignUpView,
       meta: {
-        title: 'Sign up',
+        titleKey: 'routes.signUp',
         description: 'Register your account',
       },
     }, {
@@ -60,7 +76,7 @@ const router = createRouter({
       name: 'onboardingWorkflow',
       component: () => import('@/views/OnboardingWorkflowView.vue'),
       meta: {
-        title: 'Complete Signup',
+        titleKey: 'routes.completeSignup',
         description: 'Complete your profile with us.',
       },
     }, {
@@ -68,16 +84,98 @@ const router = createRouter({
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),
       meta: {
-        title: 'Dashboard',
+        titleKey: 'routes.dashboard',
+        description: '',
+      },
+    },
+    // Hotels are licensed per installation and the API answers 404 without the
+    // licence. The routes exist at all times now and carry the product they
+    // need: the licence arrives from service-status a moment after launch, so
+    // it cannot decide which routes to build (SD-1074). A deep link is judged
+    // in the guard, once the answer has settled.
+    ...([{
+      path: '/travel/hotels',
+      name: 'hotels',
+      component: () => import('@/views/Travel/Hotels/IndexView.vue'),
+      meta: {
+        requiresProduct: PRODUCT.HOTELS,
+        titleKey: 'routes.hotels',
         description: '',
       },
     }, {
+      path: '/travel/hotel/:id/:slug',
+      name: 'viewHotel',
+      props: route => ({ id: route.params.id, slug: route.params.slug, search: route.query.search }),
+      component: () => import('@/views/Travel/Hotels/HotelView.vue'),
+      meta: {
+        requiresProduct: PRODUCT.HOTELS,
+        titleKey: 'routes.viewHotel',
+        description: '',
+      },
+    }, {
+      // The price held against a chosen rate, and what a booking is created from.
+      path: '/travel/quote/:id',
+      name: 'travelQuote',
+      props: route => ({ quoteId: route.params.id }),
+      component: () => import('@/views/Travel/Hotels/HotelQuoteView.vue'),
+      meta: {
+        requiresProduct: PRODUCT.HOTELS,
+        titleKey: 'routes.yourPrice',
+        description: '',
+      },
+    }, {
+      // Bookings a customer already holds, as opposed to an attempt in flight.
+      path: '/travel/bookings',
+      name: 'travelBookings',
+      component: () => import('@/views/Travel/Bookings/IndexView.vue'),
+      meta: {
+        requiresProduct: PRODUCT.HOTELS,
+        titleKey: 'routes.yourBookings',
+        description: '',
+      },
+    }, {
+      // Where a payment is watched until it settles. Reachable on its own so a
+      // provider can be pointed back at it, and so a customer who closed the tab
+      // has somewhere to return to.
+      path: '/travel/booking/:id/payment',
+      name: 'travelPaymentStatus',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/PaymentStatusView.vue'),
+      meta: {
+        requiresProduct: PRODUCT.HOTELS,
+        titleKey: 'routes.yourPayment',
+        description: '',
+      },
+    }, {
+      // Reached once a quote becomes a real booking. The room is already held,
+      // so leaving this page loses the payment, never the booking.
+      path: '/travel/booking/:id/pay',
+      name: 'travelBookingPayment',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/PaymentView.vue'),
+      meta: {
+        requiresProduct: PRODUCT.HOTELS,
+        titleKey: 'routes.payForYourBooking',
+        description: '',
+      },
+    }, {
+      path: '/travel/booking/:id',
+      name: 'travelBooking',
+      props: route => ({ orderId: route.params.id }),
+      component: () => import('@/views/Travel/Bookings/ItemView.vue'),
+      meta: {
+        requiresProduct: PRODUCT.HOTELS,
+        titleKey: 'routes.booking',
+        description: '',
+      },
+    }]),
+    {
       path: '/transfer/:quoteId',
       name: 'transferWizard',
       props: route => ({ id: route.params.quoteId }),
       component: () => import('@/views/Transfer/IndexView.vue'),
       meta: {
-        title: 'Send Money',
+        titleKey: 'routes.sendMoney',
         description: '',
       },
     }, {
@@ -86,7 +184,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transfer/PaymentView.vue'),
       meta: {
-        title: 'Make Payment',
+        titleKey: 'routes.makePayment',
         description: '',
       },
     }, {
@@ -95,7 +193,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transfer/PaymentCallbackView.vue'),
       meta: {
-        title: 'Processing Payment',
+        titleKey: 'routes.processingPayment',
         description: '',
       },
     }, {
@@ -103,7 +201,7 @@ const router = createRouter({
       name: 'transactions',
       component: () => import('@/views/Transaction/IndexView.vue'),
       meta: {
-        title: 'Transactions',
+        titleKey: 'routes.transactions',
         description: '',
       },
     }, {
@@ -112,7 +210,7 @@ const router = createRouter({
       props: route => ({ id: route.params.transactionId }),
       component: () => import('@/views/Transaction/ItemView.vue'),
       meta: {
-        title: 'Transactions',
+        titleKey: 'routes.transactions',
         description: '',
       },
     }, {
@@ -120,7 +218,7 @@ const router = createRouter({
       name: 'recipients',
       component: () => import('@/views/Recipient/IndexView.vue'),
       meta: {
-        title: 'Recipients',
+        titleKey: 'routes.recipients',
         description: '',
       },
     }, {
@@ -129,7 +227,7 @@ const router = createRouter({
       props: route => ({ id: route.params.id }),
       component: () => import('@/views/Recipient/ItemView.vue'),
       meta: {
-        title: 'Recipients',
+        titleKey: 'routes.recipients',
         description: '',
       },
     }, {
@@ -137,7 +235,7 @@ const router = createRouter({
       name: 'accountVerification',
       component: () => import('@/views/AccountVerification/IndexView.vue'),
       meta: {
-        title: 'Account Verification',
+        titleKey: 'routes.accountVerification',
         description: '',
       },
     }, {
@@ -146,7 +244,7 @@ const router = createRouter({
       props: route => ({ id: route.params.category }),
       component: () => import('@/views/AccountVerification/CategoryView.vue'),
       meta: {
-        title: 'Account Verification',
+        titleKey: 'routes.accountVerification',
         description: '',
       },
     }, {
@@ -154,7 +252,7 @@ const router = createRouter({
       name: 'settings',
       component: () => import('@/views/SettingsView.vue'),
       meta: {
-        title: 'Settings',
+        titleKey: 'routes.settings',
         description: '',
       },
     }, {
@@ -162,21 +260,55 @@ const router = createRouter({
       name: 'devices',
       component: () => import('@/views/DeviceView.vue'),
       meta: {
-        title: 'Devices',
+        titleKey: 'routes.devices',
         description: '',
       },
     },
-    {
-      path: '/contact',
-      name: 'contact',
-      component: () => import('@/views/ContactView.vue'),
+    // The wallet's own runtime guard is the documented probe of GET
+    // /wallet/subscription; the licence decides whether that probe happens.
+    ...([{
+      path: '/wallet',
+      name: 'wallet',
+      component: () => import('@/views/Wallet/IndexView.vue'),
       meta: {
-        title: 'Contact Support',
-        description: 'Reach us via WhatsApp or Email.',
+        requiresProduct: PRODUCT.WALLETS,
+        titleKey: 'routes.wallet',
+        description: '',
       },
-    },
+    }, {
+      path: '/wallet/statement',
+      name: 'walletStatement',
+      component: () => import('@/views/Wallet/StatementView.vue'),
+      meta: {
+        requiresProduct: PRODUCT.WALLETS,
+        titleKey: 'routes.walletStatement',
+        description: '',
+      },
+    }]),
+    {
+      // Anything unmatched. Without this an unknown address rendered an
+      // empty RouterView titled "Default Title".
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      component: () => import('@/views/NotFoundView.vue'),
+      meta: {
+        titleKey: 'routes.pageNotFound',
+        description: '',
+      },
+    }
   ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    if (to.hash) {
+      return { el: to.hash, top: 16 }
+    }
+    return { top: 0 }
+  },
 })
+
+const APP_NAME = import.meta.env.VITE_APP_NAME || 'RemitSo'
 
 NProgress.configure({ showSpinner: false, trickleSpeed: 300 })
 
@@ -185,8 +317,35 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
+// Resolved inside the guard rather than at module load: the store needs the
+// pinia the app installs, and this module is imported before that happens.
+router.beforeEach((to) => {
+  const guard = createAuthGuard({
+    store: useCustomerStore(),
+    // The interceptor's own 401 redirect would race the one this guard
+    // returns and win without the redirect query.
+    refresh: () => useCustomerUtils().refresh({skipAuthRedirect: true}),
+  })
+  return guard(to)
+})
+
+// A route that needs a licensed product waits for the first service-status
+// answer, then is judged against it. Waiting is what makes a deep link honest:
+// judged against an empty list, every product page would 404 on a cold start.
+router.beforeEach(async (to) => {
+  const product = to.meta?.requiresProduct
+  if (! product) {
+    return true
+  }
+  await productsSettled()
+
+  return offersProduct(product) ? true : {name: 'notFound'}
+})
+
 router.beforeEach((to, from) => {
-  document.title = to.meta?.title ?? 'Default Title'
+  // The tab title is copy too, so it comes from the catalogue and follows the
+  // brand's language rather than staying English.
+  document.title = to.meta?.titleKey ? i18n.global.t(to.meta.titleKey) : APP_NAME
 })
 
 router.afterEach(() => {

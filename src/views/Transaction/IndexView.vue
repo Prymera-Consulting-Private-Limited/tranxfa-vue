@@ -1,4 +1,10 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import Calculator from "@/components/Calculator.vue";
 import { computed, onMounted, ref } from "vue";
@@ -18,11 +24,16 @@ const timeUtils = useTimeUtils();
 
 const data = ref(null);
 const isLoading = ref(true);
+const loadFailure = ref(null);
 
 async function getTransactions(page = null) {
   isLoading.value = true;
+  loadFailure.value = null;
   await transactionUtils.get(page).then((response) => {
     data.value = response.data;
+  }).catch((e) => {
+    logRequestFailure(e, 'transactions');
+    loadFailure.value = failureMessage(e, t('account.weCouldntLoadYour2'));
   }).finally(() => {
     isLoading.value = false;
   });
@@ -48,22 +59,18 @@ const transactions = computed(() => {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 grid xl:grid-cols-3 gap-8">
-        <h1 class="sr-only">Transactions</h1>
+        <h1 class="sr-only">{{ $t('account.transactions') }}</h1>
         <div class="lg:col-span-2 flex flex-col gap-4">
           <div
             class="flex flex-col gap-3 rounded-lg border border-gray-100 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div>
-              <h2 class="text-base font-semibold text-gray-900">Tus transacciones</h2>
-              <p class="mt-0.5 text-sm text-gray-500">
-                Solicite un extracto por correo electrónico para cualquier rango de fechas.
-              </p>
+              <h2 class="text-base font-semibold text-gray-900">{{ $t('account.yourTransactions') }}</h2>
+              <p class="mt-0.5 text-sm/6 text-gray-500">{{ $t('account.statementHint') }}</p>
             </div>
             <button type="button"
-              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
               @click="isStatementModalOpen = true">
-              <ArrowDownTrayIcon class="size-5" aria-hidden="true" />
-              Descargar declaración
-            </button>
+              <ArrowDownTrayIcon class="size-5" aria-hidden="true" />{{ $t('account.downloadStatement') }}</button>
           </div>
           <template v-if="isLoading">
             <div class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
@@ -75,6 +82,9 @@ const transactions = computed(() => {
                 </div>
               </div>
             </div>
+          </template>
+          <template v-else-if="loadFailure">
+            <LoadFailurePanel :title="$t('account.transfersLoadFailure')" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="getTransactions()" class="mt-0 lg:col-span-2" />
           </template>
           <template v-else>
             <template v-if="transactions?.length > 0">
@@ -104,13 +114,8 @@ const transactions = computed(() => {
                 class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white shadow-lg">
                 <div>
                   <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
-                  <span class="mt-4 block text-lg font-semibold text-gray-900">Aún no tienes transacciones</span>
-                  <p class="mt-2 text-sm text-gray-600 max-w-sm">
-                    ¿Listo para enviar dinero? Tu primera
-                    transferencia está a solo unos clics.
-                    Comienza ahora y disfruta de envíos
-                    rápidos, seguros y sin complicaciones.
-                  </p>
+                  <span class="mt-4 block text-lg font-semibold text-gray-900">{{ $t('account.noTransactionsYet') }}</span>
+                  <p class="mt-2 text-sm/6 text-gray-600 max-w-sm">{{ $t('account.noTransactionsHint') }}</p>
                 </div>
               </div>
             </template>

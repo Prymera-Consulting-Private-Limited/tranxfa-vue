@@ -101,7 +101,13 @@ export class Customer {
     /**
      * @type {string|null}
      */
-    poiNameCheck = null;
+    /**
+     * `undeterministic`, `passed` or `failed`: whether the identity document
+     * agrees with the profile. On `failed` the customer can apply the details
+     * from the document (Apply Info From POI) instead of hitting the refusal
+     * at the end of checkout.
+     */
+    poiInfoCheck = null;
 
     /**
      * @type {Boolean}
@@ -143,7 +149,7 @@ export class Customer {
         customer.uniqueIdentityNumber = data.unique_identity_number;
         customer.createdAt = data.created_at;
         customer.updatedAt = data.updated_at;
-        customer.poiNameCheck = data.poi_name_check;
+        customer.poiInfoCheck = data.poi_info_check ?? null;
         customer.isBlockedForSending = data.is_blocked_for_sending;
         if (data.account) {
             customer.account = Account.getInstance(data.account);
