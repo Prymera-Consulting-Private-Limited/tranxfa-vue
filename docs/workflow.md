@@ -8,16 +8,29 @@ pull requests target `main`. Brand branches are deploys, not review targets.
 
 ## The five steps
 
-1. **Ticket first.** Create the Rover ticket before anything else, under the
-   RemitSo project with company "Prymera (CO)". The description carries the
-   problem, what will change, and a "Done when" list the PR can be checked
-   against. Nothing is branched, committed or opened without a ticket
-   number. Set the ETA before the ticket goes to in progress.
+1. **Ticket first, proposed before it is created.** Never call
+   `rover_create_ticket` without asking. Propose the ticket (subject, why
+   it is not a chore, and the description) and wait for a yes. This is the
+   console's rule from 2026-09-15, adopted here on 2026-09-19, and it holds
+   for a ticket raised mid-task too. Search the ledger first
+   (`rover_search_tickets` on the file path, route or symptom); on a hit,
+   add to that ticket rather than opening a second.
+   Once approved, the ticket goes under the RemitSo project with company
+   "Prymera (CO)". The description carries the problem, what will change,
+   and a "Done when" list the PR can be checked against. Nothing is branched,
+   committed or opened without a ticket number. Set the ETA before the ticket
+   goes to in progress.
    **Assign it to Dhruv Patel**, who owns this repository: in Rover the
    record is `Dhruv`, `dhruv@remitso.com`. Assignment is a separate call
    (`rover_assign`) and worth reading back, because a ticket created with an
    assignee field the server does not recognise is created unassigned and
-   then sits in nobody's queue. This holds for a ticket raised mid-task too.
+   then sits in nobody's queue.
+   **A small self-contained fix needs no ticket.** A wrong constant, a stale
+   comment, a missing field or a rename (anything whose whole story fits in
+   the commit message) ships from `chore/<slug>`, cut from `main`, with a PR
+   whose title has no SD prefix. Keep a ticket when the work needs a
+   decision, has acceptance criteria worth agreeing in advance, spans more
+   than one change, or is something a client will ask about.
 2. **Branch from `main`.** `feature/sd-<n>-<short-slug>`, always cut from a
    fresh `origin/main`. One ticket, one branch; a stack of dependent PRs uses
    one ticket and numbered slugs (`feature/sd-512-guard-1-router`,
@@ -38,8 +51,9 @@ pull requests target `main`. Brand branches are deploys, not review targets.
 - Progress goes to the ticket as one internal comment per review round,
   written for colleagues who will not open GitHub: state of the PR,
   decisions taken, what is still open and whose action is next.
-- A defect found on the way that is outside the ticket's scope gets its own
-  ticket. Not a silent fix, and not a note in the PR only.
+- A defect found on the way that is outside the ticket's scope is proposed as
+  its own ticket, or shipped as a chore if it is small enough. Not a silent
+  fix, and not a note in the PR only.
 - The closing note is the record the deployment ledger and the next audit
   read. It should let someone who was not there answer "what changed, where
   is it, and what is still owed" without opening the PR.

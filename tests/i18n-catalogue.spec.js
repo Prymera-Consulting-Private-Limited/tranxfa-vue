@@ -111,6 +111,7 @@ const MIGRATED = [
   'src/components/Payment/Apaylo.vue',
   'src/components/Payment/CinetPay.vue',
   'src/components/Payment/Fincode.vue',
+  'src/components/Payment/HeldByAction.vue',
   'src/components/Payment/ManualPayment.vue',
   'src/components/Payment/Monoova.vue',
   'src/components/Payment/PagaPayment.vue',
@@ -128,7 +129,10 @@ const MIGRATED = [
   'src/views/Travel/Bookings/Partials/BookingCancellation.vue',
   'src/views/Travel/Bookings/Partials/BookingCard.vue',
   'src/views/Travel/Bookings/Partials/BookingPayments.vue',
+  'src/views/Travel/Bookings/Partials/BookingNextStep.vue',
   'src/views/Travel/Bookings/Partials/BookingStateBadge.vue',
+  'src/views/Travel/Bookings/Partials/CancelPaymentAction.vue',
+  'src/views/Travel/Bookings/Partials/DepositAccountDetails.vue',
   'src/views/Travel/Bookings/Partials/VolumePayment.vue',
   'src/views/Travel/Bookings/PaymentStatusView.vue',
   'src/views/Travel/Bookings/PaymentView.vue',
@@ -150,6 +154,7 @@ const MIGRATED = [
   'src/views/Travel/Hotels/Partials/HotelRooms.vue',
   'src/views/Travel/Hotels/Partials/HotelSort.vue',
   'src/views/Travel/Hotels/Partials/HotelStayCard.vue',
+  'src/views/Travel/Hotels/Partials/PayableAtProperty.vue',
   'src/views/Travel/Hotels/Partials/PriceChangeDialog.vue',
   'src/views/Travel/Hotels/Partials/SearchBar.vue',
   // SD-1113: the sweep could not see a returned sentence, so these two were
@@ -610,9 +615,11 @@ describe('a reachable screen does not borrow copy from a product namespace', () 
   const PRODUCT_NAMESPACES = ['travel', 'wallet'];
 
   // Where each product's own screens live. A file under one of these may of
-  // course use its own namespace.
+  // course use its own namespace. Travel's composables format its stays and
+  // occupancy (SD-1257), so they are its own too - which holds only while
+  // nothing outside travel imports them, pinned below.
   const OWNS = {
-    travel: [/^src\/views\/Travel\//],
+    travel: [/^src\/views\/Travel\//, /^src\/composables\/travel\//],
     wallet: [/^src\/views\/Wallet\//, /^src\/components\/Wallet\//],
   };
 
@@ -632,6 +639,17 @@ describe('a reachable screen does not borrow copy from a product namespace', () 
       .filter(file => asks.test(read(file)));
 
     expect(borrowers, `these are reachable when ${namespace} is unlicensed, and would read English:\n  ${borrowers.join('\n  ')}`)
+      .toEqual([]);
+  });
+
+  // A reachable screen that imported a travel composable would borrow its copy
+  // one step removed, where the check above cannot see it.
+  it('travel composables are only imported by travel', () => {
+    const importers = filesUnder('src')
+      .filter(file => ! OWNS.travel.some(pattern => pattern.test(file)))
+      .filter(file => /['"]@\/composables\/travel\//.test(read(file)));
+
+    expect(importers, `these reach travel's copy through its composables:\n  ${importers.join('\n  ')}`)
       .toEqual([]);
   });
 });

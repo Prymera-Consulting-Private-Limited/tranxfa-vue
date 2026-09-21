@@ -46,6 +46,18 @@ export function serviceStatusEnabled() {
 }
 
 /**
+ * Whether the verification page lists only the document categories the console
+ * marks required.
+ *
+ * The console offers every category the customer's country accepts, and since
+ * SD-1223 says which ones a transfer will really ask for. Off by default, so a
+ * brand keeps listing everything until it chooses otherwise.
+ */
+export function verificationRequiredOnly() {
+    return flag(import.meta.env.VITE_VERIFICATION_REQUIRED_ONLY, false);
+}
+
+/**
  * Which Volume (open banking) environment to talk to.
  *
  * The transfer flow used to hardcode SANDBOX. A production build that ships

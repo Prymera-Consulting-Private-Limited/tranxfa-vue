@@ -11,9 +11,10 @@ import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import HotelMealBadge from '@/views/Travel/Hotels/Partials/HotelMealBadge.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
 import GuestContactForm from '@/views/Travel/Hotels/Partials/GuestContactForm.vue';
+import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
 import TravelQuote from '@/models/travel/quote.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
-import {getGuestBreakdown, useHotelUtils} from '@/composables/travel/hotels/hotel_utils.js';
+import {getGuestSummary, getStayLabel, useHotelUtils} from '@/composables/travel/hotels/hotel_utils.js';
 import {useOrderUtils} from '@/composables/travel/order_utils.js';
 import {CalendarDaysIcon, ClockIcon, ExclamationTriangleIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 
@@ -70,15 +71,9 @@ const isRunningOut = computed(() => secondsLeft.value !== null && secondsLeft.va
 
 const isHeld = computed(() => !hasExpired.value && (secondsLeft.value === null || secondsLeft.value > 0));
 
-const stay = computed(() => {
-  if (!quote.value?.checkIn || !quote.value?.checkOut) {
-    return null;
-  }
+const stay = computed(() => getStayLabel(quote.value?.checkIn, quote.value?.checkOut));
 
-  return `${moment(quote.value.checkIn).format('ddd D MMM')} – ${moment(quote.value.checkOut).format('llll')}`;
-});
-
-const guests = computed(() => (quote.value ? getGuestBreakdown(quote.value.rooms) : []));
+const guests = computed(() => (quote.value ? getGuestSummary(quote.value.rooms) : null));
 
 /**
  * The quote is held rather than recalculated — the price, the rule behind it and
@@ -118,9 +113,9 @@ const bookingValidation = ref(null);
 const bookingRefused = ref(false);
 
 /**
- * Turns the hold into a real booking. Payment is a separate step against the
- * order this creates — the room is held either way, and a payment page that
- * never opens should not cost the customer the booking.
+ * Turns the hold into an order to pay for (SD-1282). Nothing is booked with the
+ * hotel yet: the room is booked once the payment arrives, so the order is
+ * opened first and a payment page that never opens costs the customer nothing.
  *
  * @param {object} payload
  */
@@ -150,7 +145,7 @@ async function book(payload) {
       bookingValidation.value = error.response?.data?.errors ?? null;
       bookingError.value = getCustomerMessage(error);
     } else {
-      bookingError.value = getCustomerMessage(error) ?? t('travel.weCouldNotBook');
+      bookingError.value = getCustomerMessage(error) ?? t('travel.weCouldNotContinueWithThis');
     }
 
     isBooking.value = false;
@@ -234,9 +229,9 @@ onUnmounted(() => clearInterval(clock));
                   <span v-if="quote.nights" class="text-gray-500">· {{ $t('travel.nightCount', quote.nights, {count: quote.nights}) }}</span>
                 </span>
               </p>
-              <p v-if="guests.length" class="flex items-start gap-2 text-gray-700">
+              <p v-if="guests" class="flex items-start gap-2 text-gray-700">
                 <UserGroupIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
-                <span>{{ guests.join(' · ') }}</span>
+                <span>{{ guests }}</span>
               </p>
             </div>
             <div v-if="quote.room" class="mt-4 border-t border-gray-100 pt-4">
@@ -267,7 +262,7 @@ onUnmounted(() => clearInterval(clock));
               </div>
             </dl>
             <!-- Not part of the total: the hotel collects this on arrival. -->
-            <p v-if="quote.payableAtProperty.isStated" class="border-t border-gray-100 px-5 py-3 text-sm/6 text-warning-700">{{ $t('travel.plusCurrencyprefixedPayableAtThe', {currencyPrefixed: quote.payableAtProperty.currencyPrefixed}) }}</p>
+            <PayableAtProperty :charges="quote.payableAtProperty" class="border-t border-gray-100 px-5 py-3" />
           </section>
           <!-- What cancelling would give back, while the terms still say so. -->
           <section v-if="quote.cancellation?.refundNow?.isStated" class="mt-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">

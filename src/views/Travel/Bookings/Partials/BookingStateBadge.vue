@@ -14,6 +14,19 @@ const props = defineProps({
 // The api writes the words; this only chooses the colour. A state we have not
 // met still renders, in neutral, rather than disappearing.
 const classes = computed(() => {
+  // Paid, and the hotel could not provide the room. The order's own state says
+  // nothing went wrong, so this is the fulfilment's answer (SD-1282).
+  if (props.order.isUndelivered) {
+    return 'bg-danger-50 text-danger-700 ring-danger-200';
+  }
+
+  // Waiting on the customer to pay. FULFILLED only says the hotel confirmed the
+  // room, and green would tell them it is done (SD-1230); an order that has only
+  // been opened (SD-1282) is not done either.
+  if (props.order.isAwaitingPayment || props.order.isPriceLocked) {
+    return 'bg-warning-50 text-warning-800 ring-warning-200';
+  }
+
   switch (props.order.state) {
     case 'FULFILLED':
       return 'bg-success-50 text-success-700 ring-success-200';
@@ -35,13 +48,14 @@ const classes = computed(() => {
 
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <span :class="[classes, 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ order.stateLabel ?? order.state }}</span>
-    <!-- The hotel answers separately and later, so this is the ordinary state of
-    a new booking rather than anything having gone wrong. -->
-    <span v-if="order.isAwaitingHotel" class="inline-flex items-center gap-1.5 rounded-lg bg-warning-50 px-2.5 py-1 text-xs/5 font-medium text-warning-700 ring-1 ring-warning-200 ring-inset">
-      <span class="relative flex size-1.5">
-        <span class="absolute inline-flex size-full animate-ping rounded-full bg-warning-500 opacity-75" />
-        <span class="relative inline-flex size-1.5 rounded-full bg-warning-500" />
-      </span>{{ $t('travel.confirmingWithTheHotel') }}</span>
+    <span :class="[classes, 'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">
+      <!-- The hotel answers separately and later, so this is the ordinary state
+      of a new booking rather than anything having gone wrong. The console's
+      label already says so ("Awaiting Hotel Confirmation"); the dot only shows
+      the page is still asking. -->
+      <span v-if="order.isAwaitingHotel" class="relative flex size-1.5" aria-hidden="true">
+        <span class="absolute inline-flex size-full animate-ping rounded-full bg-current opacity-75" />
+        <span class="relative inline-flex size-1.5 rounded-full bg-current" />
+      </span>{{ order.stateLabel ?? order.state }}</span>
   </div>
 </template>

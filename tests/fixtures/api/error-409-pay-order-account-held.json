@@ -1,0 +1,4 @@
+{
+  "type": "account_held",
+  "message": "Another payment is still holding your account while we wait for it. Please pay it or cancel it first, or try again later."
+}

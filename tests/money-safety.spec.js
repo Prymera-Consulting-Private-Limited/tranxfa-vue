@@ -55,10 +55,16 @@ describe('never risk a double payment', () => {
   // onto the translated refusal with `+`, which meant it stayed English in every
   // locale - so the assertion moves with it rather than pinning the sentence to
   // this file.
-  it('payment_amount_collides gets its own message and a nudge to change the amount', () => {
+  //
+  // SD-1251: the console's message already carries the advice for its reason,
+  // so the nudge is ours only when the message is missing, and only for a
+  // same-amount collision. What each case shows is pinned by driving the wizard
+  // in transfer-confirm-refusals.spec.js; this only keeps the wiring in place.
+  it('payment_amount_collides keeps the nudge for a same-amount collision and never for a held account', () => {
     const s = read('src/views/Transfer/IndexView.vue');
     expect(s).toContain('error.response.data.type === "payment_amount_collides"');
-    expect(s).toContain("t('transfer.wizard.changeTheAmountAndConfirm')");
+    expect(s).toMatch(/\[PaymentCollisionReason\.SAME_AMOUNT\]: \[[^\]]*t\('transfer\.wizard\.changeTheAmountAndConfirm'\)/);
+    expect(s).not.toMatch(/\[PaymentCollisionReason\.ACCOUNT_HELD\]: \[[^\]]*changeTheAmountAndConfirm/);
     expect(en.transfer.wizard.changeTheAmountAndConfirm).toBe('Change the amount and confirm again.');
   });
 });
