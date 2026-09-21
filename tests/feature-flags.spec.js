@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
-import {flag, serviceStatusEnabled} from "@/feature_flags.js";
+import {flag, serviceStatusEnabled, verificationRequiredOnly} from "@/feature_flags.js";
 
 describe('flag', () => {
     it.each([
@@ -62,6 +62,25 @@ describe('the maintenance banner flag', () => {
         for (const raw of ['1', 'yes', 'on', 'true']) {
             vi.stubEnv('VITE_SERVICE_STATUS_ENABLED', raw);
             expect(serviceStatusEnabled()).toBe(true);
+        }
+    });
+});
+
+// SD-1223. Off unless a brand asks, so every deployment keeps listing every
+// category until it decides otherwise.
+describe('the required-documents-only flag', () => {
+    afterEach(() => vi.unstubAllEnvs());
+
+    it('is off unless set, and reads every spelling', () => {
+        vi.stubEnv('VITE_VERIFICATION_REQUIRED_ONLY', '');
+        expect(verificationRequiredOnly()).toBe(false);
+        for (const raw of ['0', 'no', 'off', 'false']) {
+            vi.stubEnv('VITE_VERIFICATION_REQUIRED_ONLY', raw);
+            expect(verificationRequiredOnly()).toBe(false);
+        }
+        for (const raw of ['1', 'yes', 'on', 'true']) {
+            vi.stubEnv('VITE_VERIFICATION_REQUIRED_ONLY', raw);
+            expect(verificationRequiredOnly()).toBe(true);
         }
     });
 });

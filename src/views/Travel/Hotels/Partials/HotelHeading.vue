@@ -1,6 +1,7 @@
 <script setup>
 import {computed} from 'vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
+import {formatHotelTime} from '@/composables/travel/hotels/hotel_utils.js';
 import {ArrowTopRightOnSquareIcon, ClockIcon, MapPinIcon} from '@heroicons/vue/24/outline';
 import {useI18n} from "vue-i18n";
 
@@ -21,11 +22,11 @@ const times = computed(() => {
   const parts = [];
 
   if (props.hotel.checkInFrom) {
-    parts.push(t('travel.checkInFromCheckinfrom', {checkInFrom: props.hotel.checkInFrom}));
+    parts.push(t('travel.checkInFromCheckinfrom', {checkInFrom: formatHotelTime(props.hotel.checkInFrom)}));
   }
 
   if (props.hotel.checkOutUntil) {
-    parts.push(t('travel.checkOutByCheckoutuntil', {checkOutUntil: props.hotel.checkOutUntil}));
+    parts.push(t('travel.checkOutByCheckoutuntil', {checkOutUntil: formatHotelTime(props.hotel.checkOutUntil)}));
   }
 
   return parts.length ? parts.join(' · ') : null;

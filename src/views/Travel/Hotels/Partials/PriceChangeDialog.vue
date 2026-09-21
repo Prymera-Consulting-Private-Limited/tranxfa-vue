@@ -78,7 +78,7 @@ defineEmits(['confirm', 'cancel']);
                     <span class="text-4xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ amount }}</span>
                   </p>
                 </div>
-                <p class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.continuingBooksAtThisPrice') }}</p>
+                <p class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.continuingTakesYouToPayment') }}</p>
               </div>
               <div class="flex flex-col gap-2.5 px-6 pb-6 pt-5">
                 <button
@@ -91,7 +91,7 @@ defineEmits(['confirm', 'cancel']);
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                   </svg>
-                  {{ isBooking ? $t('travel.booking2') : $t('travel.bookAtThisPrice') }}
+                  {{ isBooking ? $t('travel.continuing') : $t('travel.continueAtThisPrice') }}
                 </button>
                 <button
                     type="button"

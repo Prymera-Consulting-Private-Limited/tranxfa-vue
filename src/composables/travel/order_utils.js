@@ -119,17 +119,37 @@ export function useOrderUtils() {
      * Opens the payment with the provider in the same request, answering with a
      * payment_url wherever the provider uses one.
      *
-     * Volume, the only rail this deployment offers, uses none — it is sdk driven,
-     * so the url is null permanently and the hand-off is a call into
-     * window.Volume rather than a redirect. What that call needs is not on this
-     * response yet, so it is not wired; PaymentView's pay() records what is
-     * missing and why guessing at it would be worse than waiting.
+     * Two rails use none. Volume is sdk driven, so the url is null permanently
+     * and the hand-off is a call into window.Volume rather than a redirect. A
+     * PayID or bank transfer rail answers with client_payment_account instead —
+     * the customer's own account to send the money to — or, the first time they
+     * pay that way, CREATED with no account while it is opened.
+     *
+     * A 409 carries a type saying why the order cannot take the payment (see
+     * OrderPaymentRefusalType), and a message written for the customer.
      *
      * @param {string} orderId
      * @param {object} payload
      */
     async function createPayment(orderId, payload) {
         return await axios.post(`/client/v1/travel/order/${orderId}/payment`, payload);
+    }
+
+    /**
+     * Lets go of a payment the customer has not made. A PayID or bank transfer
+     * payment holds their deposit account until it is paid or cancelled, and
+     * every other payment into that account is refused meanwhile, so this is
+     * how they unblock themselves. The account is free the moment it answers.
+     *
+     * 200 is the payment, CANCELLED, in Pay Order's shape. A 409 with
+     * payment_not_open means it is too late: paid, failed, already cancelled,
+     * or held at the provider. Either way the order is re-read afterwards.
+     *
+     * @param {string} orderId
+     * @param {string} paymentId The payment's id, not its reference.
+     */
+    async function cancelPayment(orderId, paymentId) {
+        return await axios.post(`/client/v1/travel/order/${orderId}/payment/${paymentId}/cancel`);
     }
 
     /**
@@ -157,6 +177,7 @@ export function useOrderUtils() {
         bookQuote,
         paymentMethods,
         createPayment,
+        cancelPayment,
         cancelOrder,
     }
 }

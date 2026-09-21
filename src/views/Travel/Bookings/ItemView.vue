@@ -4,16 +4,20 @@ import {useI18n} from "vue-i18n";
 const {t} = useI18n();
 
 import {computed, onUnmounted, ref, watch} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import {safeReturnTo} from '@/composables/return_to.js';
 import moment from 'moment';
 import CustomerLayout from '@/components/CustomerLayout.vue';
+import BookingNextStep from '@/views/Travel/Bookings/Partials/BookingNextStep.vue';
 import BookingStateBadge from '@/views/Travel/Bookings/Partials/BookingStateBadge.vue';
 import BookingCancellation from '@/views/Travel/Bookings/Partials/BookingCancellation.vue';
 import BookingPayments from '@/views/Travel/Bookings/Partials/BookingPayments.vue';
+import DepositAccountDetails from '@/views/Travel/Bookings/Partials/DepositAccountDetails.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import Order from '@/models/travel/orders/order.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {CONFIRMATION_POLL_MS, useOrderUtils} from '@/composables/travel/order_utils.js';
-import {getGuestBreakdown} from '@/composables/travel/hotels/hotel_utils.js';
+import {getGuestBreakdown, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
 import {ChevronLeftIcon, ExclamationTriangleIcon, MapPinIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -25,18 +29,33 @@ const props = defineProps({
 
 const {getOrder, cancelOrder} = useOrderUtils();
 
+const router = useRouter();
+
 const order = ref(null);
+
+/**
+ * An open payment waiting for the customer to send money to their deposit
+ * account. Repeated here because this is where somebody who closed the payment
+ * screen comes back to, and paying again would be refused while it is open.
+ */
+const waitingPayment = computed(() => {
+  const latest = order.value?.latestPayment ?? null;
+
+  return latest?.hasAccountDetails ? latest : null;
+});
+
+function paymentSent() {
+  router.push({name: 'travelPaymentStatus', params: {id: props.orderId}, query: {sent: '1'}});
+}
 const isLoading = ref(true);
 const hasFailed = ref(false);
 const failureMessage = ref(null);
 
-const stay = computed(() => {
-  if (!order.value?.checkIn || !order.value?.checkOut) {
-    return null;
-  }
+// Only a console that says nothing was paid changes the words. One too old to
+// say keeps the ones this page always had (SD-1230).
+const isUnpaid = computed(() => order.value?.isPaid === false);
 
-  return `${moment(order.value.checkIn).format('llll')} – ${moment(order.value.checkOut).format('llll')}`;
-});
+const stay = computed(() => getStayLabel(order.value?.checkIn, order.value?.checkOut));
 
 const guests = computed(() => {
   const rooms = (order.value?.occupancy?.rooms ?? []).map(room => ({
@@ -132,6 +151,31 @@ async function load({quiet = false} = {}) {
   });
 }
 
+const route = useRoute();
+
+/**
+ * The customer let a waiting payment go, and their deposit account is free at
+ * once. Somebody sent here because this payment was holding the account goes
+ * back to the payment they were making (SD-1261). Anybody else is taken to
+ * where this booking's payment methods are, since it still has to be paid for
+ * and this page has no way to pay of its own.
+ */
+function paymentCancelled() {
+  router.push(safeReturnTo(route.query.returnTo) ?? {name: 'travelBookingPayment', params: {id: props.orderId}});
+}
+
+// Too late to cancel a payment: the api's own words, shown above the list the
+// re-read order then corrects.
+const paymentCancelRefusal = ref(null);
+
+/**
+ * @param {string} message
+ */
+function paymentCancelRefused(message) {
+  paymentCancelRefusal.value = message;
+  load({quiet: true});
+}
+
 const isCancelling = ref(false);
 const cancelError = ref(null);
 
@@ -207,16 +251,27 @@ onUnmounted(() => {
                 </p>
               </div>
               <div class="shrink-0 text-right">
-                <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ $t('travel.totalPaid') }}</p>
+                <p class="text-xs/5 font-medium tracking-wide text-gray-500 uppercase">{{ isUnpaid ? $t('account.total') : $t('travel.totalPaid') }}</p>
                 <p class="mt-1 text-2xl font-semibold tracking-tight text-gray-900">{{ order.total.currencyPrefixed }}</p>
               </div>
             </div>
             <div class="mt-4">
               <BookingStateBadge :order="order" />
             </div>
+            <!-- The order's own words say what happens next. For a paid booking the
+            hotel could not provide, that is the team getting in touch about the
+            refund, so it is set apart rather than read as one more line. -->
+            <p
+                v-if="order.stateDescription"
+                :class="order.isUndelivered
+                  ? 'mt-3 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700'
+                  : 'mt-2 text-sm/6 text-gray-600'"
+            >{{ order.stateDescription }}</p>
+            <BookingNextStep :order="order" class="mt-4" />
             <p v-if="order.reference" class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.bookingReference', {reference: order.reference}) }}</p>
           </header>
           <div class="mt-4 space-y-4">
+            <DepositAccountDetails v-if="waitingPayment" :payment="waitingPayment" @paid="paymentSent" />
             <!-- Stay -->
             <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
               <header class="border-b border-gray-100 px-5 py-4">
@@ -259,7 +314,7 @@ onUnmounted(() => {
             <!-- What was charged, as written when the booking was made -->
             <section v-if="order.breakdown.length" class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
               <header class="border-b border-gray-100 px-5 py-4">
-                <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.whatYouPaidFor') }}</h2>
+                <h2 class="text-sm/6 font-semibold text-gray-900">{{ isUnpaid ? $t('travel.whatYourePayingFor') : $t('travel.whatYouPaidFor') }}</h2>
               </header>
               <dl class="divide-y divide-gray-100">
                 <div v-for="line in order.breakdown" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
@@ -274,11 +329,19 @@ onUnmounted(() => {
             </section>
             <BookingCancellation
                 :cancellation="order.cancellation"
+                :is-unpaid="order.isAwaitingPayment"
+                :has-waiting-payment="!!order.waitingPayment"
                 :is-cancelling="isCancelling"
                 :cancel-error="cancelError"
                 @cancel="cancel"
             />
-            <BookingPayments :payments="order.payments" />
+            <p v-if="paymentCancelRefusal" class="flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700">{{ paymentCancelRefusal }}</p>
+            <BookingPayments
+                :order-id="orderId"
+                :payments="order.payments"
+                @payment-cancelled="paymentCancelled"
+                @cancel-refused="paymentCancelRefused"
+            />
           </div>
         </template>
       </div>
