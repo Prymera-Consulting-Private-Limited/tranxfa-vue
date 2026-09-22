@@ -117,6 +117,16 @@ Use the `port-to-tenant-branches` skill. The rules it enforces:
    confirm-flow fix to one is unverified by definition; say so in the PR.
 6. **Staging before production.** `<brand>_staging` gets the pick and a smoke
    test before `<brand>_production`.
+7. **Never open the promotion pull request with a long-lived branch as its
+   head.** A pull request from `<brand>_staging` into `<brand>_production` -
+   or from `<brand>_production` into `<brand>_staging`, or either into
+   `main` - puts a permanent deploy branch behind GitHub's per-PR "Delete
+   branch" button, which does not know the difference between that and a
+   spent `feature/*` branch (PM-008). Cut a disposable `via/<slug>` branch
+   from the source environment branch instead, and open the PR from there:
+   `git switch -c via/<slug> origin/<source-branch>`, push it, PR into the
+   target branch. Only the via-branch is ever offered up for deletion after
+   the merge.
 
 ## A brand's copy after a merge
 
