@@ -1,0 +1,4 @@
+{
+  "type": "method_not_offered",
+  "message": "That payment method is no longer available for this order. Please choose another."
+}

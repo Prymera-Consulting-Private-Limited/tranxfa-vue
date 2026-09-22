@@ -48,7 +48,8 @@ class Session {
         const session = new Session();
         session.id = data.id;
         session.isMfaCompleted = data.is_mfa_completed;
-        session.sessionToken = data.session_token;
+        // The reference names it `token`; `session_token` was never sent.
+        session.sessionToken = data.token ?? data.session_token ?? null;
         session.mfaMethod = data.mfa_method;
         session.clientVersion = data.client_version;
         session.osVersion = data.os_version;

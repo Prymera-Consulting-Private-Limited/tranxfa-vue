@@ -1,0 +1,4599 @@
+{
+  "data": [
+    {
+      "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+      "iso2_alpha": "AU",
+      "iso3_alpha": "AUS",
+      "iso_numeric": "36",
+      "fips_code": "AS",
+      "slug": "australia",
+      "calling_code": "61",
+      "common_name": "Australia",
+      "official_name": "Australia",
+      "endonym": "Australia",
+      "demonym": "Australian, Australia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 15,
+        "expression": null
+      }
+    },
+    {
+      "id": "8fe1dcea-ff86-4ec5-aef5-10adb650f96b",
+      "iso2_alpha": "FJ",
+      "iso3_alpha": "FJI",
+      "iso_numeric": "242",
+      "fips_code": "FJ",
+      "slug": "fiji",
+      "calling_code": "679",
+      "common_name": "Fiji",
+      "official_name": "Fiji",
+      "endonym": "Fiji",
+      "demonym": "Fijian, Fiji",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "9cacff53-1cc6-4e56-b439-99ee93a50b3f",
+      "iso2_alpha": "CI",
+      "iso3_alpha": "CIV",
+      "iso_numeric": "384",
+      "fips_code": "IV",
+      "slug": "ivory-coast",
+      "calling_code": "225",
+      "common_name": "Ivory Coast",
+      "official_name": "C\u00f4te d'Ivoire",
+      "endonym": "C\u00f4te d'Ivoire",
+      "demonym": "Ivorian, Ivory Coast",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "21496bab-448d-4d6b-8fee-0dc477c23916",
+      "iso2_alpha": "LR",
+      "iso3_alpha": "LBR",
+      "iso_numeric": "430",
+      "fips_code": "LI",
+      "slug": "liberia",
+      "calling_code": "231",
+      "common_name": "Liberia",
+      "official_name": "Liberia",
+      "endonym": "Liberia",
+      "demonym": "Liberian, Liberia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "e52fc688-689a-4d89-ab61-dac051aadd93",
+      "iso2_alpha": "NG",
+      "iso3_alpha": "NGA",
+      "iso_numeric": "566",
+      "fips_code": "NI",
+      "slug": "nigeria",
+      "calling_code": "234",
+      "common_name": "Nigeria",
+      "official_name": "Nigeria",
+      "endonym": "Nigeria",
+      "demonym": "Nigerian, Nigeria",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "59068f68-ba8c-4541-a745-db695bc62e2e",
+      "iso2_alpha": "RW",
+      "iso3_alpha": "RWA",
+      "iso_numeric": "646",
+      "fips_code": "RW",
+      "slug": "rwanda",
+      "calling_code": "250",
+      "common_name": "Rwanda",
+      "official_name": "Rwanda",
+      "endonym": "Rwanda",
+      "demonym": "Rwandan, Rwanda",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "6f37a78f-b602-4dee-98c4-e49b4e6266f9",
+      "iso2_alpha": "WS",
+      "iso3_alpha": "WSM",
+      "iso_numeric": "882",
+      "fips_code": "WS",
+      "slug": "samoa",
+      "calling_code": "685",
+      "common_name": "Samoa",
+      "official_name": "Samoa",
+      "endonym": "Samoa",
+      "demonym": "Samoan, Samoa",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 3,
+        "max_length": 7,
+        "expression": null
+      }
+    },
+    {
+      "id": "b5fcaa6b-0707-4c3a-bb74-5c9509a203dd",
+      "iso2_alpha": "SL",
+      "iso3_alpha": "SLE",
+      "iso_numeric": "694",
+      "fips_code": "SL",
+      "slug": "sierra-leone",
+      "calling_code": "232",
+      "common_name": "Sierra Leone",
+      "official_name": "Sierra Leone",
+      "endonym": "Sierra Leone",
+      "demonym": "Sierra Leonean, Sierra Leone",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "d3bfedc3-1ba5-4443-b9b6-4236041df514",
+      "iso2_alpha": "ZM",
+      "iso3_alpha": "ZMB",
+      "iso_numeric": "894",
+      "fips_code": "ZA",
+      "slug": "zambia",
+      "calling_code": "260",
+      "common_name": "Zambia",
+      "official_name": "Zambia",
+      "endonym": "Zambia",
+      "demonym": "Zambian, Zambia",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "9e32e8c5-2cab-4bc5-b638-fb08f58f753b",
+      "iso2_alpha": "AF",
+      "iso3_alpha": "AFG",
+      "iso_numeric": "4",
+      "fips_code": "AF",
+      "slug": "afghanistan",
+      "calling_code": "93",
+      "common_name": "Afghanistan",
+      "official_name": "Afghanistan",
+      "endonym": "\u0627\u0641\u063a\u0627\u0646\u0633\u062a\u0627\u0646",
+      "demonym": "Afghan, Afghanistan",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "80e5cb03-b494-4243-b452-df8fec385dd7",
+      "iso2_alpha": "AX",
+      "iso3_alpha": "ALA",
+      "iso_numeric": "248",
+      "fips_code": "",
+      "slug": "aland",
+      "calling_code": "358",
+      "common_name": "\u00c5land",
+      "official_name": "\u00c5land Islands",
+      "endonym": "\u00c5land",
+      "demonym": "\u00c5landish, \u00c5land",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "7567554f-2c11-4998-a460-ea88643c3895",
+      "iso2_alpha": "AL",
+      "iso3_alpha": "ALB",
+      "iso_numeric": "8",
+      "fips_code": "AL",
+      "slug": "albania",
+      "calling_code": "355",
+      "common_name": "Albania",
+      "official_name": "Albania",
+      "endonym": "Shqip\u00ebria",
+      "demonym": "Albanian, Albania",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 3,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "2b58acd8-efb1-436a-88d6-b55c8bdf9ee6",
+      "iso2_alpha": "DZ",
+      "iso3_alpha": "DZA",
+      "iso_numeric": "12",
+      "fips_code": "AG",
+      "slug": "algeria",
+      "calling_code": "213",
+      "common_name": "Algeria",
+      "official_name": "Algeria",
+      "endonym": "\u0627\u0644\u062c\u0632\u0627\u0626\u0631",
+      "demonym": "Algerian, Algeria",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "607e2de0-7d88-45d8-b5ea-e7fb33467311",
+      "iso2_alpha": "AS",
+      "iso3_alpha": "ASM",
+      "iso_numeric": "16",
+      "fips_code": "AQ",
+      "slug": "american-samoa",
+      "calling_code": "1",
+      "common_name": "American Samoa",
+      "official_name": "American Samoa",
+      "endonym": "American Samoa",
+      "demonym": "American Samoan, American Samoa",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "d9675054-c5db-4dc3-b985-8b6c86c04bfb",
+      "iso2_alpha": "AD",
+      "iso3_alpha": "AND",
+      "iso_numeric": "20",
+      "fips_code": "AN",
+      "slug": "andorra",
+      "calling_code": "376",
+      "common_name": "Andorra",
+      "official_name": "Andorra",
+      "endonym": "Andorra",
+      "demonym": "Andorran, Andorra",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "ba781501-5f84-4d41-bdb4-00169ed5175b",
+      "iso2_alpha": "AO",
+      "iso3_alpha": "AGO",
+      "iso_numeric": "24",
+      "fips_code": "AO",
+      "slug": "angola",
+      "calling_code": "244",
+      "common_name": "Angola",
+      "official_name": "Angola",
+      "endonym": "Angola",
+      "demonym": "Angolan, Angola",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "cf4c049d-8d2c-414c-a4b4-2227a60b6421",
+      "iso2_alpha": "AI",
+      "iso3_alpha": "AIA",
+      "iso_numeric": "660",
+      "fips_code": "AV",
+      "slug": "anguilla",
+      "calling_code": "1",
+      "common_name": "Anguilla",
+      "official_name": "Anguilla",
+      "endonym": "Anguilla",
+      "demonym": "Anguillian, Anguilla",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "5c739210-f507-4791-ac2c-0621d6592f54",
+      "iso2_alpha": "AQ",
+      "iso3_alpha": "ATA",
+      "iso_numeric": "10",
+      "fips_code": "AY",
+      "slug": "antarctica",
+      "calling_code": "672",
+      "common_name": "Antarctica",
+      "official_name": "Antarctica",
+      "endonym": "Antarctica",
+      "demonym": "Antarctica",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "897fee7c-d5dd-4bb7-8be4-be2e5a5481c2",
+      "iso2_alpha": "AG",
+      "iso3_alpha": "ATG",
+      "iso_numeric": "28",
+      "fips_code": "AC",
+      "slug": "antigua-and-barbuda",
+      "calling_code": "1",
+      "common_name": "Antigua and Barbuda",
+      "official_name": "Antigua and Barbuda",
+      "endonym": "Antigua and Barbuda",
+      "demonym": "Antiguan, Barbudan, Antigua and Barbuda",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "5f5bf929-ba2e-4591-95c3-4100008c30fa",
+      "iso2_alpha": "AR",
+      "iso3_alpha": "ARG",
+      "iso_numeric": "32",
+      "fips_code": "AR",
+      "slug": "argentina",
+      "calling_code": "54",
+      "common_name": "Argentina",
+      "official_name": "Argentina",
+      "endonym": "Argentina",
+      "demonym": "Argentinean, Argentina",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "4a70c09d-66e7-421f-883d-f66ec1a078e6",
+      "iso2_alpha": "AM",
+      "iso3_alpha": "ARM",
+      "iso_numeric": "51",
+      "fips_code": "AM",
+      "slug": "armenia",
+      "calling_code": "374",
+      "common_name": "Armenia",
+      "official_name": "Armenia",
+      "endonym": "\u0540\u0561\u0575\u0561\u057d\u057f\u0561\u0576",
+      "demonym": "Armenian, Armenia",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "13f3bfdd-820d-4838-bd73-731bb96ad034",
+      "iso2_alpha": "AW",
+      "iso3_alpha": "ABW",
+      "iso_numeric": "533",
+      "fips_code": "AA",
+      "slug": "aruba",
+      "calling_code": "297",
+      "common_name": "Aruba",
+      "official_name": "Aruba",
+      "endonym": "Aruba",
+      "demonym": "Aruban, Aruba",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "2ee2d506-c373-4b6a-a5e6-a6e36b5401f7",
+      "iso2_alpha": "AT",
+      "iso3_alpha": "AUT",
+      "iso_numeric": "40",
+      "fips_code": "AU",
+      "slug": "austria",
+      "calling_code": "43",
+      "common_name": "Austria",
+      "official_name": "Austria",
+      "endonym": "\u00d6sterreich",
+      "demonym": "Austrian, Austria",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 13,
+        "expression": null
+      }
+    },
+    {
+      "id": "3fdc845c-2918-406d-849d-c3c05fcfa5b6",
+      "iso2_alpha": "AZ",
+      "iso3_alpha": "AZE",
+      "iso_numeric": "31",
+      "fips_code": "AJ",
+      "slug": "azerbaijan",
+      "calling_code": "994",
+      "common_name": "Azerbaijan",
+      "official_name": "Azerbaijan",
+      "endonym": "Az\u0259rbaycan",
+      "demonym": "Azerbaijani, Azerbaijan",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "fbb0bbce-4606-424f-8e9e-8db221b76b36",
+      "iso2_alpha": "BS",
+      "iso3_alpha": "BHS",
+      "iso_numeric": "44",
+      "fips_code": "BF",
+      "slug": "bahamas",
+      "calling_code": "1",
+      "common_name": "Bahamas",
+      "official_name": "Bahamas",
+      "endonym": "Bahamas",
+      "demonym": "Bahamian, Bahamas",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "eb58aa42-13c2-45c0-88e4-8ce0b80f462d",
+      "iso2_alpha": "BH",
+      "iso3_alpha": "BHR",
+      "iso_numeric": "48",
+      "fips_code": "BA",
+      "slug": "bahrain",
+      "calling_code": "973",
+      "common_name": "Bahrain",
+      "official_name": "Bahrain",
+      "endonym": "\u200f\u0627\u0644\u0628\u062d\u0631\u064a\u0646",
+      "demonym": "Bahraini, Bahrain",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "71aedde9-155f-4c49-aa49-39d874203beb",
+      "iso2_alpha": "BD",
+      "iso3_alpha": "BGD",
+      "iso_numeric": "50",
+      "fips_code": "BG",
+      "slug": "bangladesh",
+      "calling_code": "880",
+      "common_name": "Bangladesh",
+      "official_name": "Bangladesh",
+      "endonym": "Bangladesh",
+      "demonym": "Bangladeshi, Bangladesh",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "99b17c96-61a7-4915-a846-830d9a0eaddc",
+      "iso2_alpha": "BB",
+      "iso3_alpha": "BRB",
+      "iso_numeric": "52",
+      "fips_code": "BB",
+      "slug": "barbados",
+      "calling_code": "1",
+      "common_name": "Barbados",
+      "official_name": "Barbados",
+      "endonym": "Barbados",
+      "demonym": "Barbadian, Barbados",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "ad9faed0-e4f0-403e-81bc-640ad1be121f",
+      "iso2_alpha": "BY",
+      "iso3_alpha": "BLR",
+      "iso_numeric": "112",
+      "fips_code": "BO",
+      "slug": "belarus",
+      "calling_code": "375",
+      "common_name": "Belarus",
+      "official_name": "Belarus",
+      "endonym": "\u0411\u0435\u043b\u0430\u0440\u0443\u0301\u0441\u044c",
+      "demonym": "Belarusian, Belarus",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 9,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "38e70857-eb26-4e95-9945-fbd833b20cc2",
+      "iso2_alpha": "BE",
+      "iso3_alpha": "BEL",
+      "iso_numeric": "56",
+      "fips_code": "BE",
+      "slug": "belgium",
+      "calling_code": "32",
+      "common_name": "Belgium",
+      "official_name": "Belgium",
+      "endonym": "Belgi\u00eb",
+      "demonym": "Belgian, Belgium",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "3763ede7-20c2-4700-bcff-16bdbe4107ca",
+      "iso2_alpha": "BZ",
+      "iso3_alpha": "BLZ",
+      "iso_numeric": "84",
+      "fips_code": "BH",
+      "slug": "belize",
+      "calling_code": "501",
+      "common_name": "Belize",
+      "official_name": "Belize",
+      "endonym": "Belize",
+      "demonym": "Belizean, Belize",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "d04eefaa-9a20-4ff8-8c90-6d3910fe6196",
+      "iso2_alpha": "BJ",
+      "iso3_alpha": "BEN",
+      "iso_numeric": "204",
+      "fips_code": "BN",
+      "slug": "benin",
+      "calling_code": "229",
+      "common_name": "Benin",
+      "official_name": "Benin",
+      "endonym": "B\u00e9nin",
+      "demonym": "Beninese, Benin",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "1449a869-92c7-466c-87ad-21b096934b81",
+      "iso2_alpha": "BM",
+      "iso3_alpha": "BMU",
+      "iso_numeric": "60",
+      "fips_code": "BD",
+      "slug": "bermuda",
+      "calling_code": "1",
+      "common_name": "Bermuda",
+      "official_name": "Bermuda",
+      "endonym": "Bermuda",
+      "demonym": "Bermudian, Bermuda",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "e0827f35-36ba-4738-bfb7-e45e564b2d4b",
+      "iso2_alpha": "BT",
+      "iso3_alpha": "BTN",
+      "iso_numeric": "64",
+      "fips_code": "BT",
+      "slug": "bhutan",
+      "calling_code": "975",
+      "common_name": "Bhutan",
+      "official_name": "Bhutan",
+      "endonym": "\u02bcbrug-yul",
+      "demonym": "Bhutanese, Bhutan",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "136fb334-50c9-417c-a6b3-3a7547c945fc",
+      "iso2_alpha": "BO",
+      "iso3_alpha": "BOL",
+      "iso_numeric": "68",
+      "fips_code": "BL",
+      "slug": "bolivia",
+      "calling_code": "591",
+      "common_name": "Bolivia",
+      "official_name": "Bolivia (Plurinational State of)",
+      "endonym": "Bolivia",
+      "demonym": "Bolivian, Bolivia",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "3dfd8c0e-0218-40e4-ab72-09ca356d455e",
+      "iso2_alpha": "BQ",
+      "iso3_alpha": "BES",
+      "iso_numeric": "535",
+      "fips_code": "",
+      "slug": "bonaire",
+      "calling_code": "1",
+      "common_name": "Bonaire",
+      "official_name": "Bonaire, Sint Eustatius and Saba",
+      "endonym": "Bonaire",
+      "demonym": "Dutch, Bonaire",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "a2ed2037-cc2e-41a0-966d-f6e26644fb14",
+      "iso2_alpha": "BA",
+      "iso3_alpha": "BIH",
+      "iso_numeric": "70",
+      "fips_code": "BK",
+      "slug": "bosnia-and-herzegovina",
+      "calling_code": "387",
+      "common_name": "Bosnia and Herzegovina",
+      "official_name": "Bosnia and Herzegovina",
+      "endonym": "Bosna i Hercegovina",
+      "demonym": "Bosnian, Herzegovinian, Bosnia and Herzegovina",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "e020f8ba-1aa3-4799-a359-b3629eff48b6",
+      "iso2_alpha": "BW",
+      "iso3_alpha": "BWA",
+      "iso_numeric": "72",
+      "fips_code": "BC",
+      "slug": "botswana",
+      "calling_code": "267",
+      "common_name": "Botswana",
+      "official_name": "Botswana",
+      "endonym": "Botswana",
+      "demonym": "Motswana, Botswana",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "92a5741d-5f2d-46f4-958e-5f241ab14504",
+      "iso2_alpha": "BV",
+      "iso3_alpha": "BVT",
+      "iso_numeric": "74",
+      "fips_code": "BV",
+      "slug": "bouvet-island",
+      "calling_code": "0",
+      "common_name": "Bouvet Island",
+      "official_name": "Bouvet Island",
+      "endonym": "Bouvet\u00f8ya",
+      "demonym": "Bouvet Island",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "b2dc9f4d-fc7a-4716-a06c-bd088e6b304b",
+      "iso2_alpha": "BR",
+      "iso3_alpha": "BRA",
+      "iso_numeric": "76",
+      "fips_code": "BR",
+      "slug": "brazil",
+      "calling_code": "55",
+      "common_name": "Brazil",
+      "official_name": "Brazil",
+      "endonym": "Brasil",
+      "demonym": "Brazilian, Brazil",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "e7bcc171-0c15-4b93-8949-e6cd04ad9c77",
+      "iso2_alpha": "IO",
+      "iso3_alpha": "IOT",
+      "iso_numeric": "86",
+      "fips_code": "IO",
+      "slug": "british-indian-ocean-territory",
+      "calling_code": "246",
+      "common_name": "British Indian Ocean Territory",
+      "official_name": "British Indian Ocean Territory",
+      "endonym": "British Indian Ocean Territory",
+      "demonym": "Indian, British Indian Ocean Territory",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "7c7eb7ff-5070-4ec9-be9d-dded4ebd5406",
+      "iso2_alpha": "VG",
+      "iso3_alpha": "VGB",
+      "iso_numeric": "92",
+      "fips_code": "VI",
+      "slug": "british-virgin-islands",
+      "calling_code": "1",
+      "common_name": "British Virgin Islands",
+      "official_name": "Virgin Islands (British)",
+      "endonym": "British Virgin Islands",
+      "demonym": "Virgin Islander, British Virgin Islands",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "7bdf0f47-82a5-4b8c-8889-e5cfeb1aa6fe",
+      "iso2_alpha": "BN",
+      "iso3_alpha": "BRN",
+      "iso_numeric": "96",
+      "fips_code": "BX",
+      "slug": "brunei",
+      "calling_code": "673",
+      "common_name": "Brunei",
+      "official_name": "Brunei Darussalam",
+      "endonym": "Negara Brunei Darussalam",
+      "demonym": "Bruneian, Brunei",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "e9e70d1d-5d5a-4502-8824-94b986494ce6",
+      "iso2_alpha": "BG",
+      "iso3_alpha": "BGR",
+      "iso_numeric": "100",
+      "fips_code": "BU",
+      "slug": "bulgaria",
+      "calling_code": "359",
+      "common_name": "Bulgaria",
+      "official_name": "Bulgaria",
+      "endonym": "\u0411\u044a\u043b\u0433\u0430\u0440\u0438\u044f",
+      "demonym": "Bulgarian, Bulgaria",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "751e13d8-d805-422a-8ecf-f060fa0e2608",
+      "iso2_alpha": "BF",
+      "iso3_alpha": "BFA",
+      "iso_numeric": "854",
+      "fips_code": "UV",
+      "slug": "burkina-faso",
+      "calling_code": "226",
+      "common_name": "Burkina Faso",
+      "official_name": "Burkina Faso",
+      "endonym": "Burkina Faso",
+      "demonym": "Burkinabe, Burkina Faso",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "8ae0b489-df29-44b8-8f7f-4e94e18fd034",
+      "iso2_alpha": "BI",
+      "iso3_alpha": "BDI",
+      "iso_numeric": "108",
+      "fips_code": "BY",
+      "slug": "burundi",
+      "calling_code": "257",
+      "common_name": "Burundi",
+      "official_name": "Burundi",
+      "endonym": "Burundi",
+      "demonym": "Burundian, Burundi",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "b093e571-9fa9-4eee-b628-c397d6a45f19",
+      "iso2_alpha": "KH",
+      "iso3_alpha": "KHM",
+      "iso_numeric": "116",
+      "fips_code": "CB",
+      "slug": "cambodia",
+      "calling_code": "855",
+      "common_name": "Cambodia",
+      "official_name": "Cambodia",
+      "endonym": "K\u00e2mp\u016dch\u00e9a",
+      "demonym": "Cambodian, Cambodia",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "89f08352-460e-49c9-b152-038b9d41039e",
+      "iso2_alpha": "CM",
+      "iso3_alpha": "CMR",
+      "iso_numeric": "120",
+      "fips_code": "CM",
+      "slug": "cameroon",
+      "calling_code": "237",
+      "common_name": "Cameroon",
+      "official_name": "Cameroon",
+      "endonym": "Cameroon",
+      "demonym": "Cameroonian, Cameroon",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "1b82cadb-b257-4031-946d-c54b79ae6d36",
+      "iso2_alpha": "CA",
+      "iso3_alpha": "CAN",
+      "iso_numeric": "124",
+      "fips_code": "CA",
+      "slug": "canada",
+      "calling_code": "1",
+      "common_name": "Canada",
+      "official_name": "Canada",
+      "endonym": "Canada",
+      "demonym": "Canadian, Canada",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "989174ac-bcf0-4bda-959f-c6e5d115a4b6",
+      "iso2_alpha": "CV",
+      "iso3_alpha": "CPV",
+      "iso_numeric": "132",
+      "fips_code": "CV",
+      "slug": "cape-verde",
+      "calling_code": "238",
+      "common_name": "Cape Verde",
+      "official_name": "Cabo Verde",
+      "endonym": "Cabo Verde",
+      "demonym": "Cape Verdian, Cape Verde",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "009d4a70-8a08-4190-9fee-4c43c913df3c",
+      "iso2_alpha": "KY",
+      "iso3_alpha": "CYM",
+      "iso_numeric": "136",
+      "fips_code": "CJ",
+      "slug": "cayman-islands",
+      "calling_code": "1",
+      "common_name": "Cayman Islands",
+      "official_name": "Cayman Islands",
+      "endonym": "Cayman Islands",
+      "demonym": "Caymanian, Cayman Islands",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "be988cf8-04de-49a4-98d7-3fbbf9986860",
+      "iso2_alpha": "CF",
+      "iso3_alpha": "CAF",
+      "iso_numeric": "140",
+      "fips_code": "CT",
+      "slug": "central-african-republic",
+      "calling_code": "236",
+      "common_name": "Central African Republic",
+      "official_name": "Central African Republic",
+      "endonym": "K\u00f6d\u00f6r\u00f6s\u00ease t\u00ee B\u00eaafr\u00eeka",
+      "demonym": "Central African, Central African Republic",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "d83e651d-6f5e-4056-8f74-08b75fcd1900",
+      "iso2_alpha": "TD",
+      "iso3_alpha": "TCD",
+      "iso_numeric": "148",
+      "fips_code": "CD",
+      "slug": "chad",
+      "calling_code": "235",
+      "common_name": "Chad",
+      "official_name": "Chad",
+      "endonym": "Tchad",
+      "demonym": "Chadian, Chad",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "f8e038d9-813f-4d51-9c3d-9eb58177a411",
+      "iso2_alpha": "CL",
+      "iso3_alpha": "CHL",
+      "iso_numeric": "152",
+      "fips_code": "CI",
+      "slug": "chile",
+      "calling_code": "56",
+      "common_name": "Chile",
+      "official_name": "Chile",
+      "endonym": "Chile",
+      "demonym": "Chilean, Chile",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "8b0c23cb-7bef-4ff7-a67a-b5fdb8589e28",
+      "iso2_alpha": "CN",
+      "iso3_alpha": "CHN",
+      "iso_numeric": "156",
+      "fips_code": "CH",
+      "slug": "china",
+      "calling_code": "86",
+      "common_name": "China",
+      "official_name": "China",
+      "endonym": "\u4e2d\u56fd",
+      "demonym": "Chinese, China",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 12,
+        "expression": null
+      }
+    },
+    {
+      "id": "cf45e5b3-8e8f-4ce1-8f68-3700d965d57e",
+      "iso2_alpha": "CX",
+      "iso3_alpha": "CXR",
+      "iso_numeric": "162",
+      "fips_code": "KT",
+      "slug": "christmas-island",
+      "calling_code": "61",
+      "common_name": "Christmas Island",
+      "official_name": "Christmas Island",
+      "endonym": "Christmas Island",
+      "demonym": "Christmas Island, Christmas Island",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "d62d5bc9-9b53-47fe-b932-75de76b37aff",
+      "iso2_alpha": "CC",
+      "iso3_alpha": "CCK",
+      "iso_numeric": "166",
+      "fips_code": "CK",
+      "slug": "cocos-keeling-islands",
+      "calling_code": "61",
+      "common_name": "Cocos [Keeling] Islands",
+      "official_name": "Cocos (Keeling) Islands",
+      "endonym": "Cocos (Keeling) Islands",
+      "demonym": "Cocos Islander, Cocos [Keeling] Islands",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "29b2171e-da5c-43d1-9fbb-32d25589d32b",
+      "iso2_alpha": "CO",
+      "iso3_alpha": "COL",
+      "iso_numeric": "170",
+      "fips_code": "CO",
+      "slug": "colombia",
+      "calling_code": "57",
+      "common_name": "Colombia",
+      "official_name": "Colombia",
+      "endonym": "Colombia",
+      "demonym": "Colombian, Colombia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "ad52e301-080d-43a2-8ad0-a73d7c462cc9",
+      "iso2_alpha": "KM",
+      "iso3_alpha": "COM",
+      "iso_numeric": "174",
+      "fips_code": "CN",
+      "slug": "comoros",
+      "calling_code": "269",
+      "common_name": "Comoros",
+      "official_name": "Comoros",
+      "endonym": "Komori",
+      "demonym": "Comoran, Comoros",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "b5e18b62-dbc7-4749-99ff-7ea43dceec17",
+      "iso2_alpha": "CK",
+      "iso3_alpha": "COK",
+      "iso_numeric": "184",
+      "fips_code": "CW",
+      "slug": "cook-islands",
+      "calling_code": "682",
+      "common_name": "Cook Islands",
+      "official_name": "Cook Islands",
+      "endonym": "Cook Islands",
+      "demonym": "Cook Islander, Cook Islands",
+      "mobile_number_rule": {
+        "exact_length": 5,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "2a7db452-f5a7-4607-becc-9181785510e8",
+      "iso2_alpha": "CR",
+      "iso3_alpha": "CRI",
+      "iso_numeric": "188",
+      "fips_code": "CS",
+      "slug": "costa-rica",
+      "calling_code": "506",
+      "common_name": "Costa Rica",
+      "official_name": "Costa Rica",
+      "endonym": "Costa Rica",
+      "demonym": "Costa Rican, Costa Rica",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "0e270445-eb23-4b5d-9642-5b38242d1112",
+      "iso2_alpha": "HR",
+      "iso3_alpha": "HRV",
+      "iso_numeric": "191",
+      "fips_code": "HR",
+      "slug": "croatia",
+      "calling_code": "385",
+      "common_name": "Croatia",
+      "official_name": "Croatia",
+      "endonym": "Hrvatska",
+      "demonym": "Croatian, Croatia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 12,
+        "expression": null
+      }
+    },
+    {
+      "id": "6e752e8f-a348-4833-8557-729e6b31b972",
+      "iso2_alpha": "CU",
+      "iso3_alpha": "CUB",
+      "iso_numeric": "192",
+      "fips_code": "CU",
+      "slug": "cuba",
+      "calling_code": "53",
+      "common_name": "Cuba",
+      "official_name": "Cuba",
+      "endonym": "Cuba",
+      "demonym": "Cuban, Cuba",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "2254382a-312a-4e07-af25-4ce98556069c",
+      "iso2_alpha": "CW",
+      "iso3_alpha": "CUW",
+      "iso_numeric": "531",
+      "fips_code": "UC",
+      "slug": "curacao",
+      "calling_code": "599",
+      "common_name": "Curacao",
+      "official_name": "Cura\u00e7ao",
+      "endonym": "Cura\u00e7ao",
+      "demonym": "Dutch, Curacao",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "0aeaf037-7ebd-4780-9dd7-dc8d36def1bb",
+      "iso2_alpha": "CY",
+      "iso3_alpha": "CYP",
+      "iso_numeric": "196",
+      "fips_code": "CY",
+      "slug": "cyprus",
+      "calling_code": "357",
+      "common_name": "Cyprus",
+      "official_name": "Cyprus",
+      "endonym": "\u039a\u03cd\u03c0\u03c1\u03bf\u03c2",
+      "demonym": "Cypriot, Cyprus",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "0720ae19-3b09-4186-b370-1cf4ec391887",
+      "iso2_alpha": "CZ",
+      "iso3_alpha": "CZE",
+      "iso_numeric": "203",
+      "fips_code": "EZ",
+      "slug": "czechia",
+      "calling_code": "420",
+      "common_name": "Czechia",
+      "official_name": "Czech Republic",
+      "endonym": "\u010cesk\u00e1 republika",
+      "demonym": "Czech, Czechia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 12,
+        "expression": null
+      }
+    },
+    {
+      "id": "4557610c-0ca3-4c78-bf01-c917c749c3e6",
+      "iso2_alpha": "CD",
+      "iso3_alpha": "COD",
+      "iso_numeric": "180",
+      "fips_code": "CG",
+      "slug": "democratic-republic-of-the-congo",
+      "calling_code": "243",
+      "common_name": "Democratic Republic of the Congo",
+      "official_name": "Congo (Democratic Republic of the)",
+      "endonym": "R\u00e9publique d\u00e9mocratique du Congo",
+      "demonym": "Congolese, Democratic Republic of the Congo",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "0a22e178-671d-423f-ae46-b803703d008c",
+      "iso2_alpha": "DK",
+      "iso3_alpha": "DNK",
+      "iso_numeric": "208",
+      "fips_code": "DA",
+      "slug": "denmark",
+      "calling_code": "45",
+      "common_name": "Denmark",
+      "official_name": "Denmark",
+      "endonym": "Danmark",
+      "demonym": "Danish, Denmark",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "9a34e25d-68c9-47f2-b320-c62307fa91eb",
+      "iso2_alpha": "DJ",
+      "iso3_alpha": "DJI",
+      "iso_numeric": "262",
+      "fips_code": "DJ",
+      "slug": "djibouti",
+      "calling_code": "253",
+      "common_name": "Djibouti",
+      "official_name": "Djibouti",
+      "endonym": "Djibouti",
+      "demonym": "Djibouti, Djibouti",
+      "mobile_number_rule": {
+        "exact_length": 6,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "8c2b7918-0426-4c16-b252-f3be258afce2",
+      "iso2_alpha": "DM",
+      "iso3_alpha": "DMA",
+      "iso_numeric": "212",
+      "fips_code": "DO",
+      "slug": "dominica",
+      "calling_code": "1",
+      "common_name": "Dominica",
+      "official_name": "Dominica",
+      "endonym": "Dominica",
+      "demonym": "Dominican, Dominica",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "916f4b95-17fa-4b04-8e3f-8e1cf917489a",
+      "iso2_alpha": "DO",
+      "iso3_alpha": "DOM",
+      "iso_numeric": "214",
+      "fips_code": "DR",
+      "slug": "dominican-republic",
+      "calling_code": "1",
+      "common_name": "Dominican Republic",
+      "official_name": "Dominican Republic",
+      "endonym": "Rep\u00fablica Dominicana",
+      "demonym": "Dominican, Dominican Republic",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "ce76f3c0-9b36-4a80-b05e-175cda0d5fe8",
+      "iso2_alpha": "TL",
+      "iso3_alpha": "TLS",
+      "iso_numeric": "626",
+      "fips_code": "TT",
+      "slug": "east-timor",
+      "calling_code": "670",
+      "common_name": "East Timor",
+      "official_name": "Timor-Leste",
+      "endonym": "Timor-Leste",
+      "demonym": "East Timorese, East Timor",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "3ced859e-9894-487c-95e0-be6374045d89",
+      "iso2_alpha": "EC",
+      "iso3_alpha": "ECU",
+      "iso_numeric": "218",
+      "fips_code": "EC",
+      "slug": "ecuador",
+      "calling_code": "593",
+      "common_name": "Ecuador",
+      "official_name": "Ecuador",
+      "endonym": "Ecuador",
+      "demonym": "Ecuadorean, Ecuador",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "6b945811-c64a-4284-9d77-52d8353de4f5",
+      "iso2_alpha": "EG",
+      "iso3_alpha": "EGY",
+      "iso_numeric": "818",
+      "fips_code": "EG",
+      "slug": "egypt",
+      "calling_code": "20",
+      "common_name": "Egypt",
+      "official_name": "Egypt",
+      "endonym": "\u0645\u0635\u0631\u200e",
+      "demonym": "Egyptian, Egypt",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "7d92593a-ea17-42f0-9874-094e5dd5ba3d",
+      "iso2_alpha": "SV",
+      "iso3_alpha": "SLV",
+      "iso_numeric": "222",
+      "fips_code": "ES",
+      "slug": "el-salvador",
+      "calling_code": "503",
+      "common_name": "El Salvador",
+      "official_name": "El Salvador",
+      "endonym": "El Salvador",
+      "demonym": "Salvadoran, El Salvador",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "2e415251-47ba-4793-96ff-ad0a344b5ee7",
+      "iso2_alpha": "GQ",
+      "iso3_alpha": "GNQ",
+      "iso_numeric": "226",
+      "fips_code": "EK",
+      "slug": "equatorial-guinea",
+      "calling_code": "240",
+      "common_name": "Equatorial Guinea",
+      "official_name": "Equatorial Guinea",
+      "endonym": "Guinea Ecuatorial",
+      "demonym": "Equatorial Guinean, Equatorial Guinea",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "bcd0540d-0c6e-4c80-ba36-0ee83c6c5cf7",
+      "iso2_alpha": "ER",
+      "iso3_alpha": "ERI",
+      "iso_numeric": "232",
+      "fips_code": "ER",
+      "slug": "eritrea",
+      "calling_code": "291",
+      "common_name": "Eritrea",
+      "official_name": "Eritrea",
+      "endonym": "\u12a4\u122d\u1275\u122b",
+      "demonym": "Eritrean, Eritrea",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "c299600e-6995-4094-b83a-541e6b78533d",
+      "iso2_alpha": "EE",
+      "iso3_alpha": "EST",
+      "iso_numeric": "233",
+      "fips_code": "EN",
+      "slug": "estonia",
+      "calling_code": "372",
+      "common_name": "Estonia",
+      "official_name": "Estonia",
+      "endonym": "Eesti",
+      "demonym": "Estonian, Estonia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "ca007ffe-8a03-4546-bf66-2ede431d0220",
+      "iso2_alpha": "ET",
+      "iso3_alpha": "ETH",
+      "iso_numeric": "231",
+      "fips_code": "ET",
+      "slug": "ethiopia",
+      "calling_code": "251",
+      "common_name": "Ethiopia",
+      "official_name": "Ethiopia",
+      "endonym": "\u12a2\u1275\u12ee\u1335\u12eb",
+      "demonym": "Ethiopian, Ethiopia",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "046a83d6-bc22-4e77-aa3d-9502c1ad4a45",
+      "iso2_alpha": "FK",
+      "iso3_alpha": "FLK",
+      "iso_numeric": "238",
+      "fips_code": "FK",
+      "slug": "falkland-islands",
+      "calling_code": "500",
+      "common_name": "Falkland Islands",
+      "official_name": "Falkland Islands (Malvinas)",
+      "endonym": "Falkland Islands",
+      "demonym": "Falkland Islander, Falkland Islands",
+      "mobile_number_rule": {
+        "exact_length": 5,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "6ad8756b-1128-45cd-987d-e475d1608135",
+      "iso2_alpha": "FO",
+      "iso3_alpha": "FRO",
+      "iso_numeric": "234",
+      "fips_code": "FO",
+      "slug": "faroe-islands",
+      "calling_code": "298",
+      "common_name": "Faroe Islands",
+      "official_name": "Faroe Islands",
+      "endonym": "F\u00f8royar",
+      "demonym": "Faroese, Faroe Islands",
+      "mobile_number_rule": {
+        "exact_length": 6,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "5046b89b-34b1-455a-a124-715f2bc0f9fa",
+      "iso2_alpha": "FI",
+      "iso3_alpha": "FIN",
+      "iso_numeric": "246",
+      "fips_code": "FI",
+      "slug": "finland",
+      "calling_code": "358",
+      "common_name": "Finland",
+      "official_name": "Finland",
+      "endonym": "Suomi",
+      "demonym": "Finnish, Finland",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 12,
+        "expression": null
+      }
+    },
+    {
+      "id": "bc03a0a5-1dcb-4313-8003-c4d2d95df684",
+      "iso2_alpha": "FR",
+      "iso3_alpha": "FRA",
+      "iso_numeric": "250",
+      "fips_code": "FR",
+      "slug": "france",
+      "calling_code": "33",
+      "common_name": "France",
+      "official_name": "France",
+      "endonym": "France",
+      "demonym": "French, France",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "e0fcae57-a347-4d3f-b168-2c43a16006f8",
+      "iso2_alpha": "GF",
+      "iso3_alpha": "GUF",
+      "iso_numeric": "254",
+      "fips_code": "FG",
+      "slug": "french-guiana",
+      "calling_code": "594",
+      "common_name": "French Guiana",
+      "official_name": "French Guiana",
+      "endonym": "Guyane fran\u00e7aise",
+      "demonym": "French Guiana",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "6b5ed168-3152-4680-a37d-cf0688d91edb",
+      "iso2_alpha": "PF",
+      "iso3_alpha": "PYF",
+      "iso_numeric": "258",
+      "fips_code": "FP",
+      "slug": "french-polynesia",
+      "calling_code": "689",
+      "common_name": "French Polynesia",
+      "official_name": "French Polynesia",
+      "endonym": "Polyn\u00e9sie fran\u00e7aise",
+      "demonym": "French Polynesian, French Polynesia",
+      "mobile_number_rule": {
+        "exact_length": 6,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "4572b4d7-1bff-4cd7-994c-61a07ea6705f",
+      "iso2_alpha": "TF",
+      "iso3_alpha": "ATF",
+      "iso_numeric": "260",
+      "fips_code": "FS",
+      "slug": "french-southern-territories",
+      "calling_code": "0",
+      "common_name": "French Southern Territories",
+      "official_name": "French Southern Territories",
+      "endonym": "Territoire des Terres australes et antarctiques fran\u00e7aises",
+      "demonym": "French, French Southern Territories",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "c22ac022-1d44-46c0-886b-0140b8b8e289",
+      "iso2_alpha": "GA",
+      "iso3_alpha": "GAB",
+      "iso_numeric": "266",
+      "fips_code": "GB",
+      "slug": "gabon",
+      "calling_code": "241",
+      "common_name": "Gabon",
+      "official_name": "Gabon",
+      "endonym": "Gabon",
+      "demonym": "Gabonese, Gabon",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 7,
+        "expression": null
+      }
+    },
+    {
+      "id": "57686829-1548-4d1f-b4ec-4c94ba8cab32",
+      "iso2_alpha": "GM",
+      "iso3_alpha": "GMB",
+      "iso_numeric": "270",
+      "fips_code": "GA",
+      "slug": "gambia",
+      "calling_code": "220",
+      "common_name": "Gambia",
+      "official_name": "Gambia",
+      "endonym": "Gambia",
+      "demonym": "Gambian, Gambia",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "8cafa566-d238-49c6-b925-3a2cda392511",
+      "iso2_alpha": "GE",
+      "iso3_alpha": "GEO",
+      "iso_numeric": "268",
+      "fips_code": "GG",
+      "slug": "georgia",
+      "calling_code": "995",
+      "common_name": "Georgia",
+      "official_name": "Georgia",
+      "endonym": "\u10e1\u10d0\u10e5\u10d0\u10e0\u10d7\u10d5\u10d4\u10da\u10dd",
+      "demonym": "Georgian, Georgia",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "48c3e172-72b5-4920-8c5e-6e0960da214e",
+      "iso2_alpha": "DE",
+      "iso3_alpha": "DEU",
+      "iso_numeric": "276",
+      "fips_code": "GM",
+      "slug": "germany",
+      "calling_code": "49",
+      "common_name": "Germany",
+      "official_name": "Germany",
+      "endonym": "Deutschland",
+      "demonym": "German, Germany",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 13,
+        "expression": null
+      }
+    },
+    {
+      "id": "f6a3e55c-09ab-46f9-b769-963a244dad54",
+      "iso2_alpha": "GH",
+      "iso3_alpha": "GHA",
+      "iso_numeric": "288",
+      "fips_code": "GH",
+      "slug": "ghana",
+      "calling_code": "233",
+      "common_name": "Ghana",
+      "official_name": "Ghana",
+      "endonym": "Ghana",
+      "demonym": "Ghanaian, Ghana",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "0cbfac24-bf0e-4302-9704-022e27c0eb8c",
+      "iso2_alpha": "GI",
+      "iso3_alpha": "GIB",
+      "iso_numeric": "292",
+      "fips_code": "GI",
+      "slug": "gibraltar",
+      "calling_code": "350",
+      "common_name": "Gibraltar",
+      "official_name": "Gibraltar",
+      "endonym": "Gibraltar",
+      "demonym": "Gibraltar, Gibraltar",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "84bb6e27-3249-4e79-b031-687c57f44f38",
+      "iso2_alpha": "GR",
+      "iso3_alpha": "GRC",
+      "iso_numeric": "300",
+      "fips_code": "GR",
+      "slug": "greece",
+      "calling_code": "30",
+      "common_name": "Greece",
+      "official_name": "Greece",
+      "endonym": "\u0395\u03bb\u03bb\u03ac\u03b4\u03b1",
+      "demonym": "Greek, Greece",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "0fc46421-1154-4f20-8528-ccd11fd56eaf",
+      "iso2_alpha": "GL",
+      "iso3_alpha": "GRL",
+      "iso_numeric": "304",
+      "fips_code": "GL",
+      "slug": "greenland",
+      "calling_code": "299",
+      "common_name": "Greenland",
+      "official_name": "Greenland",
+      "endonym": "Kalaallit Nunaat",
+      "demonym": "Greenlandic, Greenland",
+      "mobile_number_rule": {
+        "exact_length": 6,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "cbc501e2-157f-4e21-a889-ccf503474fef",
+      "iso2_alpha": "GD",
+      "iso3_alpha": "GRD",
+      "iso_numeric": "308",
+      "fips_code": "GJ",
+      "slug": "grenada",
+      "calling_code": "1",
+      "common_name": "Grenada",
+      "official_name": "Grenada",
+      "endonym": "Grenada",
+      "demonym": "Grenadian, Grenada",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "30ff2af3-de88-40f7-9e94-22c2274df2ec",
+      "iso2_alpha": "GP",
+      "iso3_alpha": "GLP",
+      "iso_numeric": "312",
+      "fips_code": "GP",
+      "slug": "guadeloupe",
+      "calling_code": "590",
+      "common_name": "Guadeloupe",
+      "official_name": "Guadeloupe",
+      "endonym": "Guadeloupe",
+      "demonym": "Guadeloupian, Guadeloupe",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "f4d128a6-aae7-46de-80da-636834f6f56d",
+      "iso2_alpha": "GU",
+      "iso3_alpha": "GUM",
+      "iso_numeric": "316",
+      "fips_code": "GQ",
+      "slug": "guam",
+      "calling_code": "1",
+      "common_name": "Guam",
+      "official_name": "Guam",
+      "endonym": "Guam",
+      "demonym": "Guamanian, Guam",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "f045bb40-fbda-4395-b626-546da5e87cb2",
+      "iso2_alpha": "GT",
+      "iso3_alpha": "GTM",
+      "iso_numeric": "320",
+      "fips_code": "GT",
+      "slug": "guatemala",
+      "calling_code": "502",
+      "common_name": "Guatemala",
+      "official_name": "Guatemala",
+      "endonym": "Guatemala",
+      "demonym": "Guatemalan, Guatemala",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "2afc49d0-45e4-4829-8720-de3be5e948f8",
+      "iso2_alpha": "GG",
+      "iso3_alpha": "GGY",
+      "iso_numeric": "831",
+      "fips_code": "GK",
+      "slug": "guernsey",
+      "calling_code": "44",
+      "common_name": "Guernsey",
+      "official_name": "Guernsey",
+      "endonym": "Guernsey",
+      "demonym": "Channel Islander, Guernsey",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "622b1c66-c4c9-42d4-85ad-00f1abaddad7",
+      "iso2_alpha": "GN",
+      "iso3_alpha": "GIN",
+      "iso_numeric": "324",
+      "fips_code": "GV",
+      "slug": "guinea",
+      "calling_code": "224",
+      "common_name": "Guinea",
+      "official_name": "Guinea",
+      "endonym": "Guin\u00e9e",
+      "demonym": "Guinean, Guinea",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "6485f144-16c0-458c-b3fe-6ffc27bdc9a3",
+      "iso2_alpha": "GW",
+      "iso3_alpha": "GNB",
+      "iso_numeric": "624",
+      "fips_code": "PU",
+      "slug": "guinea-bissau",
+      "calling_code": "245",
+      "common_name": "Guinea-Bissau",
+      "official_name": "Guinea-Bissau",
+      "endonym": "Guin\u00e9-Bissau",
+      "demonym": "Guinea-Bissauan, Guinea-Bissau",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "f5ffadfc-702c-49a2-b63b-f7b0eb19f772",
+      "iso2_alpha": "GY",
+      "iso3_alpha": "GUY",
+      "iso_numeric": "328",
+      "fips_code": "GY",
+      "slug": "guyana",
+      "calling_code": "592",
+      "common_name": "Guyana",
+      "official_name": "Guyana",
+      "endonym": "Guyana",
+      "demonym": "Guyanese, Guyana",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "bf5c2065-18c8-4400-b3fb-28f8a7904da4",
+      "iso2_alpha": "HT",
+      "iso3_alpha": "HTI",
+      "iso_numeric": "332",
+      "fips_code": "HA",
+      "slug": "haiti",
+      "calling_code": "509",
+      "common_name": "Haiti",
+      "official_name": "Haiti",
+      "endonym": "Ha\u00efti",
+      "demonym": "Haitian, Haiti",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "bf806cd8-015d-452a-bc5e-01d80cb1efa0",
+      "iso2_alpha": "HM",
+      "iso3_alpha": "HMD",
+      "iso_numeric": "334",
+      "fips_code": "HM",
+      "slug": "heard-island-and-mcdonald-islands",
+      "calling_code": "0",
+      "common_name": "Heard Island and McDonald Islands",
+      "official_name": "Heard Island and McDonald Islands",
+      "endonym": "Heard Island and McDonald Islands",
+      "demonym": "Heard and McDonald Islander, Heard Island and McDonald Islands",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "f3f38f27-cb33-40ce-b4a9-95f482ef9649",
+      "iso2_alpha": "HN",
+      "iso3_alpha": "HND",
+      "iso_numeric": "340",
+      "fips_code": "HO",
+      "slug": "honduras",
+      "calling_code": "504",
+      "common_name": "Honduras",
+      "official_name": "Honduras",
+      "endonym": "Honduras",
+      "demonym": "Honduran, Honduras",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "c6532052-134b-456a-b93f-baa829602684",
+      "iso2_alpha": "HK",
+      "iso3_alpha": "HKG",
+      "iso_numeric": "344",
+      "fips_code": "HK",
+      "slug": "hong-kong",
+      "calling_code": "852",
+      "common_name": "Hong Kong",
+      "official_name": "Hong Kong",
+      "endonym": "\u9999\u6e2f",
+      "demonym": "Chinese, Hong Kong",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "ec56a104-c9f6-4882-bb44-f39dfc94ca0a",
+      "iso2_alpha": "HU",
+      "iso3_alpha": "HUN",
+      "iso_numeric": "348",
+      "fips_code": "HU",
+      "slug": "hungary",
+      "calling_code": "36",
+      "common_name": "Hungary",
+      "official_name": "Hungary",
+      "endonym": "Magyarorsz\u00e1g",
+      "demonym": "Hungarian, Hungary",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "185b928c-6d8e-4004-be73-486df03d1351",
+      "iso2_alpha": "IS",
+      "iso3_alpha": "ISL",
+      "iso_numeric": "352",
+      "fips_code": "IC",
+      "slug": "iceland",
+      "calling_code": "354",
+      "common_name": "Iceland",
+      "official_name": "Iceland",
+      "endonym": "\u00cdsland",
+      "demonym": "Icelander, Iceland",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "ea023db4-5d43-4010-aa8b-8eb449717928",
+      "iso2_alpha": "IN",
+      "iso3_alpha": "IND",
+      "iso_numeric": "356",
+      "fips_code": "IN",
+      "slug": "india",
+      "calling_code": "91",
+      "common_name": "India",
+      "official_name": "India",
+      "endonym": "\u092d\u093e\u0930\u0924",
+      "demonym": "Indian, India",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "21c5a1d6-38d1-44c0-823b-a5aafc173ebb",
+      "iso2_alpha": "ID",
+      "iso3_alpha": "IDN",
+      "iso_numeric": "360",
+      "fips_code": "ID",
+      "slug": "indonesia",
+      "calling_code": "62",
+      "common_name": "Indonesia",
+      "official_name": "Indonesia",
+      "endonym": "Indonesia",
+      "demonym": "Indonesian, Indonesia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "5fc564b6-ba5e-4c6f-8881-158732ee368a",
+      "iso2_alpha": "IR",
+      "iso3_alpha": "IRN",
+      "iso_numeric": "364",
+      "fips_code": "IR",
+      "slug": "iran",
+      "calling_code": "98",
+      "common_name": "Iran",
+      "official_name": "Iran (Islamic Republic of)",
+      "endonym": "\u0627\u06cc\u0631\u0627\u0646",
+      "demonym": "Iranian, Iran",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "3b4ba6c3-877a-45c2-9ea0-6a2e56472b96",
+      "iso2_alpha": "IQ",
+      "iso3_alpha": "IRQ",
+      "iso_numeric": "368",
+      "fips_code": "IZ",
+      "slug": "iraq",
+      "calling_code": "964",
+      "common_name": "Iraq",
+      "official_name": "Iraq",
+      "endonym": "\u0627\u0644\u0639\u0631\u0627\u0642",
+      "demonym": "Iraqi, Iraq",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "198eadc6-742c-4f71-bd02-33a1b1d6efe9",
+      "iso2_alpha": "IE",
+      "iso3_alpha": "IRL",
+      "iso_numeric": "372",
+      "fips_code": "EI",
+      "slug": "ireland",
+      "calling_code": "353",
+      "common_name": "Ireland",
+      "official_name": "Ireland",
+      "endonym": "\u00c9ire",
+      "demonym": "Irish, Ireland",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "90b0493f-1da1-4cd5-af91-ff1e83b443c2",
+      "iso2_alpha": "IM",
+      "iso3_alpha": "IMN",
+      "iso_numeric": "833",
+      "fips_code": "IM",
+      "slug": "isle-of-man",
+      "calling_code": "44",
+      "common_name": "Isle of Man",
+      "official_name": "Isle of Man",
+      "endonym": "Isle of Man",
+      "demonym": "Manx, Isle of Man",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "a2c5961c-9209-421a-88b5-1e06fefa672f",
+      "iso2_alpha": "IL",
+      "iso3_alpha": "ISR",
+      "iso_numeric": "376",
+      "fips_code": "IS",
+      "slug": "israel",
+      "calling_code": "972",
+      "common_name": "Israel",
+      "official_name": "Israel",
+      "endonym": "\u05d9\u05b4\u05e9\u05b0\u05c2\u05e8\u05b8\u05d0\u05b5\u05dc",
+      "demonym": "Israeli, Israel",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "cb45a0c8-6925-44cf-b2e1-aa7025170150",
+      "iso2_alpha": "IT",
+      "iso3_alpha": "ITA",
+      "iso_numeric": "380",
+      "fips_code": "IT",
+      "slug": "italy",
+      "calling_code": "39",
+      "common_name": "Italy",
+      "official_name": "Italy",
+      "endonym": "Italia",
+      "demonym": "Italian, Italy",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": null,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "61750642-298f-44bf-b1ba-0f1380b1e3f1",
+      "iso2_alpha": "JM",
+      "iso3_alpha": "JAM",
+      "iso_numeric": "388",
+      "fips_code": "JM",
+      "slug": "jamaica",
+      "calling_code": "1",
+      "common_name": "Jamaica",
+      "official_name": "Jamaica",
+      "endonym": "Jamaica",
+      "demonym": "Jamaican, Jamaica",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "e207be75-6efe-4b54-aac0-191d9eb37e1a",
+      "iso2_alpha": "JP",
+      "iso3_alpha": "JPN",
+      "iso_numeric": "392",
+      "fips_code": "JA",
+      "slug": "japan",
+      "calling_code": "81",
+      "common_name": "Japan",
+      "official_name": "Japan",
+      "endonym": "\u65e5\u672c",
+      "demonym": "Japanese, Japan",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 13,
+        "expression": null
+      }
+    },
+    {
+      "id": "a8b037bf-de3e-445c-88f5-4d367e49b09e",
+      "iso2_alpha": "JE",
+      "iso3_alpha": "JEY",
+      "iso_numeric": "832",
+      "fips_code": "JE",
+      "slug": "jersey",
+      "calling_code": "44",
+      "common_name": "Jersey",
+      "official_name": "Jersey",
+      "endonym": "Jersey",
+      "demonym": "Channel Islander, Jersey",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "d4979a5e-3150-4fc3-a611-3a1b658364c8",
+      "iso2_alpha": "JO",
+      "iso3_alpha": "JOR",
+      "iso_numeric": "400",
+      "fips_code": "JO",
+      "slug": "jordan",
+      "calling_code": "962",
+      "common_name": "Jordan",
+      "official_name": "Jordan",
+      "endonym": "\u0627\u0644\u0623\u0631\u062f\u0646",
+      "demonym": "Jordanian, Jordan",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "84053827-d9f0-4626-a872-db92c924a12c",
+      "iso2_alpha": "KZ",
+      "iso3_alpha": "KAZ",
+      "iso_numeric": "398",
+      "fips_code": "KZ",
+      "slug": "kazakhstan",
+      "calling_code": "7",
+      "common_name": "Kazakhstan",
+      "official_name": "Kazakhstan",
+      "endonym": "\u049a\u0430\u0437\u0430\u049b\u0441\u0442\u0430\u043d",
+      "demonym": "Kazakhstani, Kazakhstan",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "9ea83e09-6268-49ec-ad3f-1c1b704f7958",
+      "iso2_alpha": "KE",
+      "iso3_alpha": "KEN",
+      "iso_numeric": "404",
+      "fips_code": "KE",
+      "slug": "kenya",
+      "calling_code": "254",
+      "common_name": "Kenya",
+      "official_name": "Kenya",
+      "endonym": "Kenya",
+      "demonym": "Kenyan, Kenya",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "73783e4b-1dfc-4beb-96b3-1b9851032752",
+      "iso2_alpha": "KI",
+      "iso3_alpha": "KIR",
+      "iso_numeric": "296",
+      "fips_code": "KR",
+      "slug": "kiribati",
+      "calling_code": "686",
+      "common_name": "Kiribati",
+      "official_name": "Kiribati",
+      "endonym": "Kiribati",
+      "demonym": "I-Kiribati, Kiribati",
+      "mobile_number_rule": {
+        "exact_length": 5,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "78430f50-7208-4244-86d2-a20d98c34cf6",
+      "iso2_alpha": "XK",
+      "iso3_alpha": "KOS",
+      "iso_numeric": "0",
+      "fips_code": "KV",
+      "slug": "kosovo",
+      "calling_code": "383",
+      "common_name": "Kosovo",
+      "official_name": "Republic of Kosovo",
+      "endonym": "Republika e Kosov\u00ebs",
+      "demonym": "Kosovar, Kosovo",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "768bbf25-1a11-440f-9b7b-346faccb8f1f",
+      "iso2_alpha": "KW",
+      "iso3_alpha": "KWT",
+      "iso_numeric": "414",
+      "fips_code": "KU",
+      "slug": "kuwait",
+      "calling_code": "965",
+      "common_name": "Kuwait",
+      "official_name": "Kuwait",
+      "endonym": "\u0627\u0644\u0643\u0648\u064a\u062a",
+      "demonym": "Kuwaiti, Kuwait",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "65588bfc-32af-466c-a03b-b11eba2425af",
+      "iso2_alpha": "KG",
+      "iso3_alpha": "KGZ",
+      "iso_numeric": "417",
+      "fips_code": "KG",
+      "slug": "kyrgyzstan",
+      "calling_code": "996",
+      "common_name": "Kyrgyzstan",
+      "official_name": "Kyrgyzstan",
+      "endonym": "\u041a\u044b\u0440\u0433\u044b\u0437\u0441\u0442\u0430\u043d",
+      "demonym": "Kirghiz, Kyrgyzstan",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "75fa8ad1-48f5-47f1-b6ca-5250f03cd67f",
+      "iso2_alpha": "LA",
+      "iso3_alpha": "LAO",
+      "iso_numeric": "418",
+      "fips_code": "LA",
+      "slug": "laos",
+      "calling_code": "856",
+      "common_name": "Laos",
+      "official_name": "Lao People's Democratic Republic",
+      "endonym": "\u0eaa\u0e9b\u0e9b\u0ea5\u0eb2\u0ea7",
+      "demonym": "Laotian, Laos",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "b44a2ec4-8d7f-4869-8a7d-18dddd0746fa",
+      "iso2_alpha": "LV",
+      "iso3_alpha": "LVA",
+      "iso_numeric": "428",
+      "fips_code": "LG",
+      "slug": "latvia",
+      "calling_code": "371",
+      "common_name": "Latvia",
+      "official_name": "Latvia",
+      "endonym": "Latvija",
+      "demonym": "Latvian, Latvia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "9320d318-f276-4230-81bc-f516ea0a51f9",
+      "iso2_alpha": "LB",
+      "iso3_alpha": "LBN",
+      "iso_numeric": "422",
+      "fips_code": "LE",
+      "slug": "lebanon",
+      "calling_code": "961",
+      "common_name": "Lebanon",
+      "official_name": "Lebanon",
+      "endonym": "\u0644\u0628\u0646\u0627\u0646",
+      "demonym": "Lebanese, Lebanon",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "d037a494-99e9-497d-90df-3822aaa249f1",
+      "iso2_alpha": "LS",
+      "iso3_alpha": "LSO",
+      "iso_numeric": "426",
+      "fips_code": "LT",
+      "slug": "lesotho",
+      "calling_code": "266",
+      "common_name": "Lesotho",
+      "official_name": "Lesotho",
+      "endonym": "Lesotho",
+      "demonym": "Mosotho, Lesotho",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "f44b750b-7a41-4cba-af2b-fb3b651fdc3f",
+      "iso2_alpha": "LY",
+      "iso3_alpha": "LBY",
+      "iso_numeric": "434",
+      "fips_code": "LY",
+      "slug": "libya",
+      "calling_code": "218",
+      "common_name": "Libya",
+      "official_name": "Libya",
+      "endonym": "\u200f\u0644\u064a\u0628\u064a\u0627",
+      "demonym": "Libyan, Libya",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "021127c4-0c4f-4b52-a361-959d0bf79206",
+      "iso2_alpha": "LI",
+      "iso3_alpha": "LIE",
+      "iso_numeric": "438",
+      "fips_code": "LS",
+      "slug": "liechtenstein",
+      "calling_code": "423",
+      "common_name": "Liechtenstein",
+      "official_name": "Liechtenstein",
+      "endonym": "Liechtenstein",
+      "demonym": "Liechtensteiner, Liechtenstein",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "ad755b15-6d9e-489b-bd05-a1b31343c103",
+      "iso2_alpha": "LT",
+      "iso3_alpha": "LTU",
+      "iso_numeric": "440",
+      "fips_code": "LH",
+      "slug": "lithuania",
+      "calling_code": "370",
+      "common_name": "Lithuania",
+      "official_name": "Lithuania",
+      "endonym": "Lietuva",
+      "demonym": "Lithuanian, Lithuania",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "1bbc2abe-c6c1-4c48-954e-bf78801b1e0b",
+      "iso2_alpha": "LU",
+      "iso3_alpha": "LUX",
+      "iso_numeric": "442",
+      "fips_code": "LU",
+      "slug": "luxembourg",
+      "calling_code": "352",
+      "common_name": "Luxembourg",
+      "official_name": "Luxembourg",
+      "endonym": "Luxembourg",
+      "demonym": "Luxembourger, Luxembourg",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "3b66622c-5b47-4cba-b898-f709e178b91e",
+      "iso2_alpha": "MO",
+      "iso3_alpha": "MAC",
+      "iso_numeric": "446",
+      "fips_code": "MC",
+      "slug": "macao",
+      "calling_code": "853",
+      "common_name": "Macao",
+      "official_name": "Macao",
+      "endonym": "\u6fb3\u9580",
+      "demonym": "Chinese, Macao",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "304af03d-b72d-464b-8244-f7dbd8afa284",
+      "iso2_alpha": "MK",
+      "iso3_alpha": "MKD",
+      "iso_numeric": "807",
+      "fips_code": "MK",
+      "slug": "macedonia",
+      "calling_code": "389",
+      "common_name": "Macedonia",
+      "official_name": "Macedonia (the former Yugoslav Republic of)",
+      "endonym": "\u041c\u0430\u043a\u0435\u0434\u043e\u043d\u0438\u0458\u0430",
+      "demonym": "Macedonian, Macedonia",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "905b8494-0f85-4ef7-b8e3-311354218683",
+      "iso2_alpha": "MG",
+      "iso3_alpha": "MDG",
+      "iso_numeric": "450",
+      "fips_code": "MA",
+      "slug": "madagascar",
+      "calling_code": "261",
+      "common_name": "Madagascar",
+      "official_name": "Madagascar",
+      "endonym": "Madagasikara",
+      "demonym": "Malagasy, Madagascar",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 9,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "b941d4a6-8112-4295-ba59-300fb0113a85",
+      "iso2_alpha": "MW",
+      "iso3_alpha": "MWI",
+      "iso_numeric": "454",
+      "fips_code": "MI",
+      "slug": "malawi",
+      "calling_code": "265",
+      "common_name": "Malawi",
+      "official_name": "Malawi",
+      "endonym": "Malawi",
+      "demonym": "Malawian, Malawi",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "38f8f180-31f7-4e2d-9494-c7f49857c572",
+      "iso2_alpha": "MY",
+      "iso3_alpha": "MYS",
+      "iso_numeric": "458",
+      "fips_code": "MY",
+      "slug": "malaysia",
+      "calling_code": "60",
+      "common_name": "Malaysia",
+      "official_name": "Malaysia",
+      "endonym": "Malaysia",
+      "demonym": "Malaysian, Malaysia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "226a3ff9-8cd9-49d2-b4ef-6f6a04f63bb1",
+      "iso2_alpha": "MV",
+      "iso3_alpha": "MDV",
+      "iso_numeric": "462",
+      "fips_code": "MV",
+      "slug": "maldives",
+      "calling_code": "960",
+      "common_name": "Maldives",
+      "official_name": "Maldives",
+      "endonym": "Maldives",
+      "demonym": "Maldivan, Maldives",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "9e6505db-a93b-466b-8adf-ed7058c08b2e",
+      "iso2_alpha": "ML",
+      "iso3_alpha": "MLI",
+      "iso_numeric": "466",
+      "fips_code": "ML",
+      "slug": "mali",
+      "calling_code": "223",
+      "common_name": "Mali",
+      "official_name": "Mali",
+      "endonym": "Mali",
+      "demonym": "Malian, Mali",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "a58dfd4c-c108-4857-bbd2-15c561be7656",
+      "iso2_alpha": "MT",
+      "iso3_alpha": "MLT",
+      "iso_numeric": "470",
+      "fips_code": "MT",
+      "slug": "malta",
+      "calling_code": "356",
+      "common_name": "Malta",
+      "official_name": "Malta",
+      "endonym": "Malta",
+      "demonym": "Maltese, Malta",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "f81502f7-b4fb-4b6d-9edb-bae208f0a0cc",
+      "iso2_alpha": "MH",
+      "iso3_alpha": "MHL",
+      "iso_numeric": "584",
+      "fips_code": "RM",
+      "slug": "marshall-islands",
+      "calling_code": "692",
+      "common_name": "Marshall Islands",
+      "official_name": "Marshall Islands",
+      "endonym": "M\u0327aje\u013c",
+      "demonym": "Marshallese, Marshall Islands",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "c0042022-4710-4aa2-919f-40009f6d85cb",
+      "iso2_alpha": "MQ",
+      "iso3_alpha": "MTQ",
+      "iso_numeric": "474",
+      "fips_code": "MB",
+      "slug": "martinique",
+      "calling_code": "596",
+      "common_name": "Martinique",
+      "official_name": "Martinique",
+      "endonym": "Martinique",
+      "demonym": "French, Martinique",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "37e8cc03-07c2-46ff-aaa5-757cd42e4e29",
+      "iso2_alpha": "MR",
+      "iso3_alpha": "MRT",
+      "iso_numeric": "478",
+      "fips_code": "MR",
+      "slug": "mauritania",
+      "calling_code": "222",
+      "common_name": "Mauritania",
+      "official_name": "Mauritania",
+      "endonym": "\u0645\u0648\u0631\u064a\u062a\u0627\u0646\u064a\u0627",
+      "demonym": "Mauritanian, Mauritania",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "f9dff72f-5ab8-4c82-b7f7-36086138f9cd",
+      "iso2_alpha": "MU",
+      "iso3_alpha": "MUS",
+      "iso_numeric": "480",
+      "fips_code": "MP",
+      "slug": "mauritius",
+      "calling_code": "230",
+      "common_name": "Mauritius",
+      "official_name": "Mauritius",
+      "endonym": "Maurice",
+      "demonym": "Mauritian, Mauritius",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "c71fbc53-17ff-4790-ac9c-d174f475fa75",
+      "iso2_alpha": "YT",
+      "iso3_alpha": "MYT",
+      "iso_numeric": "175",
+      "fips_code": "MF",
+      "slug": "mayotte",
+      "calling_code": "262",
+      "common_name": "Mayotte",
+      "official_name": "Mayotte",
+      "endonym": "Mayotte",
+      "demonym": "French, Mayotte",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "ef1c0985-1994-4fca-9d46-750c316c4e49",
+      "iso2_alpha": "MX",
+      "iso3_alpha": "MEX",
+      "iso_numeric": "484",
+      "fips_code": "MX",
+      "slug": "mexico",
+      "calling_code": "52",
+      "common_name": "Mexico",
+      "official_name": "Mexico",
+      "endonym": "M\u00e9xico",
+      "demonym": "Mexican, Mexico",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "6497e488-f542-43f2-8742-14d9e89956a1",
+      "iso2_alpha": "FM",
+      "iso3_alpha": "FSM",
+      "iso_numeric": "583",
+      "fips_code": "FM",
+      "slug": "micronesia",
+      "calling_code": "691",
+      "common_name": "Micronesia",
+      "official_name": "Micronesia (Federated States of)",
+      "endonym": "Micronesia",
+      "demonym": "Micronesian, Micronesia",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "d5fb3cf3-d39f-4f7d-9482-6d6c22fe306b",
+      "iso2_alpha": "MD",
+      "iso3_alpha": "MDA",
+      "iso_numeric": "498",
+      "fips_code": "MD",
+      "slug": "moldova",
+      "calling_code": "373",
+      "common_name": "Moldova",
+      "official_name": "Moldova (Republic of)",
+      "endonym": "Moldova",
+      "demonym": "Moldovan, Moldova",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "4d16912b-ecc0-4376-b356-58b6e6211153",
+      "iso2_alpha": "MC",
+      "iso3_alpha": "MCO",
+      "iso_numeric": "492",
+      "fips_code": "MN",
+      "slug": "monaco",
+      "calling_code": "377",
+      "common_name": "Monaco",
+      "official_name": "Monaco",
+      "endonym": "Monaco",
+      "demonym": "Monegasque, Monaco",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "60197a78-c710-4dfe-b466-7678e6358194",
+      "iso2_alpha": "MN",
+      "iso3_alpha": "MNG",
+      "iso_numeric": "496",
+      "fips_code": "MG",
+      "slug": "mongolia",
+      "calling_code": "976",
+      "common_name": "Mongolia",
+      "official_name": "Mongolia",
+      "endonym": "\u041c\u043e\u043d\u0433\u043e\u043b \u0443\u043b\u0441",
+      "demonym": "Mongolian, Mongolia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "bc57c098-37d3-4e95-9fa5-2eff61e48f2b",
+      "iso2_alpha": "ME",
+      "iso3_alpha": "MNE",
+      "iso_numeric": "499",
+      "fips_code": "MJ",
+      "slug": "montenegro",
+      "calling_code": "382",
+      "common_name": "Montenegro",
+      "official_name": "Montenegro",
+      "endonym": "\u0426\u0440\u043d\u0430 \u0413\u043e\u0440\u0430",
+      "demonym": "Montenegrin, Montenegro",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 12,
+        "expression": null
+      }
+    },
+    {
+      "id": "56eeff4f-64ff-483b-b181-e2a0f5b15450",
+      "iso2_alpha": "MS",
+      "iso3_alpha": "MSR",
+      "iso_numeric": "500",
+      "fips_code": "MH",
+      "slug": "montserrat",
+      "calling_code": "1",
+      "common_name": "Montserrat",
+      "official_name": "Montserrat",
+      "endonym": "Montserrat",
+      "demonym": "Montserratian, Montserrat",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "c556dfc0-7ff6-4a2f-82e5-3cc3a9d4b349",
+      "iso2_alpha": "MA",
+      "iso3_alpha": "MAR",
+      "iso_numeric": "504",
+      "fips_code": "MO",
+      "slug": "morocco",
+      "calling_code": "212",
+      "common_name": "Morocco",
+      "official_name": "Morocco",
+      "endonym": "\u0627\u0644\u0645\u063a\u0631\u0628",
+      "demonym": "Moroccan, Morocco",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "32a6071c-70bc-4202-ba9d-d71392897eb8",
+      "iso2_alpha": "MZ",
+      "iso3_alpha": "MOZ",
+      "iso_numeric": "508",
+      "fips_code": "MZ",
+      "slug": "mozambique",
+      "calling_code": "258",
+      "common_name": "Mozambique",
+      "official_name": "Mozambique",
+      "endonym": "Mo\u00e7ambique",
+      "demonym": "Mozambican, Mozambique",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "840f8c4c-2c48-4275-9e19-bdb4bb3fe73f",
+      "iso2_alpha": "MM",
+      "iso3_alpha": "MMR",
+      "iso_numeric": "104",
+      "fips_code": "BM",
+      "slug": "myanmar-burma",
+      "calling_code": "95",
+      "common_name": "Myanmar [Burma]",
+      "official_name": "Myanmar",
+      "endonym": "Myanma",
+      "demonym": "Burmese, Myanmar [Burma]",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "a230bafe-2c11-4732-b5e2-868c47a77acf",
+      "iso2_alpha": "NA",
+      "iso3_alpha": "NAM",
+      "iso_numeric": "516",
+      "fips_code": "WA",
+      "slug": "namibia",
+      "calling_code": "264",
+      "common_name": "Namibia",
+      "official_name": "Namibia",
+      "endonym": "Namibia",
+      "demonym": "Namibian, Namibia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "6ce427ae-b757-4fd2-9d8c-d61394786d9f",
+      "iso2_alpha": "NR",
+      "iso3_alpha": "NRU",
+      "iso_numeric": "520",
+      "fips_code": "NR",
+      "slug": "nauru",
+      "calling_code": "674",
+      "common_name": "Nauru",
+      "official_name": "Nauru",
+      "endonym": "Nauru",
+      "demonym": "Nauruan, Nauru",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 7,
+        "expression": null
+      }
+    },
+    {
+      "id": "dc6ee694-b197-4731-a3e7-8ecb7e3854ec",
+      "iso2_alpha": "NP",
+      "iso3_alpha": "NPL",
+      "iso_numeric": "524",
+      "fips_code": "NP",
+      "slug": "nepal",
+      "calling_code": "977",
+      "common_name": "Nepal",
+      "official_name": "Nepal",
+      "endonym": "\u0928\u0947\u092a\u093e\u0932",
+      "demonym": "Nepalese, Nepal",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "bfbf5865-6c61-422b-94ac-414819092753",
+      "iso2_alpha": "NL",
+      "iso3_alpha": "NLD",
+      "iso_numeric": "528",
+      "fips_code": "NL",
+      "slug": "netherlands",
+      "calling_code": "31",
+      "common_name": "Netherlands",
+      "official_name": "Netherlands",
+      "endonym": "Nederland",
+      "demonym": "Dutch, Netherlands",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "217db0d6-2c5f-4d92-b490-7cf3e7d6576e",
+      "iso2_alpha": "NC",
+      "iso3_alpha": "NCL",
+      "iso_numeric": "540",
+      "fips_code": "NC",
+      "slug": "new-caledonia",
+      "calling_code": "687",
+      "common_name": "New Caledonia",
+      "official_name": "New Caledonia",
+      "endonym": "Nouvelle-Cal\u00e9donie",
+      "demonym": "New Caledonian, New Caledonia",
+      "mobile_number_rule": {
+        "exact_length": 6,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "cc665188-24df-4ade-b2d2-18af3c780fa6",
+      "iso2_alpha": "NZ",
+      "iso3_alpha": "NZL",
+      "iso_numeric": "554",
+      "fips_code": "NZ",
+      "slug": "new-zealand",
+      "calling_code": "64",
+      "common_name": "New Zealand",
+      "official_name": "New Zealand",
+      "endonym": "New Zealand",
+      "demonym": "New Zealander, New Zealand",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 3,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "7da850a8-3b88-433e-ac99-c3a0646e3bf9",
+      "iso2_alpha": "NI",
+      "iso3_alpha": "NIC",
+      "iso_numeric": "558",
+      "fips_code": "NU",
+      "slug": "nicaragua",
+      "calling_code": "505",
+      "common_name": "Nicaragua",
+      "official_name": "Nicaragua",
+      "endonym": "Nicaragua",
+      "demonym": "Nicaraguan, Nicaragua",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "18fbc6a7-3dd2-4961-91db-9ce23aab1f72",
+      "iso2_alpha": "NE",
+      "iso3_alpha": "NER",
+      "iso_numeric": "562",
+      "fips_code": "NG",
+      "slug": "niger",
+      "calling_code": "227",
+      "common_name": "Niger",
+      "official_name": "Niger",
+      "endonym": "Niger",
+      "demonym": "Nigerien, Niger",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "c638d4f5-f528-4777-bca7-7d5f819340ab",
+      "iso2_alpha": "NU",
+      "iso3_alpha": "NIU",
+      "iso_numeric": "570",
+      "fips_code": "NE",
+      "slug": "niue",
+      "calling_code": "683",
+      "common_name": "Niue",
+      "official_name": "Niue",
+      "endonym": "Niu\u0113",
+      "demonym": "Niuean, Niue",
+      "mobile_number_rule": {
+        "exact_length": 4,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "96e7af55-44d3-43c5-930c-d3c126e0da5a",
+      "iso2_alpha": "NF",
+      "iso3_alpha": "NFK",
+      "iso_numeric": "574",
+      "fips_code": "NF",
+      "slug": "norfolk-island",
+      "calling_code": "672",
+      "common_name": "Norfolk Island",
+      "official_name": "Norfolk Island",
+      "endonym": "Norfolk Island",
+      "demonym": "Norfolk Islander, Norfolk Island",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "edbd2839-cfc2-4f23-978a-6305e223f68b",
+      "iso2_alpha": "KP",
+      "iso3_alpha": "PRK",
+      "iso_numeric": "408",
+      "fips_code": "KN",
+      "slug": "north-korea",
+      "calling_code": "850",
+      "common_name": "North Korea",
+      "official_name": "Korea (Democratic People's Republic of)",
+      "endonym": "\ubd81\ud55c",
+      "demonym": "North Korean, North Korea",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 17,
+        "expression": null
+      }
+    },
+    {
+      "id": "801c6fa8-20b5-4494-90ef-fe2fec80602c",
+      "iso2_alpha": "MP",
+      "iso3_alpha": "MNP",
+      "iso_numeric": "580",
+      "fips_code": "CQ",
+      "slug": "northern-mariana-islands",
+      "calling_code": "1",
+      "common_name": "Northern Mariana Islands",
+      "official_name": "Northern Mariana Islands",
+      "endonym": "Northern Mariana Islands",
+      "demonym": "American, Northern Mariana Islands",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "10074720-7f71-4fa0-bbcd-5df922384e38",
+      "iso2_alpha": "NO",
+      "iso3_alpha": "NOR",
+      "iso_numeric": "578",
+      "fips_code": "NO",
+      "slug": "norway",
+      "calling_code": "47",
+      "common_name": "Norway",
+      "official_name": "Norway",
+      "endonym": "Norge",
+      "demonym": "Norwegian, Norway",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "fd2611c1-77b5-49fc-9d13-6fdf82f608ca",
+      "iso2_alpha": "OM",
+      "iso3_alpha": "OMN",
+      "iso_numeric": "512",
+      "fips_code": "MU",
+      "slug": "oman",
+      "calling_code": "968",
+      "common_name": "Oman",
+      "official_name": "Oman",
+      "endonym": "\u0639\u0645\u0627\u0646",
+      "demonym": "Omani, Oman",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "3e5f7b86-307d-4d26-8579-4dcedf9a2859",
+      "iso2_alpha": "PK",
+      "iso3_alpha": "PAK",
+      "iso_numeric": "586",
+      "fips_code": "PK",
+      "slug": "pakistan",
+      "calling_code": "92",
+      "common_name": "Pakistan",
+      "official_name": "Pakistan",
+      "endonym": "Pakistan",
+      "demonym": "Pakistani, Pakistan",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "ff0832e7-047a-4574-9596-a8d0424ede67",
+      "iso2_alpha": "PW",
+      "iso3_alpha": "PLW",
+      "iso_numeric": "585",
+      "fips_code": "PS",
+      "slug": "palau",
+      "calling_code": "680",
+      "common_name": "Palau",
+      "official_name": "Palau",
+      "endonym": "Palau",
+      "demonym": "Palauan, Palau",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "5114d765-055f-4039-9893-7cca2472e6e8",
+      "iso2_alpha": "PS",
+      "iso3_alpha": "PSE",
+      "iso_numeric": "275",
+      "fips_code": "WE",
+      "slug": "palestine",
+      "calling_code": "970",
+      "common_name": "Palestine",
+      "official_name": "Palestine, State of",
+      "endonym": "\u0641\u0644\u0633\u0637\u064a\u0646",
+      "demonym": "Palestinian, Palestine",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "d61d9123-1e11-4582-9508-206f42ebe13a",
+      "iso2_alpha": "PA",
+      "iso3_alpha": "PAN",
+      "iso_numeric": "591",
+      "fips_code": "PM",
+      "slug": "panama",
+      "calling_code": "507",
+      "common_name": "Panama",
+      "official_name": "Panama",
+      "endonym": "Panam\u00e1",
+      "demonym": "Panamanian, Panama",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "25763b87-bea4-4fdd-927f-3027c0ac8f6d",
+      "iso2_alpha": "PG",
+      "iso3_alpha": "PNG",
+      "iso_numeric": "598",
+      "fips_code": "PP",
+      "slug": "papua-new-guinea",
+      "calling_code": "675",
+      "common_name": "Papua New Guinea",
+      "official_name": "Papua New Guinea",
+      "endonym": "Papua Niugini",
+      "demonym": "Papua New Guinean, Papua New Guinea",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "5b3e3a02-1c59-43c2-ac26-ed2e3415c92c",
+      "iso2_alpha": "PY",
+      "iso3_alpha": "PRY",
+      "iso_numeric": "600",
+      "fips_code": "PA",
+      "slug": "paraguay",
+      "calling_code": "595",
+      "common_name": "Paraguay",
+      "official_name": "Paraguay",
+      "endonym": "Paraguay",
+      "demonym": "Paraguayan, Paraguay",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "d605ca0d-55a4-40f1-903f-57c4c9f74b7a",
+      "iso2_alpha": "PE",
+      "iso3_alpha": "PER",
+      "iso_numeric": "604",
+      "fips_code": "PE",
+      "slug": "peru",
+      "calling_code": "51",
+      "common_name": "Peru",
+      "official_name": "Peru",
+      "endonym": "Per\u00fa",
+      "demonym": "Peruvian, Peru",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "4c224592-81b5-4583-932a-11af9946ddc4",
+      "iso2_alpha": "PH",
+      "iso3_alpha": "PHL",
+      "iso_numeric": "608",
+      "fips_code": "RP",
+      "slug": "philippines",
+      "calling_code": "63",
+      "common_name": "Philippines",
+      "official_name": "Philippines",
+      "endonym": "Pilipinas",
+      "demonym": "Filipino, Philippines",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "ef41524a-1086-42a4-91aa-506cae27995d",
+      "iso2_alpha": "PN",
+      "iso3_alpha": "PCN",
+      "iso_numeric": "612",
+      "fips_code": "PC",
+      "slug": "pitcairn-islands",
+      "calling_code": "64",
+      "common_name": "Pitcairn Islands",
+      "official_name": "Pitcairn",
+      "endonym": "Pitcairn Islands",
+      "demonym": "Pitcairn Islander, Pitcairn Islands",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "ccb8036b-663c-435c-99a1-e0792ae2075d",
+      "iso2_alpha": "PL",
+      "iso3_alpha": "POL",
+      "iso_numeric": "616",
+      "fips_code": "PL",
+      "slug": "poland",
+      "calling_code": "48",
+      "common_name": "Poland",
+      "official_name": "Poland",
+      "endonym": "Polska",
+      "demonym": "Polish, Poland",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "7b837b4f-d1dd-4e56-a246-ab6d6540fab7",
+      "iso2_alpha": "PT",
+      "iso3_alpha": "PRT",
+      "iso_numeric": "620",
+      "fips_code": "PO",
+      "slug": "portugal",
+      "calling_code": "351",
+      "common_name": "Portugal",
+      "official_name": "Portugal",
+      "endonym": "Portugal",
+      "demonym": "Portuguese, Portugal",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 9,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "2f5bdfa8-ac5c-47ce-bd3a-4702e2e3fe09",
+      "iso2_alpha": "PR",
+      "iso3_alpha": "PRI",
+      "iso_numeric": "630",
+      "fips_code": "RQ",
+      "slug": "puerto-rico",
+      "calling_code": "1",
+      "common_name": "Puerto Rico",
+      "official_name": "Puerto Rico",
+      "endonym": "Puerto Rico",
+      "demonym": "Puerto Rican, Puerto Rico",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "fcff9b8c-ac3a-4279-80e1-3c9584998ceb",
+      "iso2_alpha": "QA",
+      "iso3_alpha": "QAT",
+      "iso_numeric": "634",
+      "fips_code": "QA",
+      "slug": "qatar",
+      "calling_code": "974",
+      "common_name": "Qatar",
+      "official_name": "Qatar",
+      "endonym": "\u0642\u0637\u0631",
+      "demonym": "Qatari, Qatar",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 3,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "3abedb3d-38a7-4f64-8870-b3005cbba188",
+      "iso2_alpha": "CG",
+      "iso3_alpha": "COG",
+      "iso_numeric": "178",
+      "fips_code": "CF",
+      "slug": "republic-of-the-congo",
+      "calling_code": "242",
+      "common_name": "Republic of the Congo",
+      "official_name": "Congo",
+      "endonym": "R\u00e9publique du Congo",
+      "demonym": "Congolese, Republic of the Congo",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "3a000d7f-272d-4ca6-8450-00bb12728a1c",
+      "iso2_alpha": "RE",
+      "iso3_alpha": "REU",
+      "iso_numeric": "638",
+      "fips_code": "RE",
+      "slug": "reunion",
+      "calling_code": "262",
+      "common_name": "R\u00e9union",
+      "official_name": "R\u00e9union",
+      "endonym": "La R\u00e9union",
+      "demonym": "French, R\u00e9union",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "63940281-8a32-4e3a-9934-d76346930e36",
+      "iso2_alpha": "RO",
+      "iso3_alpha": "ROU",
+      "iso_numeric": "642",
+      "fips_code": "RO",
+      "slug": "romania",
+      "calling_code": "40",
+      "common_name": "Romania",
+      "official_name": "Romania",
+      "endonym": "Rom\u00e2nia",
+      "demonym": "Romanian, Romania",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "523faf81-e017-4064-9b83-cc11dab82081",
+      "iso2_alpha": "RU",
+      "iso3_alpha": "RUS",
+      "iso_numeric": "643",
+      "fips_code": "RS",
+      "slug": "russia",
+      "calling_code": "7",
+      "common_name": "Russia",
+      "official_name": "Russian Federation",
+      "endonym": "\u0420\u043e\u0441\u0441\u0438\u044f",
+      "demonym": "Russian, Russia",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "21914b23-2805-4b5b-ba1c-391692d391c9",
+      "iso2_alpha": "BL",
+      "iso3_alpha": "BLM",
+      "iso_numeric": "652",
+      "fips_code": "TB",
+      "slug": "saint-barthelemy",
+      "calling_code": "590",
+      "common_name": "Saint Barth\u00e9lemy",
+      "official_name": "Saint Barth\u00e9lemy",
+      "endonym": "Saint-Barth\u00e9lemy",
+      "demonym": "Saint Barth\u00e9lemy Islander, Saint Barth\u00e9lemy",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "507b46ac-a579-4c84-9ea1-d6d6bbac8c92",
+      "iso2_alpha": "SH",
+      "iso3_alpha": "SHN",
+      "iso_numeric": "654",
+      "fips_code": "SH",
+      "slug": "saint-helena",
+      "calling_code": "290",
+      "common_name": "Saint Helena",
+      "official_name": "Saint Helena, Ascension and Tristan da Cunha",
+      "endonym": "Saint Helena",
+      "demonym": "Saint Helenian, Saint Helena",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "8f6d67f2-82c4-4eb9-a696-a49e1440632e",
+      "iso2_alpha": "KN",
+      "iso3_alpha": "KNA",
+      "iso_numeric": "659",
+      "fips_code": "SC",
+      "slug": "saint-kitts-and-nevis",
+      "calling_code": "1",
+      "common_name": "Saint Kitts and Nevis",
+      "official_name": "Saint Kitts and Nevis",
+      "endonym": "Saint Kitts and Nevis",
+      "demonym": "Kittian and Nevisian, Saint Kitts and Nevis",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "d17d833d-808c-4660-84cb-f2d5fca1753e",
+      "iso2_alpha": "LC",
+      "iso3_alpha": "LCA",
+      "iso_numeric": "662",
+      "fips_code": "ST",
+      "slug": "saint-lucia",
+      "calling_code": "1",
+      "common_name": "Saint Lucia",
+      "official_name": "Saint Lucia",
+      "endonym": "Saint Lucia",
+      "demonym": "Saint Lucian, Saint Lucia",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "4b3f7e88-4696-4914-a9c1-1f1b149cc17a",
+      "iso2_alpha": "MF",
+      "iso3_alpha": "MAF",
+      "iso_numeric": "663",
+      "fips_code": "RN",
+      "slug": "saint-martin",
+      "calling_code": "590",
+      "common_name": "Saint Martin",
+      "official_name": "Saint Martin (French part)",
+      "endonym": "Saint-Martin",
+      "demonym": "Saint Martin Islander, Saint Martin",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "bf118017-2a38-4d1b-9b3c-c51fae262d66",
+      "iso2_alpha": "PM",
+      "iso3_alpha": "SPM",
+      "iso_numeric": "666",
+      "fips_code": "SB",
+      "slug": "saint-pierre-and-miquelon",
+      "calling_code": "508",
+      "common_name": "Saint Pierre and Miquelon",
+      "official_name": "Saint Pierre and Miquelon",
+      "endonym": "Saint-Pierre-et-Miquelon",
+      "demonym": "French, Saint Pierre and Miquelon",
+      "mobile_number_rule": {
+        "exact_length": 6,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "38ad9059-2253-4e7f-b824-b0110851714b",
+      "iso2_alpha": "VC",
+      "iso3_alpha": "VCT",
+      "iso_numeric": "670",
+      "fips_code": "VC",
+      "slug": "saint-vincent-and-the-grenadines",
+      "calling_code": "1",
+      "common_name": "Saint Vincent and the Grenadines",
+      "official_name": "Saint Vincent and the Grenadines",
+      "endonym": "Saint Vincent and the Grenadines",
+      "demonym": "Saint Vincentian, Saint Vincent and the Grenadines",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "3711f47c-e7cb-4887-9035-e5615b952084",
+      "iso2_alpha": "SM",
+      "iso3_alpha": "SMR",
+      "iso_numeric": "674",
+      "fips_code": "SM",
+      "slug": "san-marino",
+      "calling_code": "378",
+      "common_name": "San Marino",
+      "official_name": "San Marino",
+      "endonym": "San Marino",
+      "demonym": "Sammarinese, San Marino",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "071264af-5341-4399-ad51-4f28345703c7",
+      "iso2_alpha": "ST",
+      "iso3_alpha": "STP",
+      "iso_numeric": "678",
+      "fips_code": "TP",
+      "slug": "sao-tome-and-principe",
+      "calling_code": "239",
+      "common_name": "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
+      "official_name": "Sao Tome and Principe",
+      "endonym": "S\u00e3o Tom\u00e9 e Pr\u00edncipe",
+      "demonym": "Sao Tomean, S\u00e3o Tom\u00e9 and Pr\u00edncipe",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "b8ab4fea-5ec6-499b-9b5c-56eec9f119bb",
+      "iso2_alpha": "SA",
+      "iso3_alpha": "SAU",
+      "iso_numeric": "682",
+      "fips_code": "SA",
+      "slug": "saudi-arabia",
+      "calling_code": "966",
+      "common_name": "Saudi Arabia",
+      "official_name": "Saudi Arabia",
+      "endonym": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629",
+      "demonym": "Saudi Arabian, Saudi Arabia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "18728f9e-692a-4e67-aee5-76d481acb6a4",
+      "iso2_alpha": "SN",
+      "iso3_alpha": "SEN",
+      "iso_numeric": "686",
+      "fips_code": "SG",
+      "slug": "senegal",
+      "calling_code": "221",
+      "common_name": "Senegal",
+      "official_name": "Senegal",
+      "endonym": "S\u00e9n\u00e9gal",
+      "demonym": "Senegalese, Senegal",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "2c87e3fa-776a-4421-89c8-892f61a1918b",
+      "iso2_alpha": "RS",
+      "iso3_alpha": "SRB",
+      "iso_numeric": "688",
+      "fips_code": "RI",
+      "slug": "serbia",
+      "calling_code": "381",
+      "common_name": "Serbia",
+      "official_name": "Serbia",
+      "endonym": "\u0421\u0440\u0431\u0438\u0458\u0430",
+      "demonym": "Serbian, Serbia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 12,
+        "expression": null
+      }
+    },
+    {
+      "id": "857531ad-44a6-4c09-bbf2-3bd5e160e001",
+      "iso2_alpha": "SC",
+      "iso3_alpha": "SYC",
+      "iso_numeric": "690",
+      "fips_code": "SE",
+      "slug": "seychelles",
+      "calling_code": "248",
+      "common_name": "Seychelles",
+      "official_name": "Seychelles",
+      "endonym": "Seychelles",
+      "demonym": "Seychellois, Seychelles",
+      "mobile_number_rule": {
+        "exact_length": 7,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "72673423-a6ba-44f2-9d44-5552a2634920",
+      "iso2_alpha": "SG",
+      "iso3_alpha": "SGP",
+      "iso_numeric": "702",
+      "fips_code": "SN",
+      "slug": "singapore",
+      "calling_code": "65",
+      "common_name": "Singapore",
+      "official_name": "Singapore",
+      "endonym": "Singapore",
+      "demonym": "Singaporean, Singapore",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 12,
+        "expression": null
+      }
+    },
+    {
+      "id": "60a4626f-9efb-44eb-9fc7-9897a5e94871",
+      "iso2_alpha": "SX",
+      "iso3_alpha": "SXM",
+      "iso_numeric": "534",
+      "fips_code": "NN",
+      "slug": "sint-maarten",
+      "calling_code": "1",
+      "common_name": "Sint Maarten",
+      "official_name": "Sint Maarten (Dutch part)",
+      "endonym": "Sint Maarten",
+      "demonym": "Dutch, Sint Maarten",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "7b4e2242-57fc-4775-acb0-374d8451d7ff",
+      "iso2_alpha": "SK",
+      "iso3_alpha": "SVK",
+      "iso_numeric": "703",
+      "fips_code": "LO",
+      "slug": "slovakia",
+      "calling_code": "421",
+      "common_name": "Slovakia",
+      "official_name": "Slovakia",
+      "endonym": "Slovensko",
+      "demonym": "Slovak, Slovakia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "d6c3a052-b988-4a96-b147-6cc42061b27f",
+      "iso2_alpha": "SI",
+      "iso3_alpha": "SVN",
+      "iso_numeric": "705",
+      "fips_code": "SI",
+      "slug": "slovenia",
+      "calling_code": "386",
+      "common_name": "Slovenia",
+      "official_name": "Slovenia",
+      "endonym": "Slovenija",
+      "demonym": "Slovene, Slovenia",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "b74fcd9e-36a9-4e2a-a46b-cddb768d6f35",
+      "iso2_alpha": "SB",
+      "iso3_alpha": "SLB",
+      "iso_numeric": "90",
+      "fips_code": "BP",
+      "slug": "solomon-islands",
+      "calling_code": "677",
+      "common_name": "Solomon Islands",
+      "official_name": "Solomon Islands",
+      "endonym": "Solomon Islands",
+      "demonym": "Solomon Islander, Solomon Islands",
+      "mobile_number_rule": {
+        "exact_length": 5,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "2318f264-2334-4068-8569-58750c4cad50",
+      "iso2_alpha": "SO",
+      "iso3_alpha": "SOM",
+      "iso_numeric": "706",
+      "fips_code": "SO",
+      "slug": "somalia",
+      "calling_code": "252",
+      "common_name": "Somalia",
+      "official_name": "Somalia",
+      "endonym": "Soomaaliya",
+      "demonym": "Somali, Somalia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "c9fa9a98-c77e-44c2-951b-8c34d43a02a6",
+      "iso2_alpha": "ZA",
+      "iso3_alpha": "ZAF",
+      "iso_numeric": "710",
+      "fips_code": "SF",
+      "slug": "south-africa",
+      "calling_code": "27",
+      "common_name": "South Africa",
+      "official_name": "South Africa",
+      "endonym": "South Africa",
+      "demonym": "South African, South Africa",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "2f594553-75a8-41fb-a116-0bb9e0874b7a",
+      "iso2_alpha": "GS",
+      "iso3_alpha": "SGS",
+      "iso_numeric": "239",
+      "fips_code": "SX",
+      "slug": "south-georgia-and-the-south-sandwich-islands",
+      "calling_code": "500",
+      "common_name": "South Georgia and the South Sandwich Islands",
+      "official_name": "South Georgia and the South Sandwich Islands",
+      "endonym": "South Georgia",
+      "demonym": "South Georgia and the South Sandwich Islander, South Georgia and the South Sandwich Islands",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "b713abae-079f-4570-9319-b9b15c152238",
+      "iso2_alpha": "KR",
+      "iso3_alpha": "KOR",
+      "iso_numeric": "410",
+      "fips_code": "KS",
+      "slug": "south-korea",
+      "calling_code": "82",
+      "common_name": "South Korea",
+      "official_name": "Korea (Republic of)",
+      "endonym": "\ub300\ud55c\ubbfc\uad6d",
+      "demonym": "South Korean, South Korea",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "ddba1a37-ee33-460c-9e7f-5cd4fa39783b",
+      "iso2_alpha": "SS",
+      "iso3_alpha": "SSD",
+      "iso_numeric": "728",
+      "fips_code": "OD",
+      "slug": "south-sudan",
+      "calling_code": "211",
+      "common_name": "South Sudan",
+      "official_name": "South Sudan",
+      "endonym": "South Sudan",
+      "demonym": "South Sudanese, South Sudan",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "002a1f9d-e3a6-42a7-8e51-eda5848e1766",
+      "iso2_alpha": "ES",
+      "iso3_alpha": "ESP",
+      "iso_numeric": "724",
+      "fips_code": "SP",
+      "slug": "spain",
+      "calling_code": "34",
+      "common_name": "Spain",
+      "official_name": "Spain",
+      "endonym": "Espa\u00f1a",
+      "demonym": "Spanish, Spain",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "251f5c60-f826-404d-8faa-9f678062e594",
+      "iso2_alpha": "LK",
+      "iso3_alpha": "LKA",
+      "iso_numeric": "144",
+      "fips_code": "CE",
+      "slug": "sri-lanka",
+      "calling_code": "94",
+      "common_name": "Sri Lanka",
+      "official_name": "Sri Lanka",
+      "endonym": "\u015br\u012b la\u1e43k\u0101va",
+      "demonym": "Sri Lankan, Sri Lanka",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "33cb4ee8-ace3-45c3-aa09-85cae13d9d1f",
+      "iso2_alpha": "SD",
+      "iso3_alpha": "SDN",
+      "iso_numeric": "729",
+      "fips_code": "SU",
+      "slug": "sudan",
+      "calling_code": "249",
+      "common_name": "Sudan",
+      "official_name": "Sudan",
+      "endonym": "\u0627\u0644\u0633\u0648\u062f\u0627\u0646",
+      "demonym": "Sudanese, Sudan",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "3192edd9-508a-474d-8a4d-fb787b5d37ff",
+      "iso2_alpha": "SR",
+      "iso3_alpha": "SUR",
+      "iso_numeric": "740",
+      "fips_code": "NS",
+      "slug": "suriname",
+      "calling_code": "597",
+      "common_name": "Suriname",
+      "official_name": "Suriname",
+      "endonym": "Suriname",
+      "demonym": "Surinamer, Suriname",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 7,
+        "expression": null
+      }
+    },
+    {
+      "id": "05d1cf95-ae81-4316-9228-11ee4ad9b363",
+      "iso2_alpha": "SJ",
+      "iso3_alpha": "SJM",
+      "iso_numeric": "744",
+      "fips_code": "SV",
+      "slug": "svalbard-and-jan-mayen",
+      "calling_code": "1",
+      "common_name": "Svalbard and Jan Mayen",
+      "official_name": "Svalbard and Jan Mayen",
+      "endonym": "Svalbard og Jan Mayen",
+      "demonym": "Norwegian, Svalbard and Jan Mayen",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "ed00d33e-2c56-4b08-8c18-dcd02a084c80",
+      "iso2_alpha": "SZ",
+      "iso3_alpha": "SWZ",
+      "iso_numeric": "748",
+      "fips_code": "WZ",
+      "slug": "swaziland",
+      "calling_code": "268",
+      "common_name": "Swaziland",
+      "official_name": "Swaziland",
+      "endonym": "Swaziland",
+      "demonym": "Swazi, Swaziland",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 8,
+        "expression": null
+      }
+    },
+    {
+      "id": "b62293a6-34d1-4405-93ce-a482bbb38e9d",
+      "iso2_alpha": "SE",
+      "iso3_alpha": "SWE",
+      "iso_numeric": "752",
+      "fips_code": "SW",
+      "slug": "sweden",
+      "calling_code": "46",
+      "common_name": "Sweden",
+      "official_name": "Sweden",
+      "endonym": "Sverige",
+      "demonym": "Swedish, Sweden",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 13,
+        "expression": null
+      }
+    },
+    {
+      "id": "e7551186-a193-4233-95bd-3fee53c4f65c",
+      "iso2_alpha": "CH",
+      "iso3_alpha": "CHE",
+      "iso_numeric": "756",
+      "fips_code": "SZ",
+      "slug": "switzerland",
+      "calling_code": "41",
+      "common_name": "Switzerland",
+      "official_name": "Switzerland",
+      "endonym": "Schweiz",
+      "demonym": "Swiss, Switzerland",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 12,
+        "expression": null
+      }
+    },
+    {
+      "id": "40196846-417f-4ea3-9262-74b190e367c3",
+      "iso2_alpha": "SY",
+      "iso3_alpha": "SYR",
+      "iso_numeric": "760",
+      "fips_code": "SY",
+      "slug": "syria",
+      "calling_code": "963",
+      "common_name": "Syria",
+      "official_name": "Syrian Arab Republic",
+      "endonym": "\u0633\u0648\u0631\u064a\u0627",
+      "demonym": "Syrian, Syria",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "437afc39-a2ca-48d1-87c3-5e83156c6afa",
+      "iso2_alpha": "TW",
+      "iso3_alpha": "TWN",
+      "iso_numeric": "158",
+      "fips_code": "TW",
+      "slug": "taiwan",
+      "calling_code": "886",
+      "common_name": "Taiwan",
+      "official_name": "Taiwan",
+      "endonym": "\u81fa\u7063",
+      "demonym": "Taiwanese, Taiwan",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "71147fdd-34dc-46aa-9077-9df93d871b92",
+      "iso2_alpha": "TJ",
+      "iso3_alpha": "TJK",
+      "iso_numeric": "762",
+      "fips_code": "TI",
+      "slug": "tajikistan",
+      "calling_code": "992",
+      "common_name": "Tajikistan",
+      "official_name": "Tajikistan",
+      "endonym": "\u0422\u043e\u04b7\u0438\u043a\u0438\u0441\u0442\u043e\u043d",
+      "demonym": "Tadzhik, Tajikistan",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "6f5d7ad4-9b8b-4997-8bf7-af699ee1a5d7",
+      "iso2_alpha": "TZ",
+      "iso3_alpha": "TZA",
+      "iso_numeric": "834",
+      "fips_code": "TZ",
+      "slug": "tanzania",
+      "calling_code": "255",
+      "common_name": "Tanzania",
+      "official_name": "Tanzania, United Republic of",
+      "endonym": "Tanzania",
+      "demonym": "Tanzanian, Tanzania",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "a644ce48-1e9d-4963-927c-af21d22e4117",
+      "iso2_alpha": "TH",
+      "iso3_alpha": "THA",
+      "iso_numeric": "764",
+      "fips_code": "TH",
+      "slug": "thailand",
+      "calling_code": "66",
+      "common_name": "Thailand",
+      "official_name": "Thailand",
+      "endonym": "\u0e1b\u0e23\u0e30\u0e40\u0e17\u0e28\u0e44\u0e17\u0e22",
+      "demonym": "Thai, Thailand",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "c6e2c316-2393-40f5-b3fd-c1585c1262eb",
+      "iso2_alpha": "TG",
+      "iso3_alpha": "TGO",
+      "iso_numeric": "768",
+      "fips_code": "TO",
+      "slug": "togo",
+      "calling_code": "228",
+      "common_name": "Togo",
+      "official_name": "Togo",
+      "endonym": "Togo",
+      "demonym": "Togolese, Togo",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "d0bc01eb-d2da-49da-a6d6-beed849dfd71",
+      "iso2_alpha": "TK",
+      "iso3_alpha": "TKL",
+      "iso_numeric": "772",
+      "fips_code": "TL",
+      "slug": "tokelau",
+      "calling_code": "690",
+      "common_name": "Tokelau",
+      "official_name": "Tokelau",
+      "endonym": "Tokelau",
+      "demonym": "Tokelauan, Tokelau",
+      "mobile_number_rule": {
+        "exact_length": 4,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "a38d8dfc-10d1-4286-a7f3-1463f8449656",
+      "iso2_alpha": "TO",
+      "iso3_alpha": "TON",
+      "iso_numeric": "776",
+      "fips_code": "TN",
+      "slug": "tonga",
+      "calling_code": "676",
+      "common_name": "Tonga",
+      "official_name": "Tonga",
+      "endonym": "Tonga",
+      "demonym": "Tongan, Tonga",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 7,
+        "expression": null
+      }
+    },
+    {
+      "id": "c1446ac3-3cfd-4ee3-b96f-2502a7a119c8",
+      "iso2_alpha": "TT",
+      "iso3_alpha": "TTO",
+      "iso_numeric": "780",
+      "fips_code": "TD",
+      "slug": "trinidad-and-tobago",
+      "calling_code": "1",
+      "common_name": "Trinidad and Tobago",
+      "official_name": "Trinidad and Tobago",
+      "endonym": "Trinidad and Tobago",
+      "demonym": "Trinidadian, Trinidad and Tobago",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "a3bbe7fc-2d45-4234-a4a0-b7fd0926c608",
+      "iso2_alpha": "TN",
+      "iso3_alpha": "TUN",
+      "iso_numeric": "788",
+      "fips_code": "TS",
+      "slug": "tunisia",
+      "calling_code": "216",
+      "common_name": "Tunisia",
+      "official_name": "Tunisia",
+      "endonym": "\u062a\u0648\u0646\u0633",
+      "demonym": "Tunisian, Tunisia",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "c44eec9b-c129-42eb-ba72-3038ff192658",
+      "iso2_alpha": "TR",
+      "iso3_alpha": "TUR",
+      "iso_numeric": "792",
+      "fips_code": "TU",
+      "slug": "turkey",
+      "calling_code": "90",
+      "common_name": "Turkey",
+      "official_name": "Turkey",
+      "endonym": "T\u00fcrkiye",
+      "demonym": "Turkish, Turkey",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "93b26ec7-aa92-4e47-b65f-fe8980f8d7fb",
+      "iso2_alpha": "TM",
+      "iso3_alpha": "TKM",
+      "iso_numeric": "795",
+      "fips_code": "TX",
+      "slug": "turkmenistan",
+      "calling_code": "993",
+      "common_name": "Turkmenistan",
+      "official_name": "Turkmenistan",
+      "endonym": "T\u00fcrkmenistan",
+      "demonym": "Turkmen, Turkmenistan",
+      "mobile_number_rule": {
+        "exact_length": 8,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "a3456418-3547-42a8-bcab-aaabe7c49705",
+      "iso2_alpha": "TC",
+      "iso3_alpha": "TCA",
+      "iso_numeric": "796",
+      "fips_code": "TK",
+      "slug": "turks-and-caicos-islands",
+      "calling_code": "1",
+      "common_name": "Turks and Caicos Islands",
+      "official_name": "Turks and Caicos Islands",
+      "endonym": "Turks and Caicos Islands",
+      "demonym": "Turks and Caicos Islander, Turks and Caicos Islands",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "31f50f5f-f166-4ea1-b6ea-b420121ed8af",
+      "iso2_alpha": "TV",
+      "iso3_alpha": "TUV",
+      "iso_numeric": "798",
+      "fips_code": "TV",
+      "slug": "tuvalu",
+      "calling_code": "688",
+      "common_name": "Tuvalu",
+      "official_name": "Tuvalu",
+      "endonym": "Tuvalu",
+      "demonym": "Tuvaluan, Tuvalu",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 6,
+        "expression": null
+      }
+    },
+    {
+      "id": "f2baf907-036c-4a06-a6cc-5c75b68642df",
+      "iso2_alpha": "UM",
+      "iso3_alpha": "UMI",
+      "iso_numeric": "581",
+      "fips_code": "",
+      "slug": "us-minor-outlying-islands",
+      "calling_code": "0",
+      "common_name": "U.S. Minor Outlying Islands",
+      "official_name": "United States Minor Outlying Islands",
+      "endonym": "United States Minor Outlying Islands",
+      "demonym": "American, U.S. Minor Outlying Islands",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "1d28a15f-8ed2-462a-be0a-5e3f895d216b",
+      "iso2_alpha": "VI",
+      "iso3_alpha": "VIR",
+      "iso_numeric": "850",
+      "fips_code": "VQ",
+      "slug": "us-virgin-islands",
+      "calling_code": "1",
+      "common_name": "U.S. Virgin Islands",
+      "official_name": "Virgin Islands (U.S.)",
+      "endonym": "Virgin Islands of the United States",
+      "demonym": "Virgin Islander, U.S. Virgin Islands",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "2450c158-010d-451f-bad9-53b3900f6d69",
+      "iso2_alpha": "UG",
+      "iso3_alpha": "UGA",
+      "iso_numeric": "800",
+      "fips_code": "UG",
+      "slug": "uganda",
+      "calling_code": "256",
+      "common_name": "Uganda",
+      "official_name": "Uganda",
+      "endonym": "Uganda",
+      "demonym": "Ugandan, Uganda",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "20d2e22b-3cf7-4670-bade-0c8f3975497b",
+      "iso2_alpha": "UA",
+      "iso3_alpha": "UKR",
+      "iso_numeric": "804",
+      "fips_code": "UP",
+      "slug": "ukraine",
+      "calling_code": "380",
+      "common_name": "Ukraine",
+      "official_name": "Ukraine",
+      "endonym": "\u0423\u043a\u0440\u0430\u0457\u043d\u0430",
+      "demonym": "Ukrainian, Ukraine",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "4e85d261-ca43-42dd-8a1c-df14cae35070",
+      "iso2_alpha": "AE",
+      "iso3_alpha": "ARE",
+      "iso_numeric": "784",
+      "fips_code": "AE",
+      "slug": "united-arab-emirates",
+      "calling_code": "971",
+      "common_name": "United Arab Emirates",
+      "official_name": "United Arab Emirates",
+      "endonym": "\u062f\u0648\u0644\u0629 \u0627\u0644\u0625\u0645\u0627\u0631\u0627\u062a \u0627\u0644\u0639\u0631\u0628\u064a\u0629 \u0627\u0644\u0645\u062a\u062d\u062f\u0629",
+      "demonym": "Emirati, United Arab Emirates",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 8,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "8c5e6b55-1492-448f-8aa7-ddd8bdf4d594",
+      "iso2_alpha": "GB",
+      "iso3_alpha": "GBR",
+      "iso_numeric": "826",
+      "fips_code": "UK",
+      "slug": "united-kingdom",
+      "calling_code": "44",
+      "common_name": "United Kingdom",
+      "official_name": "United Kingdom of Great Britain and Northern Ireland",
+      "endonym": "United Kingdom",
+      "demonym": "British, United Kingdom",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "ee761c6a-8017-472c-aaad-54f36fbe1968",
+      "iso2_alpha": "US",
+      "iso3_alpha": "USA",
+      "iso_numeric": "840",
+      "fips_code": "US",
+      "slug": "united-states",
+      "calling_code": "1",
+      "common_name": "United States",
+      "official_name": "United States of America",
+      "endonym": "United States",
+      "demonym": "American, United States",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "c52688f0-a3e8-4015-87c2-7c5daf6f3fca",
+      "iso2_alpha": "UY",
+      "iso3_alpha": "URY",
+      "iso_numeric": "858",
+      "fips_code": "UY",
+      "slug": "uruguay",
+      "calling_code": "598",
+      "common_name": "Uruguay",
+      "official_name": "Uruguay",
+      "endonym": "Uruguay",
+      "demonym": "Uruguayan, Uruguay",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 4,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "d9e3510f-030f-4e39-998a-1b8f3c7856cf",
+      "iso2_alpha": "UZ",
+      "iso3_alpha": "UZB",
+      "iso_numeric": "860",
+      "fips_code": "UZ",
+      "slug": "uzbekistan",
+      "calling_code": "998",
+      "common_name": "Uzbekistan",
+      "official_name": "Uzbekistan",
+      "endonym": "O\u2018zbekiston",
+      "demonym": "Uzbekistani, Uzbekistan",
+      "mobile_number_rule": {
+        "exact_length": 9,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "392a3a02-468d-4c4c-8d28-82c4c271d0b7",
+      "iso2_alpha": "VU",
+      "iso3_alpha": "VUT",
+      "iso_numeric": "548",
+      "fips_code": "NH",
+      "slug": "vanuatu",
+      "calling_code": "678",
+      "common_name": "Vanuatu",
+      "official_name": "Vanuatu",
+      "endonym": "Vanuatu",
+      "demonym": "Ni-Vanuatu, Vanuatu",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 7,
+        "expression": null
+      }
+    },
+    {
+      "id": "475cfeb8-45ce-4276-add6-af2070e9524a",
+      "iso2_alpha": "VA",
+      "iso3_alpha": "VAT",
+      "iso_numeric": "336",
+      "fips_code": "VT",
+      "slug": "vatican-city",
+      "calling_code": "379",
+      "common_name": "Vatican City",
+      "official_name": "Holy See",
+      "endonym": "Sancta Sedes",
+      "demonym": "Vatican City",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": null,
+        "max_length": 11,
+        "expression": null
+      }
+    },
+    {
+      "id": "37084881-9e8b-449e-9f67-f011bfb4b58c",
+      "iso2_alpha": "VE",
+      "iso3_alpha": "VEN",
+      "iso_numeric": "862",
+      "fips_code": "VE",
+      "slug": "venezuela",
+      "calling_code": "58",
+      "common_name": "Venezuela",
+      "official_name": "Venezuela (Bolivarian Republic of)",
+      "endonym": "Venezuela",
+      "demonym": "Venezuelan, Venezuela",
+      "mobile_number_rule": {
+        "exact_length": 10,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "6ce80517-4173-412c-a145-89b0f8ada591",
+      "iso2_alpha": "VN",
+      "iso3_alpha": "VNM",
+      "iso_numeric": "704",
+      "fips_code": "VM",
+      "slug": "vietnam",
+      "calling_code": "84",
+      "common_name": "Vietnam",
+      "official_name": "Viet Nam",
+      "endonym": "Vi\u1ec7t Nam",
+      "demonym": "Vietnamese, Vietnam",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 7,
+        "max_length": 10,
+        "expression": null
+      }
+    },
+    {
+      "id": "edeeda9c-60bb-4b63-80d5-74335b328a1e",
+      "iso2_alpha": "WF",
+      "iso3_alpha": "WLF",
+      "iso_numeric": "876",
+      "fips_code": "WF",
+      "slug": "wallis-and-futuna",
+      "calling_code": "681",
+      "common_name": "Wallis and Futuna",
+      "official_name": "Wallis and Futuna",
+      "endonym": "Wallis et Futuna",
+      "demonym": "Wallis and Futuna Islander, Wallis and Futuna",
+      "mobile_number_rule": {
+        "exact_length": 6,
+        "min_length": null,
+        "max_length": null,
+        "expression": null
+      }
+    },
+    {
+      "id": "fecfabca-92ed-4854-891e-6dc7fdabfc83",
+      "iso2_alpha": "EH",
+      "iso3_alpha": "ESH",
+      "iso_numeric": "732",
+      "fips_code": "WI",
+      "slug": "western-sahara",
+      "calling_code": "212",
+      "common_name": "Western Sahara",
+      "official_name": "Western Sahara",
+      "endonym": "\u0627\u0644\u0635\u062d\u0631\u0627\u0621 \u0627\u0644\u063a\u0631\u0628\u064a\u0629",
+      "demonym": "Sahrawi, Western Sahara",
+      "mobile_number_rule": null
+    },
+    {
+      "id": "de268e0b-6960-483a-8b05-20e3ab580833",
+      "iso2_alpha": "YE",
+      "iso3_alpha": "YEM",
+      "iso_numeric": "887",
+      "fips_code": "YM",
+      "slug": "yemen",
+      "calling_code": "967",
+      "common_name": "Yemen",
+      "official_name": "Yemen",
+      "endonym": "\u0627\u0644\u064a\u064e\u0645\u064e\u0646",
+      "demonym": "Yemeni, Yemen",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 6,
+        "max_length": 9,
+        "expression": null
+      }
+    },
+    {
+      "id": "4afff369-2850-4f5c-9b05-9f8dc2988f31",
+      "iso2_alpha": "ZW",
+      "iso3_alpha": "ZWE",
+      "iso_numeric": "716",
+      "fips_code": "ZI",
+      "slug": "zimbabwe",
+      "calling_code": "263",
+      "common_name": "Zimbabwe",
+      "official_name": "Zimbabwe",
+      "endonym": "Zimbabwe",
+      "demonym": "Zimbabwean, Zimbabwe",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 10,
+        "expression": null
+      }
+    }
+  ]
+}

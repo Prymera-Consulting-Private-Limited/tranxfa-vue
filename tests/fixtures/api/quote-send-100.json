@@ -1,0 +1,332 @@
+{
+  "sources": [
+    {
+      "country": {
+        "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+        "iso2_alpha": "AU",
+        "iso3_alpha": "AUS",
+        "iso_numeric": "36",
+        "fips_code": "AS",
+        "slug": "australia",
+        "calling_code": "61",
+        "common_name": "Australia",
+        "official_name": "Australia",
+        "endonym": "Australia",
+        "demonym": "Australian, Australia"
+      },
+      "currency": {
+        "id": "4a16a11f-9bbb-4671-95c6-f8550325521a",
+        "decimal_places": 2,
+        "iso_numeric": 36,
+        "type": "FIAT",
+        "crypto_code": null,
+        "iso_alpha": "AUD",
+        "common_name": "Australian dollar",
+        "official_name": "Australian dollar",
+        "icon_unicode": "$",
+        "code": "AUD",
+        "salary_ranges": null
+      }
+    }
+  ],
+  "targets": [
+    {
+      "country": {
+        "id": "8fe1dcea-ff86-4ec5-aef5-10adb650f96b",
+        "iso2_alpha": "FJ",
+        "iso3_alpha": "FJI",
+        "iso_numeric": "242",
+        "fips_code": "FJ",
+        "slug": "fiji",
+        "calling_code": "679",
+        "common_name": "Fiji",
+        "official_name": "Fiji",
+        "endonym": "Fiji",
+        "demonym": "Fijian, Fiji"
+      },
+      "currency": {
+        "id": "ad66a916-0ccb-4437-b5f7-194776277992",
+        "decimal_places": 2,
+        "iso_numeric": 242,
+        "type": "FIAT",
+        "crypto_code": null,
+        "iso_alpha": "FJD",
+        "common_name": "Fijian dollar",
+        "official_name": "Fijian dollar",
+        "icon_unicode": "$",
+        "code": "FJD",
+        "salary_ranges": null
+      }
+    },
+    {
+      "country": {
+        "id": "9cacff53-1cc6-4e56-b439-99ee93a50b3f",
+        "iso2_alpha": "CI",
+        "iso3_alpha": "CIV",
+        "iso_numeric": "384",
+        "fips_code": "IV",
+        "slug": "ivory-coast",
+        "calling_code": "225",
+        "common_name": "Ivory Coast",
+        "official_name": "C\u00f4te d'Ivoire",
+        "endonym": "C\u00f4te d'Ivoire",
+        "demonym": "Ivorian, Ivory Coast"
+      },
+      "currency": {
+        "id": "64b1b3d3-15a9-46dc-b271-3ab28bd7c38b",
+        "decimal_places": 0,
+        "iso_numeric": 952,
+        "type": "FIAT",
+        "crypto_code": null,
+        "iso_alpha": "XOF",
+        "common_name": "West African CFA franc",
+        "official_name": "West African CFA franc",
+        "icon_unicode": "Fr",
+        "code": "XOF",
+        "salary_ranges": null
+      }
+    },
+    {
+      "country": {
+        "id": "e52fc688-689a-4d89-ab61-dac051aadd93",
+        "iso2_alpha": "NG",
+        "iso3_alpha": "NGA",
+        "iso_numeric": "566",
+        "fips_code": "NI",
+        "slug": "nigeria",
+        "calling_code": "234",
+        "common_name": "Nigeria",
+        "official_name": "Nigeria",
+        "endonym": "Nigeria",
+        "demonym": "Nigerian, Nigeria"
+      },
+      "currency": {
+        "id": "84663196-1479-4c47-b668-7aab3bc85535",
+        "decimal_places": 2,
+        "iso_numeric": 566,
+        "type": "FIAT",
+        "crypto_code": null,
+        "iso_alpha": "NGN",
+        "common_name": "Nigerian naira",
+        "official_name": "Nigerian naira",
+        "icon_unicode": "\u20a6",
+        "code": "NGN",
+        "salary_ranges": null
+      }
+    },
+    {
+      "country": {
+        "id": "59068f68-ba8c-4541-a745-db695bc62e2e",
+        "iso2_alpha": "RW",
+        "iso3_alpha": "RWA",
+        "iso_numeric": "646",
+        "fips_code": "RW",
+        "slug": "rwanda",
+        "calling_code": "250",
+        "common_name": "Rwanda",
+        "official_name": "Rwanda",
+        "endonym": "Rwanda",
+        "demonym": "Rwandan, Rwanda"
+      },
+      "currency": {
+        "id": "afb3d431-6441-4a88-85b0-5a755faf89b1",
+        "decimal_places": 0,
+        "iso_numeric": 646,
+        "type": "FIAT",
+        "crypto_code": null,
+        "iso_alpha": "RWF",
+        "common_name": "Rwandan franc",
+        "official_name": "Rwandan franc",
+        "icon_unicode": "Fr",
+        "code": "RWF",
+        "salary_ranges": null
+      }
+    },
+    {
+      "country": {
+        "id": "6f37a78f-b602-4dee-98c4-e49b4e6266f9",
+        "iso2_alpha": "WS",
+        "iso3_alpha": "WSM",
+        "iso_numeric": "882",
+        "fips_code": "WS",
+        "slug": "samoa",
+        "calling_code": "685",
+        "common_name": "Samoa",
+        "official_name": "Samoa",
+        "endonym": "Samoa",
+        "demonym": "Samoan, Samoa"
+      },
+      "currency": {
+        "id": "593d668e-ecb3-4105-95f1-1a78a5f28fb1",
+        "decimal_places": 2,
+        "iso_numeric": 882,
+        "type": "FIAT",
+        "crypto_code": null,
+        "iso_alpha": "WST",
+        "common_name": "Samoan t\u0101l\u0101",
+        "official_name": "Samoan t\u0101l\u0101",
+        "icon_unicode": "T",
+        "code": "WST",
+        "salary_ranges": null
+      }
+    },
+    {
+      "country": {
+        "id": "b5fcaa6b-0707-4c3a-bb74-5c9509a203dd",
+        "iso2_alpha": "SL",
+        "iso3_alpha": "SLE",
+        "iso_numeric": "694",
+        "fips_code": "SL",
+        "slug": "sierra-leone",
+        "calling_code": "232",
+        "common_name": "Sierra Leone",
+        "official_name": "Sierra Leone",
+        "endonym": "Sierra Leone",
+        "demonym": "Sierra Leonean, Sierra Leone"
+      },
+      "currency": {
+        "id": "18bdc32e-2903-4d9f-b0b4-5d41a47a2d4d",
+        "decimal_places": 2,
+        "iso_numeric": 925,
+        "type": "FIAT",
+        "crypto_code": null,
+        "iso_alpha": "SLE",
+        "common_name": "Sierra Leonean leone",
+        "official_name": "Sierra Leonean leone",
+        "icon_unicode": "Le",
+        "code": "SLE",
+        "salary_ranges": null
+      }
+    },
+    {
+      "country": {
+        "id": "d3bfedc3-1ba5-4443-b9b6-4236041df514",
+        "iso2_alpha": "ZM",
+        "iso3_alpha": "ZMB",
+        "iso_numeric": "894",
+        "fips_code": "ZA",
+        "slug": "zambia",
+        "calling_code": "260",
+        "common_name": "Zambia",
+        "official_name": "Zambia",
+        "endonym": "Zambia",
+        "demonym": "Zambian, Zambia"
+      },
+      "currency": {
+        "id": "4ea70bd5-9846-4e3c-919e-4543d6eeb3f5",
+        "decimal_places": 2,
+        "iso_numeric": 967,
+        "type": "FIAT",
+        "crypto_code": null,
+        "iso_alpha": "ZMW",
+        "common_name": "Zambian kwacha",
+        "official_name": "Zambian kwacha",
+        "icon_unicode": "ZK",
+        "code": "ZMW",
+        "salary_ranges": null
+      }
+    }
+  ],
+  "payment_country": {
+    "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "payment_currency": {
+    "id": "4a16a11f-9bbb-4671-95c6-f8550325521a",
+    "decimal_places": 2,
+    "iso_numeric": 36,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "AUD",
+    "common_name": "Australian dollar",
+    "official_name": "Australian dollar",
+    "icon_unicode": "$",
+    "code": "AUD",
+    "salary_ranges": null
+  },
+  "payout_country": {
+    "id": "8fe1dcea-ff86-4ec5-aef5-10adb650f96b",
+    "iso2_alpha": "FJ",
+    "iso3_alpha": "FJI",
+    "iso_numeric": "242",
+    "fips_code": "FJ",
+    "slug": "fiji",
+    "calling_code": "679",
+    "common_name": "Fiji",
+    "official_name": "Fiji",
+    "endonym": "Fiji",
+    "demonym": "Fijian, Fiji"
+  },
+  "payout_currency": {
+    "id": "ad66a916-0ccb-4437-b5f7-194776277992",
+    "decimal_places": 2,
+    "iso_numeric": 242,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "FJD",
+    "common_name": "Fijian dollar",
+    "official_name": "Fijian dollar",
+    "icon_unicode": "$",
+    "code": "FJD",
+    "salary_ranges": null
+  },
+  "payout_methods": [
+    {
+      "id": "7e0e09ee-870c-4829-9a5e-6d328a25e975",
+      "code": "MOBILE-WALLET",
+      "title": "Mobile Wallet",
+      "description": "A secure method allowing users to transfer funds directly to recipient's mobile wallet account.",
+      "instruction": null,
+      "promo": null,
+      "sell_rate_formatted": "AUD = 1.45 FJD"
+    }
+  ],
+  "payout_method": {
+    "id": "7e0e09ee-870c-4829-9a5e-6d328a25e975",
+    "code": "MOBILE-WALLET",
+    "title": "Mobile Wallet",
+    "description": "A secure method allowing users to transfer funds directly to recipient's mobile wallet account.",
+    "instruction": null,
+    "promo": null,
+    "sell_rate_formatted": "AUD = 1.45 FJD"
+  },
+  "payout_companies": [
+    {
+      "id": "a2af0b7a-e8e6-4376-8e1c-930d036791e8",
+      "code": "TERRA_PAY",
+      "title": "TerraPay"
+    }
+  ],
+  "payout_company": {
+    "id": "a2af0b7a-e8e6-4376-8e1c-930d036791e8",
+    "code": "TERRA_PAY",
+    "title": "TerraPay"
+  },
+  "amount_type": "send",
+  "amount": "100",
+  "local_amount": 100,
+  "local_amount_formatted": "100.00",
+  "local_amount_currency_prefixed": "AUD 100.00",
+  "base_fees": 0,
+  "base_fees_formatted": "0.00",
+  "base_fees_currency_prefixed": "AUD 0.00",
+  "foreign_amount": 145,
+  "foreign_amount_formatted": "145.00",
+  "foreign_amount_currency_prefixed": "FJD 145.00",
+  "exchange_rate": "1.45",
+  "exchange_rate_date": "2026-09-06T20:35:56.000000Z",
+  "exchange_rate_formatted": "AUD = 1.45 FJD",
+  "exchange_rate_is_inverse": false,
+  "alerts": [],
+  "transfer_disable_reason": null,
+  "require_payout_company_selection": false
+}

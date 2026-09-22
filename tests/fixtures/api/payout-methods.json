@@ -1,0 +1,66 @@
+{
+  "data": [
+    {
+      "id": "7e0e09ee-870c-4829-9a5e-6d328a25e975",
+      "code": "MOBILE-WALLET",
+      "title": "Mobile Wallet",
+      "description": "A secure method allowing users to transfer funds directly to recipient's mobile wallet account.",
+      "instruction": null,
+      "promo": null,
+      "sell_rate_formatted": null,
+      "channel": {
+        "id": "a2af0b7a-d989-48dd-a9c7-814c4072d323",
+        "configuration": {
+          "recipient_type": null,
+          "confirm_account_number": false
+        },
+        "attributes": [
+          {
+            "type": "name",
+            "input_mode": null,
+            "context": null,
+            "is_required": true,
+            "label": "Recipient Name",
+            "attribute": "name_on_account",
+            "prefix_addon": null,
+            "suffix_addon": null,
+            "help_text": "The recipient\u2019s name exactly as registered with their mobile wallet.",
+            "placeholder_text": null,
+            "regex_pattern": null,
+            "regex_failure_message": null,
+            "mask": null,
+            "min_length": null,
+            "max_length": null,
+            "exact_length": null,
+            "min_value": null,
+            "max_value": null,
+            "exact_value": null,
+            "view_order": 1
+          },
+          {
+            "type": "account_number",
+            "input_mode": "number",
+            "context": null,
+            "is_required": true,
+            "label": "Mobile Number",
+            "attribute": "mobile_number",
+            "prefix_addon": "+679",
+            "suffix_addon": null,
+            "help_text": "The recipient\u2019s mobile wallet number, without the country code.",
+            "placeholder_text": null,
+            "regex_pattern": null,
+            "regex_failure_message": null,
+            "mask": null,
+            "min_length": null,
+            "max_length": null,
+            "exact_length": null,
+            "min_value": null,
+            "max_value": null,
+            "exact_value": null,
+            "view_order": 2
+          }
+        ]
+      }
+    }
+  ]
+}

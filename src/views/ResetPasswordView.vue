@@ -1,5 +1,8 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import BrandLogo from "@/components/BrandLogo.vue";
 import {computed, onMounted, reactive, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
 import router from "@/router/index.js";
 import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -26,6 +29,7 @@ const formErrors = reactive({
   confirm_password: [],
 });
 const resetPasswordFailureMessage = ref('');
+const {t} = useI18n();
 const passwordPolicyStore = usePasswordPolicyStore();
 const customerUtils = useCustomerUtils();
 const passwordPolicyUtils = usePasswordPolicyUtils();
@@ -33,15 +37,22 @@ const validatedPasswordPolicies = reactive({
   rules: [],
 });
 
+const policyFailed = ref(false);
+
+async function loadPolicy() {
+  if (passwordPolicyStore.isLoaded) return;
+  isLoading.value = true;
+  policyFailed.value = false;
+  await passwordPolicyUtils.getPolicy().catch((e) => {
+    logRequestFailure(e, 'reset-password');
+    policyFailed.value = true;
+  }).finally(() => {
+    isLoading.value = false
+  });
+}
+
 onMounted(async () => {
-  if (! passwordPolicyStore.isLoaded) {
-    isLoading.value = true;
-    await passwordPolicyUtils.getPolicy().catch((e) => {
-      console.error(e);
-    }).finally(() => {
-      isLoading.value = false
-    });
-  }
+  await loadPolicy();
   validatedPasswordPolicies.rules = [];
   for (const rule of passwordPolicyStore.rules) {
     validatedPasswordPolicies.rules.push({
@@ -74,7 +85,7 @@ async function resetPassword() {
   customerUtils.resetPassword(props.token, form.password, form.confirm_password).then(() => {
     router.push({name: 'signIn', query: {referer: "reset-password"}});
   }).catch((e) => {
-    if (e.status === 422) {
+    if (e.response?.status === 422) {
       const errors = e.response.data.errors;
       if (typeof errors.password !== 'undefined') {
         formErrors.password = errors.password;
@@ -86,7 +97,8 @@ async function resetPassword() {
         resetPasswordFailureMessage.value = errors.token[0];
       }
     } else {
-      resetPasswordFailureMessage.value = e.response.data?.message;
+      logRequestFailure(e, 'reset-password');
+      resetPasswordFailureMessage.value = failureMessage(e, t('auth.resetPassword.failed'));
     }
   }).finally(() => {
     isLoading.value = false;
@@ -116,12 +128,12 @@ const totalPasswordRulesCount = computed(() => validatedPasswordPolicies.rules.l
 
 const passwordRequirementsSummary = computed(() => {
   if (!form.password) {
-    return 'View password requirements';
+    return t('auth.resetPassword.requirementsToggle');
   }
   if (allPasswordRulesMet.value) {
-    return 'All requirements met';
+    return t('auth.resetPassword.requirementsMet');
   }
-  return `${unmetPasswordRulesCount.value} of ${totalPasswordRulesCount.value} not met`;
+  return t('auth.resetPassword.unmetpasswordrulescountOfTotalpasswordrulescountNot', {unmetPasswordRulesCount: unmetPasswordRulesCount.value, totalPasswordRulesCount: totalPasswordRulesCount.value});
 });
 
 const passwordRequirementsHeaderClass = computed(() => {
@@ -129,9 +141,9 @@ const passwordRequirementsHeaderClass = computed(() => {
     return 'text-gray-700';
   }
   if (allPasswordRulesMet.value) {
-    return 'text-emerald-500';
+    return 'text-success-700';
   }
-  return 'text-red-500';
+  return 'text-danger-600';
 });
 
 function togglePasswordRequirements() {
@@ -156,18 +168,18 @@ watch(
         <!-- Left Section with Full Size Image -->
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
-          <img src="/images/backgrounds/resetpassword.png" alt="Full Size Image" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/resetpassword.png" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a href="javascript:"><BrandLogo class="mb-5" /></a>
+            <a href="javascript:" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
           <!-- Logo at Top Left (Desktop) -->
           <!-- Cross Mark at Form Right Corner (Desktop) -->
           <div class="hidden md:block  absolute top-4 right-4">
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 ">
+            <a href="javascript:" class="text-gray-500 text-3xl hover:text-gray-500 ">
               <i class="pi pi-times"></i>
             </a>
           </div>
@@ -178,54 +190,54 @@ watch(
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+              <a href="javascript:"><BrandLogo class="mb-5" /></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-6">Reset Password</h2>
+            <h2 class="text-2xl font-bold text-black mb-6">{{ $t('auth.resetPassword.title') }}</h2>
 
             <!-- Form -->
             <form @submit.prevent="resetPassword" class="space-y-5">
-              <div v-if="resetPasswordFailureMessage" class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-                <p class="text-sm text-red-700">{{ resetPasswordFailureMessage }}</p>
+              <div v-if="resetPasswordFailureMessage" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
+                <p class="text-sm/6 text-danger-700">{{ resetPasswordFailureMessage }}</p>
               </div>
 
               <!-- Password Field -->
               <div>
-                <label :class="[formErrors.password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="password" class="mb-2 block text-base font-medium">Choose Password</label>
+                <label :class="[formErrors.password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="password" class="mb-2 block text-base font-medium">{{ $t('auth.resetPassword.chooseLabel') }}</label>
                 <div class="mb-3">
                   <div
                     class="relative rounded-2xl border bg-white transition-all duration-200"
-                    :class="formErrors.password.length > 0 ? 'border-red-500' : (passwordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
+                    :class="formErrors.password.length > 0 ? 'border-danger-500' : (passwordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
                   >
                     <input
                       :type="showPassword ? 'text' : 'password'"
                       id="password"
                       v-model="form.password"
-                      placeholder="••••••••"
-                      class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-400"
+                      :placeholder="$t('common.passwordPlaceholder')"
+                      class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                       @focus="passwordFocused = true"
                       @blur="passwordFocused = false"
                     >
                     <button
                       type="button"
-                      class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-700 cursor-pointer"
-                      :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                      class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
+                      :aria-label="showPassword ? $t('common.hidePassword') : $t('common.showPassword')"
                       @click="showPassword = !showPassword"
                     >
                       <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                     </button>
                   </div>
-                  <p v-if="formErrors.password.length > 0" class="mt-2 text-sm text-red-600">{{ formErrors.password[0] }}</p>
+                  <p v-if="formErrors.password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.password[0] }}</p>
                 </div>
 
                 <div
                   v-if="validatedPasswordPolicies.rules.length"
                   class="rounded-2xl border bg-gray-50"
-                  :class="form.password ? (allPasswordRulesMet ? 'border-emerald-200' : 'border-red-200') : 'border-gray-200'"
+                  :class="form.password ? (allPasswordRulesMet ? 'border-success-200' : 'border-danger-200') : 'border-gray-200'"
                 >
                   <button
                     type="button"
-                    class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors"
+                    class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2.5 text-left text-sm/6 transition-colors"
                     :class="passwordRequirementsHeaderClass"
                     :aria-expanded="passwordRequirementsOpen"
                     @click="togglePasswordRequirements"
@@ -233,7 +245,7 @@ watch(
                     <span class="flex min-w-0 items-center gap-2">
                       <i
                         v-if="form.password"
-                        class="pi shrink-0 text-sm"
+                        class="pi shrink-0 text-sm/6"
                         :class="allPasswordRulesMet ? 'pi-check-circle' : 'pi-times-circle'"
                       />
                       <span class="truncate">{{ passwordRequirementsSummary }}</span>
@@ -243,6 +255,7 @@ watch(
                       :class="[passwordRequirementsHeaderClass, passwordRequirementsOpen ? 'pi-chevron-up' : 'pi-chevron-down']"
                     />
                   </button>
+                  <p v-if="policyFailed" class="text-sm/6 text-danger-700" role="alert">{{ $t('common.passwordRulesFailed') }} <button type="button" @click="loadPolicy" class="font-semibold underline underline-offset-2">{{ $t('common.tryAgain') }}</button></p>
                   <ul
                     v-show="passwordRequirementsOpen"
                     role="list"
@@ -251,21 +264,21 @@ watch(
                     <li v-for="validatedPasswordPolicyRule in validatedPasswordPolicies.rules" :key="validatedPasswordPolicyRule.id">
                       <div v-if="getRuleOutcome(validatedPasswordPolicyRule) === true" class="relative flex items-center space-x-3">
                         <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
-                          <i class="pi pi-check-circle text-emerald-500"></i>
+                          <i class="pi pi-check-circle text-success-500"></i>
                         </span>
-                        <p class="min-w-0 text-sm text-emerald-500">{{ validatedPasswordPolicyRule.message }}</p>
+                        <p class="min-w-0 text-sm/6 text-success-700">{{ validatedPasswordPolicyRule.message }}</p>
                       </div>
                       <div v-else-if="form.password && getRuleOutcome(validatedPasswordPolicyRule) === false" class="relative flex items-center space-x-3">
                         <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
-                          <i class="pi pi-times-circle text-red-500"></i>
+                          <i class="pi pi-times-circle text-danger-500"></i>
                         </span>
-                        <p class="min-w-0 text-sm text-red-500">{{ validatedPasswordPolicyRule.message }}</p>
+                        <p class="min-w-0 text-sm/6 text-danger-600">{{ validatedPasswordPolicyRule.message }}</p>
                       </div>
                       <div v-else class="relative flex items-center space-x-3">
                         <span class="flex size-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
                           <i class="pi pi-check-circle text-gray-500"></i>
                         </span>
-                        <p class="min-w-0 text-sm text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
+                        <p class="min-w-0 text-sm/6 text-gray-500">{{ validatedPasswordPolicyRule.message }}</p>
                       </div>
                     </li>
                   </ul>
@@ -274,40 +287,40 @@ watch(
 
               <!-- Confirm Password -->
               <div>
-                <label :class="[formErrors.confirm_password.length > 0 ? 'text-red-700' : 'text-brand-700']" for="confirm_password" class="mb-2 block text-base font-medium">Confirm Password</label>
+                <label :class="[formErrors.confirm_password.length > 0 ? 'text-danger-700' : 'text-brand-700']" for="confirm_password" class="mb-2 block text-base font-medium">{{ $t('auth.resetPassword.confirmLabel') }}</label>
                 <div
                   class="relative rounded-2xl border bg-white transition-all duration-200"
-                  :class="formErrors.confirm_password.length > 0 ? 'border-red-500' : (confirmPasswordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
+                  :class="formErrors.confirm_password.length > 0 ? 'border-danger-500' : (confirmPasswordFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300')"
                 >
                   <input
                     :type="showConfirmPassword ? 'text' : 'password'"
                     id="confirm_password"
                     v-model="form.confirm_password"
-                    placeholder="••••••••"
-                    class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-400"
+                    :placeholder="$t('common.passwordPlaceholder')"
+                    class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                     @focus="confirmPasswordFocused = true"
                     @blur="confirmPasswordFocused = false"
                   >
                   <button
                     type="button"
-                    class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-700 cursor-pointer"
-                    :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+                    class="absolute inset-y-0 right-1.5 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-800 cursor-pointer"
+                    :aria-label="showConfirmPassword ? $t('common.hidePassword') : $t('common.showPassword')"
                     @click="showConfirmPassword = !showConfirmPassword"
                   >
                     <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                   </button>
                 </div>
-                <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm text-red-600">{{ formErrors.confirm_password[0] }}</p>
+                <p v-if="formErrors.confirm_password.length > 0" class="mt-2 text-sm/6 text-danger-600">{{ formErrors.confirm_password[0] }}</p>
               </div>
 
               <button
                 :disabled="isLoading"
                 type="submit"
-                class="group relative block w-full overflow-hidden rounded-full bg-brand-700 py-3.5 text-center text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span class="inline-flex items-center justify-center gap-2">
-                  Continue
-                  <i class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+                  {{ $t('common.continue') }}
+                  <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
             </form>

@@ -5,9 +5,12 @@ import {ref} from "vue";
 import {createPopper} from "@popperjs/core";
 
 const props = defineProps({
+  // No default string here: a prop default is evaluated before any locale is in
+  // play, so copy written there never reaches the catalogue and stays English
+  // in every language. The template falls back to the catalogue instead.
   placeholder: {
     type: String,
-    default: 'Please Select',
+    default: null,
   },
   attribute: {
     type: PayoutChannelAttribute,
@@ -73,22 +76,23 @@ function withPopper(dropdownList, component, { width }) {
 </script>
 
 <template>
-  <v-select v-on:option:selected="optionSelected" v-on:option:deselected="optionRemoved" :calculate-position="withPopper" v-model="deliveryOption" :options="attribute.options" :placeholder="`${placeholder}`" key-by="id" label="title">
+  <!-- `label` names which property of an option v-select shows and searches. -->
+  <v-select v-on:option:selected="optionSelected" v-on:option:deselected="optionRemoved" :calculate-position="withPopper" v-model="deliveryOption" :options="attribute.options" :placeholder="placeholder ?? $t('common.pleaseSelect')" key-by="id" label="title">
     <template v-slot:no-options="{ search, searching }">
-      <template class="text-sm text-gray-300" v-if="searching">No results found for <em>{{ search }}</em>.</template>
-      <em class="text-sm text-gray-400 opacity-50" v-else>Start typing to search ...</em>
+      <template class="text-sm/6 text-gray-300" v-if="searching"><i18n-t keypath="transfer.wizard.noResultsFound" scope="global"><template #query><em>{{ search }}</em></template></i18n-t></template>
+      <em class="text-sm/6 text-gray-500 opacity-50" v-else>{{ $t('transfer.wizard.startTypingToSearch') }}</em>
     </template>
     <template #selected-option-container="{ option, deselect, multiple, disabled }">
       <div class="vs__selected">
         <div class="flex items-center w-auto">
-          <div class="text-sm flex items-center w-full gap-x-2">
+          <div class="text-sm/6 flex items-center w-full gap-x-2">
             <span class="lg:max-w-sm xl:max-w-md truncate">{{ option.title }}</span>
           </div>
         </div>
       </div>
     </template>
     <template #option="option">
-      <div class="text-sm flex items-center w-full gap-x-3 truncate">
+      <div class="text-sm/6 flex items-center w-full gap-x-3 truncate">
         <span class="truncate">{{ option.title }}</span>
       </div>
     </template>

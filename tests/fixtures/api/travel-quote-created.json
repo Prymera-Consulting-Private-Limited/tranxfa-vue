@@ -1,0 +1,90 @@
+{
+  "id": "quote-conrad-1",
+  "reference": "VQ-01A0A6C7",
+  "expires_at": "2026-09-15T21:19:36+00:00",
+  "currency": "AUD",
+  "currency_decimal_places": 2,
+  "nights": 3,
+  "check_in": "2026-10-01",
+  "check_out": "2026-10-04",
+  "residency": "AU",
+  "occupancy": {
+    "rooms": [
+      {
+        "adults": 2,
+        "children_ages": []
+      }
+    ]
+  },
+  "hotel": {
+    "id": "01a0a6a6-da6b-7176-b2a8-e5326b9bc714",
+    "slug": "conrad-los-angeles",
+    "name": "Conrad Los Angeles",
+    "address": "100 South Grand Avenue",
+    "star_rating": 5
+  },
+  "room": {
+    "room_name": "Standard Double room with balcony and with river view",
+    "meal": "NO-MEAL"
+  },
+  "breakdown": [
+    {
+      "key": "room",
+      "label": "Room",
+      "amount": 72064,
+      "amount_decimal": "720.64",
+      "amount_formatted": "720.64",
+      "amount_currency_prefixed": "AUD 720.64"
+    },
+    {
+      "key": "taxes_and_fees",
+      "label": "Taxes and fees",
+      "amount": 8934,
+      "amount_decimal": "89.34",
+      "amount_formatted": "89.34",
+      "amount_currency_prefixed": "AUD 89.34"
+    },
+    {
+      "key": "convenience_fee",
+      "label": "Convenience fee",
+      "amount": 1731,
+      "amount_decimal": "17.31",
+      "amount_formatted": "17.31",
+      "amount_currency_prefixed": "AUD 17.31"
+    }
+  ],
+  "total": 82729,
+  "total_decimal": "827.29",
+  "total_formatted": "827.29",
+  "total_currency_prefixed": "AUD 827.29",
+  "per_night": 27576,
+  "per_night_decimal": "275.76",
+  "per_night_formatted": "275.76",
+  "per_night_currency_prefixed": "AUD 275.76",
+  "payable_at_property": [
+    {
+      "name": "city_tax",
+      "currency": "USD",
+      "amount": 4400,
+      "amount_decimal": "44.00",
+      "amount_formatted": "44.00",
+      "amount_currency_prefixed": "USD 44.00"
+    }
+  ],
+  "cancellation": {
+    "status": "non_refundable",
+    "free_until": null,
+    "changes_at": null,
+    "costs_now": 82729,
+    "costs_now_decimal": "827.29",
+    "costs_now_formatted": "827.29",
+    "costs_now_currency_prefixed": "AUD 827.29",
+    "refund_now": 0,
+    "refund_now_decimal": "0.00",
+    "refund_now_formatted": "0.00",
+    "refund_now_currency_prefixed": "AUD 0.00"
+  },
+  "labels": {
+    "NO-MEAL": "No meals included"
+  }
+}

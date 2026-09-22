@@ -1,0 +1,212 @@
+{
+  "id": "a2af1126-874a-436f-a0c8-2521909344f6",
+  "crn": "TC466128",
+  "name": null,
+  "second_name": null,
+  "third_name": null,
+  "whole_name": null,
+  "unique_identity_number": null,
+  "is_blocked_for_sending": false,
+  "account": {
+    "email": "re************************@gmail.com",
+    "is_email_verified": false,
+    "password_changed_at": null,
+    "mobile_number": null,
+    "mobile_number_verified": false,
+    "created_at": "2026-09-06T20:51:46.000000Z",
+    "updated_at": "2026-09-06T20:51:46.000000Z"
+  },
+  "session": {
+    "id": "a2af1126-434a-4b46-bd61-206874375aa8",
+    "is_mfa_completed": false,
+    "mfa_method": null,
+    "client_version": "8.7",
+    "os_version": null,
+    "ip_address": {
+      "id": "a2af1126-42c2-4495-93e0-55e68515da33",
+      "ip_address": "122.163.122.32",
+      "geo_location": null
+    },
+    "touched_at": "2026-09-06T20:51:46.000000Z",
+    "created_at": "2026-09-06T20:51:46.000000Z",
+    "updated_at": "2026-09-06T20:51:46.000000Z"
+  },
+  "country": {
+    "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "nationality": null,
+  "address": null,
+  "birth_detail": null,
+  "created_at": "2026-09-06T20:51:47.000000Z",
+  "updated_at": "2026-09-06T20:51:47.000000Z",
+  "attributes": [
+    {
+      "attribute": "name",
+      "input_mode": null,
+      "category": "identity",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "First Name",
+      "info_text": "Enter your first name exactly as it appears on your proof of identity document.",
+      "placeholder_text": null,
+      "is_required": true,
+      "value": null
+    },
+    {
+      "attribute": "second_name",
+      "input_mode": null,
+      "category": "identity",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Last Name",
+      "info_text": "Enter your last name exactly as it appears on your proof of identity document.",
+      "placeholder_text": null,
+      "is_required": true,
+      "value": null
+    },
+    {
+      "attribute": "nationality_id",
+      "input_mode": null,
+      "category": "identity",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Nationality",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": null
+    },
+    {
+      "attribute": "address.address_line_1",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Address Line 1",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": null
+    },
+    {
+      "attribute": "address.address_line_2",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Address Line 2",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": false,
+      "value": null
+    },
+    {
+      "attribute": "address.city",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "City",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": null
+    },
+    {
+      "attribute": "address.postcode",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": "/^(0[289][0-9]{2})|([1-9][0-9]{3})$/",
+      "mask": null,
+      "expression_error_message": "Provided postcode is not a valid AU postcode.",
+      "rules": null,
+      "label": "Postcode",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": null
+    },
+    {
+      "attribute": "address.region",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "State",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": null
+    },
+    {
+      "attribute": "birth_detail.birth_date",
+      "input_mode": null,
+      "category": "identity",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Date of Birth",
+      "info_text": "Enter your date of birth exactly as it appears on your proof of identity document.",
+      "placeholder_text": null,
+      "is_required": true,
+      "value": null
+    }
+  ],
+  "documents": [],
+  "pending_documents": [
+    {
+      "id": "93ba70bd-f910-4323-84cf-2fc63b2472b2",
+      "code": "POI",
+      "title": "Proof of Identity",
+      "description": "Documents that verify the identity of the customer, such as a passport, driver\u2019s license, or national ID card.",
+      "document_types": [
+        {
+          "id": "f495196f-047c-4a3a-962f-845409fddaf8",
+          "code": "PASSPORT",
+          "title": "Passport",
+          "description": "A government-issued document that certifies the identity and nationality of the holder for international travel.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SUMSUB"
+        },
+        {
+          "id": "0ab35156-a21d-467f-ab08-395cfcacc0a3",
+          "code": "DRIVERS_LICENSE",
+          "title": "Driver's License",
+          "description": "An official document permitting a specific individual to operate one or more types of motorized vehicles.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SUMSUB"
+        }
+      ]
+    }
+  ],
+  "poi_info_check": "undeterministic"
+}

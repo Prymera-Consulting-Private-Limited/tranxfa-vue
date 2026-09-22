@@ -1,0 +1,84 @@
+import {describe, expect, it} from 'vitest';
+import en from '@/locales/en.json';
+import {readFileSync} from 'node:fs';
+
+// Source guards for the three money-safety rules in the Client API reference
+// (SD-1034): 412 more_authentication_required mid-checkout, the double-payment
+// re-check, and Retry Payment offered from the transfer detail.
+
+const read = f => readFileSync(f, 'utf8');
+
+describe('412 more_authentication_required', () => {
+  it('is handled once, in the interceptor, and sends the customer back afterwards', () => {
+    const s = read('src/main.js');
+    expect(s).toContain("e.response?.data?.type === MFA_REQUIRED_TYPE");
+    expect(s).toMatch(/router\.push\(\{ name: 'multiFactorAuth', query: \{ \.\.\.redirectQueryFor\(current\), reason: 'session' \} \}\)/);
+    expect(s).toContain("current.name !== 'multiFactorAuth'");
+  });
+
+  it('the MFA screen asks for a code when it was reached that way', () => {
+    const s = read('src/views/MultifactorAuthenticationView.vue');
+    expect(s).toContain("query.reason === 'session'");
+    expect(s).toMatch(/if \(isSessionReverify\) \{\n\s*customerUtils\.resendMfaOtp\(\)/);
+    expect(s).toContain("$t('onboarding.mfaIntro'");
+    expect(en.onboarding.mfaIntro).toContain('nothing you were doing is lost');
+  });
+
+  it('the wizard keeps the confirm choices and confirms the same quote again', () => {
+    const s = read('src/views/Transfer/IndexView.vue');
+    expect(s).toContain('error.response.data.type === MFA_REQUIRED_TYPE');
+    expect(s).toContain('saveDraft();');
+    expect(s).toContain('const draft = takeCheckoutDraft(props.id);');
+    expect(s).toContain('transfer.wizard.verifiedReadyToConfirm');
+    expect(en.transfer.wizard.verifiedReadyToConfirm).toContain("Thanks, you're verified");
+  });
+});
+
+describe('never risk a double payment', () => {
+  it('the wizard re-checks the transfers before offering Confirm again', () => {
+    const s = read('src/views/Transfer/IndexView.vue');
+    expect(s).toMatch(/else if \(isOutcomeUnknown\(error\)\) \{[\s\S]*?outcomeUnknown\.value = true;[\s\S]*?await reconcileOutcome\(\);/);
+    expect(s).toContain('findTransactionForQuote(transactionUtils, quote.data, attemptStartedAt');
+    expect(s).toMatch(/const showContinueButton = computed\(\(\) => \{\n\s*if \(outcomeUnknown\.value\) return false;/);
+    expect(s).not.toContain('Please check your connection and try again.');
+  });
+
+  it('the payment page re-reads the transaction and never claims nothing was charged', () => {
+    const s = read('src/views/Transfer/PaymentView.vue');
+    expect(s).not.toContain('Nothing has been charged. Please try again.');
+    expect(s).toMatch(/else if \(isOutcomeUnknown\(e\)\) \{[\s\S]*?transactionUtils\.getTransaction\(props\.id\)/);
+    expect(s).toContain("transfer.wizard.weDidntGetAn");
+    expect(en.transfer.wizard.weDidntGetAn).toContain("we've refreshed this page");
+  });
+
+  // SD-1193 moved the nudge into the catalogue. It used to be a literal welded
+  // onto the translated refusal with `+`, which meant it stayed English in every
+  // locale - so the assertion moves with it rather than pinning the sentence to
+  // this file.
+  //
+  // SD-1251: the console's message already carries the advice for its reason,
+  // so the nudge is ours only when the message is missing, and only for a
+  // same-amount collision. What each case shows is pinned by driving the wizard
+  // in transfer-confirm-refusals.spec.js; this only keeps the wiring in place.
+  it('payment_amount_collides keeps the nudge for a same-amount collision and never for a held account', () => {
+    const s = read('src/views/Transfer/IndexView.vue');
+    expect(s).toContain('error.response.data.type === "payment_amount_collides"');
+    expect(s).toMatch(/\[PaymentCollisionReason\.SAME_AMOUNT\]: \[[^\]]*t\('transfer\.wizard\.changeTheAmountAndConfirm'\)/);
+    expect(s).not.toMatch(/\[PaymentCollisionReason\.ACCOUNT_HELD\]: \[[^\]]*changeTheAmountAndConfirm/);
+    expect(en.transfer.wizard.changeTheAmountAndConfirm).toBe('Change the amount and confirm again.');
+  });
+});
+
+describe('retry from the transfer detail', () => {
+  it('offers Retry Payment for FAILED and TIMED-OUT, and links to the payment page', () => {
+    const s = read('src/views/Transaction/ItemView.vue');
+    expect(s).toContain('code === PaymentState.FAILED || code === PaymentState.TIMED_OUT');
+    expect(s).toMatch(/<router-link v-if="canRetryPayment" :to="\{name: 'makePayment', params: \{transactionId: transaction\.data\.id\}\}"/);
+  });
+
+  it('the list accepts the documented filters', () => {
+    const s = read('src/composables/transaction_utils.js');
+    expect(s).toContain('const get = async (page = null, filters = {}) => {');
+    expect(s).toContain('...filters,');
+  });
+});

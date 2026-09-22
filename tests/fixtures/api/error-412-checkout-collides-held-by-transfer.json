@@ -1,0 +1,12 @@
+{
+  "type": "payment_amount_collides",
+  "reason": "account_held",
+  "message": "Another payment is still holding your account while we wait for it. Please pay it or cancel it first, or try again later.",
+  "held_by": {
+    "kind": "transfer",
+    "id": "01a0c3d0-3333-7444-8555-a66677788899",
+    "reference": "TXN2609180042",
+    "payment_id": null,
+    "service": null
+  }
+}
