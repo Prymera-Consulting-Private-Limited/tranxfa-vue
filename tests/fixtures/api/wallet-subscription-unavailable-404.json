@@ -1,0 +1,4 @@
+{
+  "message": "",
+  "exception": "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"
+}

@@ -1,26 +1,32 @@
 <script setup>
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import BrandLogo from "@/components/BrandLogo.vue";
 import {reactive, ref} from "vue";
+import {useI18n} from "vue-i18n";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
 import axios from "axios";
 
+const {t} = useI18n();
 const customerUtils = useCustomerUtils();
 const form = reactive({
   email: '',
 });
 const isLoading = ref(false);
 const forgotPasswordMessage = ref(null);
+const forgotPasswordError = ref(null);
 const emailFocused = ref(false);
 
 async function requestResetPassword() {
   isLoading.value = true;
   forgotPasswordMessage.value = null;
+  forgotPasswordError.value = null;
   await axios.get('/sanctum/csrf-cookie');
   await customerUtils.forgotPassword(form.email).then((response) => {
     forgotPasswordMessage.value = response?.data?.message;
     form.email = '';
   }).catch((e) => {
-    forgotPasswordMessage.value = e.response?.data?.message;
-    console.error(e);
+    forgotPasswordError.value = failureMessage(e, t('auth.forgotPassword.failed'));
+    logRequestFailure(e, 'forgot-password');
   }).finally(() => {
     isLoading.value = false;
   })
@@ -32,16 +38,16 @@ async function requestResetPassword() {
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
-          <img src="/images/backgrounds/resetpassword.png" alt="Login Background" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/resetpassword.png" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
           <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
-            <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a href="javascript:"><BrandLogo class="mb-5" /></a>
+            <a href="javascript:" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
           <div class="hidden md:block  absolute top-4 right-4">
-            <a href="javascript:" class="text-gray-400 text-3xl hover:text-gray-500 pr-5">
+            <a href="javascript:" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
             </a>
           </div>
@@ -52,19 +58,22 @@ async function requestResetPassword() {
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">
-              <a href="javascript:"><img src="/images/logo.png" alt="RemitSo Logo" class="max-w-64 max-h-10 mb-5"></a>
+              <a href="javascript:"><BrandLogo class="mb-5" /></a>
             </div>
             <!-- Form Header -->
-            <h2 class="text-2xl font-bold text-black mb-2">Forgot Password</h2>
-            <p class="text-sm text-[#B7A3C1] mb-6 ">Forgot your password? No problem. Enter the email linked to your account and click "Send Reset Link." We'll email you a secure link to reset your password.</p>
+            <h2 class="text-2xl font-bold text-black mb-2">{{ $t('auth.forgotPassword.title') }}</h2>
+            <p class="text-sm/6 text-[#B7A3C1] mb-6 ">{{ $t('auth.forgotPassword.intro') }}</p>
             <!-- Form -->
             <form @submit.prevent="requestResetPassword" class="space-y-5">
-              <div v-if="forgotPasswordMessage" class="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
-                <p class="text-sm text-blue-700">{{ forgotPasswordMessage }}</p>
+              <div v-if="forgotPasswordMessage" role="status" class="rounded-2xl border border-info-100 bg-info-50 px-4 py-3">
+                <p class="text-sm/6 text-info-700">{{ forgotPasswordMessage }}</p>
+              </div>
+              <div v-if="forgotPasswordError" role="alert" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
+                <p class="text-sm/6 text-danger-700">{{ forgotPasswordError }}</p>
               </div>
 
               <div>
-                <label for="email" class="mb-2 block font-medium text-brand-700">Email</label>
+                <label for="email" class="mb-2 block font-medium text-brand-700">{{ $t('common.email') }}</label>
                 <div
                   class="relative rounded-2xl border bg-white transition-all duration-200"
                   :class="emailFocused ? 'border-brand-700 ring-4 ring-brand-700/10' : 'border-gray-200 hover:border-gray-300'"
@@ -73,8 +82,8 @@ async function requestResetPassword() {
                     type="email"
                     id="email"
                     v-model="form.email"
-                    placeholder="example@email.com"
-                    class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-400"
+                    :placeholder="$t('common.emailPlaceholder')"
+                    class="w-full rounded-2xl border-0 bg-transparent py-3 pl-4 pr-12 text-gray-900 outline-none placeholder:text-gray-500"
                     @focus="emailFocused = true"
                     @blur="emailFocused = false"
                   >
@@ -87,22 +96,22 @@ async function requestResetPassword() {
               <button
                 :disabled="isLoading"
                 type="submit"
-                class="group relative block w-full overflow-hidden rounded-full bg-brand-700 py-3.5 text-center text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
+                class="group relative block w-full overflow-hidden rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
               >
                 <span class="inline-flex items-center justify-center gap-2">
-                  <i v-if="isLoading" class="pi pi-spin pi-spinner text-sm"></i>
-                  Send Reset Link
-                  <i v-if="!isLoading" class="pi pi-arrow-right text-sm transition-transform duration-200 group-hover:translate-x-0.5"></i>
+                  <i v-if="isLoading" class="pi pi-spin pi-spinner text-sm/6"></i>
+                  {{ $t('auth.forgotPassword.submit') }}
+                  <i v-if="!isLoading" class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
                 </span>
               </button>
 
-              <p class="mt-2 text-center text-sm text-gray-600">
-                Changed mind?
+              <p class="mt-2 text-center text-sm/6 text-gray-600">
+                {{ $t('auth.forgotPassword.changedMind') }}
                 <router-link
                   :to="{name: 'signIn'}"
                   class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:underline"
                 >
-                  Sign in instead
+                  {{ $t('auth.forgotPassword.signInInstead') }}
                 </router-link>
               </p>
             </form>

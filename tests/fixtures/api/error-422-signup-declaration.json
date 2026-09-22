@@ -1,0 +1,8 @@
+{
+  "message": "The third party declaration accepted field must be accepted.",
+  "errors": {
+    "third_party_declaration_accepted": [
+      "The third party declaration accepted field must be accepted."
+    ]
+  }
+}

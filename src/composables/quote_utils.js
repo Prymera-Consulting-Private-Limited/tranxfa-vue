@@ -7,7 +7,13 @@ export function useQuoteUtils() {
         data: new Quote(),
     });
 
-    const getQuote = async (query = null) => {
+    /**
+     * @param {Object|null} query
+     * @param {Object} config extra axios config. The calculator passes an
+     *   AbortSignal: this function assigns quote.data itself, so a caller cannot
+     *   discard a stale reply after the fact - it has to not arrive.
+     */
+    const getQuote = async (query = null, config = {}) => {
         const params = {
             amount_type: query?.amountType,
             amount: query?.amount,
@@ -20,6 +26,7 @@ export function useQuoteUtils() {
         };
 
         await axios.get('/client/v1/quote', {
+            ...config,
             params: params,
         }).then((response) => {
             quote.data = Quote.getInstance(response.data);
@@ -51,44 +58,21 @@ export function useQuoteUtils() {
     }
 
     /**
-     * Applies a promotional coupon and returns the repriced quote resource.
-     * A coupon the customer cannot use comes back as a 422 carrying a
-     * customer-facing sentence in `message`; show it verbatim.
-     *
-     * @param {string} quoteId
-     * @param {string} couponCode
-     * @returns {Promise<axios.AxiosResponse<any>>}
-     */
-    const applyCoupon = async (quoteId, couponCode) => {
-        return axios.post(`/client/v1/quote/coupon/${quoteId}`, {
-            coupon_code: couponCode,
-        });
-    }
-
-    /**
-     * Removes the coupon and returns the quote at its original pricing.
-     * Releases the redemption, so the same code can be applied again.
-     *
-     * @param {string} quoteId
-     * @returns {Promise<axios.AxiosResponse<any>>}
-     */
-    const removeCoupon = async (quoteId) => {
-        return axios.delete(`/client/v1/quote/coupon/${quoteId}`);
-    }
-
-    /**
      * @param {TransactionQuote} quote
      * @param {Object} purpose
      * @param {PaymentMethod} paymentMethod
      * @param {Object|null} paymentDataAttributes
+     * @param {Boolean} thirdPartyDeclarationAccepted
+     * @param {String|null} walletOtp
      * @returns {Promise<axios.AxiosResponse<any>>}
      */
-    const confirmQuote = async (quote, purpose, paymentMethod, paymentDataAttributes = null, thirdPartyDeclarationAccepted = false) => {
+    const confirmQuote = async (quote, purpose, paymentMethod, paymentDataAttributes = null, thirdPartyDeclarationAccepted = false, walletOtp = null) => {
         return axios.post(`/client/v1/quote/confirm/${quote.id}`, {
             purpose_id: purpose.id,
             payment_method_id: paymentMethod.id,
             payment_data: paymentDataAttributes,
             third_party_declaration_accepted: thirdPartyDeclarationAccepted,
+            wallet_otp: walletOtp,
         });
     }
 
@@ -98,8 +82,6 @@ export function useQuoteUtils() {
         saveQuote,
         getTransferQuote,
         setRecipient,
-        applyCoupon,
-        removeCoupon,
         confirmQuote,
     }
 }

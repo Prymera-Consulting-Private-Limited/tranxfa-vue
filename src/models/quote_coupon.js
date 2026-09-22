@@ -1,66 +1,60 @@
+/**
+ * The promotion coupon applied to a quote, as the Client API reference's
+ * `coupon` block describes it. When set, the quote's total_* fields are
+ * already net of a monetary discount and exchange_rate is already the
+ * improved rate; the two *_before_coupon fields carry the "was" side.
+ */
 class QuoteCoupon {
-    /**
-     * @type {string|null}
-     */
+    /** @type {string|null} the applied code, as configured */
     code = null;
 
-    /**
-     * @type {string|null}
-     */
+    /** @type {'monetary'|'better-rate'|null} */
     discountType = null;
 
-    /**
-     * @type {string|null}
-     */
+    /** @type {string|null} customer-facing summary, when configured */
     infoText = null;
 
-    /**
-     * @type {string|null}
-     */
+    /** @type {string|null} customer-facing terms, when configured */
     termsText = null;
 
-    /**
-     * Null for a better-rate coupon.
-     *
-     * @type {string|null}
-     */
+    /** @type {string|null} major units of payment_currency; monetary coupons only */
     discountAmount = null;
 
-    /**
-     * Null for a better-rate coupon.
-     *
-     * @type {string|null}
-     */
+    /** @type {string|null} ready to render as the savings line */
     discountAmountCurrencyPrefixed = null;
 
-    /**
-     * The rate before the coupon was applied, for a better-rate coupon only.
-     * Null for a monetary coupon.
-     *
-     * @type {string|null}
-     */
+    /** @type {string|null} better-rate coupons only */
     exchangeRateBeforeCoupon = null;
 
-    /**
-     * The pre-coupon rate as a display label, built by the same formatter as the
-     * quote's `exchange_rate_formatted` (including payout-first ordering on an
-     * inverse pair), so the two can be shown as "was / now" without the client
-     * reproducing any ordering or formatting rules.
-     *
-     * @type {string|null}
-     */
+    /** @type {string|null} built like exchange_rate_formatted; pair as was/now */
     exchangeRateBeforeCouponFormatted = null;
 
+    get isMonetary() {
+        return this.discountType === 'monetary';
+    }
+
+    get isBetterRate() {
+        return this.discountType === 'better-rate';
+    }
+
+    /**
+     * @param {object|null} data
+     * @returns {QuoteCoupon|null}
+     */
     static getInstance(data) {
+        if (! data) {
+            return null;
+        }
         const coupon = new QuoteCoupon();
-        coupon.code = data.code;
-        coupon.discountType = data.discount_type;
-        coupon.infoText = data.info_text;
-        coupon.termsText = data.terms_text;
-        coupon.discountAmount = data.discount_amount;
-        coupon.discountAmountCurrencyPrefixed = data.discount_amount_currency_prefixed;
-        coupon.exchangeRateBeforeCoupon = data.exchange_rate_before_coupon;
-        coupon.exchangeRateBeforeCouponFormatted = data.exchange_rate_before_coupon_formatted;
+        coupon.code = data.code ?? null;
+        coupon.discountType = data.discount_type ?? null;
+        coupon.infoText = data.info_text ?? null;
+        coupon.termsText = data.terms_text ?? null;
+        coupon.discountAmount = data.discount_amount ?? null;
+        coupon.discountAmountCurrencyPrefixed = data.discount_amount_currency_prefixed ?? null;
+        coupon.exchangeRateBeforeCoupon = data.exchange_rate_before_coupon ?? null;
+        coupon.exchangeRateBeforeCouponFormatted = data.exchange_rate_before_coupon_formatted ?? null;
+
         return coupon;
     }
 }
