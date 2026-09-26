@@ -129,10 +129,23 @@ table in `CLAUDE.md`.
 | ------ | ----------------------------------------------- | ------------------------ |
 | GET    | `/client/v1/transactions`                       | paginated                |
 | GET    | `/client/v1/transaction/{id}`                   |                          |
-| POST   | `/client/v1/transaction/payment/{id}`           | retry / re-init payment  |
+| POST   | `/client/v1/transaction/payment/{id}`           | retry / re-init payment; Pay again after a cancel |
+| POST   | `/client/v1/transaction/payment/{id}/cancel`    | Cancel payment (SD-1418); `{id}` is the transfer |
 | POST   | `/client/v1/transaction/payment-sent/{paymentId}` | "I've made payment"    |
 | GET    | `/client/v1/transaction/payment/currencies`     |                          |
 | POST   | `/client/v1/transaction/statement`              | statement request        |
+
+## Payment holding the account — `held_payment_utils`
+
+Checkout's "Cancel it and continue" on `payment_amount_collides`, by `held_by.kind`.
+The order calls are written out here because checkout must not import travel.
+
+| Method | Path                                                              | Notes                  |
+| ------ | ----------------------------------------------------------------- | ---------------------- |
+| POST   | `/client/v1/transaction/payment/{id}/cancel`                      | `transfer`             |
+| POST   | `/client/v1/travel/order/{id}/payment/{paymentId}/cancel`         | `service_order`, HOTELS |
+| POST   | `/client/v1/travel/flights/order/{id}/payment/{paymentId}/cancel` | `service_order`, FLIGHTS |
+| POST   | `/client/v1/wallet/topups/{id}/cancel`                            | `wallet_topup`         |
 
 ## Wallet — `wallet_utils`
 
