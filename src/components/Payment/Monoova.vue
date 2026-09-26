@@ -16,6 +16,7 @@ import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import Failed from "@/components/Payment/State/Failed.vue";
 import {usePaymentWatch} from "@/composables/payment_watch.js";
 import ClientPaymentAccount from "@/components/ClientPaymentAccount.vue";
+import CancelTransferPayment from "@/components/Payment/CancelTransferPayment.vue";
 import {ClipboardIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import {UseClipboard} from "@vueuse/components";
 import router from "@/router/index.js";
@@ -114,7 +115,9 @@ const status = computed(() => {
   return 'unknown';
 })
 
-const emits = defineEmits(['retryPayment']);
+// paymentCancelled and cancelRefused are CancelTransferPayment's, passed up to
+// whoever owns the transfer.
+const emits = defineEmits(['retryPayment', 'paymentCancelled', 'cancelRefused']);
 
 const retryPayment = async () => {
   emits('retryPayment');
@@ -163,6 +166,7 @@ const payByFormatted = computed(() => {
         <div v-if="!transaction.payment.customerConfirmedPayment" class="my-6">
           <button @click="iHaveMadePayment" :disabled="isConfirmingPayment" type="button" class="rounded-xl w-full bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 cursor-pointer">{{ $t('payment.provider.iveMadePayment') }}</button>
           <InlineFailure :message="confirmFailure" />
+          <CancelTransferPayment :transaction="transaction" class="mt-4" @cancelled="$emit('paymentCancelled', $event)" @refused="$emit('cancelRefused', $event)" />
         </div>
       </template>
     </div>
@@ -201,7 +205,7 @@ const payByFormatted = computed(() => {
   <template v-else-if="status === 'cancelled'">
     <Failed class="-mt-20" />
     <h2 class="text-2xl font-semibold text-gray-900 mb-5 -mt-10">{{ transaction.payment.state.code === PaymentState.TIMED_OUT ? $t('payment.provider.thisPaymentHasExpired') : $t('payment.provider.thisPaymentWasCancelled') }}</h2>
-    <p class="text-base text-gray-600 mb-6">{{ $t('transfer.payment.noMoneyHasMovedYou') }}</p>
+    <p class="text-base text-gray-600 mb-6">{{ transaction.canPayAgain ? $t('transfer.payment.noMoneyHasMovedPayAgain') : $t('transfer.payment.noMoneyHasMovedYou') }}</p>
     <div class="mb-6 text-center text-gray-900 hover:text-brand-800 font-semibold text-sm/6">
       <router-link :to="{name: 'viewTransaction', params: {transactionId: transaction.id}}">{{ $t('payment.card.viewTransfer') }}</router-link>
     </div>

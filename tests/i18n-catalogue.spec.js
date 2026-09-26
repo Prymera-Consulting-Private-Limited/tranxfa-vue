@@ -109,6 +109,7 @@ const MIGRATED = [
   'src/views/Transaction/ItemView.vue',
   // slice 6, wallet, the payment adapters and travel
   'src/components/Payment/Apaylo.vue',
+  'src/components/Payment/CancelTransferPayment.vue',
   'src/components/Payment/CinetPay.vue',
   'src/components/Payment/Fincode.vue',
   'src/components/Payment/HeldByAction.vue',

@@ -129,7 +129,8 @@ table in `CLAUDE.md`.
 | ------ | ----------------------------------------------- | ------------------------ |
 | GET    | `/client/v1/transactions`                       | paginated                |
 | GET    | `/client/v1/transaction/{id}`                   |                          |
-| POST   | `/client/v1/transaction/payment/{id}`           | retry / re-init payment  |
+| POST   | `/client/v1/transaction/payment/{id}`           | retry / re-init payment; Pay again after a cancel |
+| POST   | `/client/v1/transaction/payment/{id}/cancel`    | Cancel payment (SD-1418); `{id}` is the transfer |
 | POST   | `/client/v1/transaction/payment-sent/{paymentId}` | "I've made payment"    |
 | GET    | `/client/v1/transaction/payment/currencies`     |                          |
 | POST   | `/client/v1/transaction/statement`              | statement request        |

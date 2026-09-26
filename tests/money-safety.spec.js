@@ -70,10 +70,12 @@ describe('never risk a double payment', () => {
 });
 
 describe('retry from the transfer detail', () => {
-  it('offers Retry Payment for FAILED and TIMED-OUT, and links to the payment page', () => {
+  // Which payments qualify (cancelled, failed or expired, on a transfer still
+  // open) is Transaction.canPayAgain, tested row by row in
+  // transfer-payment-actions.spec.js.
+  it('offers Pay again when the transfer can be paid again, and links to the payment page', () => {
     const s = read('src/views/Transaction/ItemView.vue');
-    expect(s).toContain('code === PaymentState.FAILED || code === PaymentState.TIMED_OUT');
-    expect(s).toMatch(/<router-link v-if="canRetryPayment" :to="\{name: 'makePayment', params: \{transactionId: transaction\.data\.id\}\}"/);
+    expect(s).toMatch(/<router-link v-if="transaction\.data\.canPayAgain" :to="\{name: 'makePayment', params: \{transactionId: transaction\.data\.id\}\}"/);
   });
 
   it('the list accepts the documented filters', () => {
