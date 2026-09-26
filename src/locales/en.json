@@ -194,7 +194,15 @@
     "heldBy": {
       "viewYourHotelBooking": "View your hotel booking",
       "viewYourTransfer": "View your transfer",
-      "viewYourWalletTopUp": "View your wallet top-up"
+      "viewYourWalletTopUp": "View your wallet top-up",
+      "cancelItAndContinue": "Cancel it and continue",
+      "yourPaymentForIsStillOpen": "Your payment for {reference} is still open. Cancel it and continue?",
+      "yourOtherPaymentIsStillOpen": "Your other payment is still open. Cancel it and continue?",
+      "dontCancelIfYouveSentTheMoney": "Don't cancel it if you've already sent the money for it.",
+      "yesCancelItAndContinue": "Yes, cancel it and continue",
+      "keepIt": "Keep it",
+      "cancelling": "Cancelling",
+      "weCouldNotCancelIt": "We could not cancel that payment. Please try again."
     },
     "card": {
       "completeYourPayment": "Complete your payment",

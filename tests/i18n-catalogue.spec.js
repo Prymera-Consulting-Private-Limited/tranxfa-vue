@@ -116,6 +116,7 @@ const MIGRATED = [
   'src/components/Payment/ManualPayment.vue',
   'src/components/Payment/Monoova.vue',
   'src/components/Payment/PagaPayment.vue',
+  'src/components/Payment/ReleaseHeldPayment.vue',
   'src/components/Payment/Pay360.vue',
   'src/components/Payment/PayCross.vue',
   'src/components/Payment/Volume.vue',
