@@ -169,6 +169,7 @@
   },
   "rates": [
     {
+      "id": "rate-sd1249-balcony-river-view",
       "token": "m-a5918870-e5c3-5203-8e29-f9eb28af7ea2",
       "room_name": "Standard Double room with balcony and with river view",
       "meal": "NO-MEAL",
@@ -216,12 +217,19 @@
       "per_night_decimal": "275.76",
       "per_night_formatted": "275.76",
       "per_night_currency_prefixed": "AUD 275.76",
-      "payable_at_property": 6700,
-      "payable_at_property_decimal": "67.00",
-      "payable_at_property_formatted": "67.00",
-      "payable_at_property_currency_prefixed": "AUD 67.00"
+      "payable_at_property": [
+        {
+          "name": "city_tax",
+          "currency": "USD",
+          "amount": 4400,
+          "amount_decimal": "44.00",
+          "amount_formatted": "44.00",
+          "amount_currency_prefixed": "USD 44.00"
+        }
+      ]
     },
     {
+      "id": "rate-sd1249-standard-double",
       "token": "m-a5918870-e5c3-5203-8e29-f9eb28af7ea2",
       "room_name": "Standard Double room",
       "meal": "NO-MEAL",
@@ -269,10 +277,16 @@
       "per_night_decimal": "275.76",
       "per_night_formatted": "275.76",
       "per_night_currency_prefixed": "AUD 275.76",
-      "payable_at_property": 6700,
-      "payable_at_property_decimal": "67.00",
-      "payable_at_property_formatted": "67.00",
-      "payable_at_property_currency_prefixed": "AUD 67.00"
+      "payable_at_property": [
+        {
+          "name": "city_tax",
+          "currency": "USD",
+          "amount": 4400,
+          "amount_decimal": "44.00",
+          "amount_formatted": "44.00",
+          "amount_currency_prefixed": "USD 44.00"
+        }
+      ]
     }
   ],
   "labels": {

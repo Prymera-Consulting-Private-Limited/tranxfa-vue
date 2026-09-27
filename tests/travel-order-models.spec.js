@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { fixture } from './fixtures.js'
 
 import Order from '@/models/travel/orders/order.js'
 import OrderHotel from '@/models/travel/orders/order_hotel.js'
@@ -229,6 +230,57 @@ describe('OrderPayment', () => {
         expect(at('CREATED')).toBe(false)
         expect(at('INITIALIZED')).toBe(false)
         expect(at('REDIRECTED')).toBe(false)
+    })
+
+    // SD-1250. A PayID or bank transfer rail answers with the customer's own
+    // account to pay into rather than a url.
+    describe('on a deposit rail', () => {
+        it('maps the account, its attributes in order, and the deadline', () => {
+            const payment = OrderPayment.getInstance(fixture('travel-order-payment-pending-account'))
+
+            expect(payment.clientPaymentAccount.instruction).toContain('transfer funds to the bank account listed below')
+            expect(payment.clientPaymentAccount.paymentReference).toBe('SP8518335')
+            expect(payment.clientPaymentAccount.attributes.map(a => a.key)).toEqual(['Account Name', 'BSB', 'Account Number'])
+            expect(payment.expiresAt).toBe('2026-09-23T22:26:06+00:00')
+            expect(payment.hasAccountDetails).toBe(true)
+            expect(payment.isSettingUp).toBe(false)
+        })
+
+        it('reads the same account off a listed attempt on the order', () => {
+            // The open attempt, after two that failed.
+            const payment = OrderPayment.getInstance(fixture('travel-order-view-deposit-pending').payments.find(p => p.state === 'PENDING'))
+
+            expect(payment.clientPaymentAccount.attributes.map(a => a.key)).toEqual(['Account Name', 'BSB', 'Account Number'])
+            expect(payment.hasAccountDetails).toBe(true)
+        })
+
+        it('is setting up while CREATED with no account', () => {
+            const payment = OrderPayment.getInstance(fixture('travel-order-payment-created'))
+
+            expect(payment.isSettingUp).toBe(true)
+            expect(payment.hasAccountDetails).toBe(false)
+        })
+
+        it('has nothing to show once an account is present but the payment is not pending', () => {
+            const payment = OrderPayment.getInstance({ ...fixture('travel-order-payment-pending-account'), state: 'CAPTURED' })
+
+            expect(payment.hasAccountDetails).toBe(false)
+        })
+
+        it('leaves the account null on every other rail', () => {
+            const payment = OrderPayment.getInstance(created())
+
+            expect(payment.clientPaymentAccount).toBeNull()
+            expect(payment.expiresAt).toBeNull()
+            expect(payment.hasAccountDetails).toBe(false)
+        })
+
+        // Mapped so the field is not dropped, and nothing more. The order view
+        // never carries it.
+        it('keeps the create answer\'s failure reason, and the order view has none', () => {
+            expect(OrderPayment.getInstance(fixture('travel-order-payment-failed')).failureReason).toContain('Reconciliation Rule')
+            expect(OrderPayment.getInstance(fixture('travel-order-view-deposit-failed').payments[0]).failureReason).toBeNull()
+        })
     })
 
     describe('majorAmount', () => {

@@ -28,9 +28,12 @@ Carried over from `console.remitso`, where they were learned the hard way:
 
 - **PRs target `main`.** Never open an ordinary PR against `staging` or a brand
   branch. `staging` is the Tranxfa brand branch, not an integration branch.
-- **Every piece of work starts as a Rover ticket** (`SD-<n>`), lives on
+- **Every piece of work bigger than a chore starts as a Rover ticket** (`SD-<n>`), lives on
   `feature/sd-<n>-<slug>` cut from `main`, ships by a PR titled `SD-<n>`, and
   ends with a closing note on the ticket. The steps are in `docs/workflow.md`.
+- **A ticket is proposed before it is created.** Never call
+  `rover_create_ticket` without a yes. A small self-contained fix ships as
+  `chore/<slug>` with no ticket (`docs/workflow.md`).
 - **Every ticket is assigned to Dhruv Patel**, who owns these repositories.
   That includes a ticket raised for a defect found along the way, not only
   the one the work started from. Never leave a ticket unassigned.
@@ -40,7 +43,7 @@ Carried over from `console.remitso`, where they were learned the hard way:
 - **Stage the change and stop** for review before committing. Group into
   logical commits, one concern each.
 - Change only what the task needs. Spotting an unrelated problem is not
-  permission to fix it - mention it, or raise it separately. If the task
+  permission to fix it - mention it, or propose it separately. If the task
   genuinely cannot be done without a surrounding change, say so in one
   sentence, then do it.
 - **Never silently drop something worth doing.** If you decide against

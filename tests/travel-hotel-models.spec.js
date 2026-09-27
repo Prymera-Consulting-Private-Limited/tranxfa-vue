@@ -9,6 +9,7 @@ import HotelSearch from '@/models/travel/hotels/hotel_search.js'
 import Region from '@/models/travel/region.js'
 
 const ratePayload = (overrides = {}) => ({
+    id: 'rate-1',
     token: 'h-abc123',
     room_name: 'Junior Suite',
     meal: 'BREAKFAST',
@@ -25,9 +26,7 @@ const ratePayload = (overrides = {}) => ({
     per_night: 11500,
     per_night_formatted: '115.00',
     per_night_currency_prefixed: 'USD 115.00',
-    payable_at_property: null,
-    payable_at_property_formatted: null,
-    payable_at_property_currency_prefixed: null,
+    payable_at_property: [],
     cancellation: {
         status: 'free',
         free_until: '2026-09-08T12:00:00+00:00',
@@ -116,8 +115,13 @@ describe('HotelRate.getInstance', () => {
         expect(rate.bookable).toBe(false)
     })
 
-    it('leaves payable_at_property unstated when nothing is owed on arrival', () => {
-        expect(HotelRate.getInstance(ratePayload()).payableAtProperty.isStated).toBe(false)
+    it('carries the rate id, which is what identifies a row', () => {
+        expect(HotelRate.getInstance(ratePayload()).id).toBe('rate-1')
+        expect(HotelRate.getInstance(ratePayload({ id: undefined })).id).toBeNull()
+    })
+
+    it('owes nothing on arrival when payable_at_property is empty', () => {
+        expect(HotelRate.getInstance(ratePayload()).payableAtProperty).toEqual([])
     })
 
     it('warns when the total disagrees with its breakdown', () => {
@@ -212,6 +216,30 @@ describe('HouseRuleCharge', () => {
         expect(charge.inclusion).toBe('UNSPECIFIED')
         expect(charge.amount.isStated).toBe(false)
         expect(charge.currency).toBeNull()
+    })
+
+    // SD-1256 on the console, SD-1259 here.
+    it('keeps which one of its kind a charge is, and the ages it covers', () => {
+        const charge = HouseRuleCharge.getInstance({
+            type: 'CHILDREN-MEAL',
+            detail: 'CHILDREN-MEAL-BREAKFAST',
+            applies_from_age: 0,
+            applies_to_age: 5,
+            inclusion: 'PAID',
+        })
+
+        expect(charge.detail).toBe('CHILDREN-MEAL-BREAKFAST')
+        // Zero is an age, not an absence.
+        expect(charge.appliesFromAge).toBe(0)
+        expect(charge.appliesToAge).toBe(5)
+    })
+
+    it('reads a console released before those fields as having none', () => {
+        const charge = HouseRuleCharge.getInstance({ type: 'MEAL', inclusion: 'PAID' })
+
+        expect(charge.detail).toBeNull()
+        expect(charge.appliesFromAge).toBeNull()
+        expect(charge.appliesToAge).toBeNull()
     })
 })
 

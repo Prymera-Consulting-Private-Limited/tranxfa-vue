@@ -1,3 +1,5 @@
+import OrderFulfilmentState from "@/enums/order_fulfilment_state.js";
+import OrderNextStepCode from "@/enums/order_next_step_code.js";
 import Money from "@/models/travel/money.js";
 import OrderCancellation from "@/models/travel/orders/order_cancellation.js";
 import OrderConfirmation from "@/models/travel/orders/order_confirmation.js";
@@ -30,16 +32,46 @@ class Order {
     state = null;
 
     /**
+     * Where the booking stands for its customer, and unlike state it takes
+     * payment into account: a FULFILLED booking nobody has paid for reads
+     * "Price Locked", not "Order Complete" (SD-1230).
+     *
      * @type {string|null}
      */
     stateLabel = null;
 
     /**
-     * Only sent on the list.
+     * A sentence explaining stateLabel.
      *
      * @type {string|null}
      */
     stateDescription = null;
+
+    /**
+     * Whether a payment on this booking has succeeded. Null means a console too
+     * old to say, where the screens keep the words they always had. The total
+     * is what the booking costs, never evidence it was paid.
+     *
+     * @type {boolean|null}
+     */
+    isPaid = null;
+
+    /**
+     * What the booking is waiting on the customer to do, or null when nothing
+     * is. The label is the console's words for the button.
+     *
+     * @type {{code: string, label: string|null}|null}
+     */
+    nextStep = null;
+
+    /**
+     * How delivering the room is going (SD-1282). Null from a console that does
+     * not send it yet, and where no delivery was ever opened. The label is the
+     * operator's wording, so it is kept for nobody to show.
+     *
+     * @type {{state: string, label: string|null}|null}
+     */
+    fulfilment = null;
 
     /**
      * @type {string|null}
@@ -135,6 +167,17 @@ class Order {
     payments = [];
 
     /**
+     * The payment still waiting on this order, as the bookings list names it
+     * (SD-1261). There is at most one, and it is null when nothing is waiting.
+     * Only the list sends it: a booking read on its own lists every attempt in
+     * payments instead. It is how a customer told "another payment is holding
+     * your account" finds which booking that payment belongs to.
+     *
+     * @type {OrderPayment|null}
+     */
+    openPayment = null;
+
+    /**
      * The attempt currently worth watching — the last one made, since a customer
      * who was declined and paid again is waiting on the second, not the first.
      * The api sends them oldest first.
@@ -143,6 +186,32 @@ class Order {
      */
     get latestPayment() {
         return this.payments.length ? this.payments[this.payments.length - 1] : null;
+    }
+
+    /**
+     * The payment the customer still has to finish, wherever this booking was
+     * read from: the list names it, and a booking read on its own has it as
+     * the last attempt. Paying again while it is open would be refused, so
+     * whatever asks the customer to pay sends them here instead.
+     *
+     * @returns {OrderPayment|null}
+     */
+    get waitingPayment() {
+        if (this.openPayment) {
+            return this.openPayment;
+        }
+
+        return this.latestPayment?.isOpen ? this.latestPayment : null;
+    }
+
+    /**
+     * The hotel has confirmed the room and nothing has been paid for it. The
+     * state alone says FULFILLED, which reads as done; it is not.
+     *
+     * @returns {boolean}
+     */
+    get isPriceLocked() {
+        return this.state === 'FULFILLED' && this.isPaid === false;
     }
 
     /**
@@ -156,13 +225,36 @@ class Order {
     }
 
     /**
-     * The room is placed but the hotel has not answered yet, which is the
-     * ordinary state of a booking for its first minutes.
+     * Nothing is booked with the hotel until the customer pays (SD-1282), and the
+     * console says so by asking for the payment. The order is waiting on the
+     * customer, not on the hotel.
+     *
+     * @returns {boolean}
+     */
+    get isAwaitingPayment() {
+        return this.nextStep?.code === OrderNextStepCode.PAY;
+    }
+
+    /**
+     * The customer paid and the hotel could not provide the room. The order's
+     * own state cannot say so, which is what the fulfilment is for.
+     *
+     * @returns {boolean}
+     */
+    get isUndelivered() {
+        return this.fulfilment?.state === OrderFulfilmentState.UNDELIVERED;
+    }
+
+    /**
+     * We are placing the room, or the hotel is answering, which is the ordinary
+     * state of a paid booking for its first minutes. It is neither an unpaid
+     * order, which nothing has been sent for, nor a failed one, which no further
+     * asking will change: both would otherwise pulse and be polled for good.
      *
      * @returns {boolean}
      */
     get isAwaitingHotel() {
-        return !this.isConfirmed && !this.isSettled;
+        return !this.isConfirmed && !this.isSettled && !this.isAwaitingPayment && !this.isUndelivered;
     }
 
     /**
@@ -180,6 +272,13 @@ class Order {
         order.state = data.state ?? null;
         order.stateLabel = data.state_label ?? null;
         order.stateDescription = data.state_description ?? null;
+        order.isPaid = typeof data.is_paid === 'boolean' ? data.is_paid : null;
+        order.nextStep = data.next_step?.code
+            ? {code: data.next_step.code, label: data.next_step.label ?? null}
+            : null;
+        order.fulfilment = data.fulfilment?.state
+            ? {state: data.fulfilment.state, label: data.fulfilment.state_label ?? null}
+            : null;
         order.bookedAt = data.booked_at ?? null;
 
         if (data.hotel) {
@@ -217,6 +316,7 @@ class Order {
         }));
 
         order.payments = OrderPayment.getCollection(data.payments ?? []);
+        order.openPayment = data.open_payment ? OrderPayment.getInstance(data.open_payment) : null;
 
         return order;
     }
