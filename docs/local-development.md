@@ -161,6 +161,7 @@ Read by the code; those marked ✗ are absent from `.env.example`:
 | `VITE_AUTH_CHANNEL` | ✓ | `EMAIL` \| `MOBILE_NUMBER` \| `BOTH` — picks the onboarding flow. `BOTH` resolves per customer from whether they have an email |
 | `VITE_ONBOARDING_COLLECT_ADDRESS` | ✗ | default **true**. Ask for a residential address during onboarding |
 | `VITE_ONBOARDING_VERIFY_MOBILE_NUMBER` | ✗ | default **false**. Email-first only; verify the number with an OTP |
+| `VITE_VERIFICATION_REQUIRED_ONLY` | ✓ | default **false**. Verification page lists only the categories the console marks `required` |
 | `VITE_USER_AGREEMENT_URL` | ✗ | signup terms link |
 | `VITE_PRIVACY_POLICY_URL` | ✗ | signup privacy link |
 | `VITE_THIRD_PARTY_SIGNUP_DECLARATION` | ✗ | if set, renders a required signup checkbox with this text |

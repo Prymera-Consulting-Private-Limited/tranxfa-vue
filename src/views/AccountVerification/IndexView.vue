@@ -11,6 +11,7 @@ import {useCustomerUtils} from "@/composables/customer_utils.js";
 import {computed, onMounted, ref} from "vue";
 import {IdentificationIcon} from "@heroicons/vue/24/outline/index.js";
 import KycDocumentStatus from "@/enums/kyc_document_status.js";
+import {verificationRequiredOnly} from "@/feature_flags.js";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -41,6 +42,16 @@ async function applyInfoFromPoi() {
  * @type {{data: Customer|null}}
  */
 const customer = customerStore.customer;
+
+// The console lists every category the customer's country accepts, which is more
+// than most customers need, and marks the ones a transfer will really ask for.
+// Hiding the rest here loses nothing: the transfer wizard and a held transaction
+// still ask for a category when they need it, and open it from the whole list in
+// the store, which is why the filter lives in this page and nowhere else.
+const pendingCategories = computed(() => {
+  const pending = customer.data?.pendingDocuments ?? [];
+  return verificationRequiredOnly() ? pending.filter(category => category.isRequired !== false) : pending;
+});
 
 const loadFailure = ref(null);
 
@@ -163,8 +174,8 @@ onMounted(load);
                         </li>
                       </template>
                     </template>
-                    <template  v-if="customer.data?.pendingDocuments.length > 0">
-                      <li v-for="pendingCategory in customer.data?.pendingDocuments" :key="pendingCategory.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm">
+                    <template  v-if="pendingCategories.length > 0">
+                      <li v-for="pendingCategory in pendingCategories" :key="pendingCategory.id" class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow-sm">
                         <div class="flex flex-1 flex-col p-8">
                           <IdentificationIcon class="mx-auto size-16 shrink-0 rounded-full text-brand-700" />
                           <h3 class="mt-6 text-sm/6 font-medium text-gray-900">{{ pendingCategory.title }}</h3>

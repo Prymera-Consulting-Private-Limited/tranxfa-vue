@@ -70,9 +70,9 @@ const amountField = (wrapper, id) => wrapper.get(`#${id}`);
  * Type a value into a real amount field, one keystroke at a time.
  *
  * Sets the value through the native setter and dispatches `input`, which is what
- * maska listens to - the same path a person's typing takes. Nothing here reaches
- * for update:amount directly, so a component that stopped emitting while typing
- * would fail these rather than pass them.
+ * MoneyInput's own handler listens to - the same path a person's typing takes.
+ * Nothing here reaches for update:amount directly, so a component that stopped
+ * emitting while typing would fail these rather than pass them.
  */
 async function type(field, value, {perKeystrokeMs = 40} = {}) {
     const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
@@ -86,10 +86,8 @@ async function type(field, value, {perKeystrokeMs = 40} = {}) {
 /**
  * Type, then let the debounce elapse and the request settle.
  *
- * Note what the digits mean. The mask is `reversed` with the currency's decimal
- * places, so digits fill from the right the way a till does: typing 2-5-0 is
- * 2.50, not 250. Tests pass the keystrokes and say what they add up to, because
- * that is the thing a person would get wrong.
+ * The field is a plain typed number now, not a reversed till-style mask: the
+ * keystrokes passed here are the amount, digit for digit.
  */
 async function typeAmount(wrapper, id, keystrokes) {
     await type(amountField(wrapper, id), keystrokes);
@@ -123,7 +121,7 @@ describe('Calculator', () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
 
-        await typeAmount(wrapper, 'send-money-input', '25000');   // 250.00
+        await typeAmount(wrapper, 'send-money-input', '250');
 
         const params = axios.get.mock.calls.at(-1)[1].params;
         expect(params.amount_type).toBe('send');
@@ -134,7 +132,7 @@ describe('Calculator', () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
 
-        await typeAmount(wrapper, 'receive-money-input', '90000');   // 900.00
+        await typeAmount(wrapper, 'receive-money-input', '900');
 
         const params = axios.get.mock.calls.at(-1)[1].params;
         expect(params.amount_type).toBe('receive');
@@ -155,7 +153,7 @@ describe('Calculator', () => {
         expect(errorsOn(wrapper, 'send-money-input')).toHaveLength(1);
 
         axios.get.mockResolvedValue(fixtureResponse('quote-send-100'));
-        await typeAmount(wrapper, 'send-money-input', '10000');   // 100.00
+        await typeAmount(wrapper, 'send-money-input', '100');
 
         expect(errorsOn(wrapper, 'send-money-input')).toEqual([]);
     });
@@ -171,7 +169,7 @@ describe('Calculator', () => {
                 }),
             );
 
-            await typeAmount(wrapper, 'send-money-input', '100');   // 1.00
+            await typeAmount(wrapper, 'send-money-input', '1');
 
             expect(errorsOn(wrapper, 'send-money-input')).toEqual(['Too small.']);
             expect(errorsOn(wrapper, 'receive-money-input')).toEqual([]);
@@ -185,7 +183,7 @@ describe('Calculator', () => {
                 }),
             );
 
-            await typeAmount(wrapper, 'receive-money-input', '100');   // 1.00
+            await typeAmount(wrapper, 'receive-money-input', '1');
 
             expect(errorsOn(wrapper, 'receive-money-input')).toEqual(['Too small.']);
             expect(errorsOn(wrapper, 'send-money-input')).toEqual([]);
@@ -273,7 +271,7 @@ describe('Calculator quote debounce', () => {
     it('makes one request for a burst of typing, not one per character', async () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
-        await typeAmount(wrapper, 'send-money-input', '100000');   // 1000.00
+        await typeAmount(wrapper, 'send-money-input', '1000');
 
         expect(axios.get).toHaveBeenCalledTimes(1);
         expect(axios.get.mock.calls[0][1].params.amount).toBe(1000);
@@ -285,7 +283,7 @@ describe('Calculator quote debounce', () => {
 
         // type() already advances 40ms after the last keystroke, so the clock
         // stands at 40 of the 300 when it returns.
-        await type(amountField(wrapper, 'send-money-input'), '25000');
+        await type(amountField(wrapper, 'send-money-input'), '250');
 
         await vi.advanceTimersByTimeAsync(250);          // 290 total - still waiting
         expect(axios.get).not.toHaveBeenCalled();
@@ -300,7 +298,7 @@ describe('Calculator quote debounce', () => {
     it('keeps the amount field mounted while typing', async () => {
         const wrapper = await mountCalculator();
 
-        await type(amountField(wrapper, 'send-money-input'), '25000');
+        await type(amountField(wrapper, 'send-money-input'), '250');
         await flushPromises();
 
         expect(wrapper.findComponent({name: 'MoneyInput'}).exists()).toBe(true);
@@ -360,8 +358,8 @@ describe('Calculator quote debounce', () => {
             }))
             .mockImplementationOnce(() => Promise.resolve(fixtureResponse('quote-send-100')));
 
-        await typeAmount(wrapper, 'send-money-input', '10000');   // 100.00
-        await typeAmount(wrapper, 'send-money-input', '99900');   // 999.00
+        await typeAmount(wrapper, 'send-money-input', '100');
+        await typeAmount(wrapper, 'send-money-input', '999');
 
         expect(aborted, 'the overtaken request was left running').toHaveBeenCalled();
 
@@ -376,7 +374,7 @@ describe('Calculator quote debounce', () => {
         const wrapper = await mountCalculator();
         axios.get.mockClear();
 
-        await type(amountField(wrapper, 'send-money-input'), '25000');
+        await type(amountField(wrapper, 'send-money-input'), '250');
         wrapper.unmount();
         await vi.advanceTimersByTimeAsync(300);
         await flushPromises();

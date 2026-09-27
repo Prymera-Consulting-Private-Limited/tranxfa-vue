@@ -1,4 +1,5 @@
 import Money from "@/models/travel/money.js";
+import PropertyCharge from "@/models/travel/property_charge.js";
 import {getLabels} from "@/composables/api_utils.js";
 import OrderHotel from "@/models/travel/orders/order_hotel.js";
 import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
@@ -97,9 +98,12 @@ class TravelQuote {
     perNight = null;
 
     /**
-     * @type {Money|null}
+     * Not part of the total: the hotel collects these on arrival, each in its own
+     * currency. Empty when nothing is owed.
+     *
+     * @type {PropertyCharge[]}
      */
-    payableAtProperty = null;
+    payableAtProperty = [];
 
     /**
      * @type {RateCancellation|null}
@@ -163,7 +167,7 @@ class TravelQuote {
 
         quote.total = Money.getInstance(data, 'total');
         quote.perNight = Money.getInstance(data, 'per_night');
-        quote.payableAtProperty = Money.getInstance(data, 'payable_at_property');
+        quote.payableAtProperty = PropertyCharge.getCollection(data.payable_at_property);
 
         if (data.cancellation) {
             quote.cancellation = RateCancellation.getInstance(data.cancellation);

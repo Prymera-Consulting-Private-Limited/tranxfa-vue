@@ -1,7 +1,10 @@
 import axios from "axios";
 import {computed, ref} from "vue";
 import moment from "moment";
+import i18n from '@/i18n.js';
 import {useCustomerStore} from "@/stores/customer.js";
+
+const t = (...args) => i18n.global.t(...args);
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -594,23 +597,111 @@ function countValue(map, key) {
 }
 
 /**
- * Each room is priced on its own adults and children, so the breakdown is one
- * line per room rather than a combined total that hides which room a child
- * belongs to. Ages are collected at booking, not shown here.
+ * @param {{adults: number, children: number[]}} room
+ * @returns {string}
+ */
+function describeRoom(room) {
+    const parts = [t('travel.adultCount', room.adults, {count: room.adults})];
+
+    if (room.children.length) {
+        parts.push(t('travel.childCount', room.children.length, {count: room.children.length}));
+    }
+
+    return parts.join(', ');
+}
+
+/**
+ * Each room is priced on its own adults and children, so where there is space
+ * the occupancy reads room by room, and says which room each line is. Without
+ * the label two rooms of two adults read "2 adults · 2 adults", which looks
+ * like a typo. Ages are collected at booking, not shown here.
  *
  * @param {Array<{adults: number, children: number[]}>} guests
  * @returns {string[]}
  */
 export function getGuestBreakdown(guests) {
-    return guests.map(room => {
-        const parts = [`${room.adults} adult${room.adults === 1 ? '' : 's'}`];
+    if (guests.length === 1) {
+        return [describeRoom(guests[0])];
+    }
 
-        if (room.children.length) {
-            parts.push(`${room.children.length} child${room.children.length === 1 ? '' : 'ren'}`);
-        }
+    return guests.map((room, index) => t('travel.roomGuests', {number: index + 1, guests: describeRoom(room)}));
+}
 
-        return parts.join(', ');
-    });
+/**
+ * The occupancy in one short line, for the places with no room to list each
+ * room: "2 rooms · 4 adults · 1 child". A single room does not say so.
+ *
+ * @param {Array<{adults: number, children: number[]}>} guests
+ * @returns {string|null}
+ */
+export function getGuestSummary(guests) {
+    if (!guests.length) {
+        return null;
+    }
+
+    const adults = guests.reduce((total, room) => total + room.adults, 0);
+    const children = guests.reduce((total, room) => total + room.children.length, 0);
+    const parts = [];
+
+    if (guests.length > 1) {
+        parts.push(t('travel.roomCount', guests.length, {count: guests.length}));
+    }
+
+    parts.push(t('travel.adultCount', adults, {count: adults}));
+
+    if (children) {
+        parts.push(t('travel.childCount', children, {count: children}));
+    }
+
+    return parts.join(' · ');
+}
+
+/**
+ * Check-in and check-out are days, not moments, so neither end carries a time:
+ * a stay formatted as a timestamp reads "12:00 AM" when the hotel's check-out
+ * is noon. Both ends share one format, and the year is written once unless the
+ * stay crosses into the next.
+ *
+ * Only the date part is read, so a value that ever arrives as a timestamp still
+ * names the day it was written for rather than the day in the browser's zone.
+ *
+ * @param {string|null} checkIn
+ * @param {string|null} checkOut
+ * @returns {string|null}
+ */
+export function getStayLabel(checkIn, checkOut) {
+    if (!checkIn || !checkOut) {
+        return null;
+    }
+
+    const start = moment(String(checkIn).slice(0, 10), DATE_FORMAT, true);
+    const end = moment(String(checkOut).slice(0, 10), DATE_FORMAT, true);
+
+    if (!start.isValid() || !end.isValid()) {
+        return null;
+    }
+
+    const startFormat = start.year() === end.year() ? 'ddd D MMM' : 'ddd D MMM YYYY';
+
+    return `${start.format(startFormat)} – ${end.format('ddd D MMM YYYY')}`;
+}
+
+/**
+ * The supplier keeps a hotel's check-in and check-out times as HH:MM:SS, and
+ * nobody reads the seconds. Anything that is not a time is shown as it came:
+ * an odd-looking time is more use to a guest than none.
+ *
+ * @param {string|null} value
+ * @returns {string|null}
+ */
+export function formatHotelTime(value) {
+    if (!value) {
+        return null;
+    }
+
+    const time = moment(value, ['HH:mm:ss', 'HH:mm'], true);
+
+    return time.isValid() ? time.format('HH:mm') : value;
 }
 
 /**
@@ -640,9 +731,7 @@ export function useHotelUtils() {
         return moment(criteria.value.checkout).diff(moment(criteria.value.checkin), 'days');
     });
 
-    const stayLabel = computed(() => {
-        return `${moment(criteria.value.checkin).format('D MMM')} – ${moment(criteria.value.checkout).format('ll')}`;
-    });
+    const stayLabel = computed(() => getStayLabel(criteria.value.checkin, criteria.value.checkout));
 
     const guestBreakdown = computed(() => getGuestBreakdown(criteria.value.guests));
 

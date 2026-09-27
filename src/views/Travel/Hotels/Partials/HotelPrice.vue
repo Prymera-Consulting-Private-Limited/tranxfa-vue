@@ -1,5 +1,6 @@
 <script setup>
 import {computed} from 'vue';
+import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
 
 const props = defineProps({
   /**
@@ -48,6 +49,6 @@ const showBreakdown = computed(() => lines.value.length > 1);
       </div>
     </dl>
     <!-- Not part of the total: the hotel collects this on arrival -->
-    <p v-if="rate.payableAtProperty.isStated" class="mt-2 text-xs/5 text-warning-700">{{ $t('travel.plusCurrencyprefixedPayableAtThe', {currencyPrefixed: rate.payableAtProperty.currencyPrefixed}) }}</p>
+    <PayableAtProperty :charges="rate.payableAtProperty" dense class="mt-2" />
   </div>
 </template>

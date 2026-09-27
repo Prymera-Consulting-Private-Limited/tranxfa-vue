@@ -239,8 +239,10 @@ describe('the hotel page', () => {
         // The supplier's own prose, section by section.
         expect(text).toContain('At the hotel');
         expect(text).toContain('Room amenities');
-        // Check-in and check-out as the hotel stated them.
-        expect(text).toContain('Check in from 15:00:00');
+        // Check-in and check-out as the hotel stated them, without the seconds
+        // the api keeps them to (SD-1257).
+        expect(text).toContain('Check in from 15:00 · check out by 12:00');
+        expect(text).not.toContain('15:00:00');
     });
 
     it('holds the chosen rate and continues to the quote the api minted', async () => {

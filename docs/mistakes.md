@@ -197,3 +197,146 @@ merged badge alone.
 
 **Status:** adopted — every merge since has been checked this way, and it caught
 a second instance the same day.
+
+---
+
+## PM-008 — A brand's own branch was used as a pull request's head
+
+**What happened:** promoting `salvtech_staging` to `salvtech_production` was
+done by opening the pull request with `head: salvtech_staging`,
+`base: salvtech_production` directly. GitHub shows a "Delete branch" button
+after every merge, on every pull request, regardless of the repository's
+`delete_branch_on_merge` setting - it does not know `salvtech_staging` is a
+long-lived deploy branch and not a spent feature branch. It was clicked
+without a second thought, four seconds after the merge, and Xenvia's staging
+Amplify app was left with no branch to build from. No commit was lost - only
+the branch pointer - and it was recovered by pushing the recorded merge
+commit's `head` sha back onto `refs/heads/salvtech_staging`. It could as
+easily have been `salvtech_production`, with no recorded sha to recover it
+from.
+
+**Root cause:** a pull request's head branch reads as disposable to GitHub's
+own UI, no matter what it is named or how long it has stood. Nothing about
+opening the PR distinguished a brand's own environment branch from an
+ordinary `feature/*` or `chore/*` branch.
+
+**Cost or risk:** a live deploy branch deleted by muscle memory, and the
+narrow miss of taking down a brand's actual production Amplify app the same
+way, with no ticket or PR recording its last commit to recover from.
+
+**SOP:** a long-lived environment branch (`<brand>_staging`,
+`<brand>_production`, and `main` itself) is **never the head of a pull
+request**. A promotion between two of them goes through a disposable
+`via/<slug>` branch instead: cut the via-branch from the source environment
+branch (or merge the other side into it), open the PR with the via-branch as
+head and the target environment branch as base, and only the via-branch is
+ever offered up for deletion after the merge. This is already how an ordinary
+`chore/*` or `feature/*` promotion into a brand's staging branch works, per
+`docs/tenant-branches.md`'s porting steps - the gap was promoting
+**staging into production**, where the habit had been to treat the staging
+branch itself as the thing to open the PR from.
+
+**Status:** open - proposed after the one recovery above; not yet proven under
+a repeat staging-to-production promotion.
+
+---
+
+## PM-008 — A build was verified on a working tree the commit did not match
+
+**What happened:** merging `main` into `quiqsend-staging` (PR #184, SD-1218)
+brought in main's stock `login.jpg` and `signup.jpg`. The follow-up commit
+`bef26ca` was meant to point `SignInView.vue` and `SignUpView.vue` at the
+brand's `login.png` and `signup.png` and delete the JPEGs. Only the deletions
+were committed. The commit message and the PR body both described the view
+change, and the PR reported `npm run build` exit 0. Amplify then failed both
+`quiqsend-staging` and `quiqsend_production` on
+`Rollup failed to resolve import "/images/backgrounds/signup.jpg"` (SD-1239).
+
+**Root cause:** the build and the suite ran in the working tree, which had the
+edited views. The commit did not. A green check proves the files on disk, not
+the commit that gets pushed, and a commit message describes what was intended
+rather than what was staged.
+
+**Cost or risk:** two Quiqsend deploys failed, and no fix could reach that
+brand until this was repaired. Had the missing file been one Vite does not
+resolve at build time, it would have shipped as a broken image with a green
+build.
+
+**SOP:** before opening a pull request into a brand branch:
+1. `git status --short` is empty, so nothing verified is left out of the commit.
+2. The build and `npm test` run on a clean checkout of the commit itself
+   (`git worktree add --detach <dir> HEAD`, then `npm ci`), not in the tree it
+   was made in.
+3. For every asset the branch deletes, `git grep -n <path> HEAD -- src index.html`
+   returns nothing.
+
+**Status:** open — adopted for SD-1239's own fix, which was built and tested
+from a clean export of the index.
+
+---
+
+## PM-009 — Advice was written around a backend message nobody had read
+
+**What happened:** the transfer wizard appended "Change the amount and confirm
+again." to the console's `payment_amount_collides` message (SD-1111, moved to
+the catalogue by SD-1193). The console's message already ends "...or send a
+slightly different amount.", so every customer who hit it was told the same
+thing twice. SD-1251's first draft repeated the pattern for the new
+`account_held` reason, appending "Pay or cancel that payment, or try again in
+an hour" after a message that already says "Please pay or cancel it, or try
+again in an hour." Both were green: the specs asserted our own invented
+messages, never the console's.
+
+**Root cause:** the advice was designed from the handout's description of the
+refusal, not from the words the console actually sends. A spec written with a
+made-up `message` can only prove our concatenation, never what the customer
+reads.
+
+**Cost or risk:** a duplicated instruction on the last screen before money
+moves. It is harmless-looking, which is why it survived two tickets, and it
+would have doubled again for every new reason.
+
+**SOP:** before writing any copy that is shown next to a backend `message`:
+1. Read the console's wording for every variant of that refusal
+   (`git grep -n '<message key>' origin/develop -- lang`), in every language
+   it ships.
+2. Specs for that refusal use the console's wording verbatim, not a
+   placeholder, so a duplicated sentence is visible in the assertion.
+3. Default to showing the backend `message` alone. The app's own sentence is
+   for a refusal that arrives without one.
+
+**Status:** adopted — SD-1251 shows the console message alone and keeps its own
+wording, chosen by `reason`, as the fallback. Its specs use the console's text.
+
+---
+
+## PM-010 — A passing count was read from a test run that had failed
+
+**What happened:** while building SD-1269 the suite was run many times, and each
+time only the summary line was read: `Tests  2195 passed`. Two new cases in
+`tests/transfer-confirm-refusals.spec.js` rendered a component that needs a
+router in a screen mounted without one. Vitest reported four unhandled errors
+and **exited 1**, and it still counted every test as passed, because the errors
+landed after the assertions had run. The change was staged, reviewed and
+committed as green. PM-008's clean-checkout step caught it before the PR, only
+because that step prints the exit code.
+
+**Root cause:** the output was piped through `grep` for the summary line, which
+throws away both the exit code and the "Unhandled Errors" block. `CLAUDE.md`
+already says "verify by exit code"; the habit of grepping a long log made that
+rule quietly not apply.
+
+**Cost or risk:** a red CI run on a PR described as green, or worse, a real
+fault hidden the same way. Vitest's own warning says unhandled errors "might
+cause false positive tests".
+
+**SOP:** every suite run that a claim rests on records the exit code, not only
+the count:
+```bash
+npx vitest run > "$SCRATCH/test.log" 2>&1; echo "exit=$?"
+grep -E "Tests |Test Files|Unhandled" "$SCRATCH/test.log"
+```
+"N passed" is reported only beside `exit=0`. A count with a non-zero exit is a
+failed run, whatever the count says.
+
+**Status:** open — adopted during SD-1269; to be confirmed on the next ticket.

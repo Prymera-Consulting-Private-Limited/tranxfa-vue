@@ -1,9 +1,8 @@
 <script setup>
 import {computed} from 'vue';
-import moment from 'moment';
 import Spinner from '@/components/Spinner.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
-import {getGuestBreakdown} from '@/composables/travel/hotels/hotel_utils.js';
+import {getGuestSummary, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
 import {CalendarDaysIcon, ExclamationTriangleIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -50,15 +49,10 @@ const emit = defineEmits([
   'hold',
 ]);
 
-const stay = computed(() => {
-  if (!props.search?.checkIn || !props.search?.checkOut) {
-    return null;
-  }
+const stay = computed(() => getStayLabel(props.search?.checkIn, props.search?.checkOut));
 
-  return `${moment(props.search.checkIn).format('ddd D MMM')} – ${moment(props.search.checkOut).format('llll')}`;
-});
-
-const guests = computed(() => (props.search ? getGuestBreakdown(props.search.rooms) : []));
+// A sidebar has no room to list each room, so the occupancy is one line.
+const guests = computed(() => (props.search ? getGuestSummary(props.search.rooms) : null));
 </script>
 
 <template>
@@ -72,9 +66,9 @@ const guests = computed(() => (props.search ? getGuestBreakdown(props.search.roo
           <span v-if="search?.nights" class="text-gray-500">· {{ $t('travel.nightCount', search.nights, {count: search.nights}) }}</span>
         </span>
       </p>
-      <p v-if="guests.length" class="flex items-start gap-2 text-gray-700">
+      <p v-if="guests" class="flex items-start gap-2 text-gray-700">
         <UserGroupIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />
-        <span>{{ guests.join(' · ') }}</span>
+        <span>{{ guests }}</span>
       </p>
     </div>
     <div class="border-t border-gray-100 pt-4">
