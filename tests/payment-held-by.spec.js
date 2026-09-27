@@ -82,9 +82,11 @@ describe('what is holding the account', () => {
         expect(order.paymentId).toBe('01a0b6a0-7dd0-71cd-bab0-d81a26ef6b1e');
         expect(order.service).toBe('HOTELS');
 
+        // Captured 27 Sep (SD-1423): a transfer carries its payment's id too.
         const transfer = holderOf('error-412-checkout-collides-held-by-transfer');
         expect(transfer.kind).toBe('transfer');
-        expect(transfer.paymentId).toBeNull();
+        expect(transfer.id).toBe('01a0dfdb-723c-73b0-a52c-1a5ba4a2da58');
+        expect(transfer.paymentId).toBe('01a0e047-6466-73ff-8127-f37f330bcc11');
         expect(transfer.service).toBeNull();
 
         expect(holderOf('error-412-wallet-topup-collides-held-by-topup').kind).toBe('wallet_topup');
@@ -136,8 +138,8 @@ describe('the button that opens it', () => {
         const wrapper = await mountAction(holderOf('error-412-checkout-collides-held-by-transfer'));
 
         expect(wrapper.find('a').text()).toBe('View your transfer');
-        expect(wrapper.find('a').attributes('href')).toBe('/transaction/01a0c3d0-3333-7444-8555-a66677788899');
-        expect(wrapper.text()).toContain('TXN2609180042');
+        expect(wrapper.find('a').attributes('href')).toBe('/transaction/01a0dfdb-723c-73b0-a52c-1a5ba4a2da58');
+        expect(wrapper.text()).toContain('PV-V2-7547953');
     });
 
     it('opens the wallet, where pending top-ups are listed and can be cancelled', async () => {

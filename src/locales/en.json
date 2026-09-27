@@ -100,7 +100,18 @@
       "thisWayToPayIsnt": "This way to pay isn't available in the app yet",
       "nothingHasBeenChargedPlease": "Nothing has been charged. Please choose another way to pay, or contact support and quote transfer #{transactionNumber}.",
       "goToYourTransfer": "Go to your transfer",
-      "weCouldntLoadYourPayment": "We couldn't load your payment"
+      "weCouldntLoadYourPayment": "We couldn't load your payment",
+      "cancelPayment": "Cancel payment",
+      "cancelThisPaymentQuestion": "Cancel this payment?",
+      "yourTransferStaysSaved": "Your transfer stays saved and you can pay for it later. Don't cancel if you've already sent the money.",
+      "yesCancelPayment": "Yes, cancel payment",
+      "keepThisPayment": "Keep this payment",
+      "cancelling": "Cancelling",
+      "weCouldNotCancelThePayment": "We could not cancel the payment. Please try again.",
+      "thisPaymentCanNoLongerBeCancelled": "This payment can no longer be cancelled.",
+      "paymentCancelledNoMoneyHasMoved": "Payment cancelled. No money has moved.",
+      "noMoneyHasMovedPayAgain": "No money has moved. Your transfer is saved, and you can pay for it again.",
+      "payAgain": "Pay again"
     },
     "wizard": {
       "reviewConfirm": "Review & Confirm",
@@ -183,7 +194,15 @@
     "heldBy": {
       "viewYourHotelBooking": "View your hotel booking",
       "viewYourTransfer": "View your transfer",
-      "viewYourWalletTopUp": "View your wallet top-up"
+      "viewYourWalletTopUp": "View your wallet top-up",
+      "cancelItAndContinue": "Cancel it and continue",
+      "yourPaymentForIsStillOpen": "Your payment for {reference} is still open. Cancel it and continue?",
+      "yourOtherPaymentIsStillOpen": "Your other payment is still open. Cancel it and continue?",
+      "dontCancelIfYouveSentTheMoney": "Don't cancel it if you've already sent the money for it.",
+      "yesCancelItAndContinue": "Yes, cancel it and continue",
+      "keepIt": "Keep it",
+      "cancelling": "Cancelling",
+      "weCouldNotCancelIt": "We could not cancel that payment. Please try again."
     },
     "card": {
       "completeYourPayment": "Complete your payment",

@@ -45,6 +45,7 @@ import WalletRefusalType from "@/enums/wallet_refusal_type.js";
 import PaymentCollisionReason from "@/enums/payment_collision_reason.js";
 import DepositHolder from "@/models/deposit_holder.js";
 import HeldByAction from "@/components/Payment/HeldByAction.vue";
+import ReleaseHeldPayment from "@/components/Payment/ReleaseHeldPayment.vue";
 import {useWalletStore} from "@/stores/wallet.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 
@@ -309,6 +310,13 @@ const preconditionFailedMessage = ref('');
 // is why the confirm was refused (SD-1261). The message says to pay or cancel
 // it; this is how they find it, whether it is a booking, a transfer or a load.
 const heldBy = ref(null);
+
+// The payment in the way is cancelled and the account is free, so the same
+// confirm goes again. Nothing was created by the refused one.
+const heldPaymentReleased = async () => {
+  isStepProcessing.value = true;
+  await confirmQuote();
+}
 
 const confirmFormErrors = ref([]);
 
@@ -728,6 +736,7 @@ const canContinue = computed(() => {
                         </div>
                         <div class="ml-3">
                           <p class="text-sm/6 text-warning-700">{{ preconditionFailedMessage }}</p>
+                          <ReleaseHeldPayment :holder="heldBy" class="mt-3" @released="heldPaymentReleased" />
                           <HeldByAction :holder="heldBy" class="mt-3" />
                         </div>
                       </div>

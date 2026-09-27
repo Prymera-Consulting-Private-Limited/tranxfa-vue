@@ -209,6 +209,24 @@ describe('Transfer wizard confirm refusals', () => {
             expect(wrapper.vm.heldBy.paymentId).toBe('payment-1');
         });
 
+        // SD-1423. Once the payment in the way is cancelled the account is free,
+        // and the refused confirm created nothing, so the same confirm goes again.
+        it('confirms again once the payment in the way is cancelled', async () => {
+            const wrapper = await mountWizard();
+            axios.post.mockRejectedValueOnce(collide({reason: 'account_held', message: ACCOUNT_HELD, held_by: {kind: 'transfer', id: 'txn-1', reference: 'PV-1'}}));
+            await wrapper.vm.confirmQuote();
+            const confirmCall = axios.post.mock.calls[0];
+
+            axios.post.mockResolvedValueOnce({data: {id: 'txn-2'}});
+            wrapper.findComponent({name: 'ReleaseHeldPayment'}).vm.$emit('released');
+            await flushPromises();
+
+            expect(axios.post).toHaveBeenCalledTimes(2);
+            expect(axios.post.mock.calls[1]).toEqual(confirmCall);
+            expect(wrapper.vm.preconditionFailedMessage).toBe('');
+            expect(wrapper.vm.heldBy).toBeNull();
+        });
+
         it('forgets the holder when the next attempt is refused without one', async () => {
             const wrapper = await mountWizard();
             axios.post.mockRejectedValue(collide({reason: 'account_held', held_by: {kind: 'transfer', id: 'txn-1'}}));
