@@ -3,6 +3,8 @@ import Country from "@/models/country.js";
 import PayoutMethod from "@/models/payout_method.js";
 import Company from "@/models/company.js";
 
+import QuoteCoupon from "@/models/quote_coupon.js";
+
 class BaseTransaction {
     /**
      * @type {string|null}
@@ -120,6 +122,35 @@ class BaseTransaction {
     exchangeRateIsInverse = false;
 
     /**
+     * The promotion coupon applied to a quote (Apply Coupon), null when none.
+     * When set, total_* are already net of the discount and exchange_rate is
+     * already the improved rate. Read from every quote response: editing the
+     * quote re-evaluates the coupon server-side.
+     * @type {QuoteCoupon|null}
+     */
+    coupon = null;
+
+    /**
+     * On a transaction: the coupon discount taken at checkout, null when no
+     * coupon was used. base_fees stays the full fee.
+     * @type {string|null}
+     */
+    couponDiscountAmount = null;
+
+    /** @type {string|null} */
+    couponDiscountAmountCurrencyPrefixed = null;
+
+    /**
+     * On a transaction: the rate without the better-rate coupon, null when no
+     * coupon moved it; paired with exchange_rate_formatted as was/now.
+     * @type {string|number|null}
+     */
+    exchangeRateBeforeCoupon = null;
+
+    /** @type {string|null} */
+    exchangeRateBeforeCouponFormatted = null;
+
+    /**
      * @param {Quote|TransactionQuote|Transaction} obj
      * @param {object} data
      * @return {Quote|TransactionQuote|Transaction}
@@ -132,13 +163,20 @@ class BaseTransaction {
         obj.baseFees = data.base_fees;
         obj.baseFeesCurrencyPrefixed = data.base_fees_currency_prefixed;
         obj.baseFeesFormatted = data.base_fees_formatted;
+        obj.coupon = QuoteCoupon.getInstance(data.coupon);
+        obj.couponDiscountAmount = data.coupon_discount_amount ?? null;
+        obj.couponDiscountAmountCurrencyPrefixed = data.coupon_discount_amount_currency_prefixed ?? null;
+        obj.exchangeRateBeforeCoupon = data.exchange_rate_before_coupon ?? null;
+        obj.exchangeRateBeforeCouponFormatted = data.exchange_rate_before_coupon_formatted ?? null;
         obj.localAmount = data.local_amount;
         obj.localAmountCurrencyPrefixed = data.local_amount_currency_prefixed;
         obj.localAmountFormatted = data.local_amount_formatted;
         obj.subTotalAmountCurrencyPrefixed = data.sub_total_amount_currency_prefixed;
         obj.subTotalAmountFormatted = data.sub_total_amount_formatted;
-        obj.totalAmountCurrencyPrefixed = data.total_amount_currency_prefixed;
-        obj.totalAmountFormatted = data.total_amount_formatted;
+        obj.totalAmountCurrencyPrefixed =
+            data.total_amount_currency_prefixed || data.sub_total_amount_currency_prefixed || null;
+        obj.totalAmountFormatted =
+            data.total_amount_formatted || data.sub_total_amount_formatted || null;
         obj.foreignAmount = data.foreign_amount || data.payout_amount;
         obj.foreignAmountCurrencyPrefixed = data.foreign_amount_currency_prefixed || data.payout_amount_currency_prefixed;
         obj.foreignAmountFormatted = data.foreign_amount_formatted || data.payout_amount_formatted;

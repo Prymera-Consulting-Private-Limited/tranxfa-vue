@@ -14,6 +14,14 @@ const props = defineProps({
     type: Function,
     default: null,
   },
+  countries: {
+    type: Array,
+    default: [],
+  },
+  fetchCountries: {
+    type: Boolean,
+    default: true,
+  }
 });
 const emit = defineEmits(['update:modelValue']);
 const selectedIsdCode = ref(props.modelValue);
@@ -27,7 +35,11 @@ const isdCode = computed({
 })
 
 onMounted(async () => {
-  countries.value = await countryUtils.getCountries();
+  if (props.fetchCountries) {
+    countries.value = await countryUtils.getCountries();
+  } else {
+    countries.value = await props.countries;
+  }
 })
 
 function updateIsdCode(updated) {
