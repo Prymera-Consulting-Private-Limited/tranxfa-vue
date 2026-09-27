@@ -1,4 +1,10 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
@@ -26,6 +32,7 @@ import Transaction from "@/models/transaction.js";
 import ListItem from "@/components/Transaction/ListItem.vue";
 import ListShimmer from "@/components/Transaction/ListShimmer.vue";
 import Pagination from "@/components/Pagination.vue";
+import WalletDashboardCard from "@/components/Wallet/DashboardCard.vue";
 
 const customerStore = useCustomerStore();
 const customerUtils = useCustomerUtils();
@@ -66,7 +73,7 @@ const taskItems = [
     description: '',
     status: '',
     icon: IdentificationIcon,
-    background: 'bg-yellow-500',
+    background: 'bg-warning-500',
     completed: false,
     href: null,
   },
@@ -76,7 +83,7 @@ const taskItems = [
     description: '',
     status: '',
     icon: HomeIcon,
-    background: 'bg-green-500',
+    background: 'bg-success-500',
     completed: false,
     href: null,
   },
@@ -137,6 +144,9 @@ const serverTasks = ref([]);
 const getTasks = async () => {
   customerUtils.tasks().then((response) => {
     serverTasks.value = response.data.map((task) => CustomerTaskModal.getInstance(task));
+  }).catch((e) => {
+    // The task list is guidance, not data; the page still works without it.
+    logRequestFailure(e, 'dashboard-tasks');
   }).finally(() => {
     isTaskLoading.value = false;
   });
@@ -145,10 +155,16 @@ const getTasks = async () => {
 const timeUtils = useTimeUtils();
 const transactionsData = ref(null);
 
+const transactionsFailure = ref(null);
+
 async function getTransactions(page = null) {
   isTransactionLoading.value = true;
+  transactionsFailure.value = null;
   await transactionUtils.get(page).then((response) => {
     transactionsData.value = response.data;
+  }).catch((e) => {
+    logRequestFailure(e, 'dashboard-transactions');
+    transactionsFailure.value = failureMessage(e, t('account.weCouldntLoadYour2'));
   }).finally(() => {
     isTransactionLoading.value = false;
   });
@@ -181,18 +197,21 @@ const recipientCreated = (recipient) => {
   <CustomerLayout>
     <main class="-mt-24 py-8 bg-gray-50">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 class="sr-only">Dashboard</h1>
+        <h1 class="sr-only">{{ $t('account.dashboard') }}</h1>
         <!-- Main 3 column grid -->
-        <h2 class="text-base font-semibold text-gray-900 mb-5">Welcome {{ customer.data?.name }}</h2>
+        <h2 class="text-base font-semibold text-gray-900 mb-5">{{ $t('account.welcomeCustomer', {name: customer.data?.name}) }}</h2>
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-8 lg:flex-row-reverse">
 
           <!-- Left column -->
           <div class="grid grid-cols-1 gap-4 lg:col-span-2 order-last lg:order-first">
             <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Section title</h2>
+              <h2 class="sr-only" id="section-2-title">{{ $t('account.sectionTitle') }}</h2>
               <div>
                 <template v-if="isTransactionLoading">
                   <ListShimmer />
+                </template>
+                <template v-else-if="transactionsFailure">
+                  <LoadFailurePanel :title="$t('account.transfersLoadFailure')" :message="transactionsFailure" :retryLabel="$t('common.tryAgain')" @retry="getTransactions()" class="mt-0" />
                 </template>
                 <template v-else>
                   <div v-if="transactions?.length > 0" class="grid grid-cols-1 gap-4 lg:col-span-2 rounded-t-lg bg-white border border-solid border-gray-100">
@@ -215,7 +234,7 @@ const recipientCreated = (recipient) => {
                     </div>
                   </div>
                   <template v-else>
-                    <p class="mt-1 text-sm text-gray-500 hidden lg:block">Get started by completing the following steps.</p>
+                    <p class="mt-1 text-sm/6 text-gray-500 hidden lg:block">{{ $t('verification.getStarted') }}</p>
                     <ul v-if="tasks.length === 0 && isTaskLoading" role="list" class="mt-6 grid-cols-1 gap-6 xl:border-t-0 xl:border-b-0 border-t border-b border-gray-200 py-6 sm:grid-cols-2 hidden lg:grid">
                       <li v-for="i of 6" :key="i" class="flow-root pulse">
                         <div v-if="isTaskLoading" class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 ring-0">
@@ -223,13 +242,13 @@ const recipientCreated = (recipient) => {
                             <DocumentTextIcon class="size-6 text-white" aria-hidden="true" />
                           </div>
                           <div>
-                            <h3 class="text-sm font-medium text-gray-900 mb-3">
-                              <a href="#" class="focus:outline-hidden">
+                            <h3 class="text-sm/6 font-medium text-gray-900 mb-3">
+                              <a href="#" class="focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
                                 <span class="absolute inset-0" aria-hidden="true" />
                                 <div class="h-3 block pulse bg-gray-300 w-full w-64"></div>
                               </a>
                             </h3>
-                            <p class="flex flex-col mt-1 text-sm text-gray-500 space-y-1">
+                            <p class="flex flex-col mt-1 text-sm/6 text-gray-500 space-y-1">
                               <span class="h-2 block pulse bg-gray-300 w-48"></span>
                               <span class="h-2 block pulse bg-gray-300 w-32"></span>
                               <span class="h-2 block pulse bg-gray-300 w-24"></span>
@@ -272,8 +291,9 @@ const recipientCreated = (recipient) => {
 
           <!-- Right column -->
           <div class="grid grid-cols-1 gap-4">
-            <section aria-labelledby="section-2-title">
-              <h2 class="sr-only" id="section-2-title">Send Money</h2>
+            <WalletDashboardCard />
+            <section aria-labelledby="send-money-title">
+              <h2 class="sr-only" id="send-money-title">{{ $t('calculator.sendMoney') }}</h2>
               <div class="rounded-lg bg-white shadow-lg p-5 pb-8">
                 <Calculator />
               </div>

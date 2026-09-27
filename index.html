@@ -1,34 +1,51 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChoiceRemit</title>
+      <!-- Loaded here rather than @import-ed from main.css: an @import inside the
+         bundled stylesheet serialises the fetches - main.css must be parsed
+         before the font request even starts. A link in the head runs both in
+         parallel, and preconnect opens the TLS session while that happens. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
+    <script type="text/javascript">
+      (function (c, l, a, r, i, t, y) {
+        c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+        t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", "wclgm5opdd");
+    </script>
 
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChoiceRemit</title>
-  <script src="https://js.volumepay.io"></script>
-  <script type="text/javascript">
-    (function (c, l, a, r, i, t, y) {
-      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-      t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-    })(window, document, "clarity", "script", "wclgm5opdd");
-  </script>
+    <!-- Google tag (gtag.js). The library is added after first paint rather than
+         as a <script src>, so no page waits on a third-party script (see
+         tests/http-headers.spec.js); the dataLayer queues calls until it lands. -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W4GGLNYW16"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-W4GGLNYW16');
-  </script>
-</head>
-
-<body class="min-h-screen">
-  <div id="app" class="min-h-screen"></div>
-  <script type="module" src="/src/main.js"></script>
-</body>
-
+      gtag('config', 'G-W4GGLNYW16');
+      (function () {
+        function loadGtag() {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W4GGLNYW16';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadGtag);
+        } else {
+          setTimeout(loadGtag, 2000);
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen">
+    <div id="app" class="min-h-screen"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

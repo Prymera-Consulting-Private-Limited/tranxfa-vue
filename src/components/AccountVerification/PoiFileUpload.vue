@@ -1,4 +1,11 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {MAX_UPLOAD_MB} from "@/composables/upload_rules.js";
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
 import {computed, onMounted, ref} from "vue";
@@ -49,13 +56,19 @@ const backSideSelected = (file) => {
 }
 
 const isSaving = ref(false);
+const saveFailure = ref(null);
+// The documented optional upload fields the type can ask for.
+const documentNumber = ref('');
+const expiryDate = ref('');
 
 async function save() {
   isSaving.value = true;
-  customerUtils.uploadDocument(props.documentCategory, props.documentType, files.value.map((file) => file.path)).then((response) => {
+  saveFailure.value = null;
+  customerUtils.uploadDocument(props.documentCategory, props.documentType, files.value.map((file) => file.path), {document_number: documentNumber.value, expiry_date: expiryDate.value}).then((response) => {
     emit('sdkApplicantStatusChanged', response.data);
   }).catch((e) => {
-    console.error(e);
+    logRequestFailure(e, 'upload-document');
+    saveFailure.value = failureMessage(e, t('verification.weCouldntAttachThese2'));
   }).finally(() => {
     isSaving.value = false;
   });
@@ -78,8 +91,8 @@ const canSave = computed(() => {
 
   <div class="px-6 py-8 space-y-6">
     <div>
-      <h1 class="text-lg font-bold">Upload {{ documentType.title }}</h1>
-      <p class="text-sm text-gray-600">Ensure all details on the document are clear and readable</p>
+      <h1 class="text-lg font-bold">{{ $t('verification.uploadDocument', {title: documentType.title}) }}</h1>
+      <p class="text-sm/6 text-gray-600">{{ $t('verification.uploadPhotoHint', {MAX_UPLOAD_MB: MAX_UPLOAD_MB}) }}</p>
     </div>
     <div class="grid sm:grid-cols-2 items-center justify-center gap-5">
       <SingleFileUpload
@@ -96,15 +109,24 @@ const canSave = computed(() => {
       />
     </div>
     <form @submit.prevent="save">
-      <button :disabled="!canSave" :class="[{'opacity-70': !canSave}, !canSave ? 'cursor-not-allowed' : 'cursor-pointer' ]" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3 rounded-md font-medium hover:bg-brand-800 transition">
+      <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div v-if="documentType.documentNumberLabel">
+          <label :for="`document-number-${documentType.id}`" class="block text-sm/6 font-medium text-gray-900">{{ documentType.documentNumberLabel }}</label>
+          <input :id="`document-number-${documentType.id}`" v-model.trim="documentNumber" type="text" autocomplete="off" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
+        </div>
+        <div>
+          <label :for="`expiry-date-${documentType.id}`" class="block text-sm/6 font-medium text-gray-900">{{ $t('verification.expiryDate') }} <span class="font-normal text-gray-500">{{ $t('verification.expiryDateOptional') }}</span></label>
+          <input :id="`expiry-date-${documentType.id}`" v-model="expiryDate" type="date" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm/6 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600" />
+        </div>
+      </div>
+      <button :disabled="!canSave" type="submit" class="mt-6 block w-full bg-brand-700 text-white text-center py-3.5 rounded-xl font-medium transition cursor-pointer hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-700">
         <template v-if="isSaving">
           <span class="flex items-center justify-center whitespace-nowrap">
-            <Spinner class="size-4 mr-2" />
-            Uploading ...
-          </span>
+            <Spinner class="size-4 mr-2" />{{ $t('verification.uploading') }}</span>
         </template>
-        <template v-else>Upload</template>
+        <template v-else>{{ $t('verification.upload') }}</template>
       </button>
+      <InlineFailure :message="saveFailure" />
     </form>
   </div>
 </template>
