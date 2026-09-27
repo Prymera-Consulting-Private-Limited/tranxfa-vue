@@ -38,9 +38,11 @@ const sources = {
     light: '/images/logo-white.png',
 };
 
+// VeloxPays' logo is a near-square mark with the name stacked underneath, so
+// at the default heights the name is unreadably small. Larger on every screen.
 const sizes = {
-    auth: 'max-w-64 max-h-10',
-    header: 'h-8 w-auto',
+    auth: 'max-h-16',
+    header: 'h-16 w-auto',
 };
 
 // Falls back rather than rendering an empty alt: a brand that has not set
