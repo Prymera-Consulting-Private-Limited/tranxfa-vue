@@ -5,7 +5,7 @@ defineEmits(['close']);
 <template>
   <button
     type="button"
-    class="absolute right-4 top-4 z-10 cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
+    class="absolute right-4 top-4 z-10 cursor-pointer text-gray-500 transition-colors hover:text-gray-600"
     aria-label="Close"
     @click="$emit('close')"
   >
