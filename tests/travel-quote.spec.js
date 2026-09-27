@@ -27,9 +27,7 @@ const quotePayload = (overrides = {}) => ({
     per_night: 11500,
     per_night_formatted: '115.00',
     per_night_currency_prefixed: 'USD 115.00',
-    payable_at_property: null,
-    payable_at_property_formatted: null,
-    payable_at_property_currency_prefixed: null,
+    payable_at_property: [],
     cancellation: {
         status: 'free',
         free_until: '2026-09-08T12:00:00+00:00',
@@ -64,7 +62,7 @@ describe('TravelQuote.getInstance', () => {
 
         expect(quote.total.currencyPrefixed).toBe('USD 230.00')
         expect(quote.perNight.formatted).toBe('115.00')
-        expect(quote.payableAtProperty.isStated).toBe(false)
+        expect(quote.payableAtProperty).toEqual([])
         expect(quote.breakdown[0].amount.amount).toBe(22000)
         expect(quote.breakdown[1].label).toBe('Convenience fee')
     })

@@ -1,0 +1,232 @@
+{
+  "id": "01a0a76b-3e9f-72db-98b0-89f04386670b",
+  "reference": "VO-01M2KPPFMZH9Z51HHBRKAE41DE",
+  "state": "FULFILLED",
+  "state_label": "Price Locked",
+  "state_description": "The hotel has confirmed your room at this price. Please pay to complete your booking.",
+  "is_paid": false,
+  "next_step": {
+    "code": "pay",
+    "label": "Pay for Confirmation"
+  },
+  "booked_at": "2026-09-15T23:33:38+00:00",
+  "hotel": {
+    "id": "01a0a6a6-f918-7143-9c26-1a8f4f055c2d",
+    "slug": "charming-duplex-home",
+    "name": "Charming Duplex Home",
+    "address": "13847 Chandler Boulevard",
+    "star_rating": 2
+  },
+  "check_in": "2026-09-17",
+  "check_out": "2026-09-18",
+  "nights": 1,
+  "room_name": "Junior Suite",
+  "meal": "NO-MEAL",
+  "occupancy": {
+    "rooms": [
+      {
+        "adults": 2,
+        "children_ages": []
+      }
+    ]
+  },
+  "guests": {
+    "rooms": [
+      {
+        "guests": [
+          {
+            "is_child": false,
+            "last_name": "Morgan",
+            "first_name": "Avery"
+          },
+          {
+            "is_child": false,
+            "last_name": "Lee",
+            "first_name": "Jordan"
+          }
+        ]
+      }
+    ]
+  },
+  "contact": {
+    "email": "avery.morgan@example.com",
+    "phone": "+61412345678"
+  },
+  "is_confirmed": true,
+  "confirmed_at": "2026-09-15T23:35:13+00:00",
+  "confirmation": {
+    "meal": "NO-MEAL",
+    "hotel": "Charming Duplex Home",
+    "total": "AUD 151.81",
+    "nights": 1,
+    "check_in": "2026-09-17",
+    "check_out": "2026-09-18",
+    "occupancy": {
+      "rooms": [
+        {
+          "adults": 2,
+          "children_ages": []
+        }
+      ]
+    },
+    "room_name": "Junior Suite",
+    "price_lines": [
+      {
+        "key": "room",
+        "label": "Room",
+        "amount": 14497,
+        "settlement_amount": 10340
+      },
+      {
+        "key": "taxes_and_fees",
+        "label": "Taxes and fees",
+        "amount": 0,
+        "settlement_amount": 0
+      },
+      {
+        "key": "convenience_fee",
+        "label": "Convenience fee",
+        "amount": 684,
+        "settlement_amount": 488
+      }
+    ],
+    "confirmed_at": "2026-09-15T23:35:13+00:00",
+    "cancellation_ladder": {
+      "policies": [
+        {
+          "ends_at": "2026-09-16T00:00:00+00:00",
+          "starts_at": null,
+          "show_amount": "0.00",
+          "charge_amount": "0.00"
+        },
+        {
+          "ends_at": null,
+          "starts_at": "2026-09-16T00:00:00+00:00",
+          "show_amount": "94.00",
+          "charge_amount": "94.00"
+        }
+      ],
+      "currency_code": "USD",
+      "free_cancellation_before": "2026-09-16T00:00:00+00:00"
+    }
+  },
+  "breakdown": [
+    {
+      "key": "room",
+      "label": "Room",
+      "amount": 14497,
+      "amount_decimal": "144.97",
+      "amount_formatted": "144.97",
+      "amount_currency_prefixed": "AUD 144.97"
+    },
+    {
+      "key": "taxes_and_fees",
+      "label": "Taxes and fees",
+      "amount": 0,
+      "amount_decimal": "0.00",
+      "amount_formatted": "0.00",
+      "amount_currency_prefixed": "AUD 0.00"
+    },
+    {
+      "key": "convenience_fee",
+      "label": "Convenience fee",
+      "amount": 684,
+      "amount_decimal": "6.84",
+      "amount_formatted": "6.84",
+      "amount_currency_prefixed": "AUD 6.84"
+    }
+  ],
+  "payments": [
+    {
+      "id": "01a0a76c-2d27-7070-95a8-987c7f747ca1",
+      "reference": "VO-01M2KPPFMZH9Z51HHBRKAE41DE-P001",
+      "state": "FAILED",
+      "state_label": "Failed",
+      "method": "Bank Transfer",
+      "attempted_at": "2026-09-15T23:34:39+00:00",
+      "client_payment_account": null,
+      "expires_at": "2026-09-20T23:34:39+00:00",
+      "amount": 15181,
+      "amount_decimal": "151.81",
+      "amount_formatted": "151.81",
+      "amount_currency_prefixed": "AUD 151.81"
+    },
+    {
+      "id": "01a0b0d6-eb2b-70be-a3bb-4a6f18e63cd5",
+      "reference": "VO-01M2KPPFMZH9Z51HHBRKAE41DE-P002",
+      "state": "FAILED",
+      "state_label": "Failed",
+      "method": "Bank Transfer",
+      "attempted_at": "2026-09-17T19:27:50+00:00",
+      "client_payment_account": {
+        "id": "a28cea63-77fb-4301-8361-37a3df6f3762",
+        "institution_name": "Monoova",
+        "instruction_text": "To complete your payment, please transfer funds to the bank account listed below. Please note that, it may take up to 24 hours, depending on your bank’s processing time.",
+        "wait_time_message": "Thank you for payment. We will process the transfer as soon as we receive the money. Please note that, it may take up to 24 hours, depending on your bank’s processing time.",
+        "payment_reference": "SP8367289",
+        "attributes": [
+          {
+            "key": "Account Name",
+            "value": "PAYVEL PTY LTD"
+          },
+          {
+            "key": "BSB",
+            "value": "802-985"
+          },
+          {
+            "key": "Account Number",
+            "value": "123456789"
+          }
+        ]
+      },
+      "expires_at": "2026-09-22T19:27:50+00:00",
+      "amount": 15181,
+      "amount_decimal": "151.81",
+      "amount_formatted": "151.81",
+      "amount_currency_prefixed": "AUD 151.81"
+    },
+    {
+      "id": "01a0b6a0-7dd0-71cd-bab0-d81a26ef6b1e",
+      "reference": "VO-01M2KPPFMZH9Z51HHBRKAE41DE-P003",
+      "state": "PENDING",
+      "state_label": "Pending",
+      "method": "Bank Transfer",
+      "attempted_at": "2026-09-18T22:26:06+00:00",
+      "client_payment_account": {
+        "id": "a28cea63-77fb-4301-8361-37a3df6f3762",
+        "institution_name": "Monoova",
+        "instruction_text": "To complete your payment, please transfer funds to the bank account listed below. Please note that, it may take up to 24 hours, depending on your bank’s processing time.",
+        "wait_time_message": "Thank you for payment. We will process the transfer as soon as we receive the money. Please note that, it may take up to 24 hours, depending on your bank’s processing time.",
+        "payment_reference": "SP8518335",
+        "attributes": [
+          {
+            "key": "Account Name",
+            "value": "PAYVEL PTY LTD"
+          },
+          {
+            "key": "BSB",
+            "value": "802-985"
+          },
+          {
+            "key": "Account Number",
+            "value": "123456789"
+          }
+        ]
+      },
+      "expires_at": "2026-09-23T22:26:06+00:00",
+      "amount": 15181,
+      "amount_decimal": "151.81",
+      "amount_formatted": "151.81",
+      "amount_currency_prefixed": "AUD 151.81"
+    }
+  ],
+  "cancellation": {
+    "requested": null,
+    "can_cancel_now": false,
+    "quote": null
+  },
+  "total": 15181,
+  "total_decimal": "151.81",
+  "total_formatted": "151.81",
+  "total_currency_prefixed": "AUD 151.81"
+}

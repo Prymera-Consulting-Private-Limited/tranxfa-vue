@@ -16,6 +16,25 @@ const props = defineProps({
     default: null,
   },
 
+  /**
+   * The order is waiting on the customer's payment (SD-1282), so nothing has
+   * been booked with the hotel. Cancelling it asks the hotel nothing and costs
+   * nothing, and there is no cost or refund to quote.
+   */
+  isUnpaid: {
+    type: Boolean,
+    default: false,
+  },
+
+  /**
+   * A payment is open on the order. The api refuses to cancel the order under
+   * it, and cancelling a payment has a warning of its own, so it is done there.
+   */
+  hasWaitingPayment: {
+    type: Boolean,
+    default: false,
+  },
+
   isCancelling: {
     type: Boolean,
     default: false,
@@ -128,28 +147,39 @@ const requestedOn = computed(() => {
     </div>
     <!-- Nobody has asked. -->
     <div v-else class="p-5">
-      <template v-if="cancellation.canCancelNow && quote">
-        <p v-if="quote.isFree" class="flex items-start gap-1.5 text-sm/6 text-success-700">
-          <CheckCircleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />{{ $t('travel.thisBookingCanBeCancelled') }}</p>
-        <i18n-t v-else keypath="travel.cancellingCostsNow" tag="p" scope="global" class="text-sm/6 text-gray-600"><template #cost><span class="font-medium text-gray-900">{{ quote.costsNow.currencyPrefixed }}</span></template></i18n-t>
-        <dl class="mt-4 space-y-2 text-sm/6">
-          <div class="flex items-baseline justify-between gap-3">
-            <dt class="text-gray-500">{{ $t('travel.cancellationCharge') }}</dt>
-            <dd class="font-medium text-gray-900 tabular-nums">{{ quote.costsNow.currencyPrefixed }}</dd>
-          </div>
-          <div class="flex items-baseline justify-between gap-3">
-            <dt class="text-gray-500">{{ $t('travel.youWouldGetBack') }}</dt>
-            <dd class="font-medium text-gray-900 tabular-nums">{{ quote.refundNow.currencyPrefixed }}</dd>
-          </div>
-        </dl>
-        <p class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.thisChangesAsYourStay') }}</p>
+      <template v-if="cancellation.canCancelNow && (quote || isUnpaid)">
+        <!-- Nothing was booked, so there is no price to quote: the customer is
+        told it costs nothing rather than shown two rows of zeros. -->
+        <p v-if="isUnpaid" class="flex items-start gap-1.5 text-sm/6 text-success-700">
+          <CheckCircleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />{{ $t('travel.weHaventBookedThisRoom') }}</p>
+        <template v-else>
+          <p v-if="quote.isFree" class="flex items-start gap-1.5 text-sm/6 text-success-700">
+            <CheckCircleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />{{ $t('travel.thisBookingCanBeCancelled') }}</p>
+          <i18n-t v-else keypath="travel.cancellingCostsNow" tag="p" scope="global" class="text-sm/6 text-gray-600"><template #cost><span class="font-medium text-gray-900">{{ quote.costsNow.currencyPrefixed }}</span></template></i18n-t>
+          <dl class="mt-4 space-y-2 text-sm/6">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-gray-500">{{ $t('travel.cancellationCharge') }}</dt>
+              <dd class="font-medium text-gray-900 tabular-nums">{{ quote.costsNow.currencyPrefixed }}</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-gray-500">{{ $t('travel.youWouldGetBack') }}</dt>
+              <dd class="font-medium text-gray-900 tabular-nums">{{ quote.refundNow.currencyPrefixed }}</dd>
+            </div>
+          </dl>
+          <p class="mt-3 text-xs/5 text-gray-500">{{ $t('travel.thisChangesAsYourStay') }}</p>
+        </template>
         <div v-if="cancelError" class="mt-4 flex items-start gap-2 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700">
           <ExclamationTriangleIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <span>{{ cancelError }}</span>
         </div>
-        <!-- The hotel has to agree, so this asks rather than announces. -->
-        <div v-if="isConfirming" class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <p class="text-sm/6 text-gray-700">{{ $t('travel.wellAskTheHotelTo') }}</p>
+        <!-- The payment under an unpaid order is let go first, on its own screen,
+        where the warning about money already sent is. -->
+        <p v-if="isUnpaid && hasWaitingPayment" class="mt-4 flex items-start gap-1.5 text-sm/6 text-gray-600">
+          <ClockIcon class="mt-0.5 size-4 shrink-0 text-gray-400" aria-hidden="true" />{{ $t('travel.cancelTheWaitingPaymentFirst') }}</p>
+        <!-- The hotel has to agree to a booking it holds, so that asks rather than
+        announces. An unpaid order has nothing with the hotel to ask about. -->
+        <div v-else-if="isConfirming" class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <p class="text-sm/6 text-gray-700">{{ isUnpaid ? $t('travel.thisClosesTheBooking') : $t('travel.wellAskTheHotelTo') }}</p>
           <div class="mt-3 flex flex-col gap-2 sm:flex-row-reverse">
             <button
                 type="button"

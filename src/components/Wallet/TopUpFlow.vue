@@ -15,6 +15,10 @@ import AwaitingPending from "@/components/Payment/State/AwaitingPending.vue";
 import ClientPaymentAccountModel from "@/models/client_payment_account.js";
 import WalletTopup from "@/models/wallet_topup.js";
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
+import PaymentCollisionReason from "@/enums/payment_collision_reason.js";
+import DepositHolderKind from "@/enums/deposit_holder_kind.js";
+import DepositHolder from "@/models/deposit_holder.js";
+import HeldByAction from "@/components/Payment/HeldByAction.vue";
 import {fixForError} from "@/composables/verification_routes.js";
 import router from "@/router/index.js";
 import {CUSTOMER_ACTIONS, useServiceStatus} from "@/composables/service_status.js";
@@ -43,6 +47,11 @@ const step = ref('declare');
 const amount = ref('');
 const amountErrors = ref([]);
 const collisionMessage = ref('');
+
+// The other payment holding the customer's deposit account, when that is why
+// this load was refused (SD-1261). The message says to pay or cancel it; this
+// is how they find it.
+const heldBy = ref(null);
 const generalError = ref('');
 const serviceStatus = useServiceStatus();
 const topupsFrozen = computed(() => serviceStatus.isFrozen(CUSTOMER_ACTIONS.WALLET_TOPUPS));
@@ -69,6 +78,7 @@ watch(() => props.open, (open) => {
   amount.value = '';
   amountErrors.value = [];
   collisionMessage.value = '';
+  heldBy.value = null;
   generalError.value = '';
   account.value = null;
   isProvisioning.value = false;
@@ -110,6 +120,7 @@ async function declare() {
   if (isSubmitting.value) return;
   amountErrors.value = [];
   collisionMessage.value = '';
+  heldBy.value = null;
   generalError.value = '';
   generalFix.value = null;
   isSubmitting.value = true;
@@ -120,7 +131,19 @@ async function declare() {
     fetchInstructions();
   }).catch((e) => {
     if (e.response?.data?.type === WalletRefusalType.TOPUP_AMOUNT_COLLIDES) {
-      collisionMessage.value = e.response.data.message;
+      // Same two reasons as a transfer's payment_amount_collides (SD-1248),
+      // and the same rule: the back end's message already carries the advice
+      // that fits its reason, so it stands alone. Our own wording, chosen by
+      // reason, is only for a refusal that came without one - and only a
+      // same-amount collision is got round by another amount.
+      const reason = e.response.data.reason;
+      const wordings = {
+        [PaymentCollisionReason.SAME_AMOUNT]: [t('wallet.youAlreadyHaveADeposit'), t('wallet.changeTheAmountAndTry')],
+        [PaymentCollisionReason.ACCOUNT_HELD]: [t('wallet.anotherPaymentIsHoldingYour'), t('wallet.payOrCancelItOr')],
+      };
+      collisionMessage.value = e.response.data.message
+          || (wordings[reason] ?? [t('wallet.anotherPaymentIsStillOpen')]).join(' ');
+      heldBy.value = DepositHolder.getInstance(e.response.data.held_by);
     } else if (e.response?.status === 422) {
       amountErrors.value = e.response.data.errors?.amount ?? [e.response.data.message];
     } else {
@@ -164,6 +187,16 @@ function close() {
                     </div>
                     <div class="ml-3">
                       <p class="text-sm/6 text-warning-700">{{ collisionMessage }}</p>
+                      <!-- Another wallet load is listed on the page behind this
+                      dialog, where it can already be cancelled, so closing is
+                      how it is reached. Anything else is a screen to go to. -->
+                      <button
+                          v-if="heldBy?.kind === DepositHolderKind.WALLET_TOPUP"
+                          type="button"
+                          @click="close"
+                          class="mt-3 inline-flex min-h-11 cursor-pointer items-center rounded-xl border border-gray-300 bg-white px-4 text-sm/6 font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-0"
+                      >{{ $t('payment.heldBy.viewYourWalletTopUp') }}</button>
+                      <HeldByAction v-else :holder="heldBy" class="mt-3" />
                     </div>
                   </div>
                 </div>
