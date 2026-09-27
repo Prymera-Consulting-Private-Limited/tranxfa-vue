@@ -20,7 +20,7 @@ const {default: ItemView} = await import('@/views/Transaction/ItemView.vue');
 const {default: Monoova} = await import('@/components/Payment/Monoova.vue');
 const {default: ManualPayment} = await import('@/components/Payment/ManualPayment.vue');
 
-const TRANSFER = fixture('transaction-detail').id;
+const TRANSFER = fixture('transaction-detail-payment-pending-account').id;
 const CANCEL_URL = `/client/v1/transaction/payment/${TRANSFER}/cancel`;
 
 beforeEach(() => {
@@ -34,30 +34,23 @@ afterEach(() => {
 const button = (wrapper, label) => wrapper.findAll('button').find(candidate => candidate.text() === label);
 
 /**
- * The captured transfer (Monoova, bank transfer) as the api would send it, with
- * its states replaced. A waiting PENDING payment carries its account details.
+ * The transfer captured on Payvel staging with its Monoova payment waiting and
+ * its account details present, with its states replaced where a test needs
+ * another row of the handout's table.
  */
 function transferPayload({payment = 'PENDING', confirmed = false, state = 'PENDING-PAYMENT', provider = 'MONOOVA'} = {}) {
-    const data = fixture('transaction-detail');
+    const data = fixture('transaction-detail-payment-pending-account');
     data.state.code = state;
     data.payment.state.code = payment;
     data.payment.customer_confirmed_payment = confirmed;
     data.payment.payment_provider.code = provider;
-    data.payment.client_payment_account = {
-        instruction: 'Pay to the account below.',
-        wait_time_message: 'Bank transfers can take up to an hour.',
-        attributes: [{label: 'Account number', value: '123456789'}],
-    };
 
     return data;
 }
 
-/** The cancel's 200: the same payment, CANCELLED, account details still on it. */
+/** The cancel's 200, as captured: the payment, CANCELLED, account details still on it. */
 function cancelledPayment() {
-    const payment = transferPayload().payment;
-    payment.state.code = 'CANCELLED';
-
-    return payment;
+    return fixture('transaction-payment-cancelled');
 }
 
 describe('CancelTransferPayment', () => {
@@ -99,7 +92,7 @@ describe('CancelTransferPayment', () => {
     });
 
     it('hands the api\'s message up when it is too late to cancel', async () => {
-        const refusal = fixtureError('error-409-cancel-payment-not-open', 409);
+        const refusal = fixtureError('error-409-transfer-cancel-payment-not-open', 409);
         axios.post.mockRejectedValue(refusal);
         const wrapper = mountAction();
 
@@ -203,22 +196,28 @@ describe('the payment screen', () => {
         expect(button(wrapper, 'Pay again')).toBeUndefined();
     });
 
+    // Both captured on the same transfer: the cancelled payment, then Pay again's
+    // answer, a new payment with its own id.
     it('opens a new payment on the same transfer when Pay again is pressed', async () => {
-        const wrapper = await mountView(transferPayload({payment: 'CANCELLED'}));
-        axios.post.mockResolvedValue({data: fixture('payment-retry')});
+        const wrapper = await mountView(fixture('transaction-detail-payment-cancelled'));
+        const payAgain = fixture('payment-retry-after-cancel');
+        axios.post.mockResolvedValue({data: payAgain});
+
+        expect(wrapper.vm.transaction.payment.id).not.toBe(payAgain.id);
 
         await button(wrapper, 'Pay again').trigger('click');
         await flushPromises();
 
         expect(axios.post).toHaveBeenCalledWith(`/client/v1/transaction/payment/${TRANSFER}`, null);
-        expect(wrapper.vm.transaction.payment.id).toBe(fixture('payment-retry').id);
+        expect(wrapper.vm.transaction.payment.id).toBe(payAgain.id);
+        expect(wrapper.vm.transaction.payment.state.code).toBe('CREATED');
     });
 
     // Ruled 27 Sep: a payment the customer cancelled is not a try that went wrong.
     it('never counts paying again after a cancel towards the three tries', async () => {
-        const wrapper = await mountView(transferPayload({payment: 'CANCELLED'}));
+        const wrapper = await mountView(fixture('transaction-detail-payment-cancelled'));
         wrapper.vm.paymentAttempt = 3;
-        axios.post.mockResolvedValue({data: fixture('payment-retry')});
+        axios.post.mockResolvedValue({data: fixture('payment-retry-after-cancel')});
 
         await wrapper.vm.retryPayment();
         await flushPromises();
@@ -323,7 +322,7 @@ describe('the transfer page', () => {
 
     it('re-reads the transfer and shows the api\'s reason when it was too late', async () => {
         const wrapper = await mountPage(transferPayload());
-        const refusal = fixtureError('error-409-cancel-payment-not-open', 409);
+        const refusal = fixtureError('error-409-transfer-cancel-payment-not-open', 409);
         axios.post.mockRejectedValue(refusal);
         axios.get.mockResolvedValue({data: transferPayload({payment: 'REDIRECTED', confirmed: true})});
 
