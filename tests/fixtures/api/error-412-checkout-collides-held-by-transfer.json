@@ -4,9 +4,9 @@
   "message": "Another payment is still holding your account while we wait for it. Please pay it or cancel it first, or try again later.",
   "held_by": {
     "kind": "transfer",
-    "id": "01a0c3d0-3333-7444-8555-a66677788899",
-    "reference": "TXN2609180042",
-    "payment_id": null,
+    "id": "01a0dfdb-723c-73b0-a52c-1a5ba4a2da58",
+    "reference": "PV-V2-7547953",
+    "payment_id": "01a0e047-6466-73ff-8127-f37f330bcc11",
     "service": null
   }
 }

@@ -112,6 +112,26 @@ describe('which gateways offer Cancel payment', () => {
     });
 });
 
+// Captured on Payvel staging on 27 Sep; see tests/fixtures/README.md.
+describe('the captured transfers', () => {
+    it('a waiting Monoova payment offers Cancel and its account details', () => {
+        const transaction = Transaction.getInstance(fixture('transaction-detail-payment-pending-account'));
+
+        expect(transaction.canCancelPayment).toBe(true);
+        expect(transaction.canPayAgain).toBe(false);
+        expect(transaction.hasOpenPayment).toBe(true);
+    });
+
+    it('a cancelled one offers Pay again and hides the account it kept', () => {
+        const transaction = Transaction.getInstance(fixture('transaction-detail-payment-cancelled'));
+
+        expect(transaction.payment.clientPaymentAccount).not.toBeNull();
+        expect(transaction.canPayAgain).toBe(true);
+        expect(transaction.canCancelPayment).toBe(false);
+        expect(transaction.hasOpenPayment).toBe(false);
+    });
+});
+
 describe('cancelPayment', () => {
     it('posts to the transfer, not the payment, with no body', async () => {
         axios.post.mockResolvedValue({status: 200, data: {}});
