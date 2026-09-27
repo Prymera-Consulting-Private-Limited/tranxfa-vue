@@ -1,6 +1,6 @@
 <script setup>
 import CustomerLayout from "@/components/CustomerLayout.vue";
-import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
+import {onMounted, onUnmounted, reactive, ref} from "vue";
 import {useTransactionUtils} from "@/composables/transaction_utils.js";
 import Transaction from "@/models/transaction.js";
 import {useColorUtils} from "@/composables/color_utils.js";
@@ -24,7 +24,10 @@ import ManualPayment from "@/components/Payment/ManualPayment.vue";
 import PagaPayment from "@/components/Payment/PagaPayment.vue";
 import Monoova from "@/components/Payment/Monoova.vue";
 import ModalCloseButton from "@/components/ModalCloseButton.vue";
+import CancelTransferPayment from "@/components/Payment/CancelTransferPayment.vue";
+import {useI18n} from "vue-i18n";
 
+const {t} = useI18n();
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
 
@@ -40,14 +43,6 @@ const isLoading = ref(false);
 /**
  * @type {Reactive<{data: Transaction|null}>}
  */
-// The API's rule: when the payment is FAILED or TIMED-OUT, offer Retry
-// Payment. Until now the only retry lived on the payment page reached from
-// checkout, so a customer who came back through their history was stuck.
-const canRetryPayment = computed(() => {
-  const code = transaction.data?.payment?.state?.code;
-  return code === PaymentState.FAILED || code === PaymentState.TIMED_OUT;
-});
-
 const transaction = reactive({
   data: null
 });
@@ -87,6 +82,25 @@ onUnmounted(async () => {
 })
 
 const isShowPaymentAccountModalOpen = ref(false);
+
+// What became of a cancel, said under the banner: done, or the api's reason it
+// was too late.
+const cancelOutcome = ref(null);
+
+// The account is free the moment the cancel answers, and the transfer stays
+// open to be paid again.
+const onPaymentCancelled = (payment) => {
+  isShowPaymentAccountModalOpen.value = false;
+  transaction.data.payment = payment;
+  cancelOutcome.value = t('transfer.payment.paymentCancelledNoMoneyHasMoved');
+}
+
+// Nothing changed on the server, but what is on screen is out of date.
+const onCancelRefused = async (message) => {
+  isShowPaymentAccountModalOpen.value = false;
+  cancelOutcome.value = message;
+  await getTransaction();
+}
 </script>
 
 <template>
@@ -135,7 +149,9 @@ const isShowPaymentAccountModalOpen = ref(false);
           <!-- Invoice -->
           <div class="-mx-4 px-4 py-8 print:px-0 print:py-4 print:ring-0 print:shadow-none ring-1 bg-white shadow-xs ring-gray-200 sm:mx-0 sm:rounded-lg sm:px-8 sm:pb-14 lg:col-span-2 lg:row-span-2 lg:row-end-2 xl:px-16 xl:pt-16 xl:pb-20">
             <h2 class="text-base font-semibold text-gray-900">{{ $t('account.transactionNumber', {transactionNumber: transaction.data.transactionNumber}) }}</h2>
-            <div v-if="transaction.data.state.code === TransactionState['PENDING-PAYMENT'] && transaction.data.payment.clientPaymentAccount">
+            <!-- A cancelled payment keeps its account details, which must not
+                 be shown as somewhere to send money. -->
+            <div v-if="transaction.data.state.code === TransactionState['PENDING-PAYMENT'] && transaction.data.payment.clientPaymentAccount && transaction.data.hasOpenPayment">
               <div :style="{
                  backgroundColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 50),
                  borderColor: colorUtils.getStyleValue(transaction.data.state.colorScheme, 400),
@@ -183,14 +199,17 @@ const isShowPaymentAccountModalOpen = ref(false);
                        }" class="text-sm/6">
                       {{ transaction.data.state.description }}
                     </p>
-                    <!-- FAILED and TIMED-OUT are the two payment states the API says to offer Retry Payment for. -->
-                    <router-link v-if="canRetryPayment" :to="{name: 'makePayment', params: {transactionId: transaction.data.id}}" :style="{
+                    <!-- The payment ended unpaid (cancelled, failed or expired) and the transfer is still open. -->
+                    <router-link v-if="transaction.data.canPayAgain" :to="{name: 'makePayment', params: {transactionId: transaction.data.id}}" :style="{
                          color: colorUtils.getStyleValue(transaction.data.state.colorScheme, 700),
-                       }" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold hover:underline">{{ $t('transfer.payment.tryThePaymentAgain') }} <span aria-hidden="true">→</span></router-link>
+                       }" class="mt-2 inline-flex min-h-11 items-center text-sm/6 font-semibold hover:underline">{{ $t('transfer.payment.payAgain') }} <span aria-hidden="true">→</span></router-link>
                   </div>
                 </div>
               </div>
             </div>
+            <p v-if="cancelOutcome" role="status" class="mt-3 text-sm/6 font-medium text-gray-700">{{ cancelOutcome }}</p>
+            <!-- Under either banner: a payment can be waiting before its account details exist. -->
+            <CancelTransferPayment :transaction="transaction.data" class="mt-3" @cancelled="onPaymentCancelled" @refused="onCancelRefused" />
             <div v-if="transaction.data.pendingDocuments.length > 0 && (transaction.data.state.code === TransactionState['DOCUMENT-REQUIRED'] || transaction.data.state.code === TransactionState['ADDITIONAL-DOCUMENT-REQUIRED'])">
               <ul role="list" class="mt-4 grid grid-cols-1 gap-5">
                 <template v-for="document in transaction.data.pendingDocuments" :key="document.id">
@@ -365,9 +384,9 @@ const isShowPaymentAccountModalOpen = ref(false);
               <div class="p-8 sm:pb-6">
                 <div class="mt-3 text-center sm:mt-5">
                   <div v-if="transaction" class="text-center">
-                    <ManualPayment v-if="transaction.data.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
+                    <ManualPayment v-if="transaction.data.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false" v-on:paymentCancelled="onPaymentCancelled" v-on:cancelRefused="onCancelRefused"  />
                     <PagaPayment v-else-if="transaction.data.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
-                    <Monoova v-else-if="transaction.data.payment.paymentProvider.code === 'MONOOVA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false"  />
+                    <Monoova v-else-if="transaction.data.payment.paymentProvider.code === 'MONOOVA'" v-bind:transaction="transaction.data" v-bind:showViewTransfer="false" v-on:paymentCancelled="onPaymentCancelled" v-on:cancelRefused="onCancelRefused"  />
                   </div>
                 </div>
               </div>

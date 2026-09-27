@@ -24,6 +24,8 @@ bizliimt, choice_remit, compliant_msb, danca, famremit, nuvendrasl, payrieo,
 payvel, pekepay, quiqsend, remit_centre, remitpay, s-expressmoney, salvtech,
 selamsend, tuhfapay, velox, waya, ypay.
 
+`remitso_demo` is separate from this list - see below.
+
 ### `staging` is a tenant branch
 
 `staging` is the repo's default HEAD, which makes it look like an integration
@@ -33,6 +35,24 @@ Updated", "Tawk.to Added"). It carries no feature work that `main` lacks.
 
 Consequence: a fix committed to `staging` reaches exactly one brand. Shared
 work belongs on `main`.
+
+### `remitso_demo` is Prymera's own demo, not a customer brand
+
+One branch, no `_staging`/`_production` split - `remitso_demo` is Prymera's
+internal sales-demo environment (SD-450), shown to prospects before they
+become a real client (Red Sea Money Transfer went through it). Its backend is
+`console.demo.remitso.com`.
+
+It carries genuine feature work of its own, same as any brand fork, and is
+promoted from `main` the same way: land the fix on `main`, merge into a
+`chore/<slug>` branch cut from `remitso_demo`, verify, PR it in.
+
+In Rover, this environment is tracked under the fleet client key `remitso`
+(not `remitso_demo` - that key exists but is deactivated, left over from
+before the two were reconciled), release branch `remitso` on
+`console.remitso`, same project as SD-450 (`ba6f3827-faa9-4f4c-a2d0-aa68f446d29c`,
+Prymera CO). The frontend git branch name and the Rover fleet key are
+deliberately not the same string - don't assume one from the other.
 
 ## What tenants actually change
 
