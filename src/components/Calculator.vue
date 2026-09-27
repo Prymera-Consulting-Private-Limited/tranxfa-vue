@@ -2,7 +2,6 @@
 import {
   ArrowRightIcon,
   CheckIcon, ChevronDownIcon,
-  ClockIcon,
   PaperAirplaneIcon,
   PlusIcon,
   TruckIcon,
@@ -69,6 +68,44 @@ const quoteErrors = reactive({
 });
 
 const quoteFailureReason = ref('');
+
+
+function totalDueDisplayText(q) {
+  if (!q) return '';
+  const pick = (...vals) => {
+    for (const v of vals) {
+      if (v !== undefined && v !== null && String(v).trim() !== '') return String(v);
+    }
+    return '';
+  };
+
+  const fromStrings = pick(
+    q.totalAmountCurrencyPrefixed,
+    q.totalAmountFormatted,
+    q.subTotalAmountCurrencyPrefixed,
+    q.subTotalAmountFormatted,
+  );
+  if (fromStrings) return fromStrings;
+
+
+  const code = q.paymentCurrency?.code;
+  if (code != null && q.localAmount != null) {
+    const local = Number(q.localAmount);
+    const fee = Number(q.baseFees ?? 0);
+    if (!Number.isNaN(local) && !Number.isNaN(fee)) {
+      const totalMajor = local + fee;
+      try {
+        return new Intl.NumberFormat(undefined, {style: 'currency', currency: code}).format(totalMajor);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  return pick(q.localAmountCurrencyPrefixed);
+}
+
+const totalDueDisplay = computed(() => totalDueDisplayText(quoteUtil.quote.data));
 
 async function getQuote() {
   isFetchingQuote.value = true;
@@ -404,18 +441,21 @@ function saveQuote() {
         </li>
         <li>
           <div class="relative pb-2">
-
             <div class="relative flex space-x-3">
-
               <div>
               <span :class="['flex size-8 items-center justify-center rounded-full ring-0', ! isFetchingQuote ? 'bg-brand-700' : 'bg-gray-300']">
-                  <ClockIcon class="size-5 text-white"/>
+                  <BanknotesIcon class="size-5 text-white"/>
               </span>
               </div>
-              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                <div>
-                  <p v-if="! isFetchingQuote" class="text-sm text-brand-700 font-semibold tracking-wider">Blazing Fast, Instant Transfers</p>
-                  <p v-else class="text-sm bg-gray-300 h-5 w-64 font-semibold tracking-wider pulse"></p>
+              <div class="flex min-w-0 flex-1 justify-between gap-x-4 pt-1.5">
+                <div class="min-w-0 flex-1">
+                  <p v-if="! isFetchingQuote" class="text-sm tracking-wider">
+                    <span class="text-gray-900 font-semibold tabular-nums">{{ totalDueDisplay }}</span>
+                  </p>
+                  <p v-else class="text-sm bg-gray-300 h-5 w-28 max-w-full font-semibold tracking-wider pulse"></p>
+                </div>
+                <div :class="[! isFetchingQuote ? 'text-gray-800' : 'text-gray-300']" class="shrink-0 text-right text-sm whitespace-nowrap font-semibold tracking-wider">
+                  <span>Total</span>
                 </div>
               </div>
             </div>
