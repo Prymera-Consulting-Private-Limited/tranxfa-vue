@@ -54,11 +54,17 @@ export const usePasswordPolicyStore = defineStore('passwordPolicy', () => {
         return rules;
     })
 
+    const reset = () => {
+        isLoaded.value = false;
+        policy.value = null;
+    }
+
     return {
         isLoaded,
         setLoaded,
         setPolicy,
         policy,
         rules,
+        reset,
     }
 })
