@@ -1,0 +1,313 @@
+{
+  "search": {
+    "id": "01a0a6be-9b2d-7085-af0e-4b860114e78a",
+    "expires_at": "2026-09-15T20:55:04+00:00",
+    "check_in": "2026-10-01",
+    "check_out": "2026-10-04",
+    "nights": 3,
+    "residency": "AU",
+    "occupancy": {
+      "rooms": [
+        {
+          "adults": 2,
+          "children_ages": []
+        }
+      ]
+    }
+  },
+  "currency": "AUD",
+  "currency_decimal_places": 2,
+  "nights": 3,
+  "hotel": {
+    "id": "01a0a6a6-da6b-7176-b2a8-e5326b9bc714",
+    "slug": "conrad-los-angeles",
+    "name": "Conrad Los Angeles",
+    "address": "100 South Grand Avenue",
+    "region": "Los Angeles",
+    "star_rating": 5,
+    "latitude": 34.05554,
+    "longitude": -118.24875,
+    "check_in_from": "15:00:00",
+    "check_out_until": "12:00:00",
+    "photos": [
+      {
+        "thumbnail": "https://cdn.worldota.net/t/120x120/content/cb/2b/cb2b1cc25be9e3f8892f9d572e3e0e71492a3b38.jpeg",
+        "card": "https://cdn.worldota.net/t/640x350/content/cb/2b/cb2b1cc25be9e3f8892f9d572e3e0e71492a3b38.jpeg",
+        "large": "https://cdn.worldota.net/t/1300x620/content/cb/2b/cb2b1cc25be9e3f8892f9d572e3e0e71492a3b38.jpeg",
+        "xlarge": "https://cdn.worldota.net/t/2048x2048/content/cb/2b/cb2b1cc25be9e3f8892f9d572e3e0e71492a3b38.jpeg"
+      },
+      {
+        "thumbnail": "https://cdn.worldota.net/t/120x120/content/1c/83/1c83047c4dd3d2a90d0c3eade5041dcb93f0e0b3.jpeg",
+        "card": "https://cdn.worldota.net/t/640x350/content/1c/83/1c83047c4dd3d2a90d0c3eade5041dcb93f0e0b3.jpeg",
+        "large": "https://cdn.worldota.net/t/1300x620/content/1c/83/1c83047c4dd3d2a90d0c3eade5041dcb93f0e0b3.jpeg",
+        "xlarge": "https://cdn.worldota.net/t/2048x2048/content/1c/83/1c83047c4dd3d2a90d0c3eade5041dcb93f0e0b3.jpeg"
+      },
+      {
+        "thumbnail": "https://cdn.worldota.net/t/120x120/content/6c/d8/6cd8f2712bb2ec878a47024d7e660c387291d497.jpeg",
+        "card": "https://cdn.worldota.net/t/640x350/content/6c/d8/6cd8f2712bb2ec878a47024d7e660c387291d497.jpeg",
+        "large": "https://cdn.worldota.net/t/1300x620/content/6c/d8/6cd8f2712bb2ec878a47024d7e660c387291d497.jpeg",
+        "xlarge": "https://cdn.worldota.net/t/2048x2048/content/6c/d8/6cd8f2712bb2ec878a47024d7e660c387291d497.jpeg"
+      }
+    ],
+    "amenities": [
+      "air-conditioning",
+      "24-hour-reception",
+      "currency-exchange",
+      "smoke-free-property",
+      "express-check-incheck-out",
+      "garden"
+    ],
+    "description": [
+      {
+        "title": "Location",
+        "body": "Dreaming about a first-class hotel? Welcome to hotel «Conrad Los Angeles» is located in Los Angeles. This hotel is located nearby from the city center. You can take a walk and explore the neighbourhood area of the hotel. Places nearby: The Broad, Civic Center/Grand Park and Ahmanson Theatre."
+      },
+      {
+        "title": "At the hotel",
+        "body": "You can stop by the bar. It’s time to have a nice meal! Stop by the restaurant. Free Wi-Fi on the territory will help you to stay on-line. Specially for tourists who travel by car, there’s a parking zone.\n\nThe beauty and wellness services: a massage room, a sauna and a spa center. Guests who love doing sports will be able to enjoy a fitness center. Swimming fans are going to enjoy an outdoor pool. At the guests’ disposal, there’s also a laundry, dry cleaning, press and a concierge.\n\nThe staff of the hotel speaks English."
+      },
+      {
+        "title": "Room amenities",
+        "body": "Guests will find the following in the room: a bathrobe and slippers. The room equipment depends on its category."
+      }
+    ],
+    "house_rules": {
+      "text": [],
+      "charges": [
+        {
+          "type": "DEPOSIT",
+          "inclusion": "UNSPECIFIED",
+          "charge_unit": "PER-ROOM-PER-STAY",
+          "currency": "USD",
+          "amount": 1000,
+          "amount_decimal": "10.00",
+          "amount_formatted": "10.00",
+          "amount_currency_prefixed": "USD 10.00"
+        },
+        {
+          "type": "PARKING",
+          "inclusion": "PAID",
+          "charge_unit": "PER-VEHICLE-PER-NIGHT",
+          "currency": "USD",
+          "amount": 1000,
+          "amount_decimal": "10.00",
+          "amount_formatted": "10.00",
+          "amount_currency_prefixed": "USD 10.00"
+        },
+        {
+          "type": "PETS",
+          "inclusion": "PAID",
+          "charge_unit": "PER-ROOM-PER-STAY",
+          "currency": "USD",
+          "amount": 5500,
+          "amount_decimal": "55.00",
+          "amount_formatted": "55.00",
+          "amount_currency_prefixed": "USD 55.00"
+        },
+        {
+          "type": "COT",
+          "inclusion": "PAID",
+          "charge_unit": "PER-ROOM-PER-NIGHT",
+          "currency": "USD",
+          "amount": 0,
+          "amount_decimal": "0.00",
+          "amount_formatted": "0.00",
+          "amount_currency_prefixed": "USD 0.00"
+        },
+        {
+          "type": "INTERNET",
+          "inclusion": "PAID",
+          "charge_unit": null,
+          "currency": "USD",
+          "amount": 100,
+          "amount_decimal": "1.00",
+          "amount_formatted": "1.00",
+          "amount_currency_prefixed": "USD 1.00"
+        },
+        {
+          "type": "CHILDREN-MEAL",
+          "inclusion": "PAID",
+          "charge_unit": null,
+          "currency": "USD",
+          "amount": 1000,
+          "amount_decimal": "10.00",
+          "amount_formatted": "10.00",
+          "amount_currency_prefixed": "USD 10.00"
+        },
+        {
+          "type": "CHILDREN-MEAL",
+          "inclusion": "PAID",
+          "charge_unit": null,
+          "currency": "USD",
+          "amount": 1400,
+          "amount_decimal": "14.00",
+          "amount_formatted": "14.00",
+          "amount_currency_prefixed": "USD 14.00"
+        },
+        {
+          "type": "MEAL",
+          "inclusion": "PAID",
+          "charge_unit": null,
+          "currency": "USD",
+          "amount": 300,
+          "amount_decimal": "3.00",
+          "amount_formatted": "3.00",
+          "amount_currency_prefixed": "USD 3.00"
+        },
+        {
+          "type": "MEAL",
+          "inclusion": "PAID",
+          "charge_unit": null,
+          "currency": "USD",
+          "amount": 500,
+          "amount_decimal": "5.00",
+          "amount_formatted": "5.00",
+          "amount_currency_prefixed": "USD 5.00"
+        }
+      ]
+    }
+  },
+  "rates": [
+    {
+      "id": "rate-sd1249-balcony-river-view",
+      "token": "m-a5918870-e5c3-5203-8e29-f9eb28af7ea2",
+      "room_name": "Standard Double room with balcony and with river view",
+      "meal": "NO-MEAL",
+      "allotment": 2,
+      "bookable": true,
+      "breakdown": [
+        {
+          "key": "room",
+          "label": "Room",
+          "amount": 72064,
+          "amount_decimal": "720.64",
+          "amount_formatted": "720.64",
+          "amount_currency_prefixed": "AUD 720.64"
+        },
+        {
+          "key": "taxes_and_fees",
+          "label": "Taxes and fees",
+          "amount": 8934,
+          "amount_decimal": "89.34",
+          "amount_formatted": "89.34",
+          "amount_currency_prefixed": "AUD 89.34"
+        },
+        {
+          "key": "convenience_fee",
+          "label": "Convenience fee",
+          "amount": 1731,
+          "amount_decimal": "17.31",
+          "amount_formatted": "17.31",
+          "amount_currency_prefixed": "AUD 17.31"
+        }
+      ],
+      "cancellation": {
+        "status": "non_refundable",
+        "free_until": null,
+        "costs_now": 82729,
+        "costs_now_decimal": "827.29",
+        "costs_now_formatted": "827.29",
+        "costs_now_currency_prefixed": "AUD 827.29"
+      },
+      "total": 82729,
+      "total_decimal": "827.29",
+      "total_formatted": "827.29",
+      "total_currency_prefixed": "AUD 827.29",
+      "per_night": 27576,
+      "per_night_decimal": "275.76",
+      "per_night_formatted": "275.76",
+      "per_night_currency_prefixed": "AUD 275.76",
+      "payable_at_property": [
+        {
+          "name": "city_tax",
+          "currency": "USD",
+          "amount": 4400,
+          "amount_decimal": "44.00",
+          "amount_formatted": "44.00",
+          "amount_currency_prefixed": "USD 44.00"
+        }
+      ]
+    },
+    {
+      "id": "rate-sd1249-standard-double",
+      "token": "m-a5918870-e5c3-5203-8e29-f9eb28af7ea2",
+      "room_name": "Standard Double room",
+      "meal": "NO-MEAL",
+      "allotment": 2,
+      "bookable": true,
+      "breakdown": [
+        {
+          "key": "room",
+          "label": "Room",
+          "amount": 72064,
+          "amount_decimal": "720.64",
+          "amount_formatted": "720.64",
+          "amount_currency_prefixed": "AUD 720.64"
+        },
+        {
+          "key": "taxes_and_fees",
+          "label": "Taxes and fees",
+          "amount": 8934,
+          "amount_decimal": "89.34",
+          "amount_formatted": "89.34",
+          "amount_currency_prefixed": "AUD 89.34"
+        },
+        {
+          "key": "convenience_fee",
+          "label": "Convenience fee",
+          "amount": 1731,
+          "amount_decimal": "17.31",
+          "amount_formatted": "17.31",
+          "amount_currency_prefixed": "AUD 17.31"
+        }
+      ],
+      "cancellation": {
+        "status": "non_refundable",
+        "free_until": null,
+        "costs_now": 82729,
+        "costs_now_decimal": "827.29",
+        "costs_now_formatted": "827.29",
+        "costs_now_currency_prefixed": "AUD 827.29"
+      },
+      "total": 82729,
+      "total_decimal": "827.29",
+      "total_formatted": "827.29",
+      "total_currency_prefixed": "AUD 827.29",
+      "per_night": 27576,
+      "per_night_decimal": "275.76",
+      "per_night_formatted": "275.76",
+      "per_night_currency_prefixed": "AUD 275.76",
+      "payable_at_property": [
+        {
+          "name": "city_tax",
+          "currency": "USD",
+          "amount": 4400,
+          "amount_decimal": "44.00",
+          "amount_formatted": "44.00",
+          "amount_currency_prefixed": "USD 44.00"
+        }
+      ]
+    }
+  ],
+  "labels": {
+    "air-conditioning": "Air conditioning",
+    "24-hour-reception": "24-hour reception",
+    "currency-exchange": "Currency exchange",
+    "smoke-free-property": "Smoke-free property",
+    "express-check-incheck-out": "Express check-in/check-out",
+    "garden": "Garden",
+    "NO-MEAL": "No meals included",
+    "DEPOSIT": "Deposit",
+    "UNSPECIFIED": "Not stated by the hotel",
+    "PER-ROOM-PER-STAY": "per room, per stay",
+    "PARKING": "Parking",
+    "PAID": "Available at extra cost",
+    "PER-VEHICLE-PER-NIGHT": "per vehicle, per night",
+    "PETS": "Pets",
+    "COT": "Cot",
+    "PER-ROOM-PER-NIGHT": "per room, per night",
+    "INTERNET": "Internet",
+    "CHILDREN-MEAL": "Children's meals",
+    "MEAL": "Meals"
+  }
+}
