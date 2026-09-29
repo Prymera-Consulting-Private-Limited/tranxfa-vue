@@ -1,5 +1,8 @@
 import Customer from "@/models/customer.js";
 import {useCustomerStore} from "@/stores/customer.js";
+import {useWalletStore} from "@/stores/wallet.js";
+import {useCountriesStore} from "@/stores/countries.js";
+import {usePasswordPolicyStore} from "@/stores/password_policy.js";
 import axios from "axios";
 
 let refreshPromise = null;
@@ -32,9 +35,13 @@ export function useCustomerUtils() {
     }
 
     async function login(email, password) {
+        // A 401 here is a wrong password, not an expired session: the
+        // interceptor must not bounce the page and lose the ?redirect.
         await axios.post('/client/v1/login', {
             email: email,
             password: password,
+        }, {
+            skipAuthRedirect: true,
         }).then((response) => {
             updateStore(response.data);
         })
@@ -72,15 +79,23 @@ export function useCustomerUtils() {
     }
 
     async function logout() {
-        await axios.post('/client/v1/logout', {}).then(() => {
-            customerStore.customer.data = null;
-            customerStore.isLoaded = false;
-        })
+        try {
+            await axios.post('/client/v1/logout', {});
+        } finally {
+            // Whatever the server said, this tab is done with the customer:
+            // every store is cleared (wallet state used to survive into the
+            // next sign-in on a shared device) and the socket is dropped.
+            customerStore.reset();
+            useWalletStore().reset();
+            useCountriesStore().reset();
+            usePasswordPolicyStore().reset();
+            window.Echo?.disconnect?.();
+        }
     }
 
-    async function refresh() {
+    async function refresh(config = {}) {
         if (refreshPromise) return refreshPromise;
-        refreshPromise = axios.get('/client/v1/profile')
+        refreshPromise = axios.get('/client/v1/profile', config)
             .then((response) => {
                 updateStore(response.data);
             })
@@ -128,6 +143,18 @@ export function useCustomerUtils() {
         })
     }
 
+    async function resendMobileVerification() {
+        await axios.post('/client/v1/resend-mobile-verification', {})
+    }
+
+    async function verifyMobileNumber(otp) {
+        await axios.post('/client/v1/verify-mobile-number', {
+            otp: otp,
+        }).then((response) => {
+            updateStore(response.data);
+        })
+    }
+
     async function updateMobileNumber(country, number) {
         await axios.post('/client/v1/update-mobile-number', {
             mobile_number_country_id: country,
@@ -167,9 +194,19 @@ export function useCustomerUtils() {
         return axios.get(`/client/v1/document-categories`);
     }
 
-    async function uploadDocument(documentCategory, documentType, pages = []) {
+    /**
+     * @param {object} details the documented optional fields: document_number,
+     *   expiry_date, issue_date, issuing_country_id, issuing_authority,
+     *   liveliness_artifact. Empty values are not sent.
+     */
+    async function uploadDocument(documentCategory, documentType, pages = [], details = {}) {
         const data = {
             pages: pages,
+        }
+        for (const [key, value] of Object.entries(details)) {
+            if (value !== null && value !== undefined && value !== '') {
+                data[key] = value;
+            }
         }
         return axios.post(`/client/v1/document/upload`, data, {
             params: {
@@ -206,8 +243,18 @@ export function useCustomerUtils() {
     }
 
     async function resetPassword(token, newPassword, confirmNewPassword) {
+        // The emailed link carries the token base64-encoded once more than the
+        // API wants. A link that is not base64 at all (truncated by a mail
+        // client) is sent as-is, so the API's own "expired or malformed"
+        // answer reaches the form instead of a thrown DOMException.
+        let decoded = token;
+        try {
+            decoded = atob(token);
+        } catch (e) {
+            decoded = token;
+        }
         return axios.post(`/client/v1/reset-password`, {
-            token: atob(token),
+            token: decoded,
             password: newPassword,
             confirm_password: confirmNewPassword,
         });
@@ -231,6 +278,8 @@ export function useCustomerUtils() {
         updateCountry,
         updateProfileAttribute,
         updateMobileNumber,
+        resendMobileVerification,
+        verifyMobileNumber,
         updateEmailAddress,
         logout,
         getAccountVerificationToken,

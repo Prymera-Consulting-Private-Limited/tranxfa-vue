@@ -1,0 +1,8 @@
+{
+  "message": "This mobile number is already being used by another account. If this is your mobile number, please login.",
+  "errors": {
+    "mobile_number": [
+      "This mobile number is already being used by another account. If this is your mobile number, please login."
+    ]
+  }
+}
