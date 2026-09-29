@@ -1,0 +1,45 @@
+# Deployment ledger - one line per deploy, appended.
+# A brand/environment with no line has NOT been observed: confirm in the
+# Amplify console before scheduling anything against it. Never guess.
+date,brand,environment,branch,commit,deployed_by,notes
+-,adpay,staging,adpay_staging,130a009,-,last commit 2025-12-01; not confirmed in Amplify
+-,adpaygo,staging,adpaygo_staging,dee234c,-,last commit 2026-05-25; not confirmed in Amplify
+-,bizliimt,staging,bizliimt_staging,a08efa1,-,last commit 2026-04-03; not confirmed in Amplify
+-,choice_remit,production,choice_remit_production,d881e2a,-,last commit 2026-04-16; not confirmed in Amplify
+-,choice_remit,staging,choice_remit_staging,509e771,-,last commit 2026-03-28; not confirmed in Amplify
+-,compliant_msb,staging,compliant_msb_staging,533f10f,-,last commit 2026-08-25; not confirmed in Amplify
+-,danca,staging,danca_staging,8906e89,-,last commit 2026-06-04; not confirmed in Amplify
+-,famremit,production,famremit_production,1280a54,-,last commit 2026-03-31; not confirmed in Amplify
+-,famremit,staging,famremit_staging,4cbddfd,-,last commit 2025-10-24; not confirmed in Amplify
+-,feature_edit_email_verification_added,unknown,feature_edit_email_verification_added,79c4355,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-06-02; not confirmed in Amplify
+-,nuvendra_staging_mobile_login_updated,unknown,nuvendra_staging_mobile_login_updated,70983ae,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-05-18; not confirmed in Amplify
+-,nuvendrasl,production,nuvendrasl_production,f8af3e5,-,last commit 2026-05-21; not confirmed in Amplify
+-,nuvendrasl,staging,nuvendrasl_staging,f8af3e5,-,last commit 2026-05-21; not confirmed in Amplify
+-,payrieo_logo_fav_updated,unknown,payrieo_logo_fav_updated,92fcfd0,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-03-25; not confirmed in Amplify
+-,payrieo,staging,payrieo_staging,9b488ef,-,last commit 2026-06-28; not confirmed in Amplify
+-,payrieo_upadted_from_main,unknown,payrieo_upadted_from_main,79c4d08,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-04-06; not confirmed in Amplify
+-,payvel_staging_template_update,unknown,payvel_staging_template_update,9dd2790,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-04-24; not confirmed in Amplify
+-,payvel-staging-budget-update,unknown,payvel-staging-budget-update,43f2818,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-05-19; not confirmed in Amplify
+-,payvelremit,staging,payvelremit-staging,8607c56,-,last commit 2026-03-25; not confirmed in Amplify
+-,pekepay,staging,pekepay_staging,4700acc,-,last commit 2026-04-07; not confirmed in Amplify
+-,quiqsend,staging,quiqsend-staging,673a9d2,-,last commit 2026-09-03; not confirmed in Amplify
+-,remit_centre,production,remit_centre_production,3b16b9c,-,last commit 2025-11-12; not confirmed in Amplify
+-,remit_centre,staging,remit_centre_staging,6ed95e4,-,last commit 2025-11-11; not confirmed in Amplify
+-,remitpay,production,remitpay_production,88a3662,-,last commit 2026-06-13; not confirmed in Amplify
+-,remitpay,staging,remitpay_staging,88a3662,-,last commit 2026-06-13; not confirmed in Amplify
+-,remitso_demo,unknown,remitso_demo,0368988,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-08-05; not confirmed in Amplify
+-,remitso_feat_close_button-added,unknown,remitso_feat_close_button-added,ff8dd4d,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-06-29; not confirmed in Amplify
+-,s-expressmoney_images_to_png,unknown,s-expressmoney_images_to_png,c1f1b26,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-05-13; not confirmed in Amplify
+-,s-expressmoney,staging,s-expressmoney_staging,e2cb086,-,last commit 2026-06-10; not confirmed in Amplify
+-,salvtech,production,salvtech_production,1a39942,-,last commit 2026-08-14; not confirmed in Amplify
+-,salvtech,staging,salvtech_staging,f220f85,-,last commit 2026-08-14; not confirmed in Amplify
+-,salvtech_staging_translation_whatsapp_integration,unknown,salvtech_staging_translation_whatsapp_integration,eae667d,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2026-05-26; not confirmed in Amplify
+-,selamsend,staging,selamsend_staging,f1ada3c,-,last commit 2026-09-04; not confirmed in Amplify
+-,tuhfapay,production,tuhfapay_production,ac71bbb,-,last commit 2026-03-31; not confirmed in Amplify
+-,tuhfapay,staging,tuhfapay_staging,5461889,-,last commit 2026-04-07; not confirmed in Amplify
+-,velox,production,velox_production,0737854,-,last commit 2026-08-26; not confirmed in Amplify
+-,velox,staging,velox_staging,27f66ef,-,last commit 2026-08-26; not confirmed in Amplify
+-,waya,staging,waya_staging,41aeb03,-,last commit 2025-11-05; not confirmed in Amplify
+-,ypay,unknown,ypay,25eb976,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2025-09-08; not confirmed in Amplify
+-,tranxfa,unknown,staging,d12f816,-,brand branch despite the name; last commit 2025-10-24; not confirmed in Amplify
+2026-09-07,selamsend,staging,selamsend_staging,0eccf1c,PB-TommyShelby,merged main (375a78b) and repointed the brand backgrounds; pushed but Amplify build NOT verified
