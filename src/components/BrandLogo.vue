@@ -40,7 +40,7 @@ const sources = {
 
 const sizes = {
     auth: 'max-w-64 max-h-10',
-    header: 'h-8 w-auto',
+    header: 'h-10 w-auto sm:h-11',
 };
 
 // Falls back rather than rendering an empty alt: a brand that has not set

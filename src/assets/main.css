@@ -8,16 +8,16 @@
 @layer theme {
     @theme {
         --default-font-family: 'Inter', sans-serif;
-        --color-brand-50: theme('colors.sky.50');
-        --color-brand-100: theme('colors.sky.100');
-        --color-brand-200: theme('colors.sky.200');
-        --color-brand-300: theme('colors.sky.300');
-        --color-brand-400: theme('colors.sky.400');
-        --color-brand-500: theme('colors.sky.500');
-        --color-brand-600: theme('colors.sky.600');
-        --color-brand-700: theme('colors.sky.700');
-        --color-brand-800: theme('colors.sky.800');
-        --color-brand-900: theme('colors.sky.900');
+        --color-brand-50: #fffbea;
+    --color-brand-100: #fff4b8;
+    --color-brand-200: #ffea70;
+    --color-brand-300: #ffe13b;
+    --color-brand-400: #fbd51a;
+    --color-brand-500: #f5cd00;
+    --color-brand-600: #d9b600;
+    --color-brand-700: #b39700;
+    --color-brand-800: #8f7800;
+    --color-brand-900: #6b5a00;
 
         /* Status ramps for the badges the API drives through color_scheme.
            They are deliberately their own hues rather than steps of the brand:
