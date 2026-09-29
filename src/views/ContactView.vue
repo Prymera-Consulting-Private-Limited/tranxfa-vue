@@ -19,7 +19,7 @@ const emailUrl = `mailto:${email}`;
 
             <div class="mb-6">
               <h2 class="text-base font-semibold text-gray-900">{{ $t('contact.title') }}</h2>
-              <p class="mt-1 text-sm text-gray-500">{{ $t('contact.intro') }}</p>
+              <p class="mt-1 text-sm/6 text-gray-500">{{ $t('contact.intro') }}</p>
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 lg:gap-8 max-w-2xl">
@@ -28,10 +28,10 @@ const emailUrl = `mailto:${email}`;
               <a :href="whatsappUrl" target="_blank" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8 cursor-pointer hover:shadow-md transition">
                 <ChatBubbleBottomCenterTextIcon class="h-7 w-7 text-green-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">{{ $t('contact.whatsAppTitle') }}</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">
                   {{ $t('contact.whatsAppBody') }}
                 </p>
-                <span class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">
+                <span class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">
                   {{ $t('contact.whatsAppAction') }}
                 </span>
               </a>
@@ -40,10 +40,10 @@ const emailUrl = `mailto:${email}`;
               <a :href="emailUrl" class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col h-full lg:px-6 lg:py-8 cursor-pointer hover:shadow-md transition">
                 <EnvelopeIcon class="h-7 w-7 text-brand-600 mb-2" />
                 <h3 class="text-base font-semibold text-gray-900">{{ $t('contact.emailTitle') }}</h3>
-                <p class="mt-2 text-sm text-gray-500 flex-grow mb-3">
+                <p class="mt-2 text-sm/6 text-gray-500 flex-grow mb-3">
                   {{ $t('contact.emailBody') }}
                 </p>
-                <span class="mt-auto text-sm inline-block font-semibold text-brand-600 hover:text-brand-500">
+                <span class="mt-auto text-sm/6 inline-block font-semibold text-brand-700 hover:text-brand-800">
                   {{ $t('contact.emailAction') }}
                 </span>
               </a>

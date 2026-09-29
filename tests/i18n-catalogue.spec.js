@@ -105,6 +105,7 @@ const MIGRATED = [
   'src/views/DashboardView.vue',
   'src/views/DeviceView.vue',
   'src/views/SettingsView.vue',
+  'src/views/ContactView.vue',
   'src/views/Transaction/IndexView.vue',
   'src/views/Transaction/ItemView.vue',
   // slice 6, wallet, the payment adapters and travel
