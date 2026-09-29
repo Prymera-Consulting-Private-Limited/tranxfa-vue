@@ -7,8 +7,14 @@ export const useCustomerStore = defineStore('customer', () => {
         data: null,
     });
 
+    const reset = () => {
+        isLoaded.value = false;
+        customer.data = null;
+    }
+
     return {
         isLoaded,
         customer,
+        reset,
     }
 });
