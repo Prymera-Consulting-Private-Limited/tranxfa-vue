@@ -38,9 +38,12 @@ const sources = {
     light: '/images/logo-white.png',
 };
 
+// SelamSend's logo carries a "Money Transfer" line under the name, which is
+// unreadable at main's heights. The brand has always run it larger: 64px on a
+// phone and 80px from md up on the auth screens, 80px in the header from lg up.
 const sizes = {
-    auth: 'max-w-64 max-h-10',
-    header: 'h-8 w-auto',
+    auth: 'max-w-64 max-h-16 md:max-h-20',
+    header: 'h-8 lg:h-20 w-auto',
 };
 
 // Falls back rather than rendering an empty alt: a brand that has not set

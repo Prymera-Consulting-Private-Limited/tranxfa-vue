@@ -11,7 +11,8 @@ describe('BrandLogo', () => {
         const img = mount(BrandLogo).get('img');
 
         expect(img.attributes('src')).toBe('/images/logo.png');
-        expect(img.classes()).toEqual(expect.arrayContaining(['max-w-64', 'max-h-10']));
+        // SelamSend runs its logo larger than main's max-h-10: 64px, and 80px from md up.
+        expect(img.classes()).toEqual(expect.arrayContaining(['max-w-64', 'max-h-16', 'md:max-h-20']));
     });
 
     it('merges the caller spacing with its own size classes', () => {
@@ -20,7 +21,7 @@ describe('BrandLogo', () => {
         const img = mount(BrandLogo, {attrs: {class: 'mb-5 -ml-2'}}).get('img');
 
         expect(img.classes()).toEqual(
-            expect.arrayContaining(['max-w-64', 'max-h-10', 'mb-5', '-ml-2']),
+            expect.arrayContaining(['max-w-64', 'max-h-16', 'md:max-h-20', 'mb-5', '-ml-2']),
         );
     });
 
@@ -28,7 +29,7 @@ describe('BrandLogo', () => {
         const img = mount(BrandLogo, {props: {variant: 'light', size: 'header'}}).get('img');
 
         expect(img.attributes('src')).toBe('/images/logo-white.png');
-        expect(img.classes()).toEqual(expect.arrayContaining(['h-8', 'w-auto']));
+        expect(img.classes()).toEqual(expect.arrayContaining(['h-8', 'lg:h-20', 'w-auto']));
         expect(img.classes()).not.toContain('max-w-64');
     });
 
