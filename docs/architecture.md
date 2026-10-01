@@ -276,6 +276,34 @@ object key is POSTed to `/document/upload`. Document bytes never transit the
 API. `PoiFileUpload` collects photo + back pages; `MultiFileUpload` takes an
 arbitrary set with a 5 MB per-file cap.
 
+## Travel (hotels)
+
+A second product on the same session, merged from `feature/travel_hotels`. It
+adds no runtime dependencies and touches the existing app in exactly two
+places: nine routes in `router/index.js` and two nav entries in `Header.vue`.
+
+| Layer | Path |
+| ----- | ---- |
+| Views | `src/views/Travel/Hotels/**`, `src/views/Travel/Bookings/**` |
+| Models | `src/models/travel/**` (hotels, orders, money) |
+| Composables | `src/composables/travel/**` |
+
+The flow is search → hotel → quote (a held price) → prebook → guest details →
+book → payment. The supplier is an Emerging Travel Group style API behind our
+own client API, which is where most of its odd pricing and cancellation rules
+come from.
+
+Two things differ from the transfer side:
+
+- **Confirmation is polled.** The booking-confirmed broadcast never fires, so
+  the flow polls instead. Do not reintroduce a listener for it.
+- **Payment is Volume**, read from `VITE_VOLUME_PAYMENT_*`. Travel is the only
+  part of the app that reads those; the transfer components hardcode `SANDBOX`.
+
+Licensing is a build flag (`VITE_TRAVEL_ENABLED`, default on) because nothing
+on the customer indicates whether the deployment has the travel licence. Routes
+answer 404 without it, so the flag only decides whether the tabs are shown.
+
 ## Wallet
 
 The newest module, and the best-documented code in the repo — treat it as the

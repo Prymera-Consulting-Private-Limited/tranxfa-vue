@@ -24,6 +24,8 @@ bizliimt, choice_remit, compliant_msb, danca, famremit, nuvendrasl, payrieo,
 payvel, pekepay, quiqsend, remit_centre, remitpay, s-expressmoney, salvtech,
 selamsend, tuhfapay, velox, waya, ypay.
 
+`remitso_demo` is separate from this list - see below.
+
 ### `staging` is a tenant branch
 
 `staging` is the repo's default HEAD, which makes it look like an integration
@@ -34,6 +36,24 @@ Updated", "Tawk.to Added"). It carries no feature work that `main` lacks.
 Consequence: a fix committed to `staging` reaches exactly one brand. Shared
 work belongs on `main`.
 
+### `remitso_demo` is Prymera's own demo, not a customer brand
+
+One branch, no `_staging`/`_production` split - `remitso_demo` is Prymera's
+internal sales-demo environment (SD-450), shown to prospects before they
+become a real client (Red Sea Money Transfer went through it). Its backend is
+`console.demo.remitso.com`.
+
+It carries genuine feature work of its own, same as any brand fork, and is
+promoted from `main` the same way: land the fix on `main`, merge into a
+`chore/<slug>` branch cut from `remitso_demo`, verify, PR it in.
+
+In Rover, this environment is tracked under the fleet client key `remitso`
+(not `remitso_demo` - that key exists but is deactivated, left over from
+before the two were reconciled), release branch `remitso` on
+`console.remitso`, same project as SD-450 (`ba6f3827-faa9-4f4c-a2d0-aa68f446d29c`,
+Prymera CO). The frontend git branch name and the Rover fleet key are
+deliberately not the same string - don't assume one from the other.
+
 ## What tenants actually change
 
 Measured across 14 brand branches, diffed against each one's own merge-base
@@ -43,7 +63,7 @@ with `main` — i.e. what each brand deliberately customised:
 | --------------------------------------- | ------------------ |
 | `src/assets/main.css`                   | 14 / 14            |
 | `public/images/logo.png`                | 14 / 14            |
-| `public/images/backgrounds/{login,signup}.png` | 13 / 14     |
+| `public/images/backgrounds/{login,signup}.*` | 13 / 14     |
 | `src/components/Header.vue`             | 13 / 14            |
 | `src/views/ForgotPasswordView.vue`      | 13 / 14            |
 | `src/views/ResetPasswordView.vue`       | 13 / 14            |
@@ -59,10 +79,17 @@ and the third-party tags in `index.html` (Google Analytics ID, MS Clarity tag,
 Tawk.to widget). These *should* differ per brand.
 
 **Accidental surface** — the auth and onboarding views appear only because they
-hardcode `src="/images/logo.png"`, wrap copy in brand-specific wording, or were
-re-laid-out per brand. Every one of these is a permanent merge conflict on
-every port. Reducing this surface (a `<BrandLogo>` component, copy behind env
-vars) is the highest-value structural cleanup available.
+hardcode asset paths, wrap copy in brand-specific wording, or were re-laid-out
+per brand. Every one of these is a permanent merge conflict on every port.
+
+The logo half of this is **done**: `src/components/BrandLogo.vue` now serves all
+16 call sites and no logo path is hardcoded anywhere on `main`. What remains is
+backgrounds — five `<img src>` paths across four auth views, and note the
+extensions differ (`login.webp`, `signup.webp`, `resetpassword.png`) while most
+brand branches carry `.png`. A brand that drops in `login.png` without editing
+`SignInView.vue` silently keeps the previous brand's background: nothing errors,
+the build is green. A `<BrandBackground>` component is the next cleanup, and
+would remove five per-brand conflicts.
 
 Anything hardcoding a palette colour (`bg-purple-700` rather than
 `bg-brand-700`) also breaks re-skinning and will show the wrong brand.
@@ -110,6 +137,36 @@ Use the `port-to-tenant-branches` skill. The rules it enforces:
    confirm-flow fix to one is unverified by definition; say so in the PR.
 6. **Staging before production.** `<brand>_staging` gets the pick and a smoke
    test before `<brand>_production`.
+7. **Never open the promotion pull request with a long-lived branch as its
+   head.** A pull request from `<brand>_staging` into `<brand>_production` -
+   or from `<brand>_production` into `<brand>_staging`, or either into
+   `main` - puts a permanent deploy branch behind GitHub's per-PR "Delete
+   branch" button, which does not know the difference between that and a
+   spent `feature/*` branch (PM-008). Cut a disposable `via/<slug>` branch
+   from the source environment branch instead, and open the PR from there:
+   `git switch -c via/<slug> origin/<source-branch>`, push it, PR into the
+   target branch. Only the via-branch is ever offered up for deletion after
+   the merge.
+
+## A brand's copy after a merge
+
+This used to be the hardest part of a brand merge and it is not any more.
+
+A translated brand carried its words as edits to the templates themselves, so
+a merge of `main` conflicted on every translated file, and a script
+(`reapply-brand-copy.py`, deleted with SD-1131) spliced the brand's words back
+into main's lines.
+
+A brand's words live in `src/locales/<lang>.json` now. A merge from `main`
+touches the catalogue as a data file and the templates not at all, so there is
+nothing to re-apply: resolve the ordinary way, then add the keys `main`
+introduced to the brand's catalogue **in the same pull request**, or those
+screens silently fall back to English. The fourth Xenvia merge had exactly one
+conflict, in a file where the brand still held copy in markup, and resolving it
+moved that copy into the catalogue for good.
+
+If a brand branch still holds copy in a template, that is the thing to fix -
+move it into the brand's catalogue - not a merge to automate.
 
 ## Starting a new brand
 
@@ -123,7 +180,10 @@ then: brand variables in `src/assets/main.css`; replace `public/images/logo.png`
 (+ `logo-white.png`, `favicon`), `backgrounds/{login,signup,resetpassword}`;
 swap the analytics/chat tags in `index.html`; set the brand env vars
 (`VITE_APP_NAME`, `VITE_APP_URL`, `VITE_USER_AGREEMENT_URL`,
-`VITE_PRIVACY_POLICY_URL`, and the declarations if the brand needs them).
+`VITE_PRIVACY_POLICY_URL`, the declarations if the brand needs them, and the
+value-added service flags from the brand's licence: `VITE_HOTELS_ENABLED`,
+`VITE_FLIGHTS_ENABLED`, `VITE_WALLET_ENABLED`, `VITE_COUPONS_ENABLED`,
+`VITE_SERVICE_STATUS_ENABLED`, see `DEPLOY.md`).
 
 `pekepay_staging` is the cleanest worked example — a 16-file diff that touches
 assets, `main.css`, `index.html` and six logo references, and nothing else.

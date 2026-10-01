@@ -1,4 +1,10 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import LoadFailurePanel from "@/components/LoadFailurePanel.vue";
 import CustomerLayout from "@/components/CustomerLayout.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import {ArrowLongLeftIcon} from "@heroicons/vue/20/solid/index.js";
@@ -17,11 +23,16 @@ const walletStore = useWalletStore();
 
 const data = ref(null);
 const isLoading = ref(true);
+const loadFailure = ref(null);
 
 async function getMovements(page = 1) {
   isLoading.value = true;
+  loadFailure.value = null;
   await walletUtils.getMovements(page).then((response) => {
     data.value = response.data;
+  }).catch((e) => {
+    logRequestFailure(e, 'wallet-statement');
+    loadFailure.value = failureMessage(e, t('wallet.weCouldntLoadYour6'));
   }).finally(() => {
     isLoading.value = false;
   });
@@ -60,14 +71,12 @@ const movements = computed(() => {
   <CustomerLayout>
     <main class="-mt-24 py-8">
       <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 flex flex-col gap-4">
-        <h1 class="sr-only">Wallet Statement</h1>
+        <h1 class="sr-only">{{ $t('wallet.walletStatement') }}</h1>
         <div class="rounded-lg border border-gray-100 bg-white px-4 py-4 sm:px-6">
-          <router-link :to="{name: 'wallet'}" class="inline-flex items-center gap-x-1.5 text-sm font-medium text-gray-500 hover:text-gray-700">
-            <ArrowLongLeftIcon class="size-5" aria-hidden="true" />
-            Back to wallet
-          </router-link>
-          <h2 class="mt-2 text-base font-semibold text-gray-900">Wallet statement</h2>
-          <p class="mt-0.5 text-sm text-gray-500">Every movement on your wallet, newest first.</p>
+          <router-link :to="{name: 'wallet'}" class="inline-flex items-center gap-x-1.5 text-sm/6 font-medium text-gray-500 hover:text-gray-700">
+            <ArrowLongLeftIcon class="size-5" aria-hidden="true" />{{ $t('wallet.backToWallet') }}</router-link>
+          <h2 class="mt-2 text-base font-semibold text-gray-900">{{ $t('wallet.walletStatement2') }}</h2>
+          <p class="mt-0.5 text-sm/6 text-gray-500">{{ $t('wallet.everyMovementOnYourWallet') }}</p>
         </div>
 
         <template v-if="isLoading">
@@ -94,12 +103,15 @@ const movements = computed(() => {
               </div>
             </div>
           </template>
+          <template v-else-if="loadFailure">
+            <LoadFailurePanel :title="$t('wallet.weCouldntLoadYourWallet2')" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="getMovements()" class="mt-0" />
+          </template>
           <template v-else>
             <div class="relative flex flex-col items-center justify-center w-full h-full rounded-lg border border-gray-300 p-12 text-center bg-white shadow-lg">
               <div>
                 <BanknotesIcon class="mx-auto size-12 text-gray-400" aria-hidden="true" />
-                <span class="mt-4 block text-lg font-semibold text-gray-900">No Movements Yet</span>
-                <p class="mt-2 text-sm text-gray-600 max-w-sm">Add money to your wallet and every load, spend, and refund will appear here.</p>
+                <span class="mt-4 block text-lg font-semibold text-gray-900">{{ $t('wallet.noMovementsYet') }}</span>
+                <p class="mt-2 text-sm/6 text-gray-600 max-w-sm">{{ $t('wallet.addMoneyToYourWallet2') }}</p>
               </div>
             </div>
           </template>

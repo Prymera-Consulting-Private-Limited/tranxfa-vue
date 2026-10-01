@@ -80,6 +80,31 @@ its `clearInterval`** — in `onUnmounted` *and* when a terminal state is
 reached. This modal is mounted and unmounted repeatedly; leaks here manifest as
 duplicate state updates and phantom redirects.
 
+The Echo half is honoured everywhere: all ten providers pair `channel` with
+`leaveChannel`. **The polling half is not.** Only five poll — `Fincode`,
+`Pay360`, `PayCross`, `ManualPayment` and `Wallet`. `Apaylo`, `CinetPay`,
+`Monoova`, `PagaPayment` and `Volume` rely on the websocket alone, so a
+customer whose socket never connects sits on a screen that never advances.
+Audit it yourself rather than assuming:
+
+```sh
+for f in src/components/Payment/*.vue; do
+  printf '%-18s echo:%s interval:%s\n' "$(basename $f)" \
+    "$(grep -c Echo.channel $f)" "$(grep -c setInterval $f)"
+done
+```
+
+Write new providers with both. If you are touching one of the five that lacks
+polling, adding it is a genuine fix — but it is a behaviour change to a payment
+screen, so raise it rather than folding it into an unrelated commit.
+
+One more shared quirk: these components **write through their `transaction`
+prop** (`props.transaction.payment = transaction.payment`). The parent passes a
+reactive model and the child mutates it in place. That is deliberate and
+load-bearing here, and it is the one place the "never mutate a prop" rule in
+the `vue-conventions` skill is knowingly broken. Match it; do not "fix" it in
+passing.
+
 ### Redirect providers: wait for the URL, not just the state
 
 `PENDING` alone does not mean payable. The hosted payment URL can arrive after
@@ -106,7 +131,11 @@ setTimeout(() => router.push({
 ```
 
 Guard the timeout id and clear it on unmount if you set it outside the Echo
-callback (see `Wallet.vue`).
+callback (see `Wallet.vue`). Note that where this `setTimeout` lives *inside*
+the Echo callback — `Fincode.vue` and its copies — the id is not captured and
+not cleared, so the push can fire ~1.5s after the modal closed. Harmless today
+because the target is the transaction the customer just paid for, but do not
+lengthen the delay or make the target conditional without capturing the id.
 
 ### Props and emits
 

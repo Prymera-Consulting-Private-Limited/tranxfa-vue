@@ -4,7 +4,7 @@ import {createPinia, setActivePinia} from "pinia";
 import {useCustomerStore} from "@/stores/customer.js";
 import Customer from "@/models/customer.js";
 import Account from "@/models/account.js";
-import {collectsAddress, verifiesMobileNumber} from "@/onboarding_config.js";
+import {addressCollection, addressIsSkippable, collectsAddress, verifiesMobileNumber} from "@/onboarding_config.js";
 import {fixture} from "./fixtures.js";
 
 const pinia = createPinia();
@@ -114,6 +114,106 @@ describe('address collection is optional', () => {
         });
 
         expect(stepFrom(onboardingNavigationMachine)).toBe('onboardingComplete');
+    });
+});
+
+// SD-1150. Three deployments wanted three answers and a boolean holds two, so
+// quiqsend stopped using the flag and rewrote both machines on its branch -
+// down to a "Skip for now" button and its own copy. `optional` is that
+// behaviour, moved here, so the fork can go away and a merge from main stops
+// threatening to revert it.
+describe('address collection has three modes', () => {
+    beforeEach(() => {
+        const store = useCustomerStore(pinia);
+        store.isLoaded = false;
+        store.customer.data = null;
+    });
+    afterEach(() => vi.unstubAllEnvs());
+
+    it.each([
+        ['required', 'addressInformation'],
+        ['optional', 'addressInformation'],   // shown, and skippable once there
+        ['omitted', 'mobileNumberInput'],
+    ])('%s routes a customer who owes an address to %s', (mode, expected) => {
+        setEnv({VITE_ONBOARDING_ADDRESS: mode});
+        customerAt('profile-03-identity-done');
+
+        expect(stepFrom(onboardingNavigationMachine)).toBe(expected);
+    });
+
+    // The difference between required and optional, and the reason the mode
+    // exists: with an address still outstanding, one lets the customer on and
+    // the other does not.
+    it('optional lets a customer past an address they have not given', () => {
+        setEnv({VITE_ONBOARDING_ADDRESS: 'optional', VITE_ONBOARDING_VERIFY_MOBILE_NUMBER: 'false'});
+        customerAt('profile-05-onboarded', (c) => {
+            c.addressInformationRequired = () => true;
+        });
+
+        expect(stepFrom(onboardingNavigationMachine)).toBe('onboardingComplete');
+    });
+
+    it('required holds them there until it is given', () => {
+        setEnv({VITE_ONBOARDING_ADDRESS: 'required'});
+        customerAt('profile-05-onboarded', (c) => {
+            c.addressInformationRequired = () => true;
+        });
+
+        expect(stepFrom(onboardingNavigationMachine)).toBe('addressInformation');
+    });
+
+    it('applies to the mobile-first flow too', () => {
+        setEnv({VITE_ONBOARDING_ADDRESS: 'optional'});
+        customerAt('profile-05-onboarded', (c) => {
+            c.identityInformationRequired = () => false;
+            c.employmentInformationRequired = () => false;
+            c.addressInformationRequired = () => true;
+        });
+
+        expect(stepFrom(mobileAuthOnboardingMachine)).toBe('addressInformation');
+    });
+
+    it('defaults to required when nothing is set', () => {
+        setEnv({VITE_ONBOARDING_ADDRESS: '', VITE_ONBOARDING_COLLECT_ADDRESS: ''});
+
+        expect(addressCollection()).toBe('required');
+        expect(collectsAddress()).toBe(true);
+        expect(addressIsSkippable()).toBe(false);
+    });
+
+    it('ignores a mode it does not recognise rather than inventing one', () => {
+        setEnv({VITE_ONBOARDING_ADDRESS: 'sometimes', VITE_ONBOARDING_COLLECT_ADDRESS: ''});
+
+        expect(addressCollection()).toBe('required');
+    });
+
+    // payvel's Amplify environment sets the old boolean today, and payvel has
+    // no AddressInformation component - ignoring it here would point that
+    // deployment at a screen that does not exist.
+    it.each([
+        ['false', 'omitted'], ['0', 'omitted'], ['no', 'omitted'],
+        ['true', 'required'], ['1', 'required'],
+    ])('still honours the old boolean %j as %s', (raw, expected) => {
+        setEnv({VITE_ONBOARDING_ADDRESS: '', VITE_ONBOARDING_COLLECT_ADDRESS: raw});
+
+        expect(addressCollection()).toBe(expected);
+    });
+
+    it('lets the new variable win over the old one', () => {
+        setEnv({VITE_ONBOARDING_ADDRESS: 'optional', VITE_ONBOARDING_COLLECT_ADDRESS: 'false'});
+
+        expect(addressCollection()).toBe('optional');
+    });
+
+    it('offers Skip only where the address is optional', () => {
+        setEnv({VITE_ONBOARDING_ADDRESS: 'optional'});
+        expect(addressIsSkippable()).toBe(true);
+
+        setEnv({VITE_ONBOARDING_ADDRESS: 'required'});
+        expect(addressIsSkippable()).toBe(false);
+
+        setEnv({VITE_ONBOARDING_ADDRESS: 'omitted'});
+        expect(addressIsSkippable()).toBe(false);
     });
 });
 

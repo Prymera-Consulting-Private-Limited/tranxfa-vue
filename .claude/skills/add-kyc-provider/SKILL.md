@@ -27,16 +27,74 @@ write a separate component instead.
 
 ### The event contract
 
-Every provider component normalises its vendor SDK onto four emits. The parent
-(`DocumentTypeItem`) owns the modal and the spinner; the provider owns nothing
-but the vendor integration.
+Every provider declares **five** emits. The parent (`DocumentTypeItem`) owns
+the modal and the spinner; the provider owns nothing but the vendor
+integration.
 
-| Emit | When | Parent's reaction |
-| ---- | ---- | ----------------- |
+| Emit | When | What the parent actually does today |
+| ---- | ---- | ---------------------------------- |
 | `sdkInitialized` | vendor UI is up | hides the spinner |
 | `sdkApplicantStatusChanged` | **terminal success** | refreshes the customer, closes the modal, routes onward |
-| `sdkCancelled` | user backed out | closes the modal, no refresh |
-| `sdkError` | vendor error | surfaces an error |
+| `sdkCancelled` | user backed out | closes the modal - **bound only for `Persona` and `Didit`** |
+| `sdkError` | vendor error, **or a failed token request** | replaces the spinner with a message and a Try again / Close pair |
+| `sdkStepCompleted` | intermediate step | **nothing. No listener exists anywhere in `src/`.** |
+
+That table is the real wiring, not the intended one - `sdkStepCompleted` is
+declared by all six providers and bound by none. Verify rather than assume:
+
+```sh
+grep -rn "v-on:sdkStepCompleted" src/     # returns nothing
+```
+
+**`sdkError` is the one that has to work, and it has two sources.** The vendor
+failing after mount is the obvious one. The commoner one is the token request:
+`getNewAccessToken()` rethrows, so an `onMounted` that awaits it without a
+catch lets the rejection escape unhandled and emits *nothing at all* - which
+left the spinner turning with nothing in the console. Wrap it:
+
+```js
+onMounted(async () => {
+  try {
+    const accessToken = await getNewAccessToken();
+    await launchVendorSdk(accessToken);
+  } catch (e) {
+    emit('sdkError', e);
+  }
+})
+```
+
+Keep `getNewAccessToken()` throwing. Sumsub also passes it to the SDK as the
+token-refresh callback, where throwing is the contract; returning `null`
+instead would hand the SDK a null token on refresh.
+
+For a hosted-redirect provider, `return` after emitting so it does not go on to
+emit `sdkInitialized` and subscribe to Echo - announcing itself ready on a
+failed token trades a hang for an empty modal with a dead Continue link.
+
+`tests/kyc-token-failure.spec.js` pins the emit for all five token-fetching
+providers; `tests/kyc-provider-dispatch.spec.js` pins the parent's handling.
+
+**A refusal is an outcome, not an error.** A review that completes and comes
+back refused emits `sdkApplicantRejected`, which the parent renders as "this
+document was not accepted" with the vendor's reason where there is one. Do not
+route it through `sdkApplicantStatusChanged`: that one refreshes the profile and
+sends the customer onward as verified, and the transfer wizard then waits for
+the document to leave `pendingDocuments`, which a rejected one never does.
+
+Two rules that fall out of it, both pinned in `tests/kyc-review-answer.spec.js`:
+
+- **Only a completed review is terminal.** `pending`, `queued`, `init` and
+  `onHold` are the applicant still working through the flow, and reporting one
+  sends them onward mid-verification.
+- **Anything that is not explicitly `GREEN` is a refusal.** Compare against
+  `ReviewAnswer.GREEN` and let everything else fall to the rejected branch, so a
+  vendor value nobody has seen yet cannot be read as an approval.
+
+**Tear the vendor down in `onUnmounted`.** All six do now. Sumsub keeps its
+built instance at module scope so it can be destroyed; Persona's client owns a
+modal it appends outside the component's tree, so unmounting the component alone
+leaves the overlay behind. Guard both calls - the instance does not exist if the
+token request failed before the SDK was built.
 
 Emit `sdkApplicantStatusChanged` **only on a genuine terminal success**. It
 triggers a profile refresh and navigation; firing it on an intermediate step
@@ -167,13 +225,30 @@ Note the two call sites behave differently, and both must work:
 ### Two invariants
 
 **1. Guards read the Pinia store, not machine context.** The machines call
-`useCustomerStore()` at module scope and close over it:
+`useCustomerStore()` at module scope and close over it. They are **plain
+module-level functions referenced directly** - there is no `guards: {}` option
+map and no string names, so a typo is a `ReferenceError` at import rather than
+a guard that silently never passes:
 
 ```js
 const customerStore = useCustomerStore();
-const customer = customerStore.customer;
-guards: { emailVerified: () => customer.data?.account?.isEmailVerified === true }
+
+function getCustomer() {
+    return customerStore.customer?.data;
+}
+
+function isEmailVerified() {
+    return customerStore.isLoaded && !! getCustomer()?.account?.isEmailVerified;
+}
+
+// ...used as a reference, not a string:
+PROCEED: [{target: 'sourceCountrySelection', guard: isEmailVerified}]
 ```
+
+Use optional calls on the model's own predicates - `customer?.addressInformationRequired?.()`.
+The transfer machine used to call `customer.data.addressInformationRequired()`
+bare in three places, so a machine started before the profile loaded threw
+*inside the guard* and errored the actor instead of navigating.
 
 So guards see profile updates with no explicit event — but Pinia **must be
 active before the module is imported**. Any test mounting a view that imports a
@@ -187,24 +262,51 @@ after the quote changes, or a guard will read a stale quote.
 **2. Targets are ordered furthest-first.** A `PROCEED` transition lists targets
 in descending order of progress, each with a guard:
 
+This is the real list from `onboarding_navigation_machine`'s opening state:
+
 ```js
 PROCEED: [
-  {target: 'onboardingComplete',  guard: 'mobileNumberProvided'},
-  {target: 'mobileNumberInput',   guard: 'employmentInformationProvided'},
-  {target: 'employmentInformation', guard: 'employmentInformationRequired'},
-  {target: 'identityInformation', guard: 'countryProvided'},
-  {target: 'sourceCountrySelection', guard: 'emailVerified'},
+  {target: 'onboardingComplete',        guard: mobileNumberSettled},
+  {target: 'mobileNumberVerification',  guard: requiresMobileNumberVerification},
+  {target: 'mobileNumberInput',         guard: addressInformationCompleted},
+  {target: 'addressInformation',        guard: requiresAddressInformation},
+  {target: 'employmentInformation',     guard: requiresEmploymentInformation},
+  {target: 'identityInformation',       guard: hasCountry},
+  {target: 'sourceCountrySelection',    guard: isEmailVerified},
 ]
 ```
 
 XState takes the first guard that passes, so a single `PROCEED` lands the
-customer at the furthest step they qualify for. This is what makes the flows
-resumable. **Inserting a step means adding its target to every earlier state's
-list, in the right position** — miss one and that state skips your step.
+customer at the furthest step they qualify for. The initial state is therefore
+a **resume dispatcher**, not a first step. **Inserting a step means adding its
+target to every earlier state's list, in the right position** — miss one and
+that state skips your step.
 
-Guards are cumulative by convention: `employmentInformationProvided` re-asserts
-email, country and identity as well. Follow that when adding one, so ordering
-stays total.
+Guards are a **cumulative prefix chain**: each one calls the one before it, so
+`hasMobileNumber()` re-asserts address, employment, identity, country and
+email. Follow that when adding one, or ordering stops being total. The
+mobile-first machine has a comment explaining why `emailVerificationRequired()`
+is written out longhand rather than as `!emailVerified()` — negating a
+prefix-carrying guard inverts the prefix too, and sends the customer to the
+wrong step.
+
+**Optional steps need both halves gated.** `requiresX()` decides whether to ask;
+`xCompleted()` is the prefix every later guard chains through, and must read
+"nothing further is owed" — so on a deployment that skips the step it is
+complete *by definition*:
+
+```js
+function addressInformationCompleted() {
+    if (! collectsAddress()) {
+        return employmentInformationCompleted();   // not false
+    }
+    return employmentInformationCompleted() && ! getCustomer()?.addressInformationRequired?.();
+}
+```
+
+Gating only `requiresX()` makes every subsequent step unreachable. The two
+flags in play are `collectsAddress()` and `verifiesMobileNumber()`, both from
+`src/onboarding_config.js`.
 
 ### Adding a step
 
@@ -222,13 +324,31 @@ stays total.
 In the transfer wizard the machine is a fast path; `POST /quote/confirm/{id}`
 is the authority. A `412` sends the customer back:
 
-| `type` | Event |
-| ------ | ----- |
+| `type` | Machine event, or UI reaction |
+| ------ | ----------------------------- |
 | `incomplete_customer_address` | `ADDRESS_REQUIRED` |
-| `account_verification_required` | `ACCOUNT_VERIFICATION_REQUIRED` |
+| `account_verification_required` | `ACCOUNT_VERIFICATION_REQUIRED`, reading `pending_documents` |
 | `poi_info_check_failed` | `POI_INFO_CHECK_FAILED` |
+| `wallet_subscription_required` | opens the terms modal in `enrol` mode |
+| `wallet_terms_reacceptance_required` | opens the terms modal in `reaccept` mode |
+| `insufficient_wallet_balance` | inline shortfall message, re-fetches the wallet |
+| `wallet_authorization_required` | requests a spend OTP, opens the OTP modal |
+| `wallet_authorization_invalid` | re-opens the OTP modal with the error |
+| `duplicate_transaction`, `active_transfer_disable_rule` | inline warning |
+| anything else | inline message from the body, or a generic fallback |
+
+Only the first three drive the machine; the wallet types are handled in the
+view. The wallet strings live in `src/enums/wallet_refusal_type.js` — use the
+enum, not literals.
 
 If you add a step that the backend can demand, add the `type` → event mapping
 in `views/Transfer/IndexView.vue` and a case to
-`tests/transfer-confirm-refusals.spec.js`. **Unrecognised types must still
-clear `isStepProcessing` and show a message** — never leave the spinner running.
+`tests/transfer-confirm-refusals.spec.js`.
+
+**Every branch must clear `isStepProcessing`, including the fallback and the
+non-412 path.** `wallet_authorization_required` is the one branch that does not
+set it directly — it delegates to `requestWalletSpendCode()`, which clears the
+flag on both its success and failure paths. If you add a delegating branch,
+check the callee the same way. The pre-`main` version of this code left the
+spinner running forever on an unknown error; `tests/transfer-confirm-refusals.spec.js`
+exists to stop that returning.

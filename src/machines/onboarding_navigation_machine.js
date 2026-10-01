@@ -1,6 +1,6 @@
 import { createMachine } from 'xstate';
 import { useCustomerStore } from '@/stores/customer.js';
-import { collectsAddress, verifiesMobileNumber } from '@/onboarding_config.js';
+import { addressCollection, collectsAddress, verifiesMobileNumber } from '@/onboarding_config.js';
 
 const customerStore = useCustomerStore();
 
@@ -57,13 +57,16 @@ function requiresAddressInformation() {
         !!customer?.addressInformationRequired?.();
 }
 
-// Reads "nothing further is owed for the address", so a deployment that does
-// not collect one is complete by definition - otherwise every later step, which
-// all chain through this, would be unreachable.
-function addressInformationCompleted() {
+// Reads "the address no longer stands between the customer and the next step".
+//
+// Not the same as "an address was given": a deployment that omits the step is
+// settled by definition, and so is one where the step is skippable - otherwise
+// every later step, which all chain through this, would be unreachable for a
+// customer who skipped.
+function addressSettled() {
     const customer = getCustomer();
 
-    if (! collectsAddress()) {
+    if (addressCollection() !== 'required') {
         return employmentInformationCompleted();
     }
 
@@ -74,7 +77,7 @@ function addressInformationCompleted() {
 function hasMobileNumber() {
     const customer = getCustomer();
 
-    return addressInformationCompleted() &&
+    return addressSettled() &&
         !!customer?.account?.mobileNumber;
 }
 
@@ -116,13 +119,20 @@ export const onboardingNavigationMachine = createMachine({
                         target: 'mobileNumberVerification',
                         guard: requiresMobileNumberVerification,
                     },
-                    {
-                        target: 'mobileNumberInput',
-                        guard: addressInformationCompleted,
-                    },
+                    // Address is offered before mobile. The other two entry
+                    // points already order it this way; this one did not, and
+                    // in `optional` mode that difference decides whether the
+                    // step is ever seen - addressSettled() is true from the
+                    // start when the customer may skip, so a mobileNumberInput
+                    // branch placed first swallows the step entirely. quiqsend
+                    // hit this and reordered by hand on its branch.
                     {
                         target: 'addressInformation',
                         guard: requiresAddressInformation,
+                    },
+                    {
+                        target: 'mobileNumberInput',
+                        guard: addressSettled,
                     },
                     {
                         target: 'employmentInformation',
@@ -162,7 +172,7 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: addressInformationCompleted,
+                        guard: addressSettled,
                     },
                 ],
 
@@ -181,7 +191,7 @@ export const onboardingNavigationMachine = createMachine({
                     },
                     {
                         target: 'mobileNumberInput',
-                        guard: addressInformationCompleted,
+                        guard: addressSettled,
                     },
                 ],
 
@@ -193,10 +203,19 @@ export const onboardingNavigationMachine = createMachine({
 
         addressInformation: {
             on: {
-                PROCEED: {
-                    target: 'mobileNumberInput',
-                    guard: addressInformationCompleted,
-                },
+                // In `optional` mode this fires on Skip as well as on Save:
+                // addressSettled() does not ask whether an address was given,
+                // only whether one still stands in the way.
+                PROCEED: [
+                    {
+                        target: 'onboardingComplete',
+                        guard: hasMobileNumber,
+                    },
+                    {
+                        target: 'mobileNumberInput',
+                        guard: addressSettled,
+                    },
+                ],
 
                 EDIT_PERSONAL_INFORMATION: {
                     target: 'identityInformation',
