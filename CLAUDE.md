@@ -13,6 +13,10 @@ product mainline; every `<brand>_staging` / `<brand>_production` branch is a
 long-lived fork for one deployment. Read `docs/tenant-branches.md` before
 merging, cherry-picking, or "just fixing it on staging".
 
+Copy is **not** written in templates: it lives in `src/locales`, and a brand
+ships a locale file rather than editing components. Read
+`docs/localisation.md` before adding any user-facing words.
+
 Architecture lives in `docs/architecture.md`. The API surface the SPA actually
 uses is enumerated in `docs/api-surface.md` (the API *itself* is documented in
 the console's API Documentation page, which is authoritative). Local end-to-end
@@ -24,13 +28,22 @@ Carried over from `console.remitso`, where they were learned the hard way:
 
 - **PRs target `main`.** Never open an ordinary PR against `staging` or a brand
   branch. `staging` is the Tranxfa brand branch, not an integration branch.
+- **Every piece of work bigger than a chore starts as a Rover ticket** (`SD-<n>`), lives on
+  `feature/sd-<n>-<slug>` cut from `main`, ships by a PR titled `SD-<n>`, and
+  ends with a closing note on the ticket. The steps are in `docs/workflow.md`.
+- **A ticket is proposed before it is created.** Never call
+  `rover_create_ticket` without a yes. A small self-contained fix ships as
+  `chore/<slug>` with no ticket (`docs/workflow.md`).
+- **Every ticket is assigned to Dhruv Patel**, who owns these repositories.
+  That includes a ticket raised for a defect found along the way, not only
+  the one the work started from. Never leave a ticket unassigned.
 - **No `Co-Authored-By` or generated-with trailers**, in commits or PR bodies.
 - Short imperative commit subject, reasoning in the body: why the change
   exists, not what the diff shows. Plain hyphens, no em-dashes.
 - **Stage the change and stop** for review before committing. Group into
   logical commits, one concern each.
 - Change only what the task needs. Spotting an unrelated problem is not
-  permission to fix it - mention it, or raise it separately. If the task
+  permission to fix it - mention it, or propose it separately. If the task
   genuinely cannot be done without a surrounding change, say so in one
   sentence, then do it.
 - **Never silently drop something worth doing.** If you decide against
@@ -38,6 +51,54 @@ Carried over from `console.remitso`, where they were learned the hard way:
   looks like a finished feature.
 - A push to a brand branch **is a deploy** (Amplify builds on push). Verify
   before pushing, not after.
+- **Edit source files one at a time, by hand.** See below; this is the rule
+  most easily broken in a hurry.
+- **`docs/mistakes.md` is the register of process mistakes** — flaws in how the
+  code gets built, as `docs/tech-debt.md` would track flaws in the code. Add an
+  entry the moment a pattern is caught, with a checkable SOP rather than a
+  resolution to be careful. Skim it before a brand deploy: these are the
+  mistakes that survive a green suite.
+- **A convention worth keeping gets a test, not a comment.** See
+  `.claude/skills/fitness-tests`, and prove the test fails before trusting it.
+
+## Source files are read and edited one at a time
+
+No `sed`, no `re.sub`, no blanket `str.replace`, no scripted rewrite across a
+set of files. Open the file, make the change, open the next one. If that is slow
+for thirty files, thirty files is the size of the task - not a reason to
+automate the edit.
+
+The reason is not neatness. A pattern edit is fast and reviews as one line; a
+*wrong* pattern edit reviews as one line too, and the compiler will not tell you
+which you wrote. Both of these shipped into a branch on 13 Sep 2026 and were
+caught only by reading the result afterwards:
+
+- A loop meant to tag hotel routes `PRODUCT.HOTELS` and wallet routes
+  `PRODUCT.WALLETS` tagged **every** route `HOTELS`, because it guessed the
+  block from its first 200 characters. Valid code, wrong meaning.
+- A blanket `'] : []),' -> ']),'` across the router closed the wrong spreads and
+  left `/wallet/statement` outside its own array. It still parsed.
+
+Neither a build nor a test suite catches that class. Reading the file does.
+
+There is no exception. The eight Python tools written for the localisation work
+- the extractor, the composer, the date rewriter, the three sweeps, the scope
+check and the render check, plus `reapply-brand-copy.py` - are deleted. They
+existed to do at scale the thing this rule forbids, and they were themselves the
+source of several defects: a sweep that could not see `return 'copy'`, one that
+keyed a CSS animation value as a sentence, an extractor that exempted the button
+a customer presses to move their money.
+
+What they detected is not lost. It is in the suite, where it runs on every
+change instead of when somebody remembers to run a script:
+`tests/i18n-catalogue.spec.js` holds the guards for bare text nodes, copy in an
+expression, copy in a script block, a word beside an interpolation, a `t()` with
+no `t` in scope, a catalogue that does not compile and a translation that
+renames a placeholder; `tests/tailwind-classes.spec.js` holds the one for a
+class built at runtime.
+
+Moving copy into a catalogue is now what it should always have been: open the
+file, move the string, run the suite.
 
 ## Layering (do not short-circuit it)
 
@@ -102,9 +163,10 @@ The two flows:
   and verifies the email. The number is already proven by the signup OTP, so
   there is deliberately no mobile verification step here.
 
-`src/onboarding_config.js` owns both flags. Read them through it rather than
-`import.meta.env`: Vite hands every variable over as a **string**, so a bare
-`import.meta.env.X` is truthy for `"false"`.
+`src/onboarding_config.js` owns both flags, parsing them with the shared `flag()`
+from `src/feature_flags.js`. Read any boolean deployment flag through one of
+those rather than `import.meta.env`: Vite hands every variable over as a
+**string**, so a bare `import.meta.env.X` is truthy for `"false"`, `0` and `off`.
 
 Two rules when adding an optional step:
 
@@ -114,6 +176,28 @@ Two rules when adding an optional step:
 - **Optional in onboarding is not optional everywhere.** Turning off address
   collection only skips the onboarding step - the transfer wizard still asks
   when the backend answers `412 incomplete_customer_address`.
+
+## Travel is a licensed second product
+
+Hotels sit alongside transfers: nine routes under `/travel/*`, `src/views/Travel/**`,
+`src/models/travel/**`, `src/composables/travel/**`. It shares the customer, the
+auth session and the payment layer, and nothing else.
+
+**It is licensed per deployment and nothing on the customer says so.** Without
+the licence every travel route answers 404. `travelEnabled()` in
+`src/feature_flags.js` reads `VITE_TRAVEL_ENABLED` and gates the Hotels and
+Bookings entries in `Header.vue`. It defaults **on**, so a brand that does not
+sell travel must set it to `false` or its customers see tabs leading to 404s.
+The flag is a stand-in until app and domain scoping supplies a real field.
+
+Travel takes payment through Volume, configured by
+`VITE_VOLUME_PAYMENT_MERCHANT_ID` and `VITE_VOLUME_PAYMENT_ENVIRONMENT`
+(`SANDBOX` when unset, so a deployment that forgets it takes no money rather
+than the wrong money). The transfer components still hardcode `SANDBOX`; only
+travel reads the variable.
+
+Booking confirmation is **polled**, not broadcast — the event the flow
+originally waited on never fires. See the `hotel-search` skill.
 
 ## Provider registries
 
@@ -149,9 +233,13 @@ Every `Echo.channel(...)` in `onMounted` **must** have a matching
 - `client-payment.{paymentId}` — `PaymentTransactionStateUpdated`
 - `client-transaction.{transactionId}` — transaction state updates
 
-Websockets are treated as an optimisation, never the only path: payment
-components also poll `getTransaction` on an interval. Keep both, and clear the
-interval on unmount and on reaching a terminal state.
+Websockets should be an optimisation, never the only path. All ten payment
+components pair `channel` with `leaveChannel`, but only five also poll
+`getTransaction` — `Fincode`, `Pay360`, `PayCross`, `ManualPayment`, `Wallet`.
+`Apaylo`, `CinetPay`, `Monoova`, `PagaPayment` and `Volume` trust the socket
+alone, so a customer whose socket never connects waits on a screen that never
+advances. Write new providers with both, and clear the interval on unmount and
+on reaching a terminal state.
 
 ## Conventions
 
@@ -159,14 +247,23 @@ interval on unmount and on reaching a terminal state.
   (`composables/wallet_utils.js`, `models/wallet_*.js`) is the reference for
   the standard the codebase is moving toward — match it in new code.
 - Props are declared with full `type:`/`required:` and passed `v-bind:foo="…"`.
-- Child→parent uses `defineEmits` with namespaced names
-  (`recipient:add:failed`, `customer:attribute_category:updated`).
+- Child→parent uses `defineEmits`. Two naming populations, both current: colon-
+  namespaced (`recipient:add:failed`, `customer:attribute:updated`) in the
+  attribute-input families under `components/Recipient/**` and
+  `components/CustomerAttribute/**`; plain camelCase (`retryPayment`,
+  `emailVerified`) everywhere else. Match the file you are in.
 - Brand colour is **always** `brand-*` (`bg-brand-700`), never a literal
   palette name. `--color-brand-*` is remapped per tenant in `assets/main.css`.
   A hardcoded `purple-700` will not re-skin and is a bug.
-- Tests are `tests/*.spec.js` (vitest + jsdom). `npm test`. `tests/helpers.js`
-  has `installFakeEcho()`, `makeTransaction()` and the modal stubs — use them
-  rather than hand-rolling.
+- Tests are `tests/*.spec.js` (vitest + jsdom), **flat** — no directory tree,
+  kebab-case, named after what they cover, with a feature prefix where the bare
+  name would be ambiguous (`travel-order-models`, `customer-model`). `npm test`.
+  `tests/helpers.js` has `installFakeEcho()`, `makeTransaction()` and the modal
+  stubs, `tests/fixtures.js` loads captured API responses — use them rather than
+  hand-rolling. `tests/axios-contract.spec.js` is the one spec that does **not**
+  mock axios; it pins the rejection shape the rest of the app branches on.
+  Use the `write-tests` skill — it covers the Pinia-before-import rule, the
+  axios mock shape, and which silent failures are worth pinning.
 
 ## Error handling contract
 
@@ -210,3 +307,30 @@ forever on an unknown error — do not reintroduce that shape.
 - `index.html` hardcodes third-party tags (Google Analytics ID, MS Clarity
   tag, Tawk.to widget, `js.volumepay.io`). These are **per-tenant** and are a
   standard source of merge conflicts.
+- **`sdkStepCompleted` still goes nowhere.** All six providers declare it and
+  nothing binds it. Harmless today (it is informational), but do not assume an
+  emit is wired just because it is declared. `sdkError` *is* now handled -
+  `DocumentTypeItem` renders an error with a retry, and the five token-fetching
+  providers emit it rather than letting the rejection escape `onMounted`.
+- A completed-but-refused review emits `sdkApplicantRejected`, not
+  `sdkApplicantStatusChanged`. Keep them apart: the success event refreshes the
+  profile and routes the customer onward, and the transfer wizard waits for the
+  document to leave `pendingDocuments`, which a rejected one never does.
+  Anything that is not explicitly `GREEN` falls to the refusal side, so a new
+  vendor answer cannot be mistaken for an approval.
+- `src/enums/transaction_state_icon.js` maps `RISK-ASSESSMENT` **twice** (lines
+  31 and 33). The later `ShieldCheckIcon` wins; the first is dead.
+- `stores/password_policy.js` `setLoaded(flag)` does `flag || true`, so it can
+  never set `false`. The spec name claims it "accepts an explicit flag" but only
+  ever calls it with none.
+- `machines/transaction_navigation_machine.js` uses the **XState v4** entry
+  signature `(context, event)` on its two final states. Under v5 actions take a
+  single object, so `event` is `undefined` and both `console.error` calls always
+  log `undefined`.
+- Background images are **not** centralised the way logos now are: five
+  hardcoded paths across four auth views. A brand that ships `login.png` while
+  the view asks for `login.jpg` silently renders the previous brand's
+  background. **Never reference a `.webp` from a view**: Amplify's SPA rewrite
+  answers a `.webp` request with `index.html`, so the image simply never
+  renders on any brand (SD-1106). Main ships JPEG at quality 80 for the
+  photographs and PNG for the rest.

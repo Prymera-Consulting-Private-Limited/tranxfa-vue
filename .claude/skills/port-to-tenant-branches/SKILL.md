@@ -58,7 +58,33 @@ assets and copy rather than reading them from the theme:
 The rule in all of them: **keep the brand's assets, colours and copy; take
 `main`'s logic.** If a conflict is purely a logo path, a background image or a
 brand string, the brand side wins. If it is control flow, error handling or an
-API call, `main` wins.
+API call, `main` wins. Or, put the way that decides the awkward cases: **take
+`main` wherever the brand still renders identically; keep the brand's markup
+wherever `main` would change how it looks.**
+
+### The logo conflicts are mostly gone - the background ones are not
+
+`main` now renders every logo through `src/components/BrandLogo.vue`, so the
+old logo-path conflict in `Header.vue` and the five auth views has no source
+left on `main`'s side. When a brand branch conflicts there now, it is usually
+because the **brand grew its own sizing inline** - selamsend's header logo is
+`lg:h-20 h-8 w-auto` against the component's `h-8`. Taking `main` wholesale
+there silently shrinks that brand's logo (80px to 32px on large screens, and
+the auth logos roughly halve). Keep the brand's sizing, or add a variant to
+`BrandLogo.vue`; do not accept the shrink by default.
+
+Backgrounds were **not** centralised and remain five hardcoded `<img src>`
+paths across four auth views, with mixed extensions (`login.webp`,
+`signup.webp`, `resetpassword.png`). Most brand branches ship `.png`. After any
+port that touches those views, check the two agree:
+
+```sh
+grep -rn "images/backgrounds" src/
+ls public/images/backgrounds/
+```
+
+A mismatch is silent - the build is green and the customer sees the previous
+brand's background.
 
 ### Verify before moving on
 

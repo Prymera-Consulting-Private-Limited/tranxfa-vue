@@ -43,7 +43,7 @@ describe('PaymentCallbackView', () => {
         axios.get.mockResolvedValue({data: makeTransactionPayload({stateCode: 'REDIRECTED'})});
         const wrapper = mountView();
         await flushPromises();
-        expect(wrapper.text()).toContain('Awaiting Payment Update');
+        expect(wrapper.text()).toContain("We're watching for your payment");
     });
 
     it('polls beside the websocket while the result is not final', async () => {
@@ -73,7 +73,7 @@ describe('PaymentCallbackView', () => {
             shared_reference: 'REF-2',
         });
         await flushPromises();
-        expect(wrapper.text()).toContain('Payment Successful');
+        expect(wrapper.text()).toContain('Payment received');
         const redirects = scheduledRedirects();
         expect(redirects).toHaveLength(1);
         redirects[0][0]();

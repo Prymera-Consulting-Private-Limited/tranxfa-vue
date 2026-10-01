@@ -65,14 +65,17 @@ Replace under `public/`:
 | File | Used by |
 | ---- | ------- |
 | `images/logo.png` | every auth/onboarding screen (light backgrounds) |
-| `images/logo-white.png` / `logo-light.png` | the header, on the brand-coloured bar |
+| `images/logo-white.png` | the header, on the brand-coloured bar |
 | `images/backgrounds/login.webp` | sign-in split panel |
 | `images/backgrounds/signup.webp` | sign-up split panel |
 | `images/backgrounds/resetpassword.png` | forgot/reset password |
-| `favicon.ico` (or `fav.svg`) | browser tab |
+| `favicon.ico` | browser tab |
 
-Keep the filenames. Renaming means editing ~20 references and guarantees
-conflicts on every future port.
+Keep the filenames. The logo pair is read by `BrandLogo.vue` and the
+backgrounds by five hardcoded paths, so renaming means editing markup and
+guarantees a conflict on every future port. Those six files above are the
+complete asset set - `logo-light.png` and `fav.svg` appear in some older brand
+branches but are referenced by nothing on `main`.
 
 Backgrounds are full-bleed and were historically committed as multi-megabyte
 PNGs — `main` moved to `.webp` for this reason. Export new backgrounds as WebP
@@ -80,36 +83,64 @@ and keep them well under 500 KB.
 
 ## 3. Logo references
 
-The logo path is hardcoded in **20 places across 15 files**, not read from
-config:
+**Nothing to do here any more.** `src/components/BrandLogo.vue` owns the logo:
+16 files render it, and `grep -rn "images/logo" src` returns nothing outside
+that component. A brand replaces the two image files and changes no markup.
 
-```
-src/components/Header.vue                          (2 — uses the light/white logo)
-src/views/SignInView.vue                           (2)
-src/views/SignUpView.vue                           (2)
-src/views/ForgotPasswordView.vue                   (2)
-src/views/ResetPasswordView.vue                    (2)
-src/views/MultifactorAuthenticationView.vue        (1)
-src/views/OnboardingWorkflowView.vue               (1)
-src/views/AuthByOtp.vue                            (1)
-src/components/Customer/{EmailInput,EmailVerification,IdentityInformation,
-                         MobileNumberInput,AddressInformation,
-                         OriginCountrySelection,EmploymentInformation}.vue  (1 each)
+```vue
+<BrandLogo variant="light" size="header" />   <!-- on the brand-coloured bar -->
+<BrandLogo />                                  <!-- auth screens, on white -->
 ```
 
-If you keep the filenames you only need to touch these for **sizing** — brand
-logos have different aspect ratios, and the stock `max-w-64 max-h-10` often
-needs adjusting.
+`variant` picks `logo.png` vs `logo-white.png`; `size` picks `max-w-64 max-h-10`
+(auth) or `h-8 w-auto` (header). Spacing stays with the caller.
 
-Find them all:
+If the brand's aspect ratio needs a different size, **add a variant to
+`BrandLogo.vue`** rather than overriding at a call site - a call-site override
+re-creates exactly the per-brand diff this component removed. Note that adopting
+`BrandLogo` on an older brand branch can *shrink* its logos, because several
+brands had grown their own sizing inline (selamsend's header logo is `lg:h-20`,
+against the component's `h-8`); check before taking `main`'s version wholesale.
+
+The alt text comes from `VITE_APP_NAME`, falling back to `RemitSo`. Set that
+variable and the accessible name is right everywhere at once. The only other
+`RemitSo` strings left in `src/` are that fallback and the "Powered by RemitSo"
+line in `Footer.vue` - decide deliberately whether the brand keeps the latter.
+
+## 3a. Backgrounds - still hardcoded, and the live trap
+
+Backgrounds did **not** get the `BrandLogo` treatment. Five `<img src>` paths
+are still written out, with two different extensions:
+
+| Path | Referenced by |
+| ---- | ------------- |
+| `/images/backgrounds/login.webp` | `SignInView.vue` |
+| `/images/backgrounds/signup.webp` | `SignUpView.vue`, `OnboardingWorkflowView.vue` |
+| `/images/backgrounds/resetpassword.png` | `ForgotPasswordView.vue`, `ResetPasswordView.vue` |
+
+This is the single most common re-skin failure. A brand drops in `login.png`
+and `signup.png` - which is what most brand branches carry, and what
+`docs/tenant-branches.md` still lists - the view keeps asking for `.webp`,
+and the customer silently sees the previous brand's background. Nothing errors
+and the build is green.
+
+So, when re-skinning:
 
 ```sh
-grep -rn "images/logo" src
+# what the views ask for, versus what the brand actually shipped
+grep -rn "images/backgrounds" src/
+ls public/images/backgrounds/
 ```
 
-There are also ~23 hardcoded `RemitSo` strings (`alt` text, `sr-only` labels).
-Update them; existing brand branches frequently miss these, leaving
-`alt="RemitSo Logo"` on a competitor's site.
+Either export the brand's backgrounds as `.webp` under the existing names, or
+change the five references to match the files. Do not leave the two disagreeing.
+
+The alt text on these is wrong on main too - the signup and onboarding panels
+both say `alt="Login Background"`. Fix it as you pass.
+
+Making these read through a `BrandBackground` component, the way `BrandLogo`
+did for the logo, is the next-highest-value cleanup in this repo: it would
+remove five per-brand conflicts from four auth views.
 
 ## 4. `index.html`
 
@@ -180,10 +211,11 @@ main brand colour.
 - [ ] Branched from `origin/main`
 - [ ] All ten `--color-brand-*` variables set
 - [ ] Logo, light logo, both backgrounds, reset-password background, favicon replaced
-- [ ] Filenames unchanged; logo sizing adjusted where the aspect ratio differs
+- [ ] Background **extensions** match what the views ask for (`.webp` for login/signup, `.png` for resetpassword) - the silent-wrong-background trap
+- [ ] Filenames unchanged; any logo resize done inside `BrandLogo.vue`, not at a call site
 - [ ] `index.html`: title, favicon, **new** analytics/Clarity/chat tags, old ones removed
 - [ ] Volume Payments script removed if unused
-- [ ] Stale `RemitSo` / previous-brand strings updated
+- [ ] `VITE_APP_NAME` set (drives every logo `alt`); `Footer.vue` "Powered by RemitSo" decided deliberately
 - [ ] Brand env vars documented for the deployment
 - [ ] `git grep` for hardcoded palette colours is clean
 - [ ] Build + tests pass; five key screens eyeballed
