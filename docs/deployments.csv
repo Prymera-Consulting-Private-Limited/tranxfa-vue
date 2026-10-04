@@ -43,3 +43,4 @@ date,brand,environment,branch,commit,deployed_by,notes
 -,ypay,unknown,ypay,25eb976,-,ad-hoc work branch, not a brand line; never renamed to feature/*. last commit 2025-09-08; not confirmed in Amplify
 -,tranxfa,unknown,staging,d12f816,-,brand branch despite the name; last commit 2025-10-24; not confirmed in Amplify
 2026-09-07,selamsend,staging,selamsend_staging,0eccf1c,PB-TommyShelby,merged main (375a78b) and repointed the brand backgrounds; pushed but Amplify build NOT verified
+2026-10-01,selamsend,staging,selamsend_staging,74e38b7,PB-TommyShelby,PR #224 merged main (104dcec) keeping the brand photos and logo sizes; Amplify build verified at the edge 14:00 UTC (bundle index-CzA148nM.js; every brand image byte-identical to 74e38b7); 0eccf1c was observed live just before; built with VITE_APP_NAME=selamsend
