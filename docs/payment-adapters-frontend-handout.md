@@ -97,6 +97,7 @@ Anything else renders nothing. A new state code needs a frontend change before i
 | `VOLUME-PAYMENTS` | Volume | Embedded SDK (open banking) | `total_payment_amount`, `id` as the merchant payment id, the transaction number as the reference. Needs `VITE_VOLUME_PAYMENT_ENVIRONMENT` and `VITE_VOLUME_PAYMENT_MERCHANT_ID` at build time |
 | `WALLET` | WalletPayment | Internal | A `wallet_otp` at confirm time; the payment settles server-side |
 | `BELMONEY-CARD` | BelmoneyCard (tranxfa only) | Hosted card page, same tab, with 3-D Secure | `payment_url` with `PENDING` for the redirect shape; `awaiting_confirmation` for the two shapes that need nothing from the customer; a pre-flight address check that fails `INITIALIZED -> FAILED` with no redirect; `expires_at` (one day, then `CANCELLED`); no payment-sent, no extra fields, no build keys, no CSP change |
+| `CHECKOUT-COM` | CheckoutCom (tranxfa only, SD-1574) | Hosted payment page, same tab: card, Apple Pay and Google Pay on Checkout.com's side | `payment_url` with every `PENDING` once set up, so no `awaiting_confirmation`; a declined card stays on Checkout.com's page, and `FAILED` is a capture the bank refused; leaving the page unpaid keeps the same URL; `expires_at` (one day, Checkout.com's 24-hour session); no cancel (`409 payment_not_cancellable`), no payment-sent, no extra fields, no build keys, no CSP change |
 
 Note the code spelling: every code uses hyphens except `CINET_PAY`, which uses an underscore. The frontend matches the string exactly.
 
@@ -160,7 +161,7 @@ The retry response replaces the `payment` object on the page in full, so it must
 9. The customer's final landing page after a hosted payment is `{frontend origin}/payment/cb/{transactionId}`, reached through the API's transport host (section 1). Nothing in that URL is read.
 10. Retry returns the whole new payment, with `payment_url` null for hosted providers until the queued provider call fills it, and `422` errors keyed by `payment_data_requirements[].attribute`.
 11. A hosted payment that reaches `PENDING` without `payment_url` either carries `awaiting_confirmation: true`, meaning the provider will settle it, or gets its URL within seconds. Anything else is stuck: the page shows "taking longer than usual" after a minute with a way back to the transfer, but it cannot complete the payment.
-12. Every `payment_provider.code` the API can send for this app has a component (section 6). A code without one now renders "This way to pay isn't available in the app yet" rather than a blank page; the back office has adapters with no screen here (BelmoneyCard, CheckoutCom, Cybrid, Leatherback, Volt as of September 2026).
+12. Every `payment_provider.code` the API can send for this app has a component (section 6). A code without one now renders "This way to pay isn't available in the app yet" rather than a blank page; the back office has adapters with no screen here (Cybrid, Leatherback, Volt as of October 2026).
 
 ## 10. What to hand the frontend for a new provider
 
