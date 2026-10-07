@@ -24,6 +24,7 @@ import PayCross from "@/components/Payment/PayCross.vue";
 import Fincode from "@/components/Payment/Fincode.vue";
 import CinetPay from "@/components/Payment/CinetPay.vue";
 import BelmoneyCard from "@/components/Payment/BelmoneyCard.vue";
+import CheckoutCom from "@/components/Payment/CheckoutCom.vue";
 import WalletPayment from "@/components/Payment/Wallet.vue";
 import ModalCloseButton from "@/components/ModalCloseButton.vue";
 
@@ -39,9 +40,9 @@ const props = defineProps({
 const transaction = ref(null);
 
 // Every code with a component below. The back office has adapters the app has
-// no screen for (BelmoneyCard, CheckoutCom, Cybrid, Leatherback, Volt as of
-// September 2026); one of those used to render a blank page.
-const KNOWN_PROVIDER_CODES = new Set(['MANUAL-PAYMENT', 'PAGA', 'MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'WALLET', 'BELMONEY-CARD']);
+// no screen for (Cybrid, Leatherback, Volt as of October 2026); one of those
+// used to render a blank page.
+const KNOWN_PROVIDER_CODES = new Set(['MANUAL-PAYMENT', 'PAGA', 'MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'WALLET', 'BELMONEY-CARD', 'CHECKOUT-COM']);
 const isKnownProvider = computed(() => KNOWN_PROVIDER_CODES.has(transaction.value?.payment?.paymentProvider?.code));
 
 const isLoading = ref(true);
@@ -155,7 +156,7 @@ const onCancelRefused = async (message) => {
 
 // Every provider but these has its own retry on a failed payment. None has one
 // on a cancelled or expired payment, which was a dead end before SD-1423.
-const PROVIDERS_WITH_RETRY_ON_FAILURE = new Set(['MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'BELMONEY-CARD', 'WALLET']);
+const PROVIDERS_WITH_RETRY_ON_FAILURE = new Set(['MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'BELMONEY-CARD', 'CHECKOUT-COM', 'WALLET']);
 const offerPayAgain = computed(() => {
   if (! transaction.value?.canPayAgain) {
     return false;
@@ -243,6 +244,7 @@ function closePaymentModal() {
                     <Fincode :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'FINCODE'" v-bind:transaction="transaction"  />
                     <CinetPay :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'CINET_PAY'" v-bind:transaction="transaction"  />
                     <BelmoneyCard :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'BELMONEY-CARD'" v-bind:transaction="transaction"  />
+                    <CheckoutCom :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'CHECKOUT-COM'" v-bind:transaction="transaction"  />
                     <WalletPayment :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'WALLET'" v-bind:transaction="transaction"  />
                     <!-- A new payment on the same transfer, at its original amount and rate. -->
                     <button v-if="offerPayAgain" type="button" @click="retryPayment()" class="-mt-2 mb-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white hover:bg-brand-800 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('transfer.payment.payAgain') }}</button>
