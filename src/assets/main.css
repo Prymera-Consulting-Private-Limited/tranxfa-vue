@@ -8,16 +8,16 @@
 @layer theme {
     @theme {
         --default-font-family: 'Inter', sans-serif;
-        --color-brand-50: theme('colors.sky.50');
-        --color-brand-100: theme('colors.sky.100');
-        --color-brand-200: theme('colors.sky.200');
-        --color-brand-300: theme('colors.sky.300');
-        --color-brand-400: theme('colors.sky.400');
-        --color-brand-500: theme('colors.sky.500');
-        --color-brand-600: theme('colors.sky.600');
-        --color-brand-700: theme('colors.sky.700');
-        --color-brand-800: theme('colors.sky.800');
-        --color-brand-900: theme('colors.sky.900');
+        --color-brand-50: #fff3ed;
+        --color-brand-100: #ffe3d5;
+        --color-brand-200: #ffc5aa;
+        --color-brand-300: #ffa27a;
+        --color-brand-400: #f87c4f;
+        --color-brand-500: #f05a28;
+        --color-brand-600: #dc4517;
+        --color-brand-700: #f05a28;
+        --color-brand-800: #982f16;
+        --color-brand-900: #7d2916;
 
         /* Status ramps for the badges the API drives through color_scheme.
            They are deliberately their own hues rather than steps of the brand:
@@ -30,63 +30,68 @@
            Text uses the 700 step. 600 on a 50 background is 3.1:1 for success
            and warning, which is under AA, and those two carry most of the
            badges in the product. */
-        --color-success-50:  #f0fdf4;
+        --color-success-50: #f0fdf4;
         --color-success-100: #dcfce7;
         --color-success-200: #bbf7d0;
         --color-success-300: #86efac;
         --color-success-400: #4ade80;
         --color-success-500: #22c55e;
         --color-success-600: #16a34a;
-        --color-success-700: #15803d; /* 5.02:1 on white, 4.79:1 on success-50 */
+        --color-success-700: #15803d;
+        /* 5.02:1 on white, 4.79:1 on success-50 */
         --color-success-800: #166534;
         --color-success-900: #14532d;
         --color-success-950: #052e16;
 
-        --color-warning-50:  #fffbeb;
+        --color-warning-50: #fffbeb;
         --color-warning-100: #fef3c7;
         --color-warning-200: #fde68a;
         --color-warning-300: #fcd34d;
         --color-warning-400: #fbbf24;
         --color-warning-500: #f59e0b;
         --color-warning-600: #d97706;
-        --color-warning-700: #b45309; /* 5.02:1 on white, 4.84:1 on warning-50 */
+        --color-warning-700: #b45309;
+        /* 5.02:1 on white, 4.84:1 on warning-50 */
         --color-warning-800: #92400e;
         --color-warning-900: #78350f;
         --color-warning-950: #451a03;
 
-        --color-danger-50:  #fef2f2;
+        --color-danger-50: #fef2f2;
         --color-danger-100: #fee2e2;
         --color-danger-200: #fecaca;
         --color-danger-300: #fca5a5;
         --color-danger-400: #f87171;
         --color-danger-500: #ef4444;
         --color-danger-600: #dc2626;
-        --color-danger-700: #b91c1c; /* 6.47:1 on white, 5.91:1 on danger-50 */
+        --color-danger-700: #b91c1c;
+        /* 6.47:1 on white, 5.91:1 on danger-50 */
         --color-danger-800: #991b1b;
         --color-danger-900: #7f1d1d;
         --color-danger-950: #450a0a;
 
-        --color-info-50:  #eef2ff;
+        --color-info-50: #eef2ff;
         --color-info-100: #e0e7ff;
         --color-info-200: #c7d2fe;
         --color-info-300: #a5b4fc;
         --color-info-400: #818cf8;
         --color-info-500: #6366f1;
         --color-info-600: #4f46e5;
-        --color-info-700: #4338ca; /* 7.90:1 on white, 7.07:1 on info-50 */
+        --color-info-700: #4338ca;
+        /* 7.90:1 on white, 7.07:1 on info-50 */
         --color-info-800: #3730a3;
         --color-info-900: #312e81;
         --color-info-950: #1e1b4b;
 
         /* Where an unrecognised color_scheme lands. Legible is the whole job. */
-        --color-neutral-50:  #f9fafb;
+        --color-neutral-50: #f9fafb;
         --color-neutral-100: #f3f4f6;
         --color-neutral-200: #e5e7eb;
         --color-neutral-300: #d1d5db;
         --color-neutral-400: #9ca3af;
         --color-neutral-500: #6b7280;
         --color-neutral-600: #4b5563;
-        --color-neutral-700: #374151; /* 10.31:1 on white, 9.86:1 on neutral-50 */
+        --color-neutral-700: #374151;
+        /* 10.31:1 on white, 9.86:1 on neutral-50 */
         --color-neutral-800: #1f2937;
         --color-neutral-900: #111827;
         --color-neutral-950: #030712;
@@ -94,11 +99,16 @@
 }
 
 .dp__theme_light {
-    --dp-background-color: theme('colors.white'); /* Background */
-    --dp-text-color: theme('colors.gray.800'); /* Text */
-    --dp-hover-color: theme('colors.gray.200'); /* Hover */
-    --dp-primary-color: theme('colors.brand.900'); /* Selected Date */
-    --dp-primary-text-color: theme('colors.white'); /* Selected Text */
+    --dp-background-color: theme('colors.white');
+    /* Background */
+    --dp-text-color: theme('colors.gray.800');
+    /* Text */
+    --dp-hover-color: theme('colors.gray.200');
+    /* Hover */
+    --dp-primary-color: theme('colors.brand.900');
+    /* Selected Date */
+    --dp-primary-text-color: theme('colors.white');
+    /* Selected Text */
 }
 
 .dp__input {
@@ -108,6 +118,7 @@
 .vs__dropdown-toggle {
     @apply px-0.5 pb-2 pt-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none;
 }
+
 .vs__selected-options {
     @apply text-sm;
 }
@@ -116,38 +127,64 @@
 :root {
     /*General*/
     --dp-font-family: 'Inter', sans-serif;
-    --dp-border-radius: 4px; /*Configurable border-radius*/
-    --dp-cell-border-radius: 4px; /*Specific border radius for the calendar cell*/
-    --dp-common-transition: all 0.1s ease-in; /*Generic transition applied on buttons and calendar cells*/
+    --dp-border-radius: 4px;
+    /*Configurable border-radius*/
+    --dp-cell-border-radius: 4px;
+    /*Specific border radius for the calendar cell*/
+    --dp-common-transition: all 0.1s ease-in;
+    /*Generic transition applied on buttons and calendar cells*/
 
     /*Sizing*/
-    --dp-button-height: 35px; /*Size for buttons in overlays*/
-    --dp-month-year-row-height: 35px; /*Height of the month-year select row*/
-    --dp-month-year-row-button-size: 35px; /*Specific height for the next/previous buttons*/
-    --dp-button-icon-height: 20px; /*Icon sizing in buttons*/
-    --dp-cell-size: 35px; /*Width and height of calendar cell*/
-    --dp-cell-padding: 5px; /*Padding in the cell*/
-    --dp-common-padding: 10px; /*Common padding used*/
-    --dp-input-icon-padding: 35px; /*Padding on the left side of the input if icon is present*/
-    --dp-input-padding: 6px 30px 6px 12px; /*Padding in the input*/
-    --dp-menu-min-width: 260px; /*Adjust the min width of the menu*/
-    --dp-action-buttons-padding: 2px 5px; /*Adjust padding for the action buttons in action row*/
-    --dp-row-margin:  5px 0; /*Adjust the spacing between rows in the calendar*/
-    --dp-calendar-header-cell-padding:  0.5rem; /*Adjust padding in calendar header cells*/
-    --dp-two-calendars-spacing:  10px; /*Space between multiple calendars*/
-    --dp-overlay-col-padding:  3px; /*Padding in the overlay column*/
-    --dp-time-inc-dec-button-size:  32px; /*Sizing for arrow buttons in the time picker*/
-    --dp-menu-padding: 6px 8px; /*Menu padding*/
+    --dp-button-height: 35px;
+    /*Size for buttons in overlays*/
+    --dp-month-year-row-height: 35px;
+    /*Height of the month-year select row*/
+    --dp-month-year-row-button-size: 35px;
+    /*Specific height for the next/previous buttons*/
+    --dp-button-icon-height: 20px;
+    /*Icon sizing in buttons*/
+    --dp-cell-size: 35px;
+    /*Width and height of calendar cell*/
+    --dp-cell-padding: 5px;
+    /*Padding in the cell*/
+    --dp-common-padding: 10px;
+    /*Common padding used*/
+    --dp-input-icon-padding: 35px;
+    /*Padding on the left side of the input if icon is present*/
+    --dp-input-padding: 6px 30px 6px 12px;
+    /*Padding in the input*/
+    --dp-menu-min-width: 260px;
+    /*Adjust the min width of the menu*/
+    --dp-action-buttons-padding: 2px 5px;
+    /*Adjust padding for the action buttons in action row*/
+    --dp-row-margin: 5px 0;
+    /*Adjust the spacing between rows in the calendar*/
+    --dp-calendar-header-cell-padding: 0.5rem;
+    /*Adjust padding in calendar header cells*/
+    --dp-two-calendars-spacing: 10px;
+    /*Space between multiple calendars*/
+    --dp-overlay-col-padding: 3px;
+    /*Padding in the overlay column*/
+    --dp-time-inc-dec-button-size: 32px;
+    /*Sizing for arrow buttons in the time picker*/
+    --dp-menu-padding: 6px 8px;
+    /*Menu padding*/
 
     /*Font sizes*/
-    --dp-font-size: theme('text.sm'); /*Default font-size*/
-    --dp-preview-font-size: 0.8rem; /*Font size of the date preview in the action row*/
-    --dp-time-font-size: 0.8rem; /*Font size in the time picker*/
+    --dp-font-size: theme('text.sm');
+    /*Default font-size*/
+    --dp-preview-font-size: 0.8rem;
+    /*Font size of the date preview in the action row*/
+    --dp-time-font-size: 0.8rem;
+    /*Font size in the time picker*/
 
     /*Transitions*/
-    --dp-animation-duration: 0.1s; /*Transition duration*/
-    --dp-menu-appear-transition-timing: cubic-bezier(.4, 0, 1, 1); /*Timing on menu appear animation*/
-    --dp-transition-timing: ease-out; /*Timing on slide animations*/
+    --dp-animation-duration: 0.1s;
+    /*Transition duration*/
+    --dp-menu-appear-transition-timing: cubic-bezier(.4, 0, 1, 1);
+    /*Timing on menu appear animation*/
+    --dp-transition-timing: ease-out;
+    /*Timing on slide animations*/
 }
 
 :root,
@@ -222,6 +259,7 @@
 #nprogress .bar {
     background: theme('colors.brand.500') !important;
 }
+
 #nprogress .peg {
     box-shadow: 0 0 10px theme('colors.brand.500'), 0 0 5px theme('colors.brand.500') !important;
 }

@@ -89,7 +89,7 @@ onMounted(async () => {
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
-            <BrandLogo variant="light" size="header" />
+            <BrandLogo variant="default" size="header" />
           </a>
         </div>
 
