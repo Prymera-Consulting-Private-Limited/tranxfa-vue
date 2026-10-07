@@ -220,6 +220,10 @@
       "takingLongerTryAgain": "This is taking longer than usual. Nothing has been charged. You can keep waiting, or {link} and try the payment again later.",
       "weCouldntTakeYourPayment": "We couldn't take your payment and no money has left your account. If your billing address is missing from your profile, add it first. You can try again or choose another way to pay."
     },
+    "checkoutCom": {
+      "youllPayOnCheckoutComs": "You'll pay on Checkout.com's secure page, then come back here. We'll confirm your transfer as soon as your payment goes through.",
+      "weCouldntTakeYourPayment": "We couldn't take your payment and no money has left your account. You can try again or choose another way to pay."
+    },
     "provider": {
       "completeYourInteracPayment": "Complete your Interac payment",
       "yourTransferIsAwaitingPayment": "Your transfer is awaiting payment. Please proceed by clicking the button below to securely complete your Interac e-Transfer.",
