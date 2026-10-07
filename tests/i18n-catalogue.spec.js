@@ -19,6 +19,7 @@ const MIGRATED = [
   // slice 2, the money path
   'src/components/Calculator.vue',
   'src/components/Payment/BelmoneyCard.vue',
+  'src/components/Payment/CheckoutCom.vue',
   'src/views/Transfer/IndexView.vue',
   'src/views/Transfer/PaymentView.vue',
   'src/views/Transfer/PaymentCallbackView.vue',
