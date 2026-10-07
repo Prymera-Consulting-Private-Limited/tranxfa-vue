@@ -238,13 +238,13 @@ watch(
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700"></i>
       <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
         <!-- Left Section with Full Size Image -->
-        <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
+        <div class="w-full md:w-[60%] h-auto md:h-full">
           <!-- Top Image in Mobile View -->
           <!-- JPEG, not WebP: Amplify's SPA rewrite answers a .webp request with
                index.html, so the image never rendered on any brand (SD-1106). -->
           <img src="/images/backgrounds/signup.jpg" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
+          <div class="md:hidden flex items-center justify-between w-full px-4 pt-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
             <a :href="appUrl" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
@@ -260,7 +260,7 @@ watch(
         </div>
 
         <!-- Form Section -->
-        <div class="flex-1 flex items-center justify-center p-4 md:p-16 pt-[100px] sm:pt-0">
+        <div class="flex-1 flex items-center justify-center p-4 md:p-16">
           <div class="w-full max-w-xl">
             <!-- Logo at Top Left (Desktop)  -->
             <div class="hidden md:block">

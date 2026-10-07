@@ -11,16 +11,16 @@ describe('BrandLogo', () => {
         const img = mount(BrandLogo).get('img');
 
         expect(img.attributes('src')).toBe('/images/logo.png');
-        expect(img.classes()).toEqual(expect.arrayContaining(['max-w-64', 'max-h-10']));
+        expect(img.classes()).toEqual(expect.arrayContaining(['max-w-72', 'max-h-12']));
     });
 
     it('merges the caller spacing with its own size classes', () => {
         // `<BrandLogo class="mb-5 -ml-2" />` has to come out the same as the
-        // original `class="max-w-64 max-h-10 mb-5 -ml-2"`.
+        // original `class="max-w-72 max-h-12 mb-5 -ml-2"`.
         const img = mount(BrandLogo, {attrs: {class: 'mb-5 -ml-2'}}).get('img');
 
         expect(img.classes()).toEqual(
-            expect.arrayContaining(['max-w-64', 'max-h-10', 'mb-5', '-ml-2']),
+            expect.arrayContaining(['max-w-72', 'max-h-12', 'mb-5', '-ml-2']),
         );
     });
 
@@ -28,8 +28,8 @@ describe('BrandLogo', () => {
         const img = mount(BrandLogo, {props: {variant: 'light', size: 'header'}}).get('img');
 
         expect(img.attributes('src')).toBe('/images/logo-white.png');
-        expect(img.classes()).toEqual(expect.arrayContaining(['h-8', 'w-auto']));
-        expect(img.classes()).not.toContain('max-w-64');
+        expect(img.classes()).toEqual(expect.arrayContaining(['h-12', 'w-auto']));
+        expect(img.classes()).not.toContain('max-w-72');
     });
 
     it('takes its alt text from the brand name rather than a literal', () => {
