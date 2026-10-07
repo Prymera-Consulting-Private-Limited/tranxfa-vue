@@ -200,6 +200,47 @@ a second instance the same day.
 
 ---
 
+## PM-008 — A brand's own branch was used as a pull request's head
+
+**What happened:** promoting `salvtech_staging` to `salvtech_production` was
+done by opening the pull request with `head: salvtech_staging`,
+`base: salvtech_production` directly. GitHub shows a "Delete branch" button
+after every merge, on every pull request, regardless of the repository's
+`delete_branch_on_merge` setting - it does not know `salvtech_staging` is a
+long-lived deploy branch and not a spent feature branch. It was clicked
+without a second thought, four seconds after the merge, and Xenvia's staging
+Amplify app was left with no branch to build from. No commit was lost - only
+the branch pointer - and it was recovered by pushing the recorded merge
+commit's `head` sha back onto `refs/heads/salvtech_staging`. It could as
+easily have been `salvtech_production`, with no recorded sha to recover it
+from.
+
+**Root cause:** a pull request's head branch reads as disposable to GitHub's
+own UI, no matter what it is named or how long it has stood. Nothing about
+opening the PR distinguished a brand's own environment branch from an
+ordinary `feature/*` or `chore/*` branch.
+
+**Cost or risk:** a live deploy branch deleted by muscle memory, and the
+narrow miss of taking down a brand's actual production Amplify app the same
+way, with no ticket or PR recording its last commit to recover from.
+
+**SOP:** a long-lived environment branch (`<brand>_staging`,
+`<brand>_production`, and `main` itself) is **never the head of a pull
+request**. A promotion between two of them goes through a disposable
+`via/<slug>` branch instead: cut the via-branch from the source environment
+branch (or merge the other side into it), open the PR with the via-branch as
+head and the target environment branch as base, and only the via-branch is
+ever offered up for deletion after the merge. This is already how an ordinary
+`chore/*` or `feature/*` promotion into a brand's staging branch works, per
+`docs/tenant-branches.md`'s porting steps - the gap was promoting
+**staging into production**, where the habit had been to treat the staging
+branch itself as the thing to open the PR from.
+
+**Status:** open - proposed after the one recovery above; not yet proven under
+a repeat staging-to-production promotion.
+
+---
+
 ## PM-008 — A build was verified on a working tree the commit did not match
 
 **What happened:** merging `main` into `quiqsend-staging` (PR #184, SD-1218)

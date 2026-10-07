@@ -188,6 +188,31 @@ No money moved, and both bookings were left unpaid.
 `FULFILLED` only says the hotel confirmed the room. Whether it is paid is
 `is_paid`, and the screens read that, never the state or the total.
 
+## Cancelling a transfer's payment, and paying again (captured)
+
+**Captured from Payvel staging on 27 September 2026**, walking SD-1423 against a
+console with SD-1418 and console #766. The walk used transfer PV-V2-7547953
+(AUD 1.39, Monoova bank transfer). The same files sit in `remitso-frontend-v2`,
+whose `README-transfer-cancel-payment.md` carries the full account.
+
+| Fixture | What it is |
+| ------- | ---------- |
+| `transaction-detail-payment-pending-account` | `GET /transaction/{id}`: the payment `PENDING` with its account details, the transfer `PENDING-PAYMENT` |
+| `transaction-detail-payment-cancelled` | The same transfer with its payment `CANCELLED`. The account details are still on it, and must not be shown as somewhere to pay |
+| `transaction-payment-cancelled` | Cancel Transfer Payment, 200: the payment, `CANCELLED` |
+| `error-409-transfer-cancel-payment-not-open` | The same cancel pressed again, 409 `payment_not_open` |
+| `payment-retry-after-cancel` | Pay again after the cancel, 200: a new payment, `CREATED`, account present |
+| `error-412-checkout-collides-held-by-transfer` | Confirm refused while that payment held the account: 412 `account_held`, `held_by` naming the transfer and its `payment_id` |
+
+The collision fixture was written by hand until this walk, with
+`held_by.payment_id` null. A transfer in `held_by` does carry its payment's id;
+the cancel still takes the transfer's `id`.
+
+`total_payment_amount` and `total_payment_amount_formatted` are set by hand to
+`1.39`, the values the same payments read after console #766. Before that fix
+the console sent `"1"` and `"1.00"`. The receiving account number is replaced
+with `123456789`.
+
 ## Written by hand, not captured
 
 These could not be captured on the walk above. Each is written from the
@@ -201,7 +226,7 @@ captured:
 | `travel-order-view-deposit-setting-up` | Order view whose payment is still `CREATED` with no account | As `-created` |
 | `travel-order-view-deposit-failed` | Order view whose payment `FAILED`. No `failure_reason`: the order view never carries it | As `-failed` |
 | `error-409-pay-order-*`, other than `-account-held-by-order` | One Pay Order 409 per SD-1248 `type`, plus `untyped` for a console older than SD-1248. Messages are the customer wording the api sends for each type (`lang/en/message.php`, through `ServicePaymentRefusal::customerMessageKey()`); `untyped` keeps the old wording, as an old console would send it | Each needs its own refusal set up |
-| `error-412-checkout-collides-held-by-transfer`, `error-412-wallet-topup-collides-held-by-topup` | The transfer confirm and wallet load collisions with `held_by`, one per remaining kind | Needs a waiting transfer or wallet load |
+| `error-412-wallet-topup-collides-held-by-topup` | The wallet load collision with `held_by` naming a wallet load | Needs a waiting wallet load |
 | `travel-order-view-awaiting-hotel` | Order view before the hotel has answered: `CONFIRMED`, "Awaiting Hotel Confirmation", `is_paid` false, `next_step` null (SD-1230). The state of a booking made before SD-1282 | Lasts a minute or two after booking |
 | `travel-order-view-awaiting-payment` | Order view of an order opened and not paid: `CREATED`, "Awaiting Payment", `is_paid` false, `next_step` `pay` "Pay to Book", `fulfilment.state` `CREATED` (SD-1282) | Pay-first is not on staging yet |
 | `travel-order-view-booking-your-room` | Order view of a paid order being booked: `CONFIRMED`, "Booking Your Room", `is_paid` true, `fulfilment.state` `PROCESSING` | As above |

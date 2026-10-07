@@ -214,6 +214,22 @@ describe('DocumentTypeItem rejected reviews', () => {
         expect(text).not.toContain('undefined');
     });
 
+    // Sumsub writes clientComment for us, not for the applicant, and says it
+    // "must not be shown to the applicant"
+    // (docs.sumsub.com/reference/get-applicant-review-status).
+    it('never shows the customer the comment Sumsub writes for us', async () => {
+        const wrapper = await openFor('SUMSUB');
+
+        await wrapper.findComponent({name: 'Sumsub'}).vm.$emit('sdkApplicantRejected', {
+            reviewStatus: 'completed',
+            reviewResult: {reviewAnswer: 'RED', clientComment: 'Suspected forgery, do not tell the applicant.'},
+        });
+
+        const text = wrapper.get('[role="alert"]').text();
+        expect(text).toContain('did not pass');
+        expect(text).not.toContain('forgery');
+    });
+
     // A refusal must not be mistaken for the success path: that one refreshes
     // the profile and routes the customer onward as though they were verified.
     it('does not report a refusal as a completed verification', async () => {
