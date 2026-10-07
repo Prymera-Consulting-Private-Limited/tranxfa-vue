@@ -99,11 +99,11 @@ describe('PaymentView', () => {
         expect(wrapper.vm.transaction.payment.id).toBe('pay-2');
     });
 
-    // Five back-office adapters have no component here. A code with no
-    // component rendered nothing at all, which is hard to notice and worse
-    // to explain.
+    // Back-office adapters with no component here (Cybrid, Leatherback, Volt
+    // as of October 2026). A code with no component rendered nothing at all,
+    // which is hard to notice and worse to explain.
     it('says so when the provider has no screen in this app', async () => {
-        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'CHECKOUT-COM'})});
+        axios.get.mockResolvedValue({data: makeTransactionPayload({providerCode: 'VOLT'})});
         const wrapper = mountView();
         await flushPromises();
 

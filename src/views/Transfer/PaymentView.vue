@@ -12,6 +12,7 @@ import {computed, onMounted, onUnmounted, ref, watch} from "vue";
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import Transaction from "@/models/transaction.js";
 import PaymentTransaction from "@/models/payment_transaction.js";
+import PaymentState from "@/enums/payment_state.js";
 import router from "@/router/index.js";
 import ManualPayment from "@/components/Payment/ManualPayment.vue";
 import PagaPayment from "@/components/Payment/PagaPayment.vue";
@@ -23,6 +24,7 @@ import PayCross from "@/components/Payment/PayCross.vue";
 import Fincode from "@/components/Payment/Fincode.vue";
 import CinetPay from "@/components/Payment/CinetPay.vue";
 import BelmoneyCard from "@/components/Payment/BelmoneyCard.vue";
+import CheckoutCom from "@/components/Payment/CheckoutCom.vue";
 import WalletPayment from "@/components/Payment/Wallet.vue";
 import ModalCloseButton from "@/components/ModalCloseButton.vue";
 
@@ -38,9 +40,9 @@ const props = defineProps({
 const transaction = ref(null);
 
 // Every code with a component below. The back office has adapters the app has
-// no screen for (BelmoneyCard, CheckoutCom, Cybrid, Leatherback, Volt as of
-// September 2026); one of those used to render a blank page.
-const KNOWN_PROVIDER_CODES = new Set(['MANUAL-PAYMENT', 'PAGA', 'MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'WALLET', 'BELMONEY-CARD']);
+// no screen for (Cybrid, Leatherback, Volt as of October 2026); one of those
+// used to render a blank page.
+const KNOWN_PROVIDER_CODES = new Set(['MANUAL-PAYMENT', 'PAGA', 'MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'WALLET', 'BELMONEY-CARD', 'CHECKOUT-COM']);
 const isKnownProvider = computed(() => KNOWN_PROVIDER_CODES.has(transaction.value?.payment?.paymentProvider?.code));
 
 const isLoading = ref(true);
@@ -73,8 +75,12 @@ const retryFailure = ref(null);
 // An attempt only counts once the server has answered: a request that never
 // left the phone must not use up one of the three tries. A fourth attempt is
 // not sent at all; the watch below pauses the transfer instead.
+//
+// Paying again after the customer cancelled is not a try that went wrong, so
+// it never counts and is never refused (ruled 27 Sep, SD-1423).
 const retryPayment = async (paymentData = null) => {
-  if (paymentAttempt.value >= 3) {
+  const counts = transaction.value?.payment?.state?.code !== PaymentState.CANCELLED;
+  if (counts && paymentAttempt.value >= 3) {
     paymentAttempt.value++;
     return;
   }
@@ -82,10 +88,12 @@ const retryPayment = async (paymentData = null) => {
   retryFailure.value = null;
   retryPaymentErrors.value = [];
   transactionUtils.retryPayment(props.id, paymentData).then((response) => {
-    paymentAttempt.value++;
+    if (counts) {
+      paymentAttempt.value++;
+    }
     transaction.value.payment = PaymentTransaction.getInstance(response.data);
   }).catch(async (e) => {
-    if (e.response) {
+    if (e.response && counts) {
       paymentAttempt.value++;
     }
     if (e.response?.status === 422) {
@@ -95,7 +103,9 @@ const retryPayment = async (paymentData = null) => {
       // transaction before saying anything, and never claim nothing was
       // charged (the double-payment rule).
       logRequestFailure(e, 'retry-payment');
-      paymentAttempt.value++;
+      if (counts) {
+        paymentAttempt.value++;
+      }
       try {
         const fresh = await transactionUtils.getTransaction(props.id);
         transaction.value = Transaction.getInstance(fresh.data);
@@ -107,11 +117,54 @@ const retryPayment = async (paymentData = null) => {
     } else {
       logRequestFailure(e, 'retry-payment');
       retryFailure.value = failureMessage(e, t('transfer.wizard.weCouldntStartA2'));
+      // A 412 with no type is the payment having moved on: already paid, or
+      // not replaceable. What is on screen is stale, so show what it is now.
+      // A typed 412 is a maintenance window, and nothing changed.
+      if (e.response?.status === 412 && ! e.response.data?.type) {
+        await refreshTransaction();
+      }
     }
   }).finally(() => {
     isLoading.value = false;
   });
 }
+
+// Re-reads the transfer behind whatever message is showing, which stays. A
+// failed read leaves the screen as it was rather than replacing the message.
+const refreshTransaction = async () => {
+  try {
+    const fresh = await transactionUtils.getTransaction(props.id);
+    transaction.value = Transaction.getInstance(fresh.data);
+  } catch (e) {
+    logRequestFailure(e, 'payment-refresh');
+  }
+}
+
+// The account is free the moment the cancel answers. The payment keeps its id,
+// so the provider's screen stays mounted and shows it cancelled.
+const onPaymentCancelled = (payment) => {
+  retryFailure.value = null;
+  transaction.value.payment = payment;
+}
+
+// Too late to cancel, or the gateway cannot. Nothing changed on the server, but
+// the screen is out of date.
+const onCancelRefused = async (message) => {
+  retryFailure.value = message;
+  await refreshTransaction();
+}
+
+// Every provider but these has its own retry on a failed payment. None has one
+// on a cancelled or expired payment, which was a dead end before SD-1423.
+const PROVIDERS_WITH_RETRY_ON_FAILURE = new Set(['MONOOVA', 'VOLUME-PAYMENTS', 'APAYLO', 'PAY360', 'PAY-CROSS', 'FINCODE', 'CINET_PAY', 'BELMONEY-CARD', 'CHECKOUT-COM', 'WALLET']);
+const offerPayAgain = computed(() => {
+  if (! transaction.value?.canPayAgain) {
+    return false;
+  }
+
+  return transaction.value.payment.state.code !== PaymentState.FAILED
+      || ! PROVIDERS_WITH_RETRY_ON_FAILURE.has(transaction.value.payment.paymentProvider.code);
+});
 
 // After the third failed attempt the transfer is paused. The customer used
 // to be sent to the transaction page with no explanation.
@@ -181,9 +234,9 @@ function closePaymentModal() {
                   </div>
                   <div v-else-if="transaction" class="text-center">
                     <InlineFailure :message="retryFailure" class="mb-4" />
-                    <ManualPayment :key="transaction.payment.id" v-if="transaction.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction"  />
+                    <ManualPayment :key="transaction.payment.id" v-on:paymentCancelled="onPaymentCancelled" v-on:cancelRefused="onCancelRefused" v-if="transaction.payment.paymentProvider.code === 'MANUAL-PAYMENT'" v-bind:transaction="transaction"  />
                     <PagaPayment :key="transaction.payment.id" v-if="transaction.payment.paymentProvider.code === 'PAGA'" v-bind:transaction="transaction"  />
-                    <Monoova :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'MONOOVA'" v-bind:transaction="transaction"  />
+                    <Monoova :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-on:paymentCancelled="onPaymentCancelled" v-on:cancelRefused="onCancelRefused" v-if="transaction.payment.paymentProvider.code === 'MONOOVA'" v-bind:transaction="transaction"  />
                     <Volume :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'VOLUME-PAYMENTS'" v-bind:transaction="transaction"  />
                     <Apaylo :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'APAYLO'" v-bind:transaction="transaction"  v-bind:retryFormErrors="retryPaymentErrors"  />
                     <Pay360 :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'PAY360'" v-bind:transaction="transaction"  />
@@ -191,7 +244,10 @@ function closePaymentModal() {
                     <Fincode :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'FINCODE'" v-bind:transaction="transaction"  />
                     <CinetPay :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'CINET_PAY'" v-bind:transaction="transaction"  />
                     <BelmoneyCard :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'BELMONEY-CARD'" v-bind:transaction="transaction"  />
+                    <CheckoutCom :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'CHECKOUT-COM'" v-bind:transaction="transaction"  />
                     <WalletPayment :key="transaction.payment.id" v-on:retryPayment="retryPayment" v-if="transaction.payment.paymentProvider.code === 'WALLET'" v-bind:transaction="transaction"  />
+                    <!-- A new payment on the same transfer, at its original amount and rate. -->
+                    <button v-if="offerPayAgain" type="button" @click="retryPayment()" class="-mt-2 mb-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white hover:bg-brand-800 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('transfer.payment.payAgain') }}</button>
                   </div>
                   <div v-else-if="loadFailed" class="text-center">
                     <h2 class="text-xl font-semibold text-gray-900 mb-5">{{ $t('transfer.payment.weCouldntLoadYourPayment') }}</h2>

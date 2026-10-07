@@ -24,6 +24,8 @@ bizliimt, choice_remit, compliant_msb, danca, famremit, nuvendrasl, payrieo,
 payvel, pekepay, quiqsend, remit_centre, remitpay, s-expressmoney, salvtech,
 selamsend, tuhfapay, velox, waya, ypay.
 
+`remitso_demo` is separate from this list - see below.
+
 ### `staging` is a tenant branch
 
 `staging` is the repo's default HEAD, which makes it look like an integration
@@ -33,6 +35,24 @@ Updated", "Tawk.to Added"). It carries no feature work that `main` lacks.
 
 Consequence: a fix committed to `staging` reaches exactly one brand. Shared
 work belongs on `main`.
+
+### `remitso_demo` is Prymera's own demo, not a customer brand
+
+One branch, no `_staging`/`_production` split - `remitso_demo` is Prymera's
+internal sales-demo environment (SD-450), shown to prospects before they
+become a real client (Red Sea Money Transfer went through it). Its backend is
+`console.demo.remitso.com`.
+
+It carries genuine feature work of its own, same as any brand fork, and is
+promoted from `main` the same way: land the fix on `main`, merge into a
+`chore/<slug>` branch cut from `remitso_demo`, verify, PR it in.
+
+In Rover, this environment is tracked under the fleet client key `remitso`
+(not `remitso_demo` - that key exists but is deactivated, left over from
+before the two were reconciled), release branch `remitso` on
+`console.remitso`, same project as SD-450 (`ba6f3827-faa9-4f4c-a2d0-aa68f446d29c`,
+Prymera CO). The frontend git branch name and the Rover fleet key are
+deliberately not the same string - don't assume one from the other.
 
 ## What tenants actually change
 
@@ -117,6 +137,16 @@ Use the `port-to-tenant-branches` skill. The rules it enforces:
    confirm-flow fix to one is unverified by definition; say so in the PR.
 6. **Staging before production.** `<brand>_staging` gets the pick and a smoke
    test before `<brand>_production`.
+7. **Never open the promotion pull request with a long-lived branch as its
+   head.** A pull request from `<brand>_staging` into `<brand>_production` -
+   or from `<brand>_production` into `<brand>_staging`, or either into
+   `main` - puts a permanent deploy branch behind GitHub's per-PR "Delete
+   branch" button, which does not know the difference between that and a
+   spent `feature/*` branch (PM-008). Cut a disposable `via/<slug>` branch
+   from the source environment branch instead, and open the PR from there:
+   `git switch -c via/<slug> origin/<source-branch>`, push it, PR into the
+   target branch. Only the via-branch is ever offered up for deletion after
+   the merge.
 
 ## A brand's copy after a merge
 
