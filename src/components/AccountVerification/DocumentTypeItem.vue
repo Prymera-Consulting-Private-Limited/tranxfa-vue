@@ -97,8 +97,10 @@ function goToFix() {
 async function sdkApplicantRejected(payload) {
   // Sumsub's payload names the reason; other providers decide by webhook and
   // the app hears about it as a CustomerDocumentRejected event with none.
+  // Only moderationComment is for the customer: Sumsub writes clientComment
+  // for us and says it "must not be shown to the applicant"
+  // (docs.sumsub.com/reference/get-applicant-review-status).
   sdkRejectionReason.value = payload?.reviewResult?.moderationComment
-      || payload?.reviewResult?.clientComment
       || payload?.reason
       || '';
   sdkRejected.value = true;

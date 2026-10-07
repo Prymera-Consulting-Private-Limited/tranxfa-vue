@@ -102,7 +102,7 @@ describe('which gateways offer Cancel payment', () => {
     });
 
     it('does not offer it where the provider would still take the money', () => {
-        for (const provider of ['PAY360', 'PAY-CROSS', 'VOLUME-PAYMENTS', 'APAYLO', 'FINCODE', 'CINET_PAY', 'BELMONEY-CARD', 'PAGA']) {
+        for (const provider of ['PAY360', 'PAY-CROSS', 'VOLUME-PAYMENTS', 'APAYLO', 'FINCODE', 'CINET_PAY', 'BELMONEY-CARD', 'CHECKOUT-COM', 'PAGA']) {
             expect(transfer({payment: 'PENDING', provider}).canCancelPayment).toBe(false);
         }
     });
