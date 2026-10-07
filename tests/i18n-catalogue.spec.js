@@ -19,6 +19,7 @@ const MIGRATED = [
   // slice 2, the money path
   'src/components/Calculator.vue',
   'src/components/Payment/BelmoneyCard.vue',
+  'src/components/Payment/CheckoutCom.vue',
   'src/views/Transfer/IndexView.vue',
   'src/views/Transfer/PaymentView.vue',
   'src/views/Transfer/PaymentCallbackView.vue',
@@ -109,12 +110,14 @@ const MIGRATED = [
   'src/views/Transaction/ItemView.vue',
   // slice 6, wallet, the payment adapters and travel
   'src/components/Payment/Apaylo.vue',
+  'src/components/Payment/CancelTransferPayment.vue',
   'src/components/Payment/CinetPay.vue',
   'src/components/Payment/Fincode.vue',
   'src/components/Payment/HeldByAction.vue',
   'src/components/Payment/ManualPayment.vue',
   'src/components/Payment/Monoova.vue',
   'src/components/Payment/PagaPayment.vue',
+  'src/components/Payment/ReleaseHeldPayment.vue',
   'src/components/Payment/Pay360.vue',
   'src/components/Payment/PayCross.vue',
   'src/components/Payment/Volume.vue',
