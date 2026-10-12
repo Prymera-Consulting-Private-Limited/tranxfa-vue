@@ -50,7 +50,9 @@ customHeaders:
           img-src 'self' data: blob: https:;
           font-src 'self' data: https://fonts.gstatic.com;
           style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-          script-src 'self' 'wasm-unsafe-eval' https://js.volumepay.io;
+          # remitpay: Clarity and GA4 are inline blocks in index.html; they need
+          # hashes (or nonces) before this policy can be enforced.
+          script-src 'self' 'wasm-unsafe-eval' https://js.volumepay.io https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms;
           worker-src 'self' blob:;
           media-src 'self' blob: https://lottie.host;
           connect-src 'self' https: wss:;

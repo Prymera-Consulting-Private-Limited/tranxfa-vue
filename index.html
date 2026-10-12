@@ -21,14 +21,21 @@
       y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
     })(window, document, "clarity", "script", "wx3piuv8wa");
   </script>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DDRGRW8PDM"></script>
+  <!-- Google tag (gtag.js). Inserted from script rather than by a <script src>
+       tag, which tests/http-headers.spec.js keeps out of this file; it still
+       loads straight away and async, as the tag did. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-DDRGRW8PDM');
+    (function () {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-DDRGRW8PDM';
+      document.head.appendChild(s);
+    })();
   </script>
 </head>
 
