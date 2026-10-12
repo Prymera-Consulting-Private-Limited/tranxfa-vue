@@ -22,6 +22,11 @@ class Account {
     mobileNumber = null;
 
     /**
+     * @type {boolean|null}
+     */
+    isMobileNumberVerified = null;
+
+    /**
      * @type {Country|null}
      */
     mobileNumberCountry = null;
@@ -42,6 +47,7 @@ class Account {
         account.isEmailVerified = data.is_email_verified;
         account.passwordChangedAt = data.password_changed_at;
         account.mobileNumber = data.mobile_number;
+        account.isMobileNumberVerified = data.mobile_number_verified;
         if (data.mobile_number_country) {
             account.mobileNumberCountry = Country.getInstance(data.mobile_number_country);
         }

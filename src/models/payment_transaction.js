@@ -46,6 +46,20 @@ class PaymentTransaction {
     paymentUrl = null;
 
     /**
+     * Partner payment terms, normalised to plain text server-side; render
+     * verbatim or not at all.
+     * @type {String|null}
+     */
+    paymentTerms = null;
+
+    /**
+     * Absolute ISO-8601 expiry; null means the payment never expires, not
+     * unknown — render no countdown and no urgency when absent.
+     * @type {String|null}
+     */
+    expiresAt = null;
+
+    /**
      * @type {String|null}
      */
     totalPaymentAmount = null;
@@ -75,6 +89,17 @@ class PaymentTransaction {
      */
     state = null;
 
+    /**
+     * The provider is settling the payment without the customer (Belmoney's
+     * FINISHED / PENDING answers to the initialise call). The Client API
+     * reference does not list this on the payment resource or the broadcast
+     * today - it exists on the flights booking assembler only - so it is read
+     * when present and otherwise inferred by the provider component. Asked
+     * of the backend in SD-1039. The reference carries no failure_reason on
+     * payments either; nothing here reads one.
+     */
+    awaitingConfirmation = false;
+
     static getInstance(data) {
         const paymentTransaction = new PaymentTransaction();
         paymentTransaction.id = data.id;
@@ -86,12 +111,15 @@ class PaymentTransaction {
         paymentTransaction.paymentProvider = PaymentProvider.getInstance(data.payment_provider);
         paymentTransaction.sharedReference = data.shared_reference;
         paymentTransaction.paymentUrl = data.payment_url;
+        paymentTransaction.paymentTerms = data.payment_terms;
+        paymentTransaction.expiresAt = data.expires_at;
         paymentTransaction.totalPaymentAmount = data.total_payment_amount;
         paymentTransaction.totalPaymentAmountFormatted = data.total_payment_amount_formatted;
         paymentTransaction.totalPaymentAmountCurrencyPrefixed = data.total_payment_amount_currency_prefixed;
         paymentTransaction.createdAt = data.created_at;
         paymentTransaction.updatedAt = data.updated_at;
         paymentTransaction.customerConfirmedPayment = data.customer_confirmed_payment;
+        paymentTransaction.awaitingConfirmation = data.awaiting_confirmation === true;
         if (data.state) {
             paymentTransaction.state = PaymentTransactionState.getInstance(data.state);
         }

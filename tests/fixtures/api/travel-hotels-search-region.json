@@ -1,0 +1,166 @@
+{
+  "search": {
+    "id": "01a0a6c7-5684-73ab-8ac4-396065b7e5fa",
+    "expires_at": "2026-09-15T21:04:36+00:00",
+    "check_in": "2026-10-01",
+    "check_out": "2026-10-04",
+    "nights": 3
+  },
+  "currency": "AUD",
+  "currency_decimal_places": 2,
+  "nights": 3,
+  "total_hotels": 246,
+  "hotels": [
+    {
+      "id": "01a0a6a6-f918-7143-9c26-1a8f4f055c2d",
+      "slug": "charming-duplex-home",
+      "name": "Charming Duplex Home",
+      "address": "13847 Chandler Boulevard",
+      "region": "Los Angeles",
+      "star_rating": 2,
+      "photo": {
+        "thumbnail": "https://cdn.worldota.net/t/120x120/content/81/5a/815abb05fe20d6da8c83728ec0788d53ab597ebc.jpeg",
+        "card": "https://cdn.worldota.net/t/640x350/content/81/5a/815abb05fe20d6da8c83728ec0788d53ab597ebc.jpeg",
+        "large": "https://cdn.worldota.net/t/1300x620/content/81/5a/815abb05fe20d6da8c83728ec0788d53ab597ebc.jpeg"
+      },
+      "amenities": [
+        "smoking-areas",
+        "garden",
+        "terrace",
+        "outdoor-furniture"
+      ],
+      "rate_count": 3,
+      "cheapest_rate": {
+        "room_name": "Junior Suite",
+        "meal": "NO-MEAL",
+        "allotment": 2,
+        "bookable": false,
+        "breakdown": [
+          {
+            "key": "room",
+            "label": "Room",
+            "amount": 43490,
+            "amount_decimal": "434.90",
+            "amount_formatted": "434.90",
+            "amount_currency_prefixed": "AUD 434.90"
+          },
+          {
+            "key": "taxes_and_fees",
+            "label": "Taxes and fees",
+            "amount": 0,
+            "amount_decimal": "0.00",
+            "amount_formatted": "0.00",
+            "amount_currency_prefixed": "AUD 0.00"
+          },
+          {
+            "key": "convenience_fee",
+            "label": "Convenience fee",
+            "amount": 1211,
+            "amount_decimal": "12.11",
+            "amount_formatted": "12.11",
+            "amount_currency_prefixed": "AUD 12.11"
+          }
+        ],
+        "cancellation": {
+          "status": "free",
+          "free_until": "2026-09-30T00:00:00+00:00",
+          "changes_at": "2026-09-30T00:00:00+00:00",
+          "costs_now": 0,
+          "costs_now_decimal": "0.00",
+          "costs_now_formatted": "0.00",
+          "costs_now_currency_prefixed": "AUD 0.00"
+        },
+        "total": 44701,
+        "total_decimal": "447.01",
+        "total_formatted": "447.01",
+        "total_currency_prefixed": "AUD 447.01",
+        "per_night": 14900,
+        "per_night_decimal": "149.00",
+        "per_night_formatted": "149.00",
+        "per_night_currency_prefixed": "AUD 149.00",
+        "payable_at_property": []
+      }
+    },
+    {
+      "id": "01a0a6a6-da6b-7176-b2a8-e5326b9bc714",
+      "slug": "conrad-los-angeles",
+      "name": "Conrad Los Angeles",
+      "address": "100 South Grand Avenue",
+      "region": "Los Angeles",
+      "star_rating": 5,
+      "photo": {
+        "thumbnail": "https://cdn.worldota.net/t/120x120/content/cb/2b/cb2b1cc25be9e3f8892f9d572e3e0e71492a3b38.jpeg",
+        "card": "https://cdn.worldota.net/t/640x350/content/cb/2b/cb2b1cc25be9e3f8892f9d572e3e0e71492a3b38.jpeg",
+        "large": "https://cdn.worldota.net/t/1300x620/content/cb/2b/cb2b1cc25be9e3f8892f9d572e3e0e71492a3b38.jpeg"
+      },
+      "amenities": [
+        "air-conditioning",
+        "24-hour-reception",
+        "currency-exchange",
+        "smoke-free-property"
+      ],
+      "rate_count": 18,
+      "cheapest_rate": {
+        "room_name": "Standard Double room with balcony and with river view",
+        "meal": "NO-MEAL",
+        "allotment": 2,
+        "bookable": false,
+        "breakdown": [
+          {
+            "key": "room",
+            "label": "Room",
+            "amount": 72064,
+            "amount_decimal": "720.64",
+            "amount_formatted": "720.64",
+            "amount_currency_prefixed": "AUD 720.64"
+          },
+          {
+            "key": "taxes_and_fees",
+            "label": "Taxes and fees",
+            "amount": 8934,
+            "amount_decimal": "89.34",
+            "amount_formatted": "89.34",
+            "amount_currency_prefixed": "AUD 89.34"
+          },
+          {
+            "key": "convenience_fee",
+            "label": "Convenience fee",
+            "amount": 1731,
+            "amount_decimal": "17.31",
+            "amount_formatted": "17.31",
+            "amount_currency_prefixed": "AUD 17.31"
+          }
+        ],
+        "cancellation": {
+          "status": "non_refundable",
+          "free_until": null,
+          "changes_at": null,
+          "costs_now": 82729,
+          "costs_now_decimal": "827.29",
+          "costs_now_formatted": "827.29",
+          "costs_now_currency_prefixed": "AUD 827.29"
+        },
+        "total": 82729,
+        "total_decimal": "827.29",
+        "total_formatted": "827.29",
+        "total_currency_prefixed": "AUD 827.29",
+        "per_night": 27576,
+        "per_night_decimal": "275.76",
+        "per_night_formatted": "275.76",
+        "per_night_currency_prefixed": "AUD 275.76",
+        "payable_at_property": []
+      }
+    }
+  ],
+  "labels": {
+    "smoking-areas": "Smoking areas",
+    "garden": "Garden",
+    "terrace": "Terrace",
+    "outdoor-furniture": "Outdoor furniture",
+    "NO-MEAL": "No meals included",
+    "air-conditioning": "Air conditioning",
+    "24-hour-reception": "24-hour reception",
+    "smoke-free-property": "Smoke-free property",
+    "currency-exchange": "Currency exchange"
+  }
+}

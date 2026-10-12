@@ -1,4 +1,10 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
+import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import InlineFailure from "@/components/InlineFailure.vue";
 import TargetSelection from "@/components/Recipient/TargetSelection.vue";
 import {onMounted, reactive, ref, watch, watchEffect} from "vue";
 import Spinner from "@/components/Spinner.vue";
@@ -47,6 +53,62 @@ const targets = ref([]);
 const payoutMethods = ref([]);
 const relationships = ref([]);
 
+// Each step fetches what the next one needs. A rejected fetch used to leave
+// the spinner up for good; now the step stays put with a message and a
+// "Try again" that repeats the same fetch.
+const loadFailure = ref(null);
+let retryLast = () => {};
+
+function retry() {
+  loadFailure.value = null;
+  retryLast();
+}
+
+// The first step used to retry by calling window.location.reload(). That is not
+// a retry: it throws away the whole application and brings the customer back at
+// the splash screen with the wizard gone. "Try again" on a failed fetch repeats
+// the fetch, like every other step here.
+async function fetchTargets() {
+  isLoading.value = true;
+  retryLast = fetchTargets;
+  try {
+    const response = await payoutChannelUtils.getTargets();
+    targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
+  } catch (e) {
+    logRequestFailure(e, 'recipient-targets');
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe7'));
+    isLoading.value = false;
+    return;
+  }
+  if (targets.value.length === 1) {
+    await updateRecipientTarget(targets.value[0]);
+  } else {
+    isLoading.value = false;
+  }
+}
+
+async function fetchPayoutMethods() {
+  isLoading.value = true;
+  retryLast = fetchPayoutMethods;
+  try {
+    const response = await payoutChannelUtils.getMethods({
+      country: recipient.country,
+      currency: recipient.currency,
+    });
+    payoutMethods.value = response.data.data.map((o) => PayoutMethod.getInstance(o));
+  } catch (e) {
+    logRequestFailure(e, 'recipient-payout-methods');
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe5'));
+    isLoading.value = false;
+    return;
+  }
+  if (payoutMethods.value.length === 1) {
+    await updatePayoutMethod(payoutMethods.value[0]);
+  } else {
+    isLoading.value = false;
+  }
+}
+
 async function updateRecipientTarget(target) {
   recipient.country = target.country;
   recipient.currency = target.currency;
@@ -55,18 +117,54 @@ async function updateRecipientTarget(target) {
     target: target
   });
   send({ type: "PROCEED" })
+  await fetchPayoutMethods();
+}
+
+async function fetchPayoutChannel() {
   isLoading.value = true;
-  const response = await payoutChannelUtils.getMethods({
-    country: recipient.country,
-    currency: recipient.currency,
-  });
-  payoutMethods.value = response.data.data.map((o) => PayoutMethod.getInstance(o));
-  if (payoutMethods.value.length === 1) {
-    await updatePayoutMethod(payoutMethods.value[0]);
+  retryLast = fetchPayoutChannel;
+  try {
+    recipient.payoutChannel = await payoutChannelUtils.getChannel({
+      payoutMethod: recipient.payoutMethod,
+      country: recipient.country,
+      currency: recipient.currency,
+    });
+  } catch (e) {
+    logRequestFailure(e, 'recipient-payout-channel');
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe6'));
+    isLoading.value = false;
+    return;
+  }
+  // `configuration` is nullable on the model - PayoutChannel only populates it
+  // when the payload carries one - and this branch used to read through it
+  // without asking, outside the try above. A channel arriving without a
+  // configuration threw a TypeError that nothing caught: isLoading stayed true,
+  // no loadFailure was set, and the customer had a spinner with no message and
+  // no retry. That is the shape somebody reports as "adding a recipient
+  // freezes" - not an error, a screen that never finishes.
+  const configuration = recipient.payoutChannel?.configuration;
+
+  if (! configuration) {
+    // A code rather than a sentence: this is telemetry, it gets grepped, and
+    // the catalogue guard cannot tell a log string from copy - correctly, since
+    // it has no way to know which one a reader will see.
+    logRequestFailure(new Error('payout-channel-missing-configuration'), 'recipient-payout-channel');
+    loadFailure.value = t('recipient.weCouldntLoadThe6');
+    isLoading.value = false;
+    return;
+  }
+
+  // A null recipientType is not a fault: the channel does not dictate one, the
+  // machine is already on recipientTypeSelection, and the customer picks.
+  if (configuration.recipientType === RecipientType.INDIVIDUAL) {
+    await updateRecipientType(RecipientType.INDIVIDUAL);
+  } else if (configuration.recipientType === RecipientType.BUSINESS) {
+    await updateRecipientType(RecipientType.BUSINESS);
   } else {
     isLoading.value = false;
   }
 }
+
 async function updatePayoutMethod(payoutMethod) {
   recipient.payoutMethod = payoutMethod;
   send({
@@ -74,19 +172,37 @@ async function updatePayoutMethod(payoutMethod) {
     payoutMethod: payoutMethod
   });
   send({ type: "PROCEED" })
+  await fetchPayoutChannel();
+}
+
+async function fetchRelationships() {
   isLoading.value = true;
-  recipient.payoutChannel = await payoutChannelUtils.getChannel({
-    payoutMethod: recipient.payoutMethod,
-    country: recipient.country,
-    currency: recipient.currency,
-  });
-  if (recipient.payoutChannel.configuration.recipientType === RecipientType.INDIVIDUAL) {
-    await updateRecipientType(RecipientType.INDIVIDUAL);
-  } else if (recipient.payoutChannel.configuration.recipientType === RecipientType.BUSINESS) {
-    await updateRecipientType(RecipientType.BUSINESS);
-  } else {
+  retryLast = fetchRelationships;
+
+  // One read, unnarrowed. The country filter stays off until the back end falls
+  // back to the full list on an empty mapping (SD-1181): narrowing by a mapping
+  // that is empty on every corridor of every tenant is what emptied this field
+  // in the first place.
+  try {
+    const response = await resourceUtils.relationships();
+    relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship));
+  } catch (e) {
+    logRequestFailure(e, 'recipient-relationships');
+    loadFailure.value = failureMessage(e, t('recipient.weCouldntLoadThe4'));
     isLoading.value = false;
+    return;
   }
+
+  // Relationship is required to save, so an empty list is not a valid state:
+  // the customer arrives at the last step and can never finish it. Before this,
+  // an empty list was silent - a picker that opened on nothing, a Save that
+  // could not pass validation, and no way to tell that anything had gone wrong.
+  if (relationships.value.length === 0) {
+    logRequestFailure(new Error('recipient-relationships-empty'), 'recipient-relationships');
+    loadFailure.value = t('recipient.weCouldntLoadThe4');
+  }
+
+  isLoading.value = false;
 }
 
 async function updateRecipientType(type) {
@@ -96,13 +212,7 @@ async function updateRecipientType(type) {
     recipientType: type
   });
   send({ type: "PROCEED" })
-  isLoading.value = true;
-  await resourceUtils.relationships().then((response) => {
-    relationships.value = response.data.data.map((relationship) => Relationship.getInstance(relationship))
-  }).finally(() => {
-    isLoading.value = false;
-  });
-
+  await fetchRelationships();
 }
 
 onMounted(async () => {
@@ -117,14 +227,7 @@ onMounted(async () => {
     send({ type: "PROCEED" })
     await updatePayoutMethod(props.quote.payoutMethod);
   } else {
-    await payoutChannelUtils.getTargets().then((response) => {
-      targets.value = response.data.data.map((data) => QuoteTarget.getInstance(data));
-    });
-    if (targets.value.length === 1) {
-      await updateRecipientTarget(targets.value[0]);
-    } else {
-      isLoading.value = false;
-    }
+    await fetchTargets();
   }
 })
 
@@ -158,12 +261,17 @@ function updateChildComponentLoadingState(newState) {
   <div>
     <div v-if="isLoading" role="status" class="p-10 flex items-center justify-center w-64 lg:min-w-96 mx-auto min-h-96">
       <Spinner class="size-16 mx-auto" />
-      <button class="sr-only">Loading...</button>
+      <span class="sr-only">{{ $t('transfer.wizard.loading') }}</span>
     </div>
+    <InlineFailure v-else-if="loadFailure" :message="loadFailure" :retryLabel="$t('common.tryAgain')" @retry="retry" class="mt-0 mb-4" />
     <template v-else>
       <template v-if="snapshot?.value === 'addRecipientForm'">
-        <h4 class="text-base text-gray-800 font-semibold">Recipient Details</h4>
-        <p class="mt-1 text-sm text-gray-700 mb-5">For receiving <span class="text-brand-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span> in <span class="text-brand-700 font-semibold">{{ recipient.country?.commonName }}</span> using <span class="text-brand-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></p>
+        <h4 class="text-base text-gray-800 font-semibold">{{ $t('recipient.recipientDetails') }}</h4>
+        <i18n-t keypath="recipient.forReceivingCurrencyInCountry" tag="p" scope="global" class="mt-1 text-sm/6 text-gray-700 mb-5">
+          <template #currency><span class="text-brand-700 font-semibold">{{ recipient.currency?.isoAlpha }}</span></template>
+          <template #country><span class="text-brand-700 font-semibold">{{ recipient.country?.commonName }}</span></template>
+          <template #method><span class="text-brand-700 font-semibold">{{ recipient.payoutMethod?.title }}</span></template>
+        </i18n-t>
         <AttributeCollection
             v-bind:country="recipient.country"
             v-bind:currency="recipient.currency"

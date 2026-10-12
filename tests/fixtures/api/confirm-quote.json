@@ -1,0 +1,35 @@
+{
+  "message": "Account verification is incomplete.",
+  "type": "account_verification_required",
+  "pending_documents": [
+    {
+      "id": "93ba70bd-f910-4323-84cf-2fc63b2472b2",
+      "code": "POI",
+      "title": "Proof of Identity",
+      "description": "Documents that verify the identity of the customer, such as a passport, driver\u2019s license, or national ID card.",
+      "document_types": [
+        {
+          "id": "f495196f-047c-4a3a-962f-845409fddaf8",
+          "code": "PASSPORT",
+          "title": "Passport",
+          "description": "A government-issued document that certifies the identity and nationality of the holder for international travel.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SUMSUB"
+        },
+        {
+          "id": "0ab35156-a21d-467f-ab08-395cfcacc0a3",
+          "code": "DRIVERS_LICENSE",
+          "title": "Driver's License",
+          "description": "An official document permitting a specific individual to operate one or more types of motorized vehicles.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SUMSUB"
+        }
+      ],
+      "required": true
+    }
+  ]
+}

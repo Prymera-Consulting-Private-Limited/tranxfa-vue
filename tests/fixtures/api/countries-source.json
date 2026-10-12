@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+      "iso2_alpha": "AU",
+      "iso3_alpha": "AUS",
+      "iso_numeric": "36",
+      "fips_code": "AS",
+      "slug": "australia",
+      "calling_code": "61",
+      "common_name": "Australia",
+      "official_name": "Australia",
+      "endonym": "Australia",
+      "demonym": "Australian, Australia",
+      "mobile_number_rule": {
+        "exact_length": null,
+        "min_length": 5,
+        "max_length": 15,
+        "expression": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "wallet_topup_amount_collides",
+  "reason": "account_held",
+  "message": "Another payment is still holding your account while we wait for it. Please pay it or cancel it first, or try again later.",
+  "held_by": {
+    "kind": "wallet_topup",
+    "id": "01a0d4e0-4444-7555-8666-b77788899900",
+    "reference": "WT2609180007",
+    "payment_id": null,
+    "service": null
+  }
+}
