@@ -28,7 +28,7 @@ describe('BrandLogo', () => {
         const img = mount(BrandLogo, {props: {variant: 'light', size: 'header'}}).get('img');
 
         expect(img.attributes('src')).toBe('/images/logo-white.png');
-        expect(img.classes()).toEqual(expect.arrayContaining(['h-8', 'w-auto']));
+        expect(img.classes()).toEqual(expect.arrayContaining(['h-8', 'lg:h-16', 'w-auto']));
         expect(img.classes()).not.toContain('max-w-64');
     });
 

@@ -38,9 +38,10 @@ const sources = {
     light: '/images/logo-white.png',
 };
 
+// RemitPay's header logo has always been twice main's height on desktop.
 const sizes = {
     auth: 'max-w-64 max-h-10',
-    header: 'h-8 w-auto',
+    header: 'h-8 lg:h-16 w-auto',
 };
 
 // Falls back rather than rendering an empty alt: a brand that has not set
