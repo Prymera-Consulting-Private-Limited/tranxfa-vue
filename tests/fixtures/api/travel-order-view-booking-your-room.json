@@ -1,0 +1,49 @@
+{
+  "id": "01a0b7c0-7777-7888-8999-e00011122233",
+  "reference": "VO-01M3C2F3H5K7M9P1R3T5V7X9Z1",
+  "state": "CONFIRMED",
+  "state_label": "Booking Your Room",
+  "state_description": "Your payment has arrived and we are booking your room with the hotel. This usually takes a few minutes.",
+  "is_paid": true,
+  "next_step": null,
+  "fulfilment": {"state": "PROCESSING", "state_label": "Processing"},
+  "booked_at": "2026-09-20T02:11:05+00:00",
+  "hotel": {"id": "01a0a6a6-da6b-7176-b2a8-e5326b9bc714", "slug": "conrad-los-angeles", "name": "Conrad Los Angeles", "address": "100 South Grand Avenue", "star_rating": 5},
+  "check_in": "2026-10-15",
+  "check_out": "2026-10-18",
+  "nights": 3,
+  "room_name": "Standard Double room with balcony and with river view (full double bed)",
+  "meal": "NO-MEAL",
+  "occupancy": {"rooms": [{"adults": 2, "children_ages": []}]},
+  "is_confirmed": false,
+  "confirmed_at": null,
+  "confirmation": null,
+  "guests": {"rooms": [{"guests": [{"first_name": "Test", "last_name": "Guest", "is_child": false}, {"first_name": "Second", "last_name": "Guest", "is_child": false}]}]},
+  "contact": {"email": "test@example.com", "phone": "+61400000000"},
+  "breakdown": [
+    {"key": "room", "label": "Room", "amount": 72064, "amount_decimal": "720.64", "amount_formatted": "720.64", "amount_currency_prefixed": "AUD 720.64"},
+    {"key": "taxes_and_fees", "label": "Taxes and fees", "amount": 8934, "amount_decimal": "89.34", "amount_formatted": "89.34", "amount_currency_prefixed": "AUD 89.34"},
+    {"key": "convenience_fee", "label": "Convenience fee", "amount": 1731, "amount_decimal": "17.31", "amount_formatted": "17.31", "amount_currency_prefixed": "AUD 17.31"}
+  ],
+  "payments": [
+    {
+      "id": "01a0b7c1-1111-7222-8333-a44455566677",
+      "reference": "VO-01M3C2F3H5K7M9P1R3T5V7X9Z1-P001",
+      "state": "CAPTURED",
+      "state_label": "Captured",
+      "method": "Bank Transfer",
+      "attempted_at": "2026-09-20T02:12:40+00:00",
+      "client_payment_account": null,
+      "expires_at": "2026-09-25T02:12:40+00:00",
+      "amount": 82729,
+      "amount_decimal": "827.29",
+      "amount_formatted": "827.29",
+      "amount_currency_prefixed": "AUD 827.29"
+    }
+  ],
+  "cancellation": {"requested": null, "can_cancel_now": false, "quote": null},
+  "total": 82729,
+  "total_decimal": "827.29",
+  "total_formatted": "827.29",
+  "total_currency_prefixed": "AUD 827.29"
+}

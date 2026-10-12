@@ -1,0 +1,4 @@
+{
+  "type": "method_settled_by_hand",
+  "message": "That payment method cannot be used here, because the price is only held for a short time. Please choose another."
+}
