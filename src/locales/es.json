@@ -106,6 +106,10 @@
     "ourFees": "Nuestra comisión",
     "subtotal": "Subtotal",
     "totalDue": "Total a pagar",
+    "payoutCountry": "País de destino",
+    "sendingAmount": "Importe a enviar",
+    "recipientGets2": "El beneficiario recibe",
+    "exchangeRate": "Tipo de cambio",
     "chooseYourRecipient": "Elige tu beneficiario",
     "spendOrWithdrawTheBalance": "Gasta o retira el saldo antes de cerrar la billetera."
   },
@@ -168,6 +172,7 @@
     "youSend": "Tú envías",
     "yourAbilityToSendMoney": "Tu posibilidad de enviar dinero está restringida temporalmente.",
     "zero": "Sin comisión",
+    "rateBeforeCouponCode": "Tipo de cambio antes del cupón {code}",
     "couponCode": "Cupón {code}"
   },
   "common": {
