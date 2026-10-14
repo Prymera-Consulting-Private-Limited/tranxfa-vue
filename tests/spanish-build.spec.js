@@ -86,6 +86,19 @@ describe('the Spanish build', () => {
     expect(t('account.sendingFromCountry', {country: 'España'})).toBe('Enviando desde España');
   });
 
+  // SD-1711. The client found four English labels on "Revisar y confirmar",
+  // the last screen before the customer commits, and chose the wording below.
+  // The coupon row is on the same screen and was English too; it only shows
+  // when a coupon improves the rate.
+  it('says the review-and-confirm summary in Spanish', () => {
+    expect(t('account.payoutCountry')).toBe('País de destino');
+    expect(t('account.sendingAmount')).toBe('Importe a enviar');
+    expect(t('account.exchangeRate')).toBe('Tipo de cambio');
+    expect(t('account.recipientGets2')).toBe('El beneficiario recibe');
+    expect(t('calculator.rateBeforeCouponCode', {code: 'BIENVENIDA'}))
+      .toBe('Tipo de cambio antes del cupón BIENVENIDA');
+  });
+
   // Three of these were wrong rather than missing, which no count would catch.
   it('uses the banking word, the informal register and Spanish spelling', () => {
     // `extracto` is the statement a bank sends; `declaración` is a tax return.
@@ -112,6 +125,6 @@ describe('the Spanish build', () => {
     const done = Object.keys(flat(es)).length;
 
     console.log(`[es] ${done} of ${total} keys translated, ${total - done} fall back to English`);
-    expect(done).toBeGreaterThanOrEqual(461);   // 461 of 950 after SD-1141
+    expect(done).toBeGreaterThanOrEqual(478);   // 478 of 1021 after SD-1711
   });
 });
