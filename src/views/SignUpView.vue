@@ -244,7 +244,7 @@ watch(
                index.html, so the image never rendered on any brand (SD-1106). -->
           <img src="/images/backgrounds/signup.jpg" :alt="$t('auth.resetPassword.imageAlt')" class="w-full h-90 md:sticky md:top-0 md:h-screen object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
+          <div class="absolute top-4 left-0 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
             <a :href="appUrl" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
