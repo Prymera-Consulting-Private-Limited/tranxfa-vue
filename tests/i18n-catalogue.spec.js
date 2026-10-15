@@ -424,7 +424,12 @@ describe('copy does not hide in a script block', () => {
   };
 
   // defineProps is hoisted above setup(), so a default there cannot call t().
-  // Those components resolve their own default with a computed instead.
+  // A component defaults such a prop to null and falls back to the catalogue
+  // where it renders it (LoadFailurePanel, CustomerAttributeForm), so a prop
+  // default is never copy and defineProps is scanned like the rest. It was
+  // skipped once, and CustomerAttributeForm's 'Continue' went through on the
+  // onboarding detail forms of every non-English brand. Only defineEmits,
+  // whose strings are event names, is skipped.
   const insideCall = (code, index, name) => {
     const open = code.lastIndexOf(`${name}(`, index);
     if (open < 0) return false;
@@ -498,7 +503,7 @@ describe('copy does not hide in a script block', () => {
       // on the n of return and every returned sentence went unseen.
       if (/\+[ \t]*$/.test(before)) continue;
       if (/^[ \t]*\+/.test(body.slice(start + quoted.length, start + quoted.length + 12))) continue;
-      if (insideCall(body, start, 'defineProps') || insideCall(body, start, 'defineEmits')) continue;
+      if (insideCall(body, start, 'defineEmits')) continue;
       if (isCopy(text)) found.push(text);
     }
 
