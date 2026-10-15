@@ -51,6 +51,18 @@ describe('auth screens grow with their content', () => {
     expect(images[0]).toEqual(expect.arrayContaining(['md:sticky', 'md:top-0', 'md:h-screen']));
   });
 
+  // A positioned bar that is full width and also starts in from the edge is
+  // wider than the window by that much. The mobile logo bar was `left-4 w-full`,
+  // so every one of these screens scrolled sideways by 16px on a phone.
+  it.each(AUTH_VIEWS)('%s: nothing full width starts in from the edge', (file) => {
+    const OFFSET = /^(?:[a-z]+:)?(?:left|right|inset-x|start|end)-(?!0$)/;
+    const overhanging = classesOf(file, /\bw-full\b/)
+      .filter(classes => classes.includes('absolute') || classes.includes('fixed'))
+      .filter(classes => classes.some(name => OFFSET.test(name)));
+
+    expect(overhanging).toEqual([]);
+  });
+
   // A screen is in this layout when it names a background. A sixth one would
   // otherwise go unchecked, so they are found rather than listed.
   it('finds every screen with a background, so none goes unchecked', () => {
