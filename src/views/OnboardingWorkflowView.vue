@@ -60,7 +60,7 @@ onMounted(loadProfile);
                rewrite answers it with index.html (SD-1106). -->
           <img src="/images/backgrounds/bg.png" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:sticky md:top-0 md:h-screen object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
+          <div class="absolute top-4 left-0 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
           </div>
         </div>
