@@ -787,10 +787,12 @@ export function useHotelUtils() {
     }
 
     /**
-     * Holds the chosen rate's price. The supplier is asked for this hotel again
-     * and the token is looked for in its current answer, so a room that has gone
-     * in the meantime comes back as a 409 — an ordinary answer rather than an
-     * error, since a room can sell out between reading about it and choosing it.
+     * Holds the chosen rate's price. From console 2026.10.6 the token is the
+     * rate's own id, and the console prices the one rate it names rather than
+     * asking the supplier for this hotel again. A 409 is an ordinary answer
+     * rather than an error: a room can sell out between reading about it and
+     * choosing it, and a token from a hotel page opened before 2026.10.6 was the
+     * supplier's.
      *
      * @param {string} searchId
      * @param {string} hotelId

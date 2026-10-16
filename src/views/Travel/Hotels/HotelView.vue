@@ -90,10 +90,10 @@ function selectRate(rate) {
 
 /**
  * Holds the price, which is the first thing that can fail for an ordinary
- * reason: the supplier is asked for this hotel again and the token looked for in
- * its current answer, so a room that sold out in the meantime comes back as a
- * 409. That is an answer, not an error — the customer is sent back to the list
- * rather than shown a dialog.
+ * reason: a room that sold out in the meantime comes back as a 409, and so does
+ * a token from a page opened before console 2026.10.6, when tokens were the
+ * supplier's. That is an answer, not an error — the customer is sent back to the
+ * list rather than shown a dialog.
  */
 async function holdPrice() {
   if (!selectedRate.value?.token || !searchId.value) {
