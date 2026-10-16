@@ -97,6 +97,7 @@ describe('the Spanish build', () => {
     expect(t('account.recipientGets2')).toBe('El beneficiario recibe');
     expect(t('calculator.rateBeforeCouponCode', {code: 'BIENVENIDA'}))
       .toBe('Tipo de cambio antes del cupón BIENVENIDA');
+    expect(t('transfer.wizard.checkCode')).toBe('Aplicar código');
   });
 
   // Three of these were wrong rather than missing, which no count would catch.
