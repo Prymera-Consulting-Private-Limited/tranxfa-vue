@@ -13,7 +13,7 @@ import HotelHouseRules from "@/views/Travel/Hotels/Partials/HotelHouseRules.vue"
 import HotelAmenities from "@/views/Travel/Hotels/Partials/HotelAmenities.vue";
 import HotelStayCard from "@/views/Travel/Hotels/Partials/HotelStayCard.vue";
 import HotelDetailSkeleton from "@/views/Travel/Hotels/Partials/HotelDetailSkeleton.vue";
-import {getCheapestRate, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
+import {getCheapestRate, getCriteria, getQuery, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import HotelDetail from "@/models/travel/hotels/hotel_detail.js";
 import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 import HotelSearch from "@/models/travel/hotels/hotel_search.js";
@@ -121,17 +121,15 @@ async function holdPrice() {
   });
 }
 
-// The search this hotel was opened from, replayed exactly as the url carries it.
+// The search this hotel was opened from, read back through the same pair the
+// results page writes its url with, so every part of it survives the way back.
+// Naming the parameters here once left the guests' passport country behind, and
+// the results came back priced for the profile's passports instead (SD-1775).
 // Only ever used to go back: the stay itself comes from the resolved search, so
 // nothing here is trusted to describe what was priced.
 const resultsLink = computed(() => ({
   name: 'hotels',
-  query: {
-    region: route.query.region,
-    checkin: route.query.checkin,
-    checkout: route.query.checkout,
-    guests: route.query.guests,
-  },
+  query: getQuery(getCriteria(route.query)),
 }));
 
 // Nothing past search/region ever carries raw criteria again, so without a
