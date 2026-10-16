@@ -2,7 +2,7 @@ import HouseRuleCharge from "@/models/travel/hotels/house_rule_charge.js";
 
 /**
  * A hotel as its own page describes it — the authoritative answer, and the only
- * place the supplier will issue a token against a rate.
+ * place a rate is given a token.
  */
 class HotelDetail {
     /**
