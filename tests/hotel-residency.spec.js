@@ -21,12 +21,16 @@ setActivePinia(createPinia());
 
 const axios = (await import('axios')).default;
 const {default: IndexView} = await import('@/views/Travel/Hotels/IndexView.vue');
+const {default: HotelView} = await import('@/views/Travel/Hotels/HotelView.vue');
 const {default: PassportCountry} = await import('@/views/Travel/Hotels/Partials/PassportCountry.vue');
 const {getCriteria, getQuery, useHotelUtils} = await import('@/composables/travel/hotels/hotel_utils.js');
 const {useCustomerStore} = await import('@/stores/customer.js');
 const {default: Customer} = await import('@/models/customer.js');
 
 const REGION = '01a0a6a5-ee4c-70bd-b0cc-376c185ad81d';
+const SEARCH = '01a0a6be-9b2d-7085-af0e-4b860114e78a';
+const CONRAD = '01a0a6a6-da6b-7176-b2a8-e5326b9bc714';
+const HOTEL_URL = `/client/v1/travel/hotel/${SEARCH}/${CONRAD}`;
 const SEARCH_URL = '/client/v1/travel/hotels/search/region';
 const ROUTES = {
     '/client/v1/countries': 'countries',
@@ -78,6 +82,39 @@ async function mountResults(query = '') {
 }
 
 const searches = () => axios.post.mock.calls.filter(([url]) => url === SEARCH_URL);
+
+// A hotel opened from the results, its url carrying the search it was found
+// under. The dates are whatever the url parser accepts today, so the stay
+// never ages into the past.
+async function mountHotel(query = '') {
+    const {checkin, checkout} = getCriteria({});
+    const router = createRouter({
+        history: createMemoryHistory(),
+        routes: [
+            {path: '/travel/hotels', name: 'hotels', component: {template: '<div />'}},
+            {path: '/travel/hotel/:id/:slug', name: 'viewHotel', component: HotelView},
+        ],
+    });
+
+    await router.push(`/travel/hotel/${CONRAD}/conrad-los-angeles?search=${SEARCH}&region=${REGION}&checkin=${checkin}&checkout=${checkout}&guests=2${query}`);
+    await router.isReady();
+
+    const wrapper = mount(HotelView, {
+        props: {id: CONRAD, slug: 'conrad-los-angeles', search: SEARCH},
+        global: {plugins: [router], stubs: {CustomerLayout: {template: '<div><slot /></div>'}}},
+    });
+
+    await flushPromises();
+
+    return {wrapper, router, checkin, checkout};
+}
+
+// Every link on the page that leads back to the results, as the query the
+// results page would search with.
+const waysBack = (wrapper, router) => wrapper.findAll('a')
+    .map(link => router.resolve(link.attributes('href')))
+    .filter(to => to.name === 'hotels')
+    .map(to => to.query);
 
 describe('the passport country in the url', () => {
     it('reads a two-letter code, upper-cased, and drops anything else', () => {
@@ -160,5 +197,39 @@ describe('the results page', () => {
         expect(router.currentRoute.value.query.residency).toBe('NZ');
         expect(searches()).toHaveLength(1);
         expect(searches()[0][1].residency).toBe('NZ');
+    });
+});
+
+// The hotel page's own "Back to results" rebuilt the search from four named
+// parameters and left the passport country behind, so a customer who changed
+// it went back to results priced for the profile's passports instead.
+describe('the way back from a hotel', () => {
+    it('keeps the passport country the customer chose, with the rest of the search', async () => {
+        mockApi(axios, {...ROUTES, [HOTEL_URL]: 'travel-hotel-view'});
+        const {wrapper, router, checkin, checkout} = await mountHotel('&residency=NZ');
+
+        expect(waysBack(wrapper, router)).toEqual([
+            {region: REGION, checkin, checkout, guests: '2', residency: 'NZ'},
+        ]);
+    });
+
+    it('keeps it from the page that could not load the hotel too', async () => {
+        axios.post.mockRejectedValue({response: {status: 404, data: {message: 'These results are out of date.'}}});
+        const {wrapper, router} = await mountHotel('&residency=NZ');
+        const back = waysBack(wrapper, router);
+
+        expect(wrapper.text()).toContain("We couldn't load this hotel");
+        expect(back).toHaveLength(2);
+        back.forEach(query => expect(query.residency).toBe('NZ'));
+    });
+
+    it('does not write one the customer did not choose', async () => {
+        loadCustomer('profile-05-onboarded');
+        mockApi(axios, {...ROUTES, [HOTEL_URL]: 'travel-hotel-view'});
+        const {wrapper, router} = await mountHotel();
+        const [back] = waysBack(wrapper, router);
+
+        expect(back.region).toBe(REGION);
+        expect(back).not.toHaveProperty('residency');
     });
 });
