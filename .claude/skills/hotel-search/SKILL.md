@@ -37,7 +37,8 @@ back button therefore all replay the same search.
 - `getCriteria(query)` → the POST body. `getQuery(criteria)` → the route query. Both are exported
   from `hotel_utils.js` and every comparison round-trips through the pair, so a signature match is
   reliable (`appliedSearch` guards against a double fetch, and lets an unchanged search re-run).
-- Query contract: `?region=<uuid>&checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&guests=2|1:5,9`.
+- Query contract: `?region=<uuid>&checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&guests=2|1:5,9`, plus
+  `&residency=GB` when the customer chose the guests' passport country.
   Rooms are `|`-separated, `adults[:age,age]`; a room with no children is just its adult count.
 - Everything from the URL is validated and clamped, never trusted: past or malformed dates fall
   back to tomorrow → day after, a checkout not after checkin is pushed out a day, counts clamp
@@ -47,9 +48,13 @@ back button therefore all replay the same search.
 - The same query contract carries onto the hotel page: `viewHotel` pushes
   `/travel/hotel/:id/:slug` with `getQuery(criteria)`, so `HotelView` rebuilds the stay with
   `getCriteria(route.query)` and never has to ask for the dates again.
-- `residency` is not part of the criteria: it is read per request from
-  `customerStore.customer.data?.country?.iso2Alpha` (fallback `IN`), because `CustomerLayout`
-  is still loading the customer while this page mounts.
+- `residency` is the country that **issued the guests' passports**, not where they live: the
+  supplier prices on it and can withhold rooms by it (SD-1775). It is never defaulted. The
+  search sends `criteria.residency` (from `?residency=`) or else the profile's
+  `nationality.iso2Alpha`; with neither, nothing is searched and `PassportCountry` asks for it in
+  place of the results. Nothing is searched until `customerStore.isLoaded`, because
+  `CustomerLayout` is still loading the customer while this page mounts, and `search()` throws
+  rather than send a request without a residency. `tests/hotel-residency.spec.js` holds all of it.
 
 ## The hotel page
 

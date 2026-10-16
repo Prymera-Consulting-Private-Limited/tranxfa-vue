@@ -157,6 +157,7 @@ const MIGRATED = [
   'src/views/Travel/Hotels/Partials/HotelRooms.vue',
   'src/views/Travel/Hotels/Partials/HotelSort.vue',
   'src/views/Travel/Hotels/Partials/HotelStayCard.vue',
+  'src/views/Travel/Hotels/Partials/PassportCountry.vue',
   'src/views/Travel/Hotels/Partials/PayableAtProperty.vue',
   'src/views/Travel/Hotels/Partials/PriceChangeDialog.vue',
   'src/views/Travel/Hotels/Partials/SearchBar.vue',
