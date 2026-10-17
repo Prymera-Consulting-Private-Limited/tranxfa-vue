@@ -42,10 +42,12 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  // No default string: a prop default is evaluated before any locale exists, so
+  // copy written here can never be translated. The template falls back instead.
   saveBtnText: {
     type: String,
     required: false,
-    default: 'Continue',
+    default: null,
   },
 })
 
@@ -150,7 +152,7 @@ watchEffect(() => {
       </template>
       <template v-else>
         <span class="inline-flex items-center justify-center gap-2">
-          {{ saveBtnText }}
+          {{ saveBtnText ?? $t('common.continue') }}
           <i class="pi pi-arrow-right text-sm/6 transition-transform duration-200 group-hover:translate-x-0.5"></i>
         </span>
       </template>
