@@ -69,6 +69,29 @@ class Transaction extends BaseTransaction {
      */
     transactionNumber = null;
 
+    /**
+     * What the payment method added on top of the base fee, as a decimal
+     * string; "0.00" for a method that adds nothing, null from a console older
+     * than 2026.10.6 (SD-1746). The total paid already includes it.
+     *
+     * @type {string|null}
+     */
+    methodFee = null;
+
+    /**
+     * @type {string|null}
+     */
+    methodFeeCurrencyPrefixed = null;
+
+    /**
+     * Whether the receipt needs a line for the payment method's fee.
+     *
+     * @returns {boolean}
+     */
+    get hasMethodFee() {
+        return this.methodFee !== null && Number(this.methodFee) !== 0;
+    }
+
     get isAwaitingPayment() {
         return AWAITING_PAYMENT.includes(this.state?.code);
     }
@@ -106,6 +129,8 @@ class Transaction extends BaseTransaction {
         transaction.createdAt = data.created_at;
         transaction.updatedAt = data.updated_at;
         transaction.transactionNumber = data.transaction_number;
+        transaction.methodFee = data.method_fee ?? null;
+        transaction.methodFeeCurrencyPrefixed = data.method_fee_currency_prefixed ?? null;
         if (data.recipient) {
             transaction.recipient = Recipient.getInstance(data.recipient);
         }

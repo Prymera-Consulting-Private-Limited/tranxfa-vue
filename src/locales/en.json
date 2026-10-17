@@ -114,6 +114,10 @@
       "payAgain": "Pay again"
     },
     "wizard": {
+      "addsFeeAmount": "Adds {fee}",
+      "availableFromAmount": "Available from {amount}",
+      "onlyInMultiplesOf": "Only for amounts in multiples of {amount}",
+      "notAvailableForThisTransfer": "Not available for this transfer",
       "reviewConfirm": "Review & Confirm",
       "loading": "Loading...",
       "weDidntGetAnAnswer": "We didn't get an answer when confirming this transfer.",
@@ -604,6 +608,7 @@
     "weCouldntSignThat": "We couldn't sign that device out. Please try again.",
     "totalDue": "Total Due",
     "ourFees": "Our Fees",
+    "paymentMethodFee": "Payment Method Fee",
     "subtotal": "Subtotal",
     "payoutCountry": "Payout Country",
     "sendingAmount": "Sending Amount",
