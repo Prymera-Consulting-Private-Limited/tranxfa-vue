@@ -53,13 +53,13 @@ onMounted(loadProfile);
         <button @click="loadProfile" type="button" class="rounded-xl bg-brand-700 px-6 py-2.5 text-sm/6 font-semibold text-white hover:bg-brand-800 cursor-pointer">{{ $t('common.tryAgain') }}</button>
       </div>
       <i v-else-if="! isReady" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
-      <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
-        <div class="w-[60%] md:w-[60%] h-auto md:h-full">
+      <div v-else class="relative flex flex-col md:flex-row w-full min-h-screen bg-white">
+        <div class="md:w-2/5 xl:w-1/2">
           <!-- Brand artwork, and a .png deliberately: SD-1106 found Amplify's
                SPA rewrite answering .webp requests with index.html. -->
-          <img src="/images/backgrounds/signup.png" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/signup.png" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:sticky md:top-0 md:h-screen object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
+          <div class="absolute top-4 left-0 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
           </div>
         </div>

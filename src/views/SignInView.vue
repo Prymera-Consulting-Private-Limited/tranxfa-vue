@@ -105,13 +105,13 @@ function updateIsdCode(updated) {
   <main>
     <div class="relative flex items-center justify-center min-h-screen bg-gray-50 tracking-wider">
       <i v-if="isLoading" class="pi pi-spin pi-spinner text-5xl text-brand-700 bg-white/10"></i>
-      <div v-else class="relative flex flex-col md:flex-row w-full h-screen bg-white">
-        <div class=" w-[60%] md:w-[60%] h-auto md:h-full">
+      <div v-else class="relative flex flex-col md:flex-row w-full min-h-screen bg-white">
+        <div class="md:w-2/5 xl:w-1/2">
           <!-- PNG, not WebP: Amplify's SPA rewrite answers a .webp request with
                index.html, so the image never rendered on any brand (SD-1106). -->
-          <img src="/images/backgrounds/login.png" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:h-full object-cover hidden md:block">
+          <img src="/images/backgrounds/login.png" :alt="$t('auth.signIn.backgroundAlt')" class="w-full h-90 md:sticky md:top-0 md:h-screen object-cover hidden md:block">
           <!-- Logo and Cross in Mobile View -->
-          <div class="absolute top-4 left-4 md:hidden flex items-center justify-between w-full px-4">
+          <div class="absolute top-4 left-0 md:hidden flex items-center justify-between w-full px-4">
             <a href="javascript:"><BrandLogo class="mb-5" /></a>
             <a :href="appUrl" class="text-gray-500 text-3xl hover:text-gray-500 pr-5">
               <i class="pi pi-times"></i>
