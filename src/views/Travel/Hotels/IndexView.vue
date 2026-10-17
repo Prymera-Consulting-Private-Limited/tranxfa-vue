@@ -13,6 +13,8 @@ import SearchBar from "@/views/Travel/Hotels/Partials/SearchBar.vue";
 import HotelFilters from "@/views/Travel/Hotels/Partials/HotelFilters.vue";
 import HotelSort from "@/views/Travel/Hotels/Partials/HotelSort.vue";
 import HotelPagination from "@/views/Travel/Hotels/Partials/HotelPagination.vue";
+import PassportCountry from "@/views/Travel/Hotels/Partials/PassportCountry.vue";
+import {useCountryUtils} from "@/composables/country_utils.js";
 import {
   getCriteria,
   getFacets,
@@ -41,7 +43,13 @@ import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline";
 const route = useRoute();
 const router = useRouter();
 
-const {criteria, search, regions} = useHotelUtils();
+const {criteria, residency, profileResidency, isCustomerLoaded, search, regions} = useHotelUtils();
+
+const countryUtils = useCountryUtils();
+
+// Every country, for naming the guests' passports and for choosing them. The
+// store fills it in the background, so it is read rather than awaited.
+const countries = ref([]);
 
 const hotels = ref([]);
 const isLoading = ref(false);
@@ -195,6 +203,13 @@ const totalHotelsLabel = computed(() => totalHotels.value.toLocaleString());
 // Nothing can be priced until a destination is chosen.
 const hasDestination = computed(() => criteria.value.region_id !== null);
 
+// The search waits for the profile, so until it is here the page reads as loading.
+const isWaitingForCustomer = computed(() => hasDestination.value && !isCustomerLoaded.value);
+
+// Neither a choice nor a nationality on file: the customer is asked, and nothing
+// is searched until they answer.
+const needsResidency = computed(() => hasDestination.value && isCustomerLoaded.value && !residency.value);
+
 async function getHotels() {
   isLoading.value = true;
   hasFailed.value = false;
@@ -282,46 +297,69 @@ async function getRegions(query = null) {
 
 /**
  * Both directions go through getCriteria/getQuery, so the same search always
- * produces the same signature no matter which side it came from.
+ * produces the same signature no matter which side it came from. It carries the
+ * residency the search would go out with, so a nationality that arrives with the
+ * profile runs the search that was waiting for it.
  *
- * @param {object} query
+ * @param {object} next As getCriteria answers it.
  * @returns {string}
  */
-function getSignature(query) {
-  return JSON.stringify(getQuery(getCriteria(query)));
+function getSignature(next) {
+  return JSON.stringify({...getQuery(next), residency: next.residency ?? profileResidency.value ?? undefined});
 }
 
 // Nothing has been applied yet, so the first url always runs.
 let appliedSearch = null;
 
+function clearResults() {
+  hotels.value = [];
+  totalHotels.value = 0;
+  nights.value = 0;
+  hasFailed.value = false;
+  failureMessage.value = null;
+  searchId.value = null;
+  isLoading.value = false;
+}
+
 /**
  * Runs whatever the url asks for, including the back and forward buttons. The
  * view state is read every time regardless of the signature below, so a page
  * turn or a filter tweak is picked up without re-running the search itself.
- *
- * @param {object} query
  */
-function applySearch(query) {
+function applySearch() {
+  const query = route.query;
+
   filters.value = getFiltersFromQuery(query);
   sort.value = getSortFromQuery(query);
   page.value = getPageFromQuery(query);
 
-  const signature = getSignature(query);
+  const next = getCriteria(query);
+  const signature = getSignature(next);
 
   if (signature === appliedSearch) {
     return;
   }
 
-  appliedSearch = signature;
-  criteria.value = getCriteria(query);
+  criteria.value = next;
 
   if (!criteria.value.region_id) {
-    hotels.value = [];
-    totalHotels.value = 0;
-    nights.value = 0;
-    hasFailed.value = false;
-    failureMessage.value = null;
-    searchId.value = null;
+    appliedSearch = signature;
+    clearResults();
+
+    return;
+  }
+
+  // Until the profile is here nobody knows whose passports these are, so nothing
+  // is searched on a guess. Its arrival runs this again.
+  if (!isCustomerLoaded.value) {
+    return;
+  }
+
+  appliedSearch = signature;
+
+  // The customer is asked instead (needsResidency).
+  if (!residency.value) {
+    clearResults();
 
     return;
   }
@@ -338,12 +376,15 @@ function applySearch(query) {
  * @param {object} update
  */
 function updateSearch(update) {
-  const query = getQuery({...criteria.value, ...update});
+  const next = {...criteria.value, ...update};
 
   // An unchanged url is never replayed, so a repeat search is run directly,
-  // leaving whatever filters, sort and page were already in place.
-  if (JSON.stringify(query) === appliedSearch) {
-    getHotels();
+  // leaving whatever filters, sort and page were already in place. Without a
+  // passport country there is nothing to repeat; the question is still showing.
+  if (getSignature(next) === appliedSearch) {
+    if (residency.value) {
+      getHotels();
+    }
 
     return;
   }
@@ -352,15 +393,23 @@ function updateSearch(update) {
   // screen belong to the previous search.
   isLoading.value = true;
 
-  router.replace({query: query});
+  router.replace({query: getQuery(next)});
 }
 
-watch(() => route.query, applySearch, {immediate: true});
+/**
+ * @param {string} code ISO 3166-1 alpha-2.
+ */
+function updateResidency(code) {
+  updateSearch({residency: code});
+}
+
+watch([() => route.query, isCustomerLoaded, profileResidency], applySearch, {immediate: true});
 
 // The curated list is what the picker opens on, so it is fetched before anyone
 // types rather than in response to typing.
-onMounted(() => {
+onMounted(async () => {
   getRegions();
+  countries.value = await countryUtils.getCountries();
 });
 
 /**
@@ -397,12 +446,20 @@ function viewHotel(hotel) {
             @search="updateSearch"
             @region-search="getRegions"
         />
+        <!-- Whose passports the prices are for, changeable for a stay that is someone else's -->
+        <PassportCountry
+            v-if="isCustomerLoaded && residency"
+            :residency="residency"
+            :countries="countries"
+            @update:residency="updateResidency"
+        />
         <!-- Summary -->
         <div class="mt-8 sm:flex sm:items-end sm:justify-between sm:gap-4">
           <div>
             <h2 class="text-base font-semibold text-gray-900">
               <template v-if="!hasDestination">{{ $t('travel.whereDoYouWantTo') }}</template>
-              <template v-else-if="isLoading">{{ $t('travel.searchingForHotels') }}</template>
+              <template v-else-if="needsResidency">{{ $t('travel.whichCountryIssuedTheGuests') }}</template>
+              <template v-else-if="isLoading || isWaitingForCustomer">{{ $t('travel.searchingForHotels') }}</template>
               <template v-else-if="filteredResults.length">{{ region
                 ? $t('travel.hotelsAvailableIn', filteredResults.length, {count: filteredResults.length, region: region})
                 : $t('travel.hotelsAvailable', filteredResults.length, {count: filteredResults.length}) }}</template>
@@ -410,6 +467,7 @@ function viewHotel(hotel) {
             </h2>
             <p class="mt-1 text-sm/6 text-gray-500">
               <template v-if="!hasDestination">{{ $t('travel.pickADestinationYourDates') }}</template>
+              <template v-else-if="needsResidency">{{ $t('travel.hotelsPriceRoomsByThe') }}</template>
               <template v-else-if="isFiltered">{{ $t('travel.filteredFromLengthHotelS', {length: results.length, s: results.length === 1 ? '' : 's'}) }}</template>
               <!-- The count above is what we could price, which is not always
               what the supplier had. Deliberately silent on why the two differ:
@@ -441,8 +499,15 @@ function viewHotel(hotel) {
                 :title="$t('travel.startWithADestination')"
                 description="Search for a city above and we'll price every available hotel for your stay."
             />
-            <!-- Loading -->
-            <template v-else-if="isLoading">
+            <!-- No passport country: asked here, where the results would be -->
+            <PassportCountry
+                v-else-if="needsResidency"
+                :residency="null"
+                :countries="countries"
+                @update:residency="updateResidency"
+            />
+            <!-- Loading, or waiting for the profile before searching -->
+            <template v-else-if="isLoading || isWaitingForCustomer">
               <HotelSkeleton v-for="index in 4" :key="index" />
             </template>
             <!-- Failed -->

@@ -278,6 +278,12 @@ non-2xx responses. `412` bodies carry a `type`:
 | `duplicate_transaction`       | inline warning                         |
 | `active_transfer_disable_rule`| inline warning                         |
 | wallet refusals               | see `enums/wallet_refusal_type.js`     |
+| payment method refusals       | inline warning, method greyed out; see `enums/payment_method_refusal_type.js` |
+
+A saved quote's `payment_methods[]` carry each method's `fee`, `total_amount`
+and limits (console 2026.10.6). Once a method is chosen, its `total_amount` is
+the amount due, never the quote's own total; no amount is worked out in the
+browser (`tests/payment-method-fees.spec.js`).
 
 **Any unrecognised `type`, and any non-412/422 failure, must still clear
 `isStepProcessing` and show a message.** `tests/transfer-confirm-refusals.spec.js`
