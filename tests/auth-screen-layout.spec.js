@@ -36,8 +36,10 @@ const classesOf = (file, pattern) => [...readFileSync(file, 'utf8').matchAll(/<[
   .map(tag => (tag.match(/\sclass="([^"]*)"/)?.[1] ?? '').split(/\s+/).filter(Boolean));
 
 describe('auth screens grow with their content', () => {
+  // Selam Send's sign-up splits at lg rather than md, so its photo only shows
+  // from lg up. That is the brand's choice, and this branch alone reads it.
   it.each(AUTH_VIEWS)('%s: the split row is at least one window tall, not exactly one', (file) => {
-    const rows = classesOf(file, /md:flex-row/);
+    const rows = classesOf(file, /\b(?:md|lg):flex-row/);
 
     expect(rows).toHaveLength(1);
     expect(rows[0]).toContain('min-h-screen');
