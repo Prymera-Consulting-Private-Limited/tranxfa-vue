@@ -4,11 +4,12 @@ import {mount} from "@vue/test-utils";
 import HotelRooms from "@/views/Travel/Hotels/Partials/HotelRooms.vue";
 import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 
-// SD-1219. A rate's token is the supplier's match key for an offer, and the
-// api deliberately gives near-identical rates the same one - the Conrad's 18
-// rates carried 12. The rooms list keyed and selected rows by token, so one
-// click lit three rows. A row is identified by which row it is; the token is
-// only what the quote is asked for.
+// SD-1219. Until console 2026.10.6 a rate's token was the supplier's match key
+// for an offer, and the api gave near-identical rates the same one - the
+// Conrad's 18 rates carried 12. The rooms list keyed and selected rows by token,
+// so one click lit three rows. A row is identified by which row it is; the token
+// is only what the quote is asked for. Tokens are unique from 2026.10.6, and
+// these keep the list from depending on that.
 const rate = (roomName, token, total) => HotelRate.getInstance({
     token,
     room_name: roomName,
@@ -25,7 +26,7 @@ const rate = (roomName, token, total) => HotelRate.getInstance({
     cancellation: {status: 'non_refundable', free_until: null, costs_now: total},
 });
 
-// Three rows, two of them sharing a token, exactly as staging serves them.
+// Three rows, two of them sharing a token, as staging served them before 2026.10.6.
 const rates = () => [
     rate('Standard Double room with balcony', 'm-shared', 82729),
     rate('Standard Double room', 'm-shared', 82729),
