@@ -295,6 +295,11 @@ const onCancelRefused = async (message) => {
                   <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.fee') }}</h2>
                   <p class="mt-1 max-w-2xl text-sm/6 text-gray-500"><i18n-t keypath="account.totalAmountIs" scope="global"><template #amount><span class="font-medium">{{ transaction.data.baseFeesCurrencyPrefixed }}</span></template></i18n-t></p>
                 </div>
+                <!-- What the way to pay added beside the base fee (SD-1792). The total below already includes it. -->
+                <div v-if="transaction.data.hasMethodFee" class="py-3">
+                  <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.paymentMethodFee') }}</h2>
+                  <p class="mt-1 max-w-2xl text-sm/6 text-gray-500"><i18n-t keypath="account.totalAmountIs" scope="global"><template #amount><span class="font-medium">{{ transaction.data.methodFeeCurrencyPrefixed }}</span></template></i18n-t></p>
+                </div>
                 <!-- A coupon taken at checkout: the API sends the discount, or the rate it replaced. -->
                 <div v-if="transaction.data.couponDiscountAmountCurrencyPrefixed" class="py-3">
                   <h2 class="text-sm/6 font-medium text-gray-900">{{ $t('account.coupon') }}</h2>
@@ -325,7 +330,8 @@ const onCancelRefused = async (message) => {
               <dl class="flex items-center flex-wrap">
                 <div class="flex-auto pt-6 pl-6">
                   <dt class="text-sm/6 font-semibold text-gray-900">{{ $t('account.totalAmount') }}</dt>
-                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.totalPaymentAmountCurrencyPrefixed }}</dd>
+                  <!-- The total is the payment's: the transfer itself carries none. -->
+                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.payment?.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">{{ $t('account.status') }}</dt>
@@ -346,6 +352,13 @@ const onCancelRefused = async (message) => {
                     <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
                   </dt>
                   <dd class="text-sm/6 text-gray-900"><span class="font-semibold">{{ $t('calculator.fees') }}</span><br />{{ transaction.data.baseFeesCurrencyPrefixed }}</dd>
+                </div>
+                <div v-if="transaction.data.hasMethodFee" class="mt-4 flex w-full flex-none gap-x-4 px-6">
+                  <dt class="flex-none">
+                    <span class="sr-only">{{ $t('account.paymentMethodFee') }}</span>
+                    <PlusCircleIcon class="h-6 w-5 text-brand-500" aria-hidden="true" />
+                  </dt>
+                  <dd class="text-sm/6 text-gray-900"><span class="font-semibold">{{ $t('account.paymentMethodFee') }}</span><br />{{ transaction.data.methodFeeCurrencyPrefixed }}</dd>
                 </div>
                 <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                   <dt class="flex-none">
