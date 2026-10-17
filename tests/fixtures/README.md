@@ -213,6 +213,22 @@ the cancel still takes the transfer's `id`.
 the console sent `"1"` and `"1.00"`. The receiving account number is replaced
 with `123456789`.
 
+## A payment method's fee and limits (captured)
+
+**Captured from Payvel staging on 17 October 2026**, walking SD-1792 against
+console 2026.10.6. The AUD → FJD fee rule gave Bank Transfer a 4.75 fee, a
+20.00 minimum and a 5.00 multiple, and PayID nothing. The quote was AUD 25 to
+a Fijian mobile wallet, made with Send Money to Recipient.
+
+| Fixture | What it is |
+| ------- | ---------- |
+| `quote-saved-method-fees` | `GET /quote/{id}`: each of `payment_methods[]` with its `fee`, `total_amount`, `min_amount` and `amount_multiplier`. Bank Transfer totals 29.75 while the quote's own total is 25.00 |
+| `transaction-detail-method-fee` | `GET /transaction/{id}` for the same quote confirmed by Bank Transfer: `method_fee` 4.75, the payment `PENDING` for 29.75 (PV-V2-1226358, cancelled after the capture) |
+
+The recipient's name and mobile number are replaced with `Test Recipient` and
+`7000000`, and the receiving account number with `123456789`. Nothing else is
+changed.
+
 ## Written by hand, not captured
 
 These could not be captured on the walk above. Each is written from the
@@ -258,6 +274,8 @@ Captures are scrubbed before they land here:
   traces and absolute paths removed.
 - Session tokens replaced.
 - The account number of a real receiving account replaced with `123456789`.
+- A staging recipient's name and number replaced with `Test Recipient` and
+  `7000000`.
 
 `tests/fixtures-contract.spec.js` asserts no `AKIA…` key or `/Users/` path
 survives, so a careless re-capture fails the suite.

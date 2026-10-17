@@ -9,20 +9,21 @@ import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
  */
 class HotelRate {
     /**
-     * Which row this is, and the one thing that identifies it: the token below is
-     * shared between near-identical rates and withheld from any that cannot be
-     * booked (SD-1220). Sent on the hotel page only, so a search result's cheapest
-     * rate has none.
+     * Which row this is, and the one thing that identifies it (SD-1220). From
+     * console 2026.10.6 the token below carries the same value, but it is withheld
+     * from any rate that cannot be booked. Sent on the hotel page only, so a
+     * search result's cheapest rate has none.
      *
      * @type {string|null}
      */
     id = null;
 
     /**
-     * The supplier's permission to proceed with this rate, issued on the hotel
-     * page and nowhere else. Null means this rate cannot be taken forward. It
-     * rotates at the next step, so it is what a quote is asked for rather than
-     * what a booking is made with.
+     * What a quote is asked for, issued on the hotel page and nowhere else. Null
+     * means this rate cannot be taken forward. From console 2026.10.6 it is our
+     * id for the rate, the same value as id, and it does not rotate: the quote is
+     * priced on the one rate it names. Before that it was the supplier's match
+     * key, which near-identical rates shared (SD-1219).
      *
      * @type {string|null}
      */
@@ -46,8 +47,8 @@ class HotelRate {
     allotment = null;
 
     /**
-     * Always false on search: the supplier only issues a booking token on the
-     * hotel page, so nothing found here can be booked from here.
+     * Always false on search: a rate is only given a token on the hotel page,
+     * so nothing found here can be booked from here.
      *
      * @type {boolean}
      */

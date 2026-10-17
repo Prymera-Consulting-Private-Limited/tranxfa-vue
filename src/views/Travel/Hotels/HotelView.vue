@@ -13,7 +13,7 @@ import HotelHouseRules from "@/views/Travel/Hotels/Partials/HotelHouseRules.vue"
 import HotelAmenities from "@/views/Travel/Hotels/Partials/HotelAmenities.vue";
 import HotelStayCard from "@/views/Travel/Hotels/Partials/HotelStayCard.vue";
 import HotelDetailSkeleton from "@/views/Travel/Hotels/Partials/HotelDetailSkeleton.vue";
-import {getCheapestRate, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
+import {getCheapestRate, getCriteria, getQuery, useHotelUtils} from "@/composables/travel/hotels/hotel_utils.js";
 import HotelDetail from "@/models/travel/hotels/hotel_detail.js";
 import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 import HotelSearch from "@/models/travel/hotels/hotel_search.js";
@@ -90,10 +90,10 @@ function selectRate(rate) {
 
 /**
  * Holds the price, which is the first thing that can fail for an ordinary
- * reason: the supplier is asked for this hotel again and the token looked for in
- * its current answer, so a room that sold out in the meantime comes back as a
- * 409. That is an answer, not an error — the customer is sent back to the list
- * rather than shown a dialog.
+ * reason: a room that sold out in the meantime comes back as a 409, and so does
+ * a token from a page opened before console 2026.10.6, when tokens were the
+ * supplier's. That is an answer, not an error — the customer is sent back to the
+ * list rather than shown a dialog.
  */
 async function holdPrice() {
   if (!selectedRate.value?.token || !searchId.value) {
@@ -121,17 +121,15 @@ async function holdPrice() {
   });
 }
 
-// The search this hotel was opened from, replayed exactly as the url carries it.
+// The search this hotel was opened from, read back through the same pair the
+// results page writes its url with, so every part of it survives the way back.
+// Naming the parameters here once left the guests' passport country behind, and
+// the results came back priced for the profile's passports instead (SD-1775).
 // Only ever used to go back: the stay itself comes from the resolved search, so
 // nothing here is trusted to describe what was priced.
 const resultsLink = computed(() => ({
   name: 'hotels',
-  query: {
-    region: route.query.region,
-    checkin: route.query.checkin,
-    checkout: route.query.checkout,
-    guests: route.query.guests,
-  },
+  query: getQuery(getCriteria(route.query)),
 }));
 
 // Nothing past search/region ever carries raw criteria again, so without a
