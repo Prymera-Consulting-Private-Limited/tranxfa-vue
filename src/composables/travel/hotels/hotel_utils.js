@@ -26,12 +26,6 @@ export const MAX_STAY_NIGHTS = 30;
 export const MAX_CHECKIN_DAYS = 730;
 
 /**
- * Only used until the customer's own country is loaded, since the supplier
- * prices on residency.
- */
-const DEFAULT_RESIDENCY = 'AU';
-
-/**
  * Bounds what the supplier sends the backend. Their own cap of 500 applies after
  * it, so at this figure we never meet it.
  */
@@ -66,6 +60,7 @@ export function getCriteria(query = {}) {
         checkin: checkin,
         checkout: getCheckoutDate(query.checkout, checkin),
         guests: getGuests(query.guests),
+        residency: getResidency(query.residency),
     };
 }
 
@@ -154,6 +149,9 @@ export function getQuery(criteria) {
         checkin: criteria.checkin,
         checkout: criteria.checkout,
         guests: getGuestsParam(criteria.guests),
+        // Only when the customer chose one; otherwise the profile's nationality
+        // is used, and a link must not pin someone else's.
+        residency: criteria.residency ?? undefined,
     };
 }
 
@@ -268,6 +266,18 @@ function getCount(value, fallback, min, max) {
     }
 
     return Math.min(Math.max(count, min), max);
+}
+
+/**
+ * The country that issued the guests' passports, as an ISO 3166-1 alpha-2 code.
+ * The supplier prices on it and can withhold rooms by it, so anything that is not
+ * a code is dropped rather than guessed at.
+ *
+ * @param {string|undefined} value
+ * @returns {string|null}
+ */
+function getResidency(value) {
+    return typeof value === 'string' && /^[A-Za-z]{2}$/.test(value) ? value.toUpperCase() : null;
 }
 
 /**
@@ -721,11 +731,17 @@ export function useHotelUtils() {
 
     const criteria = ref(getCriteria());
 
-    // The customer is still loading while this page mounts, so residency is read
-    // per request rather than baked into the criteria.
-    const residency = computed(() => {
-        return customerStore.customer.data?.nationality?.iso2Alpha ?? DEFAULT_RESIDENCY;
-    });
+    // The customer is still loading while this page mounts, and nothing may be
+    // searched until they have: their nationality is who the guests are taken to
+    // be when the customer has not said otherwise.
+    const isCustomerLoaded = computed(() => customerStore.isLoaded);
+
+    const profileResidency = computed(() => customerStore.customer.data?.nationality?.iso2Alpha ?? null);
+
+    // The supplier prices on the guests' passports and can withhold rooms by
+    // them, so there is no default: with neither a choice nor a nationality on
+    // file this is null, and the customer is asked (SD-1775).
+    const residency = computed(() => criteria.value.residency ?? profileResidency.value);
 
     const nights = computed(() => {
         return moment(criteria.value.checkout).diff(moment(criteria.value.checkin), 'days');
@@ -752,6 +768,10 @@ export function useHotelUtils() {
     }
 
     async function search() {
+        if (!residency.value) {
+            throw new Error('[travel search] no passport country to send');
+        }
+
         return await axios.post('/client/v1/travel/hotels/search/region', getSearchPayload(criteria.value, residency.value));
     }
 
@@ -767,10 +787,12 @@ export function useHotelUtils() {
     }
 
     /**
-     * Holds the chosen rate's price. The supplier is asked for this hotel again
-     * and the token is looked for in its current answer, so a room that has gone
-     * in the meantime comes back as a 409 — an ordinary answer rather than an
-     * error, since a room can sell out between reading about it and choosing it.
+     * Holds the chosen rate's price. From console 2026.10.6 the token is the
+     * rate's own id, and the console prices the one rate it names rather than
+     * asking the supplier for this hotel again. A 409 is an ordinary answer
+     * rather than an error: a room can sell out between reading about it and
+     * choosing it, and a token from a hotel page opened before 2026.10.6 was the
+     * supplier's.
      *
      * @param {string} searchId
      * @param {string} hotelId
@@ -795,6 +817,9 @@ export function useHotelUtils() {
 
     return {
         criteria,
+        residency,
+        profileResidency,
+        isCustomerLoaded,
         nights,
         stayLabel,
         guestBreakdown,
