@@ -330,7 +330,8 @@ const onCancelRefused = async (message) => {
               <dl class="flex items-center flex-wrap">
                 <div class="flex-auto pt-6 pl-6">
                   <dt class="text-sm/6 font-semibold text-gray-900">{{ $t('account.totalAmount') }}</dt>
-                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.totalPaymentAmountCurrencyPrefixed }}</dd>
+                  <!-- The total is the payment's: the transfer itself carries none. -->
+                  <dd class="text-base font-semibold text-gray-900">{{ transaction.data.payment?.totalPaymentAmountCurrencyPrefixed }}</dd>
                 </div>
                 <div v-if="false" class="flex-none px-6">
                   <dt class="sr-only">{{ $t('account.status') }}</dt>
