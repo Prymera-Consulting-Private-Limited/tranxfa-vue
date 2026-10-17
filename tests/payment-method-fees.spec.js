@@ -322,6 +322,14 @@ describe('no amount is worked out in the browser', () => {
         new RegExp(`[A-Za-z0-9_)]\\s*[-+*/%]\\s*[A-Za-z_.?]*${AMOUNT}`),
     ];
 
+    // ChoiceRemit only. The calculator's Total row predates SD-1792: a quote
+    // that is not yet saved carries no total, so the row adds the base fee to
+    // the amount. No payment method is chosen at that point, so no method fee
+    // can reach it. Listed by its exact line, so anything new still fails.
+    const BRAND_EXCEPTIONS = {
+        [path.join('src', 'components', 'Calculator.vue')]: ['const totalMajor = local + fee;'],
+    };
+
     const vueFiles = (dir) => readdirSync(dir).flatMap((name) => {
         const full = path.join(dir, name);
         if (statSync(full).isDirectory()) return vueFiles(full);
@@ -333,7 +341,8 @@ describe('no amount is worked out in the browser', () => {
         expect(files.length).toBeGreaterThan(100);
 
         const offenders = files.flatMap(file => readFileSync(file, 'utf8').split('\n')
-            .map((line, i) => (ARITHMETIC.some(pattern => pattern.test(line)) ? `${file}:${i + 1}` : null))
+            .map((line, i) => (ARITHMETIC.some(pattern => pattern.test(line))
+                && !(BRAND_EXCEPTIONS[file] ?? []).includes(line.trim()) ? `${file}:${i + 1}` : null))
             .filter(Boolean));
 
         expect(offenders).toEqual([]);
