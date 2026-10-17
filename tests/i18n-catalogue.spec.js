@@ -100,6 +100,7 @@ const MIGRATED = [
   'src/components/ServiceStatusBanner.vue',
   'src/components/Sidebar.vue',
   'src/components/Transaction/ListItem.vue',
+  'src/components/Transaction/PaymentMethodOptions.vue',
   'src/components/Transaction/Progress.vue',
   'src/components/Transaction/StatementRequestModal.vue',
   'src/components/Transaction/Wizard.vue',
