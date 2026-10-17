@@ -18,6 +18,9 @@ import {transactionNavigationMachine} from "@/machines/transaction_navigation_ma
 import RecipientListing from "@/components/Transaction/RecipientListing.vue";
 import TransactionQuote from "@/models/transaction_quote.js";
 import Confirm from "@/components/Transaction/Confirm.vue";
+import PaymentMethodOptions from "@/components/Transaction/PaymentMethodOptions.vue";
+import {getMethodRefusal} from "@/composables/payment_method_utils.js";
+import PaymentMethodRefusalType from "@/enums/payment_method_refusal_type.js";
 import Spinner from "@/components/Spinner.vue";
 import AddRecipientWizard from "@/components/Recipient/AddRecipientWizard.vue";
 import QuoteDisplay from "@/components/QuoteDisplay.vue";
@@ -32,8 +35,8 @@ import CustomerAttributeCategory from "@/enums/customer_attribute_category.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import DocumentTypeItem from "@/components/AccountVerification/DocumentTypeItem.vue";
 import {useCustomerUtils} from "@/composables/customer_utils.js";
-import {Dialog, DialogPanel, RadioGroup, RadioGroupOption, TransitionChild, TransitionRoot} from '@headlessui/vue'
-import {ArrowUpTrayIcon, CheckCircleIcon, ChevronRightIcon, IdentificationIcon, ExclamationTriangleIcon} from '@heroicons/vue/20/solid'
+import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from '@headlessui/vue'
+import {ArrowUpTrayIcon, ChevronRightIcon, IdentificationIcon, ExclamationTriangleIcon} from '@heroicons/vue/20/solid'
 import {createPopper} from "@popperjs/core";
 import CategoryDescription from "@/components/AccountVerification/CategoryDescription.vue";
 import QuotePendingDocument from "@/models/quote_pending_document.js";
@@ -77,6 +80,37 @@ const isStepProcessing = ref(false);
 const isSubComponentLoading = ref(false);
 const purpose = ref(null);
 const paymentMethod = ref(null);
+
+// Ways to pay Confirm Quote has refused for this quote, by method id. Its word
+// stands over the app's own reading of the method's limits below.
+const refusedMethods = ref({});
+
+// Why each way to pay cannot take this amount, by method id: the fee rule's
+// smallest amount or multiple, read off the saved quote (SD-1792), or a refusal
+// checkout already gave. A method listed here is greyed out, never chosen.
+const methodRefusals = computed(() => {
+  const refusals = {};
+  for (const method of quote.data?.paymentMethods ?? []) {
+    const refusal = refusedMethods.value[method.id] ?? getMethodRefusal(method, quote.data.localAmount);
+    if (refusal) {
+      refusals[method.id] = refusal;
+    }
+  }
+  return refusals;
+});
+
+/**
+ * The quote's own entry for a way to pay, if this amount can use it. The
+ * method has to come from the quote on screen: its total is priced for that
+ * quote, and a coupon replaces the quote under the customer's choice.
+ *
+ * @param {string|null|undefined} id
+ * @returns {PaymentMethod|null}
+ */
+function usableMethod(id) {
+  const method = quote.data?.paymentMethods?.find((m) => m.id === id) ?? null;
+  return method && ! methodRefusals.value[method.id] ? method : null;
+}
 const transactionUtils = useTransactionUtils();
 
 // The confirm step's choices, restored after the MFA round trip.
@@ -123,8 +157,10 @@ onMounted(async () => {
       return;
     }
   }
+  // The only way to pay is chosen for the customer, unless this amount cannot
+  // use it; then it stays greyed out with the reason.
   if (quote.data.paymentMethods.length === 1) {
-    paymentMethod.value = quote.data.paymentMethods[0];
+    paymentMethod.value = usableMethod(quote.data.paymentMethods[0].id);
   }
   if (quote.data.pendingDocuments.length === 1) {
     selectedUploadDocumentCategory.value = quote.data.pendingDocuments[0];
@@ -140,7 +176,7 @@ function restoreDraft() {
   const draft = takeCheckoutDraft(props.id);
   if (! draft) return;
   purpose.value = quote.data.purposes.find((p) => p.id === draft.purposeId) ?? purpose.value;
-  const method = quote.data.paymentMethods.find((m) => m.id === draft.paymentMethodId);
+  const method = usableMethod(draft.paymentMethodId);
   if (method) {
     paymentMethod.value = method;
   }
@@ -210,6 +246,10 @@ const isCouponBusy = ref(false);
 
 function replaceQuote(data) {
   quote.data = TransactionQuote.getInstance(data);
+  // The method chosen on the old quote carries the old quote's total. The new
+  // quote's entry for it is priced for the new amount, and a coupon can move
+  // the amount across a method's limits.
+  paymentMethod.value = usableMethod(paymentMethod.value?.id);
   send({ type: 'SET_CONTEXT', quote: quote.data });
 }
 
@@ -417,6 +457,17 @@ const confirmQuote = async () => {
         isStepProcessing.value = false;
         preconditionFailedMessage.value = error.response.data.message || t('transfer.wizard.pleaseChooseWhoTo');
         await send({ type: 'SELECT_RECIPIENT' });
+      } else if (Object.values(PaymentMethodRefusalType).includes(error.response.data.type)) {
+        // This way to pay cannot take this transfer: below the method's
+        // smallest amount, off its multiple, or no longer offered. The message
+        // names the limit already (SD-1774), so it stands alone; the method is
+        // greyed out so the same refusal cannot be asked for twice.
+        isStepProcessing.value = false;
+        preconditionFailedMessage.value = error.response.data.message || t('transfer.wizard.weCouldNotConfirm');
+        if (paymentMethod.value) {
+          refusedMethods.value = {...refusedMethods.value, [paymentMethod.value.id]: error.response.data.type};
+          paymentMethod.value = null;
+        }
       } else if (fixFor(error.response.data.type, router.currentRoute.value.fullPath)) {
         // Something on the profile has to be finished first: a mobile number
         // to verify, an identity form to complete. Send them there; the
@@ -609,8 +660,10 @@ const paymentData = reactive({
   data: null,
 });
 
-watch(paymentMethod, (newValue) => {
-  if (newValue) {
+watch(paymentMethod, (newValue, oldValue) => {
+  // The same method on a repriced quote is not a new choice: what the customer
+  // typed for it stays.
+  if (newValue && newValue.id !== oldValue?.id) {
     paymentData.data = [];
     if (newValue?.providers[0]?.paymentDataAttributes?.length > 0) {
       newValue.providers[0].paymentDataAttributes.forEach(function (attribute) {
@@ -823,6 +876,7 @@ const canContinue = computed(() => {
                     <Confirm
                         v-else-if="snapshot.value === 'confirm'"
                         v-bind:quote="quote.data"
+                        v-bind:payment-method="paymentMethod"
                     />
                   </template>
                 </div>
@@ -890,20 +944,7 @@ const canContinue = computed(() => {
                     <fieldset :aria-label="$t('transfer.wizard.paymentMethod')" class="mt-6 mb-4">
                       <label for="payment-method" class="text-sm/6 font-semibold text-gray-900">{{ $t('transfer.wizard.paymentMethod') }}<span class="text-danger-600">*</span></label>
                       <p class="mb-4 text-sm/6 text-gray-500">{{ $t('transfer.wizard.pleaseSelectHowWouldYou') }}</p>
-                      <RadioGroup v-model="paymentMethod" class="space-y-4 mt-4">
-                        <RadioGroupOption as="template" v-for="paymentMethod in quote.data.paymentMethods" :key="paymentMethod.id" :value="paymentMethod" :aria-label="paymentMethod.title" :aria-description="`${paymentMethod.title}`" v-slot="{ active, checked }">
-                          <div :class="[(active || checked) ? 'border-brand-600 ring-1 ring-brand-600 bg-brand-50' : 'border-gray-300 bg-white', 'relative flex cursor-pointer rounded-lg border px-4 py-2.5 shadow-xs focus:outline-hidden']">
-                          <span class="flex flex-1">
-                            <span class="flex flex-col">
-                              <span class="block text-sm/6 font-medium text-gray-900">{{ paymentMethod.title }}</span>
-                              <!--<span class="mt-1 flex items-center text-sm/6 text-gray-500">{{ paymentMethod.description }}</span>-->
-                            </span>
-                          </span>
-                            <CheckCircleIcon v-if="checked" :class="[!checked ? 'text-gray-400' : 'text-brand-600', 'size-5']" aria-hidden="true" />
-                            <div v-else :class="['text-gray-300', 'size-4 mt-0.5 mr-0.5 border border-2 rounded-full border-gray-300']" aria-hidden="true" />
-                          </div>
-                        </RadioGroupOption>
-                      </RadioGroup>
+                      <PaymentMethodOptions v-model="paymentMethod" :methods="quote.data.paymentMethods" :refusals="methodRefusals" />
                     </fieldset>
 
                     <template v-if="paymentMethod?.providers[0]?.paymentDataAttributes?.length > 0">
@@ -927,7 +968,8 @@ const canContinue = computed(() => {
                           </div>
                           <div class="mt-1 flex items-center justify-between text-sm/6 text-gray-600">
                             <span>{{ $t('transfer.wizard.thisTransfer') }}</span>
-                            <span class="font-semibold text-gray-900">{{ quote.data.totalAmountCurrencyPrefixed }}</span>
+                            <!-- What the wallet is asked for: the wallet's own total, which includes its fee. -->
+                            <span class="font-semibold text-gray-900">{{ paymentMethod.totalAmountCurrencyPrefixed ?? quote.data.totalAmountCurrencyPrefixed }}</span>
                           </div>
                           <template v-if="walletStore.requiresReacceptance">
                             <div class="mt-3 border-l-4 border-warning-400 bg-warning-50 p-3">
