@@ -25,7 +25,18 @@ const props = defineProps({
   quote: {
     type: TransactionQuote,
     required: true,
-  }
+  },
+  /**
+   * The way to pay the customer has chosen, if any. Its fee and its total are
+   * what the transfer costs that way (SD-1792); the quote's own total is the
+   * figure before any method's fee.
+   *
+   * @type {PaymentMethod|null}
+   */
+  paymentMethod: {
+    type: Object,
+    default: null,
+  },
 })
 
 // A computed, not an array built once at setup. The wizard replaces the quote
@@ -118,6 +129,17 @@ const reviewItems = computed(() => {
     label: t('calculator.fees'),
     value: quote.baseFeesCurrencyPrefixed,
   });
+  // What the chosen way to pay adds, beside the base fee, as the API rendered
+  // it. A web app that showed only the quote's total read 23.25 due while the
+  // payment was raised for 28.00 (SD-1790).
+  const method = props.paymentMethod;
+  if (method?.hasFee) {
+    items.push({
+      icon: PlusIcon,
+      label: t('account.paymentMethodFee'),
+      value: method.feeCurrencyPrefixed,
+    });
+  }
   if (quote.coupon?.isMonetary && quote.coupon.discountAmountCurrencyPrefixed) {
     items.push({
       icon: PercentBadgeIcon,
@@ -128,15 +150,20 @@ const reviewItems = computed(() => {
       value: `- ${quote.coupon.discountAmountCurrencyPrefixed}`,
     });
   }
-  items.push({
-    icon: CalculatorIcon,
-    label: t('account.subtotal'),
-    value: quote.subTotalAmountCurrencyPrefixed,
-  });
+  // The quote's subtotal is the amount and the base fee alone, so beside a
+  // method's fee it would add up to neither total. Nothing is summed here to
+  // replace it; the total below is the server's.
+  if (! method?.hasFee) {
+    items.push({
+      icon: CalculatorIcon,
+      label: t('account.subtotal'),
+      value: quote.subTotalAmountCurrencyPrefixed,
+    });
+  }
   items.push({
     icon: WalletIcon,
     label: t('account.totalDue'),
-    value: quote.totalAmountCurrencyPrefixed,
+    value: method?.totalAmountCurrencyPrefixed ?? quote.totalAmountCurrencyPrefixed,
   });
 
   return items;
