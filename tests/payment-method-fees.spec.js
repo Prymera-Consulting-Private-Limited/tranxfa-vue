@@ -35,56 +35,22 @@ const {default: IndexView} = await import("@/views/Transfer/IndexView.vue");
 
 const i18n = createI18n({legacy: false, locale: 'en', messages: {en}});
 
-// Shaped as the console's API reference documents a saved quote's payment
-// methods (SharedExamples::paymentChannel), on top of a captured quote. To be
-// replaced by a capture from Payvel staging once a method fee and a minimum are
-// configured there.
-const BANK_TRANSFER = {
-    fee: '4.75',
-    fee_formatted: '4.75',
-    fee_currency_prefixed: 'AUD 4.75',
-    total_amount: '29.75',
-    total_amount_formatted: '29.75',
-    total_amount_currency_prefixed: 'AUD 29.75',
-    min_amount: '20.00',
-    min_amount_formatted: '20.00',
-    min_amount_currency_prefixed: 'AUD 20.00',
-    amount_multiplier: '5.00',
-    amount_multiplier_formatted: '5.00',
-    amount_multiplier_currency_prefixed: 'AUD 5.00',
-};
-
-const PAY_ID = {
-    fee: '0.00',
-    fee_formatted: '0.00',
-    fee_currency_prefixed: 'AUD 0.00',
-    total_amount: '25.00',
-    total_amount_formatted: '25.00',
-    total_amount_currency_prefixed: 'AUD 25.00',
-    min_amount: null,
-    min_amount_formatted: null,
-    min_amount_currency_prefixed: null,
-    amount_multiplier: null,
-    amount_multiplier_formatted: null,
-    amount_multiplier_currency_prefixed: null,
-};
-
 /**
- * The captured saved quote with a recipient, at AUD 25.00 sent unless told
- * otherwise, and Bank Transfer and PayID carrying the per-method fields.
+ * A saved quote captured from Payvel staging on 17 Oct 2026, console 2026.10.6:
+ * AUD 25 to a Fijian mobile wallet, Bank Transfer carrying a 4.75 fee, a 20.00
+ * minimum and a 5.00 multiple, PayID nothing. The recipient's details are
+ * replaced. A different amount sent is laid over it for the limit cases; the
+ * methods' own totals stay as captured, since those cases never read them.
  */
-function savedQuote({localAmount = '25.00', bankTransfer = {}, payId = {}} = {}) {
-    const data = fixture('quote-set-recipient');
-    data.local_amount = localAmount;
-    data.local_amount_currency_prefixed = `AUD ${localAmount}`;
-    data.base_fees = '0.00';
-    data.base_fees_currency_prefixed = 'AUD 0.00';
-    data.sub_total_amount_currency_prefixed = `AUD ${localAmount}`;
-    data.total_amount_currency_prefixed = `AUD ${localAmount}`;
-    data.payment_methods = data.payment_methods.map(method => ({
-        ...method,
-        ...(method.code === 'BANK-TRANSFER' ? {...BANK_TRANSFER, ...bankTransfer} : {...PAY_ID, ...payId}),
-    }));
+function savedQuote({localAmount = null, bankTransfer = {}} = {}) {
+    const data = fixture('quote-saved-method-fees');
+    if (localAmount !== null) {
+        data.local_amount = localAmount;
+        data.local_amount_currency_prefixed = `AUD ${localAmount}`;
+        data.sub_total_amount_currency_prefixed = `AUD ${localAmount}`;
+        data.total_amount_currency_prefixed = `AUD ${localAmount}`;
+    }
+    data.payment_methods = data.payment_methods.map(method => (method.code === 'BANK-TRANSFER' ? {...method, ...bankTransfer} : method));
     return data;
 }
 
@@ -118,9 +84,12 @@ describe('a saved quote\'s ways to pay', () => {
     });
 
     it('put the method\'s fee on the transaction', () => {
-        const withFee = Transaction.getInstance({...fixture('transaction-detail'), method_fee: '4.75', method_fee_currency_prefixed: 'AUD 4.75'});
+        // The transfer that walk confirmed: its payment was raised for the
+        // method's total, 29.75, not the quote's 25.00.
+        const withFee = Transaction.getInstance(fixture('transaction-detail-method-fee'));
         expect(withFee.hasMethodFee).toBe(true);
         expect(withFee.methodFeeCurrencyPrefixed).toBe('AUD 4.75');
+        expect(withFee.payment.totalPaymentAmountCurrencyPrefixed).toBe('AUD 29.75');
 
         expect(Transaction.getInstance({...fixture('transaction-detail'), method_fee: '0.00'}).hasMethodFee).toBe(false);
         expect(Transaction.getInstance(fixture('transaction-detail')).hasMethodFee).toBe(false);
