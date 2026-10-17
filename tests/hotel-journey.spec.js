@@ -26,6 +26,8 @@ const {default: HotelView} = await import('@/views/Travel/Hotels/HotelView.vue')
 const {default: SearchBar} = await import('@/views/Travel/Hotels/Partials/SearchBar.vue');
 const {default: Region} = await import('@/models/travel/region.js');
 const {getCriteria, useHotelUtils} = await import('@/composables/travel/hotels/hotel_utils.js');
+const {useCustomerStore} = await import('@/stores/customer.js');
+const {default: Customer} = await import('@/models/customer.js');
 
 const REGION = '01a0a6a5-ee4c-70bd-b0cc-376c185ad81d';
 const SEARCH = '01a0a6be-9b2d-7085-af0e-4b860114e78a';
@@ -67,8 +69,18 @@ const SearchBarProbe = {
     template: '<div data-probe="search-bar">{{ regions.map(r => r.name).join(",") }}|{{ regionsError }}|{{ regionLabels.CITY }}</div>',
 };
 
+// The results page waits for the profile before it searches, since the profile's
+// nationality is whose passports the guests are taken to carry (SD-1775).
+// CustomerLayout loads it in the app; here it is loaded as already there.
+function loadCustomer(name = 'profile-05-onboarded') {
+    const store = useCustomerStore();
+    store.customer.data = Customer.getInstance(fixture(name));
+    store.isLoaded = true;
+}
+
 async function mountResults(routes) {
-    mockApi(axios, routes);
+    loadCustomer();
+    mockApi(axios, {'/client/v1/countries': 'countries', ...routes});
 
     const router = await makeRouter(`/travel/hotels?region=${REGION}&checkin=2026-10-01&checkout=2026-10-04`);
     const wrapper = mount(IndexView, {
@@ -177,7 +189,8 @@ describe('the results list', () => {
         const empty = fixture('travel-hotels-search-region');
         empty.hotels = [];
         empty.total_hotels = 0;
-        mockApi(axios, {'/client/v1/travel/regions': 'travel-regions-los-angeles'});
+        loadCustomer();
+        mockApi(axios, {'/client/v1/countries': 'countries', '/client/v1/travel/regions': 'travel-regions-los-angeles'});
         axios.post.mockResolvedValue({status: 200, data: empty});
 
         const router = await makeRouter(`/travel/hotels?region=${REGION}&checkin=2026-10-01&checkout=2026-10-04`);
@@ -192,7 +205,8 @@ describe('the results list', () => {
         const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         // A 200 whose body the mapper cannot read is our problem, not an outage.
-        mockApi(axios, {'/client/v1/travel/regions': 'travel-regions-los-angeles'});
+        loadCustomer();
+        mockApi(axios, {'/client/v1/countries': 'countries', '/client/v1/travel/regions': 'travel-regions-los-angeles'});
         axios.post.mockResolvedValue({status: 200, data: {hotels: null}});
 
         const router = await makeRouter(`/travel/hotels?region=${REGION}&checkin=2026-10-01&checkout=2026-10-04`);
@@ -285,7 +299,7 @@ describe('the dead booking-attempt journey is gone', () => {
         expect(utils).not.toMatch(/travel\/hotel\/quote\/\$\{[a-zA-Z]+\}`/);
 
         expect(Object.keys(useHotelUtils()).sort()).toEqual([
-            'createQuote', 'criteria', 'getHotelView', 'getQuote', 'guestBreakdown', 'nights', 'regions', 'search', 'stayLabel',
+            'createQuote', 'criteria', 'getHotelView', 'getQuote', 'guestBreakdown', 'isCustomerLoaded', 'nights', 'profileResidency', 'regions', 'residency', 'search', 'stayLabel',
         ]);
     });
 });
