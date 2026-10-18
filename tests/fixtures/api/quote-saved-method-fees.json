@@ -1,0 +1,404 @@
+{
+  "id": "01a14ba9-e2b9-70c0-a7a7-c274d0351a63",
+  "payment_country": {
+    "id": "a583ceaa-87df-47aa-b522-7e7d48121786",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "payment_currency": {
+    "id": "4afe6d64-5daf-4471-89a2-e0f4adef1ab3",
+    "decimal_places": 2,
+    "iso_numeric": 36,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "AUD",
+    "common_name": "Australian dollar",
+    "official_name": "Australian dollar",
+    "icon_unicode": "$",
+    "code": "AUD",
+    "salary_ranges": null
+  },
+  "payout_country": {
+    "id": "ec5c94e2-927d-424f-b84f-5ff0b4df57a2",
+    "iso2_alpha": "FJ",
+    "iso3_alpha": "FJI",
+    "iso_numeric": "242",
+    "fips_code": "FJ",
+    "slug": "fiji",
+    "calling_code": "679",
+    "common_name": "Fiji",
+    "official_name": "Fiji",
+    "endonym": "Fiji",
+    "demonym": "Fijian, Fiji"
+  },
+  "payout_currency": {
+    "id": "51a43c06-a93a-4ef3-a073-a3e04693a547",
+    "decimal_places": 2,
+    "iso_numeric": 242,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "FJD",
+    "common_name": "Fijian dollar",
+    "official_name": "Fijian dollar",
+    "icon_unicode": "$",
+    "code": "FJD",
+    "salary_ranges": null
+  },
+  "payout_method": {
+    "id": "72bbe68b-23b5-49f9-9d91-588e679de2b8",
+    "code": "MOBILE-WALLET",
+    "title": "Mobile Money",
+    "description": "A secure method allowing users to transfer funds directly to recipient's mobile wallet account.",
+    "instruction": null,
+    "promo": null,
+    "sell_rate_formatted": null
+  },
+  "payout_company": {
+    "id": "a28ce80c-2e72-4a9d-b61d-4bbd6b435c24",
+    "code": "TERRA_PAY",
+    "title": "TerraPay"
+  },
+  "amount_type": "send",
+  "amount": "25.00",
+  "local_amount": "25.00",
+  "local_amount_formatted": "25.00",
+  "local_amount_currency_prefixed": "AUD 25.00",
+  "base_fees": "0.00",
+  "base_fees_formatted": "0.00",
+  "base_fees_currency_prefixed": "AUD 0.00",
+  "sub_total_amount_formatted": "25.00",
+  "sub_total_amount_currency_prefixed": "AUD 25.00",
+  "coupon": null,
+  "total_amount_formatted": "25.00",
+  "total_amount_currency_prefixed": "AUD 25.00",
+  "foreign_amount": "36.50",
+  "foreign_amount_formatted": "36.50",
+  "foreign_amount_currency_prefixed": "FJD 36.50",
+  "exchange_rate": 1.46,
+  "exchange_rate_formatted": "AUD = 1.46 FJD",
+  "exchange_rate_is_inverse": false,
+  "recipients": [
+    {
+      "id": "a2a6273b-0234-456f-ac41-a239084c77a0",
+      "recipient_type": "individual",
+      "name": "Test",
+      "second_name": null,
+      "third_name": null,
+      "whole_name": "Test Recipient",
+      "account_detail": {
+        "account_number": "7000000",
+        "institution": null
+      },
+      "account_detail_hashmap": [],
+      "relationship": {
+        "id": "5138ae3e-c94b-4284-b3fd-accab75d688d",
+        "code": "FRIEND",
+        "title": "Friend",
+        "description": "Someone the sender knows personally who is not family."
+      },
+      "created_at": "2026-09-02T10:31:15.000000Z",
+      "updated_at": "2026-09-02T10:31:15.000000Z",
+      "transaction_summary": {
+        "first_transaction_at": "2026-09-02T10:31:15.000000Z",
+        "recent_transaction_at": "2026-09-02T10:31:15.000000Z"
+      },
+      "last_transaction": {
+        "id": "a2a6274b-5d95-4eff-92c7-f60660e5632c",
+        "transaction_number": "PV-V2-5514844",
+        "created_at": "2026-09-02T10:31:15.000000Z",
+        "payout_amount": "7.25",
+        "payout_amount_currency_prefixed": "FJD 7.25",
+        "payout_currency": {
+          "id": "51a43c06-a93a-4ef3-a073-a3e04693a547",
+          "decimal_places": 2,
+          "iso_numeric": 242,
+          "type": "FIAT",
+          "crypto_code": null,
+          "iso_alpha": "FJD",
+          "common_name": "Fijian dollar",
+          "official_name": "Fijian dollar",
+          "icon_unicode": "$",
+          "code": "FJD",
+          "salary_ranges": null
+        },
+        "state": {
+          "id": "c0efe7d5-0eeb-4733-ab5a-438cba83b75c",
+          "code": "PAYOUT-FAILED",
+          "progress": null,
+          "label": "Payout Failed",
+          "description": "We regret to inform you that the payout for your transaction has failed.",
+          "color_scheme": "red"
+        },
+        "status_group": "failed"
+      }
+    },
+    {
+      "id": "a28cea16-8595-4a2b-a569-8a735ac8763a",
+      "recipient_type": "individual",
+      "name": "Test",
+      "second_name": null,
+      "third_name": null,
+      "whole_name": "Test Recipient",
+      "account_detail": {
+        "account_number": "7000000",
+        "institution": null
+      },
+      "account_detail_hashmap": [],
+      "relationship": {
+        "id": "5138ae3e-c94b-4284-b3fd-accab75d688d",
+        "code": "FRIEND",
+        "title": "Friend",
+        "description": "Someone the sender knows personally who is not family."
+      },
+      "created_at": "2026-08-20T21:24:53.000000Z",
+      "updated_at": "2026-08-20T21:24:53.000000Z",
+      "transaction_summary": {
+        "first_transaction_at": "2026-08-20T21:24:53.000000Z",
+        "recent_transaction_at": "2026-08-20T21:24:53.000000Z"
+      },
+      "last_transaction": {
+        "id": "a28cea41-bac2-489f-82ae-c72396377bc7",
+        "transaction_number": "PV-V2-4370936",
+        "created_at": "2026-08-20T21:24:52.000000Z",
+        "payout_amount": "7.25",
+        "payout_amount_currency_prefixed": "FJD 7.25",
+        "payout_currency": {
+          "id": "51a43c06-a93a-4ef3-a073-a3e04693a547",
+          "decimal_places": 2,
+          "iso_numeric": 242,
+          "type": "FIAT",
+          "crypto_code": null,
+          "iso_alpha": "FJD",
+          "common_name": "Fijian dollar",
+          "official_name": "Fijian dollar",
+          "icon_unicode": "$",
+          "code": "FJD",
+          "salary_ranges": null
+        },
+        "state": {
+          "id": "c0efe7d5-0eeb-4733-ab5a-438cba83b75c",
+          "code": "PAYOUT-FAILED",
+          "progress": null,
+          "label": "Payout Failed",
+          "description": "We regret to inform you that the payout for your transaction has failed.",
+          "color_scheme": "red"
+        },
+        "status_group": "failed"
+      }
+    }
+  ],
+  "recipient": {
+    "id": "a2a6273b-0234-456f-ac41-a239084c77a0",
+    "recipient_type": "individual",
+    "name": "Test",
+    "second_name": null,
+    "third_name": null,
+    "whole_name": "Test Recipient",
+    "account_detail": {
+      "account_number": "7000000",
+      "institution": null
+    },
+    "account_detail_hashmap": [
+      {
+        "type": "account_number",
+        "key": "Mobile Number",
+        "value": "7000000"
+      }
+    ],
+    "attributes": [
+      {
+        "type": "name",
+        "input_mode": null,
+        "context": null,
+        "is_required": true,
+        "label": "Recipient Name",
+        "attribute": "name_on_account",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": "The recipient\u2019s name exactly as registered with their mobile wallet.",
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 1,
+        "value": "Test Recipient"
+      },
+      {
+        "type": "account_number",
+        "input_mode": "number",
+        "context": null,
+        "is_required": true,
+        "label": "Mobile Number",
+        "attribute": "mobile_number",
+        "prefix_addon": "+679",
+        "suffix_addon": null,
+        "help_text": "The recipient\u2019s mobile wallet number, without the country code.",
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 2,
+        "value": "7000000"
+      }
+    ],
+    "relationship": {
+      "id": "5138ae3e-c94b-4284-b3fd-accab75d688d",
+      "code": "FRIEND",
+      "title": "Friend",
+      "description": "Someone the sender knows personally who is not family."
+    },
+    "channel": {
+      "id": "a28ce80b-a7c9-4945-b518-ae3c94d92da6",
+      "configuration": {
+        "recipient_type": null,
+        "confirm_account_number": false
+      }
+    },
+    "created_at": "2026-09-02T10:31:04.000000Z",
+    "updated_at": "2026-09-02T10:31:04.000000Z"
+  },
+  "purposes": [
+    {
+      "id": "0b3adbdc-75ce-4c29-8a05-188e2649aad1",
+      "code": "BUSINESS",
+      "title": "Business",
+      "description": "Funding business operations or investments."
+    },
+    {
+      "id": "78ca1cf1-916d-42ca-b045-b606cdac5a07",
+      "code": "EDUCATION",
+      "title": "Education",
+      "description": "Paying for school fees, tuition, or other educational expenses."
+    },
+    {
+      "id": "ebfe97d8-c91d-470a-8752-9f8bc0e436b6",
+      "code": "EMERGENCY",
+      "title": "Emergency",
+      "description": "Providing funds for unforeseen and urgent situations."
+    },
+    {
+      "id": "457292e4-4ae5-4543-aefe-911a6537da57",
+      "code": "FAMILY-SUPPORT",
+      "title": "Family Support",
+      "description": "Sending money to family members for general support."
+    },
+    {
+      "id": "796055e5-ce7b-4801-9c47-c1c6ca85f53d",
+      "code": "FRIEND-SUPPORT",
+      "title": "Friend Support",
+      "description": "Helping friends with financial assistance."
+    },
+    {
+      "id": "8ec8528f-122c-4650-8e6a-7fecfce29592",
+      "code": "GIFTS",
+      "title": "Gifts",
+      "description": "Sending money as a gift."
+    },
+    {
+      "id": "3fc4e5a9-e650-45da-a089-f35e64ed8099",
+      "code": "HEALTHCARE",
+      "title": "Healthcare",
+      "description": "Covering medical expenses for the recipient."
+    },
+    {
+      "id": "d71ecf0a-ede8-45eb-acc0-6dd69621bcdb",
+      "code": "INVESTMENT",
+      "title": "Investment",
+      "description": "Allocating money towards financial investments."
+    },
+    {
+      "id": "6cc28486-f15b-4a17-adbf-820b8df8ce61",
+      "code": "LOAN-REPAYMENT",
+      "title": "Loan Repayment",
+      "description": "Repaying personal loans."
+    },
+    {
+      "id": "332e6ccd-6a82-45cd-8bf3-42cbfe40d95d",
+      "code": "SAVING",
+      "title": "Saving",
+      "description": "Setting aside money for future use or savings accounts."
+    },
+    {
+      "id": "626c5731-c038-48f9-9348-f8a35ac49c25",
+      "code": "TRAVEL",
+      "title": "Travel",
+      "description": "Providing funds for travel expenses."
+    }
+  ],
+  "payment_methods": [
+    {
+      "id": "358ac102-863f-496a-9ae8-e26af2590884",
+      "code": "BANK-TRANSFER",
+      "title": "Bank Transfer",
+      "description": "A traditional transaction method where funds are transferred from customer's bank accounts through manual authorization, ensuring a controlled and deliberate payment process.",
+      "fee": "4.75",
+      "fee_formatted": "4.75",
+      "fee_currency_prefixed": "AUD 4.75",
+      "total_amount": "29.75",
+      "total_amount_formatted": "29.75",
+      "total_amount_currency_prefixed": "AUD 29.75",
+      "min_amount": "20.00",
+      "min_amount_formatted": "20.00",
+      "min_amount_currency_prefixed": "AUD 20.00",
+      "amount_multiplier": "5.00",
+      "amount_multiplier_formatted": "5.00",
+      "amount_multiplier_currency_prefixed": "AUD 5.00",
+      "providers": [
+        {
+          "id": "b51e856b-0dbc-4caa-a323-b73db50f8491",
+          "code": "MONOOVA",
+          "title": "Monoova",
+          "description": "Monoova provides businesses or individuals with a quick way to receive payments."
+        }
+      ]
+    },
+    {
+      "id": "60124e89-96c8-4f0e-8e92-a31af62fc962",
+      "code": "PAY-ID",
+      "title": "PayID",
+      "description": "A traditional transaction method where funds are transferred from customer's accounts through PayID, ensuring a controlled and deliberate payment process.",
+      "fee": "0.00",
+      "fee_formatted": "0.00",
+      "fee_currency_prefixed": "AUD 0.00",
+      "total_amount": "25.00",
+      "total_amount_formatted": "25.00",
+      "total_amount_currency_prefixed": "AUD 25.00",
+      "min_amount": null,
+      "min_amount_formatted": null,
+      "min_amount_currency_prefixed": null,
+      "amount_multiplier": null,
+      "amount_multiplier_formatted": null,
+      "amount_multiplier_currency_prefixed": null,
+      "providers": [
+        {
+          "id": "b51e856b-0dbc-4caa-a323-b73db50f8491",
+          "code": "MONOOVA",
+          "title": "Monoova",
+          "description": "Monoova provides businesses or individuals with a quick way to receive payments."
+        }
+      ]
+    }
+  ],
+  "pending_documents": [],
+  "delivery_time": null
+}

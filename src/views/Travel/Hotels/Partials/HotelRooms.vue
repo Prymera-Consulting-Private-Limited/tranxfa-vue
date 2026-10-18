@@ -27,9 +27,9 @@ const props = defineProps({
 
   /**
    * The chosen rate, the object itself. A rate is identified by which row it
-   * is, never by its token: the token is the supplier's match key for an
-   * offer, and several rows can carry the same one (SD-1219). Keying on it
-   * lit three rows at once.
+   * is, never by its token: before console 2026.10.6 the token was the
+   * supplier's match key for an offer, and several rows could carry the same
+   * one (SD-1219). Keying on it lit three rows at once.
    *
    * @type {HotelRate|null}
    */
@@ -73,8 +73,8 @@ const best = computed(() => {
           </p>
         </header>
         <ul>
-          <!-- Keyed by the rate's own id: rates sharing a token are distinct rows, and a token is not a row's identity.
-          Position only stands in for a rate that arrived without one. -->
+          <!-- Keyed by the rate's own id, never its token: an unbookable rate has no token, and before console 2026.10.6 rates could share one.
+          Position only stands in for a rate that arrived without an id. -->
           <li
               v-for="(rate, position) in group.rates"
               :key="rate.id ?? `position-${position}`"
