@@ -31,7 +31,9 @@ set the flag off or its customers get tabs leading nowhere.
 - `src/views/Travel/Hotels/HotelQuoteView.vue` — the held price the hotel page hands off to.
 - `src/views/Travel/Hotels/Partials/*.vue` — `SearchBar`, `PassportCountry`, `HotelFilters`,
   `HotelSort`, `HotelPagination`, `HotelCard` and the badges it composes, and the hotel page's
-  `HotelGallery`, `HotelHeading`, `HotelRooms`, `HotelHouseRules` and `HotelStayCard`.
+  `HotelGallery`, `HotelHeading`, `HotelRooms` (with `HotelRoomPhotos`), `HotelHouseRules` and
+  `HotelStayCard`. `HotelPhotoLightbox` is the one lightbox, opened by the gallery and by each
+  room's photos.
 
 Nothing live imports `hotel_booking.js` or `hotel_prebook.js`, or the chain under them
 (`hotel_quote`, `catalog_hotel`, `hotel_selection`, `hotel_selection_rate`, `hotel_provider`,
@@ -92,9 +94,18 @@ Nothing past the region search ever sends raw criteria again.
     leads with `large` and keeps `xlarge` for the lightbox.
   - The description is the supplier's prose, section by section, rendered as written. House
     rules keep prose apart from `charges`, which are money in the property's own currency.
-- **Rates come one per room and board.** `getRateGroups(rates)` groups them by `roomName` and
-  sorts the groups and the rates inside them by total. A group's "from" price is its cheapest
-  rate's own total, never mixed with another rate's terms.
+- **Rates come one per room and board.** `getRateGroups(rates)` groups them by room and sorts
+  the groups and the rates inside them by total. A group's "from" price is its cheapest rate's
+  own total, never mixed with another rate's terms.
+  - ~~Grouped by `roomName`~~: since SD-1838 a group is the name **together with** the rate's
+    `roomPhotos` and `roomAmenities`, and is keyed by `group.key`. One name can be two rooms: the
+    certification hotel lists two "Standard Double room"s whose photos and amenities differ, so
+    grouping on the name pictured one room's rates with the other's photos. A rate the console
+    could not match to a room carries neither and still groups by name.
+  - Each card shows its room's photos (`HotelRoomPhotos`, four and a count, then the shared
+    `HotelPhotoLightbox`) and amenities (`HotelAmenities`, worded from `labels`). Room amenity
+    codes start `ROOM-` and are open-ended, so they are only ever looked up, never matched.
+    `tests/hotel-room-photos-amenities.spec.js` holds it.
 - **A row is identified by `rate.id`**, with position as the fallback for a rate that has none.
   The selected row is matched by the rate object itself, never by its token. Before console
   2026.10.6 the token was the supplier's match key, which near-identical rates shared, so keying
