@@ -28,8 +28,15 @@ const periods = computed(() => props.cancellation?.ladder ?? []);
 
 // The time matters as much as the day: a free window that ends at noon has gone
 // by the afternoon, and the windows of one rate can change on the same day.
+// The time is shown on the customer's own clock, so its zone is named too: for a
+// stay abroad they would otherwise be left to guess whose noon it is.
 function at(value) {
-  return moment(value).format('D MMM YYYY, HH:mm');
+  const date = moment(value);
+  const zone = new Intl.DateTimeFormat(undefined, {timeZoneName: 'short'})
+      .formatToParts(date.toDate())
+      .find(part => part.type === 'timeZoneName')?.value;
+
+  return [date.format('D MMM YYYY, HH:mm'), zone].filter(Boolean).join(' ');
 }
 
 /**
