@@ -247,6 +247,18 @@ describe('the booking page', () => {
         expect(text).toContain('Your order has been delivered.');
     });
 
+    it('leaves a line of nothing out of what is paid for', async () => {
+        // Captured with taxes of nothing on a line of their own.
+        const locked = (await bookingPage(fixture('travel-order-view-price-locked'))).text();
+
+        expect(locked).toContain('Convenience fee');
+        expect(locked).not.toContain('Taxes and fees');
+
+        const complete = (await bookingPage(fixture('travel-order-view-complete'))).text();
+
+        expect(complete).toContain('Taxes and fees');
+    });
+
     it('keeps its old words for a console that cannot say', async () => {
         const data = fixture('travel-order-view-complete');
         delete data.is_paid;

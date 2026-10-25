@@ -387,4 +387,19 @@ describe('the quote page', () => {
         expect(text).toContain('Until 1 Nov 2026, 12:00');
         expect(text).toContain('From 8 Nov 2026, 12:00');
     });
+
+    it('leaves a line of nothing out of the price, as the hotel page does', async () => {
+        const {wrapper} = await mountQuote(heldQuote({
+            breakdown: [
+                line('room', 'Room', 72064),
+                line('taxes_and_fees', 'Taxes and fees', 0),
+                line('convenience_fee', 'Convenience fee', 1731),
+            ],
+            ...money('total', 73795),
+        }));
+        const text = wrapper.text();
+
+        expect(text).toContain('Convenience fee');
+        expect(text).not.toContain('Taxes and fees');
+    });
 });

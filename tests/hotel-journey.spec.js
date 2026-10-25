@@ -160,6 +160,20 @@ describe('the results list', () => {
         expect(text).toContain('No meals included');
     });
 
+    // Both lines once rendered without their figures or place, as "246 hotels
+    // available in" and "of hotels", because the count went before the named values.
+    it('names the place in the heading and counts the hotels in the filters', async () => {
+        const {wrapper} = await mountResults({
+            '/client/v1/travel/regions': 'travel-regions-los-angeles',
+            '/client/v1/travel/hotels/search/region': 'travel-hotels-search-region',
+        });
+
+        const text = wrapper.text();
+
+        expect(text).toContain('2 hotels available in Los Angeles');
+        expect(text).toContain('2 of 2 hotels');
+    });
+
     it('opens a hotel on the search it was found under, never straight to a quote', async () => {
         const {wrapper, router} = await mountResults({
             '/client/v1/travel/regions': 'travel-regions-los-angeles',

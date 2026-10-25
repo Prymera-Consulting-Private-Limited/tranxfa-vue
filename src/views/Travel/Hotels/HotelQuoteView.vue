@@ -80,6 +80,10 @@ const stay = computed(() => getStayLabel(quote.value?.checkIn, quote.value?.chec
 
 const guests = computed(() => (quote.value ? getGuestSummary(quote.value.rooms) : null));
 
+// A line of nothing, such as "Taxes and fees" on a rate the supplier taxes
+// nothing on, is left out here as it is on the hotel page.
+const priceLines = computed(() => (quote.value?.breakdown ?? []).filter(line => line.amount.amount !== 0));
+
 /**
  * The quote is held rather than recalculated — the price, the rule behind it and
  * the exchange rate are all recorded — but its cancellation terms are worked out
@@ -345,7 +349,7 @@ onUnmounted(() => clearInterval(clock));
               <h2 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.yourPrice') }}</h2>
             </header>
             <dl class="divide-y divide-gray-100">
-              <div v-for="line in quote.breakdown" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
+              <div v-for="line in priceLines" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
                 <dt class="min-w-0 text-sm/6 text-gray-500">{{ line.label }}</dt>
                 <dd class="shrink-0 text-sm/6 text-gray-900 tabular-nums">{{ line.amount.currencyPrefixed }}</dd>
               </div>
