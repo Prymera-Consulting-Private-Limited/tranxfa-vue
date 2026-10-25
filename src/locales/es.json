@@ -402,6 +402,8 @@
       "activateYourWalletToPay": "Activa tu monedero para pagar así: lee y acepta las condiciones y luego carga saldo por transferencia bancaria.",
       "documentReceived": "Gracias, ya tenemos tu {documentInReview}.",
       "enterCode": "Ingresa el código",
+      "checkCode": "Aplicar código",
+      "checking": "Aplicando…",
       "haveAPromotionCode": "¿Tienes un código de promoción?",
       "iLlProvideADifferent": "Proporcionaré un documento diferente que coincida con mi perfil.",
       "identityMismatchDetected": "Se ha detectado una discrepancia de identidad",

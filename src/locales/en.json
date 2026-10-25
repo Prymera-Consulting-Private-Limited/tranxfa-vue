@@ -170,7 +170,7 @@
       "thisCodeAppliesTo": "This code applies to your transfer.",
       "payWithWallet": "Pay with Wallet",
       "checkAgain": "Check again",
-      "checkCode": "Check code",
+      "checkCode": "Apply code",
       "checking": "Checking…",
       "weCouldntCopyThe2": "We couldn't copy the details from your document. Please try again or update your details by hand.",
       "yourDocumentWasReceived": "Your document was received, but we couldn't refresh this transfer. Please reload the page.",
