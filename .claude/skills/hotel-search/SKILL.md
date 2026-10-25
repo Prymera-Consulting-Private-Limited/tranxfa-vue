@@ -22,8 +22,9 @@ set the flag off or its customers get tabs leading nowhere.
   stay labels; and `useHotelUtils()` with every call the journey makes: `regions()`, `search()`,
   `getHotelView()`, `createQuote()`, `getQuote()`.
 - `src/models/travel/hotels/` — `Hotel` (a search result), `HotelRate`, `HotelDetail` (the hotel
-  page), `HotelSearch` (the resolved stay and its `search_id`), `RateCancellation` and
-  `HouseRuleCharge`. `Region` is `src/models/travel/region.js`.
+  page), `HotelSearch` (the resolved stay and its `search_id`), `RateCancellation` with its
+  `CancellationWindow`s, `HouseRuleCharge`, and `HotelPriceChange` (Book Quote's 409 when the
+  hotel asks another price). `Region` is `src/models/travel/region.js`.
 - `src/views/Travel/Hotels/IndexView.vue` — owns the search, the region lookup and all page state.
 - `src/views/Travel/Hotels/HotelView.vue` — one hotel, priced for the search it was found under.
   Gallery, heading, rooms, description, amenities and house rules span two columns; `HotelStayCard`
@@ -33,7 +34,8 @@ set the flag off or its customers get tabs leading nowhere.
   `HotelSort`, `HotelPagination`, `HotelCard` and the badges it composes, and the hotel page's
   `HotelGallery`, `HotelHeading`, `HotelRooms` (with `HotelRoomPhotos`), `HotelHouseRules` and
   `HotelStayCard`. `HotelPhotoLightbox` is the one lightbox, opened by the gallery and by each
-  room's photos.
+  room's photos. `HotelPriceLines` and `HotelCancellationLadder` render a rate's terms wherever
+  they are shown: the rooms list, the stay card and the quote.
 
 Nothing live imports `hotel_booking.js` or `hotel_prebook.js`, or the chain under them
 (`hotel_quote`, `catalog_hotel`, `hotel_selection`, `hotel_selection_rate`, `hotel_provider`,
@@ -94,6 +96,12 @@ Nothing past the region search ever sends raw criteria again.
     leads with `large` and keeps `xlarge` for the lightbox.
   - The description is the supplier's prose, section by section, rendered as written. House
     rules keep prose apart from `charges`, which are money in the property's own currency.
+  - Since console 2026.10.11 `charges` holds **every** rule the hotel states, not only those
+    with a price (SD-1839). An included breakfast or a no-show rule arrives with its amount
+    unstated, never nought, and reads in its `inclusion` words. The list is headed "Extras and
+    conditions", and says the hotel collects the prices (and in which currencies) only when one
+    of them has a price. A prose rule's paragraphs come joined by a blank line and are rendered
+    as paragraphs. `tests/travel-hotel-extras.spec.js` holds both.
 - **Rates come one per room and board.** `getRateGroups(rates)` groups them by room and sorts
   the groups and the rates inside them by total. A group's "from" price is its cheapest rate's
   own total, never mixed with another rate's terms.
@@ -106,6 +114,13 @@ Nothing past the region search ever sends raw criteria again.
     `HotelPhotoLightbox`) and amenities (`HotelAmenities`, worded from `labels`). Room amenity
     codes start `ROOM-` and are open-ended, so they are only ever looked up, never matched.
     `tests/hotel-room-photos-amenities.spec.js` holds it.
+- **Every rate's terms open from its own row** (SD-1839), so two can be compared without
+  choosing either. A "Price and cancellation" disclosure holds `HotelPriceLines` (the
+  breakdown: the room, each tax inside the price by name, the fee, with lines of nothing left
+  out) and `HotelCancellationLadder` (every window still to come, each priced by the console).
+  It appears only when there is more than the total to say. The stay card shows the same two for
+  the selected rate. A console before 2026.10.11 sends no `ladder`, and the model reads that as
+  none. `tests/hotel-rate-terms.spec.js` holds it.
 - **A row is identified by `rate.id`**, with position as the fallback for a rate that has none.
   The selected row is matched by the rate object itself, never by its token. Before console
   2026.10.6 the token was the supplier's match key, which near-identical rates shared, so keying
@@ -128,8 +143,18 @@ Nothing past the region search ever sends raw criteria again.
 
 `HotelQuoteView` re-reads the held quote on every open with `getQuote(quoteId)`, because its
 cancellation terms are worked out again on each read. Past its expiry the answer is a 410 with a
-message to show. Everything from there on is the order journey in
-`src/composables/travel/order_utils.js`, which this skill does not cover.
+message to show. The quote lists the whole cancellation ladder beside the price.
+
+Booking it (`bookQuote`) can answer **409 with `type: 'hotel_price_changed'`** (SD-1839): the
+hotel asked another price at the moment of booking, higher or lower, and nothing was booked or
+charged. The body carries `was` (the old total) and `quote`, the new price already held as a
+quote of its own, in Read Quote's shape and on its own terms. The page shows both totals and the
+new quote's breakdown and ladder. "Book at …" posts the same guest payload to the new quote's id;
+"Go back" returns to the hotel page when there is one in the history, and to the search when the
+quote was opened directly. A 409 without that type is still a refusal shown as it stands.
+
+Everything after booking is the order journey in `src/composables/travel/order_utils.js`, which
+this skill does not cover.
 
 ## Occupancy
 
@@ -218,4 +243,9 @@ so panels open flush under the bar and align with their own column (`left-0` for
 `right-0` for guests). The calendar is an `inline` datepicker inside the panel with
 `:multi-calendars="isWide ? 2 : 1"` driven by a `matchMedia('(min-width: 1024px)')` listener, and
 `@range-end` closes the panel. The guests panel uses dashed dividers between rooms and identical
-`−  n  +` steppers for adults, children and each child's age — no selects, no per-room cards.
+`−  n  +` steppers for adults and children, and no per-room cards.
+
+Each child's age is a **drop-down**, from "<1" to `MAX_CHILD_AGE` (SD-1839). This used to say "no
+selects", and each age was a stepper too. The supplier's review asks for a drop-down, since it
+prices every child on their own age, so an age is picked outright. A newly added child still
+starts on `CHILD_AGE`.

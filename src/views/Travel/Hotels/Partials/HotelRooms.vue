@@ -6,6 +6,8 @@ import HotelAvailability from '@/views/Travel/Hotels/Partials/HotelAvailability.
 import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
 import HotelRoomPhotos from '@/views/Travel/Hotels/Partials/HotelRoomPhotos.vue';
 import HotelAmenities from '@/views/Travel/Hotels/Partials/HotelAmenities.vue';
+import HotelPriceLines from '@/views/Travel/Hotels/Partials/HotelPriceLines.vue';
+import HotelCancellationLadder from '@/views/Travel/Hotels/Partials/HotelCancellationLadder.vue';
 import {getRateGroups} from '@/composables/travel/hotels/hotel_utils.js';
 
 const props = defineProps({
@@ -58,6 +60,20 @@ const best = computed(() => {
 
   return bookable.reduce((cheapest, rate) => (rate.total.amount < cheapest.total.amount ? rate : cheapest));
 });
+
+/**
+ * Whether a rate has more to say than its total and its badge. Every rate's
+ * terms can be read without choosing it (SD-1839), so a customer comparing two
+ * never has to select one to see what it costs to cancel.
+ *
+ * @param {HotelRate} rate
+ * @returns {boolean}
+ */
+function hasTerms(rate) {
+  const lines = rate.breakdown.filter(line => line.amount.amount !== 0);
+
+  return lines.length > 1 || (rate.cancellation?.ladder.length ?? 0) > 0;
+}
 </script>
 
 <template>
@@ -102,6 +118,13 @@ const best = computed(() => {
                 <HotelAvailability :allotment="rate.allotment" />
               </div>
               <PayableAtProperty :charges="rate.payableAtProperty" dense class="max-w-xs" />
+              <details v-if="hasTerms(rate)" class="max-w-xs">
+                <summary class="cursor-pointer text-xs/5 font-medium text-brand-700 hover:text-brand-800">{{ $t('travel.priceAndCancellation') }}</summary>
+                <div class="mt-2 space-y-3">
+                  <HotelPriceLines :lines="rate.breakdown" dense />
+                  <HotelCancellationLadder :cancellation="rate.cancellation" dense />
+                </div>
+              </details>
             </div>
             <!-- Price rail, so every row lines up on the number and the button. -->
             <div class="flex shrink-0 items-end justify-between gap-4 sm:w-48 sm:flex-col sm:items-stretch sm:gap-3 sm:border-l sm:border-gray-100 sm:pl-6">

@@ -133,11 +133,33 @@ function classes(charge) {
   }
 }
 
-// The charges are in the property's own currency rather than the customer's, so
+// Since SD-1839 the list holds every rule the hotel states, and only some of
+// them carry a price: an included breakfast or a no-show rule has none.
+const priced = computed(() => props.charges.filter(charge => charge.amount.isStated));
+
+// The prices are in the property's own currency rather than the customer's, so
 // where they differ that has to be said outright.
-const currencies = computed(() => [...new Set(props.charges.map(charge => charge.currency).filter(Boolean))]);
+const currencies = computed(() => [...new Set(priced.value.map(charge => charge.currency).filter(Boolean))]);
+
+// One sentence per key, and the currencies decide which of the two is used.
+// Rendered as three fragments back to back, the space before the currencies
+// was dropped, and a sentence assembled that way cannot be translated.
+const collectedNote = computed(() => (currencies.value.length
+    ? t('travel.collectedByTheHotelAndChargedIn', {currencies: currencies.value.join(t('common.listJoin'))})
+    : t('travel.collectedByTheHotel')));
 
 const hasAnything = computed(() => props.rules.length > 0 || props.charges.length > 0);
+
+/**
+ * The hotel writes a rule as paragraphs, and the console keeps them apart with
+ * a blank line. Printed as one text they run together into a wall.
+ *
+ * @param {string|null} body
+ * @returns {string[]}
+ */
+function paragraphs(body) {
+  return (body ?? '').split(/\n\s*\n/).map(paragraph => paragraph.trim()).filter(Boolean);
+}
 </script>
 
 <template>
@@ -147,8 +169,10 @@ const hasAnything = computed(() => props.rules.length > 0 || props.charges.lengt
     actually be asked for at the desk. -->
     <div v-if="charges.length" class="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200">
       <header class="border-b border-gray-100 px-5 py-4">
-        <h3 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.paidAtTheProperty') }}</h3>
-        <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.collectedByTheHotelRather') }}<template v-if="currencies.length"> {{ $t('travel.andChargedIn', {currencies: currencies.join($t('common.listJoin'))}) }}</template>{{ $t('travel.soTheseAreNotPart') }}</p>
+        <h3 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.extrasAndConditions') }}</h3>
+        <!-- Only a price is collected at the desk, so only where there is one
+        does the hotel's currency need saying. -->
+        <p v-if="priced.length" class="mt-0.5 text-xs/5 text-gray-500">{{ collectedNote }}</p>
       </header>
       <ul class="divide-y divide-gray-100">
         <!-- By position: one type can carry several charges (two meals, two
@@ -165,7 +189,9 @@ const hasAnything = computed(() => props.rules.length > 0 || props.charges.lengt
     <dl v-if="rules.length" class="mt-4 space-y-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
       <div v-for="rule in rules" :key="rule.title">
         <dt class="text-sm/6 font-semibold text-gray-900">{{ rule.title }}</dt>
-        <dd class="mt-1 text-sm/6 text-gray-600">{{ rule.body }}</dd>
+        <dd class="mt-1 space-y-2 text-sm/6 text-gray-600">
+          <p v-for="(paragraph, position) in paragraphs(rule.body)" :key="position" class="whitespace-pre-line">{{ paragraph }}</p>
+        </dd>
       </div>
     </dl>
   </section>
