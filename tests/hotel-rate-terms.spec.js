@@ -103,15 +103,20 @@ describe('a rate\'s cancellation ladder', () => {
         expect(terms.ladder).toEqual([]);
     });
 
-    it('shows each window\'s span beside what cancelling in it costs', () => {
+    // Each time names the zone it is shown in, as the browser names it, so a
+    // customer booking a stay abroad can tell whose noon a window ends at.
+    it('shows each window\'s span, with its zone, beside what cancelling in it costs', () => {
+        const zoneAt = value => new Intl.DateTimeFormat(undefined, {timeZoneName: 'short'})
+            .formatToParts(new Date(local(value)))
+            .find(part => part.type === 'timeZoneName').value;
         const rows = mount(HotelCancellationLadder, {props: {cancellation: RateCancellation.getInstance(cancellation())}})
             .findAll('li')
             .map(row => row.findAll('span').map(part => part.text()));
 
         expect(rows).toEqual([
-            ['Until 1 Nov 2026, 12:00', 'Free'],
-            ['1 Nov 2026, 12:00 to 8 Nov 2026, 12:00', 'AUD 413.65'],
-            ['From 8 Nov 2026, 12:00', 'AUD 827.29'],
+            [`Until 1 Nov 2026, 12:00 ${zoneAt('2026-11-01 12:00')}`, 'Free'],
+            [`1 Nov 2026, 12:00 ${zoneAt('2026-11-01 12:00')} to 8 Nov 2026, 12:00 ${zoneAt('2026-11-08 12:00')}`, 'AUD 413.65'],
+            [`From 8 Nov 2026, 12:00 ${zoneAt('2026-11-08 12:00')}`, 'AUD 827.29'],
         ]);
     });
 
@@ -206,7 +211,8 @@ describe('every rate\'s terms on the hotel page', () => {
         expect(text).toContain('City tax');
         expect(text).toContain('VAT');
         expect(text).toContain('Cancellation policy');
-        expect(text).toContain('1 Nov 2026, 12:00 to 8 Nov 2026, 12:00');
+        // Each time carries the zone it is shown in, whatever zone the suite runs in.
+        expect(text).toMatch(/1 Nov 2026, 12:00 \S+ to 8 Nov 2026, 12:00 \S+/);
     });
 });
 
