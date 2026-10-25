@@ -7,12 +7,17 @@ import {computed, onUnmounted, ref, watch} from 'vue';
 import moment from 'moment';
 import {useRouter} from 'vue-router';
 import CustomerLayout from '@/components/CustomerLayout.vue';
+import Spinner from '@/components/Spinner.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import HotelMealBadge from '@/views/Travel/Hotels/Partials/HotelMealBadge.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
+import HotelCancellationLadder from '@/views/Travel/Hotels/Partials/HotelCancellationLadder.vue';
+import HotelPriceLines from '@/views/Travel/Hotels/Partials/HotelPriceLines.vue';
 import GuestContactForm from '@/views/Travel/Hotels/Partials/GuestContactForm.vue';
 import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
 import TravelQuote from '@/models/travel/quote.js';
+import HotelPriceChange from '@/models/travel/hotels/hotel_price_change.js';
+import HotelBookingRefusalType from '@/enums/hotel_booking_refusal_type.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {getGuestSummary, getStayLabel, useHotelUtils} from '@/composables/travel/hotels/hotel_utils.js';
 import {useOrderUtils} from '@/composables/travel/order_utils.js';
@@ -86,6 +91,7 @@ async function load() {
   hasFailed.value = false;
   hasExpired.value = false;
   bookingRefused.value = false;
+  priceChange.value = null;
   failureMessage.value = null;
 
   await getQuote(props.quoteId).then((response) => {
@@ -113,19 +119,31 @@ const bookingValidation = ref(null);
 const bookingRefused = ref(false);
 
 /**
+ * Set when the hotel asked another price at the moment of booking (SD-1839).
+ * Higher or lower, the customer is told before anything is booked: the new
+ * price is already held, and taking it books the held quote with the details
+ * already typed in, kept here so they are not asked for again.
+ *
+ * @type {import('vue').Ref<HotelPriceChange|null>}
+ */
+const priceChange = ref(null);
+let pendingPayload = null;
+
+/**
  * Turns the hold into an order to pay for (SD-1282). Nothing is booked with the
  * hotel yet: the room is booked once the payment arrives, so the order is
  * opened first and a payment page that never opens costs the customer nothing.
  *
  * @param {object} payload
+ * @param {string} quoteId the held price to book, which is the new one once the customer has taken it
  */
-async function book(payload) {
+async function book(payload, quoteId = props.quoteId) {
   isBooking.value = true;
   bookingError.value = null;
   bookingValidation.value = null;
   bookingRefused.value = false;
 
-  await bookQuote(props.quoteId, payload).then((response) => {
+  await bookQuote(quoteId, payload).then((response) => {
     // The order, never the booking. Nothing in the client api takes a booking
     // id — every call after this one, and the confirmation channel with them,
     // keys on the order. The two are minted in the same instant so their uuids
@@ -133,6 +151,18 @@ async function book(payload) {
     // impossible to spot by eye and a 404 the only way anyone finds out.
     router.push({name: 'travelBookingPayment', params: {id: response.data.order.id}});
   }).catch((error) => {
+    if (error.response?.status === 409 && error.response.data?.type === HotelBookingRefusalType.HOTEL_PRICE_CHANGED) {
+      priceChange.value = HotelPriceChange.getInstance(error.response.data);
+      pendingPayload = payload;
+      isBooking.value = false;
+
+      return;
+    }
+
+    // Anything else answers the booking as a whole, so the notice gives way to
+    // whatever explains it.
+    priceChange.value = null;
+
     // A hold that ran out while the form was being filled in is an expiry, not
     // a failure of anything the customer typed.
     if (error.response?.status === 410) {
@@ -150,6 +180,23 @@ async function book(payload) {
 
     isBooking.value = false;
   });
+}
+
+function acceptNewPrice() {
+  book(pendingPayload, priceChange.value.quote.id);
+}
+
+// Declining goes back to the hotel page the customer came from, which knows
+// the search this price was found under. Opened any other way, there is no
+// such page to return to, so the search is the way back.
+function declineNewPrice() {
+  if (router.options.history.state?.back) {
+    router.back();
+
+    return;
+  }
+
+  router.push({name: 'hotels'});
 }
 
 watch(() => props.quoteId, load, {immediate: true});
@@ -170,6 +217,55 @@ onUnmounted(() => clearInterval(clock));
           <div class="h-28 rounded-3xl bg-white ring-1 ring-gray-200" />
           <div class="h-64 rounded-3xl bg-white ring-1 ring-gray-200" />
         </div>
+        <!-- The hotel asked another price at the moment of booking (SD-1839).
+        Nothing is booked or charged until the customer takes it, so both totals
+        are side by side and taking it is one press. -->
+        <section v-else-if="priceChange" class="rounded-3xl bg-white p-6 ring-1 ring-warning-200 sm:p-8">
+          <div class="flex size-12 items-center justify-center rounded-full bg-warning-50 text-warning-700">
+            <ExclamationTriangleIcon class="size-6" aria-hidden="true" />
+          </div>
+          <h1 class="mt-5 text-base font-semibold text-gray-900">{{ $t('travel.thePriceHasChanged') }}</h1>
+          <p class="mt-2 text-sm/6 text-gray-500">{{ $t('travel.priceChangedExplained') }}</p>
+          <dl class="mt-5 divide-y divide-gray-100 rounded-2xl ring-1 ring-gray-200">
+            <div class="flex items-baseline justify-between gap-4 px-4 py-3">
+              <dt class="text-sm/6 text-gray-500">{{ $t('travel.priceWas') }}</dt>
+              <dd class="text-sm/6 text-gray-500 line-through tabular-nums">{{ priceChange.was.currencyPrefixed }}</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 px-4 py-3">
+              <dt class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.priceNow') }}</dt>
+              <dd class="text-base font-semibold text-gray-900 tabular-nums">{{ priceChange.quote.total.currencyPrefixed }}</dd>
+            </div>
+          </dl>
+          <!-- The new price can come on other terms: when the original rate has
+          gone, the hotel may restate the same room with different taxes or
+          cancellation. So the terms shown are the new price's own. -->
+          <div class="mt-5 space-y-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <HotelMealBadge :meal="priceChange.quote.room?.meal" :labels="priceChange.quote.labels" />
+              <HotelCancellationBadge :cancellation="priceChange.quote.cancellation" />
+            </div>
+            <HotelPriceLines :lines="priceChange.quote.breakdown" />
+            <HotelCancellationLadder :cancellation="priceChange.quote.cancellation" />
+          </div>
+          <p v-if="bookingError" class="mt-5 rounded-xl border border-danger-200 bg-danger-50 p-3 text-sm/6 text-danger-700">{{ bookingError }}</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button
+                type="button"
+                :disabled="isBooking"
+                @click="acceptNewPrice"
+                class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-2.5 text-sm/6 font-semibold text-white transition hover:bg-brand-800 focus-visible:outline-0 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+            >
+              <Spinner v-if="isBooking" class="size-4" />
+              {{ $t('travel.bookAtNewPrice', {price: priceChange.quote.total.currencyPrefixed}) }}
+            </button>
+            <button
+                type="button"
+                :disabled="isBooking"
+                @click="declineNewPrice"
+                class="cursor-pointer rounded-xl bg-white px-5 py-2.5 text-sm/6 font-semibold text-gray-900 ring-1 ring-gray-300 transition ring-inset hover:bg-gray-50 focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-60"
+            >{{ $t('common.goBack') }}</button>
+          </div>
+        </section>
         <!-- The hold ran out. Not an error the customer made, so it reads as an
         expiry with a way forward rather than as a failure. -->
         <div v-else-if="hasExpired || bookingRefused || !isHeld" class="flex flex-col items-center justify-center rounded-3xl bg-white px-8 py-16 text-center ring-1 ring-warning-200">
@@ -263,6 +359,10 @@ onUnmounted(() => clearInterval(clock));
             </dl>
             <!-- Not part of the total: the hotel collects this on arrival. -->
             <PayableAtProperty :charges="quote.payableAtProperty" class="border-t border-gray-100 px-5 py-3" />
+          </section>
+          <!-- Every window still to come, beside the price it applies to. -->
+          <section v-if="quote.cancellation?.ladder.length" class="mt-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
+            <HotelCancellationLadder :cancellation="quote.cancellation" />
           </section>
           <!-- What cancelling would give back, while the terms still say so. -->
           <section v-if="quote.cancellation?.refundNow?.isStated" class="mt-4 rounded-3xl bg-white p-5 ring-1 ring-gray-200">
