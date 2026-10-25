@@ -4,6 +4,8 @@ import HotelMealBadge from '@/views/Travel/Hotels/Partials/HotelMealBadge.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
 import HotelAvailability from '@/views/Travel/Hotels/Partials/HotelAvailability.vue';
 import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
+import HotelRoomPhotos from '@/views/Travel/Hotels/Partials/HotelRoomPhotos.vue';
+import HotelAmenities from '@/views/Travel/Hotels/Partials/HotelAmenities.vue';
 import {getRateGroups} from '@/composables/travel/hotels/hotel_utils.js';
 
 const props = defineProps({
@@ -63,7 +65,8 @@ const best = computed(() => {
     <h2 class="text-lg font-semibold tracking-tight text-gray-900">{{ $t('travel.chooseYourRoom') }}</h2>
     <p class="mt-1 text-sm/6 text-gray-500">{{ $t('travel.pricesAreForYourWhole') }}</p>
     <div class="mt-4 space-y-4">
-      <article v-for="group in groups" :key="group.name" class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300">
+      <!-- Keyed by the room, not its name: two rooms can share one name. -->
+      <article v-for="group in groups" :key="group.key" class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300">
         <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 pt-5 pb-4">
           <h3 class="min-w-0 text-base font-semibold tracking-tight text-gray-900">{{ group.name }}</h3>
           <!-- A single rate already shows its own price, so this would only repeat it. -->
@@ -72,6 +75,11 @@ const best = computed(() => {
             <span class="text-base font-semibold tracking-tight text-gray-900 tabular-nums">{{ group.from.currencyPrefixed }}</span>
           </p>
         </header>
+        <!-- Every rate below is this one room, so what it looks like and has is said once, above them. -->
+        <div v-if="group.photos.length || group.amenities.length" class="space-y-3 px-5 pb-4">
+          <HotelRoomPhotos :photos="group.photos" :name="group.name" />
+          <HotelAmenities :amenities="group.amenities" :labels="labels" :limit="group.amenities.length" />
+        </div>
         <ul>
           <!-- Keyed by the rate's own id, never its token: an unbookable rate has no token, and before console 2026.10.6 rates could share one.
           Position only stands in for a rate that arrived without an id. -->
