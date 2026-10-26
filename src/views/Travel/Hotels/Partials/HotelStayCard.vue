@@ -2,6 +2,8 @@
 import {computed} from 'vue';
 import Spinner from '@/components/Spinner.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
+import HotelPriceLines from '@/views/Travel/Hotels/Partials/HotelPriceLines.vue';
+import HotelCancellationLadder from '@/views/Travel/Hotels/Partials/HotelCancellationLadder.vue';
 import {getGuestSummary, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
 import {CalendarDaysIcon, ExclamationTriangleIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 
@@ -77,9 +79,13 @@ const guests = computed(() => (props.search ? getGuestSummary(props.search.rooms
         <p class="mt-1 text-sm/6 font-medium text-gray-900">{{ selected.roomName }}</p>
         <p class="mt-3 text-2xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ selected.total.currencyPrefixed }}</p>
         <p v-if="selected.perNight.isStated" class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.pricePerNight', {currencyPrefixed: selected.perNight.currencyPrefixed}) }}</p>
+        <!-- What the chosen rate is made of and what cancelling it costs, beside
+        the button that holds it, so its terms are read before it is taken. -->
+        <HotelPriceLines :lines="selected.breakdown" dense class="mt-3" />
         <div class="mt-3">
           <HotelCancellationBadge :cancellation="selected.cancellation" />
         </div>
+        <HotelCancellationLadder :cancellation="selected.cancellation" dense class="mt-3" />
       </template>
       <p v-else class="text-sm/6 text-gray-500">{{ $t('travel.pickARoomToSee') }}</p>
     </div>
