@@ -1,6 +1,5 @@
 <script setup>
 import {computed} from 'vue';
-import moment from 'moment';
 import {CalendarDaysIcon, ClockIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 import BookingNextStep from '@/views/Travel/Bookings/Partials/BookingNextStep.vue';
 import BookingStateBadge from '@/views/Travel/Bookings/Partials/BookingStateBadge.vue';
@@ -30,12 +29,6 @@ const guests = computed(() => {
 
   return getGuestSummary(rooms);
 });
-
-// A moment, unlike the stay's dates: the waiting payment really does lapse at
-// this time. Null means it never expires, and the line is left out.
-const openPaymentDeadline = computed(() => (props.order.openPayment?.expiresAt
-    ? moment(props.order.openPayment.expiresAt).format('lll')
-    : null));
 </script>
 
 <template>
@@ -79,7 +72,6 @@ const openPaymentDeadline = computed(() => (props.order.openPayment?.expiresAt
         <p v-if="order.openPayment" class="mt-3 inline-flex flex-wrap items-center gap-x-1.5 rounded-lg bg-warning-50 px-2.5 py-1 text-xs/5 font-medium text-warning-800 ring-1 ring-warning-200 ring-inset">
           <ClockIcon class="size-3.5 shrink-0" aria-hidden="true" />
           {{ $t('travel.paymentWaiting', {amount: order.openPayment.amount.currencyPrefixed}) }}
-          <span v-if="openPaymentDeadline" class="font-normal">· {{ $t('travel.payByShort', {deadline: openPaymentDeadline}) }}</span>
         </p>
       </div>
       <div class="shrink-0 sm:text-right">
