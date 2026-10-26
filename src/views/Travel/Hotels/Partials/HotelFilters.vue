@@ -122,7 +122,9 @@ function formatPrice(amount) {
       <header class="flex items-baseline justify-between gap-3 px-4 py-3">
         <div>
           <h3 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.filters') }}</h3>
-          <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.matchOfTotalHotels', totalCount, {matchCount: matchCount, totalCount: totalCount}) }}</p>
+          <!-- The named values go before the count, or vue-i18n reads them as options
+          and the line renders as "of hotels". -->
+          <p class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.matchOfTotalHotels', {matchCount: matchCount, totalCount: totalCount}, totalCount) }}</p>
         </div>
         <button
             v-if="isActive"
