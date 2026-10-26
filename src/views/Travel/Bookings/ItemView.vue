@@ -66,6 +66,10 @@ const guests = computed(() => {
   return rooms.length ? getGuestBreakdown(rooms) : [];
 });
 
+// The order's lines are its quote's, so a line of nothing is left out here as
+// it is on the quote.
+const chargedLines = computed(() => (order.value?.breakdown ?? []).filter(line => line.amount.amount !== 0));
+
 const guestNames = computed(() => {
   return (order.value?.guests ?? [])
       .map(guest => [guest.firstName, guest.lastName].filter(Boolean).join(' '))
@@ -317,7 +321,7 @@ onUnmounted(() => {
                 <h2 class="text-sm/6 font-semibold text-gray-900">{{ isUnpaid ? $t('travel.whatYourePayingFor') : $t('travel.whatYouPaidFor') }}</h2>
               </header>
               <dl class="divide-y divide-gray-100">
-                <div v-for="line in order.breakdown" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
+                <div v-for="line in chargedLines" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
                   <dt class="min-w-0 text-sm/6 text-gray-500">{{ line.label }}</dt>
                   <dd class="shrink-0 text-sm/6 text-gray-900 tabular-nums">{{ line.amount.currencyPrefixed }}</dd>
                 </div>

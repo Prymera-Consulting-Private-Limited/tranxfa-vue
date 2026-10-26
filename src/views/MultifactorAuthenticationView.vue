@@ -3,7 +3,7 @@ import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
 
-import {failureMessage, logRequestFailure} from "@/composables/api_utils.js";
+import {failureMessage, getCustomerMessage, logRequestFailure} from "@/composables/api_utils.js";
 import BrandLogo from "@/components/BrandLogo.vue";
 import {onMounted, ref} from "vue";
 import VOtpInput from "vue3-otp-input";
@@ -28,6 +28,7 @@ const isSessionReverify = router.currentRoute.value.query.reason === 'session';
 const isVerifying = ref(false);
 const isResendingOtp = ref(false);
 const otpError = ref('');
+const sessionEndedMessage = ref('');
 const customerUtils = useCustomerUtils();
 const customerStore = useCustomerStore();
 
@@ -47,6 +48,14 @@ async function authenticate() {
     } else if (e.response?.status === 403) {
       customerUtils.refresh();
       router.push({name: 'onboardingWorkflow', query: onward()});
+    } else if (e.response?.status === 401) {
+      // The fifth wrong code locks the account and ends the session, and the
+      // message says for how long. A session that simply expired says only
+      // "Unauthenticated.", which the usual wording covers. Either way the
+      // customer is signed out, so nothing of theirs is kept here.
+      const message = getCustomerMessage(e);
+      sessionEndedMessage.value = message && message !== 'Unauthenticated.' ? message : t('common.sessionEnded');
+      customerStore.reset();
     } else {
       logRequestFailure(e, 'mfa');
       otpError.value = failureMessage(e, t('onboarding.weCouldntCheckThat'));
@@ -111,11 +120,25 @@ onMounted(async () => {
       </div>
       <!-- Form Header -->
       <h2 class="text-2xl font-semibold text-black mb-4 text-center mt-14 sm:mt-8">{{ $t('onboarding.mfaHeading') }}</h2>
-      <p v-if="isSessionReverify" class="text-md text-[#B7A3C1] mb-2 text-center">{{ $t('onboarding.mfaIntro', {email: customer.data?.account?.email}) }}</p>
-      <p v-else class="text-md text-[#B7A3C1] mb-2 text-center">{{ $t('onboarding.enterEmailCode', {email: customer.data?.account?.email}) }}</p>
-      <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">{{ $t('verification.emailCodeDelay') }}</p>
+      <template v-if="! sessionEndedMessage">
+        <p v-if="isSessionReverify" class="text-md text-[#B7A3C1] mb-2 text-center">{{ $t('onboarding.mfaIntro', {email: customer.data?.account?.email}) }}</p>
+        <p v-else class="text-md text-[#B7A3C1] mb-2 text-center">{{ $t('onboarding.enterEmailCode', {email: customer.data?.account?.email}) }}</p>
+        <p class="text-sm/6 text-[#B7A3C1] mb-8 text-center lg:px-12">{{ $t('verification.emailCodeDelay') }}</p>
+      </template>
+      <!-- Signed out by the API: no code can be checked any more, so the form gives way. -->
+      <div v-if="sessionEndedMessage" class="space-y-10">
+        <div role="alert" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
+          <p class="text-sm/6 text-danger-700">{{ sessionEndedMessage }}</p>
+        </div>
+        <div class="mt-6 max-w-md flex justify-between mx-auto">
+          <router-link
+            :to="{name: 'signIn', query: onward()}"
+            class="block w-full rounded-xl bg-brand-700 py-3.5 text-center text-sm/6 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-800 hover:shadow-md active:scale-[0.98]"
+          >{{ $t('onboarding.backToSignIn') }}</router-link>
+        </div>
+      </div>
       <!-- Form -->
-      <form @submit.prevent="authenticate" class="space-y-10">
+      <form v-else @submit.prevent="authenticate" class="space-y-10">
         <div v-if="otpError" class="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3">
           <p class="text-sm/6 text-danger-700">{{ otpError }}</p>
         </div>
