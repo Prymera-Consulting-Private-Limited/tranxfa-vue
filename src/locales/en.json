@@ -460,6 +460,7 @@
     "enterYourMobileNumber": "Enter Your Mobile Number",
     "iAgreeTo": "I agree to",
     "and": "&",
+    "backToSignIn": "Back to sign in",
     "login": "Login",
     "mfaHeading": "More authentication needed",
     "mfaIntro": "To keep going we need to check it's you. We've sent a one time password to {email}; nothing you were doing is lost.",
