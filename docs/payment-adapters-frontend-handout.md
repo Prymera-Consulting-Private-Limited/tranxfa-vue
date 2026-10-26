@@ -50,7 +50,7 @@ The `payment` object on the transaction. Field names are the JSON keys the front
 | `payment_url` | The Pay button for hosted providers. A payment is only payable when `state.code` is `PENDING` **and** this is present |
 | `shared_reference` | The reference the customer quotes to their bank |
 | `client_payment_account` | Bank-transfer instructions: `institution_name`, `instruction_text`, `payment_reference`, `wait_time_message`, `attributes[]` of `{key, value}` rendered as copyable rows |
-| `expires_at` | ISO-8601. Renders "Payable for another …" and "Please pay by … (your local time)". **Null means no deadline**, and the frontend then says nothing about time |
+| `expires_at` | ISO-8601. When the platform's sweep cancels an attempt nobody paid, with its transfer and payout. **Never shown to the customer** (SD-1821): the payment screens ask for payment now, and the state decides what follows. Null means the attempt is never swept |
 | `payment_terms` | Plain text, rendered verbatim with line breaks kept. Never HTML |
 | `total_payment_amount`, `_formatted`, `_currency_prefixed` | Amount to pay. `_currency_prefixed` is what the customer sees |
 | `customer_confirmed_payment` | Hides the "I've paid" button once true |
@@ -97,13 +97,13 @@ Anything else renders nothing. A new state code needs a frontend change before i
 | `VOLUME-PAYMENTS` | Volume | Embedded SDK (open banking) | `total_payment_amount`, `id` as the merchant payment id, the transaction number as the reference. Needs `VITE_VOLUME_PAYMENT_ENVIRONMENT` and `VITE_VOLUME_PAYMENT_MERCHANT_ID` at build time |
 | `WALLET` | WalletPayment | Internal | A `wallet_otp` at confirm time; the payment settles server-side |
 | `BELMONEY-CARD` | BelmoneyCard (tranxfa only) | Hosted card page, same tab, with 3-D Secure | `payment_url` with `PENDING` for the redirect shape; `awaiting_confirmation` for the two shapes that need nothing from the customer; a pre-flight address check that fails `INITIALIZED -> FAILED` with no redirect; `expires_at` (one day, then `CANCELLED`); no payment-sent, no extra fields, no build keys, no CSP change |
-| `CHECKOUT-COM` | CheckoutCom (tranxfa only, SD-1574) | Hosted payment page, same tab: card, Apple Pay and Google Pay on Checkout.com's side | `payment_url` with every `PENDING` once set up, so no `awaiting_confirmation`; a declined card stays on Checkout.com's page, and `FAILED` is a capture the bank refused; leaving the page unpaid keeps the same URL; `expires_at` (one day, Checkout.com's 24-hour session); no cancel (`409 payment_not_cancellable`), no payment-sent, no extra fields, no build keys, no CSP change |
+| `CHECKOUT-COM` | CheckoutCom (tranxfa only, SD-1574) | Hosted payment page, same tab: card, Apple Pay and Google Pay on Checkout.com's side | `payment_url` with every `PENDING` once set up, so no `awaiting_confirmation`; a declined card stays on Checkout.com's page, and `FAILED` is a capture the bank refused; leaving the page unpaid keeps the same URL; no cancel (`409 payment_not_cancellable`), no payment-sent, no extra fields, no build keys, no CSP change |
 
 Note the code spelling: every code uses hyphens except `CINET_PAY`, which uses an underscore. The frontend matches the string exactly.
 
 ### Bank transfer
 
-The customer sees the account rows, the amount with a copy button, the reference, the deadline if there is one, and an "I've paid" button. Pressing it calls the payment-sent endpoint and flips the screen to "watching". The state is reverted and a message shown if that call fails, so the customer can press again.
+The customer sees the account rows, the amount with a copy button, the reference, a line asking for payment now, and an "I've paid" button. Pressing it calls the payment-sent endpoint and flips the screen to "watching". The state is reverted and a message shown if that call fails, so the customer can press again.
 
 ### Hosted redirect
 
@@ -153,7 +153,7 @@ The retry response replaces the `payment` object on the page in full, so it must
 1. `state.code` is one of the eleven codes in section 5. New codes need a frontend release first.
 2. `payment_url` is present in the transaction response whenever a hosted payment is payable, not only in the broadcast.
 3. A broadcast omits keys it has nothing to say about. It never sends `null` for a value that still holds.
-4. `expires_at` is null when there is no deadline. Do not send a far-future placeholder; the frontend would render it.
+4. `expires_at` is null when the attempt is never swept. The frontend does not show it (SD-1821), so the window behind it can change without a release; a cancelled attempt reads as cancelled from the state.
 5. `payment_terms` is plain text. It is rendered verbatim.
 6. `client_payment_account.attributes[].key` is the label the customer reads. Write it for a customer, not a system ("BSB", "Account number", not "bsb_code"). These keys are typed by an operator in the console per client, so this is a data-quality check, not something the API can enforce.
 7. `total_payment_amount_currency_prefixed` is the only amount string the customer sees on the payment screens.
@@ -194,7 +194,7 @@ Write the copy items in words a customer would use: "code" not OTP, "transfer" n
 - A broadcast without `payment_url` erased the URL the Pay button needed. Fixed by applying only present keys; keep sending only what changed.
 - `FAILED` was not treated as terminal, so a failed payment polled every 10 s for as long as the customer looked at it.
 - A retry counter incremented before the request went out, so a network failure used up an attempt.
-- Manual and Paga instructions never said the reference must go in the bank's reference field, and never showed a deadline. The deadline now shows when `expires_at` is present, so send it if there is one.
+- Manual and Paga instructions never said the reference must go in the bank's reference field, and never showed a deadline. A deadline from `expires_at` was added in September 2026 and removed in October (SD-1821): it read as time the customer was given, and Xenvia's card page told customers they had a day. The screens now ask for payment now.
 - The Volume SDK was re-injected on every reactive change and stacked bank pickers on top of each other. It now initialises once.
 - The retry endpoint returned a payment without its account details, reference, extra fields, terms or account. Fixed on the API on 10 September 2026 after this handout was audited.
 - A provider code with no component rendered a blank payment page. The page now says the method is not available in the app.
