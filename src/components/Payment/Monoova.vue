@@ -3,7 +3,6 @@ import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
 
-import moment from "moment";
 import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
 import {computed, onUnmounted, ref} from "vue";
@@ -123,12 +122,6 @@ const retryPayment = async () => {
   emits('retryPayment');
 }
 onUnmounted(() => clearTimeout(onStateRedirectId));
-
-// Only the api knows whether this payment has a deadline; null means it
-// does not, and the line is left out rather than guessed.
-const payByFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
-});
 </script>
 
 <template>
@@ -157,7 +150,7 @@ const payByFormatted = computed(() => {
               <ExclamationTriangleIcon class="size-5 text-warning-400" aria-hidden="true" />
             </div>
             <div class="ml-3">
-              <p v-if="payByFormatted" class="text-sm/6 text-warning-700 mb-2"><i18n-t keypath="payment.provider.pleasePayByYourLocal" scope="global"><template #value><strong>{{ payByFormatted }}</strong></template></i18n-t></p>
+              <p class="text-sm/6 text-warning-700 mb-2">{{ $t('payment.provider.payNowToComplete') }}</p>
               <p class="text-sm/6 text-warning-700"><i18n-t keypath="payment.provider.ensureYouPayTheExact2" scope="global"><template #value><strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong></template></i18n-t></p>
             </div>
           </div>
