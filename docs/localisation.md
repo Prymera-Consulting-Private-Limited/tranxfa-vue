@@ -233,6 +233,13 @@ a translator cannot use:
 - **A plural spelled with a ternary**, `night{{ n === 1 ? '' : 's' }}`. Keying it
   would hand a translator an `s` to place. Use vue-i18n pluralisation:
   `t('travel.nightCount', n, {count: n})` against `"{count} night | {count} nights"`.
+  **That shape works for `{count}` alone.** vue-i18n reads a third argument as
+  options, not values, so the `{count: n}` there is ignored and the line renders
+  only because vue-i18n fills `{count}` and `{n}` from the number itself. Any other
+  value goes missing without an error: the hotel results heading read "246 hotels
+  available in", and the filters "of hotels", for that reason.
+  With any other value, put the values second and the number third:
+  `t('travel.hotelsAvailableIn', {count: n, region: region}, n)`.
 - **A sentence built from template literals**, as the maintenance banner was.
   Write one whole message per case and choose between them in a computed.
 
