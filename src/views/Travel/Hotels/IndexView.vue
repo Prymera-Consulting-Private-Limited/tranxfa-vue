@@ -460,8 +460,10 @@ function viewHotel(hotel) {
               <template v-if="!hasDestination">{{ $t('travel.whereDoYouWantTo') }}</template>
               <template v-else-if="needsResidency">{{ $t('travel.whichCountryIssuedTheGuests') }}</template>
               <template v-else-if="isLoading || isWaitingForCustomer">{{ $t('travel.searchingForHotels') }}</template>
+              <!-- The named values go before the count. vue-i18n reads a third argument
+              as options rather than values, which dropped the region from the heading. -->
               <template v-else-if="filteredResults.length">{{ region
-                ? $t('travel.hotelsAvailableIn', filteredResults.length, {count: filteredResults.length, region: region})
+                ? $t('travel.hotelsAvailableIn', {count: filteredResults.length, region: region}, filteredResults.length)
                 : $t('travel.hotelsAvailable', filteredResults.length, {count: filteredResults.length}) }}</template>
               <template v-else>{{ $t('travel.noResults') }}</template>
             </h2>
