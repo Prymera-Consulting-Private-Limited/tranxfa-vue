@@ -1,7 +1,9 @@
 import Money from "@/models/travel/money.js";
 
 /**
- * Something the hotel may ask for on top of the stay — parking, a pet, a cot.
+ * One rule the hotel states about the stay — parking, a pet, a cot, breakfast,
+ * a no-show. Since SD-1839 every rule arrives, not only those with a price:
+ * one can be included, not available, or a condition with nothing to pay.
  *
  * Its currency is the property's own, not the customer's, because the hotel
  * collects this money and we neither convert it nor take a share. A booking
@@ -64,6 +66,10 @@ class HouseRuleCharge {
     currency = null;
 
     /**
+     * Unstated, rather than nought, wherever there is no price to show: a rule
+     * that is included, not available, a condition, or a charge the hotel gave
+     * no figure for. Read `inclusion` for what such a rule says.
+     *
      * @type {Money|null}
      */
     amount = null;
