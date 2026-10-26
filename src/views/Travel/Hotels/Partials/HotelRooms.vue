@@ -4,6 +4,10 @@ import HotelMealBadge from '@/views/Travel/Hotels/Partials/HotelMealBadge.vue';
 import HotelCancellationBadge from '@/views/Travel/Hotels/Partials/HotelCancellationBadge.vue';
 import HotelAvailability from '@/views/Travel/Hotels/Partials/HotelAvailability.vue';
 import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
+import HotelRoomPhotos from '@/views/Travel/Hotels/Partials/HotelRoomPhotos.vue';
+import HotelAmenities from '@/views/Travel/Hotels/Partials/HotelAmenities.vue';
+import HotelPriceLines from '@/views/Travel/Hotels/Partials/HotelPriceLines.vue';
+import HotelCancellationLadder from '@/views/Travel/Hotels/Partials/HotelCancellationLadder.vue';
 import {getRateGroups} from '@/composables/travel/hotels/hotel_utils.js';
 
 const props = defineProps({
@@ -27,9 +31,9 @@ const props = defineProps({
 
   /**
    * The chosen rate, the object itself. A rate is identified by which row it
-   * is, never by its token: the token is the supplier's match key for an
-   * offer, and several rows can carry the same one (SD-1219). Keying on it
-   * lit three rows at once.
+   * is, never by its token: before console 2026.10.6 the token was the
+   * supplier's match key for an offer, and several rows could carry the same
+   * one (SD-1219). Keying on it lit three rows at once.
    *
    * @type {HotelRate|null}
    */
@@ -56,6 +60,20 @@ const best = computed(() => {
 
   return bookable.reduce((cheapest, rate) => (rate.total.amount < cheapest.total.amount ? rate : cheapest));
 });
+
+/**
+ * Whether a rate has more to say than its total and its badge. Every rate's
+ * terms can be read without choosing it (SD-1839), so a customer comparing two
+ * never has to select one to see what it costs to cancel.
+ *
+ * @param {HotelRate} rate
+ * @returns {boolean}
+ */
+function hasTerms(rate) {
+  const lines = rate.breakdown.filter(line => line.amount.amount !== 0);
+
+  return lines.length > 1 || (rate.cancellation?.ladder.length ?? 0) > 0;
+}
 </script>
 
 <template>
@@ -63,7 +81,8 @@ const best = computed(() => {
     <h2 class="text-lg font-semibold tracking-tight text-gray-900">{{ $t('travel.chooseYourRoom') }}</h2>
     <p class="mt-1 text-sm/6 text-gray-500">{{ $t('travel.pricesAreForYourWhole') }}</p>
     <div class="mt-4 space-y-4">
-      <article v-for="group in groups" :key="group.name" class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300">
+      <!-- Keyed by the room, not its name: two rooms can share one name. -->
+      <article v-for="group in groups" :key="group.key" class="overflow-hidden rounded-3xl bg-white ring-1 ring-gray-200 transition hover:ring-gray-300">
         <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 pt-5 pb-4">
           <h3 class="min-w-0 text-base font-semibold tracking-tight text-gray-900">{{ group.name }}</h3>
           <!-- A single rate already shows its own price, so this would only repeat it. -->
@@ -72,9 +91,14 @@ const best = computed(() => {
             <span class="text-base font-semibold tracking-tight text-gray-900 tabular-nums">{{ group.from.currencyPrefixed }}</span>
           </p>
         </header>
+        <!-- Every rate below is this one room, so what it looks like and has is said once, above them. -->
+        <div v-if="group.photos.length || group.amenities.length" class="space-y-3 px-5 pb-4">
+          <HotelRoomPhotos :photos="group.photos" :name="group.name" />
+          <HotelAmenities :amenities="group.amenities" :labels="labels" :limit="group.amenities.length" />
+        </div>
         <ul>
-          <!-- Keyed by the rate's own id: rates sharing a token are distinct rows, and a token is not a row's identity.
-          Position only stands in for a rate that arrived without one. -->
+          <!-- Keyed by the rate's own id, never its token: an unbookable rate has no token, and before console 2026.10.6 rates could share one.
+          Position only stands in for a rate that arrived without an id. -->
           <li
               v-for="(rate, position) in group.rates"
               :key="rate.id ?? `position-${position}`"
@@ -94,6 +118,13 @@ const best = computed(() => {
                 <HotelAvailability :allotment="rate.allotment" />
               </div>
               <PayableAtProperty :charges="rate.payableAtProperty" dense class="max-w-xs" />
+              <details v-if="hasTerms(rate)" class="max-w-xs">
+                <summary class="cursor-pointer text-xs/5 font-medium text-brand-700 hover:text-brand-800">{{ $t('travel.priceAndCancellation') }}</summary>
+                <div class="mt-2 space-y-3">
+                  <HotelPriceLines :lines="rate.breakdown" dense />
+                  <HotelCancellationLadder :cancellation="rate.cancellation" dense />
+                </div>
+              </details>
             </div>
             <!-- Price rail, so every row lines up on the number and the button. -->
             <div class="flex shrink-0 items-end justify-between gap-4 sm:w-48 sm:flex-col sm:items-stretch sm:gap-3 sm:border-l sm:border-gray-100 sm:pl-6">

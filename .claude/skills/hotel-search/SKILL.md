@@ -17,15 +17,31 @@ set the flag off or its customers get tabs leading nowhere.
 
 ## Files
 
-- `src/composables/travel/hotels/hotel_utils.js` — criteria/URL mapping, limits, `regions()`,
-  `search()`, and the rate helpers (`getCheapestRate`, `getPhotoUrl`, `prettifyLabel`).
-- `src/models/travel/hotels/*.js` — `Hotel`, `HotelRate`, `Region`, and the rate sub-objects
-  (payment options, cancellation policy, meal data, VAT, commission…).
+- `src/composables/travel/hotels/hotel_utils.js` — criteria/URL mapping and limits; filters, sort
+  and page with their url halves; the rate helpers (`getRateGroups`, `getCheapestRate`); guest and
+  stay labels; and `useHotelUtils()` with every call the journey makes: `regions()`, `search()`,
+  `getHotelView()`, `createQuote()`, `getQuote()`.
+- `src/models/travel/hotels/` — `Hotel` (a search result), `HotelRate`, `HotelDetail` (the hotel
+  page), `HotelSearch` (the resolved stay and its `search_id`), `RateCancellation` with its
+  `CancellationWindow`s, `HouseRuleCharge`, and `HotelPriceChange` (Book Quote's 409 when the
+  hotel asks another price). `Region` is `src/models/travel/region.js`.
 - `src/views/Travel/Hotels/IndexView.vue` — owns the search, the region lookup and all page state.
-- `src/views/Travel/Hotels/HotelView.vue` — one hotel, priced for the stay on the url. Gallery and
-  detail in a two-column span, the same `SearchBar` in a sticky sidebar (`stacked`).
-- `src/views/Travel/Hotels/Partials/*.vue` — `SearchBar`, `HotelCard` and the small display
-  components the card composes (image, rating, room type, badges, price, action, skeleton, empty).
+- `src/views/Travel/Hotels/HotelView.vue` — one hotel, priced for the search it was found under.
+  Gallery, heading, rooms, description, amenities and house rules span two columns; `HotelStayCard`
+  sits in a sticky sidebar. There is no search bar on this page.
+- `src/views/Travel/Hotels/HotelQuoteView.vue` — the held price the hotel page hands off to.
+- `src/views/Travel/Hotels/Partials/*.vue` — `SearchBar`, `PassportCountry`, `HotelFilters`,
+  `HotelSort`, `HotelPagination`, `HotelCard` and the badges it composes, and the hotel page's
+  `HotelGallery`, `HotelHeading`, `HotelRooms` (with `HotelRoomPhotos`), `HotelHouseRules` and
+  `HotelStayCard`. `HotelPhotoLightbox` is the one lightbox, opened by the gallery and by each
+  room's photos. `HotelPriceLines` and `HotelCancellationLadder` render a rate's terms wherever
+  they are shown: the rooms list, the stay card and the quote.
+
+Nothing live imports `hotel_booking.js` or `hotel_prebook.js`, or the chain under them
+(`hotel_quote`, `catalog_hotel`, `hotel_selection`, `hotel_selection_rate`, `hotel_provider`,
+`hotel_photo`, `hotel_facility`, `room_data_translation`, `room_extension`), or
+`Partials/PriceChangeDialog.vue`. They model the supplier's raw shape from before SD-1218. Don't
+build on them.
 
 ## The URL is the source of truth
 
@@ -37,51 +53,108 @@ back button therefore all replay the same search.
 - `getCriteria(query)` → the POST body. `getQuery(criteria)` → the route query. Both are exported
   from `hotel_utils.js` and every comparison round-trips through the pair, so a signature match is
   reliable (`appliedSearch` guards against a double fetch, and lets an unchanged search re-run).
-- Query contract: `?region=<uuid>&checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&guests=2|1:5,9`.
+- Query contract: `?region=<uuid>&checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&guests=2|1:5,9`, plus
+  `&residency=GB` when the customer chose the guests' passport country.
   Rooms are `|`-separated, `adults[:age,age]`; a room with no children is just its adult count.
-- Everything from the URL is validated and clamped, never trusted: past or malformed dates fall
-  back to tomorrow → day after, a checkout not after checkin is pushed out a day, counts clamp
-  into range, non-numeric ages are dropped, a repeated `?region=` (an array) is treated as absent.
+- **Everything from the URL is validated and clamped, never trusted:**
+  - a check-in that is malformed, in the past or more than `MAX_CHECKIN_DAYS` (730) out falls back
+    to tomorrow;
+  - a checkout that isn't one to `MAX_STAY_NIGHTS` (30) nights after check-in falls back to one
+    night;
+  - counts clamp into range, and non-numeric ages are dropped;
+  - a repeated `?region=` (an array) is treated as absent.
 - No `region_id` means no request at all — the page shows the "Start with a destination" prompt
   instead of skeletons or an empty result.
-- The same query contract carries onto the hotel page: `viewHotel` pushes
-  `/travel/hotel/:id/:slug` with `getQuery(criteria)`, so `HotelView` rebuilds the stay with
-  `getCriteria(route.query)` and never has to ask for the dates again.
-- `residency` is not part of the criteria: it is read per request from
-  `customerStore.customer.data?.country?.iso2Alpha` (fallback `IN`), because `CustomerLayout`
-  is still loading the customer while this page mounts.
+- The same query travels onto the hotel page with `?search=<search_id>` beside it, but only so
+  that page can link back. The hotel page never prices from the url. See below.
+- `residency` is the country that **issued the guests' passports**, not where they live: the
+  supplier prices on it and can withhold rooms by it (SD-1775). It is never defaulted. The
+  search sends `criteria.residency` (from `?residency=`) or else the profile's
+  `nationality.iso2Alpha`; with neither, nothing is searched and `PassportCountry` asks for it in
+  place of the results. Nothing is searched until `customerStore.isLoaded`, because
+  `CustomerLayout` is still loading the customer while this page mounts, and `search()` throws
+  rather than send a request without a residency. `tests/hotel-residency.spec.js` holds all of it.
 
 ## The hotel page
 
-`getHotel(id)` posts the same criteria as a search minus `hotels_limit`, so the detail endpoint
-prices the stay the customer arrived with. `HotelView` mirrors `IndexView`: one
-`watch([() => props.id, () => route.query])` starts every load, and the signature carries the
-hotel id because the router reuses the page from one result to the next.
+`viewHotel` opens `/travel/hotel/:id/:slug?search=<search_id>` plus the search's own query. The
+**`search_id` is the stay**: `getHotelView(searchId, hotelId)` posts
+`/client/v1/travel/hotel/{search}/{hotel}` with no body, and the backend resolves the stay from it.
+Nothing past the region search ever sends raw criteria again.
 
-- The response is the **catalog hotel**, not a search result, so it has its own models:
-  `CatalogHotel` → `Region` + `HotelProvider` (→ `HotelPhoto[]`, `HotelFacility[]`) + the same
-  `HotelRate[]` the search returns. `provider.room_types` is still an empty list from the api and
-  deliberately unmodelled — the rooms on screen come from `rates`, not from it.
-- Rates arrive one per room-and-board combination, so `getRoomGroups(rates)` folds them by
-  `room_data_trans.main_room_type` and sorts both the groups and the rates inside them by price.
-  `HotelRooms` → `HotelRoomCard` renders group headers with a "from" price and one row per rate,
-  reusing the meal, cancellation, availability and amenity partials from the card.
-- Picking a rate sets `selectedRate` in the view and is surfaced by `HotelStayCard` in the sidebar.
-  It is keyed by `getRateKey` (`book_hash`, which is also what a booking is placed against) and is
-  cleared on every reload, since a rate is only priced for the stay it was returned for. There is
-  no booking step yet — selection is where the flow currently stops.
-- Changing the dates or guests re-prices in place (`router.replace`); changing the **destination**
-  is a region search, so it pushes back to the results page.
-- A link that arrives without `?region=` backfills `criteria.region_id` from the hotel's own
-  `primary_region`, so the search bar is never stuck with a disabled Search button.
-- Provider addresses use semicolons here (`"220 Venice Way; Venice; CA 90291; USA, Los Angeles"`),
-  which `CatalogHotel.getAddress` normalises before reusing `Hotel.getAddress` to drop the
-  repeated city.
-- `primary_region` is the same full region payload the autocomplete returns, nested country and
-  all, so `Region.getInstance` covers it and the heading can show `region.country.commonName`.
-- Facility names are null whenever the supplier only knows the group. `getFacilityGroups` keeps
-  the group either way, and `HotelFacilities` renders named ones as a checklist and the rest as
-  plain category chips — most hotels currently come back as chips only.
+- **No `search_id` means no request.** The page shows "These results are out of date". A search
+  lives thirty minutes. Past that, or for a hotel we don't sell, or for somebody else's search,
+  the api answers 404 with a message written to be shown, and the failure panel shows it.
+- **One `watch([() => props.id, searchId])` starts every load.** The router reuses the page from
+  one hotel to the next. A repeated `?search=` arrives as an array, and `searchId` treats it as
+  absent.
+- **The response is the hotel page's own shape:** `hotel` → `HotelDetail`, `rates[]` →
+  `HotelRate`, `search` → `HotelSearch`, and a `labels` dictionary.
+  - The stay card reads the stay from `search` and never from the url. A url reached by the back
+    button can describe a different stay from the one these prices were quoted for.
+  - Photos arrive ordered and pre-sized (`thumbnail`, `card`, `large`, `xlarge`). The gallery
+    leads with `large` and keeps `xlarge` for the lightbox.
+  - The description is the supplier's prose, section by section, rendered as written. House
+    rules keep prose apart from `charges`, which are money in the property's own currency.
+  - Since console 2026.10.11 `charges` holds **every** rule the hotel states, not only those
+    with a price (SD-1839). An included breakfast or a no-show rule arrives with its amount
+    unstated, never nought, and reads in its `inclusion` words. The list is headed "Extras and
+    conditions", and says the hotel collects the prices (and in which currencies) only when one
+    of them has a price. A prose rule's paragraphs come joined by a blank line and are rendered
+    as paragraphs. `tests/travel-hotel-extras.spec.js` holds both.
+- **Rates come one per room and board.** `getRateGroups(rates)` groups them by room and sorts
+  the groups and the rates inside them by total. A group's "from" price is its cheapest rate's
+  own total, never mixed with another rate's terms.
+  - ~~Grouped by `roomName`~~: since SD-1838 a group is the name **together with** the rate's
+    `roomPhotos` and `roomAmenities`, and is keyed by `group.key`. One name can be two rooms: the
+    certification hotel lists two "Standard Double room"s whose photos and amenities differ, so
+    grouping on the name pictured one room's rates with the other's photos. A rate the console
+    could not match to a room carries neither and still groups by name.
+  - Each card shows its room's photos (`HotelRoomPhotos`, four and a count, then the shared
+    `HotelPhotoLightbox`) and amenities (`HotelAmenities`, worded from `labels`). Room amenity
+    codes start `ROOM-` and are open-ended, so they are only ever looked up, never matched.
+    `tests/hotel-room-photos-amenities.spec.js` holds it.
+- **Every rate's terms open from its own row** (SD-1839), so two can be compared without
+  choosing either. A "Price and cancellation" disclosure holds `HotelPriceLines` (the
+  breakdown: the room, each tax inside the price by name, the fee, with lines of nothing left
+  out) and `HotelCancellationLadder` (every window still to come, each priced by the console).
+  It appears only when there is more than the total to say. The stay card shows the same two for
+  the selected rate. A console before 2026.10.11 sends no `ladder`, and the model reads that as
+  none. `tests/hotel-rate-terms.spec.js` holds it.
+- **A row is identified by `rate.id`**, with position as the fallback for a rate that has none.
+  The selected row is matched by the rate object itself, never by its token. Before console
+  2026.10.6 the token was the supplier's match key, which near-identical rates shared, so keying
+  on it lit three rows at once (SD-1219, `tests/hotel-rate-identity.spec.js`).
+- **A rate without `bookable` and a `token` is shown priced but "Not available".** "Lowest price"
+  marks the cheapest bookable rate on the whole page, not one per group. On every full load
+  `getCheapestRate` preselects that rate, so the stay card never sits empty.
+- **The stay card's Continue (`holdPrice`) calls `createQuote(searchId, hotelId, token)`** and
+  routes to `travelQuote` on the quote's id. From console 2026.10.6 the token is the rate's own id, and the console prices
+  the one rate it names.
+  - A 409 is an ordinary answer. The room sold out, or the token came from a page opened before
+    2026.10.6. The stay card says "That room has just gone", the selection clears, and the rates
+    are fetched again quietly: no skeleton, nothing preselected.
+  - Any other failure shows the api's message, or "We could not hold this price".
+- **Back to results reads the query through `getQuery(getCriteria(route.query))`**, so a chosen
+  `?residency=` survives the way back (SD-1775). It carries the criteria only. Filters, sort and
+  page are not on the hotel page's url, so they reset unless the browser's back button is used.
+- **The dates and guests can't be changed here.** There is no search bar on this page, so a
+  different stay starts from the results.
+
+`HotelQuoteView` re-reads the held quote on every open with `getQuote(quoteId)`, because its
+cancellation terms are worked out again on each read. Past its expiry the answer is a 410 with a
+message to show. The quote lists the whole cancellation ladder beside the price.
+
+Booking it (`bookQuote`) can answer **409 with `type: 'hotel_price_changed'`** (SD-1839): the
+hotel asked another price at the moment of booking, higher or lower, and nothing was booked or
+charged. The body carries `was` (the old total) and `quote`, the new price already held as a
+quote of its own, in Read Quote's shape and on its own terms. The page shows both totals and the
+new quote's breakdown and ladder. "Book at …" posts the same guest payload to the new quote's id;
+"Go back" returns to the hotel page when there is one in the history, and to the search when the
+quote was opened directly. A 409 without that type is still a refusal shown as it stands.
+
+Everything after booking is the order journey in `src/composables/travel/order_utils.js`, which
+this skill does not cover.
 
 ## Occupancy
 
@@ -103,38 +176,64 @@ by a watch, because the parent replaces the criteria object on every navigation.
 
 ## Filtering
 
-One region search returns everything we may show, so the SERP filters are client side:
-`getFacets(results)`, `getFilteredResults(results, filters)`, `getFilters()` and
-`hasFilters(filters)` in `hotel_utils.js`, rendered by `Partials/HotelFilters.vue` in a sticky
-left column (collapsed behind a Filters button below `lg`).
+One region search returns everything we may show, so filtering, sorting and paging all happen in
+the browser. The helpers in `hotel_utils.js` are `getFilters()`, `getFacets(hotels, money, labels)`,
+`getFilteredResults()`, `getSortedResults()` and `hasFilters()`. They render as
+`Partials/HotelFilters.vue` (a sticky left column, collapsed behind a Filters button below `lg`),
+`HotelSort` and `HotelPagination`.
 
-- Facets are built from the **unfiltered** results, so options and counts never vanish mid-use.
-- Filters run against the rate the card shows (the cheapest bookable one), so price and badges on
-  screen always match what was filtered.
-- Groups: max total price (range input), star rating (OR within the group), photos (with / without,
-  hidden unless the results are mixed), rate features from the supplier's own `serp_filters`, and
-  amenities from `amenities_data` — features and amenities are ANDed, and both are discovered from
-  the data rather than hard-coded.
-- `getHotels()` resets the filters, because a price cap or an amenity from one city says nothing
-  about the next.
-- `hotels_limit` is 250, so the region arrives in one response and the list is paged in the browser
-  at `HOTELS_PER_PAGE` (10) by `Partials/HotelPagination.vue`. The page is view state, not in the
-  url, and resets whenever the filtered list changes.
+- **Facets are built from the unfiltered results**, so options and counts never vanish mid-use.
+- **Filters and sorts run against `hotel.cheapestRate`**, the one rate the card shows, so the price
+  on screen always matches what was filtered.
+- **The groups:**
+  - max total price, a range input in minor units, hidden when every price is the same;
+  - star rating, ORed within the group and rounded, with an unrated hotel matching none;
+  - photos, with or without, shown only when the results are mixed;
+  - amenities, ANDed: codes discovered from the results and named from `labels`. The first six
+    show, then "Show all".
+- **Sort** is `recommended` (the supplier's own order, the default), price either way, or star
+  rating. It runs after filtering.
+- **`HOTELS_LIMIT` is 250,** so the region arrives in one response and is sliced into pages of
+  `HOTELS_PER_PAGE` (10).
+
+**Filters, sort and page live in the url beside the criteria.** `getListQuery` writes them as
+`max_price`, repeated `stars` and `amenities`, `photos`, `sort` and `page`, each only when it isn't
+the default. `applySearch` reads them back on every navigation, so a filter change, a sort or a
+page turn never re-runs the search, and the back button restores what was on screen.
+- Changing a filter or the sort goes back to page 1.
+- A page a filter has since ruled out clamps to the last page.
+- A new search drops all three, since a price cap or an amenity from one destination says nothing
+  about the next. Repeating an unchanged search keeps them.
 
 ## Supplier quirks worth remembering
 
-- Photo urls contain a literal `{size}` placeholder — always go through `getPhotoUrl(url, size)`,
-  and pick the size from `PHOTO_SIZE` (`thumbnail` / `card` / `large`): the cdn 404s on anything
-  outside its own set.
-- A rate with no `paymentOptions.paymentTypes` cannot be priced, so `getCheapestRate` skips it and
-  `IndexView` only lists hotels that have one. Cards never guard against a missing rate.
-- Prices come per stay, not per night, and `showAmount` wins over `amount`.
-- Region names are not in the search response body — the name is read off the first result
-  (`hotel.catalog_hotel.primary_region.name`), which is why `SearchBar` takes a `region` prop as
-  the destination label fallback until the customer picks one.
-- Star ratings of 0 mean "apartment/guest house", not "unrated" — `HotelRating` renders nothing.
-- Descriptive values arrive as slugs (`half-board`, `king-bed`); run them through
-  `prettifyLabel`.
+The backend normalises most of the supplier's raw answer (SD-1218). What still shows through:
+
+- **A search hotel carries one `cheapest_rate` and a `rate_count`, never a `rates[]`.** The
+  backend drops a hotel it cannot price, and `results` only guards against a rate that went
+  missing in between. `getCheapestRate` is for the hotel page's `rates[]` and nothing else.
+  Handing it a search hotel was the "filter is not a function" crash.
+- **Money is integers in minor units of one currency per response** (`currency`,
+  `currency_decimal_places`). Every amount also arrives pre-formatted (`currencyPrefixed`) and is
+  shown as sent. The price slider is the one place that formats a number itself (`formatMoney`),
+  because its position is a value no rate has.
+- **Prices are per stay.** `per_night` is the server's own division, shown beside the total for
+  comparison and never charged.
+- **Photos arrive pre-sized.** That's an object of sizes on a search hotel, `null` when it has
+  none, and an ordered list on the hotel page. `getPhotoUrl` and `PHOTO_SIZE` are left from the
+  `{size}` placeholder urls, and nothing on screen calls them.
+- **Region names aren't in the search response.** The name is read off the first result's
+  `region`, so `SearchBar` takes a `region` prop as the destination label, and it reads "Where
+  to?" until results arrive, including while `PassportCountry` asks its question.
+- **Star ratings:** null is unrated, and 0 means an apartment or guest house, not a rating either.
+  `HotelRating` renders nothing for both.
+- **Codes come with a `labels` dictionary** (amenities, meals, house-rule charges, region kinds),
+  read with `getLabels`. `prettifyLabel` is only the fallback for a code with no label.
+- **`total_hotels` can exceed the results,** because the supplier caps a region, and the page
+  says so.
+- **The supplier reports failures inside 200 bodies,** so the backend raises instead. An empty
+  list really is no matches, and a rejection really is an outage. A 404 is neither: without the
+  travel licence every travel route answers one.
 
 ## Search bar layout
 
@@ -144,4 +243,9 @@ so panels open flush under the bar and align with their own column (`left-0` for
 `right-0` for guests). The calendar is an `inline` datepicker inside the panel with
 `:multi-calendars="isWide ? 2 : 1"` driven by a `matchMedia('(min-width: 1024px)')` listener, and
 `@range-end` closes the panel. The guests panel uses dashed dividers between rooms and identical
-`−  n  +` steppers for adults, children and each child's age — no selects, no per-room cards.
+`−  n  +` steppers for adults and children, and no per-room cards.
+
+Each child's age is a **drop-down**, from "<1" to `MAX_CHILD_AGE` (SD-1839). This used to say "no
+selects", and each age was a stepper too. The supplier's review asks for a drop-down, since it
+prices every child on their own age, so an age is picked outright. A newly added child still
+starts on `CHILD_AGE`.

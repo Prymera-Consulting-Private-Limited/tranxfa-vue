@@ -26,6 +26,8 @@ const {default: HotelView} = await import('@/views/Travel/Hotels/HotelView.vue')
 const {default: SearchBar} = await import('@/views/Travel/Hotels/Partials/SearchBar.vue');
 const {default: Region} = await import('@/models/travel/region.js');
 const {getCriteria, useHotelUtils} = await import('@/composables/travel/hotels/hotel_utils.js');
+const {useCustomerStore} = await import('@/stores/customer.js');
+const {default: Customer} = await import('@/models/customer.js');
 
 const REGION = '01a0a6a5-ee4c-70bd-b0cc-376c185ad81d';
 const SEARCH = '01a0a6be-9b2d-7085-af0e-4b860114e78a';
@@ -67,8 +69,18 @@ const SearchBarProbe = {
     template: '<div data-probe="search-bar">{{ regions.map(r => r.name).join(",") }}|{{ regionsError }}|{{ regionLabels.CITY }}</div>',
 };
 
+// The results page waits for the profile before it searches, since the profile's
+// nationality is whose passports the guests are taken to carry (SD-1775).
+// CustomerLayout loads it in the app; here it is loaded as already there.
+function loadCustomer(name = 'profile-05-onboarded') {
+    const store = useCustomerStore();
+    store.customer.data = Customer.getInstance(fixture(name));
+    store.isLoaded = true;
+}
+
 async function mountResults(routes) {
-    mockApi(axios, routes);
+    loadCustomer();
+    mockApi(axios, {'/client/v1/countries': 'countries', ...routes});
 
     const router = await makeRouter(`/travel/hotels?region=${REGION}&checkin=2026-10-01&checkout=2026-10-04`);
     const wrapper = mount(IndexView, {
@@ -148,6 +160,20 @@ describe('the results list', () => {
         expect(text).toContain('No meals included');
     });
 
+    // Both lines once rendered without their figures or place, as "246 hotels
+    // available in" and "of hotels", because the count went before the named values.
+    it('names the place in the heading and counts the hotels in the filters', async () => {
+        const {wrapper} = await mountResults({
+            '/client/v1/travel/regions': 'travel-regions-los-angeles',
+            '/client/v1/travel/hotels/search/region': 'travel-hotels-search-region',
+        });
+
+        const text = wrapper.text();
+
+        expect(text).toContain('2 hotels available in Los Angeles');
+        expect(text).toContain('2 of 2 hotels');
+    });
+
     it('opens a hotel on the search it was found under, never straight to a quote', async () => {
         const {wrapper, router} = await mountResults({
             '/client/v1/travel/regions': 'travel-regions-los-angeles',
@@ -177,7 +203,8 @@ describe('the results list', () => {
         const empty = fixture('travel-hotels-search-region');
         empty.hotels = [];
         empty.total_hotels = 0;
-        mockApi(axios, {'/client/v1/travel/regions': 'travel-regions-los-angeles'});
+        loadCustomer();
+        mockApi(axios, {'/client/v1/countries': 'countries', '/client/v1/travel/regions': 'travel-regions-los-angeles'});
         axios.post.mockResolvedValue({status: 200, data: empty});
 
         const router = await makeRouter(`/travel/hotels?region=${REGION}&checkin=2026-10-01&checkout=2026-10-04`);
@@ -192,7 +219,8 @@ describe('the results list', () => {
         const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         // A 200 whose body the mapper cannot read is our problem, not an outage.
-        mockApi(axios, {'/client/v1/travel/regions': 'travel-regions-los-angeles'});
+        loadCustomer();
+        mockApi(axios, {'/client/v1/countries': 'countries', '/client/v1/travel/regions': 'travel-regions-los-angeles'});
         axios.post.mockResolvedValue({status: 200, data: {hotels: null}});
 
         const router = await makeRouter(`/travel/hotels?region=${REGION}&checkin=2026-10-01&checkout=2026-10-04`);
@@ -285,7 +313,50 @@ describe('the dead booking-attempt journey is gone', () => {
         expect(utils).not.toMatch(/travel\/hotel\/quote\/\$\{[a-zA-Z]+\}`/);
 
         expect(Object.keys(useHotelUtils()).sort()).toEqual([
-            'createQuote', 'criteria', 'getHotelView', 'getQuote', 'guestBreakdown', 'nights', 'regions', 'search', 'stayLabel',
+            'createQuote', 'criteria', 'getHotelView', 'getQuote', 'guestBreakdown', 'isCustomerLoaded', 'nights', 'profileResidency', 'regions', 'residency', 'search', 'stayLabel',
         ]);
+    });
+});
+
+// SD-1839. The supplier's review asks for each child's age as a drop-down: it
+// prices every child on their own age, so an age is picked outright.
+describe('the guests a search is for', () => {
+    async function openGuests(guests) {
+        const wrapper = mount(SearchBar, {
+            props: {criteria: {...getCriteria({}), region_id: REGION, guests}},
+        });
+
+        const opener = wrapper.findAll('button').find(button => button.text().includes('Guests'));
+        await opener.trigger('click');
+        await flushPromises();
+
+        return wrapper;
+    }
+
+    it('offers each child\'s age from a drop-down, under one up to seventeen', async () => {
+        const wrapper = await openGuests([{adults: 2, children: [5]}, {adults: 2, children: []}]);
+        const ages = wrapper.findAll('select');
+
+        expect(ages).toHaveLength(1);
+        expect(ages[0].attributes('aria-label')).toBe('Age of child 1 in room 1');
+        expect(ages[0].findAll('option').map(option => option.text())).toEqual(['<1', ...Array.from({length: 17}, (_, age) => String(age + 1))]);
+        expect(ages[0].element.value).toBe('5');
+    });
+
+    it('searches for the age chosen', async () => {
+        const wrapper = await openGuests([{adults: 2, children: [5]}, {adults: 2, children: []}]);
+
+        await wrapper.find('select').setValue('12');
+        await wrapper.findAll('button').find(button => button.text() === 'Search').trigger('click');
+
+        expect(wrapper.emitted('search')[0][0].guests).toEqual([{adults: 2, children: [12]}, {adults: 2, children: []}]);
+    });
+
+    it('starts a child added to a room at seven, as before', async () => {
+        const wrapper = await openGuests([{adults: 2, children: []}]);
+
+        await wrapper.find('button[aria-label="Increase Children in room 1"]').trigger('click');
+
+        expect(wrapper.find('select').element.value).toBe('7');
     });
 });
