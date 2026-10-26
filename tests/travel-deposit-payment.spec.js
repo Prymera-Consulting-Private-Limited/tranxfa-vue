@@ -115,7 +115,9 @@ describe('paying by PayID or bank transfer', () => {
         expect(wrapper.find('#payment-reference').element.value).toBe('SP8518335');
         // The amount of the payment, as Pay Order answered it.
         expect(text).toContain('AUD 151.81');
-        expect(text).toContain('Pay by');
+        // The payment's expires_at is the platform's clean-up time, not a
+        // deadline given to the customer, so none is shown (SD-1821).
+        expect(text).not.toContain('Pay by');
         expect(text).not.toContain('How would you like to pay?');
     });
 
@@ -192,7 +194,7 @@ describe('the booking page', () => {
         const {wrapper} = await mountAt(ItemView, `/travel/booking/${ORDER}`);
 
         expect(labels(wrapper)).toEqual(['Account Name', 'BSB', 'Account Number', 'Payment reference']);
-        expect(wrapper.text()).toContain('Pay by');
+        expect(wrapper.text()).not.toContain('Pay by');
     });
 
     it('shows nothing of the sort once the payment has failed', async () => {
