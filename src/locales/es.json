@@ -267,11 +267,9 @@
       "completeYourPayment": "Completa tu pago",
       "goToYourTransfer": "ir a tu transferencia",
       "payTotalpaymentamountcurrencyprefixed": "Pagar {totalPaymentAmountCurrencyPrefixed}",
-      "payableForAnotherExpiresinExpiresatformatted": "Puedes pagar durante {expiresIn} más · {expiresAtFormatted}",
       "pleaseWaitWhileWeAre": "Espera un momento mientras preparamos el pago.",
       "takingLongerTryAgain": "Esto está tardando más de lo habitual. No se ha realizado ningún cargo. Puedes seguir esperando o {link} e intentar el pago de nuevo más tarde.",
       "takingLongerWillEmail": "Esto está tardando más de lo habitual. Puedes seguir esperando o {link} y te enviaremos un correo cuando termine.",
-      "thePaymentWindowHasPassed": "El plazo de pago ha vencido. Estamos comprobándolo con el proveedor de pago…",
       "viewTransfer": "Ver el envío",
       "weAreConfirmingYourCard": "Estamos confirmando el pago con tu banco. Suele tardar unos segundos. Puedes cerrar esta página; te avisaremos por correo cuando esté listo.",
       "wereConfirmingYourPayment": "Estamos confirmando tu pago",
@@ -279,6 +277,7 @@
       "yourTransferIsWaitingFor": "Tu envío está pendiente de pago. Pulsa el botón de abajo para pagar con tarjeta."
     },
     "provider": {
+      "payNowToComplete": "Paga ahora para completar tu envío. Iniciaremos el envío en cuanto recibamos tu pago.",
       "pleaseReviewOrUpdateThe": "Por favor, revise o actualice la información a continuación y verifique que todo esté correcto, luego intente de nuevo."
     }
   },
