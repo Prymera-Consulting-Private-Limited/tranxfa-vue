@@ -126,22 +126,25 @@ describe.each([
         expect(wrapper.find('.whitespace-pre-line').exists()).toBe(false);
     });
 
-    it('shows a calm payable-until line when the payment expires later', () => {
+    // SD-1821: a payment is asked for now. expires_at is the sweep's clean-up
+    // time, not time the customer is given, so it is never shown beforehand.
+    it('asks for payment now and gives no deadline when the payment expires later', () => {
         const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: 'https://pay.example/session', expiresAt: moment().add(6, 'hours').toISOString()});
-        expect(wrapper.text()).toContain('Payable for another');
-        expect(wrapper.text()).not.toContain('window has passed');
+        expect(wrapper.text()).toContain('Pay now to complete your transfer.');
+        expect(wrapper.text()).not.toContain('Payable for another');
+        expect(wrapper.text()).not.toMatch(/hours/);
     });
 
-    it('keeps the pay link live when expiry has passed but the state has not', () => {
+    it('keeps the pay link live and says nothing of time when expiry has passed but the state has not', () => {
         const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: 'https://pay.example/session', expiresAt: moment().subtract(5, 'minutes').toISOString()});
-        expect(wrapper.text()).toContain('The payment window has passed');
+        expect(wrapper.text()).toContain('Pay now to complete your transfer.');
+        expect(wrapper.text()).not.toContain('window has passed');
         expect(wrapper.find('a[href="https://pay.example/session"]').exists()).toBe(true);
     });
 
-    it('renders no expiry line when expires_at is null', () => {
+    it('asks for payment now when expires_at is null', () => {
         const {wrapper} = mountWith({stateCode: 'PENDING', paymentUrl: 'https://pay.example/session'});
-        expect(wrapper.text()).not.toContain('Payable for another');
-        expect(wrapper.text()).not.toContain('window has passed');
+        expect(wrapper.text()).toContain('Pay now to complete your transfer.');
     });
 
     it('routes to the transaction after an AUTHORIZED websocket event', async () => {

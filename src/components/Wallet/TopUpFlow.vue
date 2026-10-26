@@ -7,7 +7,6 @@ import {computed, onUnmounted, ref, watch} from "vue";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ClipboardIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import {UseClipboard} from "@vueuse/components";
-import moment from "moment";
 import ModalCloseButton from "@/components/ModalCloseButton.vue";
 import Spinner from "@/components/Spinner.vue";
 import ClientPaymentAccount from "@/components/ClientPaymentAccount.vue";
@@ -261,8 +260,6 @@ function close() {
                 <template v-if="account">
                   <ClientPaymentAccount v-bind:account="account" />
                 </template>
-
-                <p v-if="declaration?.expiresAt" class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.thisDeclarationExpiresFromnowA', {fromNow: moment(declaration.expiresAt).fromNow(), A: moment(declaration.expiresAt).format('LLL')}) }}</p>
 
                 <button type="button" @click="close" class="mt-5 block w-full rounded-xl bg-brand-700 px-6 py-3.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 cursor-pointer">{{ $t('common.done') }}</button>
               </template>
