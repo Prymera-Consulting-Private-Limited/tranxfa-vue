@@ -3,7 +3,6 @@ import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
 
-import moment from "moment";
 import InlineFailure from "@/components/InlineFailure.vue";
 import Transaction from "@/models/transaction.js";
 import {computed, onUnmounted, ref} from "vue";
@@ -120,12 +119,6 @@ const status = computed(() => {
   return 'unknown';
 })
 onUnmounted(() => clearTimeout(onStateRedirectId));
-
-// Only the api knows whether this payment has a deadline; null means it
-// does not, and the line is left out rather than guessed.
-const payByFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
-});
 </script>
 
 <template>
@@ -136,7 +129,7 @@ const payByFormatted = computed(() => {
       <div v-if="transaction.payment.clientPaymentAccount" class="mb-6 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-left text-sm/6 text-warning-800">
         <p v-if="transaction.payment.clientPaymentAccount.paymentReference"><i18n-t keypath="payment.provider.putTheInTheReference" scope="global"><template #value><strong>{{ $t('account.paymentReference') }}</strong></template></i18n-t></p>
         <i18n-t keypath="payment.provider.sendExactlyAmount" tag="p" scope="global"><template #amount><strong>{{ transaction.payment.totalPaymentAmountCurrencyPrefixed }}</strong></template></i18n-t>
-        <i18n-t v-if="payByFormatted" keypath="payment.provider.pleasePayByTime" tag="p" scope="global"><template #time><strong>{{ payByFormatted }}</strong></template></i18n-t>
+        <p>{{ $t('payment.provider.payNowToComplete') }}</p>
       </div>
       <template v-if="transaction.payment.clientPaymentAccount">
         <ClientPaymentAccount v-bind:account="transaction.payment.clientPaymentAccount" /><div class="text-left my-5">
