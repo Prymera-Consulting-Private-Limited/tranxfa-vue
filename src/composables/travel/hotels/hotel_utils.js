@@ -99,24 +99,40 @@ export function getSearchPayload(criteria, residency) {
  * figure is the cheapest rate's own total and never travels with another rate's
  * cancellation.
  *
+ * A group is one room, not one name (SD-1838). The supplier can list two rooms
+ * under one name with different photos and amenities, so grouping on the name
+ * alone would picture a rate with another room's photos. Rates with no room
+ * data of their own still group by name, as they always did.
+ *
  * @param {HotelRate[]} rates
- * @returns {Array<{name: string, rates: HotelRate[], from: Money}>}
+ * @returns {Array<{key: string, name: string, photos: Array, amenities: string[], rates: HotelRate[], from: Money}>}
  */
 export function getRateGroups(rates) {
     const groups = new Map();
 
     rates.forEach(rate => {
         const name = rate.roomName || 'Room';
+        const key = JSON.stringify([name, rate.roomPhotos, rate.roomAmenities]);
 
-        groups.set(name, [...(groups.get(name) ?? []), rate]);
+        if (!groups.has(key)) {
+            groups.set(key, {
+                key: key,
+                name: name,
+                photos: rate.roomPhotos,
+                amenities: rate.roomAmenities,
+                rates: [],
+            });
+        }
+
+        groups.get(key).rates.push(rate);
     });
 
-    return [...groups.entries()]
-        .map(([name, items]) => {
-            const sorted = [...items].sort((a, b) => a.total.amount - b.total.amount);
+    return [...groups.values()]
+        .map(group => {
+            const sorted = [...group.rates].sort((a, b) => a.total.amount - b.total.amount);
 
             return {
-                name: name,
+                ...group,
                 rates: sorted,
                 from: sorted[0].total,
             };
