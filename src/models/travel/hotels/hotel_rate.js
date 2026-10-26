@@ -9,20 +9,21 @@ import RateCancellation from "@/models/travel/hotels/rate_cancellation.js";
  */
 class HotelRate {
     /**
-     * Which row this is, and the one thing that identifies it: the token below is
-     * shared between near-identical rates and withheld from any that cannot be
-     * booked (SD-1220). Sent on the hotel page only, so a search result's cheapest
-     * rate has none.
+     * Which row this is, and the one thing that identifies it (SD-1220). From
+     * console 2026.10.6 the token below carries the same value, but it is withheld
+     * from any rate that cannot be booked. Sent on the hotel page only, so a
+     * search result's cheapest rate has none.
      *
      * @type {string|null}
      */
     id = null;
 
     /**
-     * The supplier's permission to proceed with this rate, issued on the hotel
-     * page and nowhere else. Null means this rate cannot be taken forward. It
-     * rotates at the next step, so it is what a quote is asked for rather than
-     * what a booking is made with.
+     * What a quote is asked for, issued on the hotel page and nowhere else. Null
+     * means this rate cannot be taken forward. From console 2026.10.6 it is our
+     * id for the rate, the same value as id, and it does not rotate: the quote is
+     * priced on the one rate it names. Before that it was the supplier's match
+     * key, which near-identical rates shared (SD-1219).
      *
      * @type {string|null}
      */
@@ -32,6 +33,23 @@ class HotelRate {
      * @type {string|null}
      */
     roomName = null;
+
+    /**
+     * This rate's own room, in the same sizes as the hotel's photos. Empty when
+     * the supplier's catalogue has no room matching the rate exactly, and the
+     * console then sends none rather than a similar room's (SD-1838).
+     *
+     * @type {Array<{thumbnail: string, card: string, large: string, xlarge: string}>}
+     */
+    roomPhotos = [];
+
+    /**
+     * ROOM- codes, each worded in the page's labels. Open-ended, so they are
+     * looked up there rather than matched here.
+     *
+     * @type {string[]}
+     */
+    roomAmenities = [];
 
     /**
      * A code from the supplier's meal vocabulary, null when it states nothing.
@@ -46,8 +64,8 @@ class HotelRate {
     allotment = null;
 
     /**
-     * Always false on search: the supplier only issues a booking token on the
-     * hotel page, so nothing found here can be booked from here.
+     * Always false on search: a rate is only given a token on the hotel page,
+     * so nothing found here can be booked from here.
      *
      * @type {boolean}
      */
@@ -94,6 +112,9 @@ class HotelRate {
         rate.id = data.id ?? null;
         rate.token = data.token ?? null;
         rate.roomName = data.room_name;
+        // A console before 2026.10.11 sends neither.
+        rate.roomPhotos = data.room_photos ?? [];
+        rate.roomAmenities = data.room_amenities ?? [];
         rate.meal = data.meal ?? null;
         rate.allotment = data.allotment ?? null;
         rate.bookable = data.bookable ?? false;
