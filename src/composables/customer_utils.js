@@ -67,8 +67,13 @@ export function useCustomerUtils() {
     }
 
     async function mfa(otp) {
+        // The fifth wrong code locks the account and ends the session with a
+        // 401 whose message says so (console 2026.10.11). The MFA screen shows
+        // that message; the global redirect would drop it on the sign-in page.
         await axios.post('/client/v1/mfa', {
             otp: otp,
+        }, {
+            skipAuthRedirect: true,
         }).then((response) => {
             updateStore(response.data);
         })
