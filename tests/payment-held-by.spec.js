@@ -283,7 +283,8 @@ describe('the bookings list', () => {
         const [waiting, settled] = rows().map(order => mount(BookingCard, {props: {order}, global: {plugins: [router]}}));
 
         expect(waiting.text()).toContain('Payment waiting: AUD 151.81');
-        expect(waiting.text()).toContain('pay by');
+        // No deadline beside it: expires_at is the platform's clean-up time (SD-1821).
+        expect(waiting.text()).not.toContain('pay by');
         expect(settled.text()).not.toContain('Payment waiting');
     });
 });
