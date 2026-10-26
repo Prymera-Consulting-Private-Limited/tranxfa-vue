@@ -224,12 +224,8 @@ function step(room, key, amount) {
   room.children.pop();
 }
 
-
-function stepAge(room, index, amount) {
-  const age = (room.children[index] ?? 0) + amount;
-
-  room.children[index] = Math.min(Math.max(age, 0), MAX_CHILD_AGE);
-}
+// Every age the supplier prices a child at, youngest first.
+const CHILD_AGES = Array.from({length: MAX_CHILD_AGE + 1}, (_, age) => age);
 
 function addRoom() {
   if (guests.value.length >= MAX_ROOMS) {
@@ -467,32 +463,20 @@ function search() {
                   </button>
                 </div>
               </div>
-              <!-- Ages step like the counters above. -->
+              <!-- Each age is chosen from a drop-down, as the supplier asks
+              (SD-1839): it prices every child on their own age, so an age is
+              picked outright rather than stepped to. -->
               <div v-if="room.children.length" class="mt-2 space-y-2">
-                <div v-for="(childAge, childIndex) in room.children" :key="childIndex" class="flex items-center justify-between gap-3">
+                <div v-for="(_, childIndex) in room.children" :key="childIndex" class="flex items-center justify-between gap-3">
                   <p class="truncate text-sm/6 text-gray-500">{{ $t('travel.childIndexLabel', {childIndex: childIndex + 1}) }} <span class="ml-0.5 text-xs/5 text-gray-500">{{ $t('travel.age') }}</span>
                   </p>
-                  <div class="flex shrink-0 items-center gap-2.5">
-                    <button
-                        type="button"
-                        :disabled="childAge <= 0"
-                        @click="stepAge(room, childIndex, -1)"
-                        class="flex size-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 text-gray-600 transition hover:border-gray-400 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-30"
-                        :aria-label="`Decrease age of child ${childIndex + 1} in room ${index + 1}`"
-                    >
-                      <MinusIcon class="size-3" aria-hidden="true" />
-                    </button>
-                    <span class="w-6 text-center text-sm/6 font-medium tabular-nums">{{ childAge === 0 ? '<1' : childAge }}</span>
-                    <button
-                        type="button"
-                        :disabled="childAge >= MAX_CHILD_AGE"
-                        @click="stepAge(room, childIndex, 1)"
-                        class="flex size-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 text-gray-600 transition hover:border-gray-400 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-30"
-                        :aria-label="`Increase age of child ${childIndex + 1} in room ${index + 1}`"
-                    >
-                      <PlusIcon class="size-3" aria-hidden="true" />
-                    </button>
-                  </div>
+                  <select
+                      v-model.number="room.children[childIndex]"
+                      :aria-label="$t('travel.ageOfChildInRoom', {child: childIndex + 1, room: index + 1})"
+                      class="shrink-0 cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm/6 font-medium text-gray-700 tabular-nums transition hover:border-gray-300 focus-visible:outline-0"
+                  >
+                    <option v-for="age in CHILD_AGES" :key="age" :value="age">{{ age === 0 ? '<1' : age }}</option>
+                  </select>
                 </div>
               </div>
               <p v-if="roomWarning(room)" class="mt-2 text-xs/5 font-medium text-danger-600">{{ roomWarning(room) }}</p>
