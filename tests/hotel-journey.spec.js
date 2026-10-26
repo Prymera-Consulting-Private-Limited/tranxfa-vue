@@ -160,6 +160,20 @@ describe('the results list', () => {
         expect(text).toContain('No meals included');
     });
 
+    // Both lines once rendered without their figures or place, as "246 hotels
+    // available in" and "of hotels", because the count went before the named values.
+    it('names the place in the heading and counts the hotels in the filters', async () => {
+        const {wrapper} = await mountResults({
+            '/client/v1/travel/regions': 'travel-regions-los-angeles',
+            '/client/v1/travel/hotels/search/region': 'travel-hotels-search-region',
+        });
+
+        const text = wrapper.text();
+
+        expect(text).toContain('2 hotels available in Los Angeles');
+        expect(text).toContain('2 of 2 hotels');
+    });
+
     it('opens a hotel on the search it was found under, never straight to a quote', async () => {
         const {wrapper, router} = await mountResults({
             '/client/v1/travel/regions': 'travel-regions-los-angeles',
@@ -301,5 +315,48 @@ describe('the dead booking-attempt journey is gone', () => {
         expect(Object.keys(useHotelUtils()).sort()).toEqual([
             'createQuote', 'criteria', 'getHotelView', 'getQuote', 'guestBreakdown', 'isCustomerLoaded', 'nights', 'profileResidency', 'regions', 'residency', 'search', 'stayLabel',
         ]);
+    });
+});
+
+// SD-1839. The supplier's review asks for each child's age as a drop-down: it
+// prices every child on their own age, so an age is picked outright.
+describe('the guests a search is for', () => {
+    async function openGuests(guests) {
+        const wrapper = mount(SearchBar, {
+            props: {criteria: {...getCriteria({}), region_id: REGION, guests}},
+        });
+
+        const opener = wrapper.findAll('button').find(button => button.text().includes('Guests'));
+        await opener.trigger('click');
+        await flushPromises();
+
+        return wrapper;
+    }
+
+    it('offers each child\'s age from a drop-down, under one up to seventeen', async () => {
+        const wrapper = await openGuests([{adults: 2, children: [5]}, {adults: 2, children: []}]);
+        const ages = wrapper.findAll('select');
+
+        expect(ages).toHaveLength(1);
+        expect(ages[0].attributes('aria-label')).toBe('Age of child 1 in room 1');
+        expect(ages[0].findAll('option').map(option => option.text())).toEqual(['<1', ...Array.from({length: 17}, (_, age) => String(age + 1))]);
+        expect(ages[0].element.value).toBe('5');
+    });
+
+    it('searches for the age chosen', async () => {
+        const wrapper = await openGuests([{adults: 2, children: [5]}, {adults: 2, children: []}]);
+
+        await wrapper.find('select').setValue('12');
+        await wrapper.findAll('button').find(button => button.text() === 'Search').trigger('click');
+
+        expect(wrapper.emitted('search')[0][0].guests).toEqual([{adults: 2, children: [12]}, {adults: 2, children: []}]);
+    });
+
+    it('starts a child added to a room at seven, as before', async () => {
+        const wrapper = await openGuests([{adults: 2, children: []}]);
+
+        await wrapper.find('button[aria-label="Increase Children in room 1"]').trigger('click');
+
+        expect(wrapper.find('select').element.value).toBe('7');
     });
 });

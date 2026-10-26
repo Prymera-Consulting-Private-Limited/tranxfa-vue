@@ -35,6 +35,23 @@ class HotelRate {
     roomName = null;
 
     /**
+     * This rate's own room, in the same sizes as the hotel's photos. Empty when
+     * the supplier's catalogue has no room matching the rate exactly, and the
+     * console then sends none rather than a similar room's (SD-1838).
+     *
+     * @type {Array<{thumbnail: string, card: string, large: string, xlarge: string}>}
+     */
+    roomPhotos = [];
+
+    /**
+     * ROOM- codes, each worded in the page's labels. Open-ended, so they are
+     * looked up there rather than matched here.
+     *
+     * @type {string[]}
+     */
+    roomAmenities = [];
+
+    /**
      * A code from the supplier's meal vocabulary, null when it states nothing.
      *
      * @type {string|null}
@@ -95,6 +112,9 @@ class HotelRate {
         rate.id = data.id ?? null;
         rate.token = data.token ?? null;
         rate.roomName = data.room_name;
+        // A console before 2026.10.11 sends neither.
+        rate.roomPhotos = data.room_photos ?? [];
+        rate.roomAmenities = data.room_amenities ?? [];
         rate.meal = data.meal ?? null;
         rate.allotment = data.allotment ?? null;
         rate.bookable = data.bookable ?? false;
