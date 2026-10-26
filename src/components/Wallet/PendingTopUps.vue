@@ -3,11 +3,10 @@ import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
 
-import {onMounted, onUnmounted, ref} from "vue";
+import {ref} from "vue";
 import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 import {notify} from "notiwind";
-import moment from "moment";
 import WalletRefusalType from "@/enums/wallet_refusal_type.js";
 import {useWalletUtils} from "@/composables/wallet_utils.js";
 
@@ -28,27 +27,6 @@ const walletUtils = useWalletUtils();
 const topupToCancel = ref(null);
 const isCancelling = ref(false);
 const cancelError = ref('');
-
-const tick = ref(0);
-let intervalId = null;
-
-onMounted(() => {
-  intervalId = setInterval(() => {
-    tick.value++;
-  }, 30000);
-});
-
-onUnmounted(() => {
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
-  }
-});
-
-function expiresIn(topup) {
-  void tick.value;
-  return moment(topup.expiresAt).fromNow();
-}
 
 function openCancelModal(topup) {
   cancelError.value = '';
@@ -101,7 +79,6 @@ async function cancelTopup() {
       <li v-for="topup in topups" :key="topup.id" class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
           <p class="text-sm/6 font-semibold text-gray-900">{{ topup.amountFormatted }} <span class="ml-2 rounded-md bg-gray-100 px-2 py-0.5 text-xs/5 font-medium tracking-wider text-gray-600">{{ topup.reference }}</span></p>
-          <p class="mt-1 text-xs/5 text-gray-500">Expires {{ expiresIn(topup) }} &middot; {{ moment(topup.expiresAt).format('lll') }}</p>
         </div>
         <div class="flex shrink-0 items-center gap-x-4">
           <a href="javascript:" @click="emit('view', topup)" class="text-sm/6 font-semibold text-brand-700 hover:text-brand-800">{{ $t('wallet.viewDetails') }}</a>
