@@ -1,7 +1,6 @@
 <script setup>
 import Transaction from "@/models/transaction.js";
-import {computed, onMounted, onUnmounted, ref} from "vue";
-import moment from "moment";
+import {computed, onUnmounted} from "vue";
 import PaymentState from "@/enums/payment_state.js";
 import PaymentCompleted from "@/components/Payment/State/PaymentCompleted.vue";
 import Processing from "@/components/Payment/State/Processing.vue";
@@ -46,31 +45,6 @@ const {stopPolling, isSlow} = usePaymentWatch(props.transaction, {
 });
 
 
-
-// 30-second tick so the expiry line re-renders as time passes. The clock only
-// informs the copy — the Pay button is ruled by the payment state alone.
-const tick = ref(0);
-let tickIntervalId = null;
-
-onMounted(() => {
-  tickIntervalId = setInterval(() => { tick.value++; }, 30_000);
-});
-
-onUnmounted(() => clearInterval(tickIntervalId));
-
-const isExpiryPassed = computed(() => {
-  tick.value;
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).isSameOrBefore(moment()) : false;
-});
-
-const expiresIn = computed(() => {
-  tick.value;
-  return moment(props.transaction.payment.expiresAt).fromNow(true);
-});
-
-const expiresAtFormatted = computed(() => {
-  return props.transaction.payment.expiresAt ? moment(props.transaction.payment.expiresAt).format('lll') : '';
-});
 
 // PENDING alone is not payable — the hosted payment URL can arrive later than
 // the state, so keep polling until both are here.
@@ -120,10 +94,7 @@ onUnmounted(() => clearTimeout(onStateRedirectId));
       <p class="text-sm/6 text-gray-600 mb-6 text-left">{{ $t('payment.provider.yourTransferIsWaitingFor') }}</p>
       <a :href="transaction.payment.paymentUrl" class="block w-full px-4 md:px-6 lg:px-8 bg-success-700 text-white text-center py-3 rounded-md font-medium hover:bg-success-800 transition cursor-pointer text-sm/6 outline-none ring-0 tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('payment.card.payTotalpaymentamountcurrencyprefixed', {totalPaymentAmountCurrencyPrefixed: transaction.payment.totalPaymentAmountCurrencyPrefixed}) }}</a>
       <p class="text-sm/6 text-gray-600 mt-4 text-left">{{ $t('payment.provider.youWillBeRedirectedTo2') }}</p>
-      <p v-if="transaction.payment.expiresAt" class="mt-3 text-xs/5 text-gray-500 text-left">
-        <template v-if="! isExpiryPassed">{{ $t('payment.card.payableForAnotherExpiresinExpiresatformatted', {expiresIn: expiresIn, expiresAtFormatted: expiresAtFormatted}) }}</template>
-        <template v-else>{{ $t('payment.card.thePaymentWindowHasPassed') }}</template>
-      </p>
+      <p class="mt-3 text-xs/5 text-gray-500 text-left">{{ $t('payment.provider.payNowToComplete') }}</p>
       <p v-if="transaction.payment.paymentTerms" class="mt-4 text-xs/5 text-gray-500 text-left whitespace-pre-line">{{ transaction.payment.paymentTerms }}</p>
     </div>
   </template>
