@@ -1,5 +1,4 @@
 <script setup>
-import moment from 'moment';
 import {computed} from 'vue';
 import ClientPaymentAccount from '@/components/ClientPaymentAccount.vue';
 import OrderPayment from '@/models/travel/orders/order_payment.js';
@@ -23,10 +22,6 @@ const props = defineProps({
 defineEmits(['paid']);
 
 const account = computed(() => props.payment.clientPaymentAccount);
-
-// The real deadline the platform enforces, not the price hold. Null means the
-// payment never expires and the line is left out rather than guessed.
-const deadline = computed(() => (props.payment.expiresAt ? moment(props.payment.expiresAt).format('lll') : null));
 </script>
 
 <template>
@@ -43,7 +38,6 @@ const deadline = computed(() => (props.payment.expiresAt ? moment(props.payment.
         <div class="space-y-2 text-sm/6 text-warning-800">
           <p v-if="account.paymentReference"><i18n-t keypath="travel.putTheReferenceAtYourBank" scope="global"><template #value><strong>{{ $t('account.paymentReference') }}</strong></template></i18n-t></p>
           <p><i18n-t keypath="travel.sendExactlyAmount" scope="global"><template #value><strong>{{ payment.amount.currencyPrefixed }}</strong></template></i18n-t></p>
-          <p v-if="deadline"><i18n-t keypath="travel.payByDeadline" scope="global"><template #value><strong>{{ deadline }}</strong></template></i18n-t></p>
         </div>
       </div>
       <button

@@ -275,7 +275,7 @@ async function termsAccepted() {
                     <span>{{ $t('wallet.theMoneyLandsInYour') }}</span>
                   </li>
                 </ol>
-                <p class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.aDeclarationStaysOpenFor') }}</p>
+                <p class="mt-4 text-xs/5 text-gray-500">{{ $t('wallet.aLateOrDifferentDepositIsNotLost') }}</p>
               </div>
             </div>
           </div>
