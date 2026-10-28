@@ -30,6 +30,7 @@ are in `docs/mistakes.md`.
 | `settings-dialogs.spec.js` | every dialog has a title and a button that clears its own flag |
 | `licensed-products.spec.js` | what the app offers when service status cannot be reached |
 | `feature-flags.spec.js` | the product flags stay deleted |
+| `print-logo.spec.js` | a reversed logo is never printed; the full-colour one prints in its place, on a header bar that prints white |
 
 ## Prove it fails. Always.
 
