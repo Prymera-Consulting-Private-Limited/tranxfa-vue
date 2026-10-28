@@ -83,13 +83,19 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <Popover as="header" class="bg-brand-700 pb-24" v-slot="{ open }">
+  <Popover as="header" class="bg-brand-700 pb-24 print:bg-white" v-slot="{ open }">
     <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
       <div class="relative flex items-center justify-center py-12 lg:py-5 lg:justify-between">
         <!-- Logo -->
         <div class="absolute left-0 shrink-0 lg:static">
           <a href="#">
-            <BrandLogo variant="light" size="header" />
+            <!-- The bar's colour is a background, and browsers drop backgrounds
+                 when printing, so the reversed logo would print white on white:
+                 every saved or printed transaction page lost its logo (SD-1710).
+                 Paper gets the full-colour one, and the bar prints white even
+                 where the browser is set to print backgrounds. -->
+            <BrandLogo variant="light" size="header" class="print:hidden" />
+            <BrandLogo variant="default" size="header" class="hidden print:block" />
           </a>
         </div>
 
