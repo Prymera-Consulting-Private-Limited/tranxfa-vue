@@ -1,0 +1,80 @@
+[
+  {
+    "id": "8bc90945-2567-449c-951a-b21f5a86cada",
+    "code": "ACCOUNTANT",
+    "title": "Accountant",
+    "description": null
+  },
+  {
+    "id": "f7c2ca95-d193-498c-82f7-8e40ac560339",
+    "code": "BUSINESS-OWNER",
+    "title": "Business Owner",
+    "description": null
+  },
+  {
+    "id": "6d6413ca-5d09-41eb-8cc4-cead34b11d01",
+    "code": "CONSULTANT",
+    "title": "Consultant",
+    "description": null
+  },
+  {
+    "id": "fc7849ed-2cec-4c65-a536-fc05fdc4cbe9",
+    "code": "DOCTOR",
+    "title": "Doctor",
+    "description": null
+  },
+  {
+    "id": "b4e49e86-eb08-4f56-9a5a-b0b7cca642e1",
+    "code": "FREELANCER",
+    "title": "Freelancer",
+    "description": null
+  },
+  {
+    "id": "6e65216d-e814-4fc2-a196-0d1f73910699",
+    "code": "NURSE",
+    "title": "Nurse",
+    "description": null
+  },
+  {
+    "id": "8783bb54-4c65-41b1-b535-b42050d7bfa1",
+    "code": "RETIRED",
+    "title": "Retired",
+    "description": null
+  },
+  {
+    "id": "d98ff182-9841-40c7-9511-9d7dd5e069a9",
+    "code": "SALESPERSON",
+    "title": "Salesperson",
+    "description": null
+  },
+  {
+    "id": "e376c86b-1bf0-4974-b55c-42da09054bb5",
+    "code": "SOFTWARE-ENGINEER",
+    "title": "Software Engineer",
+    "description": null
+  },
+  {
+    "id": "675617d1-30a9-40b7-9f12-44806870b60c",
+    "code": "STUDENT",
+    "title": "Student",
+    "description": null
+  },
+  {
+    "id": "3c653483-e301-4533-b196-f2892e94b93d",
+    "code": "TEACHER",
+    "title": "Teacher",
+    "description": null
+  },
+  {
+    "id": "227144b9-0907-4d53-9668-17e1e8280d62",
+    "code": "UNEMPLOYED",
+    "title": "Unemployed",
+    "description": null
+  },
+  {
+    "id": "8fb2bf87-ec23-46da-aed8-741c1f0da0eb",
+    "code": "OTHER",
+    "title": "Other",
+    "description": null
+  }
+]

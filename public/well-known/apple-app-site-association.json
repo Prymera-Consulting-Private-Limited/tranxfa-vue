@@ -1,0 +1,16 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "H36ZUA44NB.com.famremit",
+                "paths": [
+                    "/reset-password/*",
+                    "/payment/cb/*",
+                    "/transaction/*",
+                    "/account-verification/upload/*"
+                ]
+            }
+        ]
+    }
+}

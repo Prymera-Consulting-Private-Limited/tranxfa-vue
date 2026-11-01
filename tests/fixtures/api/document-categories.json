@@ -1,0 +1,139 @@
+[
+  {
+    "id": "93ba70bd-f910-4323-84cf-2fc63b2472b2",
+    "code": "POI",
+    "title": "Proof of Identity",
+    "description": "Documents that verify the identity of the customer, such as a passport, driver\u2019s license, or national ID card.",
+    "document_types": [
+      {
+        "id": "f495196f-047c-4a3a-962f-845409fddaf8",
+        "code": "PASSPORT",
+        "title": "Passport",
+        "description": "A government-issued document that certifies the identity and nationality of the holder for international travel.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SUMSUB"
+      },
+      {
+        "id": "0ab35156-a21d-467f-ab08-395cfcacc0a3",
+        "code": "DRIVERS_LICENSE",
+        "title": "Driver's License",
+        "description": "An official document permitting a specific individual to operate one or more types of motorized vehicles.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SUMSUB"
+      }
+    ],
+    "document": null
+  },
+  {
+    "id": "4cebd969-1c58-4338-941c-2be7eeb81cb3",
+    "code": "POA",
+    "title": "Proof of Address",
+    "description": "Documents that confirm the customer\u2019s residential address, such as utility bills, bank statements, or rental agreements.",
+    "document_types": [
+      {
+        "id": "0ab35156-a21d-467f-ab08-395cfcacc0a3",
+        "code": "DRIVERS_LICENSE",
+        "title": "Driver's License",
+        "description": "An official document permitting a specific individual to operate one or more types of motorized vehicles.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      },
+      {
+        "id": "c845526b-d9b7-4a69-a20d-80297b63a740",
+        "code": "BANK_STATEMENT",
+        "title": "Bank Account Statement",
+        "description": "A document issued by a bank detailing the account holder\u2019s transactions and balance over a specific period.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      },
+      {
+        "id": "f441207f-368b-4f5c-a292-6bf82710fde5",
+        "code": "UTILITY_BILL",
+        "title": "Utility Bill",
+        "description": "A document issued by a utility service provider that confirms the customer\u2019s residential address.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      },
+      {
+        "id": "fb4caf00-ee9e-4969-b408-2bde274dd4ec",
+        "code": "COUNCIL_TAX_BILL",
+        "title": "Council Tax Bill",
+        "description": "A document issued by the local council in the UK, used as proof of residence and address verification.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      }
+    ],
+    "document": null
+  },
+  {
+    "id": "87a5cd11-5883-4479-88f0-18e367a49860",
+    "code": "SOF",
+    "title": "Source of Funds",
+    "description": "Documents that provide evidence of the source of the customer\u2019s funds, such as payslips, bank statements, or tax returns.",
+    "document_types": [
+      {
+        "id": "c845526b-d9b7-4a69-a20d-80297b63a740",
+        "code": "BANK_STATEMENT",
+        "title": "Bank Account Statement",
+        "description": "A document issued by a bank detailing the account holder\u2019s transactions and balance over a specific period.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      },
+      {
+        "id": "eb6fff80-dd30-4e16-96ab-86c10f214683",
+        "code": "SALARY_SLIP",
+        "title": "Salary Slip",
+        "description": "A document provided by an employer that outlines an employee\u2019s earnings, deductions, and net pay for a specific period.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      },
+      {
+        "id": "f6709697-9038-45be-b5aa-a7b32be90da1",
+        "code": "LOAN_AGREEMENT",
+        "title": "Loan Agreement",
+        "description": "A formal agreement between a borrower and a lender outlining the terms and conditions of a loan, including repayment schedules, interest rates, and other relevant details.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      },
+      {
+        "id": "43bbb2b5-0a64-49ca-accb-61b2dd461fe0",
+        "code": "RE_MORTGAGE_STATEMENT",
+        "title": "Re-Mortgage Statement",
+        "description": "A statement detailing the financial transactions and balances associated with a re-mortgage, typically provided by the lender or financial institution managing the mortgage.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      },
+      {
+        "id": "fd65aed6-4814-4a39-9e51-de70ef1d3319",
+        "code": "SAVINGS_ACCOUNT_STATEMENT",
+        "title": "Savings Account Statement",
+        "description": "A document provided by a financial institution that details the transactions, deposits, withdrawals, and current balance of a customer's savings account.",
+        "public_upload": true,
+        "info": null,
+        "document_number_label": "Document Number",
+        "api": "SYSTEM"
+      }
+    ],
+    "document": null
+  }
+]
