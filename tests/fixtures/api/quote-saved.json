@@ -1,0 +1,152 @@
+{
+  "id": "a2af112b-a330-4aad-a509-1ce206750f25",
+  "payment_country": {
+    "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "payment_currency": {
+    "id": "4a16a11f-9bbb-4671-95c6-f8550325521a",
+    "decimal_places": 2,
+    "iso_numeric": 36,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "AUD",
+    "common_name": "Australian dollar",
+    "official_name": "Australian dollar",
+    "icon_unicode": "$",
+    "code": "AUD",
+    "salary_ranges": null
+  },
+  "payout_country": {
+    "id": "8fe1dcea-ff86-4ec5-aef5-10adb650f96b",
+    "iso2_alpha": "FJ",
+    "iso3_alpha": "FJI",
+    "iso_numeric": "242",
+    "fips_code": "FJ",
+    "slug": "fiji",
+    "calling_code": "679",
+    "common_name": "Fiji",
+    "official_name": "Fiji",
+    "endonym": "Fiji",
+    "demonym": "Fijian, Fiji"
+  },
+  "payout_currency": {
+    "id": "ad66a916-0ccb-4437-b5f7-194776277992",
+    "decimal_places": 2,
+    "iso_numeric": 242,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "FJD",
+    "common_name": "Fijian dollar",
+    "official_name": "Fijian dollar",
+    "icon_unicode": "$",
+    "code": "FJD",
+    "salary_ranges": null
+  },
+  "payout_method": {
+    "id": "7e0e09ee-870c-4829-9a5e-6d328a25e975",
+    "code": "MOBILE-WALLET",
+    "title": "Mobile Wallet",
+    "description": "A secure method allowing users to transfer funds directly to recipient's mobile wallet account.",
+    "instruction": null,
+    "promo": null,
+    "sell_rate_formatted": null
+  },
+  "payout_company": {
+    "id": "a2af0b7a-e8e6-4376-8e1c-930d036791e8",
+    "code": "TERRA_PAY",
+    "title": "TerraPay"
+  },
+  "amount_type": "send",
+  "amount": "100.00",
+  "local_amount": "100.00",
+  "local_amount_formatted": "100.00",
+  "local_amount_currency_prefixed": "AUD 100.00",
+  "base_fees": "0.00",
+  "base_fees_formatted": "0.00",
+  "base_fees_currency_prefixed": "AUD 0.00",
+  "sub_total_amount_formatted": "100.00",
+  "sub_total_amount_currency_prefixed": "AUD 100.00",
+  "coupon": null,
+  "total_amount_formatted": "100.00",
+  "total_amount_currency_prefixed": "AUD 100.00",
+  "foreign_amount": "145.00",
+  "foreign_amount_formatted": "145.00",
+  "foreign_amount_currency_prefixed": "FJD 145.00",
+  "exchange_rate": 1.45,
+  "exchange_rate_formatted": "AUD = 1.45 FJD",
+  "exchange_rate_is_inverse": false,
+  "recipients": [],
+  "recipient": null,
+  "purposes": null,
+  "payment_methods": [
+    {
+      "id": "b62fa70a-0166-47ec-951c-dd475958fa07",
+      "code": "BANK-TRANSFER",
+      "title": "Bank Transfer",
+      "description": "A traditional transaction method where funds are transferred from customer's bank accounts through manual authorization, ensuring a controlled and deliberate payment process.",
+      "providers": [
+        {
+          "id": "292c8a06-1e8e-4eda-b24c-91aa61b0ae86",
+          "code": "MONOOVA",
+          "title": "Monoova",
+          "description": "Monoova provides businesses or individuals with a quick way to receive payments."
+        }
+      ]
+    },
+    {
+      "id": "f0061a4c-8352-4021-90a8-ca87b026addf",
+      "code": "PAY-ID",
+      "title": "PayID",
+      "description": "A traditional transaction method where funds are transferred from customer's accounts through PayID, ensuring a controlled and deliberate payment process.",
+      "providers": [
+        {
+          "id": "292c8a06-1e8e-4eda-b24c-91aa61b0ae86",
+          "code": "MONOOVA",
+          "title": "Monoova",
+          "description": "Monoova provides businesses or individuals with a quick way to receive payments."
+        }
+      ]
+    }
+  ],
+  "pending_documents": [
+    {
+      "id": "93ba70bd-f910-4323-84cf-2fc63b2472b2",
+      "code": "POI",
+      "title": "Proof of Identity",
+      "description": "Documents that verify the identity of the customer, such as a passport, driver\u2019s license, or national ID card.",
+      "document_types": [
+        {
+          "id": "f495196f-047c-4a3a-962f-845409fddaf8",
+          "code": "PASSPORT",
+          "title": "Passport",
+          "description": "A government-issued document that certifies the identity and nationality of the holder for international travel.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SUMSUB"
+        },
+        {
+          "id": "0ab35156-a21d-467f-ab08-395cfcacc0a3",
+          "code": "DRIVERS_LICENSE",
+          "title": "Driver's License",
+          "description": "An official document permitting a specific individual to operate one or more types of motorized vehicles.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SUMSUB"
+        }
+      ],
+      "required": true
+    }
+  ]
+}

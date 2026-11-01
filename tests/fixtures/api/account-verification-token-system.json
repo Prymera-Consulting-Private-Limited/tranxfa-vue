@@ -1,0 +1,3 @@
+{
+  "token": "https://s3.example-region.amazonaws.com/uploads.example.test/01EXAMPLEOBJECTKEY000000000.pdf?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260101T000000Z&X-Amz-SignedHeaders=host&X-Amz-Expires=1800&X-Amz-Signature=REDACTED"
+}

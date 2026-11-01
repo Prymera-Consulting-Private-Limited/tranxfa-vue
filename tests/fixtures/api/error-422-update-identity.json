@@ -1,0 +1,14 @@
+{
+  "message": "The nationality field is required. (and 2 more errors)",
+  "errors": {
+    "nationality_id": [
+      "The nationality field is required."
+    ],
+    "second_name": [
+      "The last name field is required."
+    ],
+    "birth_detail.birth_date": [
+      "The date of birth field is required."
+    ]
+  }
+}

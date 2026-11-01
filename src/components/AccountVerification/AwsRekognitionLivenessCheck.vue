@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import {onMounted, onUnmounted, ref} from "vue";
 import DocumentCategory from "@/models/document_category.js";
 import DocumentType from "@/models/document_type.js";
@@ -60,12 +64,12 @@ const startFaceDetection = async () => {
       const faceCount = await detectFaceInFrame();
       if (faceCount === 0) {
         liveCheckMessage.value = "";
-        liveCheckError.value = "No face detected. Please ensure your face is clearly visible.";
+        liveCheckError.value = t('verification.noFaceDetectedPlease');
       } else if (faceCount > 1) {
         liveCheckMessage.value = "";
-        liveCheckError.value = "Multiple faces detected. Please be alone in the frame.";
+        liveCheckError.value = t('verification.multipleFacesDetectedPlease');
       } else {
-        liveCheckMessage.value = "Hold still while we verify your identity...";
+        liveCheckMessage.value = t('verification.holdStillWhileWe');
         liveCheckError.value = "";
         if (!isProcessing.value) {
           isProcessing.value = true;
@@ -108,7 +112,7 @@ const startCamera = async () => {
     await startFaceDetection();
   } catch (err) {
     console.error("Camera Access Error:", err);
-    liveCheckError.value = "Camera access denied. Please grant permission.";
+    liveCheckError.value = t('verification.cameraAccessDeniedPlease');
   }
 };
 
@@ -154,22 +158,20 @@ onUnmounted(() => {
 <template>
   <div :class="{'min-h-128': !isInitialized}" class="flex flex-col items-center justify-center bg-gray-50 text-gray-800 p-6">
     <div v-if="!cameraAccess" class="text-center">
-      <p class="text-lg font-semibold mb-4">We Need Camera Access</p>
-      <button @click="startCamera" class="bg-brand-700 text-white px-6 py-2 rounded-lg shadow-lg transition cursor-pointer">
-        Grant Access
-      </button>
+      <p class="text-lg font-semibold mb-4">{{ $t('verification.cameraAccessNeeded') }}</p>
+      <button @click="startCamera" class="bg-brand-700 text-white px-6 py-2.5 rounded-xl shadow-lg transition cursor-pointer">{{ $t('verification.grantAccess') }}</button>
     </div>
     <div v-show="isInitialized" class="w-full flex flex-col items-center justify-center">
-      <h2 class="text-lg font-semibold mb-4">Liveliness Test</h2>
-      <p class="leading-6 text-gray-500 mb-3 text-center">To verify your identity, we kindly request you to record a short video. Please ensure your face is clearly visible in the frame.</p>
-      <p v-if="liveCheckMessage" class="leading-6 text-gray-400 mb-3 text-center">{{ liveCheckMessage }}</p>
-      <p v-if="liveCheckSuccess" class="leading-6 text-emerald-500 font-semibold mb-3 text-center">{{ liveCheckSuccess }}</p>
-      <p v-if="liveCheckError" class="leading-6 text-red-500 mb-3 text-center animate-pulse">{{ liveCheckError }}</p>
-      <p v-if="liveCheckWarning" class="leading-6 text-yellow-500 mb-3 text-center">{{ liveCheckWarning }}</p>
+      <h2 class="text-lg font-semibold mb-4">{{ $t('verification.livenessTest') }}</h2>
+      <p class="leading-6 text-gray-500 mb-3 text-center">{{ $t('verification.livenessIntro') }}</p>
+      <p v-if="liveCheckMessage" class="leading-6 text-gray-500 mb-3 text-center">{{ liveCheckMessage }}</p>
+      <p v-if="liveCheckSuccess" class="leading-6 text-success-700 font-semibold mb-3 text-center">{{ liveCheckSuccess }}</p>
+      <p v-if="liveCheckError" class="leading-6 text-danger-600 mb-3 text-center animate-pulse">{{ liveCheckError }}</p>
+      <p v-if="liveCheckWarning" class="leading-6 text-warning-700 mb-3 text-center">{{ liveCheckWarning }}</p>
       <div class="relative h-72 w-72 bg-black rounded-full overflow-hidden border-6 p-4 border-gray-300">
         <video ref="video" autoplay playsinline class="w-full h-full transform scale-160"></video>
       </div>
-      <p class="leading-6 text-gray-400 text-xs mt-3 text-center">All data is processed in accordance with our privacy policy.</p>
+      <p class="text-gray-500 text-xs/5 mt-3 text-center">{{ $t('verification.privacyNote') }}</p>
     </div>
   </div>
 </template>

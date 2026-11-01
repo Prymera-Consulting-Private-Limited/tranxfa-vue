@@ -1,0 +1,4 @@
+{
+  "type": "payment_not_open",
+  "message": "This payment can no longer be cancelled. It has already been paid, has failed or has been cancelled."
+}

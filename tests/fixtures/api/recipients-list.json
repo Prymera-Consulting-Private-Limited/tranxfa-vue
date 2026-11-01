@@ -1,0 +1,76 @@
+{
+  "data": [
+    {
+      "id": "a2af112c-1b4e-4a3c-a6a9-b134480bdfcf",
+      "recipient_type": "individual",
+      "name": "Grace Hopper",
+      "second_name": null,
+      "third_name": null,
+      "whole_name": "Grace Hopper",
+      "account_detail": {
+        "account_number": "9990001111",
+        "institution": null
+      },
+      "account_detail_hashmap": [],
+      "relationship": {
+        "id": "1d030aa3-70cc-4233-88c4-e0e7979cefe3",
+        "code": "BUSINESS-ASSOCIATE",
+        "title": "Business Associate",
+        "description": null
+      },
+      "channel": {
+        "id": "a2af0b7a-d989-48dd-a9c7-814c4072d323",
+        "country": {
+          "id": "8fe1dcea-ff86-4ec5-aef5-10adb650f96b",
+          "iso2_alpha": "FJ",
+          "iso3_alpha": "FJI",
+          "iso_numeric": "242",
+          "fips_code": "FJ",
+          "slug": "fiji",
+          "calling_code": "679",
+          "common_name": "Fiji",
+          "official_name": "Fiji",
+          "endonym": "Fiji",
+          "demonym": "Fijian, Fiji"
+        },
+        "currency": {
+          "id": "ad66a916-0ccb-4437-b5f7-194776277992",
+          "decimal_places": 2,
+          "iso_numeric": 242,
+          "type": "FIAT",
+          "crypto_code": null,
+          "iso_alpha": "FJD",
+          "common_name": "Fijian dollar",
+          "official_name": "Fijian dollar",
+          "icon_unicode": "$",
+          "code": "FJD",
+          "salary_ranges": null
+        },
+        "payout_method": {
+          "id": "7e0e09ee-870c-4829-9a5e-6d328a25e975",
+          "code": "MOBILE-WALLET",
+          "title": "Mobile Wallet",
+          "description": "A secure method allowing users to transfer funds directly to recipient's mobile wallet account.",
+          "instruction": null,
+          "promo": null,
+          "sell_rate_formatted": null
+        }
+      },
+      "created_at": null,
+      "updated_at": null,
+      "transaction_summary": null
+    }
+  ],
+  "pagination": {
+    "total": 1,
+    "count": 1,
+    "per_page": 24,
+    "current_page": 1,
+    "total_pages": 1,
+    "links": {
+      "self": "http://api.moneytransfer.app.localhost:8000/client/v1/recipients",
+      "next": null,
+      "prev": null
+    }
+  }
+}
