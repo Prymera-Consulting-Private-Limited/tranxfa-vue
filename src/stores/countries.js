@@ -11,9 +11,15 @@ export const useCountriesStore = defineStore('countries', () => {
         countries.data.push(country);
     }
 
+    const reset = () => {
+        isLoaded.value = false;
+        countries.data = [];
+    }
+
     return {
         isLoaded,
         countries,
         add,
+        reset,
     }
 });

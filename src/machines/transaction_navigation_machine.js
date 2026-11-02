@@ -9,6 +9,24 @@ const customerStore = useCustomerStore();
  */
 const customer = customerStore.customer;
 
+/**
+ * The address step is owed when the profile is missing one and a recipient is
+ * already chosen. Optional chaining matters: this ran as
+ * `customer.data.addressInformationRequired()` in three places, so a machine
+ * started before the profile loaded threw inside the guard and errored the
+ * actor instead of navigating.
+ *
+ * An unloaded profile now falls through rather than claiming the address is
+ * required. The wizard is only ever a fast path - if the address really is
+ * missing, POST /quote/confirm answers 412 incomplete_customer_address and the
+ * customer is sent back here, one round trip later.
+ */
+function requiresAddress({context}) {
+    return customerStore.isLoaded &&
+        customer.data?.addressInformationRequired?.() === true &&
+        (context.quote?.recipient || null) !== null;
+}
+
 export const transactionNavigationMachine = createMachine({
     id: 'moneyTransfer',
     initial: 'checkRecipients',
@@ -29,7 +47,7 @@ export const transactionNavigationMachine = createMachine({
                     },
                     {
                         target: 'provideAddress',
-                        guard: ({context}) => customer.data.addressInformationRequired() && (context.quote?.recipient || null) !== null,
+                        guard: requiresAddress,
                     },
                     {
                         target: 'accountVerification',
@@ -53,7 +71,7 @@ export const transactionNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'provideAddress',
-                        guard: ({context}) => customer.data.addressInformationRequired() && (context.quote?.recipient || null) !== null,
+                        guard: requiresAddress,
                     }, {
                         target: 'accountVerification',
                         guard: ({context}) => {
@@ -80,7 +98,7 @@ export const transactionNavigationMachine = createMachine({
                 PROCEED: [
                     {
                         target: 'provideAddress',
-                        guard: ({context}) => customer.data.addressInformationRequired() && (context.quote?.recipient || null) !== null,
+                        guard: requiresAddress,
                     }, {
                         target: 'accountVerification',
                         guard: ({context}) => {

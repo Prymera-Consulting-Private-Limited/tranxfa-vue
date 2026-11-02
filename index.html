@@ -1,47 +1,62 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FamRemit</title>
-      <!--Start of Tawk.to Script-->
-      <script type="text/javascript">
-          var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-          (function(){
-              var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-              s1.async=true;
-              s1.src='https://embed.tawk.to/68ca706fa237bc19238aa746/1j5bcedov';
-              s1.charset='UTF-8';
-              s1.setAttribute('crossorigin','*');
-              s0.parentNode.insertBefore(s1,s0);
-          })();
-      </script>
-      <!--End of Tawk.to Script-->
+      <!-- Loaded here rather than @import-ed from main.css: an @import inside the
+         bundled stylesheet serialises the fetches - main.css must be parsed
+         before the font request even starts. A link in the head runs both in
+         parallel, and preconnect opens the TLS session while that happens. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
+    <script type="text/javascript">
+      (function (c, l, a, r, i, t, y) {
+        c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+        t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", "tc3cwmbvsi");
+    </script>
 
-      <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-8F85KEJ1F4"></script>
-      <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
+    <!-- Google tag (gtag.js). The library is added after first paint rather than
+         as a <script src>, so no page waits on a third-party script (see
+         tests/http-headers.spec.js); the dataLayer queues calls until it lands. -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
 
-          gtag('config', 'G-8F85KEJ1F4');
-      </script>
+      gtag('config', 'G-8F85KEJ1F4');
+      (function () {
+        function loadGtag() {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-8F85KEJ1F4';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadGtag);
+        } else {
+          setTimeout(loadGtag, 2000);
+        }
+      })();
+    </script>
 
-      <!-- End Of Google tag (gtag.js) -->
-
-
-      <!-- Clarity ) -->
-      <script type="text/javascript">
-          (function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "tc3cwmbvsi");
-      </script>
-
-      <!-- Clarity Ends -->
+    <!-- Tawk.to chat. Double quotes on s1.src so tests/http-headers.spec.js can
+         read the host and hold the CSP to it. -->
+    <script type="text/javascript">
+      var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+      (function () {
+        var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+        s1.async = true;
+        s1.src = "https://embed.tawk.to/68ca706fa237bc19238aa746/1j5bcedov";
+        s1.charset = 'UTF-8';
+        s1.setAttribute('crossorigin', '*');
+        s0.parentNode.insertBefore(s1, s0);
+      })();
+    </script>
   </head>
   <body class="min-h-screen">
     <div id="app" class="min-h-screen"></div>
