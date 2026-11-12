@@ -1,0 +1,4 @@
+{
+  "type": "order_not_payable",
+  "message": "This order is closed and can no longer be paid for."
+}

@@ -1,0 +1,4 @@
+{
+  "type": "same_amount",
+  "message": "You already have a payment waiting for exactly this amount. Please pay or cancel that one first."
+}

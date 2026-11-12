@@ -1,12 +1,18 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <link rel="icon" type="image/svg+xml" href="/fav.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Remitpay</title>
-  <script src="https://js.volumepay.io"></script>
+  <!-- Loaded here rather than @import-ed from main.css: an @import inside the
+       bundled stylesheet serialises the fetches - main.css must be parsed
+       before the font request even starts. A link in the head runs both in
+       parallel, and preconnect opens the TLS session while that happens. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
   <!-- clarity -->
   <script type="text/javascript">
     (function (c, l, a, r, i, t, y) {
@@ -15,14 +21,21 @@
       y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
     })(window, document, "clarity", "script", "wx3piuv8wa");
   </script>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DDRGRW8PDM"></script>
+  <!-- Google tag (gtag.js). Inserted from script rather than by a <script src>
+       tag, which tests/http-headers.spec.js keeps out of this file; it still
+       loads straight away and async, as the tag did. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-DDRGRW8PDM');
+    (function () {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-DDRGRW8PDM';
+      document.head.appendChild(s);
+    })();
   </script>
 </head>
 

@@ -1,0 +1,64 @@
+{
+  "data": [
+    {
+      "id": "1d030aa3-70cc-4233-88c4-e0e7979cefe3",
+      "code": "BUSINESS-ASSOCIATE",
+      "title": "Business Associate",
+      "description": null
+    },
+    {
+      "id": "f5dfc8b0-5732-4f14-80dc-9a0c6ab841d4",
+      "code": "CHILD",
+      "title": "Child",
+      "description": null
+    },
+    {
+      "id": "b3676659-4bbf-452b-bc50-f1be6a7e1b0c",
+      "code": "COUSIN",
+      "title": "Cousin",
+      "description": null
+    },
+    {
+      "id": "0f9f7901-59b2-481d-9514-e33216684d25",
+      "code": "EMPLOYER-EMPLOYEE",
+      "title": "Employer-Employee",
+      "description": null
+    },
+    {
+      "id": "e488e27a-d6ad-471e-a66f-1817c7a0db50",
+      "code": "FRIEND",
+      "title": "Friend",
+      "description": null
+    },
+    {
+      "id": "1b08bf44-c5bd-46ee-8cd9-c0b799503b7c",
+      "code": "GRANDCHILD",
+      "title": "Grandchild",
+      "description": null
+    },
+    {
+      "id": "b74790ca-31e1-483a-ae3b-fc964e9072d3",
+      "code": "GRANDPARENT",
+      "title": "Grandparent",
+      "description": null
+    },
+    {
+      "id": "f12ab72c-3d0d-4544-8ffa-fcbef0da2b27",
+      "code": "PARENT",
+      "title": "Parent",
+      "description": null
+    },
+    {
+      "id": "544d4638-3eef-42b5-8eaa-6a5b851eb7b8",
+      "code": "SIBLING",
+      "title": "Sibling",
+      "description": null
+    },
+    {
+      "id": "81b0af81-6bdb-4f94-a27e-eaac4614a59b",
+      "code": "SPOUSE",
+      "title": "Spouse",
+      "description": null
+    }
+  ]
+}

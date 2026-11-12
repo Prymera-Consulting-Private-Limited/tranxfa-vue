@@ -1,0 +1,352 @@
+{
+  "id": "01a14bac-3609-710c-93a7-51139bf18554",
+  "transaction_number": "PV-V2-1226358",
+  "state": {
+    "id": "8301bc4a-a8ae-4904-934c-0dcd59993eec",
+    "code": "PENDING-PAYMENT",
+    "progress": 30,
+    "label": "Pending Payment",
+    "description": "We are waiting for you to complete the payment.",
+    "color_scheme": "yellow"
+  },
+  "status_group": "in_progress",
+  "delivery_time": null,
+  "payment_country": {
+    "id": "a583ceaa-87df-47aa-b522-7e7d48121786",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "payment_currency": {
+    "id": "4afe6d64-5daf-4471-89a2-e0f4adef1ab3",
+    "decimal_places": 2,
+    "iso_numeric": 36,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "AUD",
+    "common_name": "Australian dollar",
+    "official_name": "Australian dollar",
+    "icon_unicode": "$",
+    "code": "AUD",
+    "salary_ranges": null
+  },
+  "payout_country": {
+    "id": "ec5c94e2-927d-424f-b84f-5ff0b4df57a2",
+    "iso2_alpha": "FJ",
+    "iso3_alpha": "FJI",
+    "iso_numeric": "242",
+    "fips_code": "FJ",
+    "slug": "fiji",
+    "calling_code": "679",
+    "common_name": "Fiji",
+    "official_name": "Fiji",
+    "endonym": "Fiji",
+    "demonym": "Fijian, Fiji"
+  },
+  "payout_currency": {
+    "id": "51a43c06-a93a-4ef3-a073-a3e04693a547",
+    "decimal_places": 2,
+    "iso_numeric": 242,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "FJD",
+    "common_name": "Fijian dollar",
+    "official_name": "Fijian dollar",
+    "icon_unicode": "$",
+    "code": "FJD",
+    "salary_ranges": null
+  },
+  "payout_method": {
+    "id": "72bbe68b-23b5-49f9-9d91-588e679de2b8",
+    "code": "MOBILE-WALLET",
+    "title": "Mobile Money",
+    "description": "A secure method allowing users to transfer funds directly to recipient's mobile wallet account.",
+    "instruction": null,
+    "promo": null,
+    "sell_rate_formatted": null
+  },
+  "payout_company": {
+    "id": "a28ce80c-2e72-4a9d-b61d-4bbd6b435c24",
+    "code": "TERRA_PAY",
+    "title": "TerraPay"
+  },
+  "payment": {
+    "id": "01a14bac-363e-726c-a467-9f5e687a5cdc",
+    "payment_method": {
+      "id": "358ac102-863f-496a-9ae8-e26af2590884",
+      "code": "BANK-TRANSFER",
+      "title": "Bank Transfer",
+      "description": "A traditional transaction method where funds are transferred from customer's bank accounts through manual authorization, ensuring a controlled and deliberate payment process."
+    },
+    "payment_provider": {
+      "id": "b51e856b-0dbc-4caa-a323-b73db50f8491",
+      "code": "MONOOVA",
+      "title": "Monoova",
+      "description": "Monoova provides businesses or individuals with a quick way to receive payments."
+    },
+    "total_payment_amount": "29.75",
+    "total_payment_amount_formatted": "29.75",
+    "total_payment_amount_currency_prefixed": "AUD 29.75",
+    "shared_reference": "PV-V2-1226358",
+    "state": {
+      "id": "616c1bc7-01c3-404d-b382-5888dc361281",
+      "code": "PENDING",
+      "color_scheme": "blue"
+    },
+    "payment_account": null,
+    "client_payment_account": {
+      "id": "a28cea63-77fb-4301-8361-37a3df6f3762",
+      "institution_name": "Monoova",
+      "instruction_text": "To complete your payment, please transfer funds to the bank account listed below. Please note that, it may take up to 24 hours, depending on your bank\u2019s processing time.",
+      "wait_time_message": "Thank you for payment. We will process the transfer as soon as we receive the money. Please note that, it may take up to 24 hours, depending on your bank\u2019s processing time.",
+      "payment_reference": "PV-V2-1226358",
+      "attributes": [
+        {
+          "key": "Account Name",
+          "value": "PAYVEL PTY LTD"
+        },
+        {
+          "key": "BSB",
+          "value": "802-985"
+        },
+        {
+          "key": "Account Number",
+          "value": "123456789"
+        }
+      ]
+    },
+    "customer_confirmed_payment": false,
+    "payment_url": null,
+    "awaiting_confirmation": false,
+    "payment_terms": null,
+    "expires_at": "2026-10-22T21:02:19+00:00",
+    "created_at": "2026-10-17T21:02:19.000000Z",
+    "updated_at": "2026-10-17T21:02:22.000000Z"
+  },
+  "payout": {
+    "id": "01a14bac-3678-732d-9247-cfdf5fe03122",
+    "shared_reference": "PV-V2-1226358-001",
+    "collection_pin": null,
+    "collection_pin_available": false,
+    "state": {
+      "id": "5b5fb122-f376-4701-be1f-dfc13f262fb7",
+      "code": "CREATED",
+      "color_scheme": "gray"
+    }
+  },
+  "local_amount": "25.00",
+  "payout_amount": "36.50",
+  "base_fees": "0.00",
+  "local_amount_formatted": "25.00",
+  "payout_amount_formatted": "36.50",
+  "base_fees_formatted": "0.00",
+  "local_amount_currency_prefixed": "AUD 25.00",
+  "payout_amount_currency_prefixed": "FJD 36.50",
+  "base_fees_currency_prefixed": "AUD 0.00",
+  "method_fee": "4.75",
+  "method_fee_formatted": "4.75",
+  "method_fee_currency_prefixed": "AUD 4.75",
+  "coupon_discount_amount": null,
+  "coupon_discount_amount_currency_prefixed": null,
+  "exchange_rate_before_coupon": null,
+  "exchange_rate_before_coupon_formatted": null,
+  "exchange_rate": 1.46,
+  "exchange_rate_formatted": "AUD = 1.46 FJD",
+  "exchange_rate_is_inverse": false,
+  "recipient": {
+    "id": "a2a6273b-0234-456f-ac41-a239084c77a0",
+    "recipient_type": "individual",
+    "name": "Test",
+    "second_name": null,
+    "third_name": null,
+    "whole_name": "Test Recipient",
+    "account_detail": {
+      "account_number": "7000000"
+    },
+    "account_detail_hashmap": [
+      {
+        "type": "account_number",
+        "key": "Mobile Number",
+        "value": "7000000"
+      }
+    ],
+    "attributes": [
+      {
+        "type": "name",
+        "input_mode": null,
+        "context": null,
+        "is_required": null,
+        "label": "Recipient Name",
+        "attribute": "name_on_account",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": null,
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 1,
+        "value": "Test Recipient"
+      },
+      {
+        "type": "account_number",
+        "input_mode": "number",
+        "context": null,
+        "is_required": null,
+        "label": "Mobile Number",
+        "attribute": "mobile_number",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": null,
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 2,
+        "value": "7000000"
+      }
+    ],
+    "relationship": {
+      "id": "5138ae3e-c94b-4284-b3fd-accab75d688d",
+      "code": "FRIEND",
+      "title": "Friend",
+      "description": null
+    },
+    "channel": {
+      "id": "a28ce80b-a7c9-4945-b518-ae3c94d92da6",
+      "attributes": [
+        {
+          "type": "name",
+          "input_mode": null,
+          "context": null,
+          "is_required": null,
+          "label": "Recipient Name",
+          "attribute": "name_on_account",
+          "prefix_addon": null,
+          "suffix_addon": null,
+          "help_text": null,
+          "placeholder_text": null,
+          "regex_pattern": null,
+          "regex_failure_message": null,
+          "mask": null,
+          "min_length": null,
+          "max_length": null,
+          "exact_length": null,
+          "min_value": null,
+          "max_value": null,
+          "exact_value": null,
+          "view_order": 1,
+          "value": "Test Recipient"
+        },
+        {
+          "type": "account_number",
+          "input_mode": "number",
+          "context": null,
+          "is_required": null,
+          "label": "Mobile Number",
+          "attribute": "mobile_number",
+          "prefix_addon": null,
+          "suffix_addon": null,
+          "help_text": null,
+          "placeholder_text": null,
+          "regex_pattern": null,
+          "regex_failure_message": null,
+          "mask": null,
+          "min_length": null,
+          "max_length": null,
+          "exact_length": null,
+          "min_value": null,
+          "max_value": null,
+          "exact_value": null,
+          "view_order": 2,
+          "value": "7000000"
+        }
+      ]
+    },
+    "created_at": null,
+    "updated_at": null
+  },
+  "documents": [
+    {
+      "id": "01a14bac-37ab-7353-86bf-333ecae01bb4",
+      "document_category": {
+        "id": "3dac91f3-a67a-492e-a82c-23d9ff015860",
+        "code": "POI",
+        "title": "Proof of Identity",
+        "description": "Documents that verify the identity of the customer, such as a passport, driver\u2019s license, or national ID card."
+      },
+      "document_type": {
+        "id": "1aa35746-90d5-47e9-9bff-93696c741556",
+        "code": "PASSPORT",
+        "title": "Passport",
+        "description": "A government-issued document that certifies the identity and nationality of the holder for international travel."
+      },
+      "document": {
+        "id": "01a0f80f-0714-70a2-a57f-1574d1e8dcac",
+        "status_code": "approved",
+        "status_title": "Accepted",
+        "created_at": "2026-10-01T15:22:09.000000Z",
+        "updated_at": "2026-10-01T15:22:09.000000Z"
+      },
+      "created_at": "2026-10-17T21:02:20.000000Z",
+      "updated_at": "2026-10-17T21:02:20.000000Z"
+    }
+  ],
+  "pending_documents": [],
+  "timeline": [
+    {
+      "state": {
+        "id": "c9d120d2-ba22-4728-aab9-56c177fa70c8",
+        "code": "CREATED",
+        "progress": 10,
+        "label": "Created",
+        "description": "Your transaction request has been created.",
+        "color_scheme": "gray"
+      },
+      "created_at": "2026-10-17T21:02:19.000000Z"
+    },
+    {
+      "state": {
+        "id": "8301bc4a-a8ae-4904-934c-0dcd59993eec",
+        "code": "PENDING-PAYMENT",
+        "progress": 30,
+        "label": "Pending Payment",
+        "description": "We are waiting for you to complete the payment.",
+        "color_scheme": "yellow"
+      },
+      "created_at": "2026-10-17T21:02:22.000000Z"
+    },
+    {
+      "state": {
+        "id": "6a8f459b-2a4d-4704-997a-d75248c98c78",
+        "code": "PAYOUT-SUCCESS",
+        "progress": 100,
+        "label": "Payout Success",
+        "description": "Congratulations! Payout for your transaction was successful.",
+        "color_scheme": "green"
+      },
+      "created_at": null
+    }
+  ],
+  "created_at": "2026-10-17T21:02:19.000000Z",
+  "updated_at": "2026-10-17T21:02:22.000000Z"
+}

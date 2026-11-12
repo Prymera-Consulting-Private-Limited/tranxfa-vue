@@ -20,11 +20,14 @@ export function useCountryUtils() {
         return countriesStore.countries.data;
     }
 
+    // Replaces the list rather than appending, and returns the request: it
+    // used to push into the shared ref (a second call doubled every country)
+    // and resolve before the countries had arrived.
     async function getSources() {
-        axios.get('/client/v1/countries/source').then((response) => {
-            for (const data of response.data.data) {
-                sources.value.push(Country.getInstance(data));
-            }
+        return axios.get('/client/v1/countries/source').then((response) => {
+            sources.value = response.data.data.map((data) => Country.getInstance(data));
+
+            return response;
         })
     }
 
