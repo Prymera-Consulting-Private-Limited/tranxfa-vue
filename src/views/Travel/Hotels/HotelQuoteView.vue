@@ -19,7 +19,7 @@ import TravelQuote from '@/models/travel/quote.js';
 import HotelPriceChange from '@/models/travel/hotels/hotel_price_change.js';
 import HotelBookingRefusalType from '@/enums/hotel_booking_refusal_type.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
-import {getGuestSummary, getStayLabel, useHotelUtils} from '@/composables/travel/hotels/hotel_utils.js';
+import {getGuestSummary, getIncludedNote, getPriceLines, getStayLabel, useHotelUtils} from '@/composables/travel/hotels/hotel_utils.js';
 import {useOrderUtils} from '@/composables/travel/order_utils.js';
 import {CalendarDaysIcon, ClockIcon, ExclamationTriangleIcon, MapPinIcon, UserGroupIcon} from '@heroicons/vue/24/outline';
 
@@ -81,8 +81,9 @@ const stay = computed(() => getStayLabel(quote.value?.checkIn, quote.value?.chec
 const guests = computed(() => (quote.value ? getGuestSummary(quote.value.rooms) : null));
 
 // A line of nothing, such as "Taxes and fees" on a rate the supplier taxes
-// nothing on, is left out here as it is on the hotel page.
-const priceLines = computed(() => (quote.value?.breakdown ?? []).filter(line => line.amount.amount !== 0));
+// nothing on, is left out here as it is on the hotel page, and the taxes inside
+// the room are named under it (SD-2006).
+const priceLines = computed(() => getPriceLines(quote.value?.breakdown));
 
 /**
  * The quote is held rather than recalculated — the price, the rule behind it and
@@ -350,7 +351,12 @@ onUnmounted(() => clearInterval(clock));
             </header>
             <dl class="divide-y divide-gray-100">
               <div v-for="line in priceLines" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
-                <dt class="min-w-0 text-sm/6 text-gray-500">{{ line.label }}</dt>
+                <dt class="min-w-0 text-sm/6 text-gray-500">
+                  {{ line.label }}
+                  <!-- Under the label and out of the amounts' column, so a tax
+                  inside the room never reads as a charge beside it. -->
+                  <span v-if="line.included.length" class="block pl-3 text-xs/5">{{ getIncludedNote(line) }}</span>
+                </dt>
                 <dd class="shrink-0 text-sm/6 text-gray-900 tabular-nums">{{ line.amount.currencyPrefixed }}</dd>
               </div>
               <div class="flex items-baseline justify-between gap-4 bg-gray-50/70 px-5 py-3">

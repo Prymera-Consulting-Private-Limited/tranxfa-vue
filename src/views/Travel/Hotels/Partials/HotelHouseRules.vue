@@ -3,7 +3,7 @@ import {computed} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {prettifyLabel} from '@/composables/travel/hotels/hotel_utils.js';
 
-const {t} = useI18n();
+const {t, n} = useI18n();
 
 const props = defineProps({
   /**
@@ -81,6 +81,13 @@ function ages(charge) {
  * @returns {string}
  */
 function description(charge) {
+  // A charge stated as a share has no sum and no currency, and is not unstated:
+  // "20% per person, per stay" (SD-2006). The number is the locale's, so 12.5
+  // reads as the customer writes it.
+  if (charge.percentage !== null) {
+    return [t('travel.percentage', {percentage: n(charge.percentage)}), label(charge.chargeUnit)].filter(Boolean).join(' ');
+  }
+
   if (charge.amount.isStated && charge.amount.amount > 0) {
     // The unit is written to read after the amount: "USD 18.50 per vehicle, per night".
     return [charge.amount.currencyPrefixed, label(charge.chargeUnit)].filter(Boolean).join(' ');
@@ -134,19 +141,9 @@ function classes(charge) {
 }
 
 // Since SD-1839 the list holds every rule the hotel states, and only some of
-// them carry a price: an included breakfast or a no-show rule has none.
-const priced = computed(() => props.charges.filter(charge => charge.amount.isStated));
-
-// The prices are in the property's own currency rather than the customer's, so
-// where they differ that has to be said outright.
-const currencies = computed(() => [...new Set(priced.value.map(charge => charge.currency).filter(Boolean))]);
-
-// One sentence per key, and the currencies decide which of the two is used.
-// Rendered as three fragments back to back, the space before the currencies
-// was dropped, and a sentence assembled that way cannot be translated.
-const collectedNote = computed(() => (currencies.value.length
-    ? t('travel.collectedByTheHotelAndChargedIn', {currencies: currencies.value.join(t('common.listJoin'))})
-    : t('travel.collectedByTheHotel')));
+// them carry a price: an included breakfast or a no-show rule has none. A share
+// of something, such as a 20% deposit, is collected by the hotel all the same.
+const priced = computed(() => props.charges.filter(charge => charge.amount.isStated || charge.percentage !== null));
 
 const hasAnything = computed(() => props.rules.length > 0 || props.charges.length > 0);
 
@@ -171,8 +168,9 @@ function paragraphs(body) {
       <header class="border-b border-gray-100 px-5 py-4">
         <h3 class="text-sm/6 font-semibold text-gray-900">{{ $t('travel.extrasAndConditions') }}</h3>
         <!-- Only a price is collected at the desk, so only where there is one
-        does the hotel's currency need saying. -->
-        <p v-if="priced.length" class="mt-0.5 text-xs/5 text-gray-500">{{ collectedNote }}</p>
+        does that need saying. The note names no currency: each price carries
+        its own, and one hotel can state several (SD-2006). -->
+        <p v-if="priced.length" class="mt-0.5 text-xs/5 text-gray-500">{{ $t('travel.collectedByTheHotel') }}</p>
       </header>
       <ul class="divide-y divide-gray-100">
         <!-- By position: one type can carry several charges (two meals, two

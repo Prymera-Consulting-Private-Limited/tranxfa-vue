@@ -75,7 +75,12 @@ class HotelRate {
      * What the customer pays us, line by line, already labelled for display.
      * A line can legitimately be zero — search results do not itemise taxes.
      *
-     * @type {Array<{key: string, label: string, amount: Money}>}
+     * Since SD-2006 a tax names the line it is part of (`includedIn`, the room),
+     * and the room carries its price with those taxes (`amountWithIncluded`), so
+     * the app can show the room as the supplier prices it without adding money
+     * up. A console before SD-2006 sends neither: null, and an unstated amount.
+     *
+     * @type {Array<{key: string, label: string, includedIn: string|null, amount: Money, amountWithIncluded: Money}>}
      */
     breakdown = [];
 
@@ -123,7 +128,9 @@ class HotelRate {
             rate.breakdown = data.breakdown.map(line => ({
                 key: line.key,
                 label: line.label,
+                includedIn: line.included_in ?? null,
                 amount: Money.getInstance(line, 'amount'),
+                amountWithIncluded: Money.getInstance(line, 'amount_with_included'),
             }));
         }
 

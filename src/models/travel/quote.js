@@ -81,9 +81,10 @@ class TravelQuote {
 
     /**
      * Guaranteed to sum to the total — the total is the sum of these rather than
-     * a separately converted figure.
+     * a separately converted figure. The taxes inside the room say so, as on the
+     * rate (SD-2006; see HotelRate.breakdown).
      *
-     * @type {Array<{key: string, label: string, amount: Money}>}
+     * @type {Array<{key: string, label: string, includedIn: string|null, amount: Money, amountWithIncluded: Money}>}
      */
     breakdown = [];
 
@@ -162,7 +163,9 @@ class TravelQuote {
         quote.breakdown = (data.breakdown ?? []).map(line => ({
             key: line.key,
             label: line.label,
+            includedIn: line.included_in ?? null,
             amount: Money.getInstance(line, 'amount'),
+            amountWithIncluded: Money.getInstance(line, 'amount_with_included'),
         }));
 
         quote.total = Money.getInstance(data, 'total');

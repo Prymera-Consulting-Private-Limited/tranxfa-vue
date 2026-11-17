@@ -100,4 +100,27 @@ describe('TravelQuote.getInstance', () => {
     it('defaults labels to an empty dictionary', () => {
         expect(TravelQuote.getInstance(quotePayload({ labels: undefined })).labels).toEqual({})
     })
+
+    // SD-2006. A tax names the line it is part of, and the room carries its
+    // price with the tax inside.
+    it('reads which line each tax is part of, and the room with its taxes inside', () => {
+        const quote = TravelQuote.getInstance(quotePayload({
+            breakdown: [
+                { key: 'room', label: 'Room', included_in: null, amount: 20000, amount_currency_prefixed: 'USD 200.00', amount_with_included: 22000, amount_with_included_decimal: '220.00', amount_with_included_formatted: '220.00', amount_with_included_currency_prefixed: 'USD 220.00' },
+                { key: 'tax_vat', label: 'VAT', included_in: 'room', amount: 2000, amount_currency_prefixed: 'USD 20.00', amount_with_included: 2000, amount_with_included_currency_prefixed: 'USD 20.00' },
+                { key: 'convenience_fee', label: 'Convenience fee', included_in: null, amount: 1000, amount_currency_prefixed: 'USD 10.00', amount_with_included: 1000, amount_with_included_currency_prefixed: 'USD 10.00' },
+            ],
+        }))
+
+        expect(quote.breakdown.map(line => line.includedIn)).toEqual([null, 'room', null])
+        expect(quote.breakdown[0].amountWithIncluded.amount).toBe(22000)
+        expect(quote.breakdown[0].amountWithIncluded.currencyPrefixed).toBe('USD 220.00')
+    })
+
+    it('reads a line from a console before SD-2006 as part of nothing, with no figure inside it', () => {
+        const [room] = TravelQuote.getInstance(quotePayload()).breakdown
+
+        expect(room.includedIn).toBeNull()
+        expect(room.amountWithIncluded.isStated).toBe(false)
+    })
 })

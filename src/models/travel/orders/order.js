@@ -157,7 +157,11 @@ class Order {
     confirmation = null;
 
     /**
-     * @type {Array<{key: string, label: string, amount: Money}>}
+     * A hotel order's taxes say which line they are part of, as on the rate
+     * (SD-2006; see HotelRate.breakdown). A flight's are charged beside the
+     * fare, so its lines carry neither field and read null and unstated.
+     *
+     * @type {Array<{key: string, label: string, includedIn: string|null, amount: Money, amountWithIncluded: Money}>}
      */
     breakdown = [];
 
@@ -312,7 +316,9 @@ class Order {
         order.breakdown = (data.breakdown ?? []).map(line => ({
             key: line.key,
             label: line.label,
+            includedIn: line.included_in ?? null,
             amount: Money.getInstance(line, 'amount'),
+            amountWithIncluded: Money.getInstance(line, 'amount_with_included'),
         }));
 
         order.payments = OrderPayment.getCollection(data.payments ?? []);

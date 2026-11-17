@@ -20,7 +20,10 @@
   "guests": {"rooms": [{"guests": [{"first_name": "Test", "last_name": "Customer", "is_child": false}, {"first_name": "Second", "last_name": "Guest", "is_child": false}]}]},
   "contact": {"email": "customer@example.test", "phone": null},
   "breakdown": [
-    {"key": "room", "label": "Room", "amount": 48250, "amount_decimal": "482.50", "amount_formatted": "482.50", "amount_currency_prefixed": "AUD 482.50"}
+    {"key": "room", "label": "Room", "included_in": null, "amount": 40310, "amount_decimal": "403.10", "amount_formatted": "403.10", "amount_currency_prefixed": "AUD 403.10", "amount_with_included": 45147, "amount_with_included_decimal": "451.47", "amount_with_included_formatted": "451.47", "amount_with_included_currency_prefixed": "AUD 451.47"},
+    {"key": "tax_resort_fee", "label": "Resort fee", "included_in": "room", "amount": 806, "amount_decimal": "8.06", "amount_formatted": "8.06", "amount_currency_prefixed": "AUD 8.06", "amount_with_included": 806, "amount_with_included_decimal": "8.06", "amount_with_included_formatted": "8.06", "amount_with_included_currency_prefixed": "AUD 8.06"},
+    {"key": "tax_service_fee", "label": "Service fee", "included_in": "room", "amount": 4031, "amount_decimal": "40.31", "amount_formatted": "40.31", "amount_currency_prefixed": "AUD 40.31", "amount_with_included": 4031, "amount_with_included_decimal": "40.31", "amount_with_included_formatted": "40.31", "amount_with_included_currency_prefixed": "AUD 40.31"},
+    {"key": "convenience_fee", "label": "Convenience fee", "included_in": null, "amount": 3103, "amount_decimal": "31.03", "amount_formatted": "31.03", "amount_currency_prefixed": "AUD 31.03", "amount_with_included": 3103, "amount_with_included_decimal": "31.03", "amount_with_included_formatted": "31.03", "amount_with_included_currency_prefixed": "AUD 31.03"}
   ],
   "payments": [],
   "cancellation": null,

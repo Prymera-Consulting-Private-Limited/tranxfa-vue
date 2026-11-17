@@ -74,6 +74,16 @@ class HouseRuleCharge {
      */
     amount = null;
 
+    /**
+     * The charge as a share, when that is how the hotel states it: a breakage
+     * deposit of 20% (SD-2006). The amount and the currency are then unstated,
+     * because there is no sum to show. Null on every other charge, and on every
+     * charge from a console before SD-2006.
+     *
+     * @type {number|null}
+     */
+    percentage = null;
+
     static getInstance(data) {
         const charge = new HouseRuleCharge();
 
@@ -85,6 +95,7 @@ class HouseRuleCharge {
         charge.chargeUnit = data.charge_unit ?? null;
         charge.currency = data.currency ?? null;
         charge.amount = Money.getInstance(data, 'amount');
+        charge.percentage = data.percentage ?? null;
 
         return charge;
     }
