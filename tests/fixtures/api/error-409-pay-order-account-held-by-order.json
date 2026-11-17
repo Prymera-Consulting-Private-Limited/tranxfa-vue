@@ -1,0 +1,11 @@
+{
+  "type": "account_held",
+  "message": "Another payment is still holding your account while we wait for it. Please pay it or cancel it first, or try again later.",
+  "held_by": {
+    "kind": "service_order",
+    "id": "01a0a76b-3e9f-72db-98b0-89f04386670b",
+    "reference": "VO-01M2KPPFMZH9Z51HHBRKAE41DE",
+    "payment_id": "01a0b6a0-7dd0-71cd-bab0-d81a26ef6b1e",
+    "service": "HOTELS"
+  }
+}

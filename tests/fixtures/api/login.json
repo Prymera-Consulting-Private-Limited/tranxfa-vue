@@ -1,0 +1,370 @@
+{
+  "id": "a2af1126-874a-436f-a0c8-2521909344f6",
+  "crn": "TC466128",
+  "name": "Ada",
+  "second_name": "Lovelace",
+  "third_name": null,
+  "whole_name": "Ada Lovelace",
+  "unique_identity_number": null,
+  "is_blocked_for_sending": false,
+  "account": {
+    "email": "re************************@gmail.com",
+    "is_email_verified": true,
+    "password_changed_at": null,
+    "mobile_number_country": {
+      "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+      "iso2_alpha": "AU",
+      "iso3_alpha": "AUS",
+      "iso_numeric": "36",
+      "fips_code": "AS",
+      "slug": "australia",
+      "calling_code": "61",
+      "common_name": "Australia",
+      "official_name": "Australia",
+      "endonym": "Australia",
+      "demonym": "Australian, Australia"
+    },
+    "mobile_number": "410005537",
+    "mobile_number_verified": false,
+    "created_at": "2026-09-06T20:51:46.000000Z",
+    "updated_at": "2026-09-06T20:51:48.000000Z"
+  },
+  "session": {
+    "id": "a2af1129-60c1-4abe-b28b-a6b63e848b31",
+    "is_mfa_completed": false,
+    "mfa_method": null,
+    "client_version": "8.7",
+    "os_version": null,
+    "ip_address": {
+      "id": "a2af1129-603d-4961-ab08-0030d1d68960",
+      "ip_address": "122.163.122.32"
+    },
+    "device": {
+      "id": "a2af1126-4066-4f6b-b82c-b5630b9f1db6",
+      "device_type": "library",
+      "client_code": null,
+      "client_name": "curl",
+      "client_version": "8.7",
+      "os_code": null,
+      "os_name": null,
+      "os_version": null,
+      "architecture": null,
+      "vendor": "",
+      "model": ""
+    },
+    "touched_at": "2026-09-06T20:51:49.000000Z",
+    "created_at": "2026-09-06T20:51:49.000000Z",
+    "updated_at": "2026-09-06T20:51:49.000000Z"
+  },
+  "country": {
+    "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "nationality": {
+    "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "address": {
+    "address_line_1": "1 Collins Street",
+    "address_line_2": null,
+    "city": "Melbourne",
+    "postcode": "3000",
+    "region": "VIC",
+    "created_at": "2026-09-06T20:51:48.000000Z",
+    "updated_at": "2026-09-06T20:51:48.000000Z"
+  },
+  "birth_detail": {
+    "birth_date": "1990-12-10",
+    "city": null,
+    "country_id": null,
+    "nationality_id": null,
+    "created_at": "2026-09-06T20:51:47.000000Z",
+    "updated_at": "2026-09-06T20:51:47.000000Z"
+  },
+  "created_at": "2026-09-06T20:51:47.000000Z",
+  "updated_at": "2026-09-06T20:51:47.000000Z",
+  "attributes": [
+    {
+      "attribute": "name",
+      "input_mode": null,
+      "category": "identity",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "First Name",
+      "info_text": "Enter your first name exactly as it appears on your proof of identity document.",
+      "placeholder_text": null,
+      "is_required": true,
+      "value": "Ada"
+    },
+    {
+      "attribute": "second_name",
+      "input_mode": null,
+      "category": "identity",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Last Name",
+      "info_text": "Enter your last name exactly as it appears on your proof of identity document.",
+      "placeholder_text": null,
+      "is_required": true,
+      "value": "Lovelace"
+    },
+    {
+      "attribute": "nationality_id",
+      "input_mode": null,
+      "category": "identity",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Nationality",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd"
+    },
+    {
+      "attribute": "address.address_line_1",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Address Line 1",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": "1 Collins Street"
+    },
+    {
+      "attribute": "address.address_line_2",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Address Line 2",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": false,
+      "value": null
+    },
+    {
+      "attribute": "address.city",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "City",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": "Melbourne"
+    },
+    {
+      "attribute": "address.postcode",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": "/^(0[289][0-9]{2})|([1-9][0-9]{3})$/",
+      "mask": null,
+      "expression_error_message": "Provided postcode is not a valid AU postcode.",
+      "rules": null,
+      "label": "Postcode",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": "3000"
+    },
+    {
+      "attribute": "address.region",
+      "input_mode": null,
+      "category": "address",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "State",
+      "info_text": null,
+      "placeholder_text": null,
+      "is_required": true,
+      "value": "VIC"
+    },
+    {
+      "attribute": "birth_detail.birth_date",
+      "input_mode": null,
+      "category": "identity",
+      "regular_expression": null,
+      "mask": null,
+      "expression_error_message": null,
+      "rules": null,
+      "label": "Date of Birth",
+      "info_text": "Enter your date of birth exactly as it appears on your proof of identity document.",
+      "placeholder_text": null,
+      "is_required": true,
+      "value": "1990-12-10T00:00:00.000000Z"
+    }
+  ],
+  "documents": [],
+  "pending_documents": [
+    {
+      "id": "93ba70bd-f910-4323-84cf-2fc63b2472b2",
+      "code": "POI",
+      "title": "Proof of Identity",
+      "description": "Documents that verify the identity of the customer, such as a passport, driver\u2019s license, or national ID card.",
+      "document_types": [
+        {
+          "id": "f495196f-047c-4a3a-962f-845409fddaf8",
+          "code": "PASSPORT",
+          "title": "Passport",
+          "description": "A government-issued document that certifies the identity and nationality of the holder for international travel.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SUMSUB"
+        },
+        {
+          "id": "0ab35156-a21d-467f-ab08-395cfcacc0a3",
+          "code": "DRIVERS_LICENSE",
+          "title": "Driver's License",
+          "description": "An official document permitting a specific individual to operate one or more types of motorized vehicles.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SUMSUB"
+        }
+      ]
+    },
+    {
+      "id": "4cebd969-1c58-4338-941c-2be7eeb81cb3",
+      "code": "POA",
+      "title": "Proof of Address",
+      "description": "Documents that confirm the customer\u2019s residential address, such as utility bills, bank statements, or rental agreements.",
+      "document_types": [
+        {
+          "id": "0ab35156-a21d-467f-ab08-395cfcacc0a3",
+          "code": "DRIVERS_LICENSE",
+          "title": "Driver's License",
+          "description": "An official document permitting a specific individual to operate one or more types of motorized vehicles.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        },
+        {
+          "id": "c845526b-d9b7-4a69-a20d-80297b63a740",
+          "code": "BANK_STATEMENT",
+          "title": "Bank Account Statement",
+          "description": "A document issued by a bank detailing the account holder\u2019s transactions and balance over a specific period.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        },
+        {
+          "id": "f441207f-368b-4f5c-a292-6bf82710fde5",
+          "code": "UTILITY_BILL",
+          "title": "Utility Bill",
+          "description": "A document issued by a utility service provider that confirms the customer\u2019s residential address.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        },
+        {
+          "id": "fb4caf00-ee9e-4969-b408-2bde274dd4ec",
+          "code": "COUNCIL_TAX_BILL",
+          "title": "Council Tax Bill",
+          "description": "A document issued by the local council in the UK, used as proof of residence and address verification.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        }
+      ]
+    },
+    {
+      "id": "87a5cd11-5883-4479-88f0-18e367a49860",
+      "code": "SOF",
+      "title": "Source of Funds",
+      "description": "Documents that provide evidence of the source of the customer\u2019s funds, such as payslips, bank statements, or tax returns.",
+      "document_types": [
+        {
+          "id": "c845526b-d9b7-4a69-a20d-80297b63a740",
+          "code": "BANK_STATEMENT",
+          "title": "Bank Account Statement",
+          "description": "A document issued by a bank detailing the account holder\u2019s transactions and balance over a specific period.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        },
+        {
+          "id": "eb6fff80-dd30-4e16-96ab-86c10f214683",
+          "code": "SALARY_SLIP",
+          "title": "Salary Slip",
+          "description": "A document provided by an employer that outlines an employee\u2019s earnings, deductions, and net pay for a specific period.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        },
+        {
+          "id": "f6709697-9038-45be-b5aa-a7b32be90da1",
+          "code": "LOAN_AGREEMENT",
+          "title": "Loan Agreement",
+          "description": "A formal agreement between a borrower and a lender outlining the terms and conditions of a loan, including repayment schedules, interest rates, and other relevant details.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        },
+        {
+          "id": "43bbb2b5-0a64-49ca-accb-61b2dd461fe0",
+          "code": "RE_MORTGAGE_STATEMENT",
+          "title": "Re-Mortgage Statement",
+          "description": "A statement detailing the financial transactions and balances associated with a re-mortgage, typically provided by the lender or financial institution managing the mortgage.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        },
+        {
+          "id": "fd65aed6-4814-4a39-9e51-de70ef1d3319",
+          "code": "SAVINGS_ACCOUNT_STATEMENT",
+          "title": "Savings Account Statement",
+          "description": "A document provided by a financial institution that details the transactions, deposits, withdrawals, and current balance of a customer's savings account.",
+          "public_upload": true,
+          "info": null,
+          "document_number_label": "Document Number",
+          "api": "SYSTEM"
+        }
+      ]
+    }
+  ],
+  "poi_info_check": "undeterministic"
+}

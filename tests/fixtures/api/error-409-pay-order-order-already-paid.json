@@ -1,0 +1,4 @@
+{
+  "type": "order_already_paid",
+  "message": "This order has already been paid for."
+}

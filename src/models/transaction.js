@@ -4,6 +4,24 @@ import TransactionState from "@/models/transaction_state.js";
 import PaymentTransaction from "@/models/payment_transaction.js";
 import TransactionDocument from "@/models/transaction_document.js";
 import PayoutTransaction from "@/models/payout_transaction.js";
+import PaymentState from "@/enums/payment_state.js";
+import TransactionStateCode from "@/enums/transaction_state.js";
+
+// Still being paid for: nothing has cleared and the platform has not closed it.
+const AWAITING_PAYMENT = [TransactionStateCode.CREATED, TransactionStateCode.INITIATED, TransactionStateCode['PENDING-PAYMENT']];
+
+// Waiting for the customer's money. REDIRECTED is the customer at the provider,
+// or having said "I've paid"; the api refuses to cancel it.
+const WAITING = [PaymentState.CREATED, PaymentState.INITIALIZED, PaymentState.PENDING];
+
+// Over without any money moving, so the transfer can open a new payment.
+const ENDED_UNPAID = [PaymentState.CANCELLED, PaymentState.FAILED, PaymentState.TIMED_OUT];
+
+// Gateways that really stop expecting the money when a payment is cancelled
+// (SD-1422): Monoova releases its reconciliation rule, and a manual bank
+// transfer holds nothing anywhere. On a hosted checkout the provider's page stays
+// live, so a cancelled payment can still be paid there and needs a refund by hand.
+const CANCELLABLE_PROVIDERS = ['MONOOVA', 'MANUAL-PAYMENT'];
 
 class Transaction extends BaseTransaction {
     /**
@@ -50,11 +68,69 @@ class Transaction extends BaseTransaction {
      * @type {number|null}
      */
     transactionNumber = null;
+
+    /**
+     * What the payment method added on top of the base fee, as a decimal
+     * string; "0.00" for a method that adds nothing, null from a console older
+     * than 2026.10.6 (SD-1746). The total paid already includes it.
+     *
+     * @type {string|null}
+     */
+    methodFee = null;
+
+    /**
+     * @type {string|null}
+     */
+    methodFeeCurrencyPrefixed = null;
+
+    /**
+     * Whether the receipt needs a line for the payment method's fee.
+     *
+     * @returns {boolean}
+     */
+    get hasMethodFee() {
+        return this.methodFee !== null && Number(this.methodFee) !== 0;
+    }
+
+    get isAwaitingPayment() {
+        return AWAITING_PAYMENT.includes(this.state?.code);
+    }
+
+    /**
+     * The customer can still pay into this payment, so its bank details are
+     * worth showing.
+     */
+    get hasOpenPayment() {
+        return [...WAITING, PaymentState.REDIRECTED].includes(this.payment?.state?.code);
+    }
+
+    /**
+     * Offer Cancel payment (SD-1418). Never once the customer has said they
+     * paid: a deposit that lands on a cancelled payment is not credited to the
+     * transfer, and an operator has to place it by hand.
+     */
+    get canCancelPayment() {
+        return this.isAwaitingPayment
+            && WAITING.includes(this.payment?.state?.code)
+            && this.payment.customerConfirmedPayment !== true
+            && CANCELLABLE_PROVIDERS.includes(this.payment.paymentProvider?.code);
+    }
+
+    /**
+     * Offer Pay again: a new payment on the same transfer, at its original
+     * amount and rate. A transfer the platform has closed cannot be paid.
+     */
+    get canPayAgain() {
+        return this.isAwaitingPayment && ENDED_UNPAID.includes(this.payment?.state?.code);
+    }
+
     static getInstance(data) {
         const transaction = new Transaction();
         transaction.createdAt = data.created_at;
         transaction.updatedAt = data.updated_at;
         transaction.transactionNumber = data.transaction_number;
+        transaction.methodFee = data.method_fee ?? null;
+        transaction.methodFeeCurrencyPrefixed = data.method_fee_currency_prefixed ?? null;
         if (data.recipient) {
             transaction.recipient = Recipient.getInstance(data.recipient);
         }

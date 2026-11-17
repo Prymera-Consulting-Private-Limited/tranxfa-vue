@@ -1,0 +1,14 @@
+{
+  "message": "Please select your relationship to the recipient. (and 2 more errors)",
+  "errors": {
+    "relationship_id": [
+      "Please select your relationship to the recipient."
+    ],
+    "mobile_number": [
+      "The mobile number field is required."
+    ],
+    "name_on_account": [
+      "The recipient name field is required."
+    ]
+  }
+}

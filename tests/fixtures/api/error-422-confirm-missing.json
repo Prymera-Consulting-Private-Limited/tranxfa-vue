@@ -1,0 +1,14 @@
+{
+  "message": "The purpose id field is required. (and 2 more errors)",
+  "errors": {
+    "purpose_id": [
+      "The purpose id field is required."
+    ],
+    "payment_method_id": [
+      "The payment method id field is required."
+    ],
+    "third_party_declaration_accepted": [
+      "The third party declaration accepted field must be accepted."
+    ]
+  }
+}
