@@ -31,26 +31,54 @@
     {
       "key": "room",
       "label": "Room",
+      "included_in": null,
       "amount": 72064,
       "amount_decimal": "720.64",
       "amount_formatted": "720.64",
-      "amount_currency_prefixed": "AUD 720.64"
+      "amount_currency_prefixed": "AUD 720.64",
+      "amount_with_included": 80998,
+      "amount_with_included_decimal": "809.98",
+      "amount_with_included_formatted": "809.98",
+      "amount_with_included_currency_prefixed": "AUD 809.98"
     },
     {
-      "key": "taxes_and_fees",
-      "label": "Taxes and fees",
-      "amount": 8934,
-      "amount_decimal": "89.34",
-      "amount_formatted": "89.34",
-      "amount_currency_prefixed": "AUD 89.34"
+      "key": "tax_resort_fee",
+      "label": "Resort fee",
+      "included_in": "room",
+      "amount": 1487,
+      "amount_decimal": "14.87",
+      "amount_formatted": "14.87",
+      "amount_currency_prefixed": "AUD 14.87",
+      "amount_with_included": 1487,
+      "amount_with_included_decimal": "14.87",
+      "amount_with_included_formatted": "14.87",
+      "amount_with_included_currency_prefixed": "AUD 14.87"
+    },
+    {
+      "key": "tax_service_fee",
+      "label": "Service fee",
+      "included_in": "room",
+      "amount": 7447,
+      "amount_decimal": "74.47",
+      "amount_formatted": "74.47",
+      "amount_currency_prefixed": "AUD 74.47",
+      "amount_with_included": 7447,
+      "amount_with_included_decimal": "74.47",
+      "amount_with_included_formatted": "74.47",
+      "amount_with_included_currency_prefixed": "AUD 74.47"
     },
     {
       "key": "convenience_fee",
       "label": "Convenience fee",
+      "included_in": null,
       "amount": 1731,
       "amount_decimal": "17.31",
       "amount_formatted": "17.31",
-      "amount_currency_prefixed": "AUD 17.31"
+      "amount_currency_prefixed": "AUD 17.31",
+      "amount_with_included": 1731,
+      "amount_with_included_decimal": "17.31",
+      "amount_with_included_formatted": "17.31",
+      "amount_with_included_currency_prefixed": "AUD 17.31"
     }
   ],
   "total": 82729,

@@ -145,6 +145,51 @@ describe('HotelRate.getInstance', () => {
 
         warn.mockRestore()
     })
+
+    // SD-2006. The console's own example: a USD rate with two named taxes
+    // inside the room.
+    const INCLUDED_TAXES = [
+        { key: 'room', label: 'Room', included_in: null, amount: 102802, amount_formatted: '1,028.02', amount_currency_prefixed: 'USD 1,028.02', amount_with_included: 115546, amount_with_included_decimal: '1155.46', amount_with_included_formatted: '1,155.46', amount_with_included_currency_prefixed: 'USD 1,155.46' },
+        { key: 'tax_resort_fee', label: 'Resort fee', included_in: 'room', amount: 2124, amount_formatted: '21.24', amount_currency_prefixed: 'USD 21.24', amount_with_included: 2124, amount_with_included_decimal: '21.24', amount_with_included_formatted: '21.24', amount_with_included_currency_prefixed: 'USD 21.24' },
+        { key: 'tax_service_fee', label: 'Service fee', included_in: 'room', amount: 10620, amount_formatted: '106.20', amount_currency_prefixed: 'USD 106.20', amount_with_included: 10620, amount_with_included_decimal: '106.20', amount_with_included_formatted: '106.20', amount_with_included_currency_prefixed: 'USD 106.20' },
+        { key: 'convenience_fee', label: 'Convenience fee', included_in: null, amount: 4673, amount_formatted: '46.73', amount_currency_prefixed: 'USD 46.73', amount_with_included: 4673, amount_with_included_decimal: '46.73', amount_with_included_formatted: '46.73', amount_with_included_currency_prefixed: 'USD 46.73' },
+    ]
+
+    const includedTaxesRate = () => ratePayload({ breakdown: INCLUDED_TAXES, total: 120219, total_formatted: '1,202.19', total_currency_prefixed: 'USD 1,202.19' })
+
+    it('reads which line each tax is part of, and the room with its taxes inside', () => {
+        const [room, resortFee, , fee] = HotelRate.getInstance(includedTaxesRate()).breakdown
+
+        expect(room.includedIn).toBeNull()
+        expect(room.amount.currencyPrefixed).toBe('USD 1,028.02')
+        expect(room.amountWithIncluded.amount).toBe(115546)
+        expect(room.amountWithIncluded.decimal).toBe('1155.46')
+        expect(room.amountWithIncluded.formatted).toBe('1,155.46')
+        expect(room.amountWithIncluded.currencyPrefixed).toBe('USD 1,155.46')
+        expect(resortFee.includedIn).toBe('room')
+        expect(resortFee.amountWithIncluded.currencyPrefixed).toBe('USD 21.24')
+        expect(fee.includedIn).toBeNull()
+    })
+
+    it('reads a line from a console before SD-2006 as part of nothing, with no figure inside it', () => {
+        const [room] = HotelRate.getInstance(ratePayload()).breakdown
+
+        expect(room.includedIn).toBeNull()
+        expect(room.amountWithIncluded.isStated).toBe(false)
+        expect(room.amountWithIncluded.currencyPrefixed).toBeNull()
+    })
+
+    // The lines still add up to the total at their own amounts, so the check
+    // must not start warning about a rate whose taxes are inside the room.
+    it('stays quiet about a rate whose taxes sit inside the room', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+        HotelRate.getInstance(includedTaxesRate())
+
+        expect(warn).not.toHaveBeenCalled()
+
+        warn.mockRestore()
+    })
 })
 
 describe('Hotel.getInstance', () => {

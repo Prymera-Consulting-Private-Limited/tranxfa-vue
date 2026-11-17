@@ -12,6 +12,8 @@ import HotelHouseRules from "@/views/Travel/Hotels/Partials/HotelHouseRules.vue"
 // dropping its euro, children's and check-out charges: 18 lines where there
 // were 9. travel-hotel-view-extras is that hotel as console PR #638 lists it,
 // written by hand until staging carries it - see tests/fixtures/README.md.
+// SD-2006 added a 19th, the supplier's own example of a deposit stated as a
+// share: breakage, 20%, per person, per stay.
 
 afterEach(() => {
     vi.restoreAllMocks();
@@ -55,8 +57,8 @@ describe('a hotel\'s extras', () => {
     it('lists every charge the hotel makes, one line each', () => {
         const {hotel, labels} = conrad();
 
-        expect(hotel.charges).toHaveLength(18);
-        expect(lines(render(hotel.charges, labels))).toHaveLength(18);
+        expect(hotel.charges).toHaveLength(19);
+        expect(lines(render(hotel.charges, labels))).toHaveLength(19);
     });
 
     it('reads each line as type, then which one, then the ages, beside its own price', () => {
@@ -137,11 +139,23 @@ describe('a hotel\'s extras', () => {
         // than as a price.
         expect(prices.filter(price => price.startsWith('USD '))).toHaveLength(9);
         expect(prices.filter(price => price.startsWith('EUR '))).toHaveLength(8);
-        // The header names both currencies, and there is a line per charge and
-        // no more, so nothing on the list is a sum of the others.
-        expect(wrapper.find('header').text()).toContain('EUR');
-        expect(wrapper.find('header').text()).toContain('USD');
+        // A line per charge and no more, so nothing on the list is a sum of the
+        // others.
         expect(prices).toHaveLength(hotel.charges.length);
+    });
+
+    // SD-2006. The note listed the currencies of the hotel's priced charges -
+    // "charged in USD and EUR" here - and the supplier read it as a fixed rule
+    // about every hotel. Each price carries its own currency, so the note says
+    // only who collects them.
+    it('names no currency in the note, though the hotel charges in two', () => {
+        const {hotel, labels} = conrad();
+        const header = render(hotel.charges, labels).find('header').text();
+
+        expect(new Set(hotel.charges.map(charge => charge.currency).filter(Boolean))).toEqual(new Set(['USD', 'EUR']));
+        expect(header).toContain('Prices here are collected by the hotel rather than by us, so they are not part of your total.');
+        expect(header).not.toMatch(/\b(USD|EUR)\b/);
+        expect(header).not.toContain('charged in');
     });
 
     it('gives two charges of one type a line each, not one shared identity', async () => {
@@ -190,16 +204,66 @@ describe('every rule a hotel states', () => {
         expect(render([included], labels).find('header').text()).not.toContain('collected by the hotel');
 
         const parking = charge({type: 'PARKING', currency: 'EUR', amount: 1800, amount_decimal: '18.00', amount_formatted: '18.00', amount_currency_prefixed: 'EUR 18.00'});
-        // A currency on an unpriced rule is not one anything is charged in.
         const header = render([parking, {...included, currency: 'JPY'}], labels).find('header').text();
 
-        expect(header).toContain('Prices here are collected by the hotel rather than by us and charged in EUR, so they are not part of your total.');
+        expect(header).toContain('Prices here are collected by the hotel rather than by us, so they are not part of your total.');
+        expect(header).not.toContain('EUR');
         expect(header).not.toContain('JPY');
+    });
+
+    // SD-2006. A deposit stated as a share is collected by the hotel too, though
+    // it has no amount.
+    it('says the hotel collects a charge stated as a share', () => {
+        const share = charge({type: 'DEPOSIT', inclusion: 'UNSPECIFIED', currency: null, percentage: 20, ...unpriced});
+
+        expect(render([share], labels).find('header').text()).toContain('collected by the hotel');
     });
 
     it('keeps the paragraphs of a rule apart', () => {
         const wrapper = mount(HotelHouseRules, {props: {rules: [{title: 'Pets', body: 'Pets are allowed.\n\nA fee applies per stay.'}]}});
 
         expect(wrapper.findAll('dd p').map(paragraph => paragraph.text())).toEqual(['Pets are allowed.', 'A fee applies per stay.']);
+    });
+});
+
+// SD-2006. The supplier's example: a breakage deposit of 20%, per person per
+// stay, with no currency, read "Not stated by the hotel".
+describe('a charge stated as a share', () => {
+    const unpriced = {currency: null, amount: null, amount_decimal: null, amount_formatted: null, amount_currency_prefixed: null};
+    const labels = {DEPOSIT: 'Deposit', 'DEPOSIT-BREAKAGE': 'Breakage', 'PER-PERSON-PER-STAY': 'per person, per stay', UNSPECIFIED: 'Not stated by the hotel'};
+    const breakage = (overrides) => charge({type: 'DEPOSIT', detail: 'DEPOSIT-BREAKAGE', inclusion: 'UNSPECIFIED', charge_unit: 'PER-PERSON-PER-STAY', ...unpriced, percentage: 20, ...overrides});
+
+    it('reads the share and what it is per, never "Not stated by the hotel"', () => {
+        expect(lines(render([breakage()], labels))).toEqual([['Deposit · Breakage', '20% per person, per stay']]);
+    });
+
+    it('reads the supplier\'s own example as it arrives on the hotel page', () => {
+        const {hotel, labels: sent} = conrad();
+        const shown = lines(render(hotel.charges, sent));
+
+        expect(shown).toContainEqual(['Deposit · Breakage', '20% per person, per stay']);
+        expect(shown.filter(([, price]) => price === 'Not stated by the hotel')).toEqual([]);
+    });
+
+    it('writes a share that is not whole as a number, not a sum', () => {
+        expect(lines(render([breakage({percentage: 12.5})], labels))[0][1]).toBe('12.5% per person, per stay');
+    });
+
+    it('reads the share alone when the hotel states nothing it is per', () => {
+        expect(lines(render([breakage({charge_unit: null})], labels))[0][1]).toBe('20%');
+    });
+
+    it('keeps a charge with a sum as it was, with no share beside it', () => {
+        const keys = charge({type: 'DEPOSIT', detail: 'DEPOSIT-KEYS', inclusion: 'UNSPECIFIED', charge_unit: 'PER-ROOM-PER-STAY', percentage: null, amount: 1000, amount_decimal: '10.00', amount_formatted: '10.00', amount_currency_prefixed: 'USD 10.00'});
+
+        expect(lines(render([keys], {...labels, 'DEPOSIT-KEYS': 'Keys', 'PER-ROOM-PER-STAY': 'per room, per stay'})))
+            .toEqual([['Deposit · Keys', 'USD 10.00 per room, per stay']]);
+    });
+
+    it('reads a charge from a console before SD-2006 as it always did', () => {
+        const old = HouseRuleCharge.getInstance({type: 'DEPOSIT', inclusion: 'UNSPECIFIED', charge_unit: 'PER-PERSON-PER-STAY', ...unpriced});
+
+        expect(old.percentage).toBeNull();
+        expect(lines(render([old], labels))).toEqual([['Deposit', 'Not stated by the hotel']]);
     });
 });

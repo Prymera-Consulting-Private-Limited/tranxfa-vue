@@ -155,6 +155,77 @@ export function getCheapestRate(rates) {
 }
 
 /**
+ * A price's lines as the customer reads them: every line that stands on its
+ * own, each with the lines that are part of it (SD-2006).
+ *
+ * The supplier's taxes are inside the room price it charges us. Drawn as rows
+ * beside the room they read as charges on top of it, and the supplier read them
+ * as its taxes charged twice. So a line that names another as the one it is
+ * part of (`includedIn`) is listed under that line, and that line shows its
+ * price with them inside (`amountWithIncluded`). Both figures are the api's
+ * own: nothing is added up here.
+ *
+ * Lines that name no other - a flight's, or any from a console before SD-2006 -
+ * come out as they were always drawn. A line of nothing is left out, an
+ * included one too: a tax of 0.00 is not worth naming.
+ *
+ * @param {Array<{key: string, label: string, includedIn: string|null, amount: Money, amountWithIncluded: Money}>} breakdown
+ * @returns {Array<{key: string, label: string, amount: Money, included: Array<{key: string, label: string, amount: Money}>}>}
+ *     `amount` is the figure to show: the line's price with what is inside it.
+ */
+export function getPriceLines(breakdown) {
+    const lines = breakdown ?? [];
+    const byKey = new Map(lines.map(line => [line.key, line]));
+    const isPartOfAnother = line => Boolean(line.includedIn) && byKey.has(line.includedIn);
+    // Only a line drawn as a row can hold another. One naming a key that is not
+    // here, or a line that is itself inside another, keeps a row of its own
+    // rather than disappear along with its money.
+    const isListedUnder = line => isPartOfAnother(line) && !isPartOfAnother(byKey.get(line.includedIn));
+    const isWorthShowing = line => line.amount.amount !== 0;
+
+    return lines
+        .filter(line => !isListedUnder(line))
+        .map(line => ({
+            key: line.key,
+            label: line.label,
+            amount: line.amountWithIncluded?.isStated ? line.amountWithIncluded : line.amount,
+            included: lines.filter(inner => isListedUnder(inner) && inner.includedIn === line.key && isWorthShowing(inner)),
+        }))
+        .filter(isWorthShowing);
+}
+
+/**
+ * Whether a price's lines are worth drawing beside its total. A single line is
+ * only the total under another name, unless taxes sit inside it: those are
+ * what the customer needs to see named.
+ *
+ * @param {Array<{included: Array}>} priceLines  from getPriceLines()
+ * @returns {boolean}
+ */
+export function isItemised(priceLines) {
+    return priceLines.length > 1 || priceLines.some(line => line.included.length > 0);
+}
+
+/**
+ * "includes Resort fee USD 21.24 and Service fee USD 106.20", or null when
+ * nothing is inside the line. The search card states the currency once, beside
+ * the total, so it asks for the bare figures.
+ *
+ * @param {{included: Array<{label: string, amount: Money}>}} line  from getPriceLines()
+ * @param {'currencyPrefixed'|'formatted'} form
+ * @returns {string|null}
+ */
+export function getIncludedNote(line, form = 'currencyPrefixed') {
+    if (line.included.length === 0) {
+        return null;
+    }
+
+    const taxes = line.included.map(inner => t('travel.includedLine', {label: inner.label, amount: inner.amount[form]}));
+
+    return t('travel.includesTaxes', {taxes: taxes.join(t('common.listJoin'))});
+}
+
+/**
  * @param {object} criteria
  * @returns {object}
  */

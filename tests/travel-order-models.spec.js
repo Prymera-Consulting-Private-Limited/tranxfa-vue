@@ -400,6 +400,32 @@ describe('Order.getInstance', () => {
         expect(order.payments).toEqual([])
     })
 
+    // SD-2006. A hotel order's taxes name the line they are part of.
+    it('reads which line each tax of a hotel order is part of, and the room with its taxes inside', () => {
+        const order = Order.getInstance(fixture('travel-order-view-awaiting-hotel'))
+
+        expect(order.breakdown.map(line => [line.key, line.includedIn])).toEqual([
+            ['room', null],
+            ['tax_resort_fee', 'room'],
+            ['tax_service_fee', 'room'],
+            ['convenience_fee', null],
+        ])
+        expect(order.breakdown[0].amount.currencyPrefixed).toBe('AUD 403.10')
+        expect(order.breakdown[0].amountWithIncluded.amount).toBe(45147)
+        expect(order.breakdown[0].amountWithIncluded.currencyPrefixed).toBe('AUD 451.47')
+    })
+
+    // A flight's taxes are charged beside the fare, and the order model is
+    // shared, so its lines arrive with neither field.
+    it('reads a line that carries neither field as part of nothing, with no figure inside it', () => {
+        const order = Order.getInstance(orderPayload({
+            breakdown: [{ key: 'fare', label: 'Fare', amount: 20000, amount_formatted: '200.00', amount_currency_prefixed: 'GBP 200.00' }],
+        }))
+
+        expect(order.breakdown[0].includedIn).toBeNull()
+        expect(order.breakdown[0].amountWithIncluded.isStated).toBe(false)
+    })
+
     it('is awaiting the hotel while placed but unconfirmed', () => {
         const order = Order.getInstance(orderPayload({ is_confirmed: false, confirmed_at: null }))
 

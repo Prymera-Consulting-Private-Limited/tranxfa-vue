@@ -150,6 +150,33 @@ the capture, and `PAID` elsewhere, which is a guess. Re-capture it from the
 hotel page once staging has the console change and a catalog reload, and
 delete this note.
 
+**Hand-migrated by SD-2006, pending re-capture.** SD-2006 has every hotel price
+line say which line it is part of (`included_in`) and carry its amount with
+those lines inside (`amount_with_included`, in all four forms), and lets a
+house-rule charge be stated as a `percentage`. No staging console sent either
+when this was written, so these were edited by hand to the console's
+documented shape:
+
+- `travel-hotels-search-region`, `travel-hotel-view-extras` and
+  `travel-quote-created`: Conrad's single `taxes_and_fees` line of AUD 89.34
+  became two named taxes inside the room, Resort fee AUD 14.87 and Service fee
+  AUD 74.47, with the room at AUD 809.98 with them. The extras fixture's second
+  rate keeps one `taxes_and_fees` line, also inside the room. The search's
+  first hotel keeps its tax of AUD 0.00, inside the room. Totals are unchanged.
+- `travel-order-view-awaiting-hotel`: its one room line of AUD 482.50 became
+  the room at AUD 403.10 (AUD 451.47 with its taxes), Resort fee AUD 8.06,
+  Service fee AUD 40.31 and Convenience fee AUD 31.03. The total is unchanged.
+- `travel-hotel-view-extras` gained a 19th charge, the supplier's own example:
+  a breakage deposit of 20%, per person per stay, with no currency, and the two
+  labels it needs. The other 18 charges carry no `percentage` key, as a console
+  before SD-2006 sends them.
+
+The split of each tax is illustrative, not captured. `travel-hotel-view` is
+deliberately left without the new fields: it is the response of a console
+before SD-2006, which production keeps until it is updated, and
+`tests/hotel-price-lines.spec.js` reads it as such. Re-capture the others once
+staging serves SD-2006, and delete this note.
+
 ## Paying for a hotel by bank transfer, and cancelling it (captured)
 
 **Captured from Payvel staging on 19 September 2026**, by walking SD-1269 and

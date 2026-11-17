@@ -1,6 +1,7 @@
 <script setup>
 import {computed} from 'vue';
 import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
+import {getIncludedNote, getPriceLines, isItemised} from '@/composables/travel/hotels/hotel_utils.js';
 
 const props = defineProps({
   /**
@@ -25,12 +26,12 @@ const props = defineProps({
   },
 });
 
-// Search results do not itemise taxes, so a zero line is expected rather than
-// missing data — it just has nothing to say until the hotel page.
-const lines = computed(() => props.rate.breakdown.filter(line => line.amount.amount !== 0));
+// Search results do not always itemise taxes, so a zero line is expected rather
+// than missing data, and is left out. Taxes inside the room are named under it
+// rather than listed beside it (SD-2006).
+const lines = computed(() => getPriceLines(props.rate.breakdown));
 
-// One line is the total under another name, which is worth no more room.
-const showBreakdown = computed(() => lines.value.length > 1);
+const showBreakdown = computed(() => isItemised(lines.value));
 </script>
 
 <template>
@@ -44,7 +45,12 @@ const showBreakdown = computed(() => lines.value.length > 1);
     <!-- What the total is made of -->
     <dl v-if="showBreakdown" class="mt-2 space-y-0.5">
       <div v-for="line in lines" :key="line.key" class="flex items-baseline justify-between gap-2 text-xs/5">
-        <dt class="min-w-0 truncate text-gray-500">{{ line.label }}</dt>
+        <dt class="min-w-0 text-gray-500">
+          <span class="block truncate">{{ line.label }}</span>
+          <!-- Under the label and out of the amounts' column, so a tax inside
+          the room never reads as a charge beside it. -->
+          <span v-if="line.included.length" class="block pl-3">{{ getIncludedNote(line, 'formatted') }}</span>
+        </dt>
         <dd class="shrink-0 text-gray-600 tabular-nums">{{ line.amount.formatted }}</dd>
       </div>
     </dl>

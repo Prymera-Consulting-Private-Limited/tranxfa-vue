@@ -8,7 +8,7 @@ import HotelRoomPhotos from '@/views/Travel/Hotels/Partials/HotelRoomPhotos.vue'
 import HotelAmenities from '@/views/Travel/Hotels/Partials/HotelAmenities.vue';
 import HotelPriceLines from '@/views/Travel/Hotels/Partials/HotelPriceLines.vue';
 import HotelCancellationLadder from '@/views/Travel/Hotels/Partials/HotelCancellationLadder.vue';
-import {getRateGroups} from '@/composables/travel/hotels/hotel_utils.js';
+import {getPriceLines, getRateGroups, isItemised} from '@/composables/travel/hotels/hotel_utils.js';
 
 const props = defineProps({
   /**
@@ -64,15 +64,14 @@ const best = computed(() => {
 /**
  * Whether a rate has more to say than its total and its badge. Every rate's
  * terms can be read without choosing it (SD-1839), so a customer comparing two
- * never has to select one to see what it costs to cancel.
+ * never has to select one to see what it costs to cancel. The same rule as the
+ * price lines inside it, so the toggle never opens on nothing.
  *
  * @param {HotelRate} rate
  * @returns {boolean}
  */
 function hasTerms(rate) {
-  const lines = rate.breakdown.filter(line => line.amount.amount !== 0);
-
-  return lines.length > 1 || (rate.cancellation?.ladder.length ?? 0) > 0;
+  return isItemised(getPriceLines(rate.breakdown)) || (rate.cancellation?.ladder.length ?? 0) > 0;
 }
 </script>
 

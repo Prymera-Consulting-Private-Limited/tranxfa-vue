@@ -17,7 +17,7 @@ import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
 import Order from '@/models/travel/orders/order.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {CONFIRMATION_POLL_MS, useOrderUtils} from '@/composables/travel/order_utils.js';
-import {getGuestBreakdown, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
+import {getGuestBreakdown, getIncludedNote, getPriceLines, getStayLabel} from '@/composables/travel/hotels/hotel_utils.js';
 import {ChevronLeftIcon, ExclamationTriangleIcon, MapPinIcon} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -67,8 +67,9 @@ const guests = computed(() => {
 });
 
 // The order's lines are its quote's, so a line of nothing is left out here as
-// it is on the quote.
-const chargedLines = computed(() => (order.value?.breakdown ?? []).filter(line => line.amount.amount !== 0));
+// it is on the quote, and the taxes inside the room are named under it
+// (SD-2006).
+const chargedLines = computed(() => getPriceLines(order.value?.breakdown));
 
 const guestNames = computed(() => {
   return (order.value?.guests ?? [])
@@ -322,7 +323,12 @@ onUnmounted(() => {
               </header>
               <dl class="divide-y divide-gray-100">
                 <div v-for="line in chargedLines" :key="line.key" class="flex items-baseline justify-between gap-4 px-5 py-3">
-                  <dt class="min-w-0 text-sm/6 text-gray-500">{{ line.label }}</dt>
+                  <dt class="min-w-0 text-sm/6 text-gray-500">
+                    {{ line.label }}
+                    <!-- Under the label and out of the amounts' column, so a tax
+                    inside the room never reads as a charge beside it. -->
+                    <span v-if="line.included.length" class="block pl-3 text-xs/5">{{ getIncludedNote(line) }}</span>
+                  </dt>
                   <dd class="shrink-0 text-sm/6 text-gray-900 tabular-nums">{{ line.amount.currencyPrefixed }}</dd>
                 </div>
                 <div class="flex items-baseline justify-between gap-4 bg-gray-50/70 px-5 py-3">

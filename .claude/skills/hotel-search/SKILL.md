@@ -121,6 +121,15 @@ Nothing past the region search ever sends raw criteria again.
   It appears only when there is more than the total to say. The stay card shows the same two for
   the selected rate. A console before 2026.10.11 sends no `ladder`, and the model reads that as
   none. `tests/hotel-rate-terms.spec.js` holds it.
+- **Taxes inside the room are named under it, never beside it** (SD-2006). The supplier read
+  Room, Resort fee and Service fee as equal rows, and so as its taxes charged twice. Each line
+  says which line it is part of (`includedIn`), and the room carries its price with them
+  (`amountWithIncluded`). `getPriceLines()` in `hotel_utils.js` groups them, and every place
+  that draws a price draws its output: the search card, `HotelPriceLines` (room rows, stay card,
+  price-change panel), the quote's "Your price" and the booking's "What you paid for". Read
+  `includedIn` and show `label`; never match a tax key, and never add the figures up. Lines
+  without `includedIn` (a flight's, or an older console's) come out as they always did.
+  `tests/hotel-price-lines.spec.js` holds it.
 - **A row is identified by `rate.id`**, with position as the fallback for a rate that has none.
   The selected row is matched by the rate object itself, never by its token. Before console
   2026.10.6 the token was the supplier's match key, which near-identical rates shared, so keying
