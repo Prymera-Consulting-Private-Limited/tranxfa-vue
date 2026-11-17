@@ -1,0 +1,17 @@
+{
+  "is_featured": false,
+  "regions": [
+    {
+      "id": "01a0a6a5-ee4c-70bd-b0cc-376c185ad81d",
+      "slug": "los-angeles",
+      "name": "Los Angeles",
+      "kind": "CITY",
+      "country": "United States",
+      "country_code": "US",
+      "about": null
+    }
+  ],
+  "labels": {
+    "CITY": "City"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "id": "a2af1126-4066-4f6b-b82c-b5630b9f1db6",
+      "device_type": "library",
+      "client_code": null,
+      "client_name": "curl",
+      "client_version": "8.7",
+      "os_code": null,
+      "os_name": null,
+      "os_version": null,
+      "architecture": null,
+      "vendor": "",
+      "model": "",
+      "touched_at": "2026-09-06T20:51:49.000000Z",
+      "is_current": true
+    }
+  ],
+  "pagination": {
+    "total": 1,
+    "count": 1,
+    "per_page": 25,
+    "current_page": 1,
+    "total_pages": 1,
+    "links": {
+      "self": "http://api.moneytransfer.app.localhost:8000/client/v1/devices",
+      "next": null,
+      "prev": null
+    }
+  }
+}

@@ -1,4 +1,8 @@
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 import CustomerAttribute from "@/models/customer_attribute.js";
 import {ref, watch} from "vue";
 
@@ -23,8 +27,8 @@ watch(selectedGender, function (newValue) {
 
 
 const genders = [
-  {id: 'MALE', title: 'Male'},
-  {id: 'FEMALE', title: 'Female'},
+  {id: 'MALE', title: t('account.male')},
+  {id: 'FEMALE', title: t('account.female')},
 ]
 </script>
 

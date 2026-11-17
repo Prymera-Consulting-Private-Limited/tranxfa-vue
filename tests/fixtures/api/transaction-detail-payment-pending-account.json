@@ -1,0 +1,457 @@
+{
+  "id": "01a0dfdb-723c-73b0-a52c-1a5ba4a2da58",
+  "transaction_number": "PV-V2-7547953",
+  "state": {
+    "id": "8301bc4a-a8ae-4904-934c-0dcd59993eec",
+    "code": "PENDING-PAYMENT",
+    "progress": 30,
+    "label": "Pending Payment",
+    "description": "We are waiting for you to complete the payment.",
+    "color_scheme": "yellow"
+  },
+  "payment_country": {
+    "id": "a583ceaa-87df-47aa-b522-7e7d48121786",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "payment_currency": {
+    "id": "4afe6d64-5daf-4471-89a2-e0f4adef1ab3",
+    "decimal_places": 2,
+    "iso_numeric": 36,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "AUD",
+    "common_name": "Australian dollar",
+    "official_name": "Australian dollar",
+    "icon_unicode": "$",
+    "code": "AUD",
+    "salary_ranges": null
+  },
+  "payout_country": {
+    "id": "a5d778e5-e620-48a9-b99c-7ff7349facca",
+    "iso2_alpha": "IN",
+    "iso3_alpha": "IND",
+    "iso_numeric": "356",
+    "fips_code": "IN",
+    "slug": "india",
+    "calling_code": "91",
+    "common_name": "India",
+    "official_name": "India",
+    "endonym": "भारत",
+    "demonym": "Indian, India"
+  },
+  "payout_currency": {
+    "id": "0b87d7e2-a38e-4f45-aca9-d621e87cd9f2",
+    "decimal_places": 2,
+    "iso_numeric": 356,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "INR",
+    "common_name": "Indian rupee",
+    "official_name": "Indian rupee",
+    "icon_unicode": "₹",
+    "code": "INR",
+    "salary_ranges": null
+  },
+  "payout_method": {
+    "id": "038569c9-7fef-4880-9e53-8b400bafdd4e",
+    "code": "BANK-TRANSFER",
+    "title": "Bank Transfer",
+    "description": "A secure method allowing users to transfer funds directly to recipient's bank account.",
+    "instruction": null,
+    "promo": null,
+    "sell_rate_formatted": null
+  },
+  "payout_company": {
+    "id": "a28ce80c-2e72-4a9d-b61d-4bbd6b435c24",
+    "code": "TERRA_PAY",
+    "title": "TerraPay"
+  },
+  "payment": {
+    "id": "01a0e01d-fc75-73cd-8d57-ca27efad0069",
+    "payment_method": {
+      "id": "358ac102-863f-496a-9ae8-e26af2590884",
+      "code": "BANK-TRANSFER",
+      "title": "Bank Transfer",
+      "description": "A traditional transaction method where funds are transferred from customer's bank accounts through manual authorization, ensuring a controlled and deliberate payment process."
+    },
+    "payment_provider": {
+      "id": "b51e856b-0dbc-4caa-a323-b73db50f8491",
+      "code": "MONOOVA",
+      "title": "Monoova",
+      "description": "Monoova provides businesses or individuals with a quick way to receive payments."
+    },
+    "total_payment_amount": "1.39",
+    "total_payment_amount_formatted": "1.39",
+    "total_payment_amount_currency_prefixed": "AUD 1.39",
+    "shared_reference": "PV-V2-7547953-001",
+    "state": {
+      "id": "616c1bc7-01c3-404d-b382-5888dc361281",
+      "code": "PENDING",
+      "color_scheme": "blue"
+    },
+    "payment_account": null,
+    "client_payment_account": {
+      "id": "a28cea63-77fb-4301-8361-37a3df6f3762",
+      "institution_name": "Monoova",
+      "instruction_text": "To complete your payment, please transfer funds to the bank account listed below. Please note that, it may take up to 24 hours, depending on your bank’s processing time.",
+      "wait_time_message": "Thank you for payment. We will process the transfer as soon as we receive the money. Please note that, it may take up to 24 hours, depending on your bank’s processing time.",
+      "payment_reference": "PV-V2-7547953",
+      "attributes": [
+        {
+          "key": "Account Name",
+          "value": "PAYVEL PTY LTD"
+        },
+        {
+          "key": "BSB",
+          "value": "802-985"
+        },
+        {
+          "key": "Account Number",
+          "value": "123456789"
+        }
+      ]
+    },
+    "customer_confirmed_payment": false,
+    "payment_url": null,
+    "awaiting_confirmation": false,
+    "payment_terms": null,
+    "expires_at": "2026-10-01T23:47:36+00:00",
+    "created_at": "2026-09-26T23:47:36.000000Z",
+    "updated_at": "2026-09-26T23:47:41.000000Z"
+  },
+  "payout": {
+    "id": "01a0dfdb-728a-738e-9f22-eef94b87ea7d",
+    "shared_reference": "PV-V2-7547953-001",
+    "collection_pin": null,
+    "collection_pin_available": false,
+    "state": {
+      "id": "5b5fb122-f376-4701-be1f-dfc13f262fb7",
+      "code": "CREATED",
+      "color_scheme": "gray"
+    }
+  },
+  "local_amount": "1.39",
+  "payout_amount": "86.88",
+  "base_fees": "0.00",
+  "local_amount_formatted": "1.39",
+  "payout_amount_formatted": "86.88",
+  "base_fees_formatted": "0.00",
+  "local_amount_currency_prefixed": "AUD 1.39",
+  "payout_amount_currency_prefixed": "INR 86.88",
+  "base_fees_currency_prefixed": "AUD 0.00",
+  "coupon_discount_amount": null,
+  "coupon_discount_amount_currency_prefixed": null,
+  "exchange_rate_before_coupon": null,
+  "exchange_rate_before_coupon_formatted": null,
+  "exchange_rate": 62.5,
+  "exchange_rate_formatted": "AUD = 62.5 INR",
+  "exchange_rate_is_inverse": false,
+  "recipient": {
+    "id": "01a0d372-ec03-7145-9429-8ccd4179f1f4",
+    "recipient_type": "individual",
+    "name": "Advitiya Sujeet",
+    "second_name": null,
+    "third_name": null,
+    "whole_name": "Advitiya Sujeet",
+    "account_detail": {
+      "account_number": "23660150000",
+      "institution": {
+        "id": "01a0b0dc-d3de-704a-aa29-7b85a9755a95",
+        "code": "IN-CANARA-BANK",
+        "title": "CANARA BANK"
+      }
+    },
+    "account_detail_hashmap": [
+      {
+        "type": "account_number",
+        "key": "Account Number",
+        "value": "23660150000"
+      },
+      {
+        "type": "delivery_option",
+        "key": "Bank",
+        "value": "CANARA BANK"
+      }
+    ],
+    "attributes": [
+      {
+        "type": "name",
+        "input_mode": null,
+        "context": null,
+        "is_required": null,
+        "label": "Name on Account",
+        "attribute": "name_on_account",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": null,
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 0,
+        "value": "Advitiya Sujeet"
+      },
+      {
+        "type": "delivery_option",
+        "input_mode": null,
+        "context": null,
+        "is_required": null,
+        "label": "Bank",
+        "attribute": "bank",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": null,
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 1,
+        "value": {
+          "id": "01a0b0dc-d3de-704a-aa29-7b85a9755a95",
+          "code": "IN-CANARA-BANK",
+          "title": "CANARA BANK"
+        }
+      },
+      {
+        "type": "account_number",
+        "input_mode": "number",
+        "context": null,
+        "is_required": null,
+        "label": "Account Number",
+        "attribute": "account_number",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": null,
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 2,
+        "value": "23660150000"
+      },
+      {
+        "type": "text",
+        "input_mode": null,
+        "context": null,
+        "is_required": null,
+        "label": "IFSC Code",
+        "attribute": "ifsc_code",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": null,
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 3,
+        "value": "CNRB0000232"
+      }
+    ],
+    "relationship": {
+      "id": "5138ae3e-c94b-4284-b3fd-accab75d688d",
+      "code": "FRIEND",
+      "title": "Friend",
+      "description": null
+    },
+    "channel": {
+      "id": "01a0afb1-2baf-70d1-af3f-9f818a8bfcb9",
+      "attributes": [
+        {
+          "type": "name",
+          "input_mode": null,
+          "context": null,
+          "is_required": null,
+          "label": "Name on Account",
+          "attribute": "name_on_account",
+          "prefix_addon": null,
+          "suffix_addon": null,
+          "help_text": null,
+          "placeholder_text": null,
+          "regex_pattern": null,
+          "regex_failure_message": null,
+          "mask": null,
+          "min_length": null,
+          "max_length": null,
+          "exact_length": null,
+          "min_value": null,
+          "max_value": null,
+          "exact_value": null,
+          "view_order": 0,
+          "value": "Advitiya Sujeet"
+        },
+        {
+          "type": "delivery_option",
+          "input_mode": null,
+          "context": null,
+          "is_required": null,
+          "label": "Bank",
+          "attribute": "bank",
+          "prefix_addon": null,
+          "suffix_addon": null,
+          "help_text": null,
+          "placeholder_text": null,
+          "regex_pattern": null,
+          "regex_failure_message": null,
+          "mask": null,
+          "min_length": null,
+          "max_length": null,
+          "exact_length": null,
+          "min_value": null,
+          "max_value": null,
+          "exact_value": null,
+          "view_order": 1,
+          "value": {
+            "id": "01a0b0dc-d3de-704a-aa29-7b85a9755a95",
+            "code": "IN-CANARA-BANK",
+            "title": "CANARA BANK"
+          }
+        },
+        {
+          "type": "account_number",
+          "input_mode": "number",
+          "context": null,
+          "is_required": null,
+          "label": "Account Number",
+          "attribute": "account_number",
+          "prefix_addon": null,
+          "suffix_addon": null,
+          "help_text": null,
+          "placeholder_text": null,
+          "regex_pattern": null,
+          "regex_failure_message": null,
+          "mask": null,
+          "min_length": null,
+          "max_length": null,
+          "exact_length": null,
+          "min_value": null,
+          "max_value": null,
+          "exact_value": null,
+          "view_order": 2,
+          "value": "23660150000"
+        },
+        {
+          "type": "text",
+          "input_mode": null,
+          "context": null,
+          "is_required": null,
+          "label": "IFSC Code",
+          "attribute": "ifsc_code",
+          "prefix_addon": null,
+          "suffix_addon": null,
+          "help_text": null,
+          "placeholder_text": null,
+          "regex_pattern": null,
+          "regex_failure_message": null,
+          "mask": null,
+          "min_length": null,
+          "max_length": null,
+          "exact_length": null,
+          "min_value": null,
+          "max_value": null,
+          "exact_value": null,
+          "view_order": 3,
+          "value": "CNRB0000232"
+        }
+      ]
+    },
+    "created_at": null,
+    "updated_at": null
+  },
+  "documents": [
+    {
+      "id": "01a0dfdb-7405-7194-a517-4497d3d7e5f7",
+      "document_category": {
+        "id": "3dac91f3-a67a-492e-a82c-23d9ff015860",
+        "code": "POI",
+        "title": "Proof of Identity",
+        "description": "Documents that verify the identity of the customer, such as a passport, driver’s license, or national ID card."
+      },
+      "document_type": {
+        "id": "1aa35746-90d5-47e9-9bff-93696c741556",
+        "code": "PASSPORT",
+        "title": "Passport",
+        "description": "A government-issued document that certifies the identity and nationality of the holder for international travel."
+      },
+      "document": {
+        "id": "a28ce9a3-0cf3-40d4-9627-329e7c68b97a",
+        "status_code": "approved",
+        "status_title": "Accepted",
+        "created_at": "2026-08-20T21:23:08.000000Z",
+        "updated_at": "2026-09-02T10:28:43.000000Z"
+      },
+      "created_at": "2026-09-26T22:34:56.000000Z",
+      "updated_at": "2026-09-26T22:34:56.000000Z"
+    }
+  ],
+  "pending_documents": [],
+  "timeline": [
+    {
+      "state": {
+        "id": "c9d120d2-ba22-4728-aab9-56c177fa70c8",
+        "code": "CREATED",
+        "progress": 10,
+        "label": "Created",
+        "description": "Your transaction request has been created.",
+        "color_scheme": "gray"
+      },
+      "created_at": "2026-09-26T22:34:55.000000Z"
+    },
+    {
+      "state": {
+        "id": "8301bc4a-a8ae-4904-934c-0dcd59993eec",
+        "code": "PENDING-PAYMENT",
+        "progress": 30,
+        "label": "Pending Payment",
+        "description": "We are waiting for you to complete the payment.",
+        "color_scheme": "yellow"
+      },
+      "created_at": "2026-09-26T22:34:58.000000Z"
+    },
+    {
+      "state": {
+        "id": "6a8f459b-2a4d-4704-997a-d75248c98c78",
+        "code": "PAYOUT-SUCCESS",
+        "progress": 100,
+        "label": "Payout Success",
+        "description": "Congratulations! Payout for your transaction was successful.",
+        "color_scheme": "green"
+      },
+      "created_at": null
+    }
+  ],
+  "created_at": "2026-09-26T22:34:55.000000Z",
+  "updated_at": "2026-09-26T23:47:36.000000Z"
+}

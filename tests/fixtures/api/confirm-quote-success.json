@@ -1,0 +1,265 @@
+{
+  "id": "a2af156b-b44c-4456-a1b8-c6ada90e25e5",
+  "transaction_number": "TP7402166",
+  "state": {
+    "id": "8965e542-a63e-4ed9-a23a-5f8955864c70",
+    "code": "CREATED",
+    "progress": 10,
+    "label": "Created",
+    "description": "Your transaction request has been created.",
+    "color_scheme": "gray"
+  },
+  "payment_country": {
+    "id": "ab9e1920-24aa-4b3d-ba70-fd695cd904bd",
+    "iso2_alpha": "AU",
+    "iso3_alpha": "AUS",
+    "iso_numeric": "36",
+    "fips_code": "AS",
+    "slug": "australia",
+    "calling_code": "61",
+    "common_name": "Australia",
+    "official_name": "Australia",
+    "endonym": "Australia",
+    "demonym": "Australian, Australia"
+  },
+  "payment_currency": {
+    "id": "4a16a11f-9bbb-4671-95c6-f8550325521a",
+    "decimal_places": 2,
+    "iso_numeric": 36,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "AUD",
+    "common_name": "Australian dollar",
+    "official_name": "Australian dollar",
+    "icon_unicode": "$",
+    "code": "AUD",
+    "salary_ranges": null
+  },
+  "payout_country": {
+    "id": "8fe1dcea-ff86-4ec5-aef5-10adb650f96b",
+    "iso2_alpha": "FJ",
+    "iso3_alpha": "FJI",
+    "iso_numeric": "242",
+    "fips_code": "FJ",
+    "slug": "fiji",
+    "calling_code": "679",
+    "common_name": "Fiji",
+    "official_name": "Fiji",
+    "endonym": "Fiji",
+    "demonym": "Fijian, Fiji"
+  },
+  "payout_currency": {
+    "id": "ad66a916-0ccb-4437-b5f7-194776277992",
+    "decimal_places": 2,
+    "iso_numeric": 242,
+    "type": "FIAT",
+    "crypto_code": null,
+    "iso_alpha": "FJD",
+    "common_name": "Fijian dollar",
+    "official_name": "Fijian dollar",
+    "icon_unicode": "$",
+    "code": "FJD",
+    "salary_ranges": null
+  },
+  "payout_method": {
+    "id": "7e0e09ee-870c-4829-9a5e-6d328a25e975",
+    "code": "MOBILE-WALLET",
+    "title": "Mobile Wallet",
+    "description": "A secure method allowing users to transfer funds directly to recipient's mobile wallet account.",
+    "instruction": null,
+    "promo": null,
+    "sell_rate_formatted": null
+  },
+  "payout_company": {
+    "id": "a2af0b7a-e8e6-4376-8e1c-930d036791e8",
+    "code": "TERRA_PAY",
+    "title": "TerraPay"
+  },
+  "payment": {
+    "id": "a2af156b-b96c-43ab-8cb7-ab9eeea8f022",
+    "payment_method": {
+      "id": "b62fa70a-0166-47ec-951c-dd475958fa07",
+      "code": "BANK-TRANSFER",
+      "title": "Bank Transfer",
+      "description": "A traditional transaction method where funds are transferred from customer's bank accounts through manual authorization, ensuring a controlled and deliberate payment process."
+    },
+    "payment_provider": {
+      "id": "292c8a06-1e8e-4eda-b24c-91aa61b0ae86",
+      "code": "MONOOVA",
+      "title": "Monoova",
+      "description": "Monoova provides businesses or individuals with a quick way to receive payments."
+    },
+    "total_payment_amount": "100",
+    "total_payment_amount_formatted": "100.00",
+    "total_payment_amount_currency_prefixed": "AUD 100.00",
+    "shared_reference": "TP7402166",
+    "state": {
+      "id": "76f36050-1ae0-4472-8cae-8fd1328ff1a9",
+      "code": "CREATED",
+      "color_scheme": "gray"
+    },
+    "client_payment_account": null,
+    "customer_confirmed_payment": false,
+    "payment_url": null,
+    "payment_terms": null,
+    "expires_at": "2026-09-11T21:03:43+00:00",
+    "created_at": "2026-09-06T21:03:43.000000Z",
+    "updated_at": "2026-09-06T21:03:43.000000Z"
+  },
+  "payout": {
+    "id": "a2af156b-bd59-4e4a-9aaf-78cb1db13e78",
+    "shared_reference": "TP7402166",
+    "collection_pin": null,
+    "collection_pin_available": false,
+    "state": {
+      "id": "bccfee46-3a89-453f-8dfb-adc4eb8c94af",
+      "code": "CREATED",
+      "color_scheme": "gray"
+    }
+  },
+  "local_amount": "100.00",
+  "payout_amount": "145.00",
+  "base_fees": "0.00",
+  "local_amount_formatted": "100.00",
+  "payout_amount_formatted": "145.00",
+  "base_fees_formatted": "0.00",
+  "local_amount_currency_prefixed": "AUD 100.00",
+  "payout_amount_currency_prefixed": "FJD 145.00",
+  "base_fees_currency_prefixed": "AUD 0.00",
+  "coupon_discount_amount": null,
+  "coupon_discount_amount_currency_prefixed": null,
+  "exchange_rate_before_coupon": null,
+  "exchange_rate_before_coupon_formatted": null,
+  "exchange_rate": 1.45,
+  "exchange_rate_formatted": "AUD = 1.45 FJD",
+  "exchange_rate_is_inverse": false,
+  "recipient": {
+    "id": null,
+    "recipient_type": "individual",
+    "name": "Grace Hopper",
+    "second_name": null,
+    "third_name": null,
+    "whole_name": "Grace Hopper",
+    "account_detail": {
+      "account_number": "100007840"
+    },
+    "account_detail_hashmap": [
+      {
+        "type": "account_number",
+        "key": "Mobile Number",
+        "value": "100007840"
+      }
+    ],
+    "attributes": [
+      {
+        "type": "name",
+        "input_mode": null,
+        "context": null,
+        "is_required": null,
+        "label": "Recipient Name",
+        "attribute": "name_on_account",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": null,
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 1,
+        "value": "Grace Hopper"
+      },
+      {
+        "type": "account_number",
+        "input_mode": "number",
+        "context": null,
+        "is_required": null,
+        "label": "Mobile Number",
+        "attribute": "mobile_number",
+        "prefix_addon": null,
+        "suffix_addon": null,
+        "help_text": null,
+        "placeholder_text": null,
+        "regex_pattern": null,
+        "regex_failure_message": null,
+        "mask": null,
+        "min_length": null,
+        "max_length": null,
+        "exact_length": null,
+        "min_value": null,
+        "max_value": null,
+        "exact_value": null,
+        "view_order": 2,
+        "value": "100007840"
+      }
+    ],
+    "relationship": {
+      "id": "1d030aa3-70cc-4233-88c4-e0e7979cefe3",
+      "code": "BUSINESS-ASSOCIATE",
+      "title": "Business Associate",
+      "description": null
+    },
+    "channel": {
+      "id": "a2af0b7a-d989-48dd-a9c7-814c4072d323",
+      "attributes": [
+        {
+          "type": "name",
+          "input_mode": null,
+          "context": null,
+          "is_required": null,
+          "label": "Recipient Name",
+          "attribute": "name_on_account",
+          "prefix_addon": null,
+          "suffix_addon": null,
+          "help_text": null,
+          "placeholder_text": null,
+          "regex_pattern": null,
+          "regex_failure_message": null,
+          "mask": null,
+          "min_length": null,
+          "max_length": null,
+          "exact_length": null,
+          "min_value": null,
+          "max_value": null,
+          "exact_value": null,
+          "view_order": 1,
+          "value": "Grace Hopper"
+        },
+        {
+          "type": "account_number",
+          "input_mode": "number",
+          "context": null,
+          "is_required": null,
+          "label": "Mobile Number",
+          "attribute": "mobile_number",
+          "prefix_addon": null,
+          "suffix_addon": null,
+          "help_text": null,
+          "placeholder_text": null,
+          "regex_pattern": null,
+          "regex_failure_message": null,
+          "mask": null,
+          "min_length": null,
+          "max_length": null,
+          "exact_length": null,
+          "min_value": null,
+          "max_value": null,
+          "exact_value": null,
+          "view_order": 2,
+          "value": "100007840"
+        }
+      ]
+    },
+    "created_at": null,
+    "updated_at": null
+  },
+  "documents": null,
+  "pending_documents": null,
+  "created_at": "2026-09-06T21:03:43.000000Z",
+  "updated_at": "2026-09-06T21:03:43.000000Z"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "4a16a11f-9bbb-4671-95c6-f8550325521a",
+  "decimal_places": 2,
+  "iso_numeric": 36,
+  "type": "FIAT",
+  "crypto_code": null,
+  "iso_alpha": "AUD",
+  "common_name": "Australian dollar",
+  "official_name": "Australian dollar",
+  "icon_unicode": "$",
+  "code": "AUD",
+  "salary_ranges": []
+}

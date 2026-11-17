@@ -1,0 +1,18 @@
+{
+  "id": "01a0b2c4-5d6e-7f80-9a1b-2c3d4e5f6a72",
+  "reference": "VO-01J8XAQ4V2NP7WZK3RB9CDEF0-P002",
+  "shared_reference": null,
+  "order_reference": "VO-01J8XAQ4V2NP7WZK3RB9CDEF0",
+  "state": "FAILED",
+  "state_label": "Failed",
+  "amount": 48250,
+  "amount_decimal": "482.50",
+  "amount_formatted": "482.50",
+  "amount_currency_prefixed": "AUD 482.50",
+  "payment_method": {"id": "01a0b2c4-0000-7000-8000-00000000pay1", "code": "PAYID", "title": "PayID"},
+  "provider": {"id": "01a0b2c4-0000-7000-8000-00000000mon1", "code": "MONOOVA", "title": "Monoova"},
+  "payment_url": null,
+  "client_payment_account": null,
+  "expires_at": null,
+  "failure_reason": "Active Reconciliation Rule Exists for PayId. Please cancel existing rule(s) for PayId before creating new rule."
+}
