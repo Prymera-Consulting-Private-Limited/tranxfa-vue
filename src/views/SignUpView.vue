@@ -10,6 +10,7 @@ import axios from "axios";
 import IsdCodeInput from "@/components/IsdCodeInput.vue";
 import {useCountryUtils} from "@/composables/country_utils.js";
 import {useI18n} from "vue-i18n";
+import {trackSignUp} from "@/marketing_events.js";
 
 const {t} = useI18n();
 
@@ -98,9 +99,7 @@ async function register() {
     formErrors.password = [];
     formErrors.confirm_password = [];
     customerUtils.register(form.email, form.password, form.confirm_password, thirdPartyDeclarationAccepted.value).then(() => {
-      if (typeof window.fbq === 'function') {
-        window.fbq('track', 'CompleteRegistration');
-      }
+      trackSignUp();
       router.push({name: 'onboardingWorkflow'});
     }).catch((e) => {
       if (e.response?.status === 422) {
