@@ -202,6 +202,13 @@
     "yourEmail": "tu correo electrónico",
     "done": "Listo"
   },
+  "cookies": {
+    "acceptAll": "Aceptar todas",
+    "essentialOnly": "Solo esenciales",
+    "label": "Aviso de cookies",
+    "message": "Usamos cookies para mejorar tu experiencia.",
+    "readPolicy": "Leer política"
+  },
   "nav": {
     "accountVerification": "Verificación de cuenta",
     "bookings": "Reservas",
