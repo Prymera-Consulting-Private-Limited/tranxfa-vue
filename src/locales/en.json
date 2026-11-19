@@ -76,6 +76,13 @@
     "body": "Nothing has changed on your account. Reload the page to carry on; if it keeps happening, contact support.",
     "reload": "Reload page"
   },
+  "cookies": {
+    "label": "Cookie notice",
+    "message": "We use cookies to improve your experience.",
+    "readPolicy": "Read policy",
+    "essentialOnly": "Essential only",
+    "acceptAll": "Accept all"
+  },
   "transfer": {
     "payment": {
       "processingPayment": "Processing payment",

@@ -14,6 +14,7 @@ import {NotificationGroup, Notification, notify} from 'notiwind';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
 import { XMarkIcon } from '@heroicons/vue/20/solid'
 import {useI18n} from "vue-i18n";
+import {trackKycApproved} from "@/marketing_events.js";
 
 const {t} = useI18n();
 
@@ -66,9 +67,7 @@ onMounted(async () => {
           )
         })
         .listen('CustomerDocumentApproved', (e) => {
-          if (typeof window.fbq === 'function') {
-            window.fbq('trackCustom', 'KYCApproved');
-          }
+          trackKycApproved();
           customerUtils.refresh();
           const category = e.category;
           const document = e.document_type.toLowerCase();
