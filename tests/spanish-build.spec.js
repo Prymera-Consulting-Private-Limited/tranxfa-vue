@@ -99,6 +99,14 @@ describe('the Spanish build', () => {
       .toBe('Tipo de cambio antes del cupón BIENVENIDA');
   });
 
+  // Found by the client while validating SD-2059 on staging (20 Nov 2026): the
+  // line under "¡Verifica tu correo!" read English, the first screen after
+  // signing up.
+  it('says the email verification screen in Spanish', () => {
+    expect(t('verification.emailCodeSent', {email: 'ana@ejemplo.com'}))
+      .toBe('Te hemos enviado un código de verificación a tu correo ana@ejemplo.com');
+  });
+
   // Three of these were wrong rather than missing, which no count would catch.
   it('uses the banking word, the informal register and Spanish spelling', () => {
     // `extracto` is the statement a bank sends; `declaración` is a tax return.

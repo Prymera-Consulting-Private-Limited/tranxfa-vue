@@ -485,6 +485,7 @@
     "documentVerified": "Tu {title} se ha verificado correctamente.",
     "dragAndDrop": "Arrastra y suelta archivos aquí, o haz clic para buscarlos.",
     "emailCodeDelay": "Ten en cuenta que el correo puede tardar hasta un minuto en llegar. Si no lo ves en tu bandeja de entrada, revisa también tu carpeta de spam o correo no deseado.",
+    "emailCodeSent": "Te hemos enviado un código de verificación a tu correo {email}",
     "expiryDate": "Fecha de vencimiento",
     "expiryDateOptional": "(si el documento la tiene)",
     "fundsCategoryHint": "Para cumplir con la normativa financiera, sube un documento que acredite el origen de tus fondos: nómina, extracto bancario o declaración de la renta.",
