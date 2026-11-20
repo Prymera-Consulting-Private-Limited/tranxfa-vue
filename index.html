@@ -13,13 +13,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
-  <!-- #230: GA4 library deferred to after first paint via requestIdleCallback -->
+  <!-- #230: GA4 library deferred to after first paint via requestIdleCallback.
+       SD-2059: Consent Mode v2 in advanced mode, as on xenvia.eu. All four
+       signals start denied, so until the visitor accepts Google gets only its
+       anonymous pings and sets no cookies. src/consent.js grants them on
+       "Aceptar todas", and it alone loads the Meta Pixel and Clarity. Neither
+       has a tag on this page, so neither can run before consent. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('consent', 'default', {
       'analytics_storage': 'denied',
-      'ad_storage': 'denied'
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied'
     });
     gtag('js', new Date());
     gtag('config', 'G-09D5GXFFJ7', { send_page_view: false });
@@ -36,34 +43,6 @@
       }
     })();
   </script>
-  <!-- Microsoft Clarity -->
-  <script
-    type="text/javascript">(function (c, l, a, r, i, t, y) { c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) }; t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, "clarity", "script", "vvrtw05a16");</script>
-  <script>
-
-    (function () {
-      var k = 'xenvia_cookie_consent', c = localStorage.getItem(k), show = false;
-      if (!c) { show = true } else { try { var d = JSON.parse(c); if (Date.now() - new Date(d.timestamp).getTime() > 7776000000) { localStorage.removeItem(k); show = true } } catch (e) { localStorage.removeItem(k); show = true } }
-      if (!show) return;
-      document.addEventListener('DOMContentLoaded', function () {
-        var bar = document.getElementById('cookie-bar');
-        if (!bar) return;
-        requestAnimationFrame(function () { requestAnimationFrame(function () { bar.classList.add('visible') }) });
-        document.getElementById('cookie-bar-accept').onclick = function () {
-          localStorage.setItem(k, JSON.stringify({ level: 'all', timestamp: new Date().toISOString() }));
-          bar.classList.remove('visible');
-          window.dispatchEvent(new CustomEvent('xenvia-consent-update', { detail: { level: 'all' } }));
-        };
-        document.getElementById('cookie-bar-essential').onclick = function () {
-          localStorage.setItem(k, JSON.stringify({ level: 'essential', timestamp: new Date().toISOString() }));
-          bar.classList.remove('visible');
-          window.dispatchEvent(new CustomEvent('xenvia-consent-update', { detail: { level: 'essential' } }));
-        };
-      });
-    })();
-  </script>
-  <!-- Meta Pixel XENVIA -->
-  <script>!function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s) }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js"); fbq("init", "766471166259284"); fbq("track", "PageView");</script>
 </head>
 
 <body class="min-h-screen">

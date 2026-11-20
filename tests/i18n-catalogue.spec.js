@@ -12,6 +12,7 @@ const read = f => readFileSync(f, 'utf8');
 // once it holds no bare text of its own.
 const MIGRATED = [
   'src/App.vue',
+  'src/components/CookieBanner.vue',
   'src/views/NotFoundView.vue',
   'src/views/SignInView.vue',
   'src/views/ForgotPasswordView.vue',

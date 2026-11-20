@@ -27,42 +27,20 @@ import Monoova from "@/components/Payment/Monoova.vue";
 import ModalCloseButton from "@/components/ModalCloseButton.vue";
 import CancelTransferPayment from "@/components/Payment/CancelTransferPayment.vue";
 import {useI18n} from "vue-i18n";
+import {isPaymentCompleted, trackPaymentConfirmed} from "@/marketing_events.js";
 
 const {t} = useI18n();
 const transactionUtils = useTransactionUtils();
 const colorUtils = useColorUtils();
 
-const FIRST_PURCHASE_TRACKED_KEY = 'fbq_first_purchase_tracked';
-
-function isPaymentCompleted(payment) {
-  const code = payment?.state?.code;
-  return code === PaymentState.AUTHORIZED || code === PaymentState.CAPTURED;
-}
-
-function trackFirstPurchase(transactionData) {
+function trackPayment(transactionData) {
   if (!isPaymentCompleted(transactionData.payment)) {
     return;
   }
 
   // Looked up here rather than at setup so a view mounted without pinia
   // (the detail-route specs) still renders.
-  const customerId = useCustomerStore().customer.data?.id;
-  if (!customerId) {
-    return;
-  }
-
-  const trackedKey = `${FIRST_PURCHASE_TRACKED_KEY}_${customerId}`;
-  if (localStorage.getItem(trackedKey)) {
-    return;
-  }
-
-  if (typeof window.fbq === 'function') {
-    window.fbq('track', 'Purchase', {
-      value: transactionData.localAmount,
-      currency: transactionData.paymentCurrency?.isoAlpha,
-    });
-    localStorage.setItem(trackedKey, '1');
-  }
+  trackPaymentConfirmed(transactionData, useCustomerStore().customer.data?.id);
 }
 
 const props = defineProps({
@@ -87,7 +65,7 @@ const getTransaction = async () => {
   try {
     const response = await transactionUtils.getTransaction(props.id);
     transaction.data = Transaction.getInstance(response.data);
-    trackFirstPurchase(transaction.data);
+    trackPayment(transaction.data);
     failure.value = null;
   } catch (error) {
     failure.value = getCustomerMessage(error) ?? true;

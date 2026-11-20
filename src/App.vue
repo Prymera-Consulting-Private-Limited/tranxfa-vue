@@ -2,6 +2,7 @@
 import {onErrorCaptured, ref} from 'vue'
 import {RouterView} from 'vue-router'
 import {isStaleChunkError, reportError} from '@/error_handling.js'
+import CookieBanner from '@/components/CookieBanner.vue'
 
 // A render or lifecycle error anywhere below used to leave whatever had
 // painted so far, or nothing, with no message. This is the fallback the
@@ -31,4 +32,5 @@ function reload() {
     <button type="button" @click="reload" class="mt-8 inline-flex items-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">{{ $t('appError.reload') }}</button>
   </main>
   <RouterView v-else />
+  <CookieBanner />
 </template>
