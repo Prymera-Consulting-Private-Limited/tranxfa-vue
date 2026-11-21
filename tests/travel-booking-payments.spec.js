@@ -27,7 +27,7 @@ function render(payments) {
 
 const rows = wrapper => wrapper.findAll('li');
 
-// The api sends a payment's words in state_label, so a row is told apart by them.
+// A row is told apart by its badge, which is in our words (SD-2080).
 const stateOf = row => row.find('span').text();
 
 describe('the payment on a booking', () => {
@@ -38,7 +38,7 @@ describe('the payment on a booking', () => {
 
         expect(fixture('travel-order-view-deposit-pending').payments).toHaveLength(3);
         expect(rows(wrapper)).toHaveLength(1);
-        expect(stateOf(rows(wrapper)[0])).toBe('Pending');
+        expect(stateOf(rows(wrapper)[0])).toBe('Waiting for payment');
         expect(wrapper.text()).not.toContain('This attempt didn\'t go through');
     });
 
@@ -52,7 +52,7 @@ describe('the payment on a booking', () => {
         const wrapper = render(paymentsOf('travel-order-view-complete'));
 
         expect(rows(wrapper)).toHaveLength(1);
-        expect(stateOf(rows(wrapper)[0])).toBe('Captured');
+        expect(stateOf(rows(wrapper)[0])).toBe('Paid');
         expect(wrapper.text()).toContain('AUD 827.29');
         expect(wrapper.text()).not.toContain('Cancel this payment');
     });
@@ -76,21 +76,21 @@ describe('the payment on a booking', () => {
         const wrapper = render([failed, captured, later]);
 
         expect(rows(wrapper)).toHaveLength(1);
-        expect(stateOf(rows(wrapper)[0])).toBe('Captured');
+        expect(stateOf(rows(wrapper)[0])).toBe('Paid');
     });
 
     // Money that has gone back was money that arrived, so it is still the
     // payment for the booking.
     it.each([
-        ['REFUNDED', 'Refunded'],
-        ['PART-REFUNDED', 'Partially refunded'],
-    ])('counts a %s payment as the one that paid', (state, label) => {
+        ['REFUNDED', 'Refunded', 'Refunded'],
+        ['PART-REFUNDED', 'Part Refunded', 'Partly refunded'],
+    ])('counts a %s payment as the one that paid', (state, consoleLabel, badge) => {
         const failed = OrderPayment.getInstance({...fixture('travel-order-view-price-locked').payments[0], state: 'FAILED', state_label: 'Failed'});
-        const refunded = OrderPayment.getInstance({...fixture('travel-order-view-complete').payments[0], state, state_label: label});
+        const refunded = OrderPayment.getInstance({...fixture('travel-order-view-complete').payments[0], state, state_label: consoleLabel});
         const wrapper = render([refunded, failed]);
 
         expect(rows(wrapper)).toHaveLength(1);
-        expect(stateOf(rows(wrapper)[0])).toBe(label);
+        expect(stateOf(rows(wrapper)[0])).toBe(badge);
     });
 
     it('shows nothing for a booking nobody has tried to pay', () => {
@@ -102,5 +102,50 @@ describe('the payment on a booking', () => {
 
         expect(wrapper.find('h2').text()).toBe('Payment');
         expect(wrapper.text()).not.toContain('Every attempt');
+    });
+});
+
+// SD-2080. The badge showed state_label, the console's operator name for the
+// state, so a customer read "Captured" beside their own money. It is in our
+// words now, keyed off the state, like the note under it.
+describe('the payment\'s badge', () => {
+    // The console's label is replaced with one no customer should ever see, so
+    // every row proves the badge does not read it.
+    const paymentIn = (state, label = `${state} (operator wording)`) => OrderPayment.getInstance({
+        ...fixture('travel-order-view-complete').payments[0],
+        state,
+        state_label: label,
+    });
+
+    it.each([
+        ['CREATED', 'Waiting for payment'],
+        ['INITIALIZED', 'Waiting for payment'],
+        ['PENDING', 'Waiting for payment'],
+        ['REDIRECTED', 'Waiting for payment'],
+        ['AUTHORIZED', 'Paid'],
+        ['CAPTURED', 'Paid'],
+        ['FAILED', 'Didn\'t go through'],
+        ['TIMED-OUT', 'Expired'],
+        ['CANCELLED', 'Cancelled'],
+        ['REFUNDED', 'Refunded'],
+        ['PART-REFUNDED', 'Partly refunded'],
+    ])('reads a %s payment as "%s"', (state, badge) => {
+        const wrapper = render([paymentIn(state)]);
+
+        expect(stateOf(rows(wrapper)[0])).toBe(badge);
+        expect(wrapper.text()).not.toContain('operator wording');
+    });
+
+    it('never says "Captured" to a customer', () => {
+        const wrapper = render([paymentIn('CAPTURED', 'Captured')]);
+
+        expect(stateOf(rows(wrapper)[0])).toBe('Paid');
+        expect(wrapper.text()).not.toContain('Captured');
+    });
+
+    // A state the console adds later still says something.
+    it('reads a state it does not know with the console\'s label, or the state itself', () => {
+        expect(stateOf(rows(render([paymentIn('ON-HOLD', 'On hold')]))[0])).toBe('On hold');
+        expect(stateOf(rows(render([paymentIn('ON-HOLD', null)]))[0])).toBe('ON-HOLD');
     });
 });
