@@ -471,6 +471,19 @@ describe('Order.getInstance', () => {
         expect(order.isCancelled).toBe(false)
     })
 
+    // SD-2080. The hotel's confirmation stays on record after a cancellation,
+    // so the booking page needs its own date to say the stay no longer stands.
+    it('reads when the booking was cancelled, and keeps when the hotel confirmed it', () => {
+        const order = Order.getInstance(orderPayload({ state: 'CANCELLED', cancelled_at: '2026-08-18T10:05:00+00:00' }))
+
+        expect(order.cancelledAt).toBe('2026-08-18T10:05:00+00:00')
+        expect(order.confirmedAt).toBe('2026-08-17T09:14:48+00:00')
+    })
+
+    it('reads no cancellation date from a console that does not send one', () => {
+        expect(Order.getInstance(orderPayload()).cancelledAt).toBeNull()
+    })
+
     it('maps a collection', () => {
         const orders = Order.getCollection([orderPayload(), orderPayload({ id: 'ord-2' })])
 

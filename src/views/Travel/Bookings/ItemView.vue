@@ -14,6 +14,7 @@ import BookingCancellation from '@/views/Travel/Bookings/Partials/BookingCancell
 import BookingPayments from '@/views/Travel/Bookings/Partials/BookingPayments.vue';
 import DepositAccountDetails from '@/views/Travel/Bookings/Partials/DepositAccountDetails.vue';
 import HotelRating from '@/views/Travel/Hotels/Partials/HotelRating.vue';
+import PayableAtProperty from '@/views/Travel/Hotels/Partials/PayableAtProperty.vue';
 import Order from '@/models/travel/orders/order.js';
 import {getCustomerMessage, reportUnexpectedError} from '@/composables/api_utils.js';
 import {CONFIRMATION_POLL_MS, useOrderUtils} from '@/composables/travel/order_utils.js';
@@ -314,6 +315,12 @@ onUnmounted(() => {
                   <dt class="text-sm/6 text-gray-500">{{ $t('travel.confirmedByTheHotel') }}</dt>
                   <dd class="text-sm/6 font-medium text-gray-900">{{ moment(order.confirmedAt).format('lll') }}</dd>
                 </div>
+                <!-- The confirmation stays: the hotel did confirm the room. This
+                says, after it, that the booking no longer stands. -->
+                <div v-if="order.cancelledAt" class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3">
+                  <dt class="text-sm/6 text-gray-500">{{ $t('travel.cancelled') }}</dt>
+                  <dd class="text-sm/6 font-medium text-gray-900">{{ moment(order.cancelledAt).format('lll') }}</dd>
+                </div>
               </dl>
             </section>
             <!-- What was charged, as written when the booking was made -->
@@ -336,6 +343,8 @@ onUnmounted(() => {
                   <dd class="text-sm/6 font-semibold text-gray-900 tabular-nums">{{ order.total.currencyPrefixed }}</dd>
                 </div>
               </dl>
+              <!-- Not part of the total: the hotel collects this on arrival. -->
+              <PayableAtProperty :charges="order.payableAtProperty" class="border-t border-gray-100 px-5 py-3" />
             </section>
             <BookingCancellation
                 :cancellation="order.cancellation"
