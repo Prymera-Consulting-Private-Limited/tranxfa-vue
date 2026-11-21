@@ -2,6 +2,7 @@
 import {computed} from 'vue';
 import moment from 'moment';
 import {useI18n} from "vue-i18n";
+import PaymentState from '@/enums/payment_state.js';
 import CancelPaymentAction from '@/views/Travel/Bookings/Partials/CancelPaymentAction.vue';
 
 const {t} = useI18n();
@@ -65,6 +66,46 @@ function note(payment) {
 }
 
 /**
+ * The api's state_label is its operator name for the state, so a customer read
+ * "Captured" beside their own money (SD-2080). Our own words, keyed off the
+ * state like the note; a state the console adds later keeps its label.
+ *
+ * @param {OrderPayment} payment
+ * @returns {string}
+ */
+function label(payment) {
+  switch (payment.state) {
+    case PaymentState.CREATED:
+    case PaymentState.INITIALIZED:
+    case PaymentState.PENDING:
+    case PaymentState.REDIRECTED:
+      return t('travel.waitingForPayment');
+
+    case PaymentState.AUTHORIZED:
+    case PaymentState.CAPTURED:
+      return t('travel.paid');
+
+    case PaymentState.FAILED:
+      return t('travel.didntGoThrough');
+
+    case PaymentState.TIMED_OUT:
+      return t('travel.expired');
+
+    case PaymentState.CANCELLED:
+      return t('travel.cancelled');
+
+    case PaymentState.REFUNDED:
+      return t('travel.refunded');
+
+    case PaymentState.PART_REFUNDED:
+      return t('travel.partlyRefunded');
+
+    default:
+      return payment.stateLabel ?? payment.state;
+  }
+}
+
+/**
  * @param {OrderPayment} payment
  * @returns {string}
  */
@@ -100,7 +141,7 @@ function classes(payment) {
       <li v-for="payment in [shown]" :key="payment.reference" class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 py-4">
         <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-2">
-            <span :class="[classes(payment), 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ payment.stateLabel ?? payment.state }}</span>
+            <span :class="[classes(payment), 'inline-flex items-center rounded-lg px-2.5 py-1 text-xs/5 font-medium ring-1 ring-inset']">{{ label(payment) }}</span>
             <span v-if="payment.method" class="text-sm/6 text-gray-600">{{ payment.method }}</span>
           </div>
           <p v-if="note(payment)" class="mt-1.5 text-xs/5 text-gray-500">{{ note(payment) }}</p>

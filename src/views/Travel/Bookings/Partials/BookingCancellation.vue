@@ -76,6 +76,28 @@ const requestNote = computed(() => {
   }
 });
 
+// The api's state_label is its operator wording, so a cancelled booking was
+// headed "Accepted by supplier" (SD-2080). Our own words, like the note under
+// it; a state the console adds later keeps its label.
+const requestHeading = computed(() => {
+  switch (request.value?.state) {
+    case 'REQUESTED':
+      return t('travel.cancellationRequestedHeading');
+
+    case 'ACCEPTED':
+      return t('travel.cancellationAcceptedHeading');
+
+    case 'REFUSED':
+      return t('travel.cancellationRefusedHeading');
+
+    case 'UNRESOLVED':
+      return t('travel.wereChasingTheHotel');
+
+    default:
+      return request.value?.stateLabel ?? request.value?.state;
+  }
+});
+
 const requestIcon = computed(() => {
   switch (request.value?.state) {
     case 'ACCEPTED':
@@ -123,7 +145,7 @@ const requestedOn = computed(() => {
       <div :class="[requestClasses, 'flex items-start gap-3 rounded-xl border p-4']">
         <component :is="requestIcon" class="mt-0.5 size-5 shrink-0" aria-hidden="true" />
         <div class="min-w-0">
-          <p class="text-sm/6 font-medium text-gray-900">{{ request.stateLabel ?? request.state }}</p>
+          <p class="text-sm/6 font-medium text-gray-900">{{ requestHeading }}</p>
           <p class="mt-1 text-sm/6 text-gray-600">{{ requestNote }}</p>
           <p v-if="requestedOn" class="mt-1.5 text-xs/5 text-gray-500">{{ $t('travel.cancellationRequested', {requestedOn: requestedOn}) }}</p>
         </div>
