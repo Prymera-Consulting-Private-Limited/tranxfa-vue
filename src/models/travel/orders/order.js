@@ -5,6 +5,7 @@ import OrderCancellation from "@/models/travel/orders/order_cancellation.js";
 import OrderConfirmation from "@/models/travel/orders/order_confirmation.js";
 import OrderHotel from "@/models/travel/orders/order_hotel.js";
 import OrderPayment from "@/models/travel/orders/order_payment.js";
+import PropertyCharge from "@/models/travel/property_charge.js";
 
 /**
  * One hotel booking. The list and the single-booking endpoint return the same
@@ -132,6 +133,15 @@ class Order {
     confirmedAt = null;
 
     /**
+     * When the booking was cancelled, or null while it stands. confirmedAt is
+     * kept after a cancellation, because the hotel did confirm the room, so
+     * this is what says the booking no longer stands (SD-2080).
+     *
+     * @type {string|null}
+     */
+    cancelledAt = null;
+
+    /**
      * @type {Money|null}
      */
     total = null;
@@ -164,6 +174,14 @@ class Order {
      * @type {Array<{key: string, label: string, includedIn: string|null, amount: Money, amountWithIncluded: Money}>}
      */
     breakdown = [];
+
+    /**
+     * Not part of the total: the hotel collects these on arrival, each in its own
+     * currency. Empty when nothing is owed.
+     *
+     * @type {PropertyCharge[]}
+     */
+    payableAtProperty = [];
 
     /**
      * @type {OrderPayment[]}
@@ -297,6 +315,7 @@ class Order {
         order.occupancy = data.occupancy ?? null;
         order.isConfirmed = data.is_confirmed ?? false;
         order.confirmedAt = data.confirmed_at ?? null;
+        order.cancelledAt = data.cancelled_at ?? null;
         order.total = Money.getInstance(data, 'total');
 
         if (data.cancellation) {
@@ -320,6 +339,7 @@ class Order {
             amount: Money.getInstance(line, 'amount'),
             amountWithIncluded: Money.getInstance(line, 'amount_with_included'),
         }));
+        order.payableAtProperty = PropertyCharge.getCollection(data.payable_at_property);
 
         order.payments = OrderPayment.getCollection(data.payments ?? []);
         order.openPayment = data.open_payment ? OrderPayment.getInstance(data.open_payment) : null;

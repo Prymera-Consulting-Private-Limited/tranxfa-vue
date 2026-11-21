@@ -274,6 +274,7 @@ captured:
 | `travel-order-view-awaiting-payment` | Order view of an order opened and not paid: `CREATED`, "Awaiting Payment", `is_paid` false, `next_step` `pay` "Pay to Book", `fulfilment.state` `CREATED` (SD-1282) | Pay-first is not on staging yet |
 | `travel-order-view-booking-your-room` | Order view of a paid order being booked: `CONFIRMED`, "Booking Your Room", `is_paid` true, `fulfilment.state` `PROCESSING` | As above |
 | `travel-order-view-undelivered` | Order view of a paid order the hotel could not provide: `CONFIRMED`, "Booking Failed", `is_paid` true, `next_step` null, `fulfilment.state` `UNDELIVERED`. The order's `state` is the same as the one above; only `fulfilment` tells them apart | As above |
+| `travel-order-view-cancelled` | Order view of a paid booking the hotel confirmed and the customer then cancelled: `CANCELLED`, "Your booking has been cancelled", `is_confirmed` true with its `confirmed_at` kept, `cancelled_at` set, `payable_at_property` empty (SD-2080) | Not captured on a console carrying SD-2080 yet |
 
 The two hand-written order views listed `guests` as a bare array of rooms.
 The api sends `{"rooms": [...]}`, as the capture shows, and they now do too;
@@ -287,6 +288,19 @@ likely to differ. What the console sends in `cancellation` for an order it never
 booked is not known either: the fixture says `can_cancel_now` true with no quote,
 and the spec also tries a free quote. Re-capture all three once SD-1282 and its
 follow-up are on staging, and delete this note.
+
+`travel-order-view-cancelled` is `travel-order-view-complete` edited by hand to
+the console's SD-2080 shape (console.remitso #1396, `HotelOrderPresenter` and
+its `HotelBookingViewApiTest` on `develop`). Only these changed: `state`,
+`state_label` and `state_description` take the console's cancelled wording
+(`lang/en/message.php`); `cancelled_at` is added after `confirmed_at`, which
+keeps its value; `payable_at_property` is added as `[]`, as the console sends
+it for every cancelled booking; and `cancellation` holds an `ACCEPTED` request
+with `can_cancel_now` false and no quote, in `OrderViewController`'s shape. The
+amounts are the booking's own: it was non-refundable, so nothing is owed back.
+`travel-order-view-complete` is left as captured, without either new key, which
+is what a console older than SD-2080 sends. Re-capture by cancelling a booking
+on a staging console that carries SD-2080, and delete this paragraph.
 
 PayID cannot be captured at all: the provider's sandbox refuses it. Nothing
 here is a PayID payment, and nothing in the app assumes which rail's

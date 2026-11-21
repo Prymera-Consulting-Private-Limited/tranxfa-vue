@@ -3,6 +3,7 @@ import {mount} from "@vue/test-utils";
 import PropertyCharge from "@/models/travel/property_charge.js";
 import HotelRate from "@/models/travel/hotels/hotel_rate.js";
 import TravelQuote from "@/models/travel/quote.js";
+import Order from "@/models/travel/orders/order.js";
 import PayableAtProperty from "@/views/Travel/Hotels/Partials/PayableAtProperty.vue";
 import HotelRooms from "@/views/Travel/Hotels/Partials/HotelRooms.vue";
 import HotelPrice from "@/views/Travel/Hotels/Partials/HotelPrice.vue";
@@ -102,6 +103,19 @@ describe('payable_at_property on the models that carry it', () => {
         const quote = TravelQuote.getInstance({id: 'q-1', payable_at_property: charges()});
 
         expect(quote.payableAtProperty.map(charge => charge.amount.currencyPrefixed)).toEqual(['USD 15.00', 'JPY 4,000']);
+    });
+
+    // SD-2080. The supplier asked for them on the booking page as well.
+    it('is a list of charges on a booking, as on the quote', () => {
+        const order = Order.getInstance({id: 'ord-1', payable_at_property: charges()});
+
+        expect(order.payableAtProperty).toHaveLength(2);
+        expect(order.payableAtProperty[0]).toBeInstanceOf(PropertyCharge);
+        expect(order.payableAtProperty.map(charge => charge.amount.currencyPrefixed)).toEqual(['USD 15.00', 'JPY 4,000']);
+    });
+
+    it('owes nothing on a booking from a console that does not send them', () => {
+        expect(Order.getInstance({id: 'ord-1'}).payableAtProperty).toEqual([]);
     });
 });
 
